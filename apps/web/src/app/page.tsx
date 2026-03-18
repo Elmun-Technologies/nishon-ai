@@ -11,7 +11,7 @@ export default function LandingPage() {
     <div className="min-h-screen bg-[#0A0A0F] text-white selection:bg-[#7C3AED]/30">
       
       {/* ── Navigation Header ── */}
-<!-- [Navigation bar with logo, login/register buttons] -->
+      {/* [Navigation bar with logo, login/register buttons] */}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#2A2A3A] bg-[#0A0A0F]/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -31,7 +31,7 @@ export default function LandingPage() {
       </nav>
 
       {/* ── Hero Section ── */}
-<!-- [Hero section with main heading, CTA, and AI status indicator] -->
+      {/* [Hero section with main heading, CTA, and AI status indicator] */}
       <main className="pt-40 pb-20 px-6">
         <div className="max-w-5xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-[#7C3AED]/10 border border-[#7C3AED]/20 rounded-full px-5 py-2 mb-8 animate-fade-in">
@@ -65,7 +65,7 @@ export default function LandingPage() {
         </div>
 
         {/* ── Visual Proof Section ── */}
-<!-- [Visual metric cards for ROAS, CPA, and scale improvements] -->
+        {/* [Visual metric cards for ROAS, CPA, and scale improvements] */}
         <div className="max-w-7xl mx-auto mt-32 grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card variant="outlined" padding="lg" className="bg-[#13131A] group hover:border-[#7C3AED]/40 transition-all duration-500">
             <div className="p-2 mb-4">
@@ -102,7 +102,7 @@ export default function LandingPage() {
         </div>
 
         {/* ── Testimonial ── */}
-<!-- [Testimonial from a CEO customer] -->
+        {/* [Testimonial from a CEO customer] */}
         <div className="max-w-4xl mx-auto mt-32">
           <div className="relative p-8 md:p-12 rounded-3xl bg-gradient-to-br from-[#13131A] to-[#0A0A0F] border border-[#2A2A3A] overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-[#7C3AED]/5 blur-[100px] rounded-full" />
@@ -125,7 +125,7 @@ export default function LandingPage() {
       </main>
 
       {/* ── Footer ── */}
-<!-- [Simple footer with copyright] -->
+      {/* [Simple footer with copyright] */}
       <footer className="py-12 border-t border-[#2A2A3A] text-center">
         <p className="text-[#4B5563] text-sm">
           © 2025 Nishon AI. All rights reserved. Built for professional advertisers.
