@@ -1,0 +1,202 @@
+import {
+  Injectable, Logger, NotFoundException, BadRequestException,
+} from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
+import { ConfigService } from '@nestjs/config'
+import * as crypto from 'crypto'
+import { ConnectedAccount } from './entities/connected-account.entity'
+import { Workspace } from '../workspaces/entities/workspace.entity'
+import { MetaConnector } from './connectors/meta.connector'
+import { Platform } from '@nishon/shared'
+
+/**
+ * PlatformsService manages the lifecycle of connected ad accounts.
+ *
+ * The most sensitive responsibility here is token encryption.
+ * OAuth tokens are like passwords — if someone gets them, they can
+ * spend money on the user's behalf. We encrypt them with AES-256
+ * before storing in the database. Even if the database is breached,
+ * the attacker gets only ciphertext, not usable tokens.
+ */
+@Injectable()
+export class PlatformsService {
+  private readonly logger = new Logger(PlatformsService.name)
+  private readonly encryptionKey: Buffer
+
+  constructor(
+    @InjectRepository(ConnectedAccount)
+    private readonly accountRepo: Repository<ConnectedAccount>,
+    @InjectRepository(Workspace)
+    private readonly workspaceRepo: Repository<Workspace>,
+    private readonly metaConnector: MetaConnector,
+    private readonly config: ConfigService,
+  ) {
+    // Encryption key must be exactly 32 bytes for AES-256
+    const key = this.config.get<string>('ENCRYPTION_KEY', '')
+    if (key.length !== 32) {
+      throw new Error('ENCRYPTION_KEY must be exactly 32 characters')
+    }
+    this.encryptionKey = Buffer.from(key, 'utf8')
+  }
+
+  // ─── META OAUTH FLOW ──────────────────────────────────────────────────────
+
+  getMetaOAuthUrl(workspaceId: string): string {
+    return this.metaConnector.getOAuthUrl(workspaceId)
+  }
+
+  /**
+   * Handle the OAuth callback from Meta.
+   * This is the critical step where we get the access token and save it.
+   *
+   * Flow:
+   * 1. User approved on Facebook → Meta redirects here with ?code=XXX&state=YYY
+   * 2. We decode state to get workspaceId
+   * 3. We exchange the code for an access token
+   * 4. We get the list of ad accounts
+   * 5. We save the token (encrypted) to the database
+   */
+  async handleMetaCallback(
+    code: string,
+    state: string,
+  ): Promise<{ workspaceId: string; accounts: any[] }> {
+    let workspaceId: string
+
+    try {
+      const decoded = JSON.parse(Buffer.from(state, 'base64').toString('utf8'))
+      workspaceId = decoded.workspaceId
+    } catch {
+      throw new BadRequestException('Invalid state parameter')
+    }
+
+    const workspace = await this.workspaceRepo.findOne({ where: { id: workspaceId } })
+    if (!workspace) throw new NotFoundException('Workspace not found')
+
+    // Exchange code for token
+    const { accessToken, expiresAt } = await this.metaConnector.exchangeCodeForToken(code)
+
+    // Get available ad accounts
+    const accounts = await this.metaConnector.getAdAccounts(accessToken)
+
+    // Save the token temporarily — user still needs to select which account to use
+    // We store it on the workspace temporarily via a pending connected account
+    const encryptedToken = this.encrypt(accessToken)
+
+    // Create a pending connected account — user selects their ad account in next step
+    await this.accountRepo.save(
+      this.accountRepo.create({
+        workspaceId,
+        platform: Platform.META,
+        accessToken: encryptedToken,
+        externalAccountId: 'pending',
+        externalAccountName: 'Pending account selection',
+        isActive: false,
+        tokenExpiresAt: expiresAt,
+      }),
+    )
+
+    return { workspaceId, accounts }
+  }
+
+  /**
+   * User selects which ad account to use after OAuth.
+   * This finalizes the connection.
+   */
+  async selectMetaAdAccount(
+    workspaceId: string,
+    adAccountId: string,
+    adAccountName: string,
+  ): Promise<ConnectedAccount> {
+    const pendingAccount = await this.accountRepo.findOne({
+      where: { workspaceId, platform: Platform.META, externalAccountId: 'pending' },
+    })
+
+    if (!pendingAccount) {
+      throw new NotFoundException('No pending Meta connection found. Please reconnect.')
+    }
+
+    pendingAccount.externalAccountId = adAccountId
+    pendingAccount.externalAccountName = adAccountName
+    pendingAccount.isActive = true
+
+    return this.accountRepo.save(pendingAccount)
+  }
+
+  /**
+   * Get the decrypted access token for a workspace's connected platform account.
+   * This is called by connectors when they need to make API calls.
+   */
+  async getDecryptedToken(
+    workspaceId: string,
+    platform: Platform,
+  ): Promise<{ token: string; accountId: string }> {
+    const account = await this.accountRepo.findOne({
+      where: { workspaceId, platform, isActive: true },
+    })
+
+    if (!account) {
+      throw new NotFoundException(
+        `No active ${platform} account connected to this workspace`,
+      )
+    }
+
+    return {
+      token: this.decrypt(account.accessToken),
+      accountId: account.externalAccountId,
+    }
+  }
+
+  async getConnectedAccounts(workspaceId: string): Promise<ConnectedAccount[]> {
+    return this.accountRepo.find({
+      where: { workspaceId },
+      // Never return the tokens — even encrypted ones
+      select: ['id', 'platform', 'externalAccountId', 'externalAccountName', 'isActive', 'tokenExpiresAt', 'createdAt'],
+    })
+  }
+
+  async disconnectAccount(workspaceId: string, accountId: string): Promise<void> {
+    const account = await this.accountRepo.findOne({
+      where: { id: accountId, workspaceId },
+    })
+    if (!account) throw new NotFoundException('Connected account not found')
+    await this.accountRepo.remove(account)
+  }
+
+  // ─── ENCRYPTION HELPERS ───────────────────────────────────────────────────
+
+  /**
+   * Encrypt a string using AES-256-GCM.
+   * We use GCM mode (not CBC) because it provides authentication —
+   * it detects if the ciphertext was tampered with.
+   * The output format is: iv:authTag:encrypted (all hex encoded)
+   */
+  private encrypt(text: string): string {
+    const iv = crypto.randomBytes(16)
+    const cipher = crypto.createCipheriv('aes-256-gcm', this.encryptionKey, iv)
+
+    let encrypted = cipher.update(text, 'utf8', 'hex')
+    encrypted += cipher.final('hex')
+    const authTag = cipher.getAuthTag().toString('hex')
+
+    return `${iv.toString('hex')}:${authTag}:${encrypted}`
+  }
+
+  private decrypt(encryptedText: string): string {
+    const [ivHex, authTagHex, encrypted] = encryptedText.split(':')
+
+    if (!ivHex || !authTagHex || !encrypted) {
+      throw new Error('Invalid encrypted token format')
+    }
+
+    const iv = Buffer.from(ivHex, 'hex')
+    const authTag = Buffer.from(authTagHex, 'hex')
+    const decipher = crypto.createDecipheriv('aes-256-gcm', this.encryptionKey, iv)
+    decipher.setAuthTag(authTag)
+
+    let decrypted = decipher.update(encrypted, 'hex', 'utf8')
+    decrypted += decipher.final('utf8')
+
+    return decrypted
+  }
+}
