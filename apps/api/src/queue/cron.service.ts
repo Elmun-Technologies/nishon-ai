@@ -1,6 +1,6 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
-import { Cron, CronExpression } from '@nestjs/schedule'
-import { QueueService } from './queue.service'
+import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
+import { Cron, CronExpression } from "@nestjs/schedule";
+import { QueueService } from "./queue.service";
 
 /**
  * CronService defines all scheduled tasks in the system.
@@ -15,12 +15,12 @@ import { QueueService } from './queue.service'
  */
 @Injectable()
 export class CronService implements OnModuleInit {
-  private readonly logger = new Logger(CronService.name)
+  private readonly logger = new Logger(CronService.name);
 
   constructor(private readonly queueService: QueueService) {}
 
   onModuleInit() {
-    this.logger.log('CronService initialized — scheduled tasks are active')
+    this.logger.log("CronService initialized — scheduled tasks are active");
   }
 
   /**
@@ -28,20 +28,20 @@ export class CronService implements OnModuleInit {
    * This is the core autonomous feature — without this cron job,
    * the platform is just a dashboard. With it, it becomes an agent.
    */
-  @Cron('0 */2 * * *') // Every 2 hours at minute 0
+  @Cron("0 */2 * * *") // Every 2 hours at minute 0
   async runOptimizationCycle(): Promise<void> {
-    this.logger.log('Cron: Starting 2-hour optimization cycle')
-    await this.queueService.scheduleOptimizationForAllWorkspaces()
+    this.logger.log("Cron: Starting 2-hour optimization cycle");
+    await this.queueService.scheduleOptimizationForAllWorkspaces();
   }
 
   /**
    * Send daily Telegram reports at 9:00 AM every day.
    * Tashkent timezone (UTC+5) — 4:00 AM UTC.
    */
-  @Cron('0 4 * * *') // 4:00 AM UTC = 9:00 AM Tashkent (UTC+5)
+  @Cron("0 4 * * *") // 4:00 AM UTC = 9:00 AM Tashkent (UTC+5)
   async sendDailyReports(): Promise<void> {
-    this.logger.log('Cron: Sending daily Telegram reports')
-    await this.queueService.scheduleDailyReportsForAllWorkspaces()
+    this.logger.log("Cron: Sending daily Telegram reports");
+    await this.queueService.scheduleDailyReportsForAllWorkspaces();
   }
 
   /**
@@ -50,7 +50,7 @@ export class CronService implements OnModuleInit {
    */
   @Cron(CronExpression.EVERY_HOUR)
   async syncPlatformMetrics(): Promise<void> {
-    this.logger.log('Cron: Hourly platform metrics sync')
+    this.logger.log("Cron: Hourly platform metrics sync");
     // TODO: Schedule sync jobs for all active workspaces
   }
 }

@@ -1,12 +1,12 @@
-import { Processor, Process, OnQueueFailed } from '@nestjs/bull'
-import { Logger } from '@nestjs/common'
-import { Job } from 'bull'
-import { QUEUE_NAMES } from '../queue.module'
+import { Processor, Process, OnQueueFailed } from "@nestjs/bull";
+import { Logger } from "@nestjs/common";
+import { Job } from "bull";
+import { QUEUE_NAMES } from "../queue.constants";
 
 interface CampaignSyncJobData {
-  workspaceId: string
-  platform: string
-  campaignId?: string
+  workspaceId: string;
+  platform: string;
+  campaignId?: string;
 }
 
 /**
@@ -22,24 +22,28 @@ interface CampaignSyncJobData {
  */
 @Processor(QUEUE_NAMES.CAMPAIGN_SYNC)
 export class CampaignSyncProcessor {
-  private readonly logger = new Logger(CampaignSyncProcessor.name)
+  private readonly logger = new Logger(CampaignSyncProcessor.name);
 
-  @Process('sync-campaign-metrics')
+  @Process("sync-campaign-metrics")
   async handleCampaignSync(job: Job<CampaignSyncJobData>): Promise<void> {
-    const { workspaceId, platform, campaignId } = job.data
-    this.logger.log(`Syncing ${platform} metrics for workspace: ${workspaceId}`)
+    const { workspaceId, platform } = job.data;
+    this.logger.log(
+      `Syncing ${platform} metrics for workspace: ${workspaceId}`,
+    );
 
     // TODO: Route to appropriate platform connector
     // if (platform === 'meta') await this.metaConnector.syncMetrics(campaignId)
     // if (platform === 'google') await this.googleConnector.syncMetrics(campaignId)
 
-    this.logger.log(`Sync complete for ${platform} — workspace: ${workspaceId}`)
+    this.logger.log(
+      `Sync complete for ${platform} — workspace: ${workspaceId}`,
+    );
   }
 
-  @Process('sync-all-platforms')
+  @Process("sync-all-platforms")
   async handleFullSync(job: Job<CampaignSyncJobData>): Promise<void> {
-    const { workspaceId } = job.data
-    this.logger.log(`Full platform sync for workspace: ${workspaceId}`)
+    const { workspaceId } = job.data;
+    this.logger.log(`Full platform sync for workspace: ${workspaceId}`);
     // TODO: Sync all connected platforms in parallel
   }
 
@@ -47,6 +51,6 @@ export class CampaignSyncProcessor {
   onFailed(job: Job, error: Error): void {
     this.logger.error(
       `Sync job failed for workspace ${job.data.workspaceId}: ${error.message}`,
-    )
+    );
   }
 }

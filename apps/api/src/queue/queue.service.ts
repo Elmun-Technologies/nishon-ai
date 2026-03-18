@@ -1,10 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common'
-import { InjectQueue } from '@nestjs/bull'
-import { Queue } from 'bull'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import { Workspace } from '../workspaces/entities/workspace.entity'
-import { QUEUE_NAMES } from './queue.module'
+import { Injectable, Logger } from "@nestjs/common";
+import { InjectQueue } from "@nestjs/bull";
+import { Queue } from "bull";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { Workspace } from "../workspaces/entities/workspace.entity";
+import { QUEUE_NAMES } from "./queue.constants";
 
 /**
  * QueueService is the entry point for scheduling background jobs.
@@ -19,7 +19,7 @@ import { QUEUE_NAMES } from './queue.module'
  */
 @Injectable()
 export class QueueService {
-  private readonly logger = new Logger(QueueService.name)
+  private readonly logger = new Logger(QueueService.name);
 
   constructor(
     @InjectQueue(QUEUE_NAMES.OPTIMIZATION) private optimizationQueue: Queue,
@@ -37,20 +37,22 @@ export class QueueService {
   async scheduleOptimizationForAllWorkspaces(): Promise<void> {
     const workspaces = await this.workspaceRepo.find({
       where: { isOnboardingComplete: true },
-    })
+    });
 
-    this.logger.log(`Scheduling optimization for ${workspaces.length} workspaces`)
+    this.logger.log(
+      `Scheduling optimization for ${workspaces.length} workspaces`,
+    );
 
     for (const workspace of workspaces) {
       await this.optimizationQueue.add(
-        'run-optimization',
+        "run-optimization",
         { workspaceId: workspace.id },
         {
           // Stagger jobs 5 seconds apart to avoid hammering OpenAI API
           delay: workspaces.indexOf(workspace) * 5000,
           jobId: `optimization-${workspace.id}-${Date.now()}`,
         },
-      )
+      );
     }
   }
 
@@ -61,14 +63,14 @@ export class QueueService {
   async scheduleDailyReportsForAllWorkspaces(): Promise<void> {
     const workspaces = await this.workspaceRepo.find({
       where: { isOnboardingComplete: true },
-    })
+    });
 
     for (const workspace of workspaces) {
       await this.reportsQueue.add(
-        'send-daily-report',
+        "send-daily-report",
         { workspaceId: workspace.id },
         { delay: workspaces.indexOf(workspace) * 2000 },
-      )
+      );
     }
   }
 
@@ -78,11 +80,11 @@ export class QueueService {
    */
   async scheduleOptimizationNow(workspaceId: string): Promise<void> {
     await this.optimizationQueue.add(
-      'run-optimization',
+      "run-optimization",
       { workspaceId },
       { priority: 1 }, // High priority — user is waiting
-    )
-    this.logger.log(`Immediate optimization scheduled for: ${workspaceId}`)
+    );
+    this.logger.log(`Immediate optimization scheduled for: ${workspaceId}`);
   }
 
   /**
@@ -93,10 +95,14 @@ export class QueueService {
       this.optimizationQueue.getWaitingCount(),
       this.optimizationQueue.getActiveCount(),
       this.optimizationQueue.getFailedCount(),
-    ])
+    ]);
 
     return {
-      optimization: { waiting: optWaiting, active: optActive, failed: optFailed },
-    }
+      optimization: {
+        waiting: optWaiting,
+        active: optActive,
+        failed: optFailed,
+      },
+    };
   }
 }

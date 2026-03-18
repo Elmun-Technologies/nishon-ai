@@ -1,14 +1,18 @@
 import {
-  Entity, PrimaryGeneratedColumn, Column,
-  CreateDateColumn, UpdateDateColumn,
-  ManyToOne, JoinColumn
-} from 'typeorm'
-import { Workspace } from '../../workspaces/entities/workspace.entity'
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from "typeorm";
+import { Workspace } from "../../workspaces/entities/workspace.entity";
 
 export enum BudgetPeriod {
-  DAILY = 'daily',
-  WEEKLY = 'weekly',
-  MONTHLY = 'monthly',
+  DAILY = "daily",
+  WEEKLY = "weekly",
+  MONTHLY = "monthly",
 }
 
 /**
@@ -17,35 +21,37 @@ export enum BudgetPeriod {
  * When autoRebalance is true, the AI can shift budget between platforms
  * based on performance without asking for human approval.
  */
-@Entity('budgets')
+@Entity("budgets")
 export class Budget {
-  @PrimaryGeneratedColumn('uuid')
-  id: string
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
-  totalBudget: number
+  @Column({ type: "decimal", precision: 10, scale: 2, nullable: true })
+  totalBudget: number | null;
 
-  @Column({ type: 'jsonb' })
+  @Column({ type: "jsonb", nullable: true })
   // e.g. { "meta": 60, "google": 40 } — percentages, must sum to 100
-  platformSplit: Record<string, number>
+  platformSplit: Record<string, number> | null;
 
-  @Column({ type: 'enum', enum: BudgetPeriod, default: BudgetPeriod.MONTHLY })
-  period: BudgetPeriod
+  @Column({ type: "enum", enum: BudgetPeriod, default: BudgetPeriod.MONTHLY })
+  period: BudgetPeriod;
 
   @Column({ default: true })
   // If true, AI can rebalance platform split automatically based on ROAS
-  autoRebalance: boolean
+  autoRebalance: boolean;
 
   @CreateDateColumn()
-  createdAt: Date
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date
+  updatedAt: Date;
 
-  @ManyToOne(() => Workspace, (workspace) => workspace.budgets, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'workspace_id' })
-  workspace: Workspace
+  @ManyToOne(() => Workspace, (workspace) => workspace.budgets, {
+    onDelete: "CASCADE",
+  })
+  @JoinColumn({ name: "workspace_id" })
+  workspace: Workspace;
 
-  @Column({ name: 'workspace_id' })
-  workspaceId: string
+  @Column({ name: "workspace_id", nullable: true })
+  workspaceId: string | null;
 }

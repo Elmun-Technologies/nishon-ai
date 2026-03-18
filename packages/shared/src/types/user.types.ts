@@ -21,9 +21,3 @@ export interface IUser {
 export interface IUserWithWorkspaces extends IUser {
   workspaces: IWorkspace[]
 }
-
-// Importing here would cause circular — define inline
-export interface IWorkspace {
-  id: string
-  name: string
-}

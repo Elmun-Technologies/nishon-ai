@@ -1,16 +1,16 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common'
-import { PassportStrategy } from '@nestjs/passport'
-import { ExtractJwt, Strategy } from 'passport-jwt'
-import { ConfigService } from '@nestjs/config'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import { User } from '../../users/entities/user.entity'
+import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { PassportStrategy } from "@nestjs/passport";
+import { ExtractJwt, Strategy } from "passport-jwt";
+import { ConfigService } from "@nestjs/config";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { User } from "../../users/entities/user.entity";
 
 interface JwtPayload {
-  sub: string    // user ID
-  email: string
-  iat: number    // issued at
-  exp: number    // expires at
+  sub: string; // user ID
+  email: string;
+  iat: number; // issued at
+  exp: number; // expires at
 }
 
 /**
@@ -26,24 +26,30 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
   ) {
+    const jwtSecret =
+      config.get<string>("JWT_SECRET") ||
+      "your-super-secret-jwt-key-change-in-production";
+    console.log("JWT_SECRET from config:", jwtSecret);
+    console.log("JWT_SECRET length:", jwtSecret?.length);
+
     super({
       // Extract JWT from the Authorization: Bearer header
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       // Automatically reject expired tokens
       ignoreExpiration: false,
-      secretOrKey: config.get<string>('JWT_SECRET'),
-    })
+      secretOrKey: jwtSecret,
+    });
   }
 
   async validate(payload: JwtPayload): Promise<User> {
-    const user = await this.userRepo.findOne({ where: { id: payload.sub } })
+    const user = await this.userRepo.findOne({ where: { id: payload.sub } });
 
     if (!user) {
       // User was deleted after token was issued
-      throw new UnauthorizedException('User no longer exists')
+      throw new UnauthorizedException("User no longer exists");
     }
 
     // This return value becomes req.user in every controller that uses @UseGuards(AuthGuard('jwt'))
-    return user
+    return user;
   }
 }

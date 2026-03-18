@@ -1,5 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
+import { Injectable, Logger } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 
 /**
  * TiktokConnector — TikTok Ads API integration.
@@ -17,17 +17,17 @@ import { ConfigService } from '@nestjs/config'
  */
 @Injectable()
 export class TiktokConnector {
-  private readonly logger = new Logger(TiktokConnector.name)
+  private readonly logger = new Logger(TiktokConnector.name);
 
   constructor(private readonly config: ConfigService) {}
 
-  getOAuthUrl(workspaceId: string): string {
+  getOAuthUrl(): string {
     // TODO: Implement TikTok OAuth
-    return ''
+    return "";
   }
 
-  async createCampaign(params: any): Promise<{ id: string }> {
+  async createCampaign(): Promise<{ id: string }> {
     // TODO: Implement TikTok campaign creation
-    return { id: 'tiktok-stub-id' }
+    return { id: "tiktok-stub-id" };
   }
 }

@@ -2,13 +2,17 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
-} from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import { Workspace } from './entities/workspace.entity'
-import { Budget } from '../budget/entities/budget.entity'
-import { BudgetPeriod } from '../budget/entities/budget.entity'
-import { CreateWorkspaceDto, UpdateWorkspaceDto, UpdateAutopilotDto } from '@nishon/shared'
+} from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { Workspace } from "./entities/workspace.entity";
+import { Budget } from "../budget/entities/budget.entity";
+import { BudgetPeriod } from "../budget/entities/budget.entity";
+import {
+  CreateWorkspaceDto,
+  UpdateWorkspaceDto,
+  UpdateAutopilotDto,
+} from "@nishon/shared";
 
 @Injectable()
 export class WorkspacesService {
@@ -29,9 +33,9 @@ export class WorkspacesService {
       ...dto,
       userId,
       isOnboardingComplete: false,
-    })
+    });
 
-    const saved = await this.workspaceRepo.save(workspace)
+    const saved = await this.workspaceRepo.save(workspace);
 
     // Auto-create default budget allocation when workspace is created
     const budget = this.budgetRepo.create({
@@ -40,10 +44,10 @@ export class WorkspacesService {
       period: BudgetPeriod.MONTHLY,
       platformSplit: { meta: 60, google: 40 },
       autoRebalance: true,
-    })
+    });
 
-    await this.budgetRepo.save(budget)
-    return saved
+    await this.budgetRepo.save(budget);
+    return saved;
   }
 
   /**
@@ -53,9 +57,9 @@ export class WorkspacesService {
   async findAllByUser(userId: string): Promise<Workspace[]> {
     return this.workspaceRepo.find({
       where: { userId },
-      relations: ['connectedAccounts', 'budgets'],
-      order: { createdAt: 'DESC' },
-    })
+      relations: ["connectedAccounts", "budgets"],
+      order: { createdAt: "DESC" },
+    });
   }
 
   /**
@@ -65,19 +69,19 @@ export class WorkspacesService {
   async findOne(id: string, userId: string): Promise<Workspace> {
     const workspace = await this.workspaceRepo.findOne({
       where: { id },
-      relations: ['connectedAccounts', 'budgets', 'campaigns'],
-    })
+      relations: ["connectedAccounts", "budgets", "campaigns"],
+    });
 
     if (!workspace) {
-      throw new NotFoundException(`Workspace not found`)
+      throw new NotFoundException(`Workspace not found`);
     }
 
     // Security check — verify the requesting user owns this workspace
     if (workspace.userId !== userId) {
-      throw new ForbiddenException(`You do not have access to this workspace`)
+      throw new ForbiddenException(`You do not have access to this workspace`);
     }
 
-    return workspace
+    return workspace;
   }
 
   /**
@@ -88,9 +92,9 @@ export class WorkspacesService {
     userId: string,
     dto: UpdateWorkspaceDto,
   ): Promise<Workspace> {
-    const workspace = await this.findOne(id, userId)
-    Object.assign(workspace, dto)
-    return this.workspaceRepo.save(workspace)
+    const workspace = await this.findOne(id, userId);
+    Object.assign(workspace, dto);
+    return this.workspaceRepo.save(workspace);
   }
 
   /**
@@ -102,10 +106,10 @@ export class WorkspacesService {
     userId: string,
     aiStrategy: Record<string, any>,
   ): Promise<Workspace> {
-    const workspace = await this.findOne(id, userId)
-    workspace.isOnboardingComplete = true
-    workspace.aiStrategy = aiStrategy
-    return this.workspaceRepo.save(workspace)
+    const workspace = await this.findOne(id, userId);
+    workspace.isOnboardingComplete = true;
+    workspace.aiStrategy = aiStrategy;
+    return this.workspaceRepo.save(workspace);
   }
 
   /**
@@ -118,9 +122,9 @@ export class WorkspacesService {
     userId: string,
     dto: UpdateAutopilotDto,
   ): Promise<Workspace> {
-    const workspace = await this.findOne(id, userId)
-    workspace.autopilotMode = dto.mode
-    return this.workspaceRepo.save(workspace)
+    const workspace = await this.findOne(id, userId);
+    workspace.autopilotMode = dto.mode;
+    return this.workspaceRepo.save(workspace);
   }
 
   /**
@@ -128,15 +132,15 @@ export class WorkspacesService {
    * Aggregates spend, conversions, and ROAS across all campaigns.
    */
   async getPerformanceSummary(id: string, userId: string) {
-    await this.findOne(id, userId) // verify ownership
+    await this.findOne(id, userId); // verify ownership
 
     const result = await this.workspaceRepo
-      .createQueryBuilder('workspace')
-      .leftJoin('workspace.campaigns', 'campaign')
-      .leftJoin('campaign.adSets', 'adSet')
-      .leftJoin('adSet.ads', 'ad')
-      .leftJoin('ad.metrics', 'metric')
-      .where('workspace.id = :id', { id })
+      .createQueryBuilder("workspace")
+      .leftJoin("workspace.campaigns", "campaign")
+      .leftJoin("campaign.adSets", "adSet")
+      .leftJoin("adSet.ads", "ad")
+      .leftJoin("ad.metrics", "metric")
+      .where("workspace.id = :id", { id })
       .select([
         'COALESCE(SUM(metric.spend), 0) AS "totalSpend"',
         'COALESCE(SUM(metric.conversions), 0) AS "totalConversions"',
@@ -145,10 +149,10 @@ export class WorkspacesService {
         'COALESCE(SUM(metric.impressions), 0) AS "totalImpressions"',
         'COUNT(DISTINCT campaign.id) AS "campaignCount"',
       ])
-      .getRawOne()
+      .getRawOne();
 
-    const totalSpend = parseFloat(result.totalSpend) || 0
-    const totalRevenue = parseFloat(result.totalRevenue) || 0
+    const totalSpend = parseFloat(result.totalSpend) || 0;
+    const totalRevenue = parseFloat(result.totalRevenue) || 0;
 
     return {
       totalSpend,
@@ -158,11 +162,11 @@ export class WorkspacesService {
       totalImpressions: parseInt(result.totalImpressions) || 0,
       campaignCount: parseInt(result.campaignCount) || 0,
       overallRoas: totalSpend > 0 ? totalRevenue / totalSpend : 0,
-    }
+    };
   }
 
   async delete(id: string, userId: string): Promise<void> {
-    const workspace = await this.findOne(id, userId)
-    await this.workspaceRepo.remove(workspace)
+    const workspace = await this.findOne(id, userId);
+    await this.workspaceRepo.remove(workspace);
   }
 }

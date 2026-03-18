@@ -1,14 +1,19 @@
 import {
-  Entity, PrimaryGeneratedColumn, Column,
-  CreateDateColumn, UpdateDateColumn,
-  ManyToOne, OneToMany, JoinColumn
-} from 'typeorm'
-import { User } from '../../users/entities/user.entity'
-import { Campaign } from '../../campaigns/entities/campaign.entity'
-import { ConnectedAccount } from '../../platforms/entities/connected-account.entity'
-import { AiDecision } from '../../ai-decisions/entities/ai-decision.entity'
-import { Budget } from '../../budget/entities/budget.entity'
-import { AutopilotMode, CampaignObjective } from '@nishon/shared'
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+} from "typeorm";
+import { User } from "../../users/entities/user.entity";
+import { Campaign } from "../../campaigns/entities/campaign.entity";
+import { ConnectedAccount } from "../../platforms/entities/connected-account.entity";
+import { AiDecision } from "../../ai-decisions/entities/ai-decision.entity";
+import { Budget } from "../../budget/entities/budget.entity";
+import { AutopilotMode, CampaignObjective } from "@nishon/shared";
 
 /**
  * A Workspace represents one business managed inside Nishon AI.
@@ -16,72 +21,76 @@ import { AutopilotMode, CampaignObjective } from '@nishon/shared'
  * All campaigns, budgets, and AI decisions belong to a workspace, not directly to a user.
  * This design allows agency accounts to manage multiple clients under one login.
  */
-@Entity('workspaces')
+@Entity("workspaces")
 export class Workspace {
-  @PrimaryGeneratedColumn('uuid')
-  id: string
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
   @Column({ length: 255 })
-  name: string
+  name: string;
 
   @Column({ length: 100 })
-  industry: string
+  industry: string;
 
-  @Column({ type: 'text' })
-  productDescription: string
+  @Column({ type: "text", nullable: true })
+  productDescription: string | null;
 
-  @Column({ type: 'text' })
-  targetAudience: string
+  @Column({ type: "text", nullable: true })
+  targetAudience: string | null;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
-  monthlyBudget: number
+  @Column({ type: "decimal", precision: 10, scale: 2, nullable: true })
+  monthlyBudget: number | null;
 
   @Column({
-    type: 'enum',
+    type: "enum",
     enum: CampaignObjective,
     default: CampaignObjective.LEADS,
   })
-  goal: CampaignObjective
+  goal: CampaignObjective;
 
   @Column({
-    type: 'enum',
+    type: "enum",
     enum: AutopilotMode,
     default: AutopilotMode.MANUAL,
   })
-  autopilotMode: AutopilotMode
+  autopilotMode: AutopilotMode;
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ type: "jsonb", nullable: true })
   // Stores the full AI-generated strategy object — see IAiStrategy type in shared package
-  aiStrategy: Record<string, any> | null
+  aiStrategy: Record<string, any> | null;
 
   @Column({ default: false })
-  isOnboardingComplete: boolean
+  isOnboardingComplete: boolean;
 
-  @Column({ length: 100, default: 'Uzbekistan' })
-  targetLocation: string
+  @Column({ length: 100, default: "Uzbekistan" })
+  targetLocation: string;
 
   @CreateDateColumn()
-  createdAt: Date
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date
+  updatedAt: Date;
 
-  @ManyToOne(() => User, (user) => user.workspaces, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'user_id' })
-  user: User
+  @ManyToOne(() => User, (user) => user.workspaces, { onDelete: "CASCADE" })
+  @JoinColumn({ name: "user_id" })
+  user: User;
 
-  @Column({ name: 'user_id' })
-  userId: string
+  @Column({ name: "user_id", nullable: true })
+  userId: string | null;
 
-  @OneToMany(() => Campaign, (campaign) => campaign.workspace, { cascade: true })
-  campaigns: Campaign[]
+  @OneToMany(() => Campaign, (campaign) => campaign.workspace, {
+    cascade: true,
+  })
+  campaigns: Campaign[];
 
-  @OneToMany(() => ConnectedAccount, (account) => account.workspace, { cascade: true })
-  connectedAccounts: ConnectedAccount[]
+  @OneToMany(() => ConnectedAccount, (account) => account.workspace, {
+    cascade: true,
+  })
+  connectedAccounts: ConnectedAccount[];
 
   @OneToMany(() => AiDecision, (decision) => decision.workspace)
-  aiDecisions: AiDecision[]
+  aiDecisions: AiDecision[];
 
   @OneToMany(() => Budget, (budget) => budget.workspace, { cascade: true })
-  budgets: Budget[]
+  budgets: Budget[];
 }

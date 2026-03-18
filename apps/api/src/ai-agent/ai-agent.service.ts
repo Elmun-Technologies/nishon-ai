@@ -1,7 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common'
-import { StrategyEngineService, StrategyResult } from './strategy-engine.service'
-import { DecisionLoopService } from './decision-loop.service'
-import { AiDecision } from '../ai-decisions/entities/ai-decision.entity'
+import { Injectable, Logger } from "@nestjs/common";
+import {
+  StrategyEngineService,
+  StrategyResult,
+} from "./strategy-engine.service";
+import { DecisionLoopService } from "./decision-loop.service";
+import { AiDecision } from "../ai-decisions/entities/ai-decision.entity";
 
 /**
  * AiAgentService is the public facade for all AI capabilities.
@@ -15,7 +18,7 @@ import { AiDecision } from '../ai-decisions/entities/ai-decision.entity'
  */
 @Injectable()
 export class AiAgentService {
-  private readonly logger = new Logger(AiAgentService.name)
+  private readonly logger = new Logger(AiAgentService.name);
 
   constructor(
     private readonly strategyEngine: StrategyEngineService,
@@ -23,23 +26,23 @@ export class AiAgentService {
   ) {}
 
   async generateStrategy(workspaceId: string): Promise<StrategyResult> {
-    return this.strategyEngine.generateForWorkspace(workspaceId)
+    return this.strategyEngine.generateForWorkspace(workspaceId);
   }
 
   async regenerateStrategy(workspaceId: string): Promise<StrategyResult> {
-    return this.strategyEngine.regenerateStrategy(workspaceId)
+    return this.strategyEngine.regenerateStrategy(workspaceId);
   }
 
   async runOptimizationLoop(workspaceId: string): Promise<AiDecision[]> {
-    return this.decisionLoop.runForWorkspace(workspaceId)
+    return this.decisionLoop.runForWorkspace(workspaceId);
   }
 
   async approveDecision(decisionId: string): Promise<void> {
     // TODO: load decision, set isApproved = true, then executeDecision
-    this.logger.log(`Decision approved: ${decisionId}`)
+    this.logger.log(`Decision approved: ${decisionId}`);
   }
 
   async rejectDecision(decisionId: string): Promise<void> {
-    this.logger.log(`Decision rejected: ${decisionId}`)
+    this.logger.log(`Decision rejected: ${decisionId}`);
   }
 }

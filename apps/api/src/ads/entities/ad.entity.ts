@@ -1,16 +1,21 @@
 import {
-  Entity, PrimaryGeneratedColumn, Column,
-  CreateDateColumn, UpdateDateColumn,
-  ManyToOne, OneToMany, JoinColumn
-} from 'typeorm'
-import { AdSet } from '../../ad-sets/entities/ad-set.entity'
-import { PerformanceMetric } from '../../analytics/entities/performance-metric.entity'
-import { CampaignStatus } from '@nishon/shared'
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+} from "typeorm";
+import { AdSet } from "../../ad-sets/entities/ad-set.entity";
+import { PerformanceMetric } from "../../analytics/entities/performance-metric.entity";
+import { CampaignStatus } from "@nishon/shared";
 
 export enum CreativeType {
-  IMAGE = 'image',
-  VIDEO = 'video',
-  CAROUSEL = 'carousel',
+  IMAGE = "image",
+  VIDEO = "video",
+  CAROUSEL = "carousel",
 }
 
 /**
@@ -19,54 +24,54 @@ export enum CreativeType {
  * Higher score = AI predicts better performance.
  * Multiple ads in one ad set = A/B test of creatives.
  */
-@Entity('ads')
+@Entity("ads")
 export class Ad {
-  @PrimaryGeneratedColumn('uuid')
-  id: string
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
   @Column({ length: 255 })
-  name: string
+  name: string;
 
   @Column({ length: 255 })
-  headlineText: string
+  headlineText: string;
 
-  @Column({ type: 'text' })
-  bodyText: string
+  @Column({ type: "text" })
+  bodyText: string;
 
   @Column({ length: 100 })
   // e.g. 'Shop Now', 'Learn More', 'Sign Up', 'Contact Us'
-  callToAction: string
+  callToAction: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: "text", nullable: true })
   // URL to the uploaded image or video creative
-  creativeUrl: string | null
+  creativeUrl: string | null;
 
-  @Column({ type: 'enum', enum: CreativeType, default: CreativeType.IMAGE })
-  creativeType: CreativeType
+  @Column({ type: "enum", enum: CreativeType, default: CreativeType.IMAGE })
+  creativeType: CreativeType;
 
-  @Column({ type: 'enum', enum: CampaignStatus, default: CampaignStatus.DRAFT })
-  status: CampaignStatus
+  @Column({ type: "enum", enum: CampaignStatus, default: CampaignStatus.DRAFT })
+  status: CampaignStatus;
 
-  @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })
+  @Column({ type: "decimal", precision: 5, scale: 2, nullable: true })
   // AI quality score from 0 to 100. Null means not yet scored.
-  aiScore: number | null
+  aiScore: number | null;
 
   @Column({ nullable: true, length: 255 })
-  externalId: string | null
+  externalId: string | null;
 
   @CreateDateColumn()
-  createdAt: Date
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date
+  updatedAt: Date;
 
-  @ManyToOne(() => AdSet, (adSet) => adSet.ads, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'ad_set_id' })
-  adSet: AdSet
+  @ManyToOne(() => AdSet, (adSet) => adSet.ads, { onDelete: "CASCADE" })
+  @JoinColumn({ name: "ad_set_id" })
+  adSet: AdSet;
 
-  @Column({ name: 'ad_set_id' })
-  adSetId: string
+  @Column({ name: "ad_set_id" })
+  adSetId: string;
 
   @OneToMany(() => PerformanceMetric, (metric) => metric.ad, { cascade: true })
-  metrics: PerformanceMetric[]
+  metrics: PerformanceMetric[];
 }

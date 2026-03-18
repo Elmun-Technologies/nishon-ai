@@ -1,5 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
+import { Injectable, Logger } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 
 /**
  * GoogleConnector — Google Ads API integration.
@@ -15,24 +15,24 @@ import { ConfigService } from '@nestjs/config'
  */
 @Injectable()
 export class GoogleConnector {
-  private readonly logger = new Logger(GoogleConnector.name)
+  private readonly logger = new Logger(GoogleConnector.name);
 
   constructor(private readonly config: ConfigService) {}
 
   getOAuthUrl(workspaceId: string): string {
     // TODO: Implement Google OAuth URL generation
-    this.logger.log(`Google OAuth URL requested for workspace: ${workspaceId}`)
-    return ''
+    this.logger.log(`Google OAuth URL requested for workspace: ${workspaceId}`);
+    return "";
   }
 
-  async createCampaign(params: any): Promise<{ id: string }> {
+  async createCampaign(): Promise<{ id: string }> {
     // TODO: Implement using google-ads-api
-    this.logger.log(`Google campaign creation stub called`)
-    return { id: 'google-stub-id' }
+    this.logger.log(`Google campaign creation stub called`);
+    return { id: "google-stub-id" };
   }
 
-  async getInsights(params: any): Promise<any[]> {
+  async getInsights(): Promise<any[]> {
     // TODO: Implement Google Ads insights (uses GAQL — Google Ads Query Language)
-    return []
+    return [];
   }
 }

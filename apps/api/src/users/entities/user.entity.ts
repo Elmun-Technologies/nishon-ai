@@ -1,15 +1,19 @@
 import {
-  Entity, PrimaryGeneratedColumn, Column,
-  CreateDateColumn, UpdateDateColumn, OneToMany, BeforeInsert
-} from 'typeorm'
-import { Workspace } from '../../workspaces/entities/workspace.entity'
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+} from "typeorm";
+import { Workspace } from "../../workspaces/entities/workspace.entity";
 
 export enum UserPlan {
-  FREE = 'free',
-  STARTER = 'starter',
-  GROWTH = 'growth',
-  PRO = 'pro',
-  AGENCY = 'agency',
+  FREE = "free",
+  STARTER = "starter",
+  GROWTH = "growth",
+  PRO = "pro",
+  AGENCY = "agency",
 }
 
 /**
@@ -17,41 +21,41 @@ export enum UserPlan {
  * A user can own multiple workspaces (one per business they manage).
  * Authentication is handled via JWT — password is always stored hashed.
  */
-@Entity('users')
+@Entity("users")
 export class User {
-  @PrimaryGeneratedColumn('uuid')
-  id: string
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
   @Column({ unique: true, length: 255 })
-  email: string
+  email: string;
 
   @Column({ length: 255, select: false })
   // select: false means password is NOT returned by default in queries — security measure
-  password: string
+  password: string;
 
-  @Column({ length: 100 })
-  name: string
+  @Column({ length: 100, nullable: true })
+  name: string | null;
 
   @Column({
-    type: 'enum',
+    type: "enum",
     enum: UserPlan,
     default: UserPlan.FREE,
   })
-  plan: UserPlan
+  plan: UserPlan;
 
   @Column({ default: false })
-  isEmailVerified: boolean
+  isEmailVerified: boolean;
 
-  @Column({ type: 'text', nullable: true, select: false })
+  @Column({ type: "text", nullable: true, select: false })
   // Stores hashed refresh token in DB for invalidation on logout
-  refreshToken: string | null
+  refreshToken: string | null;
 
   @CreateDateColumn()
-  createdAt: Date
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date
+  updatedAt: Date;
 
   @OneToMany(() => Workspace, (workspace) => workspace.user, { cascade: true })
-  workspaces: Workspace[]
+  workspaces: Workspace[];
 }

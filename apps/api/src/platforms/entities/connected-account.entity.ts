@@ -1,10 +1,14 @@
 import {
-  Entity, PrimaryGeneratedColumn, Column,
-  CreateDateColumn, UpdateDateColumn,
-  ManyToOne, JoinColumn
-} from 'typeorm'
-import { Workspace } from '../../workspaces/entities/workspace.entity'
-import { Platform } from '@nishon/shared'
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from "typeorm";
+import { Workspace } from "../../workspaces/entities/workspace.entity";
+import { Platform } from "@nishon/shared";
 
 /**
  * Stores OAuth credentials for connected ad platform accounts.
@@ -13,46 +17,48 @@ import { Platform } from '@nishon/shared'
  * Never store raw tokens in the database.
  * One workspace can have multiple connected accounts (e.g. both Meta and Google).
  */
-@Entity('connected_accounts')
+@Entity("connected_accounts")
 export class ConnectedAccount {
-  @PrimaryGeneratedColumn('uuid')
-  id: string
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
-  @Column({ type: 'enum', enum: Platform })
-  platform: Platform
+  @Column({ type: "enum", enum: Platform })
+  platform: Platform;
 
-  @Column({ type: 'text' })
+  @Column({ type: "text" })
   // ENCRYPTED — AES-256 encrypted access token. Decrypt before use.
-  accessToken: string
+  accessToken: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: "text", nullable: true })
   // ENCRYPTED — AES-256 encrypted refresh token. Decrypt before use.
-  refreshToken: string | null
+  refreshToken: string | null;
 
   @Column({ length: 255 })
   // The ad account ID on the platform (e.g. Meta: 'act_123456789')
-  externalAccountId: string
+  externalAccountId: string;
 
   @Column({ length: 255 })
   // Human-readable account name (e.g. "My Business - Main Ad Account")
-  externalAccountName: string
+  externalAccountName: string;
 
   @Column({ default: true })
-  isActive: boolean
+  isActive: boolean;
 
-  @Column({ type: 'timestamp', nullable: true })
-  tokenExpiresAt: Date | null
+  @Column({ type: "timestamp", nullable: true })
+  tokenExpiresAt: Date | null;
 
   @CreateDateColumn()
-  createdAt: Date
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date
+  updatedAt: Date;
 
-  @ManyToOne(() => Workspace, (workspace) => workspace.connectedAccounts, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'workspace_id' })
-  workspace: Workspace
+  @ManyToOne(() => Workspace, (workspace) => workspace.connectedAccounts, {
+    onDelete: "CASCADE",
+  })
+  @JoinColumn({ name: "workspace_id" })
+  workspace: Workspace;
 
-  @Column({ name: 'workspace_id' })
-  workspaceId: string
+  @Column({ name: "workspace_id" })
+  workspaceId: string;
 }

@@ -1,11 +1,16 @@
-import { Processor, Process, OnQueueFailed, OnQueueCompleted } from '@nestjs/bull'
-import { Logger } from '@nestjs/common'
-import { Job } from 'bull'
-import { AiAgentService } from '../../ai-agent/ai-agent.service'
-import { QUEUE_NAMES } from '../queue.module'
+import {
+  Processor,
+  Process,
+  OnQueueFailed,
+  OnQueueCompleted,
+} from "@nestjs/bull";
+import { Logger } from "@nestjs/common";
+import { Job } from "bull";
+import { AiAgentService } from "../../ai-agent/ai-agent.service";
+import { QUEUE_NAMES } from "../queue.constants";
 
 interface OptimizationJobData {
-  workspaceId: string
+  workspaceId: string;
 }
 
 /**
@@ -21,24 +26,27 @@ interface OptimizationJobData {
  */
 @Processor(QUEUE_NAMES.OPTIMIZATION)
 export class OptimizationProcessor {
-  private readonly logger = new Logger(OptimizationProcessor.name)
+  private readonly logger = new Logger(OptimizationProcessor.name);
 
   constructor(private readonly aiAgentService: AiAgentService) {}
 
-  @Process('run-optimization')
+  @Process("run-optimization")
   async handleOptimization(job: Job<OptimizationJobData>): Promise<void> {
-    const { workspaceId } = job.data
-    this.logger.log(`Processing optimization job for workspace: ${workspaceId}`)
+    const { workspaceId } = job.data;
+    this.logger.log(
+      `Processing optimization job for workspace: ${workspaceId}`,
+    );
 
     // Update job progress — visible in Bull Board dashboard
-    await job.progress(10)
+    await job.progress(10);
 
-    const decisions = await this.aiAgentService.runOptimizationLoop(workspaceId)
+    const decisions =
+      await this.aiAgentService.runOptimizationLoop(workspaceId);
 
-    await job.progress(100)
+    await job.progress(100);
     this.logger.log(
       `Optimization complete for ${workspaceId}: ${decisions.length} decisions created`,
-    )
+    );
   }
 
   @OnQueueFailed()
@@ -46,11 +54,11 @@ export class OptimizationProcessor {
     this.logger.error(
       `Optimization job failed for workspace ${job.data.workspaceId}: ${error.message}`,
       error.stack,
-    )
+    );
   }
 
   @OnQueueCompleted()
   onCompleted(job: Job): void {
-    this.logger.log(`Optimization job completed: ${job.id}`)
+    this.logger.log(`Optimization job completed: ${job.id}`);
   }
 }

@@ -1,63 +1,67 @@
-import { Injectable, Logger, BadRequestException } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import { Workspace } from '../workspaces/entities/workspace.entity'
-import { NishonAiClient, buildStrategyPrompt, STRATEGY_SYSTEM_PROMPT } from '@nishon/ai-sdk'
+import { Injectable, Logger, BadRequestException } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { Workspace } from "../workspaces/entities/workspace.entity";
+import {
+  NishonAiClient,
+  buildStrategyPrompt,
+  STRATEGY_SYSTEM_PROMPT,
+} from "@nishon/ai-sdk";
 
 export interface StrategyInput {
-  businessName: string
-  industry: string
-  productDescription: string
-  targetAudience: string
-  monthlyBudget: number
-  goal: string
-  targetLocation: string
+  businessName: string;
+  industry: string;
+  productDescription: string;
+  targetAudience: string;
+  monthlyBudget: number;
+  goal: string;
+  location: string;
 }
 
 export interface StrategyResult {
-  summary: string
+  summary: string;
   marketAnalysis: {
-    targetMarketSize: string
-    competitionLevel: string
-    seasonality: string
-    keyInsights: string[]
-  }
-  recommendedPlatforms: string[]
-  budgetAllocation: Record<string, number>
+    targetMarketSize: string;
+    competitionLevel: string;
+    seasonality: string;
+    keyInsights: string[];
+  };
+  recommendedPlatforms: string[];
+  budgetAllocation: Record<string, number>;
   monthlyForecast: {
-    estimatedLeads: number
-    estimatedSales: number
-    estimatedRoas: number
-    estimatedCpa: number
-    estimatedCtr: number
-    confidence: string
-  }
+    estimatedLeads: number;
+    estimatedSales: number;
+    estimatedRoas: number;
+    estimatedCpa: number;
+    estimatedCtr: number;
+    confidence: string;
+  };
   targetingRecommendations: Array<{
-    platform: string
-    ageRange: string
-    genders: string[]
-    interests: string[]
-    locations: string[]
-    customAudiences: string[]
-  }>
+    platform: string;
+    ageRange: string;
+    genders: string[];
+    interests: string[];
+    locations: string[];
+    customAudiences: string[];
+  }>;
   creativeGuidelines: {
-    tone: string
-    keyMessages: string[]
-    callToActions: string[]
-    visualStyle: string
-    formatRecommendations: string[]
-  }
+    tone: string;
+    keyMessages: string[];
+    callToActions: string[];
+    visualStyle: string;
+    formatRecommendations: string[];
+  };
   campaignStructure: Array<{
-    name: string
-    platform: string
-    objective: string
-    dailyBudget: number
-    adSets: any[]
-  }>
-  firstWeekActions: string[]
-  warningFlags: string[]
-  generatedAt?: Date
+    name: string;
+    platform: string;
+    objective: string;
+    dailyBudget: number;
+    adSets: any[];
+  }>;
+  firstWeekActions: string[];
+  warningFlags: string[];
+  generatedAt?: Date;
 }
 
 /**
@@ -73,19 +77,19 @@ export interface StrategyResult {
  */
 @Injectable()
 export class StrategyEngineService {
-  private readonly logger = new Logger(StrategyEngineService.name)
-  private readonly aiClient: NishonAiClient
+  private readonly logger = new Logger(StrategyEngineService.name);
+  private readonly aiClient: NishonAiClient;
 
   constructor(
     private readonly config: ConfigService,
     @InjectRepository(Workspace)
     private readonly workspaceRepo: Repository<Workspace>,
   ) {
-    const apiKey = this.config.get<string>('OPENAI_API_KEY')
+    const apiKey = this.config.get<string>("OPENAI_API_KEY");
     if (!apiKey) {
-      throw new Error('OPENAI_API_KEY is not configured')
+      throw new Error("OPENAI_API_KEY is not configured");
     }
-    this.aiClient = new NishonAiClient(apiKey)
+    this.aiClient = new NishonAiClient(apiKey);
   }
 
   /**
@@ -101,14 +105,14 @@ export class StrategyEngineService {
    * The whole process takes 8-15 seconds — fast enough for real-time UI.
    */
   async generateForWorkspace(workspaceId: string): Promise<StrategyResult> {
-    this.logger.log(`Generating strategy for workspace: ${workspaceId}`)
+    this.logger.log(`Generating strategy for workspace: ${workspaceId}`);
 
     const workspace = await this.workspaceRepo.findOne({
       where: { id: workspaceId },
-    })
+    });
 
     if (!workspace) {
-      throw new BadRequestException(`Workspace ${workspaceId} not found`)
+      throw new BadRequestException(`Workspace ${workspaceId} not found`);
     }
 
     const input: StrategyInput = {
@@ -118,19 +122,21 @@ export class StrategyEngineService {
       targetAudience: workspace.targetAudience,
       monthlyBudget: Number(workspace.monthlyBudget),
       goal: workspace.goal,
-      targetLocation: workspace.targetLocation || 'Uzbekistan',
-    }
+      location: workspace.targetLocation || "Uzbekistan",
+    };
 
-    const strategy = await this.generateStrategy(input)
+    const strategy = await this.generateStrategy(input);
 
     // Save strategy back to workspace so it persists
     await this.workspaceRepo.update(workspaceId, {
       aiStrategy: strategy as any,
       isOnboardingComplete: true,
-    })
+    });
 
-    this.logger.log(`Strategy generated successfully for workspace: ${workspaceId}`)
-    return strategy
+    this.logger.log(
+      `Strategy generated successfully for workspace: ${workspaceId}`,
+    );
+    return strategy;
   }
 
   /**
@@ -138,38 +144,43 @@ export class StrategyEngineService {
    * We use completeJson() which handles JSON parsing and retry logic internally.
    */
   async generateStrategy(input: StrategyInput): Promise<StrategyResult> {
-    const prompt = buildStrategyPrompt(input)
+    const prompt = buildStrategyPrompt(input);
 
-    this.logger.log(`Calling GPT-4o for strategy: ${input.businessName} | Budget: $${input.monthlyBudget}`)
+    this.logger.log(
+      `Calling GPT-4o for strategy: ${input.businessName} | Budget: $${input.monthlyBudget}`,
+    );
 
     const strategy = await this.aiClient.completeJson<StrategyResult>(
       prompt,
       STRATEGY_SYSTEM_PROMPT,
       {
-        temperature: 0.4,  // Lower = more consistent, professional output
+        temperature: 0.4, // Lower = more consistent, professional output
         maxTokens: 3000,
       },
-    )
+    );
 
     // Enrich with metadata
-    strategy.generatedAt = new Date()
+    strategy.generatedAt = new Date();
 
     // Validate budget allocation sums to 100%
     const totalAllocation = Object.values(strategy.budgetAllocation).reduce(
-      (sum, val) => sum + val, 0
-    )
+      (sum, val) => sum + val,
+      0,
+    );
 
     if (Math.abs(totalAllocation - 100) > 1) {
-      this.logger.warn(`Budget allocation doesn't sum to 100% (got ${totalAllocation}%), normalizing...`)
+      this.logger.warn(
+        `Budget allocation doesn't sum to 100% (got ${totalAllocation}%), normalizing...`,
+      );
       // Normalize to 100%
       for (const key of Object.keys(strategy.budgetAllocation)) {
         strategy.budgetAllocation[key] = Math.round(
-          (strategy.budgetAllocation[key] / totalAllocation) * 100
-        )
+          (strategy.budgetAllocation[key] / totalAllocation) * 100,
+        );
       }
     }
 
-    return strategy
+    return strategy;
   }
 
   /**
@@ -177,7 +188,7 @@ export class StrategyEngineService {
    * or when significant business changes happen (budget doubled, new product, etc.)
    */
   async regenerateStrategy(workspaceId: string): Promise<StrategyResult> {
-    this.logger.log(`Regenerating strategy for workspace: ${workspaceId}`)
-    return this.generateForWorkspace(workspaceId)
+    this.logger.log(`Regenerating strategy for workspace: ${workspaceId}`);
+    return this.generateForWorkspace(workspaceId);
   }
 }

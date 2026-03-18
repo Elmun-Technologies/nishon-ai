@@ -1,12 +1,17 @@
 import {
-  Entity, PrimaryGeneratedColumn, Column,
-  CreateDateColumn, UpdateDateColumn,
-  ManyToOne, OneToMany, JoinColumn
-} from 'typeorm'
-import { Workspace } from '../../workspaces/entities/workspace.entity'
-import { AdSet } from '../../ad-sets/entities/ad-set.entity'
-import { AiDecision } from '../../ai-decisions/entities/ai-decision.entity'
-import { Platform, CampaignStatus, CampaignObjective } from '@nishon/shared'
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+} from "typeorm";
+import { Workspace } from "../../workspaces/entities/workspace.entity";
+import { AdSet } from "../../ad-sets/entities/ad-set.entity";
+import { AiDecision } from "../../ai-decisions/entities/ai-decision.entity";
+import { Platform, CampaignStatus, CampaignObjective } from "@nishon/shared";
 
 /**
  * A Campaign is the top-level advertising unit on any platform.
@@ -14,63 +19,65 @@ import { Platform, CampaignStatus, CampaignObjective } from '@nishon/shared'
  * externalId stores the ID from the ad platform so we can sync status back.
  * aiConfig stores the AI-generated targeting and optimization parameters.
  */
-@Entity('campaigns')
+@Entity("campaigns")
 export class Campaign {
-  @PrimaryGeneratedColumn('uuid')
-  id: string
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
   @Column({ length: 255 })
-  name: string
+  name: string;
 
-  @Column({ type: 'enum', enum: Platform })
-  platform: Platform
+  @Column({ type: "enum", enum: Platform, nullable: true })
+  platform: Platform | null;
 
   @Column({
-    type: 'enum',
+    type: "enum",
     enum: CampaignStatus,
     default: CampaignStatus.DRAFT,
   })
-  status: CampaignStatus
+  status: CampaignStatus;
 
-  @Column({ type: 'enum', enum: CampaignObjective })
-  objective: CampaignObjective
+  @Column({ type: "enum", enum: CampaignObjective, nullable: true })
+  objective: CampaignObjective | null;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
-  dailyBudget: number
+  @Column({ type: "decimal", precision: 10, scale: 2, nullable: true })
+  dailyBudget: number | null;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
-  totalBudget: number
+  @Column({ type: "decimal", precision: 10, scale: 2, nullable: true })
+  totalBudget: number | null;
 
   @Column({ nullable: true, length: 255 })
   // The campaign ID assigned by the ad platform (Meta, Google, etc.)
-  externalId: string | null
+  externalId: string | null;
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ type: "jsonb", nullable: true })
   // AI-generated config: targeting params, bid strategy, optimization goals
-  aiConfig: Record<string, any> | null
+  aiConfig: Record<string, any> | null;
 
-  @Column({ type: 'date', nullable: true })
-  startDate: Date | null
+  @Column({ type: "date", nullable: true })
+  startDate: Date | null;
 
-  @Column({ type: 'date', nullable: true })
-  endDate: Date | null
+  @Column({ type: "date", nullable: true })
+  endDate: Date | null;
 
   @CreateDateColumn()
-  createdAt: Date
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date
+  updatedAt: Date;
 
-  @ManyToOne(() => Workspace, (workspace) => workspace.campaigns, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'workspace_id' })
-  workspace: Workspace
+  @ManyToOne(() => Workspace, (workspace) => workspace.campaigns, {
+    onDelete: "CASCADE",
+  })
+  @JoinColumn({ name: "workspace_id" })
+  workspace: Workspace;
 
-  @Column({ name: 'workspace_id' })
-  workspaceId: string
+  @Column({ name: "workspace_id", nullable: true })
+  workspaceId: string | null;
 
   @OneToMany(() => AdSet, (adSet) => adSet.campaign, { cascade: true })
-  adSets: AdSet[]
+  adSets: AdSet[];
 
   @OneToMany(() => AiDecision, (decision) => decision.campaign)
-  aiDecisions: AiDecision[]
+  aiDecisions: AiDecision[];
 }

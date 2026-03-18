@@ -1,20 +1,24 @@
-import { Injectable, Logger } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import { ConfigService } from '@nestjs/config'
-import { AiDecision } from '../ai-decisions/entities/ai-decision.entity'
-import { Campaign } from '../campaigns/entities/campaign.entity'
-import { Workspace } from '../workspaces/entities/workspace.entity'
-import { NishonAiClient, OPTIMIZATION_SYSTEM_PROMPT } from '@nishon/ai-sdk'
-import { AiDecisionAction, AutopilotMode, CampaignStatus } from '@nishon/shared'
+import { Injectable, Logger } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { ConfigService } from "@nestjs/config";
+import { AiDecision } from "../ai-decisions/entities/ai-decision.entity";
+import { Campaign } from "../campaigns/entities/campaign.entity";
+import { Workspace } from "../workspaces/entities/workspace.entity";
+import { NishonAiClient, OPTIMIZATION_SYSTEM_PROMPT } from "@nishon/ai-sdk";
+import {
+  AiDecisionAction,
+  AutopilotMode,
+  CampaignStatus,
+} from "@nishon/shared";
 
 interface OptimizationDecision {
-  action: string
-  targetId: string
-  targetType: string
-  reason: string
-  estimatedImpact: string
-  urgency: string
+  action: string;
+  targetId: string;
+  targetType: string;
+  reason: string;
+  estimatedImpact: string;
+  urgency: string;
 }
 
 /**
@@ -33,8 +37,8 @@ interface OptimizationDecision {
  */
 @Injectable()
 export class DecisionLoopService {
-  private readonly logger = new Logger(DecisionLoopService.name)
-  private readonly aiClient: NishonAiClient
+  private readonly logger = new Logger(DecisionLoopService.name);
+  private readonly aiClient: NishonAiClient;
 
   constructor(
     private readonly config: ConfigService,
@@ -45,8 +49,8 @@ export class DecisionLoopService {
     @InjectRepository(Workspace)
     private readonly workspaceRepo: Repository<Workspace>,
   ) {
-    const apiKey = this.config.get<string>('OPENAI_API_KEY')
-    this.aiClient = new NishonAiClient(apiKey)
+    const apiKey = this.config.get<string>("OPENAI_API_KEY");
+    this.aiClient = new NishonAiClient(apiKey);
   }
 
   /**
@@ -58,49 +62,49 @@ export class DecisionLoopService {
    * Except it does this automatically, at scale, every 2 hours.
    */
   async runForWorkspace(workspaceId: string): Promise<AiDecision[]> {
-    this.logger.log(`Running decision loop for workspace: ${workspaceId}`)
+    this.logger.log(`Running decision loop for workspace: ${workspaceId}`);
 
     const workspace = await this.workspaceRepo.findOne({
       where: { id: workspaceId },
-    })
+    });
 
-    if (!workspace) return []
+    if (!workspace) return [];
 
     // Fetch active campaigns with their recent performance metrics
     const campaigns = await this.campaignRepo
-      .createQueryBuilder('campaign')
-      .leftJoinAndSelect('campaign.adSets', 'adSet')
-      .leftJoinAndSelect('adSet.ads', 'ad')
-      .leftJoinAndSelect('ad.metrics', 'metric')
-      .where('campaign.workspaceId = :workspaceId', { workspaceId })
-      .andWhere('campaign.status = :status', { status: CampaignStatus.ACTIVE })
-      .orderBy('metric.recordedAt', 'DESC')
-      .getMany()
+      .createQueryBuilder("campaign")
+      .leftJoinAndSelect("campaign.adSets", "adSet")
+      .leftJoinAndSelect("adSet.ads", "ad")
+      .leftJoinAndSelect("ad.metrics", "metric")
+      .where("campaign.workspaceId = :workspaceId", { workspaceId })
+      .andWhere("campaign.status = :status", { status: CampaignStatus.ACTIVE })
+      .orderBy("metric.recordedAt", "DESC")
+      .getMany();
 
     if (campaigns.length === 0) {
-      this.logger.log(`No active campaigns for workspace: ${workspaceId}`)
-      return []
+      this.logger.log(`No active campaigns for workspace: ${workspaceId}`);
+      return [];
     }
 
     // Build performance summary for the AI to analyze
-    const performanceSummary = this.buildPerformanceSummary(campaigns)
+    const performanceSummary = this.buildPerformanceSummary(campaigns);
 
     // Ask GPT-4o what actions to take
     const aiResponse = await this.aiClient.completeJson<{
-      decisions: OptimizationDecision[]
-      overallAssessment: string
-      nextReviewIn: string
+      decisions: OptimizationDecision[];
+      overallAssessment: string;
+      nextReviewIn: string;
     }>(
       `Analyze these campaign metrics and decide what actions to take:\n${JSON.stringify(performanceSummary, null, 2)}`,
       OPTIMIZATION_SYSTEM_PROMPT,
       { temperature: 0.2 }, // Very low temp — we want consistent, data-driven decisions
-    )
+    );
 
     // Convert AI decisions to database records
-    const savedDecisions: AiDecision[] = []
+    const savedDecisions: AiDecision[] = [];
 
     for (const decision of aiResponse.decisions) {
-      if (decision.action === 'no_action') continue
+      if (decision.action === "no_action") continue;
 
       const aiDecision = this.decisionRepo.create({
         workspaceId,
@@ -110,24 +114,25 @@ export class DecisionLoopService {
         beforeState: performanceSummary,
         afterState: null, // Will be filled after execution
         // In FULL_AUTO: auto-approve. In ASSISTED/MANUAL: wait for human.
-        isApproved: workspace.autopilotMode === AutopilotMode.FULL_AUTO ? true : null,
+        isApproved:
+          workspace.autopilotMode === AutopilotMode.FULL_AUTO ? true : null,
         isExecuted: false,
-      })
+      });
 
-      const saved = await this.decisionRepo.save(aiDecision)
-      savedDecisions.push(saved)
+      const saved = await this.decisionRepo.save(aiDecision);
+      savedDecisions.push(saved);
 
       // In FULL_AUTO mode, execute the decision immediately
       if (workspace.autopilotMode === AutopilotMode.FULL_AUTO) {
-        await this.executeDecision(saved)
+        await this.executeDecision(saved);
       }
     }
 
     this.logger.log(
-      `Decision loop complete for ${workspaceId}: ${savedDecisions.length} decisions created`
-    )
+      `Decision loop complete for ${workspaceId}: ${savedDecisions.length} decisions created`,
+    );
 
-    return savedDecisions
+    return savedDecisions;
   }
 
   /**
@@ -139,7 +144,9 @@ export class DecisionLoopService {
    * For now it marks the decision as executed and logs it.
    */
   async executeDecision(decision: AiDecision): Promise<void> {
-    this.logger.log(`Executing decision: ${decision.actionType} (${decision.id})`)
+    this.logger.log(
+      `Executing decision: ${decision.actionType} (${decision.id})`,
+    );
 
     // TODO: Route to appropriate platform connector based on campaign platform
     // await this.metaConnector.pauseAd(decision.targetId)
@@ -148,8 +155,8 @@ export class DecisionLoopService {
     await this.decisionRepo.update(decision.id, {
       isExecuted: true,
       isApproved: true,
-      afterState: { executedAt: new Date(), status: 'completed' },
-    })
+      afterState: { executedAt: new Date(), status: "completed" } as any,
+    });
   }
 
   /**
@@ -158,17 +165,17 @@ export class DecisionLoopService {
    * and doesn't waste tokens on irrelevant data.
    */
   private buildPerformanceSummary(campaigns: Campaign[]) {
-    return campaigns.map(campaign => ({
+    return campaigns.map((campaign) => ({
       campaignId: campaign.id,
       campaignName: campaign.name,
       platform: campaign.platform,
       dailyBudget: campaign.dailyBudget,
-      adSets: campaign.adSets?.map(adSet => ({
+      adSets: campaign.adSets?.map((adSet) => ({
         adSetId: adSet.id,
         name: adSet.name,
-        ads: adSet.ads?.map(ad => {
+        ads: adSet.ads?.map((ad) => {
           // Get the most recent 7 days of metrics
-          const recentMetrics = ad.metrics?.slice(0, 7) || []
+          const recentMetrics = ad.metrics?.slice(0, 7) || [];
           const totals = recentMetrics.reduce(
             (acc, m) => ({
               spend: acc.spend + Number(m.spend),
@@ -177,8 +184,8 @@ export class DecisionLoopService {
               conversions: acc.conversions + m.conversions,
               revenue: acc.revenue + Number(m.revenue),
             }),
-            { spend: 0, clicks: 0, impressions: 0, conversions: 0, revenue: 0 }
-          )
+            { spend: 0, clicks: 0, impressions: 0, conversions: 0, revenue: 0 },
+          );
 
           return {
             adId: ad.id,
@@ -186,19 +193,22 @@ export class DecisionLoopService {
             aiScore: ad.aiScore,
             last7Days: {
               ...totals,
-              ctr: totals.impressions > 0
-                ? (totals.clicks / totals.impressions * 100).toFixed(3)
-                : '0',
-              cpa: totals.conversions > 0
-                ? (totals.spend / totals.conversions).toFixed(2)
-                : null,
-              roas: totals.spend > 0
-                ? (totals.revenue / totals.spend).toFixed(2)
-                : '0',
+              ctr:
+                totals.impressions > 0
+                  ? ((totals.clicks / totals.impressions) * 100).toFixed(3)
+                  : "0",
+              cpa:
+                totals.conversions > 0
+                  ? (totals.spend / totals.conversions).toFixed(2)
+                  : null,
+              roas:
+                totals.spend > 0
+                  ? (totals.revenue / totals.spend).toFixed(2)
+                  : "0",
             },
-          }
+          };
         }),
       })),
-    }))
+    }));
   }
 }
