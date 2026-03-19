@@ -41,21 +41,61 @@ export default function CampaignsPage() {
   const [filter, setFilter] = useState<'all' | 'active' | 'paused' | 'draft'>('all')
 
   const fetchCampaigns = useCallback(async () => {
-    if (!currentWorkspace?.id) {
-      setLoading(false)
-      return
-    }
-    try {
-      const res = await apiClient.get(
-        `/campaigns/workspace/${currentWorkspace.id}`
-      )
-      setCampaigns(res.data)
-    } catch (err) {
-      console.error('Failed to fetch campaigns:', err)
-    } finally {
-      setLoading(false)
-    }
-  }, [currentWorkspace?.id])
+    setLoading(true)
+    // Simulate API delay
+    await new Promise((r) => setTimeout(r, 800))
+
+    const mockCampaigns: Campaign[] = [
+      {
+        id: '1',
+        name: 'Meta | Retargeting | High Intent',
+        platform: 'meta',
+        status: 'active',
+        objective: 'sales',
+        dailyBudget: 150,
+        totalBudget: 4500,
+        externalId: 'ext_7788',
+        createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+        adSets: [{}, {}],
+      },
+      {
+        id: '2',
+        name: 'Google | Shopping | Best Sellers',
+        platform: 'google',
+        status: 'active',
+        objective: 'sales',
+        dailyBudget: 100,
+        totalBudget: 3000,
+        externalId: 'g_8899',
+        createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+      {
+        id: '3',
+        name: 'TikTok | Awareness | Video Ads',
+        platform: 'tiktok',
+        status: 'paused',
+        objective: 'awareness',
+        dailyBudget: 50,
+        totalBudget: 1500,
+        externalId: null,
+        createdAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+      {
+        id: '4',
+        name: 'Meta | Prospecting | Lookalike',
+        platform: 'meta',
+        status: 'active',
+        objective: 'leads',
+        dailyBudget: 120,
+        totalBudget: 3600,
+        externalId: 'ext_9900',
+        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+    ]
+
+    setCampaigns(mockCampaigns)
+    setLoading(false)
+  }, [])
 
   useEffect(() => {
     fetchCampaigns()

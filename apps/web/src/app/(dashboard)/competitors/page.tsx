@@ -1,0 +1,735 @@
+'use client'
+import { useMemo, useState } from 'react'
+import { useWorkspaceStore } from '@/stores/workspace.store'
+import { Button } from '@/components/ui/Button'
+import { Card } from '@/components/ui/Card'
+import { Alert } from '@/components/ui/Alert'
+import { Badge } from '@/components/ui/Badge'
+import { Spinner } from '@/components/ui/Spinner'
+import apiClient from '@/lib/api-client'
+
+interface AuditSubParam {
+  name: string
+  yourStatus: 'good' | 'bad' | 'medium'
+  competitorStatus: 'good' | 'bad' | 'medium'
+  yourNote: string
+  competitorNote: string
+}
+
+interface AuditCategory {
+  id: number
+  title: string
+  icon: string
+  description: string
+  subParams: AuditSubParam[]
+  yourScore: number
+  competitorScore: number
+}
+
+interface CompetitorAnalysis {
+  competitor: {
+    name: string
+    instagram: string
+    website: string
+    overallSummary: string
+    estimatedAdSpend: string
+  }
+  categories: AuditCategory[]
+  overallScore: { you: number; competitor: number }
+  overallWinner: 'you' | 'competitor' | 'tie'
+  topWeaknesses: string[]
+  topStrengths: string[]
+  urgentFixes: string[]
+  annualStrategy: {
+    q1: string
+    q2: string
+    q3: string
+    q4: string
+    keyActions: string[]
+    budgetAdvice: string
+  }
+}
+
+const AUDIT_CATEGORIES = [
+  {
+    id: 1,
+    icon: '📸',
+    title: 'Instagram identikasi',
+    description:
+      'Profil, bio, vizual, CTA, business account, raqobatchilar tahlili',
+    subParams: [
+      'Profil nomlanishi (tarixiy, qiziqarli, oson yodda qoladi)',
+      "Bio va positioning (kompaniya qiladigan narsa, foydalari, kontakt)",
+      "Vizual uyg'unlik (ranglar, fontlar, uslub va estetika)",
+      'CTA (Call to Action) — aniq harakatga chaqiruv',
+      'Business account holati (aktiv, barcha funksiyalar yoqilgan)',
+      'Raqobatchilar tahlili (ular nima qilayapti, eng yaxshi amaliyotlar)',
+    ],
+  },
+  {
+    id: 2,
+    icon: '📊',
+    title: 'Statistika',
+    description:
+      'Obunachilar sifati, engagement, oxvat, kontent samaradorligi',
+    subParams: [
+      'Obunachilar sifati (real manzil, bot emas, aktiv foydalanuvchilar)',
+      "Engagement darajasi (like/comment/save nisbati, normal ko'rsatkich 3–5%)",
+      "Oxvat (Reach va Impression) tendensiyasi",
+      'Kontent samaradorligi (eng yaxshi postlar, muvaffaqiyatli formatlar)',
+      'Post vaqtlari (eng yaxshi vaqtlar aniqlangan va rejalashtirilgan)',
+      "Story ko'rishlar soni va reaksiya darajasi",
+    ],
+  },
+  {
+    id: 3,
+    icon: '📅',
+    title: 'SMM tizimi',
+    description:
+      'Reels, carousel, story intizomi, kontent struktura va rejalash',
+    subParams: [
+      'Reels soni va muntazamligi (haftada kamida 2–3 ta)',
+      "Carusel formati (ko'p rasmlik postlar, slideshow, infographics)",
+      "Story intizomi (kunlik, muntazam, interaktiv — polls, questions)",
+      'Kontent struktura (tarqalib ketganmi, rejalashtirilganmi)',
+      'Post tayyorlash jarayoni (fikr bor, lekin amalga oshmayaptimi?)',
+      "Hashtag strategiyasi (to'g'ri hashtaglar, lokal hashtaglar)",
+    ],
+  },
+  {
+    id: 4,
+    icon: '🎯',
+    title: 'Target reklama',
+    description:
+      'Active reklamalar, Facebook/Instagram struktura, kampaniya logikasi',
+    subParams: [
+      'Active reklamalar soni (kamida 2–3 ta bir vaqtda ishlayaptimi)',
+      "Facebook/Instagram targeting (age, gender, location, interests)",
+      'Kampaniya logikasi (funnel: awareness → consideration → conversion)',
+      'Pixel va tracking (Facebook Pixel, conversion events)',
+      "Creative materials (rasm va video sifati, ad copy)",
+      'Retargeting (mijozlar qayta targetlanayaptimi)',
+    ],
+  },
+  {
+    id: 5,
+    icon: '⚡',
+    title: 'Javob tezligi',
+    description:
+      "Direct, comment javoblar, Telegram/Facebook/YouTube/TikTok monitoring",
+    subParams: [
+      'Direct javob vaqti (optimal 15–30 daqiqa ichida)',
+      'Comment javob (hamma commentga javob beriladi)',
+      'Telegram monitoring (tezkor javob, auto-reply)',
+      'Facebook monitoring (Messenger va commentlar)',
+      "YouTube & TikTok commentlar tekshiriladi",
+      'Javob standartlari (skript bor, bir xil javob sifati)',
+    ],
+  },
+  {
+    id: 6,
+    icon: '🌐',
+    title: 'Web sayt',
+    description:
+      'UX, tezlik, kontakt shakllari, chatbot mavjudligi va ishlashi',
+    subParams: [
+      'UX — foydalanish qulayligi (navigatsiya aniq, mobile version)',
+      'Tezlik (yuklash 3–5 sekund ichida, PageSpeed score)',
+      "Kontakt shakllari (ishlaydimi, ma'lumot kiryaptimi)",
+      'Chatbot mavjudligi (avtomatik javoblash, 24/7)',
+      'SEO basics (meta tags, title, description, sitemap)',
+      "Responsiveness (barcha device larda yaxshi ko'rinadi)",
+    ],
+  },
+  {
+    id: 7,
+    icon: '🔍',
+    title: 'SEO',
+    description:
+      "On-page, technical SEO, kalit so'zlar, backlinks tahlili",
+    subParams: [
+      'On-page SEO (title, meta, H1-H6, keywords, internal linking)',
+      'Technical SEO (site speed, mobile-friendly, HTTPS, sitemap)',
+      'Keyword research (asosiy kalit so\'zlar, long-tail, search volume)',
+      'Content optimization (sifat, keyword placement, readability)',
+      'Backlink analysis (domain authority, referring domains)',
+      'Local SEO (Google My Business, local keywords, NAP)',
+    ],
+  },
+  {
+    id: 8,
+    icon: '🛒',
+    title: 'Marketplace',
+    description:
+      'Uzum, Express va boshqa platformalarda mavjudlik va to‘liqlik',
+    subParams: [
+      'Platformalar mavjudligi (Uzum.uz, Express.uz, local marketplaces)',
+      'Product listings (tushunarli description, quality photos)',
+      'Inventory management (mahsulotlar mavjud, stock tracking)',
+      'Customer service (comments, feedbacks, javoblar, reyting monitoring)',
+      'Promotions (discounts, aksiyalar ishlatilayaptimi)',
+      'Analytics (sales data, top products, customer behavior)',
+    ],
+  },
+  {
+    id: 9,
+    icon: '🔎',
+    title: 'Context reklama',
+    description:
+      'Google Ads, Yandex Direct, kalit so\'zlar, budget, konversiya',
+    subParams: [
+      'Google Ads kampaniyalari (search, display, shopping, video)',
+      'Yandex Direct (kampaniyalar mavjudligi, Russian market)',
+      'Kalit so\'zlar (relevant keywords, negative keywords)',
+      'Budget va bid strategies (CPC, ad spend optimization)',
+      'Landing pages (sifat, relevance, conversion rate)',
+      'Remarketing (retargeting setup, audience segments)',
+    ],
+  },
+  {
+    id: 10,
+    icon: '📞',
+    title: 'Call center',
+    description:
+      'Skript, KEV varonka, offer, qayta aloqa tizimi, suhbat sifati',
+    subParams: [
+      'Telefon skript (muammo yechimi, offer taqdimoti, objection handling)',
+      'KEV varonka (awareness → interest → desire → action)',
+      'Offer sifati (attraktiv, value proposition, urgency, scarcity)',
+      'Qayta aloqa — follow up (1st, 2nd, 3rd follow-up timing)',
+      'Suhbat sifati (professional, product knowledge, customer-centric)',
+      'KPI tracking (calls made, conversion rate, average call duration)',
+    ],
+  },
+  {
+    id: 11,
+    icon: '🗺️',
+    title: 'Xarita presence',
+    description:
+      "Google Map, Yandex, 2GIS ro'yxat, reviews va to'liqlik tahlili",
+    subParams: [
+      'Google Map (Business Profile, NAP, hours, reviews, photos)',
+      "Yandex Business (mavjudligi, to'liqligi, Russian audience)",
+      "2GIS (manzil to'g'ri, kontakt ma'lumotlar, navigatsiya)",
+      'Reviews monitoring (barcha platformada baho va javoblar)',
+      "Consistency (barcha platformalarda bir xil NAP ma'lumotlar)",
+      'Local SEO (local keywords, geotagging, proximity factors)',
+    ],
+  },
+  {
+    id: 12,
+    icon: '⚔️',
+    title: 'Raqobatchilar SWOT',
+    description:
+      "Kuchli/zaif tomonlar, imkoniyatlar, tahdidlar, narxlarni solishtirish",
+    subParams: [
+      'Strengths (kuchli tomonlari, unique selling proposition)',
+      'Weaknesses (zaif tomonlari, muammolari, gaplar)',
+      'Opportunities (bozor imkoniyatlari, market trends)',
+      'Threats (yangi raqobatchilar, market changes)',
+      'Price comparison (narxlarni solishtirish, value proposition)',
+      "Best practices (o'rganish, innovative approaches)",
+    ],
+  },
+] as const
+
+function StatusIcon({ status, size = 'md' }: { status: AuditSubParam['yourStatus']; size?: 'sm' | 'md' }) {
+  const s = size === 'sm' ? 'w-5 h-5 text-xs' : 'w-6 h-6 text-sm'
+  if (status === 'good') {
+    return (
+      <div
+        className={`${s} rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center shrink-0`}
+      >
+        <span className="text-emerald-400">✓</span>
+      </div>
+    )
+  }
+  if (status === 'bad') {
+    return (
+      <div
+        className={`${s} rounded-full bg-red-500/20 border border-red-500/30 flex items-center justify-center shrink-0`}
+      >
+        <span className="text-red-400">✗</span>
+      </div>
+    )
+  }
+  return (
+    <div
+      className={`${s} rounded-full bg-amber-500/20 border border-amber-500/30 flex items-center justify-center shrink-0`}
+    >
+      <span className="text-amber-400">~</span>
+    </div>
+  )
+}
+
+function ScoreCircle({ score, label, color }: { score: number; label: string; color: 'green' | 'red' }) {
+  const c = color === 'green' ? '#10B981' : '#EF4444'
+  const bg = color === 'green' ? 'bg-emerald-500/10' : 'bg-red-500/10'
+  const border = color === 'green' ? 'border-emerald-500/20' : 'border-red-500/20'
+  const text = color === 'green' ? 'text-emerald-400' : 'text-red-400'
+
+  return (
+    <div className={`flex flex-col items-center p-4 rounded-xl border ${bg} ${border}`}>
+      <span className={`text-4xl font-black ${text}`}>{score}</span>
+      <span className="text-[#9CA3AF] text-xs mt-1 text-center">{label}</span>
+      <div className="w-full bg-[#2A2A3A] rounded-full h-1.5 mt-2">
+        <div className="h-full rounded-full" style={{ width: `${score}%`, backgroundColor: c }} />
+      </div>
+    </div>
+  )
+}
+
+export default function CompetitorsPage() {
+  const { currentWorkspace } = useWorkspaceStore()
+
+  const [form, setForm] = useState({
+    name: '',
+    instagram: '',
+    website: '',
+  })
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [result, setResult] = useState<CompetitorAnalysis | null>(null)
+  const [openCategory, setOpenCategory] = useState<number | null>(null)
+  const [activeTab, setActiveTab] = useState<'audit' | 'strategy'>('audit')
+
+  function update(field: string, value: string) {
+    setForm((p) => ({ ...p, [field]: value }))
+  }
+
+  function validate(): string | null {
+    if (!form.name.trim()) return 'Raqobatchi nomini kiriting'
+    if (!form.instagram.trim() && !form.website.trim())
+      return 'Kamida bitta havola kiriting (Instagram yoki sayt)'
+    return null
+  }
+
+  async function handleAnalyze() {
+    const err = validate()
+    if (err) {
+      setError(err)
+      return
+    }
+    setError('')
+    setLoading(true)
+    setResult(null)
+
+    try {
+      const res = await apiClient.post('/ai-agent/competitor-analysis', {
+        workspaceId: currentWorkspace?.id,
+        competitor: form,
+        businessContext: {
+          name: currentWorkspace?.name,
+          industry: (currentWorkspace as any)?.industry,
+          productDescription: (currentWorkspace as any)?.productDescription,
+          targetLocation: (currentWorkspace as any)?.targetLocation,
+          monthlyBudget: (currentWorkspace as any)?.monthlyBudget,
+          goal: (currentWorkspace as any)?.goal,
+          aiStrategy: currentWorkspace?.aiStrategy,
+        },
+      })
+      setResult(res.data)
+      setActiveTab('audit')
+      setOpenCategory(null)
+    } catch (e: any) {
+      setError(e.response?.data?.message || 'Tahlil amalga oshirilmadi')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const computed = useMemo(() => {
+    if (!result) return null
+    const totalYourGood =
+      result.categories.reduce(
+        (acc, cat) =>
+          acc + cat.subParams.filter((s) => s.yourStatus === 'good').length,
+        0,
+      ) ?? 0
+    const totalCompGood =
+      result.categories.reduce(
+        (acc, cat) =>
+          acc + cat.subParams.filter((s) => s.competitorStatus === 'good').length,
+        0,
+      ) ?? 0
+    return { totalYourGood, totalCompGood }
+  }, [result])
+
+  return (
+    <div className="space-y-6 max-w-5xl">
+      <div>
+        <div className="flex items-center gap-3 mb-1">
+          <h1 className="text-2xl font-bold text-white">Raqobatchi Tahlili</h1>
+          <Badge variant="purple">🔥 Audit</Badge>
+        </div>
+        <p className="text-[#6B7280] text-sm">
+          12 ta audit kategoriyasi bo‘yicha siz va raqobatchi solishtiriladi
+        </p>
+      </div>
+
+      <Card>
+        <div className="flex items-center gap-2 mb-5">
+          <span className="text-xl">⚔️</span>
+          <h2 className="font-semibold text-white">Raqobatchi ma’lumotlari</h2>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-[#9CA3AF] mb-2">
+              Raqobatchi nomi <span className="text-red-400">*</span>
+            </label>
+            <input
+              type="text"
+              value={form.name}
+              onChange={(e) => update('name', e.target.value)}
+              placeholder="Masalan: Texnomart, MediaPark, ..."
+              className="w-full bg-[#1C1C27] border border-[#2A2A3A] rounded-xl px-4 py-3 text-white placeholder:text-[#4B5563] focus:outline-none focus:border-[#7C3AED] transition-all"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-[#9CA3AF] mb-2">
+                Instagram <span className="text-red-400">*</span>
+                <span className="text-[#4B5563] font-normal ml-1">
+                  (@username yoki URL)
+                </span>
+              </label>
+              <div className="relative">
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-lg">
+                  📸
+                </span>
+                <input
+                  type="text"
+                  value={form.instagram}
+                  onChange={(e) => update('instagram', e.target.value)}
+                  placeholder="@texnomart_uz"
+                  className="w-full bg-[#1C1C27] border border-[#2A2A3A] rounded-xl pl-10 pr-4 py-3 text-white placeholder:text-[#4B5563] focus:outline-none focus:border-[#7C3AED] transition-all"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#9CA3AF] mb-2">
+                Veb-sayt <span className="text-red-400">*</span>
+                <span className="text-[#4B5563] font-normal ml-1">(URL)</span>
+              </label>
+              <div className="relative">
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-lg">
+                  🌐
+                </span>
+                <input
+                  type="text"
+                  value={form.website}
+                  onChange={(e) => update('website', e.target.value)}
+                  placeholder="https://texnomart.uz"
+                  className="w-full bg-[#1C1C27] border border-[#2A2A3A] rounded-xl pl-10 pr-4 py-3 text-white placeholder:text-[#4B5563] focus:outline-none focus:border-[#7C3AED] transition-all"
+                />
+              </div>
+            </div>
+          </div>
+
+          {error && <Alert variant="error">{error}</Alert>}
+
+          <Button fullWidth size="lg" loading={loading} onClick={handleAnalyze}>
+            {loading ? 'Tahlil qilinmoqda (AI 12 bo‘lim)...' : '🔍 Tahlilni boshlash'}
+          </Button>
+        </div>
+      </Card>
+
+      {loading && (
+        <Card>
+          <div className="py-10 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-[#7C3AED]/10 border border-[#7C3AED]/20 flex items-center justify-center mx-auto mb-4">
+              <Spinner size="lg" />
+            </div>
+            <h3 className="text-white font-semibold mb-1">
+              Tahlil qilinmoqda...
+            </h3>
+            <p className="text-[#6B7280] text-sm mb-5">
+              12 bo‘lim, 72 parametr tekshiriladi
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-w-sm mx-auto">
+              {AUDIT_CATEGORIES.map((cat) => (
+                <div key={cat.id} className="flex items-center gap-2 text-xs text-[#6B7280]">
+                  <span>{cat.icon}</span> {cat.title}
+                </div>
+              ))}
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {result && !loading && (
+        <div className="space-y-5">
+          <Card
+            className={`border-2 ${
+              result.overallWinner === 'you'
+                ? 'border-emerald-500/40'
+                : result.overallWinner === 'competitor'
+                  ? 'border-red-500/30'
+                  : 'border-[#7C3AED]/30'
+            }`}
+          >
+            <div className="flex flex-col md:flex-row items-center gap-6 p-4">
+              <div className="flex-1 text-center md:text-left">
+                <p className="text-4xl mb-2">
+                  {result.overallWinner === 'you'
+                    ? '🏆'
+                    : result.overallWinner === 'competitor'
+                      ? '😤'
+                      : '🤝'}
+                </p>
+                <h2
+                  className={`text-xl font-bold ${
+                    result.overallWinner === 'you'
+                      ? 'text-emerald-400'
+                      : result.overallWinner === 'competitor'
+                        ? 'text-red-400'
+                        : 'text-[#A78BFA]'
+                  }`}
+                >
+                  {result.overallWinner === 'you'
+                    ? 'Siz oldindasiz!'
+                    : result.overallWinner === 'competitor'
+                      ? `${result.competitor.name} sizdan oldinda`
+                      : 'Teng darajada'}
+                </h2>
+                <p className="text-[#6B7280] text-sm mt-1">
+                  72 parametr bo‘yicha siz {computed?.totalYourGood ?? 0}, raqobatchi {computed?.totalCompGood ?? 0} ta “good” segmentga ega
+                </p>
+              </div>
+
+              <div className="flex items-center gap-4 shrink-0">
+                <ScoreCircle
+                  score={result.overallScore.you}
+                  label={currentWorkspace?.name ?? 'Siz'}
+                  color="green"
+                />
+                <div className="text-[#4B5563] font-bold text-xl">vs</div>
+                <ScoreCircle
+                  score={result.overallScore.competitor}
+                  label={result.competitor.name}
+                  color="red"
+                />
+              </div>
+            </div>
+          </Card>
+
+          <div className="grid grid-cols-2 gap-4">
+            <Card>
+              <p className="text-emerald-400 font-semibold text-sm mb-3">
+                ✅ Sizning ustunliklaringiz
+              </p>
+              <ul className="space-y-1.5">
+                {result.topStrengths.map((s, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-[#D1D5DB]">
+                    <span className="text-emerald-400 shrink-0">✓</span> {s}
+                  </li>
+                ))}
+              </ul>
+            </Card>
+            <Card>
+              <p className="text-red-400 font-semibold text-sm mb-3">
+                ⚠️ Orqada qolgan joylaringiz
+              </p>
+              <ul className="space-y-1.5">
+                {result.topWeaknesses.map((w, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-[#D1D5DB]">
+                    <span className="text-red-400 shrink-0">!</span> {w}
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          </div>
+
+          <Card className="border-amber-500/30 bg-amber-500/5">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-xl">⚡</span>
+              <h3 className="font-semibold text-amber-400">
+                Darhol hal qilish kerak (Top 5)
+              </h3>
+            </div>
+            <div className="space-y-2">
+              {result.urgentFixes.map((fix, i) => (
+                <div
+                  key={i}
+                  className="flex items-start gap-3 bg-amber-500/5 border border-amber-500/15 rounded-lg px-3 py-2.5"
+                >
+                  <span className="text-amber-400 font-bold text-sm shrink-0 mt-0.5">
+                    {i + 1}
+                  </span>
+                  <p className="text-[#D1D5DB] text-sm">{fix}</p>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <div className="flex gap-1 bg-[#13131A] border border-[#2A2A3A] rounded-xl p-1 w-fit">
+            {[
+              { key: 'audit', label: '📋 12 bo‘lim tahlili' },
+              { key: 'strategy', label: '📅 Yillik strategiya' },
+            ].map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key as any)}
+                className={`
+                  px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200
+                  ${
+                    activeTab === tab.key
+                      ? 'bg-[#7C3AED] text-white'
+                      : 'text-[#6B7280] hover:text-white hover:bg-[#1C1C27]'
+                  }
+                `}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {activeTab === 'audit' && (
+            <div className="space-y-3">
+              {result.categories.map((cat) => {
+                const isOpen = openCategory === cat.id
+                const yourGood = cat.subParams.filter((s) => s.yourStatus === 'good').length
+                const compGood = cat.subParams.filter((s) => s.competitorStatus === 'good').length
+                const catWinner = yourGood > compGood ? 'you' : yourGood < compGood ? 'comp' : 'tie'
+
+                return (
+                  <Card key={cat.id} padding="none">
+                    <button
+                      onClick={() => setOpenCategory(isOpen ? null : cat.id)}
+                      className="w-full flex items-center gap-4 px-5 py-4 text-left"
+                    >
+                      <span className="text-2xl shrink-0">{cat.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <span className="text-[#4B5563] text-xs font-medium">{cat.id}.</span>
+                          <h3 className="font-semibold text-white text-sm">{cat.title}</h3>
+                          {catWinner === 'you' && (
+                            <Badge variant="success" size="sm">Siz oldinda</Badge>
+                          )}
+                          {catWinner === 'comp' && (
+                            <Badge variant="danger" size="sm">Orqadasiz</Badge>
+                          )}
+                        </div>
+                        <p className="text-[#4B5563] text-xs">{cat.description}</p>
+                      </div>
+
+                      <div className="flex items-center gap-4 shrink-0">
+                        <div className="text-center">
+                          <span className="text-emerald-400 font-bold text-base block">
+                            {yourGood}/{cat.subParams.length}
+                          </span>
+                          <span className="text-[#4B5563] text-xs">Siz</span>
+                        </div>
+                        <div className="text-center">
+                          <span className="text-red-400 font-bold text-base block">
+                            {compGood}/{cat.subParams.length}
+                          </span>
+                          <span className="text-[#4B5563] text-xs">Raqobatchi</span>
+                        </div>
+                      </div>
+                    </button>
+
+                    {isOpen && (
+                      <div className="border-t border-[#2A2A3A]">
+                        <div className="grid grid-cols-[1fr_1fr_1fr] gap-0 px-5 py-2.5 bg-[#0D0D15] border-b border-[#1C1C27]">
+                          <p className="text-[#4B5563] text-xs font-medium uppercase tracking-wide">Parametr</p>
+                          <p className="text-emerald-400 text-xs font-medium pl-3">Siz</p>
+                          <p className="text-red-400 text-xs font-medium pl-3">{result.competitor.name}</p>
+                        </div>
+
+                        {cat.subParams.map((sub, i) => (
+                          <div
+                            key={i}
+                            className={`
+                              grid grid-cols-[1fr_1fr_1fr] gap-0 px-5 py-3.5
+                              border-b border-[#1C1C27] last:border-0
+                              ${i % 2 === 0 ? '' : 'bg-[#0D0D15]/40'}
+                            `}
+                          >
+                            <div className="pr-4">
+                              <p className="text-[#9CA3AF] text-xs leading-relaxed">{sub.name}</p>
+                            </div>
+
+                            <div className="pl-3 pr-4 flex items-start gap-2">
+                              <StatusIcon status={sub.yourStatus} size="sm" />
+                              <p className="text-xs text-[#D1D5DB] leading-relaxed">{sub.yourNote}</p>
+                            </div>
+
+                            <div className="pl-3 flex items-start gap-2">
+                              <StatusIcon status={sub.competitorStatus} size="sm" />
+                              <p className="text-xs text-[#D1D5DB] leading-relaxed">{sub.competitorNote}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </Card>
+                )
+              })}
+            </div>
+          )}
+
+          {activeTab === 'strategy' && (
+            <div className="space-y-4">
+              <Card>
+                <div className="flex items-center gap-2 mb-5">
+                  <span className="text-lg">📅</span>
+                  <h2 className="font-semibold text-white">Yillik Marketing Strategiyasi</h2>
+                  <Badge variant="purple" size="sm">Auditga asoslangan</Badge>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[
+                    { key: 'q1', months: 'Yanvar – Mart', icon: '❄️', text: result.annualStrategy.q1, color: 'border-blue-500/30 bg-blue-500/5', tc: 'text-blue-400' },
+                    { key: 'q2', months: 'Aprel – Iyun', icon: '🌸', text: result.annualStrategy.q2, color: 'border-emerald-500/30 bg-emerald-500/5', tc: 'text-emerald-400' },
+                    { key: 'q3', months: 'Iyul – Sentabr', icon: '☀️', text: result.annualStrategy.q3, color: 'border-amber-500/30 bg-amber-500/5', tc: 'text-amber-400' },
+                    { key: 'q4', months: 'Oktabr – Dekabr', icon: '🎄', text: result.annualStrategy.q4, color: 'border-red-500/30 bg-red-500/5', tc: 'text-red-400' },
+                  ].map((q) => (
+                    <div key={q.key} className={`border rounded-xl p-4 ${q.color}`}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-xl">{q.icon}</span>
+                        <span className={`font-bold text-lg ${q.tc}`}>{q.key.toUpperCase()}</span>
+                        <span className="text-[#4B5563] text-xs">{q.months}</span>
+                      </div>
+                      <p className="text-[#D1D5DB] text-sm leading-relaxed">{q.text}</p>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+
+              <Card>
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-lg">🎯</span>
+                  <h3 className="font-semibold text-white">Asosiy harakatlar</h3>
+                </div>
+                <div className="space-y-2">
+                  {result.annualStrategy.keyActions.map((action, i) => (
+                    <div key={i} className="flex items-start gap-3 bg-[#1C1C27] rounded-xl px-4 py-3">
+                      <div className="w-6 h-6 rounded-lg bg-[#7C3AED]/20 flex items-center justify-center shrink-0">
+                        <span className="text-[#A78BFA] text-xs font-bold">{i + 1}</span>
+                      </div>
+                      <p className="text-[#D1D5DB] text-sm leading-relaxed">{action}</p>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+
+              <Card>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-lg">💰</span>
+                  <h3 className="font-semibold text-white">Byudjet tavsiyasi</h3>
+                </div>
+                <p className="text-[#D1D5DB] text-sm leading-relaxed">
+                  {result.annualStrategy.budgetAdvice}
+                </p>
+              </Card>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+

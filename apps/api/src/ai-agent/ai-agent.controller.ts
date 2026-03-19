@@ -3,6 +3,7 @@ import {
   Post,
   Patch,
   Param,
+  Body,
   UseGuards,
   HttpCode,
   HttpStatus,
@@ -23,6 +24,24 @@ import { AiAgentService } from "./ai-agent.service";
 @ApiBearerAuth()
 export class AiAgentController {
   constructor(private readonly aiAgentService: AiAgentService) {}
+
+  @Post("generate-scripts/:workspaceId")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: "Generate platform-specific ad scripts after onboarding",
+  })
+  async generateScripts(@Param("workspaceId") workspaceId: string, @Body() dto: any) {
+    return this.aiAgentService.generateAdScripts(workspaceId, dto);
+  }
+
+  @Post("competitor-analysis")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: "Analyze a competitor against the client's business (12-category audit)",
+  })
+  async analyzeCompetitor(@Body() dto: any) {
+    return this.aiAgentService.analyzeCompetitor(dto);
+  }
 
   @Post("workspaces/:workspaceId/strategy")
   @HttpCode(HttpStatus.OK)
@@ -68,5 +87,12 @@ export class AiAgentController {
   @ApiOperation({ summary: "Reject a pending AI decision (ASSISTED mode)" })
   async rejectDecision(@Param("decisionId") decisionId: string) {
     return this.aiAgentService.rejectDecision(decisionId);
+  }
+
+  @Post("score-creative")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: "Score a creative using GPT-4o Vision" })
+  async scoreCreative(@Body() dto: any) {
+    return this.aiAgentService.scoreCreative(dto)
   }
 }

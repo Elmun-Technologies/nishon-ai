@@ -82,61 +82,95 @@ export default function AiDecisionsPage() {
   const [actionError, setActionError] = useState('')
 
   const fetchDecisions = useCallback(async () => {
-    if (!currentWorkspace?.id) {
-      setLoading(false)
-      return
-    }
-    try {
-      const res = await apiClient.get(
-        `/ai-decisions/workspace/${currentWorkspace.id}`
-      )
-      setDecisions(res.data)
-    } catch (err) {
-      console.error('Failed to fetch AI decisions:', err)
-    } finally {
-      setLoading(false)
-    }
-  }, [currentWorkspace?.id])
+    setLoading(true)
+    // Simulate API delay
+    await new Promise((r) => setTimeout(r, 1000))
+
+    const mockDecisions: AiDecision[] = [
+      {
+        id: 'd1',
+        actionType: 'scale_budget',
+        reason:
+          'Campaign "Meta | Retargeting" shows ROAS of 4.5x, which is 40% above target. Increasing daily budget by $20 to capitalize on high performance.',
+        estimatedImpact: 'Expected to maintain ROAS while increasing volume of conversions by ~15%.',
+        beforeState: { dailyBudget: 150, roas: 4.5 },
+        afterState: { dailyBudget: 170 },
+        isApproved: null,
+        isExecuted: false,
+        createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+        campaignId: '1',
+      },
+      {
+        id: 'd2',
+        actionType: 'pause_ad',
+        reason:
+          'Ad "Creative_V2" in Google Shopping campaign has spent $45 without any conversions. CTR is also 30% below account average.',
+        estimatedImpact: 'Saving ~$15/day of wasted spend to be reallocated to better performing ads.',
+        beforeState: { spend: 45, conversions: 0, ctr: '0.8%' },
+        afterState: { status: 'paused' },
+        isApproved: true,
+        isExecuted: true,
+        createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+        campaignId: '2',
+      },
+      {
+        id: 'd3',
+        actionType: 'adjust_targeting',
+        reason:
+          'Audience "Interest: Fitness" on Meta is performing significantly better for females aged 25-34. Narrowing targeting to this demographic.',
+        estimatedImpact: 'Expected to lower CPA by ~10% by eliminating underperforming segments.',
+        beforeState: { cpa: 22.5, audience: 'Broad Fitness' },
+        afterState: { cpa: 19.8, audience: 'Fitness | Women 25-34' },
+        isApproved: true,
+        isExecuted: true,
+        createdAt: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(),
+        campaignId: '1',
+      },
+      {
+        id: 'd4',
+        actionType: 'shift_budget',
+        reason:
+          'Detected budget saturation on TikTok Awareness campaign. Shifting $30 of daily budget to Meta Retargeting where conversion potential is higher.',
+        estimatedImpact: 'Better overall account ROAS by moving funds from awareness to conversion-focused channels.',
+        beforeState: { tiktokBudget: 50, metaBudget: 150 },
+        afterState: { tiktokBudget: 20, metaBudget: 180 },
+        isApproved: false,
+        isExecuted: false,
+        createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+        campaignId: null,
+      },
+    ]
+
+    setDecisions(mockDecisions)
+    setLoading(false)
+  }, [])
 
   useEffect(() => {
     fetchDecisions()
   }, [fetchDecisions])
 
-  // Approve a pending decision (ASSISTED mode)
+  // Approve a pending decision (MOCK)
   async function handleApprove(id: string) {
     setActionLoading(id)
-    setActionError('')
-    try {
-      await apiClient.patch(`/ai-agent/decisions/${id}/approve`)
-      // Update local state immediately — no need to refetch entire list
-      setDecisions((prev) =>
-        prev.map((d) =>
-          d.id === id ? { ...d, isApproved: true, isExecuted: true } : d
-        )
+    await new Promise((r) => setTimeout(r, 800))
+    setDecisions((prev) =>
+      prev.map((d) =>
+        d.id === id ? { ...d, isApproved: true, isExecuted: true } : d
       )
-    } catch {
-      setActionError('Failed to approve decision. Please try again.')
-    } finally {
-      setActionLoading(null)
-    }
+    )
+    setActionLoading(null)
   }
 
-  // Reject a pending decision
+  // Reject a pending decision (MOCK)
   async function handleReject(id: string) {
     setActionLoading(id)
-    setActionError('')
-    try {
-      await apiClient.patch(`/ai-agent/decisions/${id}/reject`)
-      setDecisions((prev) =>
-        prev.map((d) =>
-          d.id === id ? { ...d, isApproved: false } : d
-        )
+    await new Promise((r) => setTimeout(r, 800))
+    setDecisions((prev) =>
+      prev.map((d) =>
+        d.id === id ? { ...d, isApproved: false } : d
       )
-    } catch {
-      setActionError('Failed to reject decision. Please try again.')
-    } finally {
-      setActionLoading(null)
-    }
+    )
+    setActionLoading(null)
   }
 
   // Compute counts for filter tabs

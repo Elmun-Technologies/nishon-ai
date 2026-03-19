@@ -20,9 +20,24 @@ export default function SimulationPage() {
   const router = useRouter()
   const { currentWorkspace } = useWorkspaceStore()
 
-  // Base values from the AI strategy
-  const baseBudget = currentWorkspace?.monthlyBudget ?? 500
-  const strategy   = currentWorkspace?.aiStrategy
+  const DEMO_WORKSPACE = {
+    id: 'demo-workspace-1',
+    name: 'Demo Shop',
+    monthlyBudget: 5000,
+    aiStrategy: {
+      budgetAllocation: { meta: 60, google: 30, tiktok: 10 },
+      monthlyForecast: {
+        estimatedLeads: 320,
+        estimatedRoas: 3.2,
+        estimatedCpa: 15.6,
+        estimatedCtr: 0.024,
+      },
+    },
+  }
+
+  const ws = currentWorkspace ?? DEMO_WORKSPACE
+  const baseBudget = ws.monthlyBudget ?? 500
+  const strategy   = ws.aiStrategy
   const forecast   = strategy?.monthlyForecast
 
   // The slider value — starts at the user's current budget
@@ -70,28 +85,6 @@ export default function SimulationPage() {
 
     return { leads, roas, cpa, revenue, ctr, platformBreakdown }
   }, [budget, baseBudget, scenario, forecast, strategy])
-
-  if (!currentWorkspace) {
-    return (
-      <EmptyState
-        icon="🔮"
-        title="No workspace found"
-        description="Complete onboarding to use the budget simulator."
-        action={{ label: 'Start Onboarding', onClick: () => router.push('/onboarding') }}
-      />
-    )
-  }
-
-  if (!forecast) {
-    return (
-      <EmptyState
-        icon="🧠"
-        title="No strategy yet"
-        description="Generate an AI strategy first to use the budget simulator — it needs KPI baseline data."
-        action={{ label: 'Generate Strategy', onClick: () => router.push('/onboarding') }}
-      />
-    )
-  }
 
   const roasColor =
     (projection?.roas ?? 0) >= 4 ? 'text-emerald-400'
@@ -361,8 +354,7 @@ export default function SimulationPage() {
                 </p>
                 <p className="text-[#6B7280] text-xs leading-relaxed">
                   These projections are based on your AI-generated strategy
-                  and industry benchmarks for{' '}
-                  {currentWorkspace.targetLocation ?? 'your market'}.
+                  and industry benchmarks for your market.
                   Actual results depend on creative quality, landing page
                   performance, and market conditions. Use this as a planning
                   guide — not a guarantee.

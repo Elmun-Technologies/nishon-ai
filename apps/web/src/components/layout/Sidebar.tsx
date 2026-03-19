@@ -17,7 +17,7 @@ const NAV_ITEMS = [
     ),
   },
   {
-    href: '/dashboard/campaigns',
+    href: '/campaigns',
     label: 'Campaigns',
     icon: (
       <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -26,7 +26,7 @@ const NAV_ITEMS = [
     ),
   },
   {
-    href: '/dashboard/ai-decisions',
+    href: '/ai-decisions',
     label: 'AI Decisions',
     icon: (
       <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -36,7 +36,7 @@ const NAV_ITEMS = [
     badge: true,
   },
   {
-    href: '/dashboard/budget',
+    href: '/budget',
     label: 'Budget',
     icon: (
       <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -45,7 +45,7 @@ const NAV_ITEMS = [
     ),
   },
   {
-    href: '/dashboard/simulation',
+    href: '/simulation',
     label: 'Simulation',
     icon: (
       <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -54,7 +54,37 @@ const NAV_ITEMS = [
     ),
   },
   {
-    href: '/dashboard/settings',
+    href: '/competitors',
+    label: 'Competitors',
+    icon: (
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path d="M8 21h8" />
+        <path d="M12 17v4" />
+        <path d="M4 7l8-4 8 4-8 4-8-4Z" />
+        <path d="M4 7v10l8 4 8-4V7" />
+      </svg>
+    ),
+  },
+  {
+    href: '/creative-scorer',
+    label: 'Creative Scorer',
+    icon: (
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+      </svg>
+    ),
+  },
+  {
+    href: '/roi-calculator',
+    label: 'ROI Kalkulyator',
+    icon: (
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+      </svg>
+    ),
+  },
+  {
+    href: '/settings',
     label: 'Settings',
     icon: (
       <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>

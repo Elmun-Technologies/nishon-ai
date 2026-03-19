@@ -38,25 +38,19 @@ export default function BudgetPage() {
   const [loading, setLoading] = useState(true)
 
   const fetchBudget = useCallback(async () => {
-    if (!currentWorkspace?.id) {
-      setLoading(false)
-      return
-    }
-    try {
-      const res = await apiClient.get(
-        `/workspaces/${currentWorkspace.id}`
-      )
-      // Budget comes nested inside workspace response
-      const ws = res.data
-      if (ws.budgets && ws.budgets.length > 0) {
-        setBudget(ws.budgets[0])
-      }
-    } catch (err) {
-      console.error('Failed to fetch budget:', err)
-    } finally {
-      setLoading(false)
-    }
-  }, [currentWorkspace?.id])
+    setLoading(true)
+    // Simulate API delay
+    await new Promise((r) => setTimeout(r, 600))
+
+    setBudget({
+      id: 'b1',
+      totalBudget: 5000,
+      platformSplit: { meta: 60, google: 30, tiktok: 10 },
+      period: 'monthly',
+      autoRebalance: true,
+    })
+    setLoading(false)
+  }, [])
 
   useEffect(() => {
     fetchBudget()
@@ -64,19 +58,43 @@ export default function BudgetPage() {
 
   if (loading) return <PageSpinner />
 
-  if (!currentWorkspace) {
-    return (
-      <EmptyState
-        icon="💰"
-        title="No workspace found"
-        description="Complete onboarding to set up your budget allocation."
-      />
-    )
+  const DEMO_WORKSPACE = {
+    id: 'demo-workspace-1',
+    name: 'Demo Shop',
+    industry: 'E-commerce',
+    monthlyBudget: 5000,
+    goal: 'increase_sales',
+    autopilotMode: 'assisted',
+    isOnboardingComplete: true,
+    aiStrategy: {
+      summary:
+        'Focus 60% budget on Meta retargeting high-intent audiences. Allocate 30% to Google Shopping targeting bottom-funnel keywords. Reserve 10% for TikTok awareness.',
+      budgetAllocation: { meta: 60, google: 30, tiktok: 10 },
+      monthlyForecast: {
+        estimatedLeads: 320,
+        estimatedRoas: 3.2,
+        estimatedCpa: 15.6,
+        estimatedSales: 45,
+        estimatedCtr: 0.024,
+        confidence: 'High (85%)',
+      },
+      creativeGuidelines: {
+        tone: 'Professional yet approachable, focusing on value and quality.',
+        keyMessages: [
+          'Premium quality products for daily use.',
+          'Limited time offer: 20% off first order.',
+          'Fast & Free shipping across Uzbekistan.',
+        ],
+        callToActions: ['Shop Now', 'Learn More', 'Get Offer'],
+      },
+    },
   }
 
-  const strategy = currentWorkspace.aiStrategy
+  const ws = currentWorkspace ?? DEMO_WORKSPACE
+
+  const strategy = ws.aiStrategy
   const allocation = budget?.platformSplit ?? strategy?.budgetAllocation ?? {}
-  const totalBudget = budget?.totalBudget ?? currentWorkspace.monthlyBudget ?? 0
+  const totalBudget = budget?.totalBudget ?? ws.monthlyBudget ?? 0
 
   // Build platform stats with dollar amounts
   const platformStats: PlatformStat[] = Object.entries(allocation).map(

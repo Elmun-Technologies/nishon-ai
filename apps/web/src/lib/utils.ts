@@ -4,27 +4,37 @@ export function cn(...inputs: ClassValue[]) {
   return inputs.filter(Boolean).join(' ')
 }
 
-export function formatCurrency(amount: number, currency = 'USD'): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency,
-    minimumFractionDigits: 2,
-  }).format(amount)
+export function formatCurrency(amount: number | null | undefined, currency = 'USD'): string {
+  if (amount === null || amount === undefined) return '—'
+  try {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency,
+      minimumFractionDigits: 2,
+    }).format(amount)
+  } catch (err) {
+    return '—'
+  }
 }
 
-export function formatNumber(num: number): string {
+export function formatNumber(num: number | null | undefined): string {
+  if (num === null || num === undefined) return '0'
   if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(1)}M`
   if (num >= 1_000) return `${(num / 1_000).toFixed(1)}K`
   return num.toString()
 }
 
-export function formatPercent(value: number): string {
+export function formatPercent(value: number | null | undefined): string {
+  if (value === null || value === undefined) return '0%'
   return `${(value * 100).toFixed(2)}%`
 }
 
-export function timeAgo(date: Date | string): string {
+export function timeAgo(date: Date | string | null | undefined): string {
+  if (!date) return '—'
   const now = new Date()
   const past = new Date(date)
+  if (isNaN(past.getTime())) return '—'
+  
   const diffMs = now.getTime() - past.getTime()
   const diffMins = Math.floor(diffMs / 60000)
   const diffHours = Math.floor(diffMs / 3600000)

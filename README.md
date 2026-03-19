@@ -14,11 +14,11 @@ Nishon AI is an AI agent that autonomously manages digital advertising campaigns
 
 ## Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - Docker & Docker Compose
-- npm or yarn
+- [pnpm](https://pnpm.io/) (recommended package manager)
 
-## Quick Start
+## Quick Start (local development)
 
 1. Clone the repository:
 ```bash
@@ -31,24 +31,24 @@ cd nishon-ai
 cp .env.example .env
 ```
 
-3. Start database services:
+3. Start database services (Postgres + Redis):
 ```bash
-docker-compose up -d postgres redis
+docker compose up -d postgres redis
 ```
 
-4. Install dependencies:
+4. Install dependencies with pnpm:
 ```bash
-npm install
+pnpm install
 ```
 
-5. Start development servers:
+5. Start all apps in dev mode (API + Web):
 ```bash
-npm run dev
+pnpm dev
 ```
 
-The application will be available at:
-- Frontend: http://localhost:3000
-- API: http://localhost:3001
+By default, the applications will be available at:
+- **Frontend (Next.js)**: `http://localhost:3000` (agar port band bo‘lsa, Next avtomatik ravishda `3001`, `3002`, va hokazolarni ishlatadi)
+- **API (NestJS)**: `http://localhost:3001`
 
 ## Project Structure
 
@@ -66,12 +66,14 @@ nishon-ai/
 
 ## Available Scripts
 
-- `npm run dev` - Start development servers
-- `npm run build` - Build all packages
-- `npm run test` - Run tests
-- `npm run lint` - Lint code
-- `npm run db:migrate` - Run database migrations
-- `npm run db:seed` - Seed database
+Root package (`nishon-ai/`) ichidan:
+
+- `pnpm dev` - Turbo orqali barcha ilovalarni dev rejimida ishga tushirish
+- `pnpm build` - Barcha paketlar uchun production build
+- `pnpm test` - Testlarni ishga tushirish
+- `pnpm lint` - Kodni lint qilish
+- `pnpm db:migrate` - API uchun ma’lumotlar bazasi migratsiyalari
+- `pnpm db:seed` - Demo/initial ma’lumotlar bilan bazani to‘ldirish
 
 ## Module Overview
 

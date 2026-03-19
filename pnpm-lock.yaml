@@ -73,6 +73,9 @@ importers:
       node-fetch:
         specifier: ^3.3.0
         version: 3.3.2
+      openai:
+        specifier: ^4.104.0
+        version: 4.104.0
       passport:
         specifier: ^0.7.0
         version: 0.7.0

@@ -5,12 +5,12 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Alert } from '@/components/ui/Alert'
-import { auth } from '@/lib/api-client'
+import { auth, workspaces as workspacesApi } from '@/lib/api-client'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 
 export default function LoginPage() {
   const router = useRouter()
-  const { setUser, setAccessToken } = useWorkspaceStore()
+  const { setUser, setAccessToken, setCurrentWorkspace } = useWorkspaceStore()
   const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -28,7 +28,17 @@ export default function LoginPage() {
       setAccessToken(accessToken)
       setUser(user)
 
-      router.push('/dashboard')
+      // Load user's workspaces so dashboard/competitor analysis can work immediately
+      const wsRes = await workspacesApi.list()
+      const ws = wsRes.data?.[0] ?? null
+
+      setError('')
+      if (ws) {
+        setCurrentWorkspace(ws)
+        router.push('/dashboard')
+      } else {
+        router.push('/onboarding')
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Invalid email or password')
     } finally {
@@ -37,9 +47,40 @@ export default function LoginPage() {
   }
 
   async function handleDemoLogin() {
-    // Fill in the form visually so user sees what's happening
-    setForm({ email: 'demo@nishon.ai', password: 'demo1234' })
-    await handleSubmit({ preventDefault: () => {} } as any)
+    setLoading(true)
+    setError('')
+    // Simulate short loading
+    await new Promise((r) => setTimeout(r, 600))
+
+    const mockUser = {
+      id: 'demo-user-1',
+      email: 'demo@nishon.ai',
+      name: 'Demo User',
+      plan: 'pro',
+    }
+    const mockToken = 'demo_mock_token_nishon_ai'
+    const mockWorkspace = {
+      id: 'demo-workspace-1',
+      name: 'Demo Shop',
+      industry: 'E-commerce',
+      monthlyBudget: 5000,
+      goal: 'increase_sales',
+      autopilotMode: 'assisted',
+      isOnboardingComplete: true,
+      aiStrategy: {
+        summary:
+          'Focus 60% budget on Meta retargeting high-intent audiences. Allocate 30% to Google Shopping targeting bottom-funnel keywords. Reserve 10% for TikTok awareness.',
+        budgetAllocation: { meta: 60, google: 30, tiktok: 10 },
+      },
+    }
+
+    localStorage.setItem('nishon_access_token', mockToken)
+    localStorage.setItem('nishon_refresh_token', 'demo_refresh_token')
+    setAccessToken(mockToken)
+    setUser(mockUser)
+    setCurrentWorkspace(mockWorkspace)
+    setLoading(false)
+    router.push('/dashboard')
   }
 
   return (

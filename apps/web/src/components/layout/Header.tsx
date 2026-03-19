@@ -8,23 +8,35 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
     title: 'Dashboard',
     subtitle: 'Overview of your advertising performance',
   },
-  '/dashboard/campaigns': {
+  '/campaigns': {
     title: 'Campaigns',
     subtitle: 'All campaigns managed by Nishon AI',
   },
-  '/dashboard/ai-decisions': {
+  '/ai-decisions': {
     title: 'AI Decisions',
     subtitle: 'Every action the AI has taken — with full reasoning',
   },
-  '/dashboard/budget': {
+  '/budget': {
     title: 'Budget',
     subtitle: 'Allocation and performance by platform',
   },
-  '/dashboard/simulation': {
+  '/simulation': {
     title: 'Simulation',
     subtitle: 'Forecast results before committing budget',
   },
-  '/dashboard/settings': {
+  '/competitors': {
+    title: 'Competitors',
+    subtitle: "12 bo‘limli audit va SWOT taqqoslash",
+  },
+  '/creative-scorer': {
+    title: 'Creative Scorer',
+    subtitle: 'AI-powered ad creative evaluation',
+  },
+  '/roi-calculator': {
+    title: 'ROI Kalkulyator',
+    subtitle: 'Nishon AI bilan reklama foydasini hisoblash',
+  },
+  '/settings': {
     title: 'Settings',
     subtitle: 'Workspace and account configuration',
   },
