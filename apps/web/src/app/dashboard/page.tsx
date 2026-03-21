@@ -35,7 +35,7 @@ const DEMO_WORKSPACE = {
   },
 }
 
-export default function DashboardPage() {
+export default function Page() {
   const router = useRouter()
   const { currentWorkspace, setCurrentWorkspace } = useWorkspaceStore()
   const [performance, setPerformance] = useState<PerformanceSummary | null>(null)
@@ -334,4 +334,3 @@ export default function DashboardPage() {
     </div>
   )
 }
-
