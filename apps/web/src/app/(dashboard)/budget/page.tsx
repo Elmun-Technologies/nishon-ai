@@ -1,29 +1,25 @@
 'use client'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { PageSpinner } from '@/components/ui/Spinner'
 import { EmptyState } from '@/components/ui/EmptyState'
-import apiClient from '@/lib/api-client'
+import { workspaces as workspacesApi } from '@/lib/api-client'
 import { formatCurrency } from '@/lib/utils'
 
-interface Budget {
-  id: string
-  totalBudget: number
-  platformSplit: Record<string, number>
-  period: string
-  autoRebalance: boolean
+interface PerformanceSummary {
+  totalSpend?: number
+  totalImpressions?: number
+  totalClicks?: number
+  avgRoas?: number
+  avgCpa?: number
+  avgCtr?: number
+  activeCampaigns?: number
+  totalCampaigns?: number
 }
 
-interface PlatformStat {
-  platform: string
-  allocated: number
-  percentage: number
-}
-
-// Platform display config — color for the progress bars
 const PLATFORM_CONFIG: Record<string, { color: string; emoji: string; label: string }> = {
   meta:     { color: '#1877F2', emoji: '📘', label: 'Meta (Facebook & Instagram)' },
   google:   { color: '#4285F4', emoji: '🔍', label: 'Google Ads' },
@@ -34,76 +30,29 @@ const PLATFORM_CONFIG: Record<string, { color: string; emoji: string; label: str
 
 export default function BudgetPage() {
   const { currentWorkspace } = useWorkspaceStore()
-  const [budget, setBudget] = useState<Budget | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  const fetchBudget = useCallback(async () => {
-    setLoading(true)
-    // Simulate API delay
-    await new Promise((r) => setTimeout(r, 600))
-
-    setBudget({
-      id: 'b1',
-      totalBudget: 5000,
-      platformSplit: { meta: 60, google: 30, tiktok: 10 },
-      period: 'monthly',
-      autoRebalance: true,
-    })
-    setLoading(false)
-  }, [])
+  const [performance, setPerformance] = useState<PerformanceSummary | null>(null)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    fetchBudget()
-  }, [fetchBudget])
+    if (!currentWorkspace?.id) return
+    setLoading(true)
+    workspacesApi.performance(currentWorkspace.id)
+      .then((res) => setPerformance((res.data as any) ?? {}))
+      .catch(() => setPerformance({}))
+      .finally(() => setLoading(false))
+  }, [currentWorkspace?.id])
 
   if (loading) return <PageSpinner />
 
-  const DEMO_WORKSPACE = {
-    id: 'demo-workspace-1',
-    name: 'Demo Shop',
-    industry: 'E-commerce',
-    monthlyBudget: 5000,
-    goal: 'increase_sales',
-    autopilotMode: 'assisted',
-    isOnboardingComplete: true,
-    aiStrategy: {
-      summary:
-        'Focus 60% budget on Meta retargeting high-intent audiences. Allocate 30% to Google Shopping targeting bottom-funnel keywords. Reserve 10% for TikTok awareness.',
-      budgetAllocation: { meta: 60, google: 30, tiktok: 10 },
-      monthlyForecast: {
-        estimatedLeads: 320,
-        estimatedRoas: 3.2,
-        estimatedCpa: 15.6,
-        estimatedSales: 45,
-        estimatedCtr: 0.024,
-        confidence: 'High (85%)',
-      },
-      creativeGuidelines: {
-        tone: 'Professional yet approachable, focusing on value and quality.',
-        keyMessages: [
-          'Premium quality products for daily use.',
-          'Limited time offer: 20% off first order.',
-          'Fast & Free shipping across Uzbekistan.',
-        ],
-        callToActions: ['Shop Now', 'Learn More', 'Get Offer'],
-      },
-    },
-  }
+  const strategy = currentWorkspace?.aiStrategy
+  const allocation: Record<string, number> = strategy?.budgetAllocation ?? {}
+  const totalBudget = currentWorkspace?.monthlyBudget ?? 0
 
-  const ws = currentWorkspace ?? DEMO_WORKSPACE
-
-  const strategy = ws.aiStrategy
-  const allocation = budget?.platformSplit ?? strategy?.budgetAllocation ?? {}
-  const totalBudget = budget?.totalBudget ?? ws.monthlyBudget ?? 0
-
-  // Build platform stats with dollar amounts
-  const platformStats: PlatformStat[] = Object.entries(allocation).map(
-    ([platform, pct]) => ({
-      platform,
-      percentage: Number(pct),
-      allocated: (Number(pct) / 100) * totalBudget,
-    })
-  )
+  const platformStats = Object.entries(allocation).map(([platform, pct]) => ({
+    platform,
+    percentage: Number(pct),
+    allocated: (Number(pct) / 100) * totalBudget,
+  }))
 
   const forecast = strategy?.monthlyForecast
 
@@ -118,7 +67,7 @@ export default function BudgetPage() {
             AI-optimized budget distribution across your ad platforms
           </p>
         </div>
-        {budget?.autoRebalance && (
+        {strategy?.autoRebalance && (
           <Badge variant="success" dot>Auto-rebalance on</Badge>
         )}
       </div>
@@ -129,34 +78,32 @@ export default function BudgetPage() {
           {
             label: 'Monthly Budget',
             value: formatCurrency(totalBudget),
-            sub: budget?.period ?? 'monthly',
+            sub: 'per month',
             icon: '💰',
           },
           {
             label: 'Daily Budget',
             value: formatCurrency(totalBudget / 30),
-            sub: 'Per day average',
+            sub: 'per day average',
             icon: '📅',
           },
           {
             label: 'Platforms',
-            value: platformStats.length,
-            sub: 'Active channels',
+            value: platformStats.length || '—',
+            sub: 'active channels',
             icon: '📢',
           },
           {
-            label: 'Auto-rebalance',
-            value: budget?.autoRebalance ? 'Enabled' : 'Disabled',
-            sub: 'AI can shift budget',
-            icon: '⚖️',
+            label: 'Active Campaigns',
+            value: performance?.activeCampaigns ?? '—',
+            sub: `of ${performance?.totalCampaigns ?? '—'} total`,
+            icon: '📊',
           },
         ].map(({ label, value, sub, icon }) => (
           <Card key={label}>
             <div className="flex items-center gap-2 mb-3">
               <span className="text-lg">{icon}</span>
-              <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide">
-                {label}
-              </p>
+              <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide">{label}</p>
             </div>
             <p className="text-xl font-bold text-white">{value}</p>
             <p className="text-[#4B5563] text-xs mt-1 capitalize">{sub}</p>
@@ -164,10 +111,33 @@ export default function BudgetPage() {
         ))}
       </div>
 
-      {/* ── Main content: allocation + forecast ── */}
+      {/* ── Real performance metrics (if available) ── */}
+      {performance && (performance.totalSpend !== undefined || performance.avgRoas !== undefined) && (
+        <Card>
+          <div className="flex items-center gap-2 mb-5">
+            <span className="text-lg">📈</span>
+            <h2 className="font-semibold text-white">Live Performance</h2>
+            <Badge variant="success" size="sm" dot>Real data</Badge>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { label: 'Total Spend', value: performance.totalSpend !== undefined ? formatCurrency(performance.totalSpend) : '—', color: 'text-white' },
+              { label: 'Avg ROAS', value: performance.avgRoas !== undefined ? `${Number(performance.avgRoas).toFixed(1)}x` : '—', color: 'text-emerald-400' },
+              { label: 'Avg CPA', value: performance.avgCpa !== undefined ? formatCurrency(performance.avgCpa) : '—', color: 'text-white' },
+              { label: 'Avg CTR', value: performance.avgCtr !== undefined ? `${(Number(performance.avgCtr) * 100).toFixed(2)}%` : '—', color: 'text-white' },
+            ].map(({ label, value, color }) => (
+              <div key={label} className="bg-[#1C1C27] border border-[#2A2A3A] rounded-xl p-4">
+                <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide mb-2">{label}</p>
+                <p className={`text-xl font-bold ${color}`}>{value}</p>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {/* ── Allocation + forecast ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-        {/* Platform allocation breakdown */}
         <Card>
           <div className="flex items-center gap-2 mb-5">
             <span className="text-lg">📊</span>
@@ -184,74 +154,44 @@ export default function BudgetPage() {
           ) : (
             <div className="space-y-5">
               {platformStats.map(({ platform, percentage, allocated }) => {
-                const config = PLATFORM_CONFIG[platform] ?? {
-                  color: '#7C3AED',
-                  emoji: '📢',
-                  label: platform,
-                }
-
+                const config = PLATFORM_CONFIG[platform] ?? { color: '#7C3AED', emoji: '📢', label: platform }
                 return (
                   <div key={platform}>
-                    {/* Platform name row */}
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2.5">
                         <span className="text-base">{config.emoji}</span>
                         <div>
-                          <p className="text-white text-sm font-medium">
-                            {config.label}
-                          </p>
-                          <p className="text-[#4B5563] text-xs">
-                            {formatCurrency(allocated)}/month
-                          </p>
+                          <p className="text-white text-sm font-medium">{config.label}</p>
+                          <p className="text-[#4B5563] text-xs">{formatCurrency(allocated)}/month</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-white font-bold text-sm">
-                          {percentage}%
-                        </p>
-                        <p className="text-[#4B5563] text-xs">
-                          {formatCurrency(allocated / 30)}/day
-                        </p>
+                        <p className="text-white font-bold text-sm">{percentage}%</p>
+                        <p className="text-[#4B5563] text-xs">{formatCurrency(allocated / 30)}/day</p>
                       </div>
                     </div>
-
-                    {/* Progress bar with platform color */}
                     <div className="h-2 bg-[#2A2A3A] rounded-full overflow-hidden">
                       <div
                         className="h-full rounded-full transition-all duration-700"
-                        style={{
-                          width: `${percentage}%`,
-                          backgroundColor: config.color,
-                        }}
+                        style={{ width: `${percentage}%`, backgroundColor: config.color }}
                       />
                     </div>
                   </div>
                 )
               })}
 
-              {/* Visual donut-style summary */}
               <div className="mt-4 pt-4 border-t border-[#2A2A3A]">
                 <div className="flex items-center gap-2 flex-wrap">
                   {platformStats.map(({ platform, percentage }) => {
-                    const config = PLATFORM_CONFIG[platform] ?? {
-                      color: '#7C3AED',
-                      emoji: '📢',
-                    }
+                    const config = PLATFORM_CONFIG[platform] ?? { color: '#7C3AED', emoji: '📢' }
                     return (
                       <div
                         key={platform}
                         className="flex items-center gap-1.5 bg-[#1C1C27] border border-[#2A2A3A] rounded-lg px-2.5 py-1.5"
                       >
-                        <div
-                          className="w-2 h-2 rounded-full"
-                          style={{ backgroundColor: config.color }}
-                        />
-                        <span className="text-[#9CA3AF] text-xs capitalize">
-                          {platform}
-                        </span>
-                        <span className="text-white text-xs font-medium">
-                          {percentage}%
-                        </span>
+                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: config.color }} />
+                        <span className="text-[#9CA3AF] text-xs capitalize">{platform}</span>
+                        <span className="text-white text-xs font-medium">{percentage}%</span>
                       </div>
                     )
                   })}
@@ -261,7 +201,6 @@ export default function BudgetPage() {
           )}
         </Card>
 
-        {/* AI Forecast */}
         <Card>
           <div className="flex items-center gap-2 mb-5">
             <span className="text-lg">🎯</span>
@@ -271,31 +210,17 @@ export default function BudgetPage() {
           {forecast ? (
             <div className="space-y-4">
               {[
-                {
-                  label: 'Estimated Leads',
-                  value: forecast.estimatedLeads ?? '—',
-                  icon: '🎯',
-                  color: 'text-white',
-                },
-                {
-                  label: 'Estimated Sales',
-                  value: forecast.estimatedSales ?? '—',
-                  icon: '🛒',
-                  color: 'text-white',
-                },
+                { label: 'Estimated Leads', value: forecast.estimatedLeads ?? '—', icon: '🎯', color: 'text-white' },
+                { label: 'Estimated Sales', value: forecast.estimatedSales ?? '—', icon: '🛒', color: 'text-white' },
                 {
                   label: 'Estimated ROAS',
-                  value: forecast.estimatedRoas
-                    ? `${Number(forecast.estimatedRoas).toFixed(1)}x`
-                    : '—',
+                  value: forecast.estimatedRoas ? `${Number(forecast.estimatedRoas).toFixed(1)}x` : '—',
                   icon: '📈',
                   color: 'text-emerald-400',
                 },
                 {
                   label: 'Estimated CPA',
-                  value: forecast.estimatedCpa
-                    ? formatCurrency(forecast.estimatedCpa)
-                    : '—',
+                  value: forecast.estimatedCpa ? formatCurrency(forecast.estimatedCpa) : '—',
                   icon: '💵',
                   color: 'text-white',
                 },
@@ -307,12 +232,7 @@ export default function BudgetPage() {
                   icon: '👆',
                   color: 'text-white',
                 },
-                {
-                  label: 'Confidence',
-                  value: forecast.confidence ?? '—',
-                  icon: '🎲',
-                  color: 'text-[#A78BFA]',
-                },
+                { label: 'Confidence', value: forecast.confidence ?? '—', icon: '🎲', color: 'text-[#A78BFA]' },
               ].map(({ label, value, icon, color }) => (
                 <div
                   key={label}
@@ -336,7 +256,7 @@ export default function BudgetPage() {
         </Card>
       </div>
 
-      {/* ── Creative guidelines from strategy ── */}
+      {/* ── Creative guidelines ── */}
       {strategy?.creativeGuidelines && (
         <Card>
           <div className="flex items-center gap-2 mb-4">
@@ -346,40 +266,44 @@ export default function BudgetPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-[#1C1C27] border border-[#2A2A3A] rounded-xl p-4">
-              <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide mb-2">
-                Tone
-              </p>
-              <p className="text-white text-sm">
-                {strategy.creativeGuidelines.tone ?? '—'}
-              </p>
+              <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide mb-2">Tone</p>
+              <p className="text-white text-sm">{strategy.creativeGuidelines.tone ?? '—'}</p>
             </div>
             <div className="bg-[#1C1C27] border border-[#2A2A3A] rounded-xl p-4">
-              <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide mb-2">
-                Key Messages
-              </p>
+              <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide mb-2">Key Messages</p>
               <ul className="space-y-1">
-                {(strategy.creativeGuidelines.keyMessages ?? []).map(
-                  (msg: string, i: number) => (
-                    <li key={i} className="text-white text-sm flex items-start gap-2">
-                      <span className="text-[#7C3AED] mt-0.5">•</span>
-                      {msg}
-                    </li>
-                  )
-                )}
+                {(strategy.creativeGuidelines.keyMessages ?? []).map((msg: string, i: number) => (
+                  <li key={i} className="text-white text-sm flex items-start gap-2">
+                    <span className="text-[#7C3AED] mt-0.5">•</span>
+                    {msg}
+                  </li>
+                ))}
               </ul>
             </div>
             <div className="bg-[#1C1C27] border border-[#2A2A3A] rounded-xl p-4">
-              <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide mb-2">
-                Call to Actions
-              </p>
+              <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide mb-2">Call to Actions</p>
               <div className="flex flex-wrap gap-2">
-                {(strategy.creativeGuidelines.callToActions ?? []).map(
-                  (cta: string, i: number) => (
-                    <Badge key={i} variant="purple" size="sm">{cta}</Badge>
-                  )
-                )}
+                {(strategy.creativeGuidelines.callToActions ?? []).map((cta: string, i: number) => (
+                  <Badge key={i} variant="purple" size="sm">{cta}</Badge>
+                ))}
               </div>
             </div>
+          </div>
+        </Card>
+      )}
+
+      {/* ── No strategy prompt ── */}
+      {!strategy && !loading && (
+        <Card variant="outlined" padding="sm">
+          <div className="flex items-center gap-3 px-2">
+            <span className="text-xl">🧠</span>
+            <div className="flex-1">
+              <p className="text-white text-sm font-medium">No AI strategy yet</p>
+              <p className="text-[#6B7280] text-xs">Go to Settings to generate your first AI strategy and budget plan.</p>
+            </div>
+            <Button variant="secondary" size="sm" onClick={() => window.location.href = '/settings'}>
+              Go to Settings
+            </Button>
           </div>
         </Card>
       )}

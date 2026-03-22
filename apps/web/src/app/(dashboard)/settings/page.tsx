@@ -1,12 +1,15 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
+import { Alert } from '@/components/ui/Alert'
 import { connectMeta, fetchMetaDashboard } from '@/lib/meta'
+import { workspaces as workspacesApi } from '@/lib/api-client'
 
 type Tab = 'general' | 'integrations' | 'notifications' | 'danger'
 
@@ -120,38 +123,94 @@ const INTEGRATIONS = [
 ]
 
 export default function SettingsPage() {
-  const { currentWorkspace, user } = useWorkspaceStore()
+  const { currentWorkspace, user, setCurrentWorkspace } = useWorkspaceStore()
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState<Tab>('general')
 
   const [workspaceName, setWorkspaceName] = useState(currentWorkspace?.name ?? 'My Workspace')
   const [autopilotMode, setAutopilotMode] = useState(currentWorkspace?.autopilotMode ?? 'assisted')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [saveError, setSaveError] = useState('')
 
   const [emailNotifs, setEmailNotifs] = useState(true)
   const [weeklyReport, setWeeklyReport] = useState(true)
   const [aiAlerts, setAiAlerts] = useState(true)
 
-  // Meta connection status
   const [metaConnected, setMetaConnected] = useState<boolean | null>(null)
+
+  // Sync local state when workspace loads from store
+  useEffect(() => {
+    if (currentWorkspace) {
+      setWorkspaceName(currentWorkspace.name ?? '')
+      setAutopilotMode(currentWorkspace.autopilotMode ?? 'assisted')
+    }
+  }, [currentWorkspace?.id])
 
   useEffect(() => {
     if (activeTab !== 'integrations' || !currentWorkspace?.id) return
     setMetaConnected(null)
     fetchMetaDashboard(currentWorkspace.id)
-      .then((data) => setMetaConnected((data.accounts?.length ?? 0) > 0 || true))
+      .then((data) => setMetaConnected((data.accounts?.length ?? 0) > 0))
       .catch((err) => {
         const status = err?.response?.status
-        setMetaConnected(status !== 404 && status !== 403)
+        setMetaConnected(status !== 404 && status !== 403 ? true : false)
       })
   }, [activeTab, currentWorkspace?.id])
 
   async function handleSave() {
+    if (!currentWorkspace?.id) return
     setSaving(true)
-    await new Promise((r) => setTimeout(r, 800))
-    setSaving(false)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2500)
+    setSaveError('')
+    try {
+      // Update workspace name
+      const updated = await workspacesApi.update(currentWorkspace.id, { name: workspaceName })
+      // Update autopilot mode separately (dedicated endpoint)
+      await workspacesApi.setAutopilot(currentWorkspace.id, autopilotMode)
+      // Sync store
+      setCurrentWorkspace({ ...currentWorkspace, name: workspaceName, autopilotMode, ...(updated.data as any) })
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2500)
+    } catch (err: any) {
+      setSaveError(err?.message ?? 'Failed to save settings')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handleResetStrategy() {
+    if (!currentWorkspace?.id) return
+    if (!confirm('Reset AI strategy? A new one will be generated on next visit.')) return
+    try {
+      await workspacesApi.update(currentWorkspace.id, { aiStrategy: null } as any)
+      setCurrentWorkspace({ ...currentWorkspace, aiStrategy: null })
+    } catch (err: any) {
+      setSaveError(err?.message ?? 'Failed to reset strategy')
+    }
+  }
+
+  async function handleDeleteWorkspace() {
+    if (!currentWorkspace?.id) return
+    const confirmed = prompt(
+      `Type "${currentWorkspace.name}" to confirm permanent deletion:`
+    )
+    if (confirmed !== currentWorkspace.name) return
+    try {
+      await workspacesApi.update(currentWorkspace.id, {} as any)  // trigger auth check
+      // Use delete endpoint
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/workspaces/${currentWorkspace.id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('nishon_access_token') ?? ''}`,
+        },
+      })
+      if (res.ok || res.status === 204) {
+        setCurrentWorkspace(null)
+        router.push('/login')
+      }
+    } catch (err: any) {
+      setSaveError(err?.message ?? 'Failed to delete workspace')
+    }
   }
 
   return (
@@ -195,6 +254,8 @@ export default function SettingsPage() {
 
         {/* Content */}
         <div className="flex-1 min-w-0 space-y-5">
+
+          {saveError && <Alert variant="error">{saveError}</Alert>}
 
           {/* ── GENERAL ── */}
           {activeTab === 'general' && (
@@ -510,7 +571,7 @@ export default function SettingsPage() {
                       Clears your current AI strategy. A new one will be generated on next visit.
                     </p>
                   </div>
-                  <Button variant="danger" size="sm">
+                  <Button variant="danger" size="sm" onClick={handleResetStrategy}>
                     Reset
                   </Button>
                 </div>
@@ -523,7 +584,7 @@ export default function SettingsPage() {
                       Permanently deletes this workspace and all associated campaigns, data, and settings.
                     </p>
                   </div>
-                  <Button variant="danger" size="sm">
+                  <Button variant="danger" size="sm" onClick={handleDeleteWorkspace}>
                     Delete
                   </Button>
                 </div>
