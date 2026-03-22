@@ -1,4 +1,4 @@
-import { Injectable, Logger, BadRequestException } from "@nestjs/common";
+import { Injectable, Logger, BadRequestException, InternalServerErrorException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -85,11 +85,13 @@ export class StrategyEngineService {
     @InjectRepository(Workspace)
     private readonly workspaceRepo: Repository<Workspace>,
   ) {
-    const apiKey = this.config.get<string>("OPENROUTER_API_KEY");
+    const apiKey =
+      this.config.get<string>("OPENROUTER_API_KEY") ||
+      this.config.get<string>("OPENAI_API_KEY");
     if (apiKey) {
       this.aiClient = new NishonAiClient(apiKey);
     } else {
-      this.logger.warn("OPENROUTER_API_KEY is not configured - AI features will be unavailable");
+      this.logger.warn("Neither OPENROUTER_API_KEY nor OPENAI_API_KEY is configured - AI features will be unavailable");
     }
   }
 
@@ -126,7 +128,19 @@ export class StrategyEngineService {
       location: workspace.targetLocation || "Uzbekistan",
     };
 
-    const strategy = await this.generateStrategy(input);
+    let strategy: StrategyResult;
+    try {
+      strategy = await this.generateStrategy(input);
+    } catch (err: any) {
+      this.logger.error({
+        message: "AI strategy generation failed",
+        workspaceId,
+        error: err?.message,
+      });
+      throw new InternalServerErrorException(
+        err?.message || "AI strategiya yaratishda xatolik yuz berdi. Qayta urinib ko'ring.",
+      );
+    }
 
     // Save strategy back to workspace so it persists
     await this.workspaceRepo.update(workspaceId, {
