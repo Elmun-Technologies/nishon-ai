@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
+import { useRealtimeRefresh } from '@/hooks/useRealtimeRefresh'
 import { Badge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
@@ -65,6 +66,9 @@ export default function AiDecisionsPage() {
   useEffect(() => {
     fetchDecisions()
   }, [fetchDecisions])
+
+  // Auto-refresh when AI optimization loop completes
+  useRealtimeRefresh(currentWorkspace?.id, ['optimization_done'], fetchDecisions)
 
   async function handleApprove(id: string) {
     setActionLoading(id)

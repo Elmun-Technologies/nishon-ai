@@ -7,6 +7,7 @@ import {
 import { Logger } from "@nestjs/common";
 import { Job } from "bull";
 import { AiAgentService } from "../../ai-agent/ai-agent.service";
+import { EventsGateway } from "../../events/events.gateway";
 import { QUEUE_NAMES } from "../queue.constants";
 
 interface OptimizationJobData {
@@ -28,7 +29,10 @@ interface OptimizationJobData {
 export class OptimizationProcessor {
   private readonly logger = new Logger(OptimizationProcessor.name);
 
-  constructor(private readonly aiAgentService: AiAgentService) {}
+  constructor(
+    private readonly aiAgentService: AiAgentService,
+    private readonly eventsGateway: EventsGateway,
+  ) {}
 
   @Process("run-optimization")
   async handleOptimization(job: Job<OptimizationJobData>): Promise<void> {
@@ -47,6 +51,13 @@ export class OptimizationProcessor {
     this.logger.log(
       `Optimization complete for ${workspaceId}: ${decisions.length} decisions created`,
     );
+
+    // Notify connected frontend clients in real-time
+    this.eventsGateway.emitToWorkspace(workspaceId, 'optimization_done', {
+      workspaceId,
+      decisionsCreated: decisions.length,
+      timestamp: new Date().toISOString(),
+    })
   }
 
   @OnQueueFailed()

@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
+import { useRealtimeRefresh } from '@/hooks/useRealtimeRefresh'
 import { Button } from '@/components/ui/Button'
 import { Badge, CampaignStatusBadge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
@@ -60,6 +61,9 @@ export default function CampaignsPage() {
   useEffect(() => {
     fetchCampaigns()
   }, [fetchCampaigns])
+
+  // Auto-refresh when Meta sync completes or optimization runs
+  useRealtimeRefresh(currentWorkspace?.id, ['meta_synced', 'optimization_done'], fetchCampaigns)
 
   async function handleStatusChange(id: string, newStatus: string) {
     setActionLoading(id)
