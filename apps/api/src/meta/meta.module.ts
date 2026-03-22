@@ -10,6 +10,7 @@ import { MetaAdAccount } from "./entities/meta-ad-account.entity";
 import { MetaCampaignSync } from "./entities/meta-campaign-sync.entity";
 import { MetaInsight } from "./entities/meta-insight.entity";
 import { ConnectedAccount } from "../platforms/entities/connected-account.entity";
+import { Workspace } from "../workspaces/entities/workspace.entity";
 
 /**
  * MetaModule owns everything related to the Meta Ads Graph API integration:
@@ -32,6 +33,7 @@ import { ConnectedAccount } from "../platforms/entities/connected-account.entity
       MetaCampaignSync,
       MetaInsight,
       ConnectedAccount, // needed by MetaSyncService and MetaCronService to look up stored tokens
+      Workspace,        // needed by MetaController for workspace ownership validation
     ]),
   ],
   controllers: [MetaController],

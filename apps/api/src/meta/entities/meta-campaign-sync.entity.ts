@@ -7,9 +7,11 @@ import {
   ManyToOne,
   OneToMany,
   JoinColumn,
+  Index,
 } from "typeorm";
 import { MetaAdAccount } from "./meta-ad-account.entity";
 import { MetaInsight } from "./meta-insight.entity";
+import { Workspace } from "../../workspaces/entities/workspace.entity";
 
 /**
  * A lightweight mirror of a Meta campaign — contains only what we need for
@@ -18,8 +20,12 @@ import { MetaInsight } from "./meta-insight.entity";
  *
  * The Meta campaign ID string is the PK — safe because Meta IDs are globally unique
  * and immutable, making upserts simple and duplicate-free.
+ *
+ * workspaceId is stored directly for O(1) data isolation — no JOIN needed to
+ * filter by tenant. All queries MUST include WHERE workspace_id = <id>.
  */
 @Entity("meta_campaign_syncs")
+@Index("IDX_meta_campaign_syncs_workspace", ["workspaceId"])
 export class MetaCampaignSync {
   /** Meta's numeric campaign ID stored as string. */
   @PrimaryColumn({ length: 50 })
@@ -41,6 +47,21 @@ export class MetaCampaignSync {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  // ── Multi-tenant isolation ──────────────────────────────────────────────────
+
+  /**
+   * Direct workspace FK for tenant isolation.
+   * Avoids a JOIN through ad_account → workspace on every tenant-scoped query.
+   */
+  @ManyToOne(() => Workspace, { onDelete: "CASCADE" })
+  @JoinColumn({ name: "workspace_id" })
+  workspace: Workspace;
+
+  @Column({ name: "workspace_id", length: 50 })
+  workspaceId: string;
+
+  // ── Ad account relationship ─────────────────────────────────────────────────
 
   @ManyToOne(() => MetaAdAccount, (account) => account.campaigns, {
     onDelete: "CASCADE",

@@ -13,15 +13,22 @@ type MetaAdAccount = {
  * IMPORTANT: this must be a full browser redirect (window.location.href), NOT a
  * fetch() call. Meta's OAuth dialog requires a real page navigation.
  *
- * The backend route GET /meta/connect will:
- *   1. Build the Meta OAuth dialog URL
- *   2. Redirect the user to Meta for permission grant
+ * workspaceId MUST be provided — the backend encodes it in the OAuth `state` so
+ * the callback knows which tenant to associate the token with.
  *
- * After the user grants access, Meta redirects to GET /meta/callback on the
- * backend, which exchanges the code for a token and redirects back to the
- * frontend with ?connected=1.
+ * Flow:
+ *   1. Browser → GET /meta/connect?workspaceId=<id>&redirectTo=<url>
+ *   2. Backend → redirects to Meta OAuth dialog
+ *   3. Meta → user grants access → GET /meta/callback?code=...&state=...
+ *   4. Backend → saves token to connected_accounts for this workspace
+ *   5. Backend → redirects to frontend /settings/meta?connected=1&workspaceId=<id>
  */
-export function connectMeta(): void {
+export function connectMeta(workspaceId: string): void {
+  if (!workspaceId) {
+    console.error("[Nishon AI] connectMeta: workspaceId is required");
+    return;
+  }
+
   const backendUrl =
     env.apiBaseUrl ||
     (typeof window !== "undefined"
@@ -31,11 +38,10 @@ export function connectMeta(): void {
   const frontendUrl =
     typeof window !== "undefined" ? window.location.origin : "";
 
-  // Tell the backend where to redirect after a successful OAuth exchange.
-  // This is encoded into the OAuth `state` parameter and validated server-side.
   const redirectTo = frontendUrl ? `${frontendUrl}/settings/meta` : undefined;
 
   const connectUrl = new URL(`${backendUrl}/meta/connect`);
+  connectUrl.searchParams.set("workspaceId", workspaceId);
   if (redirectTo) {
     connectUrl.searchParams.set("redirectTo", redirectTo);
   }

@@ -1,5 +1,6 @@
 import {
   Controller,
+  ForbiddenException,
   Get,
   HttpStatus,
   Logger,
@@ -7,17 +8,24 @@ import {
   Res,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
 import { Response } from "express";
 import { MetaOAuthService } from "./meta-oauth.service";
+import { ConnectedAccount } from "../platforms/entities/connected-account.entity";
+import { Workspace } from "../workspaces/entities/workspace.entity";
+import { Platform } from "@nishon/shared";
 
 /**
  * Public OAuth endpoints for Meta Ads integration.
  * No JWT guard — these routes handle the OAuth redirect dance before a token exists.
  *
- * Routes (no global prefix in this app):
+ * Routes:
  *   GET /meta/connect   → build Meta OAuth URL and redirect user to it
- *   GET /meta/callback  → Meta redirects here after user grants permission;
- *                         exchange code for access token, set cookie, redirect to frontend
+ *   GET /meta/callback  → Meta redirects here; exchange code, persist token, redirect to frontend
+ *
+ * IMPORTANT: The redirect_uri registered in Meta App Dashboard must be exactly:
+ *   https://<your-backend>/meta/callback
  */
 @Controller("meta")
 export class MetaAuthController {
@@ -26,35 +34,50 @@ export class MetaAuthController {
   constructor(
     private readonly metaOAuthService: MetaOAuthService,
     private readonly config: ConfigService,
+    @InjectRepository(ConnectedAccount)
+    private readonly connectedAccountRepo: Repository<ConnectedAccount>,
+    @InjectRepository(Workspace)
+    private readonly workspaceRepo: Repository<Workspace>,
   ) {}
 
   /**
    * Entry point for the OAuth flow.
-   * Frontend should redirect to this URL (NOT call it via fetch):
-   *   window.location.href = `${BACKEND_URL}/meta/connect`
+   * The frontend must redirect the browser here — NOT call via fetch():
+   *   window.location.href = `${BACKEND_URL}/meta/connect?workspaceId=<id>`
    *
-   * Optional ?redirectTo=<url> tells the callback where to send the user after
-   * a successful token exchange.
+   * workspaceId is REQUIRED — it identifies which tenant is connecting Meta.
+   * redirectTo tells the callback where to send the user after success.
    */
   @Get("connect")
   redirectToMeta(
+    @Query("workspaceId") workspaceId: string | undefined,
     @Query("redirectTo") redirectTo: string | undefined,
     @Res() res: Response,
   ): void {
-    this.logger.log({ message: "/meta/connect hit — redirecting to Meta OAuth" });
+    this.logger.log({ message: "/meta/connect hit", workspaceId, hasRedirectTo: Boolean(redirectTo) });
 
-    const oauthUrl = this.metaOAuthService.getAuthUrl(redirectTo);
+    if (!workspaceId) {
+      res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        error: "workspaceId query parameter is required to start Meta OAuth",
+      });
+      return;
+    }
+
+    const oauthUrl = this.metaOAuthService.getAuthUrl(workspaceId, redirectTo);
     res.redirect(HttpStatus.FOUND, oauthUrl);
   }
 
   /**
    * OAuth callback — Meta redirects here after the user grants (or denies) access.
-   * The `redirect_uri` registered in Meta App Dashboard must match this URL exactly.
    *
    * On success:
-   *   1. Exchange `code` for an access token
-   *   2. Store token in an httpOnly cookie
-   *   3. Redirect to the frontend page encoded in `state`
+   *   1. Decode `state` → extract workspaceId + redirectTo
+   *   2. Verify workspace exists
+   *   3. Exchange `code` for access token
+   *   4. Persist token to connected_accounts (upsert by workspace + platform)
+   *   5. Set httpOnly cookie for same-session API calls
+   *   6. Redirect to frontend with ?connected=1
    */
   @Get("callback")
   async metaCallback(
@@ -66,24 +89,12 @@ export class MetaAuthController {
   ): Promise<void> {
     this.logger.log({ message: "/meta/callback hit", hasCode: Boolean(code), error });
 
-    // Meta sends `error` if the user denied the permission dialog
+    const frontendUrl = this.config.get<string>("FRONTEND_URL", "");
+
+    // ── Meta denied (user cancelled) ──────────────────────────────────────────
     if (error) {
-      this.logger.warn({
-        message: "Meta OAuth denied by user",
-        error,
-        errorDescription,
-      });
-
-      const frontendUrl = this.config.get<string>("FRONTEND_URL", "");
-      const target = frontendUrl
-        ? `${frontendUrl}/settings/meta?error=access_denied`
-        : null;
-
-      if (target) {
-        res.redirect(HttpStatus.FOUND, target);
-      } else {
-        res.status(HttpStatus.BAD_REQUEST).json({ success: false, error: "Meta OAuth denied" });
-      }
+      this.logger.warn({ message: "Meta OAuth denied by user", error, errorDescription });
+      this.redirectWithError(res, frontendUrl, "access_denied");
       return;
     }
 
@@ -96,85 +107,139 @@ export class MetaAuthController {
       return;
     }
 
+    // ── Decode state ──────────────────────────────────────────────────────────
+    const decoded = state ? this.metaOAuthService.decodeState(state) : null;
+    const workspaceId = decoded?.workspaceId;
+    const redirectTo = decoded?.redirectTo;
+
+    if (!workspaceId) {
+      this.logger.error({ message: "Meta callback: workspaceId missing from state" });
+      res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        error: "Missing workspaceId in OAuth state — cannot identify tenant",
+      });
+      return;
+    }
+
+    // ── Verify workspace exists ───────────────────────────────────────────────
+    const workspace = await this.workspaceRepo.findOne({ where: { id: workspaceId } });
+    if (!workspace) {
+      this.logger.error({ message: "Meta callback: workspace not found", workspaceId });
+      throw new ForbiddenException("Invalid workspace — cannot associate Meta token");
+    }
+
     try {
+      // ── Exchange code for token ───────────────────────────────────────────
       const tokenResponse = await this.metaOAuthService.exchangeCodeForToken(code);
-      const frontendUrl = this.config.get<string>("FRONTEND_URL", "");
-      const redirectTarget = this.resolveRedirectTarget(state, frontendUrl);
+      const accessToken = tokenResponse.access_token;
+
+      // ── Persist token to connected_accounts (upsert) ──────────────────────
+      // This is what the cron auto-sync reads to find tokens per workspace.
+      await this.upsertConnectedAccount(workspaceId, accessToken, tokenResponse.expires_in);
 
       this.logger.log({
-        message: "Meta OAuth token exchange succeeded",
-        hasAccessToken: Boolean(tokenResponse.access_token),
-        redirectTarget,
+        message: "Meta OAuth complete — token saved to connected_accounts",
+        workspaceId,
+        hasAccessToken: Boolean(accessToken),
       });
 
-      // Store the token in an httpOnly cookie so the browser sends it on
-      // subsequent requests to the backend without exposing it to JavaScript.
-      res.cookie("meta_access_token", tokenResponse.access_token, {
+      // ── Set short-lived httpOnly cookie for same-session passthrough calls ─
+      res.cookie("meta_access_token", accessToken, {
         httpOnly: true,
         secure: true,
         sameSite: "none",
         maxAge: 60 * 60 * 1000, // 1 hour
       });
 
-      if (redirectTarget) {
-        const separator = redirectTarget.includes("?") ? "&" : "?";
-        res.redirect(HttpStatus.FOUND, `${redirectTarget}${separator}connected=1`);
-        return;
+      // ── Redirect back to frontend ─────────────────────────────────────────
+      const target = this.resolveRedirectTarget(redirectTo, frontendUrl, workspaceId);
+      if (target) {
+        res.redirect(HttpStatus.FOUND, target);
+      } else {
+        res.status(HttpStatus.OK).json({ success: true, workspaceId });
       }
-
-      // No frontend redirect target — return JSON (useful for server-side callers)
-      res.status(HttpStatus.OK).json({ success: true });
     } catch (err: any) {
       this.logger.error({
         message: "Meta token exchange failed",
+        workspaceId,
         httpStatus: err?.response?.status,
         metaError: err?.response?.data?.error?.message ?? err?.message,
       });
+      this.redirectWithError(res, frontendUrl, "token_exchange_failed");
+    }
+  }
 
-      const frontendUrl = this.config.get<string>("FRONTEND_URL", "");
-      const errorTarget = frontendUrl
-        ? `${frontendUrl}/settings/meta?error=token_exchange_failed`
-        : null;
+  // ─── Private helpers ─────────────────────────────────────────────────────────
 
-      if (errorTarget) {
-        res.redirect(HttpStatus.FOUND, errorTarget);
-      } else {
-        res.status(HttpStatus.BAD_GATEWAY).json({
-          success: false,
-          error: "Failed to exchange Meta authorisation code for access token",
-        });
-      }
+  /**
+   * Upserts the Meta access token for a workspace.
+   * If a ConnectedAccount already exists for this workspace + META, it is updated.
+   * Otherwise a new record is created.
+   */
+  private async upsertConnectedAccount(
+    workspaceId: string,
+    accessToken: string,
+    expiresIn?: number,
+  ): Promise<void> {
+    const tokenExpiresAt = expiresIn
+      ? new Date(Date.now() + expiresIn * 1000)
+      : null;
+
+    const existing = await this.connectedAccountRepo.findOne({
+      where: { workspaceId, platform: Platform.META },
+    });
+
+    if (existing) {
+      existing.accessToken = accessToken;
+      existing.isActive = true;
+      existing.tokenExpiresAt = tokenExpiresAt;
+      await this.connectedAccountRepo.save(existing);
+    } else {
+      const record = this.connectedAccountRepo.create({
+        workspaceId,
+        platform: Platform.META,
+        accessToken,
+        refreshToken: null,
+        externalAccountId: "meta_oauth",   // updated to real ID on first sync
+        externalAccountName: "Meta Account", // updated to real name on first sync
+        isActive: true,
+        tokenExpiresAt,
+      });
+      await this.connectedAccountRepo.save(record);
     }
   }
 
   /**
-   * Decodes the base64-JSON `state` parameter and validates that the embedded
-   * `redirectTo` URL belongs to the configured FRONTEND_URL before returning it.
-   * Returns null if state is absent, invalid, or points to an untrusted host.
+   * Returns a safe redirect target for the post-OAuth redirect.
+   * If `redirectTo` is set and matches the allowed frontend origin, use it
+   * (append ?connected=1&workspaceId=...). Otherwise fall back to /settings/meta.
    */
-  private resolveRedirectTarget(state: string | undefined, frontendUrl: string): string | null {
-    if (!state || !frontendUrl) return null;
+  private resolveRedirectTarget(
+    redirectTo: string | undefined,
+    frontendUrl: string,
+    workspaceId: string,
+  ): string | null {
+    if (!frontendUrl) return null;
 
-    try {
-      const decoded = JSON.parse(
-        Buffer.from(state, "base64").toString("utf8"),
-      ) as { redirectTo?: string };
+    let target: string;
 
-      if (!decoded.redirectTo) return null;
+    if (redirectTo && redirectTo.startsWith(frontendUrl)) {
+      target = redirectTo;
+    } else {
+      // Safe fallback within the allowed frontend origin
+      target = `${frontendUrl}/settings/meta`;
+    }
 
-      // Security check: only redirect to the configured frontend origin
-      if (!decoded.redirectTo.startsWith(frontendUrl)) {
-        this.logger.warn({
-          message: "Ignoring untrusted OAuth redirect target",
-          redirectTo: decoded.redirectTo,
-          allowedOrigin: frontendUrl,
-        });
-        return null;
-      }
+    const separator = target.includes("?") ? "&" : "?";
+    return `${target}${separator}connected=1&workspaceId=${encodeURIComponent(workspaceId)}`;
+  }
 
-      return decoded.redirectTo;
-    } catch {
-      return null;
+  /** Redirects to the frontend with an error query param. */
+  private redirectWithError(res: Response, frontendUrl: string, error: string): void {
+    if (frontendUrl) {
+      res.redirect(HttpStatus.FOUND, `${frontendUrl}/settings/meta?error=${error}`);
+    } else {
+      res.status(HttpStatus.BAD_REQUEST).json({ success: false, error });
     }
   }
 }

@@ -19,17 +19,20 @@ export type SyncResult = {
 /**
  * Orchestrates a full Meta Ads sync for a workspace.
  *
+ * All data written includes workspaceId for strict tenant isolation.
+ * Every campaign and insight row is tagged with the workspace they belong to —
+ * no JOIN through ad_account is needed to filter by tenant.
+ *
  * Sync flow per workspace:
  *   1. Load the workspace's connected Meta account to get the access token.
  *   2. Fetch all ad accounts from the Graph API.
  *   3. For each ad account:
- *      a. Upsert MetaAdAccount record.
- *      b. Fetch campaigns → upsert MetaCampaignSync records.
- *      c. Fetch insights → upsert MetaInsight records.
+ *      a. Upsert MetaAdAccount record (with workspaceId).
+ *      b. Fetch campaigns → upsert MetaCampaignSync records (with workspaceId).
+ *      c. Fetch insights → upsert MetaInsight records (with workspaceId).
  *
  * Error philosophy: errors on individual accounts are logged and collected but
  * do NOT abort the rest of the sync — partial success is better than full failure.
- * The final SyncResult reports what succeeded and what failed.
  */
 @Injectable()
 export class MetaSyncService {
@@ -65,15 +68,14 @@ export class MetaSyncService {
       errors: [],
     };
 
-    // ── Step 1: Resolve access token ──────────────────────────────────────────
+    // ── Step 1: Resolve access token ─────────────────────────────────────────
     const accessToken =
-      accessTokenOverride ??
-      (await this.resolveAccessToken(workspaceId));
+      accessTokenOverride ?? (await this.resolveAccessToken(workspaceId));
 
     if (!accessToken) {
       throw new NotFoundException(
         `No active Meta integration found for workspace ${workspaceId}. ` +
-        "Please connect a Meta ad account first.",
+          "Please connect a Meta ad account first.",
       );
     }
 
@@ -91,7 +93,12 @@ export class MetaSyncService {
         await this.syncAccount(account, workspaceId, accessToken, result);
       } catch (err: any) {
         const msg = `Account ${account.id} (${account.name}): ${err?.message ?? "unknown error"}`;
-        this.logger.error({ message: "Account sync failed", accountId: account.id, error: err?.message });
+        this.logger.error({
+          message: "Account sync failed",
+          accountId: account.id,
+          workspaceId,
+          error: err?.message,
+        });
         result.errors.push(msg);
         // Continue with remaining accounts — partial sync is better than none
       }
@@ -111,7 +118,13 @@ export class MetaSyncService {
   // ─── Private: per-account sync ───────────────────────────────────────────────
 
   private async syncAccount(
-    account: { id: string; name: string; account_status: number; currency: string | null; timezone_name: string | null },
+    account: {
+      id: string;
+      name: string;
+      account_status: number;
+      currency: string | null;
+      timezone_name: string | null;
+    },
     workspaceId: string,
     accessToken: string,
     result: SyncResult,
@@ -145,6 +158,8 @@ export class MetaSyncService {
           status: c.status,
           objective: c.objective,
           adAccountId: account.id,
+          // Tenant isolation: tag every row with the workspace it belongs to
+          workspaceId,
         }));
 
         await em.upsert(MetaCampaignSync, campaignRows, {
@@ -177,6 +192,8 @@ export class MetaSyncService {
             ctr: row.ctr,
             cpc: row.cpc,
             pagingCursor: null,
+            // Tenant isolation: tag every row with the workspace it belongs to
+            workspaceId,
           }));
 
         if (validInsights.length > 0) {

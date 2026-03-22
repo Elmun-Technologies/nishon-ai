@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  ForbiddenException,
   Get,
   Headers,
   HttpCode,
@@ -31,6 +32,8 @@ import { MetaAiEngineService, CampaignInsights } from "./meta-ai-engine.service"
 import { MetaAdAccount } from "./entities/meta-ad-account.entity";
 import { MetaCampaignSync } from "./entities/meta-campaign-sync.entity";
 import { MetaInsight } from "./entities/meta-insight.entity";
+import { Workspace } from "../workspaces/entities/workspace.entity";
+import { User } from "../users/entities/user.entity";
 
 // Maps the user-facing range shorthand to Meta's date_preset values
 const RANGE_TO_DATE_PRESET: Record<string, string> = {
@@ -44,10 +47,10 @@ const RANGE_TO_DATE_PRESET: Record<string, string> = {
  *
  * Auth strategy:
  * - JWT guard protects all routes (user must be logged in to Nishon).
- * - Passthrough endpoints (ad-accounts, campaigns, insights) take the Meta token
- *   from Authorization header or meta_access_token cookie.
- * - Sync and dashboard use the token stored in the DB (connected_accounts table)
- *   unless overridden via the request body.
+ * - Data endpoints (dashboard, sync) validate workspace OWNERSHIP against the JWT
+ *   user to prevent cross-tenant data access — ForbiddenException if mismatch.
+ * - Passthrough endpoints (ad-accounts, campaigns, insights) use a Meta token
+ *   from the Authorization header or meta_access_token cookie.
  */
 @ApiTags("Meta Ads")
 @ApiBearerAuth()
@@ -66,6 +69,8 @@ export class MetaController {
     private readonly campaignRepo: Repository<MetaCampaignSync>,
     @InjectRepository(MetaInsight)
     private readonly insightRepo: Repository<MetaInsight>,
+    @InjectRepository(Workspace)
+    private readonly workspaceRepo: Repository<Workspace>,
   ) {}
 
   // ─── Passthrough Graph API endpoints ────────────────────────────────────────
@@ -102,13 +107,13 @@ export class MetaController {
   @ApiQuery({
     name: "range",
     required: false,
-    description: "Date range shorthand: 7d | 30d | today. Defaults to 30d.",
+    description: "Date range: 7d | 30d | today. Defaults to 30d.",
     enum: ["7d", "30d", "today"],
   })
   @ApiQuery({
     name: "datePreset",
     required: false,
-    description: "Raw Meta date_preset value (e.g. last_7d, last_30d, this_month). Overridden by range if both provided.",
+    description: "Raw Meta date_preset value. Overridden by range if both provided.",
   })
   async getInsights(
     @Query("accountId") accountId: string | undefined,
@@ -119,10 +124,7 @@ export class MetaController {
   ) {
     if (!accountId) throw new BadRequestException("accountId query parameter is required");
     const accessToken = this.extractMetaToken(authorization, req);
-
-    // `range` shorthand takes priority; fall back to raw datePreset; default to last_30d
     const resolvedPreset = this.resolveRange(range, datePreset);
-
     const insights = await this.metaAdsService.getInsights(accountId, accessToken, resolvedPreset);
     return { success: true, insights };
   }
@@ -145,20 +147,22 @@ export class MetaController {
         workspaceId: { type: "string", description: "Nishon workspace UUID" },
         accessToken: {
           type: "string",
-          description:
-            "Optional Meta access token override. If omitted, the token stored " +
-            "in the workspace's connected_accounts record is used.",
+          description: "Optional Meta access token override.",
         },
       },
     },
   })
-  @ApiResponse({ status: 200, description: "Sync completed (may include partial errors in result.errors)" })
+  @ApiResponse({ status: 200, description: "Sync completed" })
   async sync(
     @Body() body: { workspaceId?: string; accessToken?: string },
+    @Req() req: Request,
   ) {
     if (!body.workspaceId) {
       throw new BadRequestException("workspaceId is required in the request body");
     }
+
+    // Security: verify the authenticated user owns this workspace
+    await this.assertWorkspaceOwnership(body.workspaceId, this.getRequestUserId(req));
 
     this.logger.log({ message: "Sync triggered", workspaceId: body.workspaceId });
 
@@ -176,16 +180,17 @@ export class MetaController {
   @ApiOperation({
     summary: "Get enriched dashboard data for a workspace",
     description:
-      "Returns all synced ad accounts and their campaigns, enriched with aggregated " +
-      "metrics (spend, clicks, impressions, CTR, CPC) and an AI health/action recommendation " +
-      "per campaign.",
+      "Returns all synced ad accounts and their campaigns for the workspace, enriched with " +
+      "aggregated metrics and an AI health/action recommendation per campaign. " +
+      "Only data for the requesting user's workspace is returned.",
   })
   @ApiQuery({ name: "workspaceId", description: "Nishon workspace UUID" })
   @ApiResponse({
     status: 200,
-    description: "Dashboard data",
+    description: "Dashboard data — scoped to the requesting workspace only",
     schema: {
       example: {
+        workspaceId: "ws_uuid",
         accounts: [
           {
             id: "act_123456789",
@@ -206,10 +211,16 @@ export class MetaController {
       },
     },
   })
-  async dashboard(@Query("workspaceId") workspaceId: string | undefined) {
+  async dashboard(
+    @Query("workspaceId") workspaceId: string | undefined,
+    @Req() req: Request,
+  ) {
     if (!workspaceId) {
       throw new BadRequestException("workspaceId query parameter is required");
     }
+
+    // Security: verify the authenticated user owns this workspace
+    await this.assertWorkspaceOwnership(workspaceId, this.getRequestUserId(req));
 
     const accounts = await this.adAccountRepo.find({
       where: { workspaceId },
@@ -217,22 +228,23 @@ export class MetaController {
     });
 
     const enrichedAccounts = await Promise.all(
-      accounts.map((account) => this.buildAccountPayload(account)),
+      accounts.map((account) => this.buildAccountPayload(account, workspaceId)),
     );
 
-    return { accounts: enrichedAccounts };
+    return { workspaceId, accounts: enrichedAccounts };
   }
 
   // ─── Private: dashboard builders ────────────────────────────────────────────
 
-  private async buildAccountPayload(account: MetaAdAccount) {
+  private async buildAccountPayload(account: MetaAdAccount, workspaceId: string) {
+    // Filter campaigns by both adAccountId AND workspaceId for strict isolation
     const campaigns = await this.campaignRepo.find({
-      where: { adAccountId: account.id },
+      where: { adAccountId: account.id, workspaceId },
       order: { name: "ASC" },
     });
 
     const enrichedCampaigns = await Promise.all(
-      campaigns.map((c) => this.buildCampaignPayload(c)),
+      campaigns.map((c) => this.buildCampaignPayload(c, workspaceId)),
     );
 
     return {
@@ -244,8 +256,8 @@ export class MetaController {
     };
   }
 
-  private async buildCampaignPayload(campaign: MetaCampaignSync) {
-    const aggregated = await this.aggregateInsights(campaign.id);
+  private async buildCampaignPayload(campaign: MetaCampaignSync, workspaceId: string) {
+    const aggregated = await this.aggregateInsights(campaign.id, workspaceId);
     const aiResult = this.aiEngine.analyzeCampaign(aggregated);
 
     return {
@@ -269,11 +281,15 @@ export class MetaController {
 
   /**
    * Aggregates all MetaInsight rows for a campaign into a single totals snapshot.
-   * Recalculates CTR and CPC from aggregated totals (not averages) — correct for
-   * weighted metrics. Guards against division by zero.
+   * ALWAYS filters by workspaceId to enforce tenant isolation — even though the
+   * campaign PK is already unique, an explicit workspaceId filter prevents any
+   * edge-case data leaks during upsert race conditions.
    */
-  private async aggregateInsights(campaignId: string): Promise<CampaignInsights> {
-    const rows = await this.insightRepo.find({ where: { campaignId } });
+  private async aggregateInsights(
+    campaignId: string,
+    workspaceId: string,
+  ): Promise<CampaignInsights> {
+    const rows = await this.insightRepo.find({ where: { campaignId, workspaceId } });
 
     if (rows.length === 0) {
       return { campaignId, spend: 0, impressions: 0, clicks: 0, ctr: 0, cpc: 0 };
@@ -283,19 +299,54 @@ export class MetaController {
     const impressions = rows.reduce((s, r) => s + Number(r.impressions), 0);
     const clicks = rows.reduce((s, r) => s + Number(r.clicks), 0);
 
-    // Recalculate from totals to avoid averaging-bias on daily values
+    // Recalculate from totals to avoid averaging-bias; guard against division by zero
     const ctr = impressions > 0 ? (clicks / impressions) * 100 : 0;
     const cpc = clicks > 0 ? spend / clicks : 0;
 
     return { campaignId, spend, impressions, clicks, ctr, cpc };
   }
 
-  // ─── Private: helpers ────────────────────────────────────────────────────────
+  // ─── Private: workspace ownership ────────────────────────────────────────────
 
   /**
-   * Resolves the Meta API date_preset from the user-facing `range` shorthand
-   * or falls back to the raw `datePreset` param. Defaults to "last_30d".
+   * Verifies the given workspaceId belongs to the authenticated user.
+   * Throws ForbiddenException on mismatch — prevents cross-tenant data access.
    */
+  private async assertWorkspaceOwnership(
+    workspaceId: string,
+    userId: string,
+  ): Promise<void> {
+    const workspace = await this.workspaceRepo.findOne({
+      where: { id: workspaceId },
+      select: ["id", "userId"],
+    });
+
+    if (!workspace) {
+      throw new BadRequestException(`Workspace ${workspaceId} not found`);
+    }
+
+    if (workspace.userId !== userId) {
+      this.logger.warn({
+        message: "Cross-tenant access attempt blocked",
+        workspaceId,
+        requestingUserId: userId,
+        ownerUserId: workspace.userId,
+      });
+      throw new ForbiddenException("You do not have access to this workspace");
+    }
+  }
+
+  /** Extracts the authenticated user's ID from req.user (set by JwtStrategy). */
+  private getRequestUserId(req: Request): string {
+    const user = (req as any).user as User | undefined;
+    if (!user?.id) {
+      throw new UnauthorizedException("Authenticated user not found in request");
+    }
+    return user.id;
+  }
+
+  // ─── Private: request helpers ────────────────────────────────────────────────
+
   private resolveRange(range?: string, datePreset?: string): string {
     if (range) {
       const mapped = RANGE_TO_DATE_PRESET[range];
@@ -329,7 +380,7 @@ export class MetaController {
 
     throw new UnauthorizedException(
       "Meta access token is required. Provide it as Authorization: Bearer <token> " +
-      "or as a meta_access_token cookie.",
+        "or as a meta_access_token cookie.",
     );
   }
 }

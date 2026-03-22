@@ -3,6 +3,11 @@ import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { firstValueFrom } from "rxjs";
 
+export type MetaOAuthState = {
+  workspaceId: string;
+  redirectTo?: string;
+};
+
 type MetaTokenResponse = {
   access_token: string;
   token_type?: string;
@@ -14,7 +19,6 @@ const GRAPH_VERSION = "v20.0";
 @Injectable()
 export class MetaOAuthService {
   private readonly logger = new Logger(MetaOAuthService.name);
-  private latestAccessToken: string | null = null;
 
   constructor(
     private readonly config: ConfigService,
@@ -23,46 +27,52 @@ export class MetaOAuthService {
 
   /**
    * Builds the Meta OAuth dialog URL to redirect the user to.
-   * The optional `redirectTo` value is Base64-encoded into the `state` parameter
-   * so it survives the round-trip through Meta's servers and can be used in the
-   * callback to send the user back to the right frontend page.
+   *
+   * The `workspaceId` MUST be provided — it is encoded into the OAuth `state`
+   * so the callback knows which tenant to associate the token with.
+   * The optional `redirectTo` tells the callback where to send the user after success.
    *
    * Alias: also exposed as `buildOAuthUrl()` for backward compatibility.
    */
-  getAuthUrl(redirectTo?: string): string {
+  getAuthUrl(workspaceId: string, redirectTo?: string): string {
     const clientId = this.config.get<string>("META_APP_ID", "");
     const redirectUri = this.resolveCallbackUrl();
 
-    const statePayload = redirectTo ? { redirectTo } : undefined;
-    const state = statePayload
-      ? Buffer.from(JSON.stringify(statePayload), "utf8").toString("base64")
-      : undefined;
+    // Encode workspace + redirectTo in state so they survive the Meta round-trip
+    const statePayload: MetaOAuthState = { workspaceId, redirectTo };
+    const state = Buffer.from(JSON.stringify(statePayload), "utf8").toString("base64");
 
     const params = new URLSearchParams({
       client_id: clientId,
       redirect_uri: redirectUri,
       scope: "ads_management,ads_read,business_management",
       response_type: "code",
+      state,
     });
-
-    if (state) {
-      params.set("state", state);
-    }
 
     const url = `https://www.facebook.com/${GRAPH_VERSION}/dialog/oauth?${params.toString()}`;
 
     this.logger.log({
       message: "Meta OAuth URL built",
+      workspaceId,
       redirectUri,
-      hasState: Boolean(state),
     });
 
     return url;
   }
 
-  /** Backward-compatible alias for getAuthUrl(). */
-  buildOAuthUrl(redirectTo?: string): string {
-    return this.getAuthUrl(redirectTo);
+  /** Backward-compatible alias — redirectTo only, workspaceId optional. */
+  buildOAuthUrl(redirectTo?: string, workspaceId = "unknown"): string {
+    return this.getAuthUrl(workspaceId, redirectTo);
+  }
+
+  /** Decodes the base64 state string back to a typed object. Returns null on failure. */
+  decodeState(state: string): MetaOAuthState | null {
+    try {
+      return JSON.parse(Buffer.from(state, "base64").toString("utf8")) as MetaOAuthState;
+    } catch {
+      return null;
+    }
   }
 
   async exchangeCodeForToken(code: string): Promise<MetaTokenResponse> {
@@ -85,7 +95,6 @@ export class MetaOAuthService {
     );
 
     const token = response.data.access_token;
-    this.latestAccessToken = token;
 
     this.logger.log({
       message: "Meta token exchange succeeded",
@@ -97,16 +106,12 @@ export class MetaOAuthService {
     return response.data;
   }
 
-  getLatestAccessToken(): string | null {
-    return this.latestAccessToken;
-  }
-
   /**
    * Resolves the OAuth callback URL.
    * Prefers the explicit `META_CALLBACK_URL` env var (must match Meta App Dashboard
    * exactly). Falls back to constructing it from `API_BASE_URL` + `/meta/callback`.
    */
-  private resolveCallbackUrl(): string {
+  resolveCallbackUrl(): string {
     const explicit = this.config.get<string>("META_CALLBACK_URL", "").trim();
     if (explicit) return explicit;
 
