@@ -33,6 +33,8 @@ import { RequestLoggingInterceptor } from "./common/interceptors/request-logging
       useFactory: (config: ConfigService) => {
         const databaseUrl = config.get<string>("DATABASE_URL");
 
+        const isProduction = config.get<string>("NODE_ENV") === "production";
+
         return {
           type: "postgres" as const,
           ...(databaseUrl
@@ -44,9 +46,10 @@ import { RequestLoggingInterceptor } from "./common/interceptors/request-logging
                 password: config.get<string>("DATABASE_PASSWORD", "nishon_secret"),
                 database: config.get<string>("DATABASE_NAME", "nishon_ai_db"),
               }),
+          ssl: isProduction ? { rejectUnauthorized: false } : false,
           entities: [__dirname + "/**/*.entity{.ts,.js}"],
-          synchronize: config.get<string>("NODE_ENV") !== "production",
-          logging: config.get<string>("NODE_ENV") === "development",
+          synchronize: !isProduction,
+          logging: !isProduction,
         };
       },
     }),
