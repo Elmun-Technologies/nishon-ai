@@ -3,7 +3,7 @@ services:
     name: nishon-ai-api
     env: node
     plan: free
-    buildCommand: pnpm install --frozen-lockfile && pnpm --filter @nishon/shared build && pnpm --filter @nishon/ai-sdk build && NODE_OPTIONS='--max-old-space-size=400' pnpm --filter api build
+    buildCommand: NODE_ENV=development pnpm install --frozen-lockfile && pnpm --filter @nishon/shared build && pnpm --filter @nishon/ai-sdk build && NODE_OPTIONS='--max-old-space-size=400' pnpm --filter api build
     startCommand: pnpm start:prod
     healthCheckPath: /health
     envVars:
