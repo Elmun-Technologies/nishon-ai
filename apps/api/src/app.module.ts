@@ -46,7 +46,7 @@ import { RequestLoggingInterceptor } from "./common/interceptors/request-logging
                 password: config.get<string>("DATABASE_PASSWORD", "nishon_secret"),
                 database: config.get<string>("DATABASE_NAME", "nishon_ai_db"),
               }),
-          ssl: isProduction ? { rejectUnauthorized: false } : false,
+          ssl: (isProduction || databaseUrl) ? { rejectUnauthorized: false } : false,
           entities: [__dirname + "/**/*.entity{.ts,.js}"],
           synchronize: !isProduction,
           logging: !isProduction,

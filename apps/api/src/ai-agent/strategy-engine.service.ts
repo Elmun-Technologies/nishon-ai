@@ -85,11 +85,12 @@ export class StrategyEngineService {
     @InjectRepository(Workspace)
     private readonly workspaceRepo: Repository<Workspace>,
   ) {
-    const apiKey = this.config.get<string>("OPENAI_API_KEY");
-    if (!apiKey) {
-      throw new Error("OPENAI_API_KEY is not configured");
+    const apiKey = this.config.get<string>("OPENROUTER_API_KEY");
+    if (apiKey) {
+      this.aiClient = new NishonAiClient(apiKey);
+    } else {
+      this.logger.warn("OPENROUTER_API_KEY is not configured - AI features will be unavailable");
     }
-    this.aiClient = new NishonAiClient(apiKey);
   }
 
   /**
@@ -144,6 +145,10 @@ export class StrategyEngineService {
    * We use completeJson() which handles JSON parsing and retry logic internally.
    */
   async generateStrategy(input: StrategyInput): Promise<StrategyResult> {
+    if (!this.aiClient) {
+      throw new BadRequestException("AI features are not available: OPENROUTER_API_KEY is not configured");
+    }
+
     const prompt = buildStrategyPrompt(input);
 
     this.logger.log(
