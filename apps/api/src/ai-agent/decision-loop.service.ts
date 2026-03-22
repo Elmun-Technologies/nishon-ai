@@ -50,7 +50,11 @@ export class DecisionLoopService {
     private readonly workspaceRepo: Repository<Workspace>,
   ) {
     const apiKey = this.config.get<string>("OPENAI_API_KEY");
-    this.aiClient = new NishonAiClient(apiKey);
+    if (apiKey) {
+      this.aiClient = new NishonAiClient(apiKey);
+    } else {
+      this.logger.warn("OPENAI_API_KEY is not configured - AI decision loop will be unavailable");
+    }
   }
 
   /**
@@ -90,6 +94,10 @@ export class DecisionLoopService {
     const performanceSummary = this.buildPerformanceSummary(campaigns);
 
     // Ask GPT-4o what actions to take
+    if (!this.aiClient) {
+      this.logger.warn("AI client not configured, skipping decision loop");
+      return [];
+    }
     const aiResponse = await this.aiClient.completeJson<{
       decisions: OptimizationDecision[];
       overallAssessment: string;
