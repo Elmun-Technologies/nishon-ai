@@ -70,7 +70,7 @@ export class MetaInsight {
   @JoinColumn({ name: "workspace_id" })
   workspace: Workspace;
 
-  @Column({ name: "workspace_id", length: 50 })
+  @Column({ name: "workspace_id" })
   workspaceId: string;
 
   // ── Campaign relationship ───────────────────────────────────────────────────
