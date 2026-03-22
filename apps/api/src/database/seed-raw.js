@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs')
 
 // Database connection
 const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
+  host: process.env.DB_HOST || process.env.DATABASE_HOST || 'postgres',
   port: process.env.DB_PORT || 5432,
   database: process.env.DB_NAME || 'nishon_ai_db',
   user: process.env.DB_USER || 'nishon',

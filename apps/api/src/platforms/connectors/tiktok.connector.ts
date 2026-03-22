@@ -1,5 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import { getOAuthCallbackUrl } from "./oauth-callback.util";
 
 /**
  * TiktokConnector — TikTok Ads API integration.
@@ -22,8 +23,23 @@ export class TiktokConnector {
   constructor(private readonly config: ConfigService) {}
 
   getOAuthUrl(): string {
-    // TODO: Implement TikTok OAuth
-    return "";
+    const clientKey = this.config.get<string>("TIKTOK_APP_ID", "");
+    const redirectUri = getOAuthCallbackUrl(this.config, "tiktok");
+
+    if (!clientKey || !redirectUri) {
+      this.logger.warn("TikTok OAuth requested without TIKTOK_APP_ID/API_BASE_URL");
+      return "";
+    }
+
+    const params = new URLSearchParams({
+      client_key: clientKey,
+      redirect_uri: redirectUri,
+      response_type: "code",
+      scope: "ad.account.read,ad.report.read,ad.campaign.read,ad.campaign.write",
+      state: "tiktok-oauth",
+    });
+
+    return `https://www.tiktok.com/v2/auth/authorize/?${params.toString()}`;
   }
 
   async createCampaign(): Promise<{ id: string }> {

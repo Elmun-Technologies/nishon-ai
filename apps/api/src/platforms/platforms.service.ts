@@ -37,8 +37,6 @@ export class PlatformsService {
   ) {
     // Encryption key must be exactly 32 bytes for AES-256
     const key = this.config.get<string>("ENCRYPTION_KEY", "");
-    this.logger.log(`ENCRYPTION_KEY from config: ${key}`);
-    this.logger.log(`ENCRYPTION_KEY length: ${key.length}`);
     if (key.length !== 32) {
       throw new Error("ENCRYPTION_KEY must be exactly 32 characters");
     }

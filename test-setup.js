@@ -120,5 +120,5 @@ console.log('\nNext steps:');
 console.log('1. Run `npm install` to install dependencies');
 console.log('2. Run `docker-compose up -d postgres redis` to start database services');
 console.log('3. Run `npm run dev` to start development servers');
-console.log('4. Visit http://localhost:3000 to see the frontend');
-console.log('5. Visit http://localhost:3001 to see the API');
+console.log(`4. Visit ${process.env.FRONTEND_URL || 'your FRONTEND_URL'} to see the frontend`);
+console.log(`5. Visit ${process.env.API_BASE_URL || 'your API_BASE_URL'} to see the API`);

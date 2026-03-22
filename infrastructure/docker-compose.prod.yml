@@ -57,7 +57,7 @@ services:
       target: production
     container_name: nishon_web_prod
     environment:
-      - NEXT_PUBLIC_API_URL=https://api.nishon.ai
+      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
     depends_on:
       - api
     restart: always

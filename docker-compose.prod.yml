@@ -51,7 +51,6 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - META_APP_ID=${META_APP_ID}
       - META_APP_SECRET=${META_APP_SECRET}
-      - META_CALLBACK_URL=${META_CALLBACK_URL}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
       - GOOGLE_DEVELOPER_TOKEN=${GOOGLE_DEVELOPER_TOKEN}
@@ -61,6 +60,7 @@ services:
       - PORT=3001
       - NODE_ENV=production
       - FRONTEND_URL=${FRONTEND_URL}
+      - API_BASE_URL=${API_BASE_URL}
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
     depends_on:
       postgres:
@@ -77,7 +77,7 @@ services:
     container_name: nishon-ai-web-prod
     restart: always
     environment:
-      - NEXT_PUBLIC_API_URL=http://api:3001
+      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
       - NODE_ENV=production
     depends_on:
       - api

@@ -3,15 +3,19 @@ import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { HttpModule } from "@nestjs/axios";
 import { AuthService } from "./auth.service";
 import { AuthController } from "./auth.controller";
 import { JwtStrategy } from "./strategies/jwt.strategy";
 import { LocalStrategy } from "./strategies/local.strategy";
 import { User } from "../users/entities/user.entity";
+import { MetaAuthController } from "./meta-auth.controller";
+import { MetaOAuthService } from "./meta-oauth.service";
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
+    HttpModule,
     PassportModule.register({ defaultStrategy: "jwt" }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -24,8 +28,8 @@ import { User } from "../users/entities/user.entity";
       }),
     }),
   ],
-  controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, LocalStrategy],
+  controllers: [AuthController, MetaAuthController],
+  providers: [AuthService, JwtStrategy, LocalStrategy, MetaOAuthService],
   exports: [AuthService, JwtModule],
 })
 export class AuthModule {}

@@ -1,5 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import { getOAuthCallbackUrl } from "./oauth-callback.util";
 
 /**
  * GoogleConnector — Google Ads API integration.
@@ -20,9 +21,26 @@ export class GoogleConnector {
   constructor(private readonly config: ConfigService) {}
 
   getOAuthUrl(workspaceId: string): string {
-    // TODO: Implement Google OAuth URL generation
+    const clientId = this.config.get<string>("GOOGLE_CLIENT_ID", "");
+    const redirectUri = getOAuthCallbackUrl(this.config, "google");
+
+    if (!clientId || !redirectUri) {
+      this.logger.warn("Google OAuth requested without GOOGLE_CLIENT_ID/API_BASE_URL");
+      return "";
+    }
+
+    const params = new URLSearchParams({
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      response_type: "code",
+      access_type: "offline",
+      prompt: "consent",
+      scope: "https://www.googleapis.com/auth/adwords",
+      state: Buffer.from(JSON.stringify({ workspaceId })).toString("base64"),
+    });
+
     this.logger.log(`Google OAuth URL requested for workspace: ${workspaceId}`);
-    return "";
+    return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
   }
 
   async createCampaign(): Promise<{ id: string }> {

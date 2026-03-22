@@ -5,6 +5,7 @@ import {
 } from "./strategy-engine.service";
 import { DecisionLoopService } from "./decision-loop.service";
 import { AiDecision } from "../ai-decisions/entities/ai-decision.entity";
+import { ConfigService } from "@nestjs/config";
 
 /**
  * AiAgentService is the public facade for all AI capabilities.
@@ -23,6 +24,7 @@ export class AiAgentService {
   constructor(
     private readonly strategyEngine: StrategyEngineService,
     private readonly decisionLoop: DecisionLoopService,
+    private readonly config: ConfigService,
   ) {}
 
   async generateStrategy(workspaceId: string): Promise<StrategyResult> {
@@ -56,7 +58,7 @@ export class AiAgentService {
     businessContext: any
   }): Promise<any> {
     const { NishonAiClient } = await import("@nishon/ai-sdk")
-    const apiKey = process.env.OPENAI_API_KEY || ""
+    const apiKey = this.config.get<string>("OPENAI_API_KEY", "")
     const client = new NishonAiClient(apiKey)
 
     const systemPrompt = `
@@ -257,7 +259,7 @@ Be specific, actionable, and write all notes in Uzbek language.
 
   async generateAdScripts(workspaceId: string, dto: any): Promise<any> {
     const { NishonAiClient } = await import("@nishon/ai-sdk")
-    const apiKey = process.env.OPENAI_API_KEY || ""
+    const apiKey = this.config.get<string>("OPENAI_API_KEY", "")
     const client = new NishonAiClient(apiKey)
 
     const platforms: string[] = dto.platforms || ["meta"]
@@ -395,7 +397,7 @@ For video scripts, write exactly what the person says on camera or voiceover.
     workspaceContext: any
   }): Promise<any> {
     const { NishonAiClient } = await import("@nishon/ai-sdk")
-    const apiKey = process.env.OPENAI_API_KEY || ''
+    const apiKey = this.config.get<string>("OPENAI_API_KEY", "")
 
     // Use OpenAI directly for vision - NishonAiClient needs vision support
     const OpenAI = (await import('openai')).default

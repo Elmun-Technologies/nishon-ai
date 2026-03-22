@@ -46,9 +46,9 @@ pnpm install
 pnpm dev
 ```
 
-By default, the applications will be available at:
-- **Frontend (Next.js)**: `http://localhost:3000` (agar port band bo‘lsa, Next avtomatik ravishda `3001`, `3002`, va hokazolarni ishlatadi)
-- **API (NestJS)**: `http://localhost:3001`
+By default, the applications will be available at values from environment variables:
+- **Frontend (Next.js)**: `FRONTEND_URL`
+- **API (NestJS)**: `API_BASE_URL`
 
 ## Project Structure
 

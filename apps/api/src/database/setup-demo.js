@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs')
 
 // Database connection
 const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
+  host: process.env.DB_HOST || process.env.DATABASE_HOST || 'postgres',
   port: process.env.DB_PORT || 5432,
   database: process.env.DB_NAME || 'nishon_ai_db',
   user: process.env.DB_USER || 'nishon',
@@ -376,7 +376,7 @@ async function setupDemo() {
     console.log('🚀 You can now:')
     console.log('   1. Start the API: cd apps/api && npm run start:dev')
     console.log('   2. Start the web app: cd apps/web && npm run dev')
-    console.log('   3. Visit http://localhost:3000 and click "Try Demo Account"')
+    console.log(`   3. Visit ${process.env.FRONTEND_URL || process.env.NEXT_PUBLIC_FRONTEND_URL || 'your frontend URL'} and click "Try Demo Account"`)
     console.log('')
 
   } catch (err) {

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -27,6 +28,22 @@ export default function Page() {
         <div className="mt-4 flex justify-end">
           <Button size="sm">Save Changes</Button>
         </div>
+      </Card>
+
+      <Card>
+        <div className="mb-4 flex items-center justify-between">
+          <div>
+            <h2 className="mb-1 text-xl font-semibold text-white">Integrations</h2>
+            <p className="text-sm text-[#6B7280]">Connect external advertising platforms.</p>
+          </div>
+          <Link
+            href="/settings/meta"
+            className="rounded-lg border border-[#2A2A3A] px-3 py-2 text-sm text-[#D1D5DB] hover:bg-[#1C1C27]"
+          >
+            Manage Meta
+          </Link>
+        </div>
+
       </Card>
 
       <Card>

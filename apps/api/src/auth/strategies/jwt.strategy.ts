@@ -26,11 +26,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
   ) {
-    const jwtSecret =
-      config.get<string>("JWT_SECRET") ||
-      "your-super-secret-jwt-key-change-in-production";
-    console.log("JWT_SECRET from config:", jwtSecret);
-    console.log("JWT_SECRET length:", jwtSecret?.length);
+    const jwtSecret = config.get<string>("JWT_SECRET", "");
 
     super({
       // Extract JWT from the Authorization: Bearer header

@@ -2,6 +2,7 @@ import { Injectable, Logger, BadRequestException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { HttpService } from "@nestjs/axios";
 import { firstValueFrom } from "rxjs";
+import { getOAuthCallbackUrl } from "./oauth-callback.util";
 
 // Meta Graph API version — update when Meta releases new versions
 const META_API_VERSION = "v19.0";
@@ -79,10 +80,7 @@ export class MetaConnector {
   ) {
     this.appId = this.config.get<string>("META_APP_ID", "");
     this.appSecret = this.config.get<string>("META_APP_SECRET", "");
-    this.callbackUrl = this.config.get<string>(
-      "META_CALLBACK_URL",
-      "http://localhost:3001/api/v1/platforms/meta/callback",
-    );
+    this.callbackUrl = getOAuthCallbackUrl(this.config, "meta");
   }
 
   // ─── OAUTH ────────────────────────────────────────────────────────────────
@@ -94,6 +92,10 @@ export class MetaConnector {
    * with a ?code=XXX query parameter.
    */
   getOAuthUrl(workspaceId: string): string {
+    if (!this.callbackUrl) {
+      throw new BadRequestException("API_BASE_URL is not configured for Meta OAuth callback");
+    }
+
     const scopes = [
       "ads_management",
       "ads_read",
@@ -124,6 +126,10 @@ export class MetaConnector {
     tokenType: string;
     expiresAt: Date | null;
   }> {
+    if (!this.callbackUrl) {
+      throw new BadRequestException("API_BASE_URL is not configured for Meta OAuth callback");
+    }
+
     const url = `${META_BASE_URL}/oauth/access_token`;
 
     const response = await this.apiGet<{
