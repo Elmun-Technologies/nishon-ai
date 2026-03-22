@@ -9,6 +9,8 @@ type MetaTokenResponse = {
   expires_in?: number;
 };
 
+const GRAPH_VERSION = "v20.0";
+
 @Injectable()
 export class MetaOAuthService {
   private readonly logger = new Logger(MetaOAuthService.name);
@@ -19,9 +21,17 @@ export class MetaOAuthService {
     private readonly http: HttpService,
   ) {}
 
-  buildOAuthUrl(redirectTo?: string): string {
+  /**
+   * Builds the Meta OAuth dialog URL to redirect the user to.
+   * The optional `redirectTo` value is Base64-encoded into the `state` parameter
+   * so it survives the round-trip through Meta's servers and can be used in the
+   * callback to send the user back to the right frontend page.
+   *
+   * Alias: also exposed as `buildOAuthUrl()` for backward compatibility.
+   */
+  getAuthUrl(redirectTo?: string): string {
     const clientId = this.config.get<string>("META_APP_ID", "");
-    const redirectUri = this.config.get<string>("META_CALLBACK_URL", "");
+    const redirectUri = this.resolveCallbackUrl();
 
     const statePayload = redirectTo ? { redirectTo } : undefined;
     const state = statePayload
@@ -39,17 +49,30 @@ export class MetaOAuthService {
       params.set("state", state);
     }
 
-    return `https://www.facebook.com/v19.0/dialog/oauth?${params.toString()}`;
+    const url = `https://www.facebook.com/${GRAPH_VERSION}/dialog/oauth?${params.toString()}`;
+
+    this.logger.log({
+      message: "Meta OAuth URL built",
+      redirectUri,
+      hasState: Boolean(state),
+    });
+
+    return url;
+  }
+
+  /** Backward-compatible alias for getAuthUrl(). */
+  buildOAuthUrl(redirectTo?: string): string {
+    return this.getAuthUrl(redirectTo);
   }
 
   async exchangeCodeForToken(code: string): Promise<MetaTokenResponse> {
     const clientId = this.config.get<string>("META_APP_ID", "");
     const clientSecret = this.config.get<string>("META_APP_SECRET", "");
-    const redirectUri = this.config.get<string>("META_CALLBACK_URL", "");
+    const redirectUri = this.resolveCallbackUrl();
 
     const response = await firstValueFrom(
       this.http.get<MetaTokenResponse>(
-        "https://graph.facebook.com/v19.0/oauth/access_token",
+        `https://graph.facebook.com/${GRAPH_VERSION}/oauth/access_token`,
         {
           params: {
             client_id: clientId,
@@ -78,11 +101,26 @@ export class MetaOAuthService {
     return this.latestAccessToken;
   }
 
-  private maskToken(token: string): string {
-    if (!token || token.length < 10) {
-      return "[redacted]";
-    }
+  /**
+   * Resolves the OAuth callback URL.
+   * Prefers the explicit `META_CALLBACK_URL` env var (must match Meta App Dashboard
+   * exactly). Falls back to constructing it from `API_BASE_URL` + `/meta/callback`.
+   */
+  private resolveCallbackUrl(): string {
+    const explicit = this.config.get<string>("META_CALLBACK_URL", "").trim();
+    if (explicit) return explicit;
 
+    const apiBase = this.config.get<string>("API_BASE_URL", "").trim().replace(/\/$/, "");
+    if (apiBase) return `${apiBase}/meta/callback`;
+
+    this.logger.warn(
+      "Neither META_CALLBACK_URL nor API_BASE_URL is set — OAuth redirect_uri will be empty",
+    );
+    return "";
+  }
+
+  private maskToken(token: string): string {
+    if (!token || token.length < 10) return "[redacted]";
     return `${token.slice(0, 6)}...${token.slice(-4)}`;
   }
 }
