@@ -85,11 +85,11 @@ export class StrategyEngineService {
     @InjectRepository(Workspace)
     private readonly workspaceRepo: Repository<Workspace>,
   ) {
-    const apiKey = this.config.get<string>("OPENAI_API_KEY");
+    const apiKey = this.config.get<string>("OPENROUTER_API_KEY");
     if (apiKey) {
       this.aiClient = new NishonAiClient(apiKey);
     } else {
-      this.logger.warn("OPENAI_API_KEY is not configured - AI features will be unavailable");
+      this.logger.warn("OPENROUTER_API_KEY is not configured - AI features will be unavailable");
     }
   }
 
@@ -146,7 +146,7 @@ export class StrategyEngineService {
    */
   async generateStrategy(input: StrategyInput): Promise<StrategyResult> {
     if (!this.aiClient) {
-      throw new BadRequestException("AI features are not available: OPENAI_API_KEY is not configured");
+      throw new BadRequestException("AI features are not available: OPENROUTER_API_KEY is not configured");
     }
 
     const prompt = buildStrategyPrompt(input);

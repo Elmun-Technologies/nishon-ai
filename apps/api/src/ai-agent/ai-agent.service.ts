@@ -58,7 +58,7 @@ export class AiAgentService {
     businessContext: any
   }): Promise<any> {
     const { NishonAiClient } = await import("@nishon/ai-sdk")
-    const apiKey = this.config.get<string>("OPENAI_API_KEY", "")
+    const apiKey = this.config.get<string>("OPENROUTER_API_KEY", "")
     const client = new NishonAiClient(apiKey)
 
     const systemPrompt = `
@@ -259,7 +259,7 @@ Be specific, actionable, and write all notes in Uzbek language.
 
   async generateAdScripts(workspaceId: string, dto: any): Promise<any> {
     const { NishonAiClient } = await import("@nishon/ai-sdk")
-    const apiKey = this.config.get<string>("OPENAI_API_KEY", "")
+    const apiKey = this.config.get<string>("OPENROUTER_API_KEY", "")
     const client = new NishonAiClient(apiKey)
 
     const platforms: string[] = dto.platforms || ["meta"]
@@ -397,11 +397,10 @@ For video scripts, write exactly what the person says on camera or voiceover.
     workspaceContext: any
   }): Promise<any> {
     const { NishonAiClient } = await import("@nishon/ai-sdk")
-    const apiKey = this.config.get<string>("OPENAI_API_KEY", "")
+    const apiKey = this.config.get<string>("OPENROUTER_API_KEY", "")
 
-    // Use OpenAI directly for vision - NishonAiClient needs vision support
     const OpenAI = (await import('openai')).default
-    const openai = new OpenAI({ apiKey })
+    const openai = new OpenAI({ apiKey, baseURL: 'https://openrouter.ai/api/v1' })
 
     const systemPrompt = `
 You are an expert ad creative analyst with 15+ years experience
@@ -478,7 +477,7 @@ Write all feedback in Uzbek language.
 `
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o',
+      model: 'openai/gpt-4o',
       max_tokens: 2000,
       messages: [
         { role: 'system', content: systemPrompt },

@@ -19,11 +19,14 @@ interface CompleteResult {
  */
 export class NishonAiClient {
   private client: OpenAI
-  private defaultModel = 'gpt-4o'
+  private defaultModel = 'openai/gpt-4o'
   private maxRetries = 3
 
   constructor(apiKey: string) {
-    this.client = new OpenAI({ apiKey })
+    this.client = new OpenAI({
+      apiKey,
+      baseURL: 'https://openrouter.ai/api/v1',
+    })
   }
 
   /**

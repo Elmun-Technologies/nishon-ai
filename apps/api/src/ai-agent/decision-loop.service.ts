@@ -49,11 +49,11 @@ export class DecisionLoopService {
     @InjectRepository(Workspace)
     private readonly workspaceRepo: Repository<Workspace>,
   ) {
-    const apiKey = this.config.get<string>("OPENAI_API_KEY");
+    const apiKey = this.config.get<string>("OPENROUTER_API_KEY");
     if (apiKey) {
       this.aiClient = new NishonAiClient(apiKey);
     } else {
-      this.logger.warn("OPENAI_API_KEY is not configured - AI decision loop will be unavailable");
+      this.logger.warn("OPENROUTER_API_KEY is not configured - AI decision loop will be unavailable");
     }
   }
 
