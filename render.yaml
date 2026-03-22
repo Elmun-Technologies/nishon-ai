@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: nishon-ai-api
+    env: node
+    plan: free
+    buildCommand: pnpm install --frozen-lockfile && NODE_OPTIONS='--max-old-space-size=400' pnpm --filter api build
+    startCommand: pnpm start:prod
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
