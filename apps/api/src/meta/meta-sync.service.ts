@@ -40,7 +40,7 @@ export type SyncResult = {
 export class MetaSyncService {
   private readonly logger = new Logger(MetaSyncService.name);
 
-  private readonly encryptionKey: Buffer | null;
+  private readonly encryptionKey: string | null;
 
   constructor(
     private readonly metaApi: MetaAdsService,
@@ -56,7 +56,7 @@ export class MetaSyncService {
     private readonly connectedAccountRepo: Repository<ConnectedAccount>,
   ) {
     const key = this.config.get<string>("ENCRYPTION_KEY", "");
-    this.encryptionKey = key.length === 32 ? Buffer.from(key, "utf8") : null;
+    this.encryptionKey = key.length === 32 ? key : null;
   }
 
   /**

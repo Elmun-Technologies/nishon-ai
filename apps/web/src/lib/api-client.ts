@@ -79,10 +79,25 @@ async function apiRequest<T>(
   const data = await parseBody(res).catch(() => null)
 
   if (!res.ok) {
-    const message =
+    let message =
       (data && typeof data === 'object' && 'message' in data && (data as any).message) ||
       res.statusText ||
       'Request failed'
+
+    // Add debugging info for common errors
+    if (res.status === 0 || res.status === null) {
+      message = `Network error — backend ishlamayapti yoki URL notog'ri: ${url}`
+    } else if (res.status === 401) {
+      message = 'Autentifikatsiya xatosi — qayta login qiling'
+    } else if (res.status === 403) {
+      message = 'Sizda ruxsat yo\'q bu ish uchun'
+    } else if (res.status === 404) {
+      message = `Topilmadi: ${url}`
+    } else if (res.status === 500) {
+      message = `Server xatosi — Render.com status'ni tekshiring`
+    } else if (res.status >= 400) {
+      message = `HTTP ${res.status}: ${message}`
+    }
 
     const err: ApiError = {
       response: { data, status: res.status },

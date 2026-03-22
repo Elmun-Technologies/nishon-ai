@@ -32,7 +32,7 @@ import { encrypt } from "../common/crypto.util";
 export class MetaAuthController {
   private readonly logger = new Logger(MetaAuthController.name);
 
-  private readonly encryptionKey: Buffer | null;
+  private readonly encryptionKey: string | null;
 
   constructor(
     private readonly metaOAuthService: MetaOAuthService,
@@ -44,7 +44,7 @@ export class MetaAuthController {
   ) {
     const key = this.config.get<string>("ENCRYPTION_KEY", "");
     if (key.length === 32) {
-      this.encryptionKey = Buffer.from(key, "utf8");
+      this.encryptionKey = key;
     } else {
       this.logger.warn(
         "ENCRYPTION_KEY is not set or not 32 chars — Meta tokens will be stored unencrypted",

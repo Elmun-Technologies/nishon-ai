@@ -25,7 +25,7 @@ import { Platform } from "@nishon/shared";
 @Injectable()
 export class PlatformsService {
   private readonly logger = new Logger(PlatformsService.name);
-  private readonly encryptionKey: Buffer;
+  private readonly encryptionKey: string;
 
   constructor(
     @InjectRepository(ConnectedAccount)
@@ -35,13 +35,13 @@ export class PlatformsService {
     private readonly metaConnector: MetaConnector,
     private readonly config: ConfigService,
   ) {
-    // Encryption key must be exactly 32 bytes for AES-256
+    // Encryption key must be exactly 32 chars for AES-256
     const key = this.config.get<string>("ENCRYPTION_KEY", "");
     if (key.length !== 32) {
       this.logger.warn("ENCRYPTION_KEY is not set or not 32 characters - platform token encryption will be unavailable");
-      this.encryptionKey = Buffer.alloc(32);
+      this.encryptionKey = "00000000000000000000000000000000";
     } else {
-      this.encryptionKey = Buffer.from(key, "utf8");
+      this.encryptionKey = key;
     }
   }
 
@@ -198,11 +198,7 @@ export class PlatformsService {
    */
   private encrypt(text: string): string {
     const iv = crypto.randomBytes(16);
-    const cipher = crypto.createCipheriv(
-      "aes-256-cbc",
-      this.encryptionKey as any,
-      iv as any,
-    );
+    const cipher = crypto.createCipheriv("aes-256-cbc", this.encryptionKey, iv);
 
     let encrypted = cipher.update(text, "utf8", "hex");
     encrypted += cipher.final("hex");
@@ -218,11 +214,7 @@ export class PlatformsService {
     }
 
     const iv = Buffer.from(ivHex, "hex");
-    const decipher = crypto.createDecipheriv(
-      "aes-256-cbc",
-      this.encryptionKey as any,
-      iv as any,
-    );
+    const decipher = crypto.createDecipheriv("aes-256-cbc", this.encryptionKey, iv);
 
     let decrypted = decipher.update(encrypted, "hex", "utf8");
     decrypted += decipher.final("utf8");
