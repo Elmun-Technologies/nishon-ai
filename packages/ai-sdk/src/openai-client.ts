@@ -68,7 +68,13 @@ export class NishonAiClient {
         // Only retry on rate limit (429) or server errors (500, 503)
         const isRetryable = error?.status === 429 || error?.status >= 500
         if (!isRetryable || attempt === this.maxRetries) {
-          throw new Error(`OpenAI API error after ${attempt} attempts: ${error.message}`)
+          const detail =
+            error?.error?.message ||
+            error?.message ||
+            String(error)
+          throw new Error(
+            `OpenRouter API error (status ${error?.status ?? 'unknown'}) after ${attempt} attempt(s): ${detail}`
+          )
         }
 
         // Exponential backoff: wait 1s, then 2s, then 4s
