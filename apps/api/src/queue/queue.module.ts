@@ -20,20 +20,24 @@ import { QUEUE_NAMES } from "./queue.constants";
     BullModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        redis: {
-          host: config.get<string>("REDIS_HOST", "redis"),
-          port: Number(config.get<string>("REDIS_PORT", "6379")),
-        },
-        defaultJobOptions: {
-          // Keep completed jobs for 24 hours for debugging
-          removeOnComplete: { age: 86400 },
-          // Keep failed jobs for 7 days so we can investigate
-          removeOnFail: { age: 604800 },
-          attempts: 3,
-          backoff: { type: "exponential", delay: 5000 },
-        },
-      }),
+      useFactory: (config: ConfigService) => {
+        const redisUrl = config.get<string>("REDIS_URL");
+        const redisConfig = redisUrl
+          ? { url: redisUrl }
+          : {
+              host: config.get<string>("REDIS_HOST", "redis"),
+              port: Number(config.get<string>("REDIS_PORT", "6379")),
+            };
+        return {
+          redis: redisConfig,
+          defaultJobOptions: {
+            removeOnComplete: { age: 86400 },
+            removeOnFail: { age: 604800 },
+            attempts: 3,
+            backoff: { type: "exponential", delay: 5000 },
+          },
+        };
+      },
     }),
     BullModule.registerQueue(
       { name: QUEUE_NAMES.OPTIMIZATION },
