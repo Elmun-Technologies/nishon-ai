@@ -13,7 +13,7 @@ import * as crypto from "crypto";
  * key must be exactly 32 bytes (use ENCRYPTION_KEY env var).
  */
 
-export function encrypt(plaintext: string, key: Buffer): string {
+export function encrypt(plaintext: string, key: string): string {
   const iv = crypto.randomBytes(16);
   const cipher = crypto.createCipheriv("aes-256-cbc", key, iv);
   let encrypted = cipher.update(plaintext, "utf8", "hex");
@@ -21,7 +21,7 @@ export function encrypt(plaintext: string, key: Buffer): string {
   return `${iv.toString("hex")}:${encrypted}`;
 }
 
-export function decrypt(ciphertext: string, key: Buffer): string {
+export function decrypt(ciphertext: string, key: string): string {
   const [ivHex, encrypted] = ciphertext.split(":");
   if (!ivHex || !encrypted) {
     throw new Error("Invalid encrypted token format — expected iv:ciphertext");
@@ -34,16 +34,16 @@ export function decrypt(ciphertext: string, key: Buffer): string {
 }
 
 /**
- * Derive a 32-byte key from the ENCRYPTION_KEY env var.
+ * Derive a 32-char key from the ENCRYPTION_KEY env var.
  * Throws at startup if the key is missing or wrong length so misconfiguration
  * is caught immediately rather than at runtime when a token is first accessed.
  */
-export function resolveEncryptionKey(rawKey: string | undefined): Buffer {
+export function resolveEncryptionKey(rawKey: string | undefined): string {
   if (!rawKey || rawKey.length !== 32) {
     throw new Error(
       "ENCRYPTION_KEY must be exactly 32 ASCII characters. " +
         "Generate one with: openssl rand -hex 16",
     );
   }
-  return Buffer.from(rawKey, "utf8");
+  return rawKey;
 }
