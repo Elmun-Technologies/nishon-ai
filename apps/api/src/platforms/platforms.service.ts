@@ -38,9 +38,11 @@ export class PlatformsService {
     // Encryption key must be exactly 32 bytes for AES-256
     const key = this.config.get<string>("ENCRYPTION_KEY", "");
     if (key.length !== 32) {
-      throw new Error("ENCRYPTION_KEY must be exactly 32 characters");
+      this.logger.warn("ENCRYPTION_KEY is not set or not 32 characters - platform token encryption will be unavailable");
+      this.encryptionKey = Buffer.alloc(32);
+    } else {
+      this.encryptionKey = Buffer.from(key, "utf8");
     }
-    this.encryptionKey = Buffer.from(key, "utf8");
   }
 
   // ─── META OAUTH FLOW ──────────────────────────────────────────────────────
