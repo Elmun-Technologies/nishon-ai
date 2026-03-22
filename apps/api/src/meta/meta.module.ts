@@ -5,6 +5,7 @@ import { MetaController } from "./meta.controller";
 import { MetaAdsService } from "./meta-ads.service";
 import { MetaSyncService } from "./meta-sync.service";
 import { MetaAiEngineService } from "./meta-ai-engine.service";
+import { MetaCronService } from "./meta-cron.service";
 import { MetaAdAccount } from "./entities/meta-ad-account.entity";
 import { MetaCampaignSync } from "./entities/meta-campaign-sync.entity";
 import { MetaInsight } from "./entities/meta-insight.entity";
@@ -16,6 +17,7 @@ import { ConnectedAccount } from "../platforms/entities/connected-account.entity
  *  MetaAdsService      — pure Graph API client (no DB, reusable by other modules)
  *  MetaSyncService     — sync orchestrator (API → DB, with transactions)
  *  MetaAiEngineService — rule-based campaign health analyser
+ *  MetaCronService     — scheduler: auto-syncs all workspaces every 10 minutes
  *  MetaController      — REST endpoints: GET /meta/ad-accounts, POST /meta/sync, GET /meta/dashboard
  *
  * ConnectedAccount is imported (not owned) — it's managed by PlatformsModule.
@@ -29,11 +31,11 @@ import { ConnectedAccount } from "../platforms/entities/connected-account.entity
       MetaAdAccount,
       MetaCampaignSync,
       MetaInsight,
-      ConnectedAccount, // needed by MetaSyncService to look up stored tokens
+      ConnectedAccount, // needed by MetaSyncService and MetaCronService to look up stored tokens
     ]),
   ],
   controllers: [MetaController],
-  providers: [MetaAdsService, MetaSyncService, MetaAiEngineService],
+  providers: [MetaAdsService, MetaSyncService, MetaAiEngineService, MetaCronService],
   exports: [MetaAdsService, MetaSyncService, MetaAiEngineService],
 })
 export class MetaModule {}

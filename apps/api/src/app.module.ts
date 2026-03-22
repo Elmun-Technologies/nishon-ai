@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { ConfigService } from "@nestjs/config";
+import { ScheduleModule } from "@nestjs/schedule";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AuthModule } from "./auth/auth.module";
 import { WorkspacesModule } from "./workspaces/workspaces.module";
@@ -28,6 +29,7 @@ import { RequestLoggingInterceptor } from "./common/interceptors/request-logging
       envFilePath: ".env",
       validate: validateEnv,
     }),
+    ScheduleModule.forRoot(),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {

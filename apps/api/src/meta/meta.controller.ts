@@ -32,6 +32,13 @@ import { MetaAdAccount } from "./entities/meta-ad-account.entity";
 import { MetaCampaignSync } from "./entities/meta-campaign-sync.entity";
 import { MetaInsight } from "./entities/meta-insight.entity";
 
+// Maps the user-facing range shorthand to Meta's date_preset values
+const RANGE_TO_DATE_PRESET: Record<string, string> = {
+  "7d": "last_7d",
+  "30d": "last_30d",
+  "today": "today",
+};
+
 /**
  * All Meta Ads endpoints live under /meta.
  *
@@ -92,16 +99,31 @@ export class MetaController {
   @Get("insights")
   @ApiOperation({ summary: "Fetch raw campaign insights for an ad account" })
   @ApiQuery({ name: "accountId", description: "Meta ad account ID (act_xxx)" })
-  @ApiQuery({ name: "datePreset", required: false, description: "e.g. last_7d, last_30d, this_month" })
+  @ApiQuery({
+    name: "range",
+    required: false,
+    description: "Date range shorthand: 7d | 30d | today. Defaults to 30d.",
+    enum: ["7d", "30d", "today"],
+  })
+  @ApiQuery({
+    name: "datePreset",
+    required: false,
+    description: "Raw Meta date_preset value (e.g. last_7d, last_30d, this_month). Overridden by range if both provided.",
+  })
   async getInsights(
     @Query("accountId") accountId: string | undefined,
-    @Query("datePreset") datePreset = "last_30d",
+    @Query("range") range?: string,
+    @Query("datePreset") datePreset?: string,
     @Headers("authorization") authorization?: string,
     @Req() req?: Request,
   ) {
     if (!accountId) throw new BadRequestException("accountId query parameter is required");
     const accessToken = this.extractMetaToken(authorization, req);
-    const insights = await this.metaAdsService.getInsights(accountId, accessToken, datePreset);
+
+    // `range` shorthand takes priority; fall back to raw datePreset; default to last_30d
+    const resolvedPreset = this.resolveRange(range, datePreset);
+
+    const insights = await this.metaAdsService.getInsights(accountId, accessToken, resolvedPreset);
     return { success: true, insights };
   }
 
@@ -155,7 +177,8 @@ export class MetaController {
     summary: "Get enriched dashboard data for a workspace",
     description:
       "Returns all synced ad accounts and their campaigns, enriched with aggregated " +
-      "insight totals and an AI-generated health/action recommendation per campaign.",
+      "metrics (spend, clicks, impressions, CTR, CPC) and an AI health/action recommendation " +
+      "per campaign.",
   })
   @ApiQuery({ name: "workspaceId", description: "Nishon workspace UUID" })
   @ApiResponse({
@@ -174,9 +197,8 @@ export class MetaController {
                 id: "120214192783690",
                 name: "Black Friday – Retargeting",
                 status: "ACTIVE",
-                objective: "OUTCOME_SALES",
-                insights: { spend: 87.5, clicks: 412, impressions: 12843, ctr: 3.21, cpc: 0.21 },
-                ai: { health: "GOOD", action: "SCALE", reason: "Strong CTR and low CPC…" },
+                metrics: { spend: 87.5, clicks: 412, impressions: 12843, ctr: 3.21, cpc: 0.21 },
+                ai: { health: "GOOD", action: "SCALE", reason: "High CTR and low CPC" },
               },
             ],
           },
@@ -230,8 +252,7 @@ export class MetaController {
       id: campaign.id,
       name: campaign.name,
       status: campaign.status,
-      objective: campaign.objective,
-      insights: {
+      metrics: {
         spend: aggregated.spend,
         clicks: aggregated.clicks,
         impressions: aggregated.impressions,
@@ -248,8 +269,8 @@ export class MetaController {
 
   /**
    * Aggregates all MetaInsight rows for a campaign into a single totals snapshot.
-   * Recalculates CTR and CPC from aggregated totals rather than averaging daily
-   * values, which is the correct approach for weighted metrics.
+   * Recalculates CTR and CPC from aggregated totals (not averages) — correct for
+   * weighted metrics. Guards against division by zero.
    */
   private async aggregateInsights(campaignId: string): Promise<CampaignInsights> {
     const rows = await this.insightRepo.find({ where: { campaignId } });
@@ -261,13 +282,32 @@ export class MetaController {
     const spend = rows.reduce((s, r) => s + Number(r.spend), 0);
     const impressions = rows.reduce((s, r) => s + Number(r.impressions), 0);
     const clicks = rows.reduce((s, r) => s + Number(r.clicks), 0);
+
+    // Recalculate from totals to avoid averaging-bias on daily values
     const ctr = impressions > 0 ? (clicks / impressions) * 100 : 0;
     const cpc = clicks > 0 ? spend / clicks : 0;
 
     return { campaignId, spend, impressions, clicks, ctr, cpc };
   }
 
-  // ─── Private: token helpers ──────────────────────────────────────────────────
+  // ─── Private: helpers ────────────────────────────────────────────────────────
+
+  /**
+   * Resolves the Meta API date_preset from the user-facing `range` shorthand
+   * or falls back to the raw `datePreset` param. Defaults to "last_30d".
+   */
+  private resolveRange(range?: string, datePreset?: string): string {
+    if (range) {
+      const mapped = RANGE_TO_DATE_PRESET[range];
+      if (!mapped) {
+        throw new BadRequestException(
+          `Invalid range "${range}". Allowed values: ${Object.keys(RANGE_TO_DATE_PRESET).join(", ")}`,
+        );
+      }
+      return mapped;
+    }
+    return datePreset ?? "last_30d";
+  }
 
   /** Resolves a Meta access token from the Authorization header or cookie. */
   private extractMetaToken(authorization?: string, req?: Request): string {
