@@ -15,6 +15,7 @@ import { MetaOAuthService } from "./meta-oauth.service";
 import { ConnectedAccount } from "../platforms/entities/connected-account.entity";
 import { Workspace } from "../workspaces/entities/workspace.entity";
 import { Platform } from "@nishon/shared";
+import { encrypt } from "../common/crypto.util";
 
 /**
  * Public OAuth endpoints for Meta Ads integration.
@@ -31,6 +32,8 @@ import { Platform } from "@nishon/shared";
 export class MetaAuthController {
   private readonly logger = new Logger(MetaAuthController.name);
 
+  private readonly encryptionKey: Buffer | null;
+
   constructor(
     private readonly metaOAuthService: MetaOAuthService,
     private readonly config: ConfigService,
@@ -38,7 +41,17 @@ export class MetaAuthController {
     private readonly connectedAccountRepo: Repository<ConnectedAccount>,
     @InjectRepository(Workspace)
     private readonly workspaceRepo: Repository<Workspace>,
-  ) {}
+  ) {
+    const key = this.config.get<string>("ENCRYPTION_KEY", "");
+    if (key.length === 32) {
+      this.encryptionKey = Buffer.from(key, "utf8");
+    } else {
+      this.logger.warn(
+        "ENCRYPTION_KEY is not set or not 32 chars — Meta tokens will be stored unencrypted",
+      );
+      this.encryptionKey = null;
+    }
+  }
 
   /**
    * Entry point for the OAuth flow.
@@ -185,12 +198,17 @@ export class MetaAuthController {
       ? new Date(Date.now() + expiresIn * 1000)
       : null;
 
+    // Encrypt token at rest when ENCRYPTION_KEY is available
+    const storedToken = this.encryptionKey
+      ? encrypt(accessToken, this.encryptionKey)
+      : accessToken;
+
     const existing = await this.connectedAccountRepo.findOne({
       where: { workspaceId, platform: Platform.META },
     });
 
     if (existing) {
-      existing.accessToken = accessToken;
+      existing.accessToken = storedToken;
       existing.isActive = true;
       existing.tokenExpiresAt = tokenExpiresAt;
       await this.connectedAccountRepo.save(existing);
@@ -198,7 +216,7 @@ export class MetaAuthController {
       const record = this.connectedAccountRepo.create({
         workspaceId,
         platform: Platform.META,
-        accessToken,
+        accessToken: storedToken,
         refreshToken: null,
         externalAccountId: "meta_oauth",   // updated to real ID on first sync
         externalAccountName: "Meta Account", // updated to real name on first sync

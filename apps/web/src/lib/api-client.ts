@@ -137,6 +137,24 @@ export const aiAgent = {
     apiClient.patch(`/ai-agent/decisions/${decisionId}/reject`, {}),
 }
 
+export const campaigns = {
+  list: (workspaceId: string) =>
+    apiClient.get(`/campaigns/workspace/${workspaceId}`),
+  updateStatus: (id: string, status: string) =>
+    apiClient.patch(`/campaigns/${id}/status`, { status }),
+  delete: (id: string) =>
+    apiRequest('DELETE', `/campaigns/${id}`),
+}
+
+export const aiDecisions = {
+  list: (workspaceId: string) =>
+    apiClient.get(`/ai-decisions/workspace/${workspaceId}`),
+  approve: (id: string) =>
+    apiClient.patch(`/ai-decisions/${id}/approve`, {}),
+  reject: (id: string) =>
+    apiClient.patch(`/ai-decisions/${id}/reject`, {}),
+}
+
 export const platforms = {
   getAccounts: (workspaceId: string) =>
     apiClient.get(`/platforms/accounts/${workspaceId}`),
