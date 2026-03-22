@@ -10,12 +10,16 @@ import { createRequestIdMiddleware } from "./common/middleware/request-id.middle
 import { RequestLoggingInterceptor } from "./common/interceptors/request-logging.interceptor";
 import { createRateLimitMiddleware } from "./common/middleware/rate-limit.middleware";
 import { DataSource } from "typeorm";
+import { IoAdapter } from "@nestjs/platform-socket.io";
 import helmet from "helmet";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const logger = app.get(JsonLoggerService);
   app.useLogger(logger);
+
+  // Enable Socket.IO WebSocket adapter
+  app.useWebSocketAdapter(new IoAdapter(app));
 
   const configService = app.get(ConfigService);
   const requestContext = app.get(RequestContextService);

@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useWorkspaceStore } from '@/stores/workspace.store'
+import { useRealtimeRefresh } from '@/hooks/useRealtimeRefresh'
 import { MetricCard } from '@/components/ui/MetricCard'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
@@ -43,6 +44,14 @@ export default function DashboardPage() {
       .catch(() => setPerformance({}))
       .finally(() => setLoadingPerf(false))
   }, [currentWorkspace?.id])
+
+  // Refresh performance metrics in real-time when Meta syncs or optimization completes
+  useRealtimeRefresh(currentWorkspace?.id, ['meta_synced', 'optimization_done'], () => {
+    if (!currentWorkspace?.id) return
+    workspacesApi.performance(currentWorkspace.id)
+      .then((res) => setPerformance((res.data as any) ?? {}))
+      .catch(() => {})
+  })
 
   async function handleRunOptimization() {
     if (!currentWorkspace?.id) return

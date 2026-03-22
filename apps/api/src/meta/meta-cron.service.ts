@@ -5,6 +5,7 @@ import { Repository } from "typeorm";
 import { MetaSyncService } from "./meta-sync.service";
 import { ConnectedAccount } from "../platforms/entities/connected-account.entity";
 import { Platform } from "@nishon/shared";
+import { EventsGateway } from "../events/events.gateway";
 
 /**
  * Runs an automatic Meta Ads sync every 10 minutes across all workspaces
@@ -19,6 +20,7 @@ export class MetaCronService {
     private readonly syncService: MetaSyncService,
     @InjectRepository(ConnectedAccount)
     private readonly connectedAccountRepo: Repository<ConnectedAccount>,
+    private readonly eventsGateway: EventsGateway,
   ) {}
 
   /**
@@ -58,6 +60,13 @@ export class MetaCronService {
             campaignsSynced: result.campaignsSynced,
             insightRowsSynced: result.insightRowsSynced,
             errors: result.errors,
+          });
+
+          // Notify frontend in real-time
+          this.eventsGateway.emitToWorkspace(workspaceId, 'meta_synced', {
+            workspaceId,
+            campaignsSynced: result.campaignsSynced,
+            timestamp: new Date().toISOString(),
           });
         } catch (err: any) {
           this.logger.error({

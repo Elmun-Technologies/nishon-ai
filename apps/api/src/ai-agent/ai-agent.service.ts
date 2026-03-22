@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger, InternalServerErrorException } from "@nestjs/common";
 import {
   StrategyEngineService,
   StrategyResult,
@@ -251,10 +251,18 @@ Use the Instagram and website URLs to gather real insights about the competitor.
 Be specific, actionable, and write all notes in Uzbek language.
 `
 
-    return client.completeJson(userPrompt, systemPrompt, {
-      temperature: 0.3,
-      maxTokens: 6000,
-    })
+    try {
+      return await client.completeJson(userPrompt, systemPrompt, {
+        temperature: 0.3,
+        maxTokens: 4000,
+      })
+    } catch (err: any) {
+      const detail = err?.message || String(err)
+      this.logger.error(`Competitor analysis failed: ${detail}`)
+      throw new InternalServerErrorException(
+        `AI tahlil amalga oshmadi: ${detail.slice(0, 200)}`
+      )
+    }
   }
 
   async generateAdScripts(workspaceId: string, dto: any): Promise<any> {
