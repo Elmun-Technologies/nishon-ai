@@ -14,11 +14,12 @@ import * as crypto from "crypto";
  */
 
 export function encrypt(plaintext: string, key: string): string {
-  const iv = crypto.randomBytes(16);
+  const ivBuf = crypto.randomBytes(16);
+  const iv = new Uint8Array(ivBuf);
   const cipher = crypto.createCipheriv("aes-256-cbc", key, iv);
   let encrypted = cipher.update(plaintext, "utf8", "hex");
   encrypted += cipher.final("hex");
-  return `${iv.toString("hex")}:${encrypted}`;
+  return `${ivBuf.toString("hex")}:${encrypted}`;
 }
 
 export function decrypt(ciphertext: string, key: string): string {
@@ -26,7 +27,7 @@ export function decrypt(ciphertext: string, key: string): string {
   if (!ivHex || !encrypted) {
     throw new Error("Invalid encrypted token format — expected iv:ciphertext");
   }
-  const iv = Buffer.from(ivHex, "hex");
+  const iv = new Uint8Array(Buffer.from(ivHex, "hex"));
   const decipher = crypto.createDecipheriv("aes-256-cbc", key, iv);
   let decrypted = decipher.update(encrypted, "hex", "utf8");
   decrypted += decipher.final("utf8");

@@ -197,13 +197,14 @@ export class PlatformsService {
    * The output format is: iv:authTag:encrypted (all hex encoded)
    */
   private encrypt(text: string): string {
-    const iv = crypto.randomBytes(16);
+    const ivBuf = crypto.randomBytes(16);
+    const iv = new Uint8Array(ivBuf);
     const cipher = crypto.createCipheriv("aes-256-cbc", this.encryptionKey, iv);
 
     let encrypted = cipher.update(text, "utf8", "hex");
     encrypted += cipher.final("hex");
 
-    return `${iv.toString("hex")}:${encrypted}`;
+    return `${ivBuf.toString("hex")}:${encrypted}`;
   }
 
   private decrypt(encryptedText: string): string {
@@ -213,7 +214,7 @@ export class PlatformsService {
       throw new Error("Invalid encrypted token format");
     }
 
-    const iv = Buffer.from(ivHex, "hex");
+    const iv = new Uint8Array(Buffer.from(ivHex, "hex"));
     const decipher = crypto.createDecipheriv("aes-256-cbc", this.encryptionKey, iv);
 
     let decrypted = decipher.update(encrypted, "hex", "utf8");
