@@ -23,7 +23,7 @@ export class MetaCronService {
 
   /**
    * Auto-sync all Meta-connected workspaces every 10 minutes.
-   * Cron: */10 * * * *
+   * Cron pattern: every-10-minutes (see @Cron decorator below).
    */
   @Cron("*/10 * * * *")
   async syncAll(): Promise<void> {
