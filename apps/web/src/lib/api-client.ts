@@ -140,10 +140,23 @@ export const aiAgent = {
 export const platforms = {
   getAccounts: (workspaceId: string) =>
     apiClient.get(`/platforms/accounts/${workspaceId}`),
-  connectMeta: (workspaceId: string) =>
-    `${API_BASE_URL}/platforms/meta/connect/${workspaceId}`,
-  selectMetaAccount: (data: any) =>
-    apiClient.post('/platforms/meta/select-account', data),
+  /**
+   * Returns the redirect URL for starting Meta OAuth.
+   * Use: window.location.href = platforms.connectMetaUrl(workspaceId)
+   * Or simply use connectMeta() from lib/meta.ts which handles this correctly.
+   */
+  connectMetaUrl: (workspaceId: string) => {
+    const url = new URL(`${API_BASE_URL}/meta/connect`)
+    url.searchParams.set('workspaceId', workspaceId)
+    return url.toString()
+  },
+}
+
+export const meta = {
+  dashboard: (workspaceId: string) =>
+    apiClient.get(`/meta/dashboard?workspaceId=${encodeURIComponent(workspaceId)}`),
+  sync: (workspaceId: string) =>
+    apiClient.post('/meta/sync', { workspaceId }),
 }
 
 export default apiClient
