@@ -3,6 +3,14 @@ type EnvRecord = Record<string, string | undefined>;
 const REQUIRED_ENV_VARS = [
   "DATABASE_URL",
   "JWT_SECRET",
+  "META_APP_ID",
+  "META_APP_SECRET",
+  "ENCRYPTION_KEY",
+] as const;
+
+const WARN_ENV_VARS = [
+  "FRONTEND_URL",
+  "META_CALLBACK_URL",
 ] as const;
 
 export function validateEnv(config: EnvRecord): EnvRecord {
@@ -15,6 +23,28 @@ export function validateEnv(config: EnvRecord): EnvRecord {
     throw new Error(
       `Missing required environment variables: ${missing.join(", ")}. ` +
         "Set them in Render environment settings before starting the API.",
+    );
+  }
+
+  // Validate ENCRYPTION_KEY length — must be exactly 32 chars for AES-256
+  const encryptionKey = config["ENCRYPTION_KEY"];
+  if (encryptionKey && encryptionKey.trim().length !== 32) {
+    throw new Error(
+      "ENCRYPTION_KEY must be exactly 32 ASCII characters. " +
+        "Generate one with: openssl rand -hex 16",
+    );
+  }
+
+  // Warn about recommended but not strictly required vars
+  const warned = WARN_ENV_VARS.filter((key) => {
+    const value = config[key];
+    return !value || value.trim().length === 0;
+  });
+
+  if (warned.length > 0) {
+    console.warn(
+      `[Nishon AI] Missing recommended environment variables: ${warned.join(", ")}. ` +
+        "Some features may not work correctly.",
     );
   }
 

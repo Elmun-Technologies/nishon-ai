@@ -1,12 +1,14 @@
 import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { DataSource, Repository } from "typeorm";
+import { ConfigService } from "@nestjs/config";
 import { MetaAdsService } from "./meta-ads.service";
 import { MetaAdAccount } from "./entities/meta-ad-account.entity";
 import { MetaCampaignSync } from "./entities/meta-campaign-sync.entity";
 import { MetaInsight } from "./entities/meta-insight.entity";
 import { ConnectedAccount } from "../platforms/entities/connected-account.entity";
 import { Platform } from "@nishon/shared";
+import { decrypt } from "../common/crypto.util";
 
 export type SyncResult = {
   success: boolean;
@@ -38,9 +40,12 @@ export type SyncResult = {
 export class MetaSyncService {
   private readonly logger = new Logger(MetaSyncService.name);
 
+  private readonly encryptionKey: Buffer | null;
+
   constructor(
     private readonly metaApi: MetaAdsService,
     private readonly dataSource: DataSource,
+    private readonly config: ConfigService,
     @InjectRepository(MetaAdAccount)
     private readonly adAccountRepo: Repository<MetaAdAccount>,
     @InjectRepository(MetaCampaignSync)
@@ -49,7 +54,10 @@ export class MetaSyncService {
     private readonly insightRepo: Repository<MetaInsight>,
     @InjectRepository(ConnectedAccount)
     private readonly connectedAccountRepo: Repository<ConnectedAccount>,
-  ) {}
+  ) {
+    const key = this.config.get<string>("ENCRYPTION_KEY", "");
+    this.encryptionKey = key.length === 32 ? Buffer.from(key, "utf8") : null;
+  }
 
   /**
    * Entry point: sync all Meta data for the given workspace.
@@ -213,8 +221,10 @@ export class MetaSyncService {
   // ─── Private: helpers ────────────────────────────────────────────────────────
 
   /**
-   * Looks up the Meta access token for a workspace from the connected_accounts table.
-   * In production, tokens should be AES-256 encrypted at rest — add decryption here.
+   * Looks up and decrypts the Meta access token for a workspace.
+   * Tokens are stored AES-256-CBC encrypted when ENCRYPTION_KEY is set.
+   * Falls back to returning the raw value so existing plain-text tokens
+   * still work during the encryption migration window.
    */
   private async resolveAccessToken(workspaceId: string): Promise<string | null> {
     const account = await this.connectedAccountRepo.findOne({
@@ -224,8 +234,22 @@ export class MetaSyncService {
 
     if (!account) return null;
 
-    // TODO: decrypt account.accessToken before returning when encryption is enabled.
-    return account.accessToken;
+    const raw = account.accessToken;
+
+    // Decrypt if the token looks like our iv:ciphertext format and key is available
+    if (this.encryptionKey && raw.includes(":")) {
+      try {
+        return decrypt(raw, this.encryptionKey);
+      } catch (err: any) {
+        this.logger.warn({
+          message: "Token decryption failed — trying raw value",
+          workspaceId,
+          error: err?.message,
+        });
+      }
+    }
+
+    return raw;
   }
 
   /** Splits an array into chunks of `size` for batch DB operations. */
