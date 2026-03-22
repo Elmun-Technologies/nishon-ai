@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
+import { connectMeta, fetchMetaDashboard } from '@/lib/meta'
 
 type Tab = 'general' | 'integrations' | 'notifications' | 'danger'
 
@@ -74,19 +75,7 @@ const AUTOPILOT_MODES = [
   },
 ]
 
-const INTEGRATIONS = [
-  {
-    id: 'meta',
-    name: 'Meta (Facebook & Instagram)',
-    description: 'Run ads on Facebook, Instagram, Messenger, and Audience Network.',
-    logo: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-blue-400">
-        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-      </svg>
-    ),
-    href: '/settings/meta',
-    connected: false,
-  },
+const INTEGRATIONS_STATIC = [
   {
     id: 'google',
     name: 'Google Ads',
@@ -100,7 +89,6 @@ const INTEGRATIONS = [
       </svg>
     ),
     href: '#',
-    connected: false,
     comingSoon: true,
   },
   {
@@ -113,8 +101,21 @@ const INTEGRATIONS = [
       </svg>
     ),
     href: '#',
-    connected: false,
     comingSoon: true,
+  },
+]
+
+const INTEGRATIONS = [
+  {
+    id: 'meta',
+    name: 'Meta (Facebook & Instagram)',
+    description: 'Run ads on Facebook, Instagram, Messenger, and Audience Network.',
+    logo: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-blue-400">
+        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+      </svg>
+    ),
+    href: '/settings/meta',
   },
 ]
 
@@ -130,6 +131,20 @@ export default function SettingsPage() {
   const [emailNotifs, setEmailNotifs] = useState(true)
   const [weeklyReport, setWeeklyReport] = useState(true)
   const [aiAlerts, setAiAlerts] = useState(true)
+
+  // Meta connection status
+  const [metaConnected, setMetaConnected] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    if (activeTab !== 'integrations' || !currentWorkspace?.id) return
+    setMetaConnected(null)
+    fetchMetaDashboard(currentWorkspace.id)
+      .then((data) => setMetaConnected((data.accounts?.length ?? 0) > 0 || true))
+      .catch((err) => {
+        const status = err?.response?.status
+        setMetaConnected(status !== 404 && status !== 403)
+      })
+  }, [activeTab, currentWorkspace?.id])
 
   async function handleSave() {
     setSaving(true)
@@ -326,26 +341,26 @@ export default function SettingsPage() {
                 </p>
               </div>
               <div className="space-y-3">
+
+                {/* ── Meta (live connection status) ── */}
                 {INTEGRATIONS.map((integration) => (
                   <div
                     key={integration.id}
                     className="flex items-center gap-4 p-4 rounded-xl border border-[#2A2A3A] bg-[#0F0F15]"
                   >
-                    {/* Logo */}
                     <div className="w-10 h-10 rounded-xl bg-[#1C1C27] border border-[#2A2A3A] flex items-center justify-center shrink-0">
                       {integration.logo}
                     </div>
-
-                    {/* Info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <p className="text-sm font-medium text-white">{integration.name}</p>
-                        {integration.comingSoon && (
-                          <span className="text-xs px-1.5 py-0.5 rounded-md bg-[#1C1C27] text-[#6B7280] border border-[#2A2A3A]">
-                            Coming soon
+                        {/* Dynamic connection status */}
+                        {metaConnected === null && (
+                          <span className="text-xs px-1.5 py-0.5 rounded-md bg-[#1C1C27] text-[#4B5563] border border-[#2A2A3A]">
+                            Checking…
                           </span>
                         )}
-                        {integration.connected && (
+                        {metaConnected === true && (
                           <span className="text-xs px-1.5 py-0.5 rounded-md bg-emerald-400/10 text-emerald-400 border border-emerald-400/20 flex items-center gap-1">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                             Connected
@@ -354,25 +369,59 @@ export default function SettingsPage() {
                       </div>
                       <p className="text-xs text-[#6B7280] mt-0.5">{integration.description}</p>
                     </div>
-
                     {/* Action */}
-                    {integration.comingSoon ? (
-                      <button
-                        disabled
-                        className="text-xs px-3 py-1.5 rounded-lg border border-[#2A2A3A] text-[#4B5563] cursor-not-allowed"
-                      >
-                        Connect
-                      </button>
-                    ) : (
+                    {metaConnected === true ? (
                       <Link
                         href={integration.href}
-                        className="text-xs px-3 py-1.5 rounded-lg border border-[#7C3AED]/30 text-[#A78BFA] hover:bg-[#7C3AED]/10 transition-colors"
+                        className="text-xs px-3 py-1.5 rounded-lg border border-[#7C3AED]/30 text-[#A78BFA] hover:bg-[#7C3AED]/10 transition-colors shrink-0"
                       >
-                        {integration.connected ? 'Manage' : 'Connect'}
+                        Manage
                       </Link>
+                    ) : (
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => currentWorkspace?.id && connectMeta(currentWorkspace.id)}
+                          disabled={!currentWorkspace?.id}
+                          className="text-xs px-3 py-1.5 rounded-lg border border-[#7C3AED]/30 text-[#A78BFA] hover:bg-[#7C3AED]/10 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                        >
+                          Connect
+                        </button>
+                        <Link
+                          href={integration.href}
+                          className="text-xs px-3 py-1.5 rounded-lg border border-[#2A2A3A] text-[#6B7280] hover:text-white hover:bg-[#1C1C27] transition-colors"
+                        >
+                          Details
+                        </Link>
+                      </div>
                     )}
                   </div>
                 ))}
+
+                {/* ── Coming soon platforms ── */}
+                {INTEGRATIONS_STATIC.map((integration) => (
+                  <div
+                    key={integration.id}
+                    className="flex items-center gap-4 p-4 rounded-xl border border-[#2A2A3A] bg-[#0F0F15] opacity-60"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-[#1C1C27] border border-[#2A2A3A] flex items-center justify-center shrink-0">
+                      {integration.logo}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium text-white">{integration.name}</p>
+                        <span className="text-xs px-1.5 py-0.5 rounded-md bg-[#1C1C27] text-[#6B7280] border border-[#2A2A3A]">
+                          Coming soon
+                        </span>
+                      </div>
+                      <p className="text-xs text-[#6B7280] mt-0.5">{integration.description}</p>
+                    </div>
+                    <button disabled className="text-xs px-3 py-1.5 rounded-lg border border-[#2A2A3A] text-[#4B5563] cursor-not-allowed shrink-0">
+                      Connect
+                    </button>
+                  </div>
+                ))}
+
               </div>
             </Card>
           )}

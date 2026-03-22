@@ -1,65 +1,99 @@
-import { env } from "@/lib/env";
+import apiClient from './api-client'
+import { env } from './env'
 
-type MetaAdAccount = {
-  id: string;
-  name: string;
-  account_status: number;
-  currency: string | null;
-};
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+export type MetaHealthScore = 'GOOD' | 'AVERAGE' | 'BAD'
+export type MetaCampaignAction = 'SCALE' | 'MONITOR' | 'STOP' | 'KILL'
+
+export type MetaDashboardCampaign = {
+  id: string
+  name: string
+  status: string
+  metrics: {
+    spend: number
+    clicks: number
+    impressions: number
+    ctr: number
+    cpc: number
+  }
+  ai: {
+    health: MetaHealthScore
+    action: MetaCampaignAction
+    reason: string
+  }
+}
+
+export type MetaDashboardAccount = {
+  id: string
+  name: string
+  currency: string | null
+  timezone: string | null
+  campaigns: MetaDashboardCampaign[]
+}
+
+export type MetaDashboard = {
+  workspaceId: string
+  accounts: MetaDashboardAccount[]
+}
+
+export type SyncResult = {
+  success: boolean
+  accountsSynced: number
+  campaignsSynced: number
+  insightRowsSynced: number
+  errors: string[]
+}
+
+// ─── OAuth ────────────────────────────────────────────────────────────────────
 
 /**
- * Redirects the browser to the backend OAuth connect route.
+ * Starts the Meta OAuth flow by redirecting the browser to the backend.
+ * Must be a full page redirect — NOT fetch().
  *
- * IMPORTANT: this must be a full browser redirect (window.location.href), NOT a
- * fetch() call. Meta's OAuth dialog requires a real page navigation.
- *
- * workspaceId MUST be provided — the backend encodes it in the OAuth `state` so
- * the callback knows which tenant to associate the token with.
- *
- * Flow:
- *   1. Browser → GET /meta/connect?workspaceId=<id>&redirectTo=<url>
- *   2. Backend → redirects to Meta OAuth dialog
- *   3. Meta → user grants access → GET /meta/callback?code=...&state=...
- *   4. Backend → saves token to connected_accounts for this workspace
- *   5. Backend → redirects to frontend /settings/meta?connected=1&workspaceId=<id>
+ * workspaceId is required: the backend encodes it in OAuth state so the
+ * callback knows which workspace to save the token to.
  */
 export function connectMeta(workspaceId: string): void {
   if (!workspaceId) {
-    console.error("[Nishon AI] connectMeta: workspaceId is required");
-    return;
+    console.error('[Nishon AI] connectMeta: workspaceId is required')
+    return
   }
 
-  const backendUrl =
-    env.apiBaseUrl ||
-    (typeof window !== "undefined"
-      ? `${window.location.protocol}//${window.location.hostname}:3001`
-      : "");
+  const backendUrl = env.apiBaseUrl.replace(/\/$/, '')
+  const redirectTo =
+    typeof window !== 'undefined' ? `${window.location.origin}/settings/meta` : undefined
 
-  const frontendUrl =
-    typeof window !== "undefined" ? window.location.origin : "";
+  const url = new URL(`${backendUrl}/meta/connect`)
+  url.searchParams.set('workspaceId', workspaceId)
+  if (redirectTo) url.searchParams.set('redirectTo', redirectTo)
 
-  const redirectTo = frontendUrl ? `${frontendUrl}/settings/meta` : undefined;
-
-  const connectUrl = new URL(`${backendUrl}/meta/connect`);
-  connectUrl.searchParams.set("workspaceId", workspaceId);
-  if (redirectTo) {
-    connectUrl.searchParams.set("redirectTo", redirectTo);
-  }
-
-  window.location.href = connectUrl.toString();
+  window.location.href = url.toString()
 }
 
-export async function fetchMetaAdAccounts(): Promise<MetaAdAccount[]> {
-  const response = await fetch(`${env.apiBaseUrl}/api/v1/meta/ad-accounts`, {
-    method: "GET",
-    credentials: "include",
-  });
+// ─── API calls (authenticated via JWT in api-client) ─────────────────────────
 
-  const payload = await response.json();
+/**
+ * Returns the full Meta dashboard for a workspace:
+ * ad accounts → campaigns → aggregated metrics + AI analysis.
+ * Throws if the workspace has no connected Meta account.
+ */
+export async function fetchMetaDashboard(workspaceId: string): Promise<MetaDashboard> {
+  const res = await apiClient.get<MetaDashboard>(
+    `/meta/dashboard?workspaceId=${encodeURIComponent(workspaceId)}`,
+  )
+  return res.data
+}
 
-  if (!response.ok) {
-    throw new Error(payload?.message || "Failed to fetch Meta ad accounts");
-  }
-
-  return payload.accounts || [];
+/**
+ * Triggers a full Meta Ads sync for a workspace.
+ * Fetches all ad accounts, campaigns, and daily insights from the Graph API
+ * and upserts them into the local database.
+ */
+export async function triggerSync(workspaceId: string): Promise<SyncResult> {
+  const res = await apiClient.post<{ success: boolean; result: SyncResult }>(
+    '/meta/sync',
+    { workspaceId },
+  )
+  return res.data.result
 }
