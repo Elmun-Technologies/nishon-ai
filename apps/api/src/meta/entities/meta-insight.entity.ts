@@ -5,8 +5,10 @@ import {
   CreateDateColumn,
   ManyToOne,
   JoinColumn,
+  Index,
 } from "typeorm";
 import { MetaCampaignSync } from "./meta-campaign-sync.entity";
+import { Workspace } from "../../workspaces/entities/workspace.entity";
 
 /**
  * Daily performance snapshot for a single Meta campaign.
@@ -15,8 +17,13 @@ import { MetaCampaignSync } from "./meta-campaign-sync.entity";
  *
  * All monetary values are in the ad account's native currency.
  * CTR and CPC are stored as returned by the Graph API (CTR as %, CPC as currency).
+ *
+ * workspaceId is stored directly for O(1) tenant filtering — required on ALL
+ * queries to prevent cross-tenant data leaks.
  */
 @Entity("meta_insights")
+@Index("IDX_meta_insights_workspace", ["workspaceId"])
+@Index("IDX_meta_insights_campaign_workspace", ["campaignId", "workspaceId"])
 export class MetaInsight {
   /**
    * Deterministic PK: `${campaignId}_${date}` (e.g. "120214192783690_2024-01-15").
@@ -52,6 +59,21 @@ export class MetaInsight {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  // ── Multi-tenant isolation ──────────────────────────────────────────────────
+
+  /**
+   * Direct workspace FK for tenant isolation.
+   * Every read query on this table MUST include WHERE workspace_id = <id>.
+   */
+  @ManyToOne(() => Workspace, { onDelete: "CASCADE" })
+  @JoinColumn({ name: "workspace_id" })
+  workspace: Workspace;
+
+  @Column({ name: "workspace_id", length: 50 })
+  workspaceId: string;
+
+  // ── Campaign relationship ───────────────────────────────────────────────────
 
   @ManyToOne(() => MetaCampaignSync, (campaign) => campaign.insights, {
     onDelete: "CASCADE",

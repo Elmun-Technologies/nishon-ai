@@ -11,10 +11,12 @@ import { LocalStrategy } from "./strategies/local.strategy";
 import { User } from "../users/entities/user.entity";
 import { MetaAuthController } from "./meta-auth.controller";
 import { MetaOAuthService } from "./meta-oauth.service";
+import { ConnectedAccount } from "../platforms/entities/connected-account.entity";
+import { Workspace } from "../workspaces/entities/workspace.entity";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, ConnectedAccount, Workspace]),
     HttpModule,
     PassportModule.register({ defaultStrategy: "jwt" }),
     JwtModule.registerAsync({

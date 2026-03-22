@@ -12,7 +12,7 @@ export type CampaignInsights = {
 };
 
 export type CampaignHealth = "GOOD" | "AVERAGE" | "BAD";
-export type CampaignAction = "SCALE" | "MONITOR" | "STOP";
+export type CampaignAction = "SCALE" | "MONITOR" | "STOP" | "KILL";
 
 export type AnalysisResult = {
   campaignId: string;
@@ -24,29 +24,27 @@ export type AnalysisResult = {
 // ─── Rule thresholds (single source of truth) ─────────────────────────────────
 
 const RULES = {
-  /** Campaigns spending over this with very few clicks are wasting budget. */
-  HIGH_SPEND_THRESHOLD: 50,
-  LOW_CLICKS_THRESHOLD: 5,
+  /** Low CTR despite spend → stop wasting budget. */
+  LOW_CTR_SPEND_THRESHOLD: 20,   // spend > $20
+  LOW_CTR_THRESHOLD: 1,          // ctr < 1%
 
-  /** Campaigns with strong CTR and cheap clicks are ready to scale. */
-  GOOD_CTR_THRESHOLD: 2,    // 2%
-  GOOD_CPC_THRESHOLD: 0.5,  // $0.50
+  /** Strong CTR + cheap CPC → ready to scale. */
+  GOOD_CTR_THRESHOLD: 2.5,       // ctr > 2.5%
+  GOOD_CPC_THRESHOLD: 0.4,       // cpc < $0.40
+
+  /** High spend with near-zero engagement → kill immediately. */
+  HIGH_SPEND_KILL_THRESHOLD: 100, // spend > $100
+  NO_ENGAGEMENT_CLICKS: 10,      // clicks < 10
 } as const;
 
 /**
  * Rule-based campaign health analysis engine.
  *
- * This is intentionally kept simple and deterministic — rules are explicit,
- * easy to audit, and require no ML infrastructure. The goal is to surface
- * obvious winners and losers quickly so human operators can act on them.
- *
  * Rule priority (first matching rule wins):
- *  1. BAD  → high spend + very few clicks (wasting money)
- *  2. GOOD → strong CTR + cheap CPC (performing well, ready to scale)
- *  3. AVERAGE → everything else (needs more data or is mediocre)
- *
- * Future: replace or augment these rules with an ML model once enough
- * historical data has been collected in the meta_insights table.
+ *  1. BAD/STOP  → spend > $20 AND CTR < 1%  (low engagement with spend)
+ *  2. GOOD/SCALE → CTR > 2.5% AND CPC < $0.40  (high performer, scale budget)
+ *  3. BAD/KILL  → spend > $100 AND clicks < 10  (high spend, zero engagement)
+ *  4. AVERAGE/MONITOR → everything else
  */
 @Injectable()
 export class MetaAiEngineService {
@@ -57,29 +55,33 @@ export class MetaAiEngineService {
   analyzeCampaign(insights: CampaignInsights): AnalysisResult {
     const { campaignId, spend, clicks, ctr, cpc } = insights;
 
-    // ── Rule 1: High spend, almost no clicks → stop wasting budget ───────────
-    if (spend > RULES.HIGH_SPEND_THRESHOLD && clicks < RULES.LOW_CLICKS_THRESHOLD) {
+    // ── Rule 1: Low CTR with spend → stop ────────────────────────────────────
+    if (spend > RULES.LOW_CTR_SPEND_THRESHOLD && ctr < RULES.LOW_CTR_THRESHOLD) {
       return {
         campaignId,
         health: "BAD",
         action: "STOP",
-        reason:
-          `Campaign spent $${spend.toFixed(2)} but only generated ${clicks} click(s). ` +
-          `This is far below the minimum threshold of ${RULES.LOW_CLICKS_THRESHOLD} clicks ` +
-          `for a $${RULES.HIGH_SPEND_THRESHOLD}+ spend — likely a creative or targeting mismatch.`,
+        reason: "Low CTR with spend",
       };
     }
 
-    // ── Rule 2: Good CTR + cheap CPC → high-performer, increase budget ───────
+    // ── Rule 2: High CTR + low CPC → scale ───────────────────────────────────
     if (ctr > RULES.GOOD_CTR_THRESHOLD && cpc < RULES.GOOD_CPC_THRESHOLD) {
       return {
         campaignId,
         health: "GOOD",
         action: "SCALE",
-        reason:
-          `CTR of ${ctr.toFixed(2)}% exceeds the ${RULES.GOOD_CTR_THRESHOLD}% threshold ` +
-          `and CPC of $${cpc.toFixed(2)} is below the $${RULES.GOOD_CPC_THRESHOLD} target. ` +
-          "Strong efficiency signals — increase budget to capture more volume.",
+        reason: "High CTR and low CPC",
+      };
+    }
+
+    // ── Rule 3: High spend, no engagement → kill ──────────────────────────────
+    if (spend > RULES.HIGH_SPEND_KILL_THRESHOLD && clicks < RULES.NO_ENGAGEMENT_CLICKS) {
+      return {
+        campaignId,
+        health: "BAD",
+        action: "KILL",
+        reason: "High spend, no engagement",
       };
     }
 
@@ -90,14 +92,12 @@ export class MetaAiEngineService {
       action: "MONITOR",
       reason:
         `CTR ${ctr.toFixed(2)}% / CPC $${cpc.toFixed(2)} / spend $${spend.toFixed(2)}. ` +
-        "Performance is within acceptable range. Continue monitoring for trend changes " +
-        "before making budget adjustments.",
+        "Performance is within acceptable range. Continue monitoring for trend changes.",
     };
   }
 
   /**
    * Analyse multiple campaigns at once. Returns one result per campaign.
-   * Campaigns with no insight data are skipped (excluded from the result array).
    */
   analyzeCampaigns(insights: CampaignInsights[]): AnalysisResult[] {
     return insights.map((i) => this.analyzeCampaign(i));
