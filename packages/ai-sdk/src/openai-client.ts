@@ -26,6 +26,8 @@ export class NishonAiClient {
     this.client = new OpenAI({
       apiKey,
       baseURL: 'https://openrouter.ai/api/v1',
+      timeout: 45_000,   // 45s per request — prevents Render 504 timeouts
+      maxRetries: 0,     // we handle retries ourselves below
     })
   }
 

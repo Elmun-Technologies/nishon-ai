@@ -594,8 +594,11 @@ export default function OnboardingPage() {
 
     } catch (err: any) {
       clearInterval(interval)
-      const msg = err?.response?.data?.message || err?.message || 'Xatolik yuz berdi. Qayta urinib ko\'ring.'
-      setError(Array.isArray(msg) ? msg.join(', ') : msg)
+      const rawMsg = err?.response?.data?.message || err?.message || ''
+      const msg = rawMsg
+        ? (Array.isArray(rawMsg) ? rawMsg.join(', ') : rawMsg)
+        : 'Server javob bermadi. Bir necha soniyadan keyin qayta urinib ko\'ring.'
+      setError(msg)
       setStep(5)
     } finally {
       setLoading(false)
