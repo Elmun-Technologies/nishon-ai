@@ -306,6 +306,60 @@ export class MetaController {
     return { campaignId, spend, impressions, clicks, ctr, cpc };
   }
 
+  // ─── Top performing campaigns ────────────────────────────────────────────────
+
+  @Get("top-ads")
+  @ApiOperation({ summary: "Get top performing campaigns by CTR for a workspace" })
+  @ApiQuery({ name: "workspaceId", description: "Nishon workspace UUID" })
+  @ApiQuery({ name: "limit", required: false, description: "Number of results (default 5)" })
+  async topAds(
+    @Query("workspaceId") workspaceId: string | undefined,
+    @Query("limit") limit = "5",
+    @Req() req: Request,
+  ) {
+    if (!workspaceId) throw new BadRequestException("workspaceId is required");
+    await this.assertWorkspaceOwnership(workspaceId, this.getRequestUserId(req));
+
+    const since = new Date();
+    since.setDate(since.getDate() - 30);
+    const n = Math.min(parseInt(limit) || 5, 20);
+
+    // Aggregate by campaign: sum spend/clicks/impressions, avg CTR
+    const rows = await this.insightRepo
+      .createQueryBuilder("insight")
+      .where("insight.workspaceId = :wid", { wid: workspaceId })
+      .andWhere("insight.date >= :since", { since })
+      .select([
+        "insight.campaignId AS campaignId",
+        'COALESCE(SUM(insight.spend), 0) AS "spend"',
+        'COALESCE(SUM(insight.clicks), 0) AS "clicks"',
+        'COALESCE(SUM(insight.impressions), 0) AS "impressions"',
+        'CASE WHEN SUM(insight.impressions) > 0 THEN ROUND(SUM(insight.clicks)::numeric / SUM(insight.impressions) * 100, 2) ELSE 0 END AS "ctr"',
+      ])
+      .groupBy("insight.campaignId")
+      .having("SUM(insight.impressions) > 0")
+      .orderBy('"ctr"', "DESC")
+      .limit(n)
+      .getRawMany();
+
+    // Enrich with campaign names
+    const campaignIds = rows.map((r) => r.campaignId);
+    const campaigns = campaignIds.length
+      ? await this.campaignRepo.find({ where: campaignIds.map((id) => ({ id })) })
+      : [];
+    const campaignMap = Object.fromEntries(campaigns.map((c) => [c.id, c]));
+
+    return rows.map((r) => ({
+      campaignId:  r.campaignId,
+      name:        campaignMap[r.campaignId]?.name ?? r.campaignId,
+      status:      campaignMap[r.campaignId]?.status ?? "UNKNOWN",
+      spend:       parseFloat(r.spend) || 0,
+      clicks:      parseInt(r.clicks) || 0,
+      impressions: parseInt(r.impressions) || 0,
+      ctr:         parseFloat(r.ctr) || 0,
+    }));
+  }
+
   // ─── Private: workspace ownership ────────────────────────────────────────────
 
   /**

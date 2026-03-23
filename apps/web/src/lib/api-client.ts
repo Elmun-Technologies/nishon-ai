@@ -195,6 +195,20 @@ export const meta = {
     apiClient.get(`/meta/dashboard?workspaceId=${encodeURIComponent(workspaceId)}`),
   sync: (workspaceId: string) =>
     apiClient.post('/meta/sync', { workspaceId }),
+  topAds: (workspaceId: string, limit = 5) =>
+    apiClient.get(`/meta/top-ads?workspaceId=${encodeURIComponent(workspaceId)}&limit=${limit}`),
+}
+
+export const triggersets = {
+  list: (workspaceId: string) =>
+    apiClient.get(`/triggersets?workspaceId=${encodeURIComponent(workspaceId)}`),
+  get: (id: string) => apiClient.get(`/triggersets/${id}`),
+  create: (workspaceId: string, dto: any) =>
+    apiClient.post(`/triggersets?workspaceId=${encodeURIComponent(workspaceId)}`, dto),
+  update: (id: string, patch: any) => apiClient.patch(`/triggersets/${id}`, patch),
+  remove: (id: string) => apiRequest('DELETE', `/triggersets/${id}`),
+  logs: (id: string, limit = 20) => apiClient.get(`/triggersets/${id}/logs?limit=${limit}`),
+  runNow: (id: string) => apiClient.post(`/triggersets/${id}/run`, {}),
 }
 
 export const autoOptimization = {

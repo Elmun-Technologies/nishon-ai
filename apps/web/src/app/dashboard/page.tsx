@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { useRealtimeRefresh } from '@/hooks/useRealtimeRefresh'
@@ -9,8 +9,10 @@ import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Alert } from '@/components/ui/Alert'
-import { workspaces as workspacesApi, aiAgent } from '@/lib/api-client'
+import { workspaces as workspacesApi, aiAgent, meta as metaApi } from '@/lib/api-client'
 import { formatCurrency, formatNumber } from '@/lib/utils'
+
+interface SparklinePoint { day: string; spend: number; clicks: number }
 
 interface PerformanceSummary {
   totalSpend?: number
@@ -22,6 +24,19 @@ interface PerformanceSummary {
   activeCampaigns?: number
   overallRoas?: number
   avgRoas?: number
+  metaConnected?: boolean
+  changes?: { spend: number | null; clicks: number | null; impressions: number | null }
+  sparkline?: SparklinePoint[]
+}
+
+interface TopAd {
+  campaignId: string
+  name: string
+  status: string
+  spend: number
+  clicks: number
+  impressions: number
+  ctr: number
 }
 
 export default function DashboardPage() {
@@ -29,35 +44,34 @@ export default function DashboardPage() {
   const { currentWorkspace } = useWorkspaceStore()
   const [performance, setPerformance] = useState<PerformanceSummary | null>(null)
   const [loadingPerf, setLoadingPerf] = useState(true)
+  const [topAds, setTopAds] = useState<TopAd[]>([])
   const [optimizing, setOptimizing] = useState(false)
   const [optimizeMsg, setOptimizeMsg] = useState('')
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    if (!currentWorkspace?.id) {
-      setLoadingPerf(false)
-      return
-    }
-    setLoadingPerf(true)
+  const loadPerformance = useCallback(() => {
+    if (!currentWorkspace?.id) return
     workspacesApi.performance(currentWorkspace.id)
       .then((res) => setPerformance((res.data as any) ?? {}))
       .catch(() => setPerformance({}))
       .finally(() => setLoadingPerf(false))
   }, [currentWorkspace?.id])
 
-  // Refresh performance metrics in real-time when Meta syncs or optimization completes
-  useRealtimeRefresh(currentWorkspace?.id, ['meta_synced', 'optimization_done'], () => {
-    if (!currentWorkspace?.id) return
-    workspacesApi.performance(currentWorkspace.id)
-      .then((res) => setPerformance((res.data as any) ?? {}))
+  useEffect(() => {
+    if (!currentWorkspace?.id) { setLoadingPerf(false); return }
+    setLoadingPerf(true)
+    loadPerformance()
+    // Load top performing campaigns
+    metaApi.topAds(currentWorkspace.id, 5)
+      .then((res) => setTopAds((res.data as any) ?? []))
       .catch(() => {})
-  })
+  }, [currentWorkspace?.id])
+
+  useRealtimeRefresh(currentWorkspace?.id, ['meta_synced', 'optimization_done'], loadPerformance)
 
   async function handleRunOptimization() {
     if (!currentWorkspace?.id) return
-    setOptimizing(true)
-    setOptimizeMsg('')
-    setError('')
+    setOptimizing(true); setOptimizeMsg(''); setError('')
     try {
       await aiAgent.optimize(currentWorkspace.id)
       setOptimizeMsg('Optimization complete — check AI Decisions for results.')
@@ -65,20 +79,14 @@ export default function DashboardPage() {
     } catch (err: any) {
       setError(err?.message ?? 'Optimization failed')
       setTimeout(() => setError(''), 4000)
-    } finally {
-      setOptimizing(false)
-    }
+    } finally { setOptimizing(false) }
   }
 
   const ws = currentWorkspace
-
   const roas = performance?.overallRoas ?? performance?.avgRoas ?? 0
-  const roasColor =
-    roas >= 4 ? 'text-emerald-400'
-    : roas >= 2 ? 'text-amber-400'
-    : 'text-red-400'
+  const sparklineSpend = performance?.sparkline?.map((p) => p.spend) ?? []
+  const sparklineClicks = performance?.sparkline?.map((p) => p.clicks) ?? []
 
-  // If no workspace, prompt to start onboarding
   if (!ws) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -88,9 +96,7 @@ export default function DashboardPage() {
           <p className="text-[#6B7280] text-sm mb-6">
             Complete onboarding to create your first workspace and let AI manage your ad campaigns.
           </p>
-          <Button onClick={() => router.push('/onboarding')}>
-            Start Setup →
-          </Button>
+          <Button onClick={() => router.push('/onboarding')}>Start Setup →</Button>
         </Card>
       </div>
     )
@@ -106,8 +112,8 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* ── Meta Ads data source badge ── */}
-      {(performance as any)?.metaConnected && (
+      {/* ── Meta data source badge ── */}
+      {performance?.metaConnected && (
         <div className="flex items-center gap-2 text-xs text-[#9CA3AF]">
           <span className="w-2 h-2 rounded-full bg-[#1877F2] shrink-0" />
           <span>Ko'rsatkichlar <span className="text-white font-medium">Meta Ads</span> dan real vaqt rejimida olinmoqda</span>
@@ -115,19 +121,21 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* ── TOP ROW: KPI metrics ── */}
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
+      {/* ── KPI metrics with sparklines ── */}
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
         <MetricCard
-          label="Total Spend"
+          label="Xarajat"
           value={formatCurrency(performance?.totalSpend ?? 0)}
-          subtext="This month"
+          subtext="So'nggi 30 kun"
           loading={loadingPerf}
           icon="💰"
+          sparkline={sparklineSpend}
+          change={performance?.changes?.spend ?? null}
         />
         <MetricCard
-          label="Revenue"
+          label="Daromad"
           value={formatCurrency(performance?.totalRevenue ?? 0)}
-          subtext="Generated"
+          subtext="Jami"
           loading={loadingPerf}
           icon="💵"
           accent
@@ -140,27 +148,94 @@ export default function DashboardPage() {
           icon="📈"
         />
         <MetricCard
-          label="Conversions"
+          label="Konversiyalar"
           value={formatNumber(performance?.totalConversions ?? 0)}
-          subtext="Total"
+          subtext="Jami"
           loading={loadingPerf}
           icon="🎯"
         />
         <MetricCard
-          label="Clicks"
+          label="Kliklar"
           value={formatNumber(performance?.totalClicks ?? 0)}
-          subtext="Total clicks"
+          subtext="Jami"
           loading={loadingPerf}
           icon="👆"
+          sparkline={sparklineClicks}
+          change={performance?.changes?.clicks ?? null}
         />
         <MetricCard
-          label="Campaigns"
+          label="Kampaniyalar"
           value={performance?.activeCampaigns ?? performance?.campaignCount ?? '—'}
-          subtext="Active"
+          subtext="Aktiv"
           loading={loadingPerf}
           icon="📢"
         />
       </div>
+
+      {/* ── Best performing ads (Smartly-style) ── */}
+      {topAds.length > 0 && (
+        <Card>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-base font-semibold text-white flex items-center gap-2">
+                🏆 Eng yaxshi kampaniyalar
+              </h2>
+              <p className="text-xs text-[#6B7280] mt-0.5">
+                CTR bo'yicha top {topAds.length} ta · so'nggi 30 kun
+              </p>
+            </div>
+            <Button variant="ghost" size="sm" onClick={() => router.push('/settings/meta')}>
+              Barchasi →
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+            {topAds.map((ad, idx) => (
+              <div
+                key={ad.campaignId}
+                className="bg-[#0D0D14] border border-[#2A2A3A] rounded-xl p-3 hover:border-[#7C3AED]/40 transition-colors"
+              >
+                {/* Rank badge */}
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] font-bold text-[#7C3AED] bg-[#7C3AED]/10 px-1.5 py-0.5 rounded">
+                    #{idx + 1}
+                  </span>
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
+                    ad.status === 'ACTIVE'
+                      ? 'bg-emerald-500/10 text-emerald-400'
+                      : 'bg-[#2A2A3A] text-[#6B7280]'
+                  }`}>
+                    {ad.status}
+                  </span>
+                </div>
+
+                {/* Campaign name */}
+                <p className="text-white text-xs font-medium leading-tight mb-3 line-clamp-2 min-h-[2.5rem]">
+                  {ad.name}
+                </p>
+
+                {/* CTR — primary metric (Smartly style) */}
+                <div className="mb-2">
+                  <p className="text-[#6B7280] text-[10px]">CTR</p>
+                  <p className="text-white text-base font-bold">{ad.ctr.toFixed(2)}%</p>
+                </div>
+
+                {/* Secondary metrics */}
+                <div className="grid grid-cols-2 gap-1 pt-2 border-t border-[#1C1C27]">
+                  <div>
+                    <p className="text-[#4B5563] text-[10px]">Xarajat</p>
+                    <p className="text-[#9CA3AF] text-xs font-medium">{formatCurrency(ad.spend)}</p>
+                  </div>
+                  <div>
+                    <p className="text-[#4B5563] text-[10px]">Kliklar</p>
+                    <p className="text-[#9CA3AF] text-xs font-medium">{formatNumber(ad.clicks)}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
 
       {/* ── MIDDLE ROW: Strategy + Autopilot ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -177,12 +252,7 @@ export default function DashboardPage() {
                 Generated by Nishon AI based on your business profile
               </p>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleRunOptimization}
-              loading={optimizing}
-            >
+            <Button variant="ghost" size="sm" onClick={handleRunOptimization} loading={optimizing}>
               Run optimization
             </Button>
           </div>
@@ -190,9 +260,7 @@ export default function DashboardPage() {
           {ws.aiStrategy ? (
             <div className="space-y-4">
               <div className="bg-[#1C1C27] rounded-xl p-4 border border-[#2A2A3A]">
-                <p className="text-[#D1D5DB] text-sm leading-relaxed">
-                  {ws.aiStrategy.summary}
-                </p>
+                <p className="text-[#D1D5DB] text-sm leading-relaxed">{ws.aiStrategy.summary}</p>
               </div>
 
               {ws.aiStrategy.budgetAllocation && (
@@ -207,10 +275,7 @@ export default function DashboardPage() {
                         <span className="text-white font-medium">{String(pct)}%</span>
                       </div>
                       <div className="h-1.5 bg-[#2A2A3A] rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-[#7C3AED] rounded-full"
-                          style={{ width: `${pct}%` }}
-                        />
+                        <div className="h-full bg-[#7C3AED] rounded-full" style={{ width: `${pct}%` }} />
                       </div>
                     </div>
                   ))}
@@ -222,10 +287,7 @@ export default function DashboardPage() {
               icon="🧠"
               title="No strategy yet"
               description="Complete onboarding to generate your AI strategy."
-              action={{
-                label: 'Generate Strategy',
-                onClick: () => router.push('/onboarding'),
-              }}
+              action={{ label: 'Generate Strategy', onClick: () => router.push('/onboarding') }}
             />
           )}
         </Card>
@@ -292,23 +354,19 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* ── BOTTOM ROW: Quick actions ── */}
+      {/* ── Quick actions ── */}
       <Card padding="sm">
         <div className="flex items-center justify-between px-2">
-          <p className="text-[#6B7280] text-sm font-medium">Quick actions</p>
-          <div className="flex items-center gap-2">
+          <p className="text-[#6B7280] text-sm font-medium">Tezkor amallar</p>
+          <div className="flex items-center gap-2 flex-wrap">
             {[
-              { label: 'Campaigns', href: '/campaigns', icon: '📢' },
-              { label: 'AI Decisions', href: '/ai-decisions', icon: '🤖' },
-              { label: 'Budget', href: '/budget', icon: '💰' },
-              { label: 'Simulate', href: '/simulation', icon: '🔮' },
+              { label: 'Kampaniyalar', href: '/campaigns', icon: '📢' },
+              { label: 'AI Qarorlar', href: '/ai-decisions', icon: '🤖' },
+              { label: 'Byudjet', href: '/budget', icon: '💰' },
+              { label: 'Qoidalar', href: '/triggersets', icon: '⚡' },
+              { label: 'Simulyatsiya', href: '/simulation', icon: '🔮' },
             ].map((action) => (
-              <Button
-                key={action.href}
-                variant="ghost"
-                size="sm"
-                onClick={() => router.push(action.href)}
-              >
+              <Button key={action.href} variant="ghost" size="sm" onClick={() => router.push(action.href)}>
                 {action.icon} {action.label}
               </Button>
             ))}

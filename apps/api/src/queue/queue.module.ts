@@ -12,6 +12,7 @@ import { Workspace } from "../workspaces/entities/workspace.entity";
 import { AiDecision } from "../ai-decisions/entities/ai-decision.entity";
 import { PerformanceMetric } from "../analytics/entities/performance-metric.entity";
 import { AiAgentModule } from "../ai-agent/ai-agent.module";
+import { TriggersetModule } from "../triggersets/triggersets.module";
 import { QUEUE_NAMES } from "./queue.constants";
 
 @Module({
@@ -47,6 +48,7 @@ import { QUEUE_NAMES } from "./queue.constants";
       { name: QUEUE_NAMES.REPORTS },
     ),
     AiAgentModule,
+    TriggersetModule,
     ScheduleModule.forRoot(),
   ],
   providers: [
