@@ -250,7 +250,7 @@ export class ConversionAnalyticsService {
   /**
    * Get campaigns with declining conversion rates (potential optimization targets).
    */
-  async getDecli ningConversionCampaigns(
+  async getDecliningConversionCampaigns(
     workspaceId: string,
     startDate: Date,
     endDate: Date,

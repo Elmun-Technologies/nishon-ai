@@ -4,6 +4,7 @@ const OAUTH_CALLBACK_PATHS = {
   meta: "/platforms/meta/callback",
   google: "/platforms/google/callback",
   tiktok: "/platforms/tiktok/callback",
+  yandex: "/platforms/yandex/callback",
 } as const;
 
 type OAuthProvider = keyof typeof OAUTH_CALLBACK_PATHS;
