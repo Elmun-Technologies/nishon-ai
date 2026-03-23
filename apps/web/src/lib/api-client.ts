@@ -197,6 +197,12 @@ export const meta = {
     apiClient.post('/meta/sync', { workspaceId }),
   topAds: (workspaceId: string, limit = 5) =>
     apiClient.get(`/meta/top-ads?workspaceId=${encodeURIComponent(workspaceId)}&limit=${limit}`),
+  reporting: (workspaceId: string, days = 30) =>
+    apiClient.get(`/meta/reporting?workspaceId=${encodeURIComponent(workspaceId)}&days=${days}`),
+  exportReporting: (workspaceId: string, days = 30) =>
+    apiClient.get(`/meta/reporting/export?workspaceId=${encodeURIComponent(workspaceId)}&days=${days}`),
+  spendForecast: (workspaceId: string) =>
+    apiClient.get(`/meta/spend-forecast?workspaceId=${encodeURIComponent(workspaceId)}`),
 }
 
 export const triggersets = {

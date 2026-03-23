@@ -11,6 +11,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { Alert } from '@/components/ui/Alert'
 import { workspaces as workspacesApi, aiAgent, meta as metaApi } from '@/lib/api-client'
 import { formatCurrency, formatNumber } from '@/lib/utils'
+import { SpendForecastChart } from '@/components/ui/SpendForecastChart'
 
 interface SparklinePoint { day: string; spend: number; clicks: number }
 
@@ -45,6 +46,7 @@ export default function DashboardPage() {
   const [performance, setPerformance] = useState<PerformanceSummary | null>(null)
   const [loadingPerf, setLoadingPerf] = useState(true)
   const [topAds, setTopAds] = useState<TopAd[]>([])
+  const [forecast, setForecast] = useState<any>(null)
   const [optimizing, setOptimizing] = useState(false)
   const [optimizeMsg, setOptimizeMsg] = useState('')
   const [error, setError] = useState('')
@@ -64,6 +66,10 @@ export default function DashboardPage() {
     // Load top performing campaigns
     metaApi.topAds(currentWorkspace.id, 5)
       .then((res) => setTopAds((res.data as any) ?? []))
+      .catch(() => {})
+    // Load spend forecast
+    metaApi.spendForecast(currentWorkspace.id)
+      .then((res) => setForecast(res.data))
       .catch(() => {})
   }, [currentWorkspace?.id])
 
@@ -171,6 +177,35 @@ export default function DashboardPage() {
           icon="📢"
         />
       </div>
+
+      {/* ── Spend Forecast (Smartly-style) ── */}
+      {forecast && forecast.daily?.length > 0 && (
+        <Card>
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <h2 className="text-base font-semibold text-white">Oylik xarajat bashorati</h2>
+              <p className="text-xs text-[#6B7280] mt-0.5">
+                {forecast.daysElapsed} kun o'tdi · {forecast.daysTotal} kunlik oy
+              </p>
+            </div>
+            <div className="flex items-center gap-4 text-right">
+              <div>
+                <p className="text-xs text-[#6B7280]">Hozircha sarflandi</p>
+                <p className="text-white font-bold text-lg">${forecast.spendToDate?.toFixed(0)}</p>
+              </div>
+              <div>
+                <p className="text-xs text-[#6B7280]">Oy oxiriga bashorat</p>
+                <p className="text-[#A78BFA] font-bold text-lg">${forecast.predictedTotal?.toFixed(0)}</p>
+              </div>
+            </div>
+          </div>
+          <SpendForecastChart
+            daily={forecast.daily}
+            spendToDate={forecast.spendToDate}
+            predictedTotal={forecast.predictedTotal}
+          />
+        </Card>
+      )}
 
       {/* ── Best performing ads (Smartly-style) ── */}
       {topAds.length > 0 && (
