@@ -119,4 +119,21 @@ export class AiAgentController {
   ) {
     return this.orchestrator.runCampaignPipeline({ ...dto, workspaceId });
   }
+
+  @Post("chat")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: "AI Chat assistant — answer questions about campaigns and metrics",
+    description: "Powers the floating chat widget on the dashboard.",
+  })
+  async chat(
+    @Body()
+    dto: {
+      workspaceId: string;
+      message: string;
+      history?: { role: "user" | "assistant"; content: string }[];
+    },
+  ) {
+    return this.aiAgentService.chat(dto);
+  }
 }

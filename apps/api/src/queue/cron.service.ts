@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { QueueService } from "./queue.service";
+import { TriggersetService } from "../triggersets/triggersets.service";
 
 /**
  * CronService defines all scheduled tasks in the system.
@@ -17,7 +18,10 @@ import { QueueService } from "./queue.service";
 export class CronService implements OnModuleInit {
   private readonly logger = new Logger(CronService.name);
 
-  constructor(private readonly queueService: QueueService) {}
+  constructor(
+    private readonly queueService: QueueService,
+    private readonly triggersetService: TriggersetService,
+  ) {}
 
   onModuleInit() {
     this.logger.log("CronService initialized — scheduled tasks are active");
@@ -52,5 +56,15 @@ export class CronService implements OnModuleInit {
   async syncPlatformMetrics(): Promise<void> {
     this.logger.log("Cron: Hourly platform metrics sync");
     // TODO: Schedule sync jobs for all active workspaces
+  }
+
+  /**
+   * Evaluate all enabled triggersets every 30 minutes.
+   * This is what makes Nishon AI autonomous — rules fire without human input.
+   */
+  @Cron("*/30 * * * *")
+  async runTriggersets(): Promise<void> {
+    this.logger.log("Cron: Running triggersets");
+    await this.triggersetService.runAll();
   }
 }

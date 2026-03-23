@@ -8,6 +8,7 @@ import { Repository } from "typeorm";
 import { Workspace } from "./entities/workspace.entity";
 import { Budget } from "../budget/entities/budget.entity";
 import { BudgetPeriod } from "../budget/entities/budget.entity";
+import { MetaInsight } from "../meta/entities/meta-insight.entity";
 import {
   CreateWorkspaceDto,
   UpdateWorkspaceDto,
@@ -21,6 +22,8 @@ export class WorkspacesService {
     private readonly workspaceRepo: Repository<Workspace>,
     @InjectRepository(Budget)
     private readonly budgetRepo: Repository<Budget>,
+    @InjectRepository(MetaInsight)
+    private readonly metaInsightRepo: Repository<MetaInsight>,
   ) {}
 
   /**
@@ -130,11 +133,19 @@ export class WorkspacesService {
   /**
    * Get workspace performance summary — used for the dashboard overview card.
    * Aggregates spend, conversions, and ROAS across all campaigns.
+   *
+   * Data sources:
+   * 1. PerformanceMetric — internal campaign data (manually-created campaigns)
+   * 2. MetaInsight — real Meta Ads data synced from the Graph API
+   *
+   * We merge both so that users who connected Meta see real numbers on
+   * the dashboard even if they haven't created any internal campaigns.
    */
   async getPerformanceSummary(id: string, userId: string) {
     await this.findOne(id, userId); // verify ownership
 
-    const result = await this.workspaceRepo
+    // ── Internal campaign metrics ─────────────────────────────────────────────
+    const internalResult = await this.workspaceRepo
       .createQueryBuilder("workspace")
       .leftJoin("workspace.campaigns", "campaign")
       .leftJoin("campaign.adSets", "adSet")
@@ -151,17 +162,122 @@ export class WorkspacesService {
       ])
       .getRawOne();
 
-    const totalSpend = parseFloat(result.totalSpend) || 0;
-    const totalRevenue = parseFloat(result.totalRevenue) || 0;
+    // ── Real Meta Ads insights (last 30 days + daily breakdown) ──────────────
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now);
+    thirtyDaysAgo.setDate(now.getDate() - 30);
+    const sevenDaysAgo = new Date(now);
+    sevenDaysAgo.setDate(now.getDate() - 7);
+    const fourteenDaysAgo = new Date(now);
+    fourteenDaysAgo.setDate(now.getDate() - 14);
+
+    // Aggregate totals for current 30 days
+    const metaResult = await this.metaInsightRepo
+      .createQueryBuilder("insight")
+      .where("insight.workspaceId = :id", { id })
+      .andWhere("insight.date >= :since", { since: thirtyDaysAgo })
+      .select([
+        'COALESCE(SUM(insight.spend), 0) AS "metaSpend"',
+        'COALESCE(SUM(insight.clicks), 0) AS "metaClicks"',
+        'COALESCE(SUM(insight.impressions), 0) AS "metaImpressions"',
+        'COUNT(DISTINCT insight.campaignId) AS "metaCampaignCount"',
+      ])
+      .getRawOne();
+
+    // Previous 7 days (for % change comparison)
+    const prevPeriod = await this.metaInsightRepo
+      .createQueryBuilder("insight")
+      .where("insight.workspaceId = :id", { id })
+      .andWhere("insight.date >= :from", { from: fourteenDaysAgo })
+      .andWhere("insight.date < :to", { to: sevenDaysAgo })
+      .select([
+        'COALESCE(SUM(insight.spend), 0) AS "prevSpend"',
+        'COALESCE(SUM(insight.clicks), 0) AS "prevClicks"',
+        'COALESCE(SUM(insight.impressions), 0) AS "prevImpressions"',
+      ])
+      .getRawOne();
+
+    // Current 7 days (for % change comparison)
+    const currPeriod = await this.metaInsightRepo
+      .createQueryBuilder("insight")
+      .where("insight.workspaceId = :id", { id })
+      .andWhere("insight.date >= :from", { from: sevenDaysAgo })
+      .select([
+        'COALESCE(SUM(insight.spend), 0) AS "currSpend"',
+        'COALESCE(SUM(insight.clicks), 0) AS "currClicks"',
+        'COALESCE(SUM(insight.impressions), 0) AS "currImpressions"',
+      ])
+      .getRawOne();
+
+    // Daily sparkline data (last 14 days, one point per day)
+    const sparklineRows = await this.metaInsightRepo
+      .createQueryBuilder("insight")
+      .where("insight.workspaceId = :id", { id })
+      .andWhere("insight.date >= :since", { since: fourteenDaysAgo })
+      .select([
+        "CAST(insight.date AS date) AS day",
+        'COALESCE(SUM(insight.spend), 0) AS "spend"',
+        'COALESCE(SUM(insight.clicks), 0) AS "clicks"',
+      ])
+      .groupBy("CAST(insight.date AS date)")
+      .orderBy("day", "ASC")
+      .getRawMany();
+
+    // ── Merge: Meta data supplements internal data ────────────────────────────
+    const internalSpend   = parseFloat(internalResult.totalSpend) || 0;
+    const internalRevenue = parseFloat(internalResult.totalRevenue) || 0;
+    const metaSpend       = parseFloat(metaResult?.metaSpend ?? "0") || 0;
+
+    const totalSpend      = Math.max(internalSpend, metaSpend);
+    const totalRevenue    = internalRevenue;
+    const totalClicks     = Math.max(
+      parseInt(internalResult.totalClicks) || 0,
+      parseInt(metaResult?.metaClicks ?? "0") || 0,
+    );
+    const totalImpressions = Math.max(
+      parseInt(internalResult.totalImpressions) || 0,
+      parseInt(metaResult?.metaImpressions ?? "0") || 0,
+    );
+    const campaignCount = Math.max(
+      parseInt(internalResult.campaignCount) || 0,
+      parseInt(metaResult?.metaCampaignCount ?? "0") || 0,
+    );
+
+    // % change helpers
+    const pctChange = (curr: number, prev: number): number | null => {
+      if (prev === 0) return null;
+      return Math.round(((curr - prev) / prev) * 100 * 10) / 10;
+    };
+
+    const currSpend = parseFloat(currPeriod?.currSpend ?? "0") || 0;
+    const prevSpend = parseFloat(prevPeriod?.prevSpend ?? "0") || 0;
+    const currClicks = parseInt(currPeriod?.currClicks ?? "0") || 0;
+    const prevClicks = parseInt(prevPeriod?.prevClicks ?? "0") || 0;
+    const currImpr = parseInt(currPeriod?.currImpressions ?? "0") || 0;
+    const prevImpr = parseInt(prevPeriod?.prevImpressions ?? "0") || 0;
 
     return {
       totalSpend,
       totalRevenue,
-      totalConversions: parseInt(result.totalConversions) || 0,
-      totalClicks: parseInt(result.totalClicks) || 0,
-      totalImpressions: parseInt(result.totalImpressions) || 0,
-      campaignCount: parseInt(result.campaignCount) || 0,
+      totalConversions: parseInt(internalResult.totalConversions) || 0,
+      totalClicks,
+      totalImpressions,
+      campaignCount,
       overallRoas: totalSpend > 0 ? totalRevenue / totalSpend : 0,
+      metaConnected: metaSpend > 0,
+      metaSpend,
+      // % change (current 7d vs previous 7d)
+      changes: {
+        spend:       pctChange(currSpend, prevSpend),
+        clicks:      pctChange(currClicks, prevClicks),
+        impressions: pctChange(currImpr, prevImpr),
+      },
+      // Daily sparkline: array of spend values (last 14 days)
+      sparkline: sparklineRows.map((r) => ({
+        day:    r.day,
+        spend:  parseFloat(r.spend) || 0,
+        clicks: parseInt(r.clicks) || 0,
+      })),
     };
   }
 

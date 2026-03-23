@@ -44,4 +44,8 @@ export class UpdateWorkspaceDto {
   @IsNumber()
   @Min(50)
   monthlyBudget?: number
+
+  @IsOptional()
+  @IsString()
+  telegramChatId?: string | null
 }

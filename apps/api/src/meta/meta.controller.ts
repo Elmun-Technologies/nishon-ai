@@ -8,6 +8,7 @@ import {
   HttpCode,
   HttpStatus,
   Logger,
+  Param,
   Post,
   Query,
   Req,
@@ -304,6 +305,310 @@ export class MetaController {
     const cpc = clicks > 0 ? spend / clicks : 0;
 
     return { campaignId, spend, impressions, clicks, ctr, cpc };
+  }
+
+  // ─── Top performing campaigns ────────────────────────────────────────────────
+
+  @Get("top-ads")
+  @ApiOperation({ summary: "Get top performing campaigns by CTR for a workspace" })
+  @ApiQuery({ name: "workspaceId", description: "Nishon workspace UUID" })
+  @ApiQuery({ name: "limit", required: false, description: "Number of results (default 5)" })
+  async topAds(
+    @Query("workspaceId") workspaceId: string | undefined,
+    @Query("limit") limit = "5",
+    @Req() req: Request,
+  ) {
+    if (!workspaceId) throw new BadRequestException("workspaceId is required");
+    await this.assertWorkspaceOwnership(workspaceId, this.getRequestUserId(req));
+
+    const since = new Date();
+    since.setDate(since.getDate() - 30);
+    const n = Math.min(parseInt(limit) || 5, 20);
+
+    // Aggregate by campaign: sum spend/clicks/impressions, avg CTR
+    const rows = await this.insightRepo
+      .createQueryBuilder("insight")
+      .where("insight.workspaceId = :wid", { wid: workspaceId })
+      .andWhere("insight.date >= :since", { since })
+      .select([
+        "insight.campaignId AS campaignId",
+        'COALESCE(SUM(insight.spend), 0) AS "spend"',
+        'COALESCE(SUM(insight.clicks), 0) AS "clicks"',
+        'COALESCE(SUM(insight.impressions), 0) AS "impressions"',
+        'CASE WHEN SUM(insight.impressions) > 0 THEN ROUND(SUM(insight.clicks)::numeric / SUM(insight.impressions) * 100, 2) ELSE 0 END AS "ctr"',
+      ])
+      .groupBy("insight.campaignId")
+      .having("SUM(insight.impressions) > 0")
+      .orderBy('"ctr"', "DESC")
+      .limit(n)
+      .getRawMany();
+
+    // Enrich with campaign names
+    const campaignIds = rows.map((r) => r.campaignId);
+    const campaigns = campaignIds.length
+      ? await this.campaignRepo.find({ where: campaignIds.map((id) => ({ id })) })
+      : [];
+    const campaignMap = Object.fromEntries(campaigns.map((c) => [c.id, c]));
+
+    return rows.map((r) => ({
+      campaignId:  r.campaignId,
+      name:        campaignMap[r.campaignId]?.name ?? r.campaignId,
+      status:      campaignMap[r.campaignId]?.status ?? "UNKNOWN",
+      spend:       parseFloat(r.spend) || 0,
+      clicks:      parseInt(r.clicks) || 0,
+      impressions: parseInt(r.impressions) || 0,
+      ctr:         parseFloat(r.ctr) || 0,
+    }));
+  }
+
+  // ─── Reporting (hierarchical Account → Campaign) ─────────────────────────────
+
+  @Get("reporting")
+  @ApiOperation({ summary: "Hierarchical report: Account → Campaign with aggregated metrics" })
+  @ApiQuery({ name: "workspaceId" })
+  @ApiQuery({ name: "days", required: false, description: "Lookback window in days (default 30)" })
+  async reporting(
+    @Query("workspaceId") workspaceId: string | undefined,
+    @Query("days") days = "30",
+    @Req() req: Request,
+  ) {
+    if (!workspaceId) throw new BadRequestException("workspaceId is required");
+    await this.assertWorkspaceOwnership(workspaceId, this.getRequestUserId(req));
+
+    const since = new Date();
+    since.setDate(since.getDate() - (parseInt(days) || 30));
+
+    // Aggregate MetaInsight per campaign
+    const insightRows = await this.insightRepo
+      .createQueryBuilder("insight")
+      .where("insight.workspaceId = :wid", { wid: workspaceId })
+      .andWhere("insight.date >= :since", { since })
+      .select([
+        "insight.campaignId AS campaignId",
+        'COALESCE(SUM(insight.spend), 0) AS "spend"',
+        'COALESCE(SUM(insight.clicks), 0) AS "clicks"',
+        'COALESCE(SUM(insight.impressions), 0) AS "impressions"',
+        'CASE WHEN SUM(insight.impressions) > 0 THEN ROUND(SUM(insight.clicks)::numeric / SUM(insight.impressions) * 100, 4) ELSE 0 END AS "ctr"',
+        'CASE WHEN SUM(insight.clicks) > 0 THEN ROUND(SUM(insight.spend)::numeric / SUM(insight.clicks), 4) ELSE 0 END AS "cpc"',
+      ])
+      .groupBy("insight.campaignId")
+      .getRawMany();
+
+    const metricByCampaign: Record<string, any> = {};
+    for (const r of insightRows) {
+      metricByCampaign[r.campaignId] = {
+        spend:       parseFloat(r.spend) || 0,
+        clicks:      parseInt(r.clicks) || 0,
+        impressions: parseInt(r.impressions) || 0,
+        ctr:         parseFloat(r.ctr) || 0,
+        cpc:         parseFloat(r.cpc) || 0,
+      };
+    }
+
+    const accounts = await this.adAccountRepo.find({ where: { workspaceId } });
+
+    const result = await Promise.all(
+      accounts.map(async (account) => {
+        const campaigns = await this.campaignRepo.find({
+          where: { adAccountId: account.id, workspaceId },
+          order: { name: "ASC" },
+        });
+
+        const enriched = campaigns.map((c) => ({
+          id:        c.id,
+          name:      c.name,
+          status:    c.status,
+          objective: c.objective,
+          tags:      c.tags ?? [],
+          metrics:   metricByCampaign[c.id] ?? { spend: 0, clicks: 0, impressions: 0, ctr: 0, cpc: 0 },
+        }));
+
+        // Roll up account-level metrics
+        const accountMetrics = enriched.reduce(
+          (acc, c) => ({
+            spend:       acc.spend + c.metrics.spend,
+            clicks:      acc.clicks + c.metrics.clicks,
+            impressions: acc.impressions + c.metrics.impressions,
+            ctr:         0, // calculated below
+            cpc:         0,
+          }),
+          { spend: 0, clicks: 0, impressions: 0, ctr: 0, cpc: 0 },
+        );
+        accountMetrics.ctr = accountMetrics.impressions > 0
+          ? Math.round((accountMetrics.clicks / accountMetrics.impressions) * 10000) / 100
+          : 0;
+        accountMetrics.cpc = accountMetrics.clicks > 0
+          ? Math.round((accountMetrics.spend / accountMetrics.clicks) * 100) / 100
+          : 0;
+
+        return {
+          id:        account.id,
+          name:      account.name,
+          currency:  account.currency ?? "USD",
+          timezone:  account.timezone,
+          metrics:   accountMetrics,
+          campaigns: enriched,
+        };
+      }),
+    );
+
+    return { workspaceId, days: parseInt(days) || 30, accounts: result };
+  }
+
+  @Get("reporting/export")
+  @ApiOperation({ summary: "Export reporting data as CSV" })
+  @ApiQuery({ name: "workspaceId" })
+  @ApiQuery({ name: "days", required: false })
+  async exportReporting(
+    @Query("workspaceId") workspaceId: string | undefined,
+    @Query("days") days = "30",
+    @Req() req: Request,
+  ) {
+    const data = await this.reporting(workspaceId, days, req);
+    const lines: string[] = [
+      "Account,Account ID,Campaign,Campaign ID,Status,Objective,Spend,Clicks,Impressions,CTR (%),CPC",
+    ];
+
+    for (const account of data.accounts) {
+      for (const campaign of account.campaigns) {
+        lines.push([
+          `"${account.name}"`,
+          account.id,
+          `"${campaign.name}"`,
+          campaign.id,
+          campaign.status,
+          campaign.objective ?? "",
+          campaign.metrics.spend.toFixed(2),
+          campaign.metrics.clicks,
+          campaign.metrics.impressions,
+          campaign.metrics.ctr.toFixed(4),
+          campaign.metrics.cpc.toFixed(4),
+        ].join(","));
+      }
+    }
+
+    return { csv: lines.join("\n"), filename: `nishon-report-${new Date().toISOString().slice(0, 10)}.csv` };
+  }
+
+  // ─── Spend forecast ────────────────────────────────────────────────────────
+
+  @Get("spend-forecast")
+  @ApiOperation({ summary: "Monthly spend actuals + linear prediction for rest of month" })
+  @ApiQuery({ name: "workspaceId" })
+  async spendForecast(
+    @Query("workspaceId") workspaceId: string | undefined,
+    @Req() req: Request,
+  ) {
+    if (!workspaceId) throw new BadRequestException("workspaceId is required");
+    await this.assertWorkspaceOwnership(workspaceId, this.getRequestUserId(req));
+
+    const now = new Date();
+    const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    const daysElapsed = now.getDate(); // days elapsed including today
+
+    // Daily spend for this month
+    const dailyRows = await this.insightRepo
+      .createQueryBuilder("insight")
+      .where("insight.workspaceId = :wid", { wid: workspaceId })
+      .andWhere("insight.date >= :since", { since: firstOfMonth })
+      .select([
+        "CAST(insight.date AS date) AS day",
+        'COALESCE(SUM(insight.spend), 0) AS "spend"',
+      ])
+      .groupBy("CAST(insight.date AS date)")
+      .orderBy("day", "ASC")
+      .getRawMany();
+
+    // Build a full daily array (fill missing days with 0)
+    const spendByDay: Record<string, number> = {};
+    for (const r of dailyRows) {
+      const key = typeof r.day === "string" ? r.day.slice(0, 10) : new Date(r.day).toISOString().slice(0, 10);
+      spendByDay[key] = parseFloat(r.spend) || 0;
+    }
+
+    const daily: { date: string; spend: number; isPredicted: boolean }[] = [];
+    for (let d = 1; d <= daysInMonth; d++) {
+      const date = new Date(now.getFullYear(), now.getMonth(), d);
+      const key = date.toISOString().slice(0, 10);
+      const isPredicted = d > daysElapsed;
+      daily.push({ date: key, spend: spendByDay[key] ?? 0, isPredicted });
+    }
+
+    const spendToDate = daily.filter((d) => !d.isPredicted).reduce((s, d) => s + d.spend, 0);
+    const avgDailySpend = daysElapsed > 0 ? spendToDate / daysElapsed : 0;
+
+    // Fill predicted days with average daily spend
+    for (const d of daily) {
+      if (d.isPredicted) d.spend = Math.round(avgDailySpend * 100) / 100;
+    }
+
+    const predictedTotal = Math.round(avgDailySpend * daysInMonth * 100) / 100;
+
+    return {
+      spendToDate: Math.round(spendToDate * 100) / 100,
+      predictedTotal,
+      avgDailySpend: Math.round(avgDailySpend * 100) / 100,
+      daysElapsed,
+      daysTotal: daysInMonth,
+      daily,
+    };
+  }
+
+  // ─── Learning Monitor ─────────────────────────────────────────────────────────
+
+  @Get("learning-monitor")
+  @ApiOperation({ summary: "Ad set delivery status breakdown for Learning Monitor widget" })
+  @ApiQuery({ name: "workspaceId" })
+  async learningMonitor(
+    @Query("workspaceId") workspaceId: string | undefined,
+    @Req() req: Request,
+  ) {
+    if (!workspaceId) throw new BadRequestException("workspaceId is required");
+    await this.assertWorkspaceOwnership(workspaceId, this.getRequestUserId(req));
+
+    // Use MetaCampaignSync status as a proxy for ad set delivery.
+    // Real ad set status would require syncing ad sets separately.
+    const rows = await this.campaignRepo
+      .createQueryBuilder("c")
+      .where("c.workspaceId = :wid", { wid: workspaceId })
+      .select(["c.status AS status", "COUNT(*) AS cnt"])
+      .groupBy("c.status")
+      .getRawMany();
+
+    // Normalise to four buckets used in Smartly's Learning Monitor
+    let active = 0, learning = 0, limited = 0, paused = 0;
+    for (const r of rows) {
+      const s = (r.status as string).toUpperCase();
+      const n = parseInt(r.cnt, 10) || 0;
+      if (s === "ACTIVE") active += n;
+      else if (s === "PAUSED" || s === "ARCHIVED" || s === "DELETED") paused += n;
+      else learning += n; // any other status counts as learning/in-progress
+    }
+
+    const total = active + learning + limited + paused;
+    return { total, active, learning, limited, paused };
+  }
+
+  // ─── Campaign Tags ────────────────────────────────────────────────────────────
+
+  @Post("campaigns/:campaignId/tags")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: "Set tags for a Meta campaign" })
+  async setTags(
+    @Param("campaignId") campaignId: string,
+    @Query("workspaceId") workspaceId: string | undefined,
+    @Body() body: { tags: string[] },
+    @Req() req: Request,
+  ) {
+    if (!workspaceId) throw new BadRequestException("workspaceId is required");
+    await this.assertWorkspaceOwnership(workspaceId, this.getRequestUserId(req));
+
+    const campaign = await this.campaignRepo.findOne({ where: { id: campaignId, workspaceId } });
+    if (!campaign) throw new BadRequestException("Campaign not found");
+
+    await this.campaignRepo.update({ id: campaignId }, { tags: body.tags });
+    return { id: campaignId, tags: body.tags };
   }
 
   // ─── Private: workspace ownership ────────────────────────────────────────────

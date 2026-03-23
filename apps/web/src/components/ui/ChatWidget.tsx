@@ -1,0 +1,168 @@
+'use client'
+
+import { useState, useRef, useEffect } from 'react'
+import { useWorkspaceStore } from '@/stores/workspace.store'
+
+interface Message {
+  role: 'user' | 'assistant'
+  content: string
+}
+
+const SUGGESTED = [
+  'Kampaniyam nima uchun to\'xtadi?',
+  'CTR qanday oshirsa bo\'ladi?',
+  'Bugungi xarajat qancha?',
+  'Eng yaxshi reklamam qaysi?',
+]
+
+export function ChatWidget() {
+  const { currentWorkspace } = useWorkspaceStore()
+  const [open, setOpen] = useState(false)
+  const [messages, setMessages] = useState<Message[]>([
+    { role: 'assistant', content: 'Salom! Men Nishon AI yordamchisiman. Kampaniyalaringiz, metrikalar yoki strategiya haqida savol bering.' },
+  ])
+  const [input, setInput] = useState('')
+  const [loading, setLoading] = useState(false)
+  const bottomRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (open) bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages, open])
+
+  async function send(text?: string) {
+    const msg = (text ?? input).trim()
+    if (!msg || loading || !currentWorkspace) return
+
+    const history = messages.slice(-6)
+    const next: Message[] = [...messages, { role: 'user', content: msg }]
+    setMessages(next)
+    setInput('')
+    setLoading(true)
+
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('nishon_token') : null
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/ai-agent/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          workspaceId: currentWorkspace.id,
+          message: msg,
+          history: history.map((m) => ({ role: m.role, content: m.content })),
+        }),
+      })
+      const data = await res.json()
+      setMessages((prev) => [...prev, { role: 'assistant', content: data.reply || 'Xatolik yuz berdi.' }])
+    } catch {
+      setMessages((prev) => [...prev, { role: 'assistant', content: 'Tarmoq xatosi. Iltimos qaytadan urinib ko\'ring.' }])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <>
+      {/* Floating button */}
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-[#7C3AED] hover:bg-[#6D28D9] shadow-lg flex items-center justify-center transition-all"
+        aria-label="AI Chat"
+      >
+        {open ? (
+          <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        ) : (
+          <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+              d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+          </svg>
+        )}
+      </button>
+
+      {/* Chat panel */}
+      {open && (
+        <div className="fixed bottom-24 right-6 z-50 w-[360px] max-h-[520px] flex flex-col rounded-2xl border border-[#2A2A3A] bg-[#13131F] shadow-2xl overflow-hidden">
+          {/* Header */}
+          <div className="flex items-center gap-3 px-4 py-3 bg-[#7C3AED]">
+            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-sm">N</div>
+            <div>
+              <div className="text-white font-semibold text-sm">Nishon AI</div>
+              <div className="text-purple-200 text-xs">Kampaniya yordamchisi</div>
+            </div>
+            <div className="ml-auto w-2 h-2 rounded-full bg-emerald-400"></div>
+          </div>
+
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-0">
+            {messages.map((m, i) => (
+              <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div
+                  className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm leading-relaxed ${
+                    m.role === 'user'
+                      ? 'bg-[#7C3AED] text-white rounded-br-sm'
+                      : 'bg-[#1E1E2E] text-[#E5E7EB] rounded-bl-sm'
+                  }`}
+                >
+                  {m.content}
+                </div>
+              </div>
+            ))}
+            {loading && (
+              <div className="flex justify-start">
+                <div className="bg-[#1E1E2E] px-3 py-2 rounded-2xl rounded-bl-sm">
+                  <div className="flex gap-1 items-center">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#6B7280] animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#6B7280] animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#6B7280] animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
+                </div>
+              </div>
+            )}
+            <div ref={bottomRef} />
+          </div>
+
+          {/* Suggested questions (only if 1 message = initial greeting) */}
+          {messages.length === 1 && (
+            <div className="px-4 pb-2 flex flex-wrap gap-2">
+              {SUGGESTED.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => send(s)}
+                  className="text-xs px-2.5 py-1 rounded-full border border-[#2A2A3A] text-[#9CA3AF] hover:border-[#7C3AED] hover:text-[#7C3AED] transition-colors"
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Input */}
+          <div className="px-3 pb-3 pt-2 border-t border-[#2A2A3A]">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && send()}
+                placeholder="Savol bering..."
+                className="flex-1 bg-[#1E1E2E] border border-[#2A2A3A] rounded-xl px-3 py-2 text-sm text-white placeholder-[#4B5563] focus:outline-none focus:border-[#7C3AED]"
+              />
+              <button
+                onClick={() => send()}
+                disabled={!input.trim() || loading}
+                className="w-9 h-9 rounded-xl bg-[#7C3AED] disabled:opacity-40 flex items-center justify-center hover:bg-[#6D28D9] transition-colors"
+              >
+                <svg className="w-4 h-4 text-white rotate-90" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M2 21l21-9L2 3v7l15 2-15 2z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}

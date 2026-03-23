@@ -145,6 +145,9 @@ export default function SettingsPage() {
   const [emailNotifs, setEmailNotifs] = useState(true)
   const [weeklyReport, setWeeklyReport] = useState(true)
   const [aiAlerts, setAiAlerts] = useState(true)
+  const [telegramChatId, setTelegramChatId] = useState('')
+  const [telegramSaving, setTelegramSaving] = useState(false)
+  const [telegramSaved, setTelegramSaved] = useState(false)
 
   const [metaConnected, setMetaConnected] = useState<boolean | null>(null)
 
@@ -165,6 +168,7 @@ export default function SettingsPage() {
     if (currentWorkspace) {
       setWorkspaceName(currentWorkspace.name ?? '')
       setAutopilotMode(currentWorkspace.autopilotMode ?? 'assisted')
+      setTelegramChatId((currentWorkspace as any).telegramChatId ?? '')
     }
   }, [currentWorkspace?.id])
 
@@ -521,6 +525,7 @@ export default function SettingsPage() {
 
           {/* ── NOTIFICATIONS ── */}
           {activeTab === 'notifications' && (
+            <div className="space-y-4">
             <Card>
               <div className="mb-5">
                 <h2 className="text-base font-semibold text-white">Notification Preferences</h2>
@@ -583,6 +588,59 @@ export default function SettingsPage() {
                 </Button>
               </div>
             </Card>
+
+            {/* ── Telegram daily report ── */}
+
+            <Card>
+              <div className="mb-4">
+                <h2 className="text-base font-semibold text-white flex items-center gap-2">
+                  <span>Telegram Kunlik Hisobot</span>
+                  <span className="text-xs bg-[#7C3AED]/20 text-[#A78BFA] px-2 py-0.5 rounded-full font-normal">Tavsiya etiladi</span>
+                </h2>
+                <p className="text-xs text-[#6B7280] mt-1">
+                  Har kuni soat 09:00 da kampaniya natijalari Telegramga yuboriladi. Bot orqali Chat ID oling.
+                </p>
+              </div>
+
+              <div className="bg-[#1A1A2E] border border-[#2A2A3A] rounded-lg p-4 mb-4 text-xs text-[#9CA3AF] space-y-1.5">
+                <p className="font-medium text-[#E5E7EB]">Qanday ulash:</p>
+                <p>1. Telegramda <span className="text-[#A78BFA] font-mono">@NishonAIBot</span> ga yozing</p>
+                <p>2. <span className="font-mono text-white">/start</span> buyrug'ini yuboring</p>
+                <p>3. Bot sizga Chat ID ni ko'rsatadi — uni quyida kiriting</p>
+              </div>
+
+              <div className="flex gap-3 items-end">
+                <div className="flex-1">
+                  <label className="block text-xs text-[#6B7280] mb-1.5">Telegram Chat ID</label>
+                  <Input
+                    value={telegramChatId}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTelegramChatId(e.target.value)}
+                    placeholder="Masalan: 123456789"
+                    className="font-mono"
+                  />
+                </div>
+                <Button
+                  onClick={async () => {
+                    if (!currentWorkspace?.id) return
+                    setTelegramSaving(true)
+                    setTelegramSaved(false)
+                    try {
+                      await workspacesApi.update(currentWorkspace.id, {
+                        telegramChatId: telegramChatId.trim() || null,
+                      } as any)
+                      setTelegramSaved(true)
+                      setTimeout(() => setTelegramSaved(false), 2500)
+                    } finally {
+                      setTelegramSaving(false)
+                    }
+                  }}
+                  loading={telegramSaving}
+                >
+                  {telegramSaved ? 'Saqlandi ✓' : telegramSaving ? 'Saqlanmoqda…' : 'Saqlash'}
+                </Button>
+              </div>
+            </Card>
+            </div>
           )}
 
           {/* ── OPTIMIZATION POLICY ── */}

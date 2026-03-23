@@ -57,6 +57,42 @@ export class AiAgentService {
   }
 
   /**
+   * AI Chat — answers questions about campaigns, metrics, errors, and strategy.
+   * Used by the floating chat widget on the dashboard.
+   */
+  async chat(dto: {
+    workspaceId: string;
+    message: string;
+    history?: { role: "user" | "assistant"; content: string }[];
+  }): Promise<{ reply: string }> {
+    const systemPrompt = `You are Nishon AI — a helpful advertising assistant for the Nishon AI platform.
+You help users understand their Meta ad campaign performance, troubleshoot errors, and optimize their strategy.
+You have knowledge about Meta Ads (Facebook/Instagram), campaign budgets, CTR, ROAS, CPM, CPC metrics.
+Answer in the same language the user writes in (Uzbek, Russian, or English).
+Be concise, practical, and friendly. When giving advice, use concrete numbers from context if available.
+If asked about a specific campaign or metric, explain what it means and what actions to take.
+Workspace ID for this conversation: ${dto.workspaceId}`;
+
+    const historyText = (dto.history || [])
+      .slice(-6)
+      .map((m) => `${m.role === "user" ? "User" : "Assistant"}: ${m.content}`)
+      .join("\n");
+
+    const userPrompt = historyText
+      ? `Previous conversation:\n${historyText}\n\nUser: ${dto.message}`
+      : dto.message;
+
+    const result = await this.aiClient.complete(userPrompt, systemPrompt, {
+      taskType: "chat",
+      agentName: "ChatWidget",
+      temperature: 0.7,
+      maxTokens: 500,
+    });
+
+    return { reply: result.content };
+  }
+
+  /**
    * Competitor analysis — 12-category marketing audit (72 sub-parameters).
    * Returns a rich JSON that the frontend renders as a comparison table.
    */
