@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { OptimizerAgentService } from './optimizer-agent.service';
 import { runRulesEngine } from './rules/rules-engine';
 import { scoreAndRankActions } from './action-scorer';
+import { governActions, SAFE_DEFAULTS } from './policy/action-policy';
+import type { WorkspacePolicy } from './policy/action-policy';
 import { OptimizationRun } from './entities/optimization-run.entity';
 import { RunOptimizationDto } from './dto/run-optimization.dto';
 import type {
@@ -14,6 +16,8 @@ import type {
   AiOptimizationSuggestion,
   ScoredAction,
   OptimizationMode,
+  GovernedAction,
+  GovernanceSummary,
 } from './types/optimization.types';
 
 /**
@@ -46,9 +50,11 @@ export class AutoOptimizationService {
   async runOptimization(
     workspaceId: string,
     dto: RunOptimizationDto,
+    workspacePolicy?: WorkspacePolicy,
   ): Promise<OptimizationReport> {
     const startTime = Date.now();
     const { performance: campaign, mode, goal, constraints } = dto;
+    const policy = workspacePolicy ?? SAFE_DEFAULTS;
 
     this.logger.log(
       `[${workspaceId}] Optimization run started — campaign="${campaign.campaignName}"` +
@@ -65,6 +71,8 @@ export class AutoOptimizationService {
       ruleAnalysis:        null,
       aiSuggestion:        null,
       rankedActions:       [],
+      governedActions:     [],
+      governanceSummary:   null,
       autoAppliedActions:  [],
       generatedCreatives:  null,
       summary:             '',
@@ -127,15 +135,31 @@ export class AutoOptimizationService {
       this.logger.warn(`[${workspaceId}] Action scoring failed: ${report.errors['scoring']}`);
     }
 
-    // ── Step 4: Decision engine + safety gate ────────────────────────────────
+    // ── Step 4: Governance classification ───────────────────────────────────
     try {
-      report.autoAppliedActions = this.applyDecisionEngine(report.rankedActions, mode);
+      const allActions = report.rankedActions.map(sa => sa.action);
+      const { governed, summary: govSummary } = governActions(allActions, policy, constraints);
+      report.governedActions   = governed;
+      report.governanceSummary = govSummary;
+      report.completedSteps.push('governance');
+      this.logger.log(
+        `[${workspaceId}] Governance: auto=${govSummary.autoApply}` +
+        ` approval=${govSummary.approvalRequired} blocked=${govSummary.blocked}`,
+      );
+    } catch (err: any) {
+      report.errors['governance'] = err?.message ?? String(err);
+      this.logger.warn(`[${workspaceId}] Governance step failed: ${report.errors['governance']}`);
+    }
+
+    // ── Step 5: Decision engine + safety gate ────────────────────────────────
+    try {
+      report.autoAppliedActions = this.applyDecisionEngine(report.governedActions, mode);
       report.completedSteps.push('decision_engine');
     } catch (err: any) {
       report.errors['decision_engine'] = err?.message ?? String(err);
     }
 
-    // ── Step 5: Creative refresh (only when creative problems exist) ──────────
+    // ── Step 6: Creative refresh (only when creative problems exist) ──────────
     const hasCreativeProblem = this.hasCreativeProblem(report.ruleAnalysis, report.aiSuggestion);
     if (hasCreativeProblem) {
       try {
@@ -156,11 +180,11 @@ export class AutoOptimizationService {
       }
     }
 
-    // ── Step 6: Build summary ─────────────────────────────────────────────────
+    // ── Step 7: Build summary ─────────────────────────────────────────────────
     report.summary = this.buildSummary(report);
     report.metadata.durationMs = Date.now() - startTime;
 
-    // ── Step 7: Persist ───────────────────────────────────────────────────────
+    // ── Step 8: Persist ───────────────────────────────────────────────────────
     try {
       await this.persistRun(workspaceId, dto, report);
       report.completedSteps.push('persisted');
@@ -232,19 +256,19 @@ export class AutoOptimizationService {
   }
 
   /**
-   * Safety gate — decides which actions can be applied in auto_apply mode.
-   * Only LOW_RISK content-generation actions can be auto-applied.
-   * Platform mutations (pause, budget changes) always require human approval.
+   * Safety gate — decides which actions to auto-apply.
+   * Now driven by governance decisions from governActions():
+   * only AUTO_APPLY_ALLOWED actions are executed in auto_apply mode.
    */
   private applyDecisionEngine(
-    rankedActions: ScoredAction[],
+    governedActions: GovernedAction[],
     mode: OptimizationMode,
   ): ActionType[] {
     if (mode !== 'auto_apply') return [];
 
-    return rankedActions
-      .filter(sa => sa.action.autoApplicable && sa.score >= 50)
-      .map(sa => sa.action.type);
+    return governedActions
+      .filter(ga => ga.governance === 'AUTO_APPLY_ALLOWED')
+      .map(ga => ga.action.type);
   }
 
   /** Returns true if there are creative-related problems worth refreshing */
@@ -327,6 +351,8 @@ export class AutoOptimizationService {
         ruleAnalysis:       report.ruleAnalysis,
         aiSuggestion:       report.aiSuggestion,
         rankedActions:      report.rankedActions,
+        governedActions:    report.governedActions,
+        governanceSummary:  report.governanceSummary,
         autoAppliedActions: report.autoAppliedActions,
         summary:            report.summary,
         model:              report.metadata.model,

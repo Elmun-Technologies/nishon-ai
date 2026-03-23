@@ -192,4 +192,11 @@ export const meta = {
     apiClient.post('/meta/sync', { workspaceId }),
 }
 
+export const autoOptimization = {
+  run: (workspaceId: string, dto: any) =>
+    apiClient.post(`/auto-optimization/workspaces/${workspaceId}/run`, dto),
+  history: (workspaceId: string, limit = 10) =>
+    apiClient.get(`/auto-optimization/workspaces/${workspaceId}/history?limit=${limit}`),
+}
+
 export default apiClient

@@ -166,6 +166,24 @@ export interface AiOptimizationSuggestion {
   actions: OptimizationAction[];
 }
 
+// ─── Governance ───────────────────────────────────────────────────────────────
+
+export type GovernanceDecision = 'AUTO_APPLY_ALLOWED' | 'APPROVAL_REQUIRED' | 'BLOCKED';
+
+export interface GovernedAction {
+  action: OptimizationAction;
+  governance: GovernanceDecision;
+  governanceReason: string;
+  riskLevel: 'low' | 'medium' | 'high';
+}
+
+export interface GovernanceSummary {
+  total: number;
+  autoApply: number;
+  approvalRequired: number;
+  blocked: number;
+}
+
 // ─── Final report ─────────────────────────────────────────────────────────────
 
 export interface OptimizationReport {
@@ -178,6 +196,8 @@ export interface OptimizationReport {
   ruleAnalysis: RuleAnalysisResult | null;
   aiSuggestion: AiOptimizationSuggestion | null;
   rankedActions: ScoredAction[];
+  governedActions: GovernedAction[];
+  governanceSummary: GovernanceSummary | null;
   autoAppliedActions: ActionType[];
   generatedCreatives: any | null;
   summary: string;

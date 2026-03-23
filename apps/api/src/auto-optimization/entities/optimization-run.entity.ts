@@ -66,6 +66,19 @@ export class OptimizationRun {
   @Column({ type: 'jsonb', nullable: true })
   rankedActions: any;
 
+  /** Governance-classified actions (AUTO_APPLY_ALLOWED | APPROVAL_REQUIRED | BLOCKED) */
+  @Column({ type: 'jsonb', nullable: true })
+  governedActions: any;
+
+  /** Summary counts: total / autoApply / approvalRequired / blocked */
+  @Column({ type: 'jsonb', nullable: true })
+  governanceSummary: {
+    total: number;
+    autoApply: number;
+    approvalRequired: number;
+    blocked: number;
+  } | null;
+
   /** Action types that were auto-applied (non-empty only in auto_apply mode) */
   @Column({ type: 'jsonb', nullable: true })
   autoAppliedActions: string[] | null;
