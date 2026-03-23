@@ -39,7 +39,7 @@ interface OptimizationReport {
   completedSteps: string[]
   errors: Record<string, string>
   ruleAnalysis: {
-    problems: { type: string; severity: string; message: string; targetId: string }[]
+    problems: { type: string; severity: string; message: string; targetId: string; targetType: string }[]
     opportunities: { message: string; potentialImpact: string }[]
     winners: string[]
     losers: string[]
