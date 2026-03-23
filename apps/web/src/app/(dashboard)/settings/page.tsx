@@ -11,7 +11,7 @@ import { Alert } from '@/components/ui/Alert'
 import { connectMeta, fetchMetaDashboard } from '@/lib/meta'
 import { workspaces as workspacesApi } from '@/lib/api-client'
 
-type Tab = 'general' | 'integrations' | 'notifications' | 'danger'
+type Tab = 'general' | 'integrations' | 'notifications' | 'policy' | 'danger'
 
 const TABS = [
   {
@@ -39,6 +39,15 @@ const TABS = [
     icon: (
       <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
         <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+      </svg>
+    ),
+  },
+  {
+    id: 'policy' as Tab,
+    label: 'Optimallashtirish',
+    icon: (
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
       </svg>
     ),
   },
@@ -139,6 +148,18 @@ export default function SettingsPage() {
 
   const [metaConnected, setMetaConnected] = useState<boolean | null>(null)
 
+  // ── Optimization policy state ──────────────────────────────────────────────
+  const [policy, setPolicy] = useState({
+    allowAutoBudgetChange:    false,
+    maxAutoBudgetChangePct:   0,
+    allowAutoCreativeRefresh: true,
+    allowAutoPauseCreative:   false,
+    allowAudienceChanges:     false,
+  })
+  const [policyLoading, setPolicyLoading] = useState(false)
+  const [policySaving, setPolicySaving] = useState(false)
+  const [policySaved, setPolicySaved] = useState(false)
+
   // Sync local state when workspace loads from store
   useEffect(() => {
     if (currentWorkspace) {
@@ -146,6 +167,17 @@ export default function SettingsPage() {
       setAutopilotMode(currentWorkspace.autopilotMode ?? 'assisted')
     }
   }, [currentWorkspace?.id])
+
+  useEffect(() => {
+    if (activeTab !== 'policy' || !currentWorkspace?.id) return
+    setPolicyLoading(true)
+    workspacesApi.getPolicy(currentWorkspace.id)
+      .then((res: any) => {
+        if (res.data) setPolicy((prev) => ({ ...prev, ...res.data }))
+      })
+      .catch(() => {})
+      .finally(() => setPolicyLoading(false))
+  }, [activeTab, currentWorkspace?.id])
 
   useEffect(() => {
     if (activeTab !== 'integrations' || !currentWorkspace?.id) return
@@ -551,6 +583,137 @@ export default function SettingsPage() {
                 </Button>
               </div>
             </Card>
+          )}
+
+          {/* ── OPTIMIZATION POLICY ── */}
+          {activeTab === 'policy' && (
+            <div className="space-y-4">
+              <Card>
+                <div className="mb-5">
+                  <h2 className="text-base font-semibold text-white">Avtomatik optimallashtirish ruxsatlari</h2>
+                  <p className="text-xs text-[#6B7280] mt-0.5">
+                    Auto-apply rejimida AI qanday harakatlarni avtomatik bajarishi mumkinligini nazorat qiling.
+                    Tasdiq talab qiladiganlar sizning roziligingizni kutadi.
+                  </p>
+                </div>
+
+                {policyLoading ? (
+                  <div className="py-8 flex justify-center"><div className="w-5 h-5 border-2 border-[#7C3AED] border-t-transparent rounded-full animate-spin" /></div>
+                ) : (
+                  <div className="space-y-0 divide-y divide-[#2A2A3A]">
+                    {[
+                      {
+                        key: 'allowAutoCreativeRefresh' as const,
+                        label: 'Kreativ yangilanish taklifi',
+                        description: 'AI kreativ muammolar aniqlanganda yangi sarlavha va matn variantlarini avtomatik taklif qiladi. (Faqat kontent — platforma o\'zgarmaydi)',
+                        risk: 'low' as const,
+                      },
+                      {
+                        key: 'allowAutoBudgetChange' as const,
+                        label: 'Byudjet o\'zgartirishlariga ruxsat',
+                        description: 'AI yuqori ROAS ko\'rsatkichli ad-setlarga byudjetni avtomatik ko\'chirishi mumkin.',
+                        risk: 'high' as const,
+                      },
+                      {
+                        key: 'allowAutoPauseCreative' as const,
+                        label: 'Kreativlarni avtomatik to\'xtatish',
+                        description: 'Juda past CTR yoki charchagan kreativlarni AI o\'zi to\'xtatishi mumkin.',
+                        risk: 'high' as const,
+                      },
+                      {
+                        key: 'allowAudienceChanges' as const,
+                        label: 'Auditoriya o\'zgartirishlariga ruxsat',
+                        description: 'AI auditoriya targetingini kengaytirishi yoki toraytirishi mumkin.',
+                        risk: 'high' as const,
+                      },
+                    ].map((item) => (
+                      <div key={item.key} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
+                        <div className="flex-1 min-w-0 pr-4">
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <p className="text-sm font-medium text-white">{item.label}</p>
+                            <span className={`text-xs px-1.5 py-0.5 rounded-full border ${
+                              item.risk === 'low'
+                                ? 'text-emerald-400 border-emerald-500/20 bg-emerald-500/10'
+                                : 'text-red-400 border-red-500/20 bg-red-500/10'
+                            }`}>
+                              {item.risk === 'low' ? 'xavfsiz' : 'yuqori xavf'}
+                            </span>
+                          </div>
+                          <p className="text-xs text-[#6B7280] leading-relaxed">{item.description}</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setPolicy((p) => ({ ...p, [item.key]: !p[item.key] }))}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 shrink-0 ${
+                            policy[item.key] ? 'bg-[#7C3AED]' : 'bg-[#2A2A3A]'
+                          }`}
+                        >
+                          <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200 ${
+                            policy[item.key] ? 'translate-x-6' : 'translate-x-1'
+                          }`} />
+                        </button>
+                      </div>
+                    ))}
+
+                    {/* Budget change % slider — visible only when budget change is allowed */}
+                    {policy.allowAutoBudgetChange && (
+                      <div className="py-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-sm text-white">Maksimal byudjet o'zgarishi</p>
+                          <span className="text-[#A78BFA] font-semibold text-sm">{policy.maxAutoBudgetChangePct}%</span>
+                        </div>
+                        <input
+                          type="range" min={5} max={50} step={5}
+                          value={policy.maxAutoBudgetChangePct}
+                          onChange={(e) => setPolicy((p) => ({ ...p, maxAutoBudgetChangePct: Number(e.target.value) }))}
+                          className="w-full h-2 bg-[#2A2A3A] rounded-full appearance-none cursor-pointer
+                            [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4
+                            [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full
+                            [&::-webkit-slider-thumb]:bg-[#7C3AED] [&::-webkit-slider-thumb]:cursor-pointer"
+                        />
+                        <div className="flex justify-between text-xs text-[#4B5563] mt-1">
+                          <span>5%</span><span>25%</span><span>50%</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div className="mt-5 pt-5 border-t border-[#2A2A3A] flex items-center justify-between">
+                  <p className="text-xs text-[#4B5563]">
+                    O'zgartirilmagan sozlamalar xavfsiz standartlardan foydalanadi
+                  </p>
+                  <Button
+                    onClick={async () => {
+                      if (!currentWorkspace?.id) return
+                      setPolicySaving(true)
+                      setPolicySaved(false)
+                      try {
+                        await workspacesApi.updatePolicy(currentWorkspace.id, policy)
+                        setPolicySaved(true)
+                        setTimeout(() => setPolicySaved(false), 2500)
+                      } catch {}
+                      finally { setPolicySaving(false) }
+                    }}
+                    loading={policySaving}
+                  >
+                    {policySaved ? 'Saqlandi ✓' : policySaving ? 'Saqlanmoqda…' : 'Saqlash'}
+                  </Button>
+                </div>
+              </Card>
+
+              <Card variant="outlined" padding="sm">
+                <div className="flex items-start gap-3 px-2">
+                  <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#A78BFA" strokeWidth={1.8} className="shrink-0 mt-0.5">
+                    <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <p className="text-[#6B7280] text-xs leading-relaxed">
+                    Barcha platforma mutatsiyalari (pauza, byudjet) uchun AI hech qachon sizning roziligingisiz harakat qilmaydi —
+                    agar ruxsat bermagan bo'lsangiz. "Tavsiya" rejimida hech narsa avtomatik bajarilmaydi.
+                  </p>
+                </div>
+              </Card>
+            </div>
           )}
 
           {/* ── DANGER ZONE ── */}

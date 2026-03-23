@@ -165,6 +165,34 @@ export class WorkspacesService {
     };
   }
 
+  /** Return workspace optimization policy (null → caller should use SAFE_DEFAULTS) */
+  async getPolicy(id: string, userId: string) {
+    const workspace = await this.findOne(id, userId);
+    return workspace.optimizationPolicy ?? null;
+  }
+
+  /** Merge partial policy update — unset fields keep current value */
+  async updatePolicy(
+    id: string,
+    userId: string,
+    patch: Partial<Workspace['optimizationPolicy']>,
+  ) {
+    const workspace = await this.findOne(id, userId);
+    workspace.optimizationPolicy = {
+      allowAutoBudgetChange:    false,
+      maxAutoBudgetChangePct:   0,
+      allowAutoCreativeRefresh: true,
+      allowAutoPauseCreative:   false,
+      allowAudienceChanges:     false,
+      protectedCampaignIds:     [],
+      protectedAdSetIds:        [],
+      ...(workspace.optimizationPolicy ?? {}),
+      ...patch,
+    };
+    await this.workspaceRepo.save(workspace);
+    return workspace.optimizationPolicy;
+  }
+
   async delete(id: string, userId: string): Promise<void> {
     const workspace = await this.findOne(id, userId);
     await this.workspaceRepo.remove(workspace);

@@ -128,6 +128,7 @@ export const auth = {
     apiClient.post('/auth/login', data),
   me: () => apiClient.get('/auth/me'),
   googleUrl: () => `${API_BASE_URL}/auth/google`,
+  facebookUrl: () => `${API_BASE_URL}/auth/facebook`,
 }
 
 export const workspaces = {
@@ -138,6 +139,9 @@ export const workspaces = {
   setAutopilot: (id: string, mode: string) =>
     apiClient.patch(`/workspaces/${id}/autopilot`, { mode }),
   performance: (id: string) => apiClient.get(`/workspaces/${id}/performance`),
+  getPolicy: (id: string) => apiClient.get(`/workspaces/${id}/policy`),
+  updatePolicy: (id: string, policy: any) =>
+    apiClient.patch(`/workspaces/${id}/policy`, policy),
 }
 
 export const aiAgent = {

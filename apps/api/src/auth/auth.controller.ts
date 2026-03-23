@@ -119,4 +119,22 @@ export class AuthController {
 
     res.redirect(`${frontendUrl}/auth/google/callback?${params.toString()}`);
   }
+
+  // ─── Facebook OAuth ─────────────────────────────────────────────────────────
+
+  @Get("facebook")
+  @UseGuards(AuthGuard("facebook"))
+  @ApiOperation({ summary: "Redirect to Facebook OAuth" })
+  facebookLogin() {}
+
+  @Get("facebook/callback")
+  @UseGuards(AuthGuard("facebook"))
+  @ApiOperation({ summary: "Facebook OAuth callback" })
+  facebookCallback(@Request() req: any, @Res() res: Response) {
+    const { accessToken, refreshToken } = req.user as AuthResponseDto;
+    const frontendUrl = this.config.get<string>("FRONTEND_URL", "http://localhost:3000");
+    const params = new URLSearchParams({ accessToken, refreshToken });
+    // Reuse the same callback page as Google
+    res.redirect(`${frontendUrl}/auth/google/callback?${params.toString()}`);
+  }
 }
