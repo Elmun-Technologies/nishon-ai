@@ -37,7 +37,7 @@ export class OptimizerAgentService {
   constructor(private readonly config: ConfigService) {
     const apiKey  = config.get<string>('AGENT_ROUTER_API_KEY', '');
     const baseURL =
-      (config.get<string>('AGENT_ROUTER_BASE_URL') || 'https://api.agentrouter.org')
+      (config.get<string>('AGENT_ROUTER_BASE_URL') || 'https://agentrouter.org')
         .replace(/\/$/, '') + '/v1';
     this.aiClient = new NishonAiClient(apiKey, baseURL);
   }
