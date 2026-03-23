@@ -128,6 +128,7 @@ export const auth = {
     apiClient.post('/auth/login', data),
   me: () => apiClient.get('/auth/me'),
   googleUrl: () => `${API_BASE_URL}/auth/google`,
+  facebookUrl: () => `${API_BASE_URL}/auth/facebook`,
 }
 
 export const workspaces = {

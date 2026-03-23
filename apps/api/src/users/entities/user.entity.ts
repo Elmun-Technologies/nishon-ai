@@ -55,7 +55,11 @@ export class User {
   @Column({ length: 255, nullable: true, unique: true })
   googleId: string | null;
 
-  /** Profile picture URL from Google (optional) */
+  /** Facebook OAuth user ID */
+  @Column({ length: 255, nullable: true, unique: true })
+  facebookId: string | null;
+
+  /** Profile picture URL from OAuth provider */
   @Column({ type: "text", nullable: true })
   picture: string | null;
 

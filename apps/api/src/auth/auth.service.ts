@@ -162,6 +162,39 @@ export class AuthService {
     return this.generateAuthResponse(user);
   }
 
+  /** Find or create user from Facebook OAuth profile. */
+  async findOrCreateFromFacebook(profile: {
+    facebookId: string;
+    email: string;
+    name: string;
+    picture?: string;
+  }): Promise<AuthResponseDto> {
+    let user = await this.userRepo.findOne({ where: { facebookId: profile.facebookId } });
+
+    if (!user) {
+      user = await this.userRepo.findOne({ where: { email: profile.email } });
+      if (user) {
+        await this.userRepo.update(user.id, {
+          facebookId: profile.facebookId,
+          picture:    profile.picture ?? user.picture,
+        });
+        user.facebookId = profile.facebookId;
+      } else {
+        user = await this.userRepo.save(
+          this.userRepo.create({
+            email:      profile.email,
+            name:       profile.name,
+            facebookId: profile.facebookId,
+            picture:    profile.picture ?? null,
+            password:   null,
+          }),
+        );
+      }
+    }
+
+    return this.generateAuthResponse(user);
+  }
+
   /**
    * Validate user credentials — called by LocalStrategy during login.
    */
