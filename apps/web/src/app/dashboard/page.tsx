@@ -106,6 +106,15 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {/* ── Meta Ads data source badge ── */}
+      {(performance as any)?.metaConnected && (
+        <div className="flex items-center gap-2 text-xs text-[#9CA3AF]">
+          <span className="w-2 h-2 rounded-full bg-[#1877F2] shrink-0" />
+          <span>Ko'rsatkichlar <span className="text-white font-medium">Meta Ads</span> dan real vaqt rejimida olinmoqda</span>
+          <a href="/settings/meta" className="text-[#7C3AED] hover:underline ml-1">sozlamalar →</a>
+        </div>
+      )}
+
       {/* ── TOP ROW: KPI metrics ── */}
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
         <MetricCard

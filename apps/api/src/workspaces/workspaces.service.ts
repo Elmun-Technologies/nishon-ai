@@ -8,6 +8,7 @@ import { Repository } from "typeorm";
 import { Workspace } from "./entities/workspace.entity";
 import { Budget } from "../budget/entities/budget.entity";
 import { BudgetPeriod } from "../budget/entities/budget.entity";
+import { MetaInsight } from "../meta/entities/meta-insight.entity";
 import {
   CreateWorkspaceDto,
   UpdateWorkspaceDto,
@@ -21,6 +22,8 @@ export class WorkspacesService {
     private readonly workspaceRepo: Repository<Workspace>,
     @InjectRepository(Budget)
     private readonly budgetRepo: Repository<Budget>,
+    @InjectRepository(MetaInsight)
+    private readonly metaInsightRepo: Repository<MetaInsight>,
   ) {}
 
   /**
@@ -130,11 +133,19 @@ export class WorkspacesService {
   /**
    * Get workspace performance summary — used for the dashboard overview card.
    * Aggregates spend, conversions, and ROAS across all campaigns.
+   *
+   * Data sources:
+   * 1. PerformanceMetric — internal campaign data (manually-created campaigns)
+   * 2. MetaInsight — real Meta Ads data synced from the Graph API
+   *
+   * We merge both so that users who connected Meta see real numbers on
+   * the dashboard even if they haven't created any internal campaigns.
    */
   async getPerformanceSummary(id: string, userId: string) {
     await this.findOne(id, userId); // verify ownership
 
-    const result = await this.workspaceRepo
+    // ── Internal campaign metrics ─────────────────────────────────────────────
+    const internalResult = await this.workspaceRepo
       .createQueryBuilder("workspace")
       .leftJoin("workspace.campaigns", "campaign")
       .leftJoin("campaign.adSets", "adSet")
@@ -151,17 +162,55 @@ export class WorkspacesService {
       ])
       .getRawOne();
 
-    const totalSpend = parseFloat(result.totalSpend) || 0;
-    const totalRevenue = parseFloat(result.totalRevenue) || 0;
+    // ── Real Meta Ads insights (last 30 days) ─────────────────────────────────
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const metaResult = await this.metaInsightRepo
+      .createQueryBuilder("insight")
+      .where("insight.workspaceId = :id", { id })
+      .andWhere("insight.date >= :since", { since: thirtyDaysAgo })
+      .select([
+        'COALESCE(SUM(insight.spend), 0) AS "metaSpend"',
+        'COALESCE(SUM(insight.clicks), 0) AS "metaClicks"',
+        'COALESCE(SUM(insight.impressions), 0) AS "metaImpressions"',
+        'COUNT(DISTINCT insight.campaignId) AS "metaCampaignCount"',
+      ])
+      .getRawOne();
+
+    // ── Merge: Meta data supplements internal data ────────────────────────────
+    const internalSpend   = parseFloat(internalResult.totalSpend) || 0;
+    const internalRevenue = parseFloat(internalResult.totalRevenue) || 0;
+    const metaSpend       = parseFloat(metaResult?.metaSpend ?? "0") || 0;
+
+    // Use the larger spend source to avoid double-counting.
+    // If Meta is connected and has data, it becomes the primary spend source.
+    const totalSpend      = Math.max(internalSpend, metaSpend);
+    const totalRevenue    = internalRevenue;
+    const totalClicks     = Math.max(
+      parseInt(internalResult.totalClicks) || 0,
+      parseInt(metaResult?.metaClicks ?? "0") || 0,
+    );
+    const totalImpressions = Math.max(
+      parseInt(internalResult.totalImpressions) || 0,
+      parseInt(metaResult?.metaImpressions ?? "0") || 0,
+    );
+    const campaignCount = Math.max(
+      parseInt(internalResult.campaignCount) || 0,
+      parseInt(metaResult?.metaCampaignCount ?? "0") || 0,
+    );
 
     return {
       totalSpend,
       totalRevenue,
-      totalConversions: parseInt(result.totalConversions) || 0,
-      totalClicks: parseInt(result.totalClicks) || 0,
-      totalImpressions: parseInt(result.totalImpressions) || 0,
-      campaignCount: parseInt(result.campaignCount) || 0,
+      totalConversions: parseInt(internalResult.totalConversions) || 0,
+      totalClicks,
+      totalImpressions,
+      campaignCount,
       overallRoas: totalSpend > 0 ? totalRevenue / totalSpend : 0,
+      // Expose raw source breakdown so the UI can show a "Powered by Meta" badge
+      metaConnected: metaSpend > 0,
+      metaSpend,
     };
   }
 
