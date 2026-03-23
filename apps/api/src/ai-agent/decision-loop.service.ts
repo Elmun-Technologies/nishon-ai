@@ -49,11 +49,13 @@ export class DecisionLoopService {
     @InjectRepository(Workspace)
     private readonly workspaceRepo: Repository<Workspace>,
   ) {
-    const apiKey = this.config.get<string>("OPENROUTER_API_KEY");
+    const apiKey = this.config.get<string>("AGENT_ROUTER_API_KEY") || "";
+    const baseURL =
+      (this.config.get<string>("AGENT_ROUTER_BASE_URL") || "https://api.agentrouter.org").replace(/\/$/, "") + "/v1";
     if (apiKey) {
-      this.aiClient = new NishonAiClient(apiKey);
+      this.aiClient = new NishonAiClient(apiKey, baseURL);
     } else {
-      this.logger.warn("OPENROUTER_API_KEY is not configured - AI decision loop will be unavailable");
+      this.logger.warn("AGENT_ROUTER_API_KEY is not configured - AI decision loop will be unavailable");
     }
   }
 
@@ -105,7 +107,11 @@ export class DecisionLoopService {
     }>(
       `Analyze these campaign metrics and decide what actions to take:\n${JSON.stringify(performanceSummary, null, 2)}`,
       OPTIMIZATION_SYSTEM_PROMPT,
-      { temperature: 0.2 }, // Very low temp — we want consistent, data-driven decisions
+      {
+        taskType: 'optimization',
+        agentName: 'DecisionLoop',
+        temperature: 0.2, // Very low temp — we want consistent, data-driven decisions
+      },
     );
 
     // Convert AI decisions to database records

@@ -14,6 +14,7 @@ import { AiDecisionsModule } from "./ai-decisions/ai-decisions.module";
 import { QueueModule } from "./queue/queue.module";
 import { MetaModule } from "./meta/meta.module";
 import { EventsModule } from "./events/events.module";
+import { AutoOptimizationModule } from "./auto-optimization/auto-optimization.module";
 import { validateEnv } from "./config/env.validation";
 import { HealthController } from "./health/health.controller";
 import { HealthService } from "./health/health.service";
@@ -67,6 +68,7 @@ import { RequestLoggingInterceptor } from "./common/interceptors/request-logging
     QueueModule,
     MetaModule,
     EventsModule,
+    AutoOptimizationModule,
   ],
   controllers: [HealthController],
   providers: [

@@ -85,13 +85,13 @@ export class StrategyEngineService {
     @InjectRepository(Workspace)
     private readonly workspaceRepo: Repository<Workspace>,
   ) {
-    const apiKey =
-      this.config.get<string>("OPENROUTER_API_KEY") ||
-      this.config.get<string>("OPENAI_API_KEY");
+    const apiKey = this.config.get<string>("AGENT_ROUTER_API_KEY") || "";
+    const baseURL =
+      (this.config.get<string>("AGENT_ROUTER_BASE_URL") || "https://api.agentrouter.org").replace(/\/$/, "") + "/v1";
     if (apiKey) {
-      this.aiClient = new NishonAiClient(apiKey);
+      this.aiClient = new NishonAiClient(apiKey, baseURL);
     } else {
-      this.logger.warn("Neither OPENROUTER_API_KEY nor OPENAI_API_KEY is configured - AI features will be unavailable");
+      this.logger.warn("AGENT_ROUTER_API_KEY is not configured - AI features will be unavailable");
     }
   }
 
@@ -160,7 +160,7 @@ export class StrategyEngineService {
    */
   async generateStrategy(input: StrategyInput): Promise<StrategyResult> {
     if (!this.aiClient) {
-      throw new BadRequestException("AI features are not available: OPENROUTER_API_KEY is not configured");
+      throw new BadRequestException("AI features are not available: AGENT_ROUTER_API_KEY is not configured");
     }
 
     const prompt = buildStrategyPrompt(input);
@@ -173,8 +173,9 @@ export class StrategyEngineService {
       prompt,
       STRATEGY_SYSTEM_PROMPT,
       {
+        taskType: 'strategy',
+        agentName: 'StrategyEngine',
         temperature: 0.4, // Lower = more consistent, professional output
-        maxTokens: 3000,
       },
     );
 

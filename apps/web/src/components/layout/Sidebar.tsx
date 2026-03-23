@@ -54,6 +54,15 @@ const NAV_ITEMS = [
     ),
   },
   {
+    href: '/auto-optimization',
+    label: 'Auto-Optimallashtirish',
+    icon: (
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+      </svg>
+    ),
+  },
+  {
     href: '/competitors',
     label: 'Competitors',
     icon: (

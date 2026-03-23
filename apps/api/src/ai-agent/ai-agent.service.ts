@@ -6,6 +6,7 @@ import {
 import { DecisionLoopService } from "./decision-loop.service";
 import { AiDecision } from "../ai-decisions/entities/ai-decision.entity";
 import { ConfigService } from "@nestjs/config";
+import { NishonAiClient } from "@nishon/ai-sdk";
 
 /**
  * AiAgentService is the public facade for all AI capabilities.
@@ -20,12 +21,19 @@ import { ConfigService } from "@nestjs/config";
 @Injectable()
 export class AiAgentService {
   private readonly logger = new Logger(AiAgentService.name);
+  private readonly aiClient: NishonAiClient;
 
   constructor(
     private readonly strategyEngine: StrategyEngineService,
     private readonly decisionLoop: DecisionLoopService,
     private readonly config: ConfigService,
-  ) {}
+  ) {
+    const apiKey  = this.config.get<string>("AGENT_ROUTER_API_KEY", "");
+    const baseURL =
+      (this.config.get<string>("AGENT_ROUTER_BASE_URL") || "https://api.agentrouter.org")
+        .replace(/\/$/, "") + "/v1";
+    this.aiClient = new NishonAiClient(apiKey, baseURL);
+  }
 
   async generateStrategy(workspaceId: string): Promise<StrategyResult> {
     return this.strategyEngine.generateForWorkspace(workspaceId);
@@ -57,10 +65,6 @@ export class AiAgentService {
     competitor: { name: string; instagram: string; website: string }
     businessContext: any
   }): Promise<any> {
-    const { NishonAiClient } = await import("@nishon/ai-sdk")
-    const apiKey = this.config.get<string>("OPENROUTER_API_KEY", "")
-    const client = new NishonAiClient(apiKey)
-
     const systemPrompt = `
 You are an expert digital marketing analyst who has audited 100+ businesses
 in Uzbekistan and CIS markets. You use a proven 12-category audit framework.
@@ -252,9 +256,10 @@ Be specific, actionable, and write all notes in Uzbek language.
 `
 
     try {
-      return await client.completeJson(userPrompt, systemPrompt, {
+      return await this.aiClient.completeJson(userPrompt, systemPrompt, {
+        taskType: 'competitor',
+        agentName: 'CompetitorAnalysis',
         temperature: 0.3,
-        maxTokens: 4000,
       })
     } catch (err: any) {
       const detail = err?.message || String(err)
@@ -266,10 +271,6 @@ Be specific, actionable, and write all notes in Uzbek language.
   }
 
   async generateAdScripts(workspaceId: string, dto: any): Promise<any> {
-    const { NishonAiClient } = await import("@nishon/ai-sdk")
-    const apiKey = this.config.get<string>("OPENROUTER_API_KEY", "")
-    const client = new NishonAiClient(apiKey)
-
     const platforms: string[] = dto.platforms || ["meta"]
 
     const systemPrompt = `
@@ -390,9 +391,10 @@ Write all scripts in Uzbek. Make them specific to this business.
 For video scripts, write exactly what the person says on camera or voiceover.
 `
 
-    return client.completeJson(userPrompt, systemPrompt, {
+    return this.aiClient.completeJson(userPrompt, systemPrompt, {
+      taskType: 'creative',
+      agentName: 'AdScriptWriter',
       temperature: 0.7,
-      maxTokens: 6000,
     })
   }
 
@@ -404,12 +406,6 @@ For video scripts, write exactly what the person says on camera or voiceover.
     goal: string
     workspaceContext: any
   }): Promise<any> {
-    const { NishonAiClient } = await import("@nishon/ai-sdk")
-    const apiKey = this.config.get<string>("OPENROUTER_API_KEY", "")
-
-    const OpenAI = (await import('openai')).default
-    const openai = new OpenAI({ apiKey, baseURL: 'https://openrouter.ai/api/v1' })
-
     const systemPrompt = `
 You are an expert ad creative analyst with 15+ years experience
 evaluating advertising creatives for CIS markets (Uzbekistan, Kazakhstan, Russia).
@@ -484,29 +480,12 @@ Please evaluate this creative image and provide scores for all 10 parameters.
 Write all feedback in Uzbek language.
 `
 
-    const response = await openai.chat.completions.create({
-      model: 'openai/gpt-4o',
-      max_tokens: 2000,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'image_url',
-              image_url: {
-                url: `data:${dto.mimeType};base64,${dto.imageBase64}`,
-                detail: 'high',
-              },
-            },
-            { type: 'text', text: userMessage },
-          ],
-        },
-      ],
-    })
-
-    const content = response.choices[0]?.message?.content ?? ''
-    const cleaned = content.replace(/```json\n?|\n?```/g, '').trim()
-    return JSON.parse(cleaned)
+    return this.aiClient.completeVision(
+      dto.imageBase64,
+      dto.mimeType,
+      userMessage,
+      systemPrompt,
+      { taskType: 'vision', agentName: 'CreativeScorer' },
+    )
   }
 }

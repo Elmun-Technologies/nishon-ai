@@ -8,6 +8,7 @@ import { AuthService } from "./auth.service";
 import { AuthController } from "./auth.controller";
 import { JwtStrategy } from "./strategies/jwt.strategy";
 import { LocalStrategy } from "./strategies/local.strategy";
+import { GoogleStrategy } from "./strategies/google.strategy";
 import { User } from "../users/entities/user.entity";
 import { MetaAuthController } from "./meta-auth.controller";
 import { MetaOAuthService } from "./meta-oauth.service";
@@ -31,7 +32,7 @@ import { Workspace } from "../workspaces/entities/workspace.entity";
     }),
   ],
   controllers: [AuthController, MetaAuthController],
-  providers: [AuthService, JwtStrategy, LocalStrategy, MetaOAuthService],
+  providers: [AuthService, JwtStrategy, LocalStrategy, GoogleStrategy, MetaOAuthService],
   exports: [AuthService, JwtModule],
 })
 export class AuthModule {}

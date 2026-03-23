@@ -2,11 +2,22 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Button } from 'components/ui'
-import { Input } from 'components/ui'
-import { Alert } from 'components/ui'
-import { auth } from 'lib/api-client'
-import { useWorkspaceStore } from 'stores/workspace.store'
+import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
+import { Alert } from '@/components/ui/Alert'
+import { auth } from '@/lib/api-client'
+import { useWorkspaceStore } from '@/stores/workspace.store'
+
+function GoogleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615Z" fill="#4285F4"/>
+      <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18Z" fill="#34A853"/>
+      <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332Z" fill="#FBBC05"/>
+      <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58Z" fill="#EA4335"/>
+    </svg>
+  )
+}
 
 interface FormData {
   name: string
@@ -20,6 +31,16 @@ interface FormErrors {
   email?: string
   password?: string
   confirmPassword?: string
+}
+
+function getPasswordStrength(password: string) {
+  if (!password) return { level: 0, label: '', color: '' }
+  if (password.length < 6) return { level: 1, label: 'Kuchsiz', color: 'bg-red-500' }
+  if (password.length < 10) return { level: 2, label: "O'rtacha", color: 'bg-amber-500' }
+  if (/[A-Z]/.test(password) && /[0-9]/.test(password)) {
+    return { level: 4, label: 'Kuchli', color: 'bg-emerald-500' }
+  }
+  return { level: 3, label: 'Yaxshi', color: 'bg-blue-500' }
 }
 
 export default function RegisterPage() {
@@ -37,30 +58,17 @@ export default function RegisterPage() {
 
   function update(field: keyof FormData, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }))
-    // Clear field error when user starts typing
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: undefined }))
-    }
+    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }))
   }
 
   function validate(): boolean {
-    const newErrors: FormErrors = {}
-
-    if (!form.name || form.name.trim().length < 2) {
-      newErrors.name = 'Name must be at least 2 characters'
-    }
-    if (!form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      newErrors.email = 'Please enter a valid email address'
-    }
-    if (!form.password || form.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters'
-    }
-    if (form.password !== form.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match'
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+    const e: FormErrors = {}
+    if (!form.name || form.name.trim().length < 2) e.name = "Ism kamida 2 ta harf bo'lishi kerak"
+    if (!form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = "To'g'ri email kiriting"
+    if (!form.password || form.password.length < 8) e.password = "Parol kamida 8 ta belgidan iborat bo'lishi kerak"
+    if (form.password !== form.confirmPassword) e.confirmPassword = 'Parollar mos kelmaydi'
+    setErrors(e)
+    return Object.keys(e).length === 0
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -80,30 +88,18 @@ export default function RegisterPage() {
       localStorage.setItem('nishon_refresh_token', refreshToken)
       setAccessToken(accessToken)
       setUser(user)
-      // New users go to onboarding first
       router.push('/onboarding')
     } catch (err: any) {
       setServerError(
-        err.response?.data?.message || 'Registration failed. Please try again.'
+        err.response?.data?.message || "Ro'yxatdan o'tishda xato yuz berdi. Qayta urinib ko'ring."
       )
     } finally {
       setLoading(false)
     }
   }
 
-  // Password strength indicator
-  function getPasswordStrength(password: string): {
-    level: number
-    label: string
-    color: string
-  } {
-    if (!password) return { level: 0, label: '', color: '' }
-    if (password.length < 6) return { level: 1, label: 'Weak', color: 'bg-red-500' }
-    if (password.length < 10) return { level: 2, label: 'Fair', color: 'bg-amber-500' }
-    if (/[A-Z]/.test(password) && /[0-9]/.test(password)) {
-      return { level: 4, label: 'Strong', color: 'bg-emerald-500' }
-    }
-    return { level: 3, label: 'Good', color: 'bg-blue-500' }
+  function handleGoogleRegister() {
+    window.location.href = auth.googleUrl()
   }
 
   const passwordStrength = getPasswordStrength(form.password)
@@ -118,36 +114,34 @@ export default function RegisterPage() {
             Nishon <span className="text-[#7C3AED]">AI</span>
           </h1>
           <p className="text-[#6B7280] text-sm mt-1">
-            Start managing ads with AI — free to try
+            AI bilan reklama boshqarishni boshlang
           </p>
         </div>
 
-        {/* Benefits row */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          {[
-            { icon: '🤖', text: 'AI Strategy' },
-            { icon: '📊', text: 'Auto Reports' },
-            { icon: '💰', text: 'Better ROAS' },
-          ].map((item) => (
-            <div
-              key={item.text}
-              className="bg-[#13131A] border border-[#2A2A3A] rounded-xl p-3 text-center"
-            >
-              <div className="text-xl mb-1">{item.icon}</div>
-              <p className="text-[#9CA3AF] text-xs font-medium">{item.text}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Register form */}
         <div className="bg-[#13131A] border border-[#2A2A3A] rounded-xl p-6">
           <h2 className="text-xl font-semibold text-white mb-6">
-            Create your account
+            Hisob yaratish
           </h2>
+
+          {/* Google button */}
+          <button
+            type="button"
+            onClick={handleGoogleRegister}
+            className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-50 text-gray-700 font-medium py-2.5 px-4 rounded-lg border border-gray-200 transition-colors text-sm mb-4"
+          >
+            <GoogleIcon />
+            Google orqali ro'yxatdan o'tish
+          </button>
+
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex-1 h-px bg-[#2A2A3A]" />
+            <span className="text-[#4B5563] text-xs">yoki email bilan</span>
+            <div className="flex-1 h-px bg-[#2A2A3A]" />
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
-              label="Full name"
+              label="To'liq ism"
               type="text"
               placeholder="Jasur Toshmatov"
               value={form.name}
@@ -158,9 +152,9 @@ export default function RegisterPage() {
             />
 
             <Input
-              label="Email address"
+              label="Email"
               type="email"
-              placeholder="you@company.com"
+              placeholder="siz@kompaniya.com"
               value={form.email}
               onChange={(e) => update('email', e.target.value)}
               error={errors.email}
@@ -170,16 +164,15 @@ export default function RegisterPage() {
 
             <div>
               <Input
-                label="Password"
+                label="Parol"
                 type="password"
-                placeholder="At least 8 characters"
+                placeholder="Kamida 8 ta belgi"
                 value={form.password}
                 onChange={(e) => update('password', e.target.value)}
                 error={errors.password}
                 leftIcon={<span className="text-sm">🔒</span>}
                 required
               />
-              {/* Password strength bar */}
               {form.password && (
                 <div className="mt-2">
                   <div className="flex gap-1">
@@ -194,17 +187,15 @@ export default function RegisterPage() {
                       />
                     ))}
                   </div>
-                  <p className="text-xs text-[#6B7280] mt-1">
-                    {passwordStrength.label} password
-                  </p>
+                  <p className="text-xs text-[#6B7280] mt-1">{passwordStrength.label}</p>
                 </div>
               )}
             </div>
 
             <Input
-              label="Confirm password"
+              label="Parolni tasdiqlang"
               type="password"
-              placeholder="Same password again"
+              placeholder="Xuddi shu parol"
               value={form.confirmPassword}
               onChange={(e) => update('confirmPassword', e.target.value)}
               error={errors.confirmPassword}
@@ -212,35 +203,23 @@ export default function RegisterPage() {
               required
             />
 
-            {serverError && (
-              <Alert variant="error">{serverError}</Alert>
-            )}
+            {serverError && <Alert variant="error">{serverError}</Alert>}
 
-            <Button
-              type="submit"
-              fullWidth
-              loading={loading}
-              size="lg"
-              className="mt-2"
-            >
-              Create free account
+            <Button type="submit" fullWidth loading={loading} size="lg" className="mt-2">
+              Bepul hisob yaratish
             </Button>
           </form>
 
           <p className="text-center text-[#6B7280] text-sm mt-5">
-            Already have an account?{' '}
-            <Link
-              href="/login"
-              className="text-[#A78BFA] hover:text-white transition-colors font-medium"
-            >
-              Sign in
+            Hisobingiz bormi?{' '}
+            <Link href="/login" className="text-[#A78BFA] hover:text-white transition-colors font-medium">
+              Kirish
             </Link>
           </p>
         </div>
 
-        {/* Trust indicators */}
         <div className="flex items-center justify-center gap-6 mt-6">
-          {['No credit card', 'Free to start', 'Cancel anytime'].map((item) => (
+          {["Kredit karta shart emas", "Bepul boshlash", 'Istalgan vaqt bekor qilish'].map((item) => (
             <div key={item} className="flex items-center gap-1.5">
               <span className="text-emerald-400 text-xs">✓</span>
               <span className="text-[#4B5563] text-xs">{item}</span>

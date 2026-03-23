@@ -127,6 +127,7 @@ export const auth = {
   login: (data: { email: string; password: string }) =>
     apiClient.post('/auth/login', data),
   me: () => apiClient.get('/auth/me'),
+  googleUrl: () => `${API_BASE_URL}/auth/google`,
 }
 
 export const workspaces = {
@@ -190,6 +191,13 @@ export const meta = {
     apiClient.get(`/meta/dashboard?workspaceId=${encodeURIComponent(workspaceId)}`),
   sync: (workspaceId: string) =>
     apiClient.post('/meta/sync', { workspaceId }),
+}
+
+export const autoOptimization = {
+  run: (workspaceId: string, dto: any) =>
+    apiClient.post(`/auto-optimization/workspaces/${workspaceId}/run`, dto),
+  history: (workspaceId: string, limit = 10) =>
+    apiClient.get(`/auto-optimization/workspaces/${workspaceId}/history?limit=${limit}`),
 }
 
 export default apiClient

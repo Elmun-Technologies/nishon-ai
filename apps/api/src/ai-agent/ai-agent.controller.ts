@@ -17,13 +17,20 @@ import {
 } from "@nestjs/swagger";
 import { AuthGuard } from "@nestjs/passport";
 import { AiAgentService } from "./ai-agent.service";
+import {
+  CampaignOrchestratorService,
+  CampaignPipelineInput,
+} from "./campaign-orchestrator.service";
 
 @ApiTags("AI Agent")
 @Controller("ai-agent")
 @UseGuards(AuthGuard("jwt"))
 @ApiBearerAuth()
 export class AiAgentController {
-  constructor(private readonly aiAgentService: AiAgentService) {}
+  constructor(
+    private readonly aiAgentService: AiAgentService,
+    private readonly orchestrator: CampaignOrchestratorService,
+  ) {}
 
   @Post("generate-scripts/:workspaceId")
   @HttpCode(HttpStatus.OK)
@@ -94,5 +101,22 @@ export class AiAgentController {
   @ApiOperation({ summary: "Score a creative using GPT-4o Vision" })
   async scoreCreative(@Body() dto: any) {
     return this.aiAgentService.scoreCreative(dto)
+  }
+
+  @Post("workspaces/:workspaceId/pipeline")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: "Run the full multi-agent campaign pipeline",
+    description:
+      "Chains Strategy → Ad Scripts → Creative Scoring → Optimization in one call. " +
+      "Each step is independent — partial results are returned if any step fails.",
+  })
+  @ApiParam({ name: "workspaceId", description: "Workspace UUID" })
+  @ApiResponse({ status: 200, description: "Pipeline result with per-step outputs and error map" })
+  async runPipeline(
+    @Param("workspaceId") workspaceId: string,
+    @Body() dto: Omit<CampaignPipelineInput, "workspaceId">,
+  ) {
+    return this.orchestrator.runCampaignPipeline({ ...dto, workspaceId });
   }
 }

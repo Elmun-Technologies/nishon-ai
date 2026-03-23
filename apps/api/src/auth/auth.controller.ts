@@ -7,7 +7,9 @@ import {
   UseGuards,
   Request,
   Get,
+  Res,
 } from "@nestjs/common";
+import { Response } from "express";
 import {
   ApiTags,
   ApiOperation,
@@ -15,6 +17,7 @@ import {
   ApiBearerAuth,
 } from "@nestjs/swagger";
 import { AuthGuard } from "@nestjs/passport";
+import { ConfigService } from "@nestjs/config";
 import { AuthService } from "./auth.service";
 import {
   RegisterDto,
@@ -26,7 +29,10 @@ import {
 @ApiTags("Authentication")
 @Controller("auth")
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly config: ConfigService,
+  ) {}
 
   @Post("register")
   @HttpCode(HttpStatus.CREATED)
@@ -82,5 +88,35 @@ export class AuthController {
   @ApiResponse({ status: 200, description: "Current user data" })
   async me(@Request() req: any) {
     return req.user;
+  }
+
+  // ─── Google OAuth ───────────────────────────────────────────────────────────
+
+  @Get("google")
+  @UseGuards(AuthGuard("google"))
+  @ApiOperation({ summary: "Redirect to Google OAuth consent screen" })
+  googleLogin() {
+    // Passport redirects — nothing to return
+  }
+
+  @Get("google/callback")
+  @UseGuards(AuthGuard("google"))
+  @ApiOperation({ summary: "Google OAuth callback" })
+  googleCallback(@Request() req: any, @Res() res: Response) {
+    // req.user is the AuthResponseDto returned by GoogleStrategy.validate()
+    const { accessToken, refreshToken, user } = req.user as AuthResponseDto;
+    const frontendUrl = this.config.get<string>(
+      "FRONTEND_URL",
+      "http://localhost:3000",
+    );
+
+    const isNew = !user; // won't happen — always exists after findOrCreate
+    const params = new URLSearchParams({
+      accessToken,
+      refreshToken,
+      isNew: String(isNew),
+    });
+
+    res.redirect(`${frontendUrl}/auth/google/callback?${params.toString()}`);
   }
 }
