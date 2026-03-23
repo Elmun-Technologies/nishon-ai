@@ -57,6 +57,11 @@ export class NishonAiClient {
       baseURL,
       timeout: 45_000,  // 45 s — prevents Render 504 timeouts
       maxRetries: 0,    // retries are handled manually below
+      defaultHeaders: {
+        'User-Agent': 'NishonAI/1.0 (compatible; OpenAI-client)',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
     })
   }
 
