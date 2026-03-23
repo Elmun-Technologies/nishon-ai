@@ -83,11 +83,22 @@ export class NishonAiClient {
             { role: 'user',   content: prompt },
           ],
         })
+        // Detect WAF / HTML block responses (e.g. Alibaba Cloud WAF)
+        const rawStr = JSON.stringify(response)
         if (!response.choices || response.choices.length === 0) {
-          throw new Error(`Empty response from AI provider: ${JSON.stringify(response).slice(0, 300)}`)
+          const isHtmlBlock = rawStr.includes('<!doctype') || rawStr.includes('<html') || rawStr.includes('aliyun_waf')
+          if (isHtmlBlock) {
+            throw new Error('AI provider is temporarily unavailable (network block). Please try again in a few minutes.')
+          }
+          throw new Error(`Empty response from AI provider: ${rawStr.slice(0, 200)}`)
+        }
+        const content = response.choices[0]?.message?.content ?? ''
+        // Also guard against HTML content being returned as the model message
+        if (content.includes('<!doctype') || content.includes('<html') || content.includes('aliyun_waf')) {
+          throw new Error('AI provider is temporarily unavailable (network block). Please try again in a few minutes.')
         }
         return {
-          content:    response.choices[0]?.message?.content ?? '',
+          content,
           tokensUsed: response.usage?.total_tokens ?? 0,
           model,
         }
@@ -234,7 +245,11 @@ export class NishonAiClient {
         const isRetryable = error?.status === 429 || error?.status >= 500
 
         if (!isRetryable || attempt === this.maxRetries) {
-          const detail = error?.error?.message || error?.message || String(error)
+          const rawDetail = error?.error?.message || error?.message || String(error)
+          // Strip HTML from error detail to avoid leaking WAF pages to users
+          const detail = (rawDetail.includes('<!doctype') || rawDetail.includes('<html') || rawDetail.includes('aliyun_waf'))
+            ? 'AI provider is temporarily unavailable (network block). Please try again in a few minutes.'
+            : rawDetail
           const msg = `Agent Router error [${label}/${task}] status=${error?.status ?? 'unknown'} attempt=${attempt}: ${detail}`
           console.error(`[NishonAI] ${msg} duration=${durationMs}ms`)
           throw new Error(msg)
