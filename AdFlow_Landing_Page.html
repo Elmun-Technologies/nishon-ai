@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdFlow — Multi-platform reklama boshqaruv</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #080B10;
+            --bg2: #0D1117;
+            --surface: #161D27;
+            --surface2: #1C2535;
+            --accent: #00E5A0;
+            --accent2: #0066FF;
+            --text: #E8EDF5;
+            --text2: #8A96A8;
+            --border: rgba(255,255,255,0.07);
+            --radius: 16px;
+            --radius-sm: 10px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.4'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Typography */
+        h1 { font-size: clamp(2rem, 6vw, 4rem); font-weight: 800; font-family: 'Syne', sans-serif; }
+        h2 { font-size: clamp(1.5rem, 4vw, 2.5rem); font-weight: 700; font-family: 'Syne', sans-serif; }
+        h3 { font-size: 1.5rem; font-weight: 700; font-family: 'Syne', sans-serif; }
+        h4 { font-size: 1.1rem; font-weight: 600; font-family: 'Syne', sans-serif; }
+        p { font-size: 1rem; color: var(--text2); }
+        .text-primary { color: var(--text); }
+        .text-secondary { color: var(--text2); }
+
+        /* Layout */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+        .grid { display: grid; gap: 24px; }
+        .grid-2 { grid-template-columns: 1fr 1fr; }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
+        .flex { display: flex; gap: 16px; align-items: center; }
+        .center { text-align: center; }
+        .start { text-align: left; }
+        .end { text-align: right; }
+
+        /* Components */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .badge .dot {
+            width: 8px; height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 229, 160, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 229, 160, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 229, 160, 0); }
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            font-weight: 500;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-family: 'Syne', sans-serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #000;
+            border: none;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+        }
+
+        .btn:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(255,255,255,0.15);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover::before { opacity: 1; }
+
+        /* Sections */
+        section { padding: 80px 0; }
+        .section-header { margin-bottom: 48px; }
+
+        /* Nav */
+        nav {
+            position: sticky;
+            top: 0;
+            backdrop-filter: blur(10px);
+            background: rgba(8, 11, 16, 0.8);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .nav-links { display: flex; gap: 24px; }
+        .nav-links a { color: var(--text2); text-decoration: none; font-weight: 500; }
+        .nav-links a:hover { color: var(--text); }
+
+        /* Hero */
+        .hero {
+            position: relative;
+            padding: 120px 0 80px;
+            background: radial-gradient(1200px 600px at top center, rgba(0, 229, 160, 0.15), transparent 60%);
+        }
+
+        .hero-grid { grid-template-columns: 1.2fr 1fr; align-items: center; gap: 48px; }
+        .hero-content { position: relative; z-index: 2; }
+        .hero-title { margin-bottom: 16px; }
+        .hero-sub { font-size: 1.1rem; margin-bottom: 32px; color: var(--text2); }
+        .hero-cta { display: flex; gap: 16px; flex-wrap: wrap; }
+        .hero-stats { display: flex; gap: 24px; margin-top: 24px; }
+        .stat { font-size: 0.9rem; color: var(--text2); }
+
+        .hero-visual {
+            position: relative;
+            display: grid;
+            gap: 16px;
+            perspective: 1000px;
+        }
+
+        .dashboard-card {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            transform: rotateX(15deg) rotateY(-15deg);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: rotateX(15deg) rotateY(-15deg) translateY(0); }
+            50% { transform: rotateX(15deg) rotateY(-15deg) translateY(-10px); }
+        }
+
+        .chart {
+            width: 100%;
+            height: 120px;
+            background: var(--surface);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart svg { width: 100%; height: 100%; }
+        .chart path { fill: url(#gradient); stroke: var(--accent); stroke-width: 2; }
+        .chart line { stroke: var(--border); stroke-width: 1; }
+
+        /* Platform Logos */
+        .platforms {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            opacity: 0.6;
+            text-align: center;
+        }
+
+        .platform-logo {
+            font-size: 2rem;
+            color: var(--text2);
+            transition: all 0.3s ease;
+        }
+
+        .platform-logo:hover {
+            opacity: 1;
+            color: var(--text);
+            transform: translateY(-4px);
+        }
+
+        /* Pain Points */
+        .pain-grid { grid-template-columns: repeat(3, 1fr); }
+        .pain-card { position: relative; }
+        .pain-icon { font-size: 2rem; margin-bottom: 16px; }
+        .pain-title { font-size: 1.2rem; margin-bottom: 8px; }
+        .pain-desc { font-size: 0.95rem; }
+
+        /* How It Works */
+        .steps { position: relative; }
+        .steps::before {
+            content: '';
+            position: absolute;
+            left: 24px;
+            top: 0; bottom: 0;
+            width: 2px;
+            background: var(--border);
+        }
+
+        .step {
+            position: relative;
+            padding-left: 64px;
+            margin-bottom: 48px;
+        }
+
+        .step::before {
+            content: '';
+            position: absolute;
+            left: 12px;
+            top: 4px;
+            width: 32px; height: 32px;
+            border: 2px solid var(--accent);
+            border-radius: 50%;
+            background: var(--surface);
+            z-index: 2;
+        }
+
+        .step-number {
+            position: absolute;
+            left: 16px;
+            top: 6px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 0.9rem;
+            color: var(--accent);
+            z-index: 3;
+        }
+
+        /* Features */
+        .features-grid { grid-template-columns: repeat(2, 1fr); }
+        .feature-card.featured {
+            grid-column: 1 / -1;
+            border: 2px solid var(--accent);
+            position: relative;
+        }
+
+        .feature-list { margin-top: 16px; }
+        .feature-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .feature-item::before {
+            content: '✓';
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Results */
+        .metrics-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .metric-card {
+            background: linear-gradient(135deg, var(--surface), var(--surface2));
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            text-align: center;
+        }
+        .metric-value { font-size: 2.5rem; font-weight: 800; color: var(--accent); margin-bottom: 8px; }
+        .metric-label { font-size: 0.9rem; color: var(--text2); }
+
+        .testimonial-grid { grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 48px; }
+        .testimonial-card { display: flex; gap: 16px; }
+        .testimonial-avatar {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: #000;
+        }
+        .testimonial-content { flex: 1; }
+        .testimonial-name { font-weight: 600; margin-bottom: 4px; }
+        .testimonial-role { font-size: 0.85rem; color: var(--text2); margin-bottom: 8px; }
+        .testimonial-text { font-style: italic; }
+
+        /* Pricing */
+        .pricing-grid { grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        .pricing-card {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: -12px; right: 24px;
+            background: var(--accent);
+            color: #000;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            display: none;
+        }
+
+        .pricing-card.featured .popular-badge { display: block; }
+
+        .price { font-size: 3rem; font-weight: 800; margin-bottom: 8px; }
+        .price-period { font-size: 1rem; color: var(--text2); }
+        .pricing-features { margin: 24px 0; }
+        .pricing-features li { margin-bottom: 8px; color: var(--text2); }
+        .pricing-cta { margin-top: 24px; }
+
+        /* FAQ */
+        .faq-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .faq-item { border-bottom: 1px solid var(--border); padding: 16px 0; }
+        .faq-question { font-weight: 600; margin-bottom: 8px; cursor: pointer; }
+        .faq-answer { color: var(--text2); display: none; }
+
+        /* Final CTA */
+        .final-cta {
+            text-align: center;
+            background: linear-gradient(135deg, rgba(0, 229, 160, 0.1), rgba(0, 102, 255, 0.1));
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 48px;
+        }
+
+        .trust-badges { display: flex; gap: 24px; justify-content: center; margin-top: 24px; flex-wrap: wrap; }
+        .trust-badge { color: var(--text2); font-size: 0.9rem; }
+
+        /* Footer */
+        footer { border-top: 1px solid var(--border); }
+        .footer-grid { grid-template-columns: 2fr repeat(3, 1fr); gap: 48px; }
+        .footer-col h4 { margin-bottom: 16px; }
+        .footer-links { display: flex; flex-direction: column; gap: 8px; }
+        .footer-links a { color: var(--text2); text-decoration: none; }
+        .footer-links a:hover { color: var(--text); }
+
+        /* Animations */
+        .reveal { opacity: 0; transform: translateY(28px); transition: all 0.6s ease; }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero-grid { grid-template-columns: 1fr; }
+            .hero-visual { display: none; }
+            .pain-grid, .features-grid, .metrics-grid, .pricing-grid, .faq-grid { grid-template-columns: repeat(2, 1fr); }
+            .testimonial-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 640px) {
+            .nav-links { display: none; }
+            .hero-cta { flex-direction: column; align-items: flex-start; }
+            .pain-grid, .features-grid, .metrics-grid, .pricing-grid, .faq-grid { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAV -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">AdFlow</div>
+            <div class="nav-links">
+                <a href="#features">Xususiyatlar</a>
+                <a href="#results">Natijalar</a>
+                <a href="#pricing">Narxlar</a>
+                <a href="#faq">FAQ</a>
+            </div>
+            <div class="flex" style="gap: 12px;">
+                <a href="#" class="btn btn-secondary">Kirish</a>
+                <a href="#pricing" class="btn btn-primary">Bepul boshlash</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="container">
+            <div class="grid hero-grid">
+                <div class="hero-content">
+                    <div class="badge">
+                        <span class="dot"></span>
+                        <span>O'zbekiston №1 reklama platformasi</span>
+                    </div>
+                    <h1 class="hero-title reveal">Bitta interfeysda to'rtta platforma</h1>
+                    <p class="hero-sub reveal">Meta, Google, Yandex va Telegram reklamalaringizni AdFlow orqali boshqaring — vaqtingizni tejash, byudjetni optimallashtirish va natijalarni oshirish uchun aqlli yechim.</p>
+                    <div class="hero-cta reveal">
+                        <a href="#pricing" class="btn btn-primary">Bepul boshlash</a>
+                        <a href="#features" class="btn btn-secondary">Qanday ishlaydi</a>
+                    </div>
+                    <div class="hero-stats reveal">
+                        <span class="stat">500+ faol foydalanuvchi</span>
+                        <span class="stat">98% qoniqish darajasi</span>
+                        <span class="stat">24/7 texnik yordam</span>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="dashboard-card reveal">
+                        <div class="chart">
+                            <svg viewBox="0 0 400 120">
+                                <defs>
+                                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" stop-color="rgba(0, 229, 160, 0.3)"/>
+                                        <stop offset="100%" stop-color="rgba(0, 102, 255, 0.3)"/>
+                                    </linearGradient>
+                                </defs>
+                                <line x1="0" y1="100" x2="400" y2="100" />
+                                <line x1="0" y1="60" x2="400" y2="60" />
+                                <line x1="0" y1="20" x2="400" y2="20" />
+                                <path d="M0,100 L50,80 L100,90 L150,60 L200,40 L250,50 L300,30 L350,40 L400,20" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="dashboard-card reveal" style="animation-delay: 1s;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div class="card" style="padding: 12px;">
+                                <div style="font-size: 0.8rem; color: var(--text2);">Spend</div>
+                                <div style="font-size: 1.2rem; font-weight: 700;">$2,450</div>
+                            </div>
+                            <div class="card" style="padding: 12px;">
+                                <div style="font-size: 0.8rem; color: var(--text2);">ROAS</div>
+                                <div style="font-size: 1.2rem; font-weight: 700; color: var(--accent);">3.8x</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PLATFORM LOGOS -->
+    <section style="padding: 40px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+        <div class="container">
+            <div class="platforms">
+                <div class="platform-logo">📘 Meta</div>
+                <div class="platform-logo">🔍 Google</div>
+                <div class="platform-logo">📘 Yandex</div>
+                <div class="platform-logo">✈️ Telegram</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PAIN POINTS -->
+    <section id="pain" class="container">
+        <div class="section-header center">
+            <h2 class="reveal">Siz ham ushbu muammolarga duch keldingizmi?</h2>
+            <p class="text-secondary reveal">AdFlow bu muammolarga aniq yechim taklif etadi</p>
+        </div>
+        <div class="grid pain-grid">
+            <div class="card pain-card reveal">
+                <div class="pain-icon">⏰</div>
+                <h3 class="pain-title">Vaqt isrof</h3>
+                <p class="pain-desc">Turli platformalarda alohida kabinetlarda ishlash, ma'lumotlarni qo'lda ko'chirish va hisobotlar tuzish kunningizni olib tashlaydi.</p>
+            </div>
+            <div class="card pain-card reveal">
+                <div class="pain-icon">📊</div>
+                <h3 class="pain-title">Tarqoq hisobotlar</h3>
+                <p class="pain-desc">Har bir platforma uchun alohida statistika, umumiy natijani tushunish qiyin, qaror qabul qilish sekinlashadi.</p>
+            </div>
+            <div class="card pain-card reveal">
+                <div class="pain-icon">💸</div>
+                <h3 class="pain-title">Byudjet yo'qolishi</h3>
+                <p class="pain-desc">Optimal byudjet taqsimoti yo'q, bir platformada ortiqcha sarf, boshqasida esa imkoniyatlar boy beriladi.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section id="features" class="container">
+        <div class="section-header center">
+            <h2 class="reveal">Qanday ishlaydi</h2>
+            <p class="text-secondary reveal">AdFlow 6 qadamda barcha platformalarni birlashtiradi</p>
+        </div>
+        <div class="steps">
+            <div class="step reveal">
+                <div class="step-number">1</div>
+                <h3>Platformani tanlang</h3>
+                <p>Meta, Google, Yandex yoki Telegram — kerakli platformalarni belgilang.</p>
+                <span class="badge">Multi-platform</span>
+            </div>
+            <div class="step reveal">
+                <div class="step-number">2</div>
+                <h3>Kampaniyani sozlang</h3>
+                <p>Byudjet, muddat, maqsad, UTM parametrlari — barcha asosiy sozlamalar.</p>
+                <span class="badge">AI optimizatsiya</span>
+            </div>
+            <div class="step reveal">
+                <div class="step-number">3</div>
+                <h3>Auditoriyani aniqlang</h3>
+                <p>Geo, demografiya, interaktivlik, retargeting — kengaytirilgan targeting.</p>
+                <span class="badge">Rule-based</span>
+            </div>
+            <div class="step reveal">
+                <div class="step-number">4</div>
+                <h3>Kreativlar yarating</h3>
+                <p>AI yordamida sarlavha, tavsif, rasm promptlari — tez va sifatli.</p>
+                <span class="badge">AI Agent</span>
+            </div>
+            <div class="step reveal">
+                <div class="step-number">5</div>
+                <h3>Preview qiling</h3>
+                <p>Har bir platforma uchun real-time ko'rinish — xatolarni oldindan ko'ring.</p>
+                <span class="badge">Live preview</span>
+            </div>
+            <div class="step reveal">
+                <div class="step-number">6</div>
+                <h3>Bir tugmada publish</h3>
+                <p>Hammasi tayyor — barcha platformalarga bir vaqtda joylang.</p>
+                <span class="badge">Multi-publish</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="container" style="margin-top: 40px;">
+        <div class="section-header center">
+            <h2 class="reveal">Barcha kerakli xususiyatlar bitta joyda</h2>
+            <p class="text-secondary reveal">AdFlow sizga zamonaviy reklama boshqaruvning barcha imkoniyatlarini taklif etadi</p>
+        </div>
+        <div class="grid features-grid">
+            <div class="card feature-card reveal">
+                <h3>AI Ad Copy Generator</h3>
+                <p>Maxsulotingizga mos sarlavha va tavsiflar, platformaga qarab optimallashtirilgan.</p>
+                <ul class="feature-list">
+                    <li class="feature-item">3 ta sarlavha varianti</li>
+                    <li class="feature-item">2 ta tavsif varianti</li>
+                    <li class="feature-item">Harflar chegarasiga mos</li>
+                </ul>
+            </div>
+            <div class="card feature-card reveal">
+                <h3>Smart Targeting</h3>
+                <p>Geo, demografiya, interaktivlik, retargeting — murakkab segmentlar yarating.</p>
+                <ul class="feature-list">
+                    <li class="feature-item">Xarita + ro'yxat rejimi</li>
+                    <li class="feature-item">7 xil bid korreksiya</li>
+                    <li class="feature-item">Rule-based quruvchi</li>
+                </ul>
+            </div>
+            <div class="card feature-card featured reveal">
+                <div class="popular-badge">Eng mashhur</div>
+                <h3>Birlashgan Dashboard</h3>
+                <p>4 platformaning barcha metrikalari — bitta ekranda, real-time.</p>
+                <ul class="feature-list">
+                    <li class="feature-item">Spend, CTR, CPC, ROAS</li>
+                    <li class="feature-item">Trendlar va taqqoslash</li>
+                    <li class="feature-item">AI tavsiyalari</li>
+                </ul>
+            </div>
+            <div class="card feature-card reveal">
+                <h3>Multi-Platform Publish</h3>
+                <p>Bir necha soniya ichida barcha platformalarga kampaniya joylang.</p>
+                <ul class="feature-list">
+                    <li class="feature-item">OAuth 2.0 integratsiya</li>
+                    <li class="feature-item">Progress tracking</li>
+                    <li class="feature-item">Xatolarni avtomatik hal etish</li>
+                </ul>
+            </div>
+            <div class="card feature-card reveal">
+                <h3>Keyword AI</h3>
+                <p>Aqlli kalit so'zlar va minus so'zlar, har bir platforma uchun moslashtirilgan.</p>
+                <ul class="feature-list">
+                    <li class="feature-item">Match type tanlovi</li>
+                    <li class="feature-item">Minus so'zlar avtomatik</li>
+                    <li class="feature-item">Sifat balli</li>
+                </ul>
+            </div>
+            <div class="card feature-card reveal">
+                <h3>Budget Optimizer</h3>
+                <p>AI asosida byudjet taqsimoti, natijalarni maksimal oshirish.</p>
+                <ul class="feature-list">
+                    <li class="feature-item">Prognoz va tavsiya</li>
+                    <li class="feature-item">Platformaga qarab</li>
+                    <li class="feature-item">Real-time monitoring</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- RESULTS -->
+    <section id="results" class="container" style="margin-top: 80px;">
+        <div class="section-header center">
+            <h2 class="reveal">AdFlow foydalanuvchilari natijalari</h2>
+            <p class="text-secondary reveal">Bizning foydalanuvchilarimiz haqiqiy muvaffaqiyatga erishyaptilar</p>
+        </div>
+        <div class="grid metrics-grid">
+            <div class="metric-card reveal">
+                <div class="metric-value">3.8x</div>
+                <div class="metric-label">O'rtacha ROAS</div>
+            </div>
+            <div class="metric-card reveal">
+                <div class="metric-value">68%</div>
+                <div class="metric-label">Vaqtni tejash</div>
+            </div>
+            <div class="metric-card reveal">
+                <div class="metric-value">23%</div>
+                <div class="metric-label">CPC pasayishi</div>
+            </div>
+            <div class="metric-card reveal">
+                <div class="metric-value">10 daqiqa</div>
+                <div class="metric-label">Kampaniya yaratish</div>
+            </div>
+        </div>
+
+        <div class="testimonial-grid">
+            <div class="card testimonial-card reveal">
+                <div class="testimonial-avatar">AB</div>
+                <div class="testimonial-content">
+                    <div class="testimonial-name">Anvarbek Xolmatov</div>
+                    <div class="testimonial-role">SMM Manager, TechStore UZ</div>
+                    <p class="testimonial-text">AdFlow yordamida 3 oy ichida ROAS 2.1x dan 3.8x gacha oshdi. Vaqtni tejash — katta imtiyoz.</p>
+                </div>
+            </div>
+            <div class="card testimonial-card reveal">
+                <div class="testimonial-avatar">SM</div>
+                <div class="testimonial-content">
+                    <div class="testimonial-name">Sevinch Muxtorova</div>
+                    <div class="testimonial-role">Marketing Director, StyleUZ</div>
+                    <p class="testimonial-text">Bir nechta platformani boshqarish qiyin edi. Endi bitta interfeysda barchasi. AI kreativlar ham ajoyib.</p>
+                </div>
+            </div>
+            <div class="card testimonial-card reveal">
+                <div class="testimonial-avatar">JR</div>
+                <div class="testimonial-content">
+                    <div class="testimonial-name">Javohir Rahmonov</div>
+                    <div class="testimonial-role">CEO, Digital Agency</div>
+                    <p class="testimonial-text">Mijozlarimiz uchun 40% kamroq byudjet bilan yaxshiroq natijalar olishimizga yordam berdi.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRICING -->
+    <section id="pricing" class="container" style="margin-top: 80px;">
+        <div class="section-header center">
+            <h2 class="reveal">Sizga mos tarifni tanlang</h2>
+            <p class="text-secondary reveal">Barcha tariflar 14 kun bepul sinov muddati bilan</p>
+        </div>
+        <div class="grid pricing-grid">
+            <div class="card pricing-card reveal">
+                <h3>Starter</h3>
+                <div class="price">$29<span class="price-period">/oy</span></div>
+                <ul class="pricing-features">
+                    <li>2 ta platforma</li>
+                    <li>5 ta kampaniya</li>
+                    <li>Asosiy targeting</li>
+                    <li>AI Ad Copy (10 ta)</li>
+                    <li>Basic hisobot</li>
+                </ul>
+                <div class="pricing-cta">
+                    <a href="#" class="btn btn-secondary">Boshlash</a>
+                </div>
+            </div>
+            <div class="card pricing-card featured reveal">
+                <div class="popular-badge">Eng mashhur</div>
+                <h3>Growth</h3>
+                <div class="price">$89<span class="price-period">/oy</span></div>
+                <ul class="pricing-features">
+                    <li>Barcha 4 platforma</li>
+                    <li>20 ta kampaniya</li>
+                    <li>Kengaytirilgan targeting</li>
+                    <li>AI Ad Copy (50 ta)</li>
+                    <li>AI Keyword (100 ta)</li>
+                    <li>AI Budget Optimizer</li>
+                    <li>Birlashgan dashboard</li>
+                </ul>
+                <div class="pricing-cta">
+                    <a href="#" class="btn btn-primary">Bepul boshlash</a>
+                </div>
+            </div>
+            <div class="card pricing-card reveal">
+                <h3>Agency</h3>
+                <div class="price">$249<span class="price-period">/oy</span></div>
+                <ul class="pricing-features">
+                    <li>Cheksiz platforma</li>
+                    <li>Cheksiz kampaniya</li>
+                    <li>Advanced targeting</li>
+                    <li>AI Ad Copy (cheksiz)</li>
+                    <li>AI Keyword (cheksiz)</li>
+                    <li>AI Budget Optimizer</li>
+                    <li>Birlashgan dashboard</li>
+                    <li>Multi-user</li>
+                    <li>Priority support</li>
+                </ul>
+                <div class="pricing-cta">
+                    <a href="#" class="btn btn-secondary">Boshlash</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" class="container" style="margin-top: 80px;">
+        <div class="section-header center">
+            <h2 class="reveal">Ko'p beriladigan savollar</h2>
+            <p class="text-secondary reveal">AdFlow haqida savollaringiz bo'lsa, ehtimol bu yerda javobi bor</p>
+        </div>
+        <div class="grid faq-grid">
+            <div class="card faq-item reveal">
+                <div class="faq-question">AdFlow qanday platformalarga ulanadi?</div>
+                <div class="faq-answer">Hozirda Meta Ads, Google Ads, Yandex Direct va Telegram Ads. Yangi platformalar tez orada qo'shiladi.</div>
+            </div>
+            <div class="card faq-item reveal">
+                <div class="faq-question">AI kreativlar sifati qanday?</div>
+                <div class="faq-answer">Biz OpenAI va mahalliy modellar asosida ishlaymiz. Har bir platforma uchun harflar chegarasiga mos keladi.</div>
+            </div>
+            <div class="card faq-item reveal">
+                <div class="faq-question">Bir oylik bepul sinov bormi?</div>
+                <div class="faq-answer">Ha, barcha tariflar 14 kunlik bepul sinov muddati bilan. To'lovni kiritish shart emas.</div>
+            </div>
+            <div class="card faq-item reveal">
+                <div class="faq-question">Ma'lumotlar xavfsizmi?</div>
+                <div class="faq-answer">Ha, biz GDPR va mahalliy qonunlarga amal qilamiz. Barcha ma'lumotlar shifrlanadi.</div>
+            </div>
+            <div class="card faq-item reveal">
+                <div class="faq-question">Kampaniyalarni qanday nazorat qilaman?</div>
+                <div class="faq-answer">Birlashgan dashboard orqali real-time monitoring, har bir platforma uchun alohida boshqaruv ham mavjud.</div>
+            </div>
+            <div class="card faq-item reveal">
+                <div class="faq-question">Agar platforma API uzilishi bo'lsa?</div>
+                <div class="faq-answer">Biz monitoring tizimi bilan ishlaymiz, uzilishlar haqida darhol xabar beramiz va avtomatik qayta ulanish amalga oshiramiz.</div>
+            </div>
+            <div class="card faq-item reveal">
+                <div class="faq-question">Kampaniyalarni qancha tezlikda yaratish mumkin?</div>
+                <div class="faq-answer">AI yordamida 10 daqiqada, oddiy usulda 20-30 daqiqada. Barcha platformalarga bir vaqtda joylaymiz.</div>
+            </div>
+            <div class="card faq-item reveal">
+                <div class="faq-question">Qo'llab-quvvatlash qanday ishlaydi?</div>
+                <div class="faq-answer">24/7 online yordam, email support, live chat. Premium tariflar uchun priority support mavjud.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="container" style="margin: 80px 0;">
+        <div class="final-cta">
+            <h2 class="reveal">Endi navbat siznikikin</h2>
+            <p class="text-secondary reveal" style="max-width: 600px; margin: 0 auto 32px;">AdFlow bilan reklama boshqaruvni soddalashtiring, natijalaringizni oshiring va vaqtingizni muhim ishlarga qarating.</p>
+            <div class="flex" style="justify-content: center; gap: 16px; flex-wrap: wrap;">
+                <a href="#" class="btn btn-primary">Bepul boshlash</a>
+                <a href="#pricing" class="btn btn-secondary">Barcha tariflar</a>
+            </div>
+            <div class="trust-badges">
+                <span class="trust-badge">🔒 Kredit kartasi kerak emas</span>
+                <span class="trust-badge">⚡ 2 minutda sozlash</span>
+                <span class="trust-badge">🔄 Har qanday vaqtda bekor qilish</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="grid footer-grid">
+                <div>
+                    <div class="logo" style="margin-bottom: 16px;">AdFlow</div>
+                    <p class="text-secondary">Multi-platform reklama boshqaruv tizimi. O'zbekiston va MDH bozori uchun yaratilgan.</p>
+                    <div class="flex" style="gap: 12px; margin-top: 24px;">
+                        <a href="#" class="text-secondary">💼</a>
+                        <a href="#" class="text-secondary">📱</a>
+                        <a href="#" class="text-secondary">📧</a>
+                    </div>
+                </div>
+                <div>
+                    <h4>Mahsulot</h4>
+                    <div class="footer-links">
+                        <a href="#features">Xususiyatlar</a>
+                        <a href="#pricing">Narxlar</a>
+                        <a href="#faq">Yordam</a>
+                        <a href="#">API</a>
+                    </div>
+                </div>
+                <div>
+                    <h4>Kompaniya</h4>
+                    <div class="footer-links">
+                        <a href="#">Biz haqimizda</a>
+                        <a href="#">Blog</a>
+                        <a href="#">Karera</a>
+                        <a href="#">Aloqa</a>
+                    </div>
+                </div>
+                <div>
+                    <h4>Yordam</h4>
+                    <div class="footer-links">
+                        <a href="#faq">FAQ</a>
+                        <a href="#">Hujjatlar</a>
+                        <a href="#">To'lovlar</a>
+                        <a href="#">Maxfiylik</a>
+                    </div>
+                </div>
+            </div>
+            <div style="border-top: 1px solid var(--border); margin-top: 48px; padding-top: 24px; text-align: center; color: var(--text2);">
+                © 2024 AdFlow. Barcha huquqlar himoyalangan.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Scroll Reveal
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // FAQ Toggle
+        document.querySelectorAll('.faq-question').forEach(q => {
+            q.addEventListener('click', () => {
+                const answer = q.nextElementSibling;
+                const isVisible = answer.style.display === 'block';
+                answer.style.display = isVisible ? 'none' : 'block';
+                q.style.fontWeight = isVisible ? '600' : '800';
+            });
+        });
+    </script>
+</body>
+</html>
