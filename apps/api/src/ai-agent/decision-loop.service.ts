@@ -107,7 +107,11 @@ export class DecisionLoopService {
     }>(
       `Analyze these campaign metrics and decide what actions to take:\n${JSON.stringify(performanceSummary, null, 2)}`,
       OPTIMIZATION_SYSTEM_PROMPT,
-      { temperature: 0.2 }, // Very low temp — we want consistent, data-driven decisions
+      {
+        taskType: 'optimization',
+        agentName: 'DecisionLoop',
+        temperature: 0.2, // Very low temp — we want consistent, data-driven decisions
+      },
     );
 
     // Convert AI decisions to database records

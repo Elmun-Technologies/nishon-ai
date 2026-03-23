@@ -173,8 +173,9 @@ export class StrategyEngineService {
       prompt,
       STRATEGY_SYSTEM_PROMPT,
       {
+        taskType: 'strategy',
+        agentName: 'StrategyEngine',
         temperature: 0.4, // Lower = more consistent, professional output
-        maxTokens: 3000,
       },
     );
 
