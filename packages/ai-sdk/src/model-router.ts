@@ -33,12 +33,12 @@ export const TASK_MODELS: Record<AgentTask, string> = {
 
 /** Max output tokens per task — hard ceiling to prevent cost overruns */
 export const TASK_TOKEN_LIMITS: Record<AgentTask, number> = {
-  strategy:     3000,
-  competitor:   4000,
-  creative:     6000,
-  analytics:    2000,
-  vision:       2000,
-  optimization: 2000,
+  strategy:     2000,
+  competitor:   2000,
+  creative:     2000,
+  analytics:    1500,
+  vision:       1500,
+  optimization: 1500,
   chat:         600,
 }
 

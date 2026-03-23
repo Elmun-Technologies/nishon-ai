@@ -416,6 +416,8 @@ export default function OnboardingPage() {
   const [scriptLoading, setScriptLoading] = useState(false)
   const [activeScriptTab, setActiveScriptTab] = useState('meta')
   const [scriptError, setScriptError] = useState('')
+  // Track created workspaceId so user can skip to dashboard if strategy fails
+  const [createdWorkspaceId, setCreatedWorkspaceId] = useState<string | null>(null)
 
   function update<K extends keyof FormData>(field: K, value: FormData[K]) {
     setForm((prev) => ({ ...prev, [field]: value }))
@@ -577,6 +579,7 @@ export default function OnboardingPage() {
       })
 
       const workspaceId = wsRes.data.id
+      setCreatedWorkspaceId(workspaceId)
       const stratRes = await aiAgent.generateStrategy(workspaceId)
       const generated = stratRes.data
 
@@ -594,11 +597,16 @@ export default function OnboardingPage() {
 
     } catch (err: any) {
       clearInterval(interval)
-      const rawMsg = err?.response?.data?.message || err?.message || ''
-      const msg = rawMsg
-        ? (Array.isArray(rawMsg) ? rawMsg.join(', ') : rawMsg)
-        : 'Server javob bermadi. Bir necha soniyadan keyin qayta urinib ko\'ring.'
-      setError(msg)
+      const rawMsg: string = err?.response?.data?.message || err?.message || ''
+      // Strip HTML from error message (e.g. WAF block pages)
+      const isHtml = rawMsg.includes('<!doctype') || rawMsg.includes('<html') || rawMsg.includes('aliyun_waf')
+      const cleanMsg = isHtml
+        ? 'AI provayder vaqtincha mavjud emas. Bir necha daqiqadan keyin qayta urinib ko\'ring.'
+        : rawMsg || 'Server javob bermadi. Bir necha soniyadan keyin qayta urinib ko\'ring.'
+      const msg = Array.isArray(cleanMsg) ? (cleanMsg as string[]).join(', ') : cleanMsg
+      // Also clean Agent Router error prefix for display
+      const displayMsg = msg.replace(/^Agent Router error \[.*?\].*?attempt=\d+:\s*/, '')
+      setError(displayMsg)
       setStep(5)
     } finally {
       setLoading(false)
@@ -1672,7 +1680,16 @@ export default function OnboardingPage() {
             )}
 
             {/* Error */}
-            {error && <Alert variant="error">{error}</Alert>}
+            {error && (
+              <div className="space-y-2">
+                <Alert variant="error">{error}</Alert>
+                {createdWorkspaceId && (
+                  <p className="text-xs text-[#6B7280] text-center">
+                    Workspace yaratildi. Dashboard'ga o'tib keyinroq strategiya yaratishingiz mumkin.
+                  </p>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Footer buttons */}
@@ -1697,15 +1714,28 @@ export default function OnboardingPage() {
                   Dashboardni ochish →
                 </Button>
               ) : (
-                <Button
-                  fullWidth={step === 1}
-                  size="lg"
-                  onClick={handleNext}
-                  loading={loading}
-                  className={step > 1 ? 'flex-1' : ''}
-                >
-                  {step === 5 ? '🤖 Strategiya yaratish →' : 'Davom etish →'}
-                </Button>
+                <div className="flex gap-2 flex-1">
+                  {/* Show "Go to Dashboard" if workspace was created but strategy failed */}
+                  {error && createdWorkspaceId && step === 5 && (
+                    <Button
+                      variant="secondary"
+                      size="lg"
+                      onClick={() => router.push('/dashboard')}
+                      className="flex-1"
+                    >
+                      Dashboard →
+                    </Button>
+                  )}
+                  <Button
+                    fullWidth={step === 1 || !(error && createdWorkspaceId && step === 5)}
+                    size="lg"
+                    onClick={handleNext}
+                    loading={loading}
+                    className={step > 1 ? 'flex-1' : ''}
+                  >
+                    {step === 5 ? '🤖 Strategiya yaratish →' : 'Davom etish →'}
+                  </Button>
+                </div>
               )}
             </div>
           )}
