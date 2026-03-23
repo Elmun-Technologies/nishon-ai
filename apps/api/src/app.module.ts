@@ -52,7 +52,7 @@ import { RequestLoggingInterceptor } from "./common/interceptors/request-logging
               }),
           ssl: (isProduction || databaseUrl) ? { rejectUnauthorized: false } : false,
           entities: [__dirname + "/**/*.entity{.ts,.js}"],
-          synchronize: !isProduction,
+          synchronize: config.get<string>('TYPEORM_SYNCHRONIZE', String(!isProduction)) === 'true',
           logging: !isProduction,
         };
       },

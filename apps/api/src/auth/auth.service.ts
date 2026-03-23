@@ -60,7 +60,7 @@ export class AuthService {
       .where("user.email = :email", { email: dto.email })
       .getOne();
 
-    if (!user) {
+    if (!user || !user.password) {
       throw new UnauthorizedException("Invalid email or password");
     }
 
@@ -205,7 +205,7 @@ export class AuthService {
       .where("user.email = :email", { email })
       .getOne();
 
-    if (!user) return null;
+    if (!user || !user.password) return null;
 
     const isValid = await bcrypt.compare(password, user.password);
     return isValid ? user : null;
