@@ -120,6 +120,49 @@ export class AuthService {
   }
 
   /**
+   * Find or create a user from Google OAuth profile data.
+   * Looks up by googleId first, then by email (to link existing accounts),
+   * otherwise creates a new user record.
+   */
+  async findOrCreateFromGoogle(profile: {
+    googleId: string;
+    email: string;
+    name: string;
+    picture?: string;
+  }): Promise<AuthResponseDto> {
+    // First try to find by googleId
+    let user = await this.userRepo.findOne({
+      where: { googleId: profile.googleId },
+    });
+
+    if (!user) {
+      // Try to link existing email account
+      user = await this.userRepo.findOne({ where: { email: profile.email } });
+      if (user) {
+        // Link Google to existing account
+        await this.userRepo.update(user.id, {
+          googleId: profile.googleId,
+          picture:  profile.picture ?? user.picture,
+        });
+        user.googleId = profile.googleId;
+      } else {
+        // Create a brand-new user
+        user = await this.userRepo.save(
+          this.userRepo.create({
+            email:    profile.email,
+            name:     profile.name,
+            googleId: profile.googleId,
+            picture:  profile.picture ?? null,
+            password: null,
+          }),
+        );
+      }
+    }
+
+    return this.generateAuthResponse(user);
+  }
+
+  /**
    * Validate user credentials — called by LocalStrategy during login.
    */
   async validateUser(email: string, password: string): Promise<User | null> {

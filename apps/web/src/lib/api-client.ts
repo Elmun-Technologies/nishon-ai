@@ -127,6 +127,7 @@ export const auth = {
   login: (data: { email: string; password: string }) =>
     apiClient.post('/auth/login', data),
   me: () => apiClient.get('/auth/me'),
+  googleUrl: () => `${API_BASE_URL}/auth/google`,
 }
 
 export const workspaces = {

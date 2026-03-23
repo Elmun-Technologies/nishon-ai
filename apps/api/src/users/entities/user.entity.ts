@@ -29,9 +29,10 @@ export class User {
   @Column({ unique: true, length: 255 })
   email: string;
 
-  @Column({ length: 255, select: false })
+  @Column({ length: 255, nullable: true, select: false })
   // select: false means password is NOT returned by default in queries — security measure
-  password: string;
+  // nullable: true for Google OAuth users who have no password
+  password: string | null;
 
   @Column({ length: 100, nullable: true })
   name: string | null;
@@ -49,6 +50,14 @@ export class User {
   @Column({ type: "text", nullable: true, select: false })
   // Stores hashed refresh token in DB for invalidation on logout
   refreshToken: string | null;
+
+  /** Google OAuth subject ID — null for email/password users */
+  @Column({ length: 255, nullable: true, unique: true })
+  googleId: string | null;
+
+  /** Profile picture URL from Google (optional) */
+  @Column({ type: "text", nullable: true })
+  picture: string | null;
 
   @CreateDateColumn()
   createdAt: Date;
