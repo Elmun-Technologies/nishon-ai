@@ -11,6 +11,7 @@ import { Alert } from '@/components/ui/Alert'
 import { PlatformIcon } from '@/components/ui/PlatformIcon'
 import { campaigns as campaignsApi } from '@/lib/api-client'
 import { formatCurrency, timeAgo } from '@/lib/utils'
+import { CreateCampaignForm } from '@/components/campaigns/CreateCampaignForm'
 
 interface Campaign {
   id: string
@@ -43,6 +44,7 @@ export default function CampaignsPage() {
   const [filter, setFilter] = useState<'all' | 'active' | 'paused' | 'draft'>('all')
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [actionError, setActionError] = useState('')
+  const [showCreatePanel, setShowCreatePanel] = useState(false)
 
   const fetchCampaigns = useCallback(async () => {
     if (!currentWorkspace?.id) return
@@ -108,9 +110,18 @@ export default function CampaignsPage() {
             All advertising campaigns managed by Nishon AI
           </p>
         </div>
-        <Button variant="secondary" size="sm" onClick={fetchCampaigns}>
-          ↻ Refresh
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="secondary" size="sm" onClick={fetchCampaigns}>
+            ↻ Yangilash
+          </Button>
+          <button
+            onClick={() => setShowCreatePanel(true)}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-sm font-semibold transition-colors shadow-lg shadow-[#7C3AED]/25"
+          >
+            <span className="text-base leading-none">+</span>
+            Kampaniya yaratish
+          </button>
+        </div>
       </div>
 
       {error && <Alert variant="error">{error}</Alert>}
@@ -294,15 +305,54 @@ export default function CampaignsPage() {
             <div className="flex items-center gap-3">
               <span className="text-xl">🔗</span>
               <div>
-                <p className="text-white text-sm font-medium">Connect more platforms</p>
-                <p className="text-[#6B7280] text-xs">Add Google, TikTok, or Telegram to expand your reach</p>
+                <p className="text-white text-sm font-medium">Ko'proq platformalar ulash</p>
+                <p className="text-[#6B7280] text-xs">Google, TikTok yoki Telegram qo'shib qamrovni kengaytiring</p>
               </div>
             </div>
             <Button variant="secondary" size="sm" onClick={() => window.location.href = '/settings/meta'}>
-              Connect Platform
+              Platforma ulash
             </Button>
           </div>
         </Card>
+      )}
+
+      {/* ── Create Campaign slide-over panel ── */}
+      {showCreatePanel && (
+        <div className="fixed inset-0 z-50 flex">
+          {/* Backdrop */}
+          <div
+            className="flex-1 bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowCreatePanel(false)}
+          />
+          {/* Panel */}
+          <div className="w-full max-w-lg bg-[#0D0D15] border-l border-[#2A2A3A] flex flex-col shadow-2xl">
+            {/* Panel header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#2A2A3A]">
+              <div>
+                <h2 className="text-white font-semibold">Yangi kampaniya</h2>
+                <p className="text-[#6B7280] text-xs mt-0.5">{currentWorkspace?.name}</p>
+              </div>
+              <button
+                onClick={() => setShowCreatePanel(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-[#6B7280] hover:text-white hover:bg-[#1C1C27] transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+            {/* Panel body */}
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              <CreateCampaignForm
+                workspaceId={currentWorkspace?.id ?? ''}
+                platform="meta"
+                onSuccess={() => {
+                  setShowCreatePanel(false)
+                  fetchCampaigns()
+                }}
+                onCancel={() => setShowCreatePanel(false)}
+              />
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

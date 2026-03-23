@@ -160,6 +160,8 @@ export const aiAgent = {
 export const campaigns = {
   list: (workspaceId: string) =>
     apiClient.get(`/campaigns/workspace/${workspaceId}`),
+  create: (workspaceId: string, dto: Record<string, unknown>) =>
+    apiClient.post(`/campaigns/workspace/${workspaceId}`, dto),
   updateStatus: (id: string, status: string) =>
     apiClient.patch(`/campaigns/${id}/status`, { status }),
   delete: (id: string) =>

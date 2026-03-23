@@ -11,7 +11,8 @@ import {
 import { Workspace } from "../../workspaces/entities/workspace.entity";
 import { AdSet } from "../../ad-sets/entities/ad-set.entity";
 import { AiDecision } from "../../ai-decisions/entities/ai-decision.entity";
-import { Platform, CampaignStatus, CampaignObjective } from "@nishon/shared";
+import { Platform, CampaignStatus, CampaignObjective, BudgetType, CampaignCurrency } from "@nishon/shared";
+import type { CampaignSchedule } from "@nishon/shared";
 
 /**
  * A Campaign is the top-level advertising unit on any platform.
@@ -45,6 +46,20 @@ export class Campaign {
 
   @Column({ type: "decimal", precision: 10, scale: 2, nullable: true })
   totalBudget: number | null;
+
+  /** Budget amount as entered by user (daily or weekly) */
+  @Column({ type: "decimal", precision: 12, scale: 2, nullable: true })
+  budget: number | null;
+
+  @Column({ type: "enum", enum: BudgetType, default: BudgetType.DAILY })
+  budgetType: BudgetType;
+
+  @Column({ type: "enum", enum: CampaignCurrency, default: CampaignCurrency.USD })
+  currency: CampaignCurrency;
+
+  /** Display schedule: { always: true } or { always: false, hours: [9,10,...] } */
+  @Column({ type: "jsonb", nullable: true })
+  schedule: CampaignSchedule | null;
 
   @Column({ nullable: true, length: 255 })
   // The campaign ID assigned by the ad platform (Meta, Google, etc.)
