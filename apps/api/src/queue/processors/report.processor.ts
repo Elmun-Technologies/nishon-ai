@@ -2,13 +2,27 @@ import { Processor, Process, OnQueueFailed } from "@nestjs/bull";
 import { Logger } from "@nestjs/common";
 import { Job } from "bull";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { Repository, MoreThanOrEqual } from "typeorm";
 import { ConfigService } from "@nestjs/config";
 import { Workspace } from "../../workspaces/entities/workspace.entity";
+import { AiDecision } from "../../ai-decisions/entities/ai-decision.entity";
+import { PerformanceMetric } from "../../analytics/entities/performance-metric.entity";
 import { QUEUE_NAMES } from "../queue.constants";
 
 interface ReportJobData {
   workspaceId: string;
+}
+
+interface ReportData {
+  workspaceName: string;
+  date: string;
+  totalSpend: number;
+  totalRevenue: number;
+  totalConversions: number;
+  roas: number;
+  activeCampaigns: number;
+  aiDecisionsToday: number;
+  topAdName: string | null;
 }
 
 /**
@@ -33,6 +47,10 @@ export class ReportProcessor {
   constructor(
     @InjectRepository(Workspace)
     private readonly workspaceRepo: Repository<Workspace>,
+    @InjectRepository(AiDecision)
+    private readonly decisionRepo: Repository<AiDecision>,
+    @InjectRepository(PerformanceMetric)
+    private readonly metricRepo: Repository<PerformanceMetric>,
     private readonly config: ConfigService,
   ) {}
 
@@ -47,36 +65,83 @@ export class ReportProcessor {
 
     if (!workspace) return;
 
-    // TODO: Get actual yesterday's metrics from analytics service
-    // For now we build the report structure — metrics will come from analytics module
-    const reportData = await this.buildReportData(workspace);
-
-    // Send to Telegram if bot token and chat ID are configured
     const botToken = this.config.get<string>("TELEGRAM_BOT_TOKEN");
-    const chatId = (workspace as any).telegramChatId;
+    const chatId = workspace.telegramChatId;
 
-    if (botToken && chatId) {
-      await this.sendTelegramMessage(botToken, chatId, reportData);
-    } else {
+    if (!botToken || !chatId) {
       this.logger.log(
         `Telegram not configured for workspace ${workspaceId} — skipping report`,
       );
+      return;
     }
+
+    const reportData = await this.buildReportData(workspace);
+    await this.sendTelegramMessage(botToken, chatId, reportData);
   }
 
-  private async buildReportData(workspace: Workspace) {
-    // TODO: Replace with real metrics from PerformanceMetric entity
+  private async buildReportData(workspace: Workspace): Promise<ReportData> {
+    // Yesterday's date range
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    yesterday.setHours(0, 0, 0, 0);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Aggregate yesterday's metrics across all ads in this workspace
+    const metricsRaw = await this.metricRepo
+      .createQueryBuilder("m")
+      .innerJoin("m.ad", "ad")
+      .innerJoin("ad.adSet", "adSet")
+      .innerJoin("adSet.campaign", "campaign")
+      .where("campaign.workspaceId = :wid", { wid: workspace.id })
+      .andWhere("m.recordedAt >= :yesterday", { yesterday })
+      .andWhere("m.recordedAt < :today", { today })
+      .select([
+        "COALESCE(SUM(m.spend), 0) AS spend",
+        "COALESCE(SUM(m.conversions), 0) AS conversions",
+        "COALESCE(SUM(m.revenue), 0) AS revenue",
+      ])
+      .getRawOne();
+
+    const totalSpend = parseFloat(metricsRaw?.spend ?? "0") || 0;
+    const totalRevenue = parseFloat(metricsRaw?.revenue ?? "0") || 0;
+    const totalConversions = parseInt(metricsRaw?.conversions ?? "0") || 0;
+    const roas = totalSpend > 0 ? totalRevenue / totalSpend : 0;
+
+    // Count AI decisions made since midnight today
+    const aiDecisionsToday = await this.decisionRepo.count({
+      where: {
+        workspaceId: workspace.id,
+        createdAt: MoreThanOrEqual(today),
+      },
+    });
+
+    // Find best performing ad by ROAS yesterday
+    const topAdRaw = await this.metricRepo
+      .createQueryBuilder("m")
+      .innerJoin("m.ad", "ad")
+      .innerJoin("ad.adSet", "adSet")
+      .innerJoin("adSet.campaign", "campaign")
+      .where("campaign.workspaceId = :wid", { wid: workspace.id })
+      .andWhere("m.recordedAt >= :yesterday", { yesterday })
+      .andWhere("m.recordedAt < :today", { today })
+      .andWhere("m.spend > 0")
+      .select(["ad.name AS adName", "m.roas AS roas"])
+      .orderBy("m.roas", "DESC")
+      .limit(1)
+      .getRawOne();
+
     return {
       workspaceName: workspace.name,
-      date: new Date().toLocaleDateString("uz-UZ"),
-      totalSpend: 0,
-      totalLeads: 0,
-      totalRevenue: 0,
-      roas: 0,
+      date: yesterday.toLocaleDateString("uz-UZ"),
+      totalSpend,
+      totalRevenue,
+      totalConversions,
+      roas,
       activeCampaigns:
         workspace.campaigns?.filter((c) => c.status === "active").length || 0,
-      aiDecisionsToday: 0,
-      topAdName: null,
+      aiDecisionsToday,
+      topAdName: topAdRaw?.adName ?? null,
     };
   }
 
@@ -88,10 +153,9 @@ export class ReportProcessor {
   private async sendTelegramMessage(
     botToken: string,
     chatId: string,
-    data: any,
+    data: ReportData,
   ): Promise<void> {
     const message = this.buildTelegramMessage(data);
-
     const telegramApiUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
 
     try {
@@ -106,7 +170,8 @@ export class ReportProcessor {
       });
 
       if (!response.ok) {
-        throw new Error(`Telegram API error: ${response.status}`);
+        const errorBody = await response.text();
+        throw new Error(`Telegram API error: ${response.status} — ${errorBody}`);
       }
 
       this.logger.log(
@@ -118,10 +183,10 @@ export class ReportProcessor {
     }
   }
 
-  private buildTelegramMessage(data: any): string {
+  private buildTelegramMessage(data: ReportData): string {
     const roasEmoji = data.roas >= 3 ? "🚀" : data.roas >= 1 ? "📈" : "⚠️";
-    const spendFormatted = `$${Number(data.totalSpend).toFixed(2)}`;
-    const revenueFormatted = `$${Number(data.totalRevenue).toFixed(2)}`;
+    const spendFormatted = `$${data.totalSpend.toFixed(2)}`;
+    const revenueFormatted = `$${data.totalRevenue.toFixed(2)}`;
 
     return `
 <b>📊 Nishon AI — Kunlik Hisobot</b>
@@ -129,14 +194,14 @@ export class ReportProcessor {
 
 💰 <b>Sarflandi:</b> ${spendFormatted}
 💵 <b>Daromad:</b> ${revenueFormatted}
-${roasEmoji} <b>ROAS:</b> ${Number(data.roas).toFixed(2)}x
-🎯 <b>Leadlar:</b> ${data.totalLeads} ta
+${roasEmoji} <b>ROAS:</b> ${data.roas.toFixed(2)}x
+🎯 <b>Leadlar:</b> ${data.totalConversions} ta
 📢 <b>Aktiv kampaniyalar:</b> ${data.activeCampaigns} ta
 
 🤖 <b>AI bugun:</b> ${data.aiDecisionsToday} ta qaror qabul qildi
 ${data.topAdName ? `🔥 <b>Eng yaxshi reklama:</b> "${data.topAdName}"` : ""}
 
-<i>Batafsil: nishon.ai/dashboard</i>
+<i>Batafsil: nishon-ai-web.vercel.app/dashboard</i>
     `.trim();
   }
 

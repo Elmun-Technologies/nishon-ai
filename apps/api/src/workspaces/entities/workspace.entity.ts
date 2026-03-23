@@ -81,6 +81,14 @@ export class Workspace {
   @Column({ length: 100, default: "Uzbekistan" })
   targetLocation: string;
 
+  /**
+   * Telegram chat ID for daily report delivery.
+   * User gets this by messaging @NishonAIBot and running /start.
+   * If null, daily reports are skipped for this workspace.
+   */
+  @Column({ type: 'varchar', length: 64, nullable: true })
+  telegramChatId: string | null;
+
   @CreateDateColumn()
   createdAt: Date;
 

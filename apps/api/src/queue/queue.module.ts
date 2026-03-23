@@ -9,13 +9,15 @@ import { ReportProcessor } from "./processors/report.processor";
 import { QueueService } from "./queue.service";
 import { CronService } from "./cron.service";
 import { Workspace } from "../workspaces/entities/workspace.entity";
+import { AiDecision } from "../ai-decisions/entities/ai-decision.entity";
+import { PerformanceMetric } from "../analytics/entities/performance-metric.entity";
 import { AiAgentModule } from "../ai-agent/ai-agent.module";
 import { QUEUE_NAMES } from "./queue.constants";
 
 @Module({
   imports: [
     ConfigModule,
-    TypeOrmModule.forFeature([Workspace]),
+    TypeOrmModule.forFeature([Workspace, AiDecision, PerformanceMetric]),
     // Register Bull queues — each connects to Redis automatically
     BullModule.forRootAsync({
       imports: [ConfigModule],
