@@ -49,6 +49,14 @@ export class MetaInsight {
   @Column({ type: "decimal", precision: 10, scale: 4, default: 0 })
   cpc: number;
 
+  /** Number of conversions (purchases) */
+  @Column({ type: "integer", default: 0 })
+  conversions: number;
+
+  /** Total conversion value/revenue in account currency */
+  @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
+  conversionValue: number;
+
   /** The date this insight snapshot covers (UTC midnight) */
   @Column({ type: "date" })
   date: Date;
