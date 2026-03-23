@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { workspaces as workspacesApi } from '@/lib/api-client'
+import { workspaces as workspacesApi, auth } from '@/lib/api-client'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { Spinner } from '@/components/ui/Spinner'
 
@@ -32,14 +32,9 @@ export default function GoogleCallbackPage() {
         localStorage.setItem('nishon_refresh_token', refreshToken!)
         setAccessToken(accessToken!)
 
-        // Fetch current user
-        const meRes = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/auth/me`,
-          { headers: { Authorization: `Bearer ${accessToken}` } }
-        )
-        if (!meRes.ok) throw new Error('me failed')
-        const user = await meRes.json()
-        setUser(user)
+        // Fetch current user (apiClient reads token from localStorage automatically)
+        const meRes = await auth.me()
+        setUser((meRes as any).data)
 
         // Check if workspace exists
         const wsRes = await workspacesApi.list()
