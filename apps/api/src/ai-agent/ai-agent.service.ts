@@ -30,7 +30,7 @@ export class AiAgentService {
   ) {
     const apiKey  = this.config.get<string>("AGENT_ROUTER_API_KEY", "");
     const baseURL =
-      (this.config.get<string>("AGENT_ROUTER_BASE_URL") || "https://api.agentrouter.org")
+      (this.config.get<string>("AGENT_ROUTER_BASE_URL") || "https://agentrouter.org")
         .replace(/\/$/, "") + "/v1";
     this.aiClient = new NishonAiClient(apiKey, baseURL);
   }

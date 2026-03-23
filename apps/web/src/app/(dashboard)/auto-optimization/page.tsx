@@ -153,6 +153,7 @@ function HealthScore({ score }: { score: number }) {
 // ─── Demo input ───────────────────────────────────────────────────────────────
 
 const DEMO_PAYLOAD = {
+  platform: 'meta' as const,
   performance: {
     campaignId: 'demo-campaign-1',
     campaignName: 'Summer Sale 2024',

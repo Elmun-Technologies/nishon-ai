@@ -83,6 +83,9 @@ export class NishonAiClient {
             { role: 'user',   content: prompt },
           ],
         })
+        if (!response.choices || response.choices.length === 0) {
+          throw new Error(`Empty response from AI provider: ${JSON.stringify(response).slice(0, 300)}`)
+        }
         return {
           content:    response.choices[0]?.message?.content ?? '',
           tokensUsed: response.usage?.total_tokens ?? 0,

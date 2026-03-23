@@ -51,7 +51,7 @@ export class DecisionLoopService {
   ) {
     const apiKey = this.config.get<string>("AGENT_ROUTER_API_KEY") || "";
     const baseURL =
-      (this.config.get<string>("AGENT_ROUTER_BASE_URL") || "https://api.agentrouter.org").replace(/\/$/, "") + "/v1";
+      (this.config.get<string>("AGENT_ROUTER_BASE_URL") || "https://agentrouter.org").replace(/\/$/, "") + "/v1";
     if (apiKey) {
       this.aiClient = new NishonAiClient(apiKey, baseURL);
     } else {
