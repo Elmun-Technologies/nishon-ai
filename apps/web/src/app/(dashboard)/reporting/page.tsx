@@ -23,6 +23,7 @@ interface ReportCampaign {
   name: string
   status: string
   objective: string | null
+  tags?: string[]
   metrics: CampaignMetrics
 }
 
@@ -80,6 +81,10 @@ export default function ReportingPage() {
   const [days, setDays] = useState(30)
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
   const [exporting, setExporting] = useState(false)
+  // Tags: map of campaignId → current tags
+  const [campaignTags, setCampaignTags] = useState<Record<string, string[]>>({})
+  const [editingTagId, setEditingTagId] = useState<string | null>(null)
+  const [tagInput, setTagInput] = useState('')
 
   const load = useCallback(() => {
     if (!currentWorkspace?.id) return
@@ -111,6 +116,33 @@ export default function ReportingPage() {
       setError('CSV eksportda xatolik')
     } finally {
       setExporting(false)
+    }
+  }
+
+  async function saveTag(campaignId: string, newTag: string) {
+    if (!currentWorkspace?.id || !newTag.trim()) return
+    const current = campaignTags[campaignId] ?? []
+    if (current.includes(newTag.trim())) return
+    const next = [...current, newTag.trim()]
+    setCampaignTags((prev) => ({ ...prev, [campaignId]: next }))
+    setTagInput('')
+    try {
+      await metaApi.setTags(campaignId, currentWorkspace.id, next)
+    } catch {
+      // revert
+      setCampaignTags((prev) => ({ ...prev, [campaignId]: current }))
+    }
+  }
+
+  async function removeTag(campaignId: string, tag: string) {
+    if (!currentWorkspace?.id) return
+    const current = campaignTags[campaignId] ?? []
+    const next = current.filter((t) => t !== tag)
+    setCampaignTags((prev) => ({ ...prev, [campaignId]: next }))
+    try {
+      await metaApi.setTags(campaignId, currentWorkspace.id, next)
+    } catch {
+      setCampaignTags((prev) => ({ ...prev, [campaignId]: current }))
     }
   }
 
@@ -313,6 +345,36 @@ export default function ReportingPage() {
                                 <span className="text-[10px] text-[#4B5563] bg-[#1C1C27] border border-[#2A2A3A] px-1.5 py-0.5 rounded">
                                   {campaign.objective.replace('OUTCOME_', '')}
                                 </span>
+                              )}
+                            </div>
+                            {/* Tags row */}
+                            <div className="pl-14 flex items-center gap-1.5 flex-wrap mt-1">
+                              {(campaignTags[campaign.id] ?? campaign.tags ?? []).map((tag) => (
+                                <span key={tag} className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-[#7C3AED]/20 text-[#A78BFA] border border-[#7C3AED]/30">
+                                  {tag}
+                                  <button onClick={() => removeTag(campaign.id, tag)} className="hover:text-red-400 leading-none">×</button>
+                                </span>
+                              ))}
+                              {editingTagId === campaign.id ? (
+                                <input
+                                  autoFocus
+                                  value={tagInput}
+                                  onChange={(e) => setTagInput(e.target.value)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') saveTag(campaign.id, tagInput)
+                                    if (e.key === 'Escape') setEditingTagId(null)
+                                  }}
+                                  onBlur={() => setEditingTagId(null)}
+                                  placeholder="teg nomi..."
+                                  className="text-[10px] px-2 py-0.5 rounded-full bg-[#1E1E2E] border border-[#7C3AED] text-white placeholder-[#4B5563] outline-none w-24"
+                                />
+                              ) : (
+                                <button
+                                  onClick={() => { setEditingTagId(campaign.id); setTagInput('') }}
+                                  className="text-[10px] text-[#4B5563] hover:text-[#7C3AED] border border-dashed border-[#2A2A3A] hover:border-[#7C3AED] px-2 py-0.5 rounded-full transition-colors"
+                                >
+                                  + teg
+                                </button>
                               )}
                             </div>
                           </td>

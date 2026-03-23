@@ -12,6 +12,8 @@ import { Alert } from '@/components/ui/Alert'
 import { workspaces as workspacesApi, aiAgent, meta as metaApi } from '@/lib/api-client'
 import { formatCurrency, formatNumber } from '@/lib/utils'
 import { SpendForecastChart } from '@/components/ui/SpendForecastChart'
+import { LearningMonitor } from '@/components/dashboard/LearningMonitor'
+import { ChatWidget } from '@/components/ui/ChatWidget'
 
 interface SparklinePoint { day: string; spend: number; clicks: number }
 
@@ -178,34 +180,42 @@ export default function DashboardPage() {
         />
       </div>
 
-      {/* ── Spend Forecast (Smartly-style) ── */}
-      {forecast && forecast.daily?.length > 0 && (
-        <Card>
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <h2 className="text-base font-semibold text-white">Oylik xarajat bashorati</h2>
-              <p className="text-xs text-[#6B7280] mt-0.5">
-                {forecast.daysElapsed} kun o'tdi · {forecast.daysTotal} kunlik oy
-              </p>
-            </div>
-            <div className="flex items-center gap-4 text-right">
+      {/* ── Learning Monitor + Spend Forecast row ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {currentWorkspace && (
+          <LearningMonitor workspaceId={currentWorkspace.id} />
+        )}
+        {/* Spend Forecast (Smartly-style) — takes 2/3 columns */}
+        {forecast && forecast.daily?.length > 0 && (
+        <div className="lg:col-span-2">
+          <Card>
+            <div className="flex items-start justify-between mb-4">
               <div>
-                <p className="text-xs text-[#6B7280]">Hozircha sarflandi</p>
-                <p className="text-white font-bold text-lg">${forecast.spendToDate?.toFixed(0)}</p>
+                <h2 className="text-base font-semibold text-white">Oylik xarajat bashorati</h2>
+                <p className="text-xs text-[#6B7280] mt-0.5">
+                  {forecast.daysElapsed} kun o'tdi · {forecast.daysTotal} kunlik oy
+                </p>
               </div>
-              <div>
-                <p className="text-xs text-[#6B7280]">Oy oxiriga bashorat</p>
-                <p className="text-[#A78BFA] font-bold text-lg">${forecast.predictedTotal?.toFixed(0)}</p>
+              <div className="flex items-center gap-4 text-right">
+                <div>
+                  <p className="text-xs text-[#6B7280]">Hozircha sarflandi</p>
+                  <p className="text-white font-bold text-lg">${forecast.spendToDate?.toFixed(0)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-[#6B7280]">Oy oxiriga bashorat</p>
+                  <p className="text-[#A78BFA] font-bold text-lg">${forecast.predictedTotal?.toFixed(0)}</p>
+                </div>
               </div>
             </div>
-          </div>
-          <SpendForecastChart
-            daily={forecast.daily}
-            spendToDate={forecast.spendToDate}
-            predictedTotal={forecast.predictedTotal}
-          />
-        </Card>
-      )}
+            <SpendForecastChart
+              daily={forecast.daily}
+              spendToDate={forecast.spendToDate}
+              predictedTotal={forecast.predictedTotal}
+            />
+          </Card>
+        </div>
+        )}
+      </div>
 
       {/* ── Best performing ads (Smartly-style) ── */}
       {topAds.length > 0 && (
@@ -408,6 +418,9 @@ export default function DashboardPage() {
           </div>
         </div>
       </Card>
+
+      {/* ── AI Chat Widget ── */}
+      <ChatWidget />
     </div>
   )
 }

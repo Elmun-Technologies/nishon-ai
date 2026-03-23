@@ -8,6 +8,7 @@ import {
   HttpCode,
   HttpStatus,
   Logger,
+  Param,
   Post,
   Query,
   Req,
@@ -418,6 +419,7 @@ export class MetaController {
           name:      c.name,
           status:    c.status,
           objective: c.objective,
+          tags:      c.tags ?? [],
           metrics:   metricByCampaign[c.id] ?? { spend: 0, clicks: 0, impressions: 0, ctr: 0, cpc: 0 },
         }));
 
@@ -551,6 +553,62 @@ export class MetaController {
       daysTotal: daysInMonth,
       daily,
     };
+  }
+
+  // ─── Learning Monitor ─────────────────────────────────────────────────────────
+
+  @Get("learning-monitor")
+  @ApiOperation({ summary: "Ad set delivery status breakdown for Learning Monitor widget" })
+  @ApiQuery({ name: "workspaceId" })
+  async learningMonitor(
+    @Query("workspaceId") workspaceId: string | undefined,
+    @Req() req: Request,
+  ) {
+    if (!workspaceId) throw new BadRequestException("workspaceId is required");
+    await this.assertWorkspaceOwnership(workspaceId, this.getRequestUserId(req));
+
+    // Use MetaCampaignSync status as a proxy for ad set delivery.
+    // Real ad set status would require syncing ad sets separately.
+    const rows = await this.campaignRepo
+      .createQueryBuilder("c")
+      .where("c.workspaceId = :wid", { wid: workspaceId })
+      .select(["c.status AS status", "COUNT(*) AS cnt"])
+      .groupBy("c.status")
+      .getRawMany();
+
+    // Normalise to four buckets used in Smartly's Learning Monitor
+    let active = 0, learning = 0, limited = 0, paused = 0;
+    for (const r of rows) {
+      const s = (r.status as string).toUpperCase();
+      const n = parseInt(r.cnt, 10) || 0;
+      if (s === "ACTIVE") active += n;
+      else if (s === "PAUSED" || s === "ARCHIVED" || s === "DELETED") paused += n;
+      else learning += n; // any other status counts as learning/in-progress
+    }
+
+    const total = active + learning + limited + paused;
+    return { total, active, learning, limited, paused };
+  }
+
+  // ─── Campaign Tags ────────────────────────────────────────────────────────────
+
+  @Post("campaigns/:campaignId/tags")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: "Set tags for a Meta campaign" })
+  async setTags(
+    @Param("campaignId") campaignId: string,
+    @Query("workspaceId") workspaceId: string | undefined,
+    @Body() body: { tags: string[] },
+    @Req() req: Request,
+  ) {
+    if (!workspaceId) throw new BadRequestException("workspaceId is required");
+    await this.assertWorkspaceOwnership(workspaceId, this.getRequestUserId(req));
+
+    const campaign = await this.campaignRepo.findOne({ where: { id: campaignId, workspaceId } });
+    if (!campaign) throw new BadRequestException("Campaign not found");
+
+    await this.campaignRepo.update({ id: campaignId }, { tags: body.tags });
+    return { id: campaignId, tags: body.tags };
   }
 
   // ─── Private: workspace ownership ────────────────────────────────────────────

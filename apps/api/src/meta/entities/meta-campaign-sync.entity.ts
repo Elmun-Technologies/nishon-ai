@@ -72,6 +72,10 @@ export class MetaCampaignSync {
   @Column({ name: "ad_account_id", length: 50 })
   adAccountId: string;
 
+  /** User-defined tags for filtering (e.g. "Flash Sale", "Dynamic Ads") */
+  @Column({ type: "simple-array", nullable: true })
+  tags: string[];
+
   @OneToMany(() => MetaInsight, (insight) => insight.campaign, {
     cascade: true,
   })

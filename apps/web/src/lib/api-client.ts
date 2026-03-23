@@ -203,6 +203,10 @@ export const meta = {
     apiClient.get(`/meta/reporting/export?workspaceId=${encodeURIComponent(workspaceId)}&days=${days}`),
   spendForecast: (workspaceId: string) =>
     apiClient.get(`/meta/spend-forecast?workspaceId=${encodeURIComponent(workspaceId)}`),
+  learningMonitor: (workspaceId: string) =>
+    apiClient.get(`/meta/learning-monitor?workspaceId=${encodeURIComponent(workspaceId)}`),
+  setTags: (campaignId: string, workspaceId: string, tags: string[]) =>
+    apiClient.post(`/meta/campaigns/${campaignId}/tags?workspaceId=${encodeURIComponent(workspaceId)}`, { tags }),
 }
 
 export const triggersets = {

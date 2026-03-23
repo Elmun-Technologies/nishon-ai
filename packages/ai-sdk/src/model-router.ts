@@ -5,6 +5,7 @@
  *   strategy / competitor → gpt-4o   (deep reasoning, complex multi-step planning)
  *   creative / analytics  → gpt-4o-mini (speed, volume, structured output)
  *   vision / optimization → gpt-4o-mini (vision-capable, cost-effective, consistent)
+ *   chat                  → gpt-4o-mini (fast, friendly, low-latency)
  *
  * Token limits act as a hard ceiling per request to prevent runaway costs.
  * They can be overridden per-call by passing `maxTokens` in CompleteOptions.
@@ -17,6 +18,7 @@ export type AgentTask =
   | 'analytics'     // Structured data analysis — consistency over depth
   | 'vision'        // Image scoring / creative analysis — multimodal
   | 'optimization'  // Autonomous campaign optimization — data-driven, consistent
+  | 'chat'          // Conversational assistant — fast, friendly, concise
 
 /** Model assigned per task type */
 export const TASK_MODELS: Record<AgentTask, string> = {
@@ -26,6 +28,7 @@ export const TASK_MODELS: Record<AgentTask, string> = {
   analytics:    'gpt-4o-mini',  // Structured output, consistency over depth
   vision:       'gpt-4o-mini',  // Vision-capable and cost-effective
   optimization: 'gpt-4o-mini',  // Data-driven decisions, needs low variance
+  chat:         'gpt-4o-mini',  // Fast conversational responses
 }
 
 /** Max output tokens per task — hard ceiling to prevent cost overruns */
@@ -36,6 +39,7 @@ export const TASK_TOKEN_LIMITS: Record<AgentTask, number> = {
   analytics:    2000,
   vision:       2000,
   optimization: 2000,
+  chat:         600,
 }
 
 /** Returns the recommended model for the given task type */
