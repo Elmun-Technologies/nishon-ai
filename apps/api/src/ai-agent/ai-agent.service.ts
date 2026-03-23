@@ -58,8 +58,10 @@ export class AiAgentService {
     businessContext: any
   }): Promise<any> {
     const { NishonAiClient } = await import("@nishon/ai-sdk")
-    const apiKey = this.config.get<string>("OPENROUTER_API_KEY", "")
-    const client = new NishonAiClient(apiKey)
+    const apiKey = this.config.get<string>("AGENT_ROUTER_API_KEY", "")
+    const baseURL =
+      (this.config.get<string>("AGENT_ROUTER_BASE_URL") || "https://api.agentrouter.org").replace(/\/$/, "") + "/v1"
+    const client = new NishonAiClient(apiKey, baseURL)
 
     const systemPrompt = `
 You are an expert digital marketing analyst who has audited 100+ businesses
@@ -267,8 +269,10 @@ Be specific, actionable, and write all notes in Uzbek language.
 
   async generateAdScripts(workspaceId: string, dto: any): Promise<any> {
     const { NishonAiClient } = await import("@nishon/ai-sdk")
-    const apiKey = this.config.get<string>("OPENROUTER_API_KEY", "")
-    const client = new NishonAiClient(apiKey)
+    const apiKey = this.config.get<string>("AGENT_ROUTER_API_KEY", "")
+    const baseURL =
+      (this.config.get<string>("AGENT_ROUTER_BASE_URL") || "https://api.agentrouter.org").replace(/\/$/, "") + "/v1"
+    const client = new NishonAiClient(apiKey, baseURL)
 
     const platforms: string[] = dto.platforms || ["meta"]
 
@@ -405,10 +409,10 @@ For video scripts, write exactly what the person says on camera or voiceover.
     workspaceContext: any
   }): Promise<any> {
     const { NishonAiClient } = await import("@nishon/ai-sdk")
-    const apiKey = this.config.get<string>("OPENROUTER_API_KEY", "")
-
-    const OpenAI = (await import('openai')).default
-    const openai = new OpenAI({ apiKey, baseURL: 'https://openrouter.ai/api/v1' })
+    const apiKey = this.config.get<string>("AGENT_ROUTER_API_KEY", "")
+    const baseURL =
+      (this.config.get<string>("AGENT_ROUTER_BASE_URL") || "https://api.agentrouter.org").replace(/\/$/, "") + "/v1"
+    const client = new NishonAiClient(apiKey, baseURL)
 
     const systemPrompt = `
 You are an expert ad creative analyst with 15+ years experience
@@ -484,29 +488,12 @@ Please evaluate this creative image and provide scores for all 10 parameters.
 Write all feedback in Uzbek language.
 `
 
-    const response = await openai.chat.completions.create({
-      model: 'openai/gpt-4o',
-      max_tokens: 2000,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'image_url',
-              image_url: {
-                url: `data:${dto.mimeType};base64,${dto.imageBase64}`,
-                detail: 'high',
-              },
-            },
-            { type: 'text', text: userMessage },
-          ],
-        },
-      ],
-    })
-
-    const content = response.choices[0]?.message?.content ?? ''
-    const cleaned = content.replace(/```json\n?|\n?```/g, '').trim()
-    return JSON.parse(cleaned)
+    return client.completeVision(
+      dto.imageBase64,
+      dto.mimeType,
+      userMessage,
+      systemPrompt,
+      { maxTokens: 2000 },
+    )
   }
 }

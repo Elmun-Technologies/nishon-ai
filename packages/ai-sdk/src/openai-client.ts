@@ -13,26 +13,26 @@ interface CompleteResult {
 }
 
 /**
- * NishonAI OpenAI client with retry logic and error handling.
+ * NishonAI client powered by Agent Router.
  * All AI features (strategy generation, script writing, optimization)
  * go through this single client so we can monitor usage and costs centrally.
  */
 export class NishonAiClient {
   private client: OpenAI
-  private defaultModel = 'openai/gpt-4o'
+  private defaultModel = 'gpt-4o-mini'
   private maxRetries = 3
 
-  constructor(apiKey: string) {
+  constructor(apiKey: string, baseURL: string) {
     this.client = new OpenAI({
       apiKey,
-      baseURL: 'https://openrouter.ai/api/v1',
+      baseURL,
       timeout: 45_000,   // 45s per request — prevents Render 504 timeouts
       maxRetries: 0,     // we handle retries ourselves below
     })
   }
 
   /**
-   * Send a prompt to GPT-4o and get a completion back.
+   * Send a prompt to the AI model and get a completion back.
    * Automatically retries up to 3 times with exponential backoff
    * if the API returns a rate limit or server error.
    */
@@ -75,13 +75,13 @@ export class NishonAiClient {
             error?.message ||
             String(error)
           throw new Error(
-            `OpenRouter API error (status ${error?.status ?? 'unknown'}) after ${attempt} attempt(s): ${detail}`
+            `Agent Router API error (status ${error?.status ?? 'unknown'}) after ${attempt} attempt(s): ${detail}`
           )
         }
 
         // Exponential backoff: wait 1s, then 2s, then 4s
         const waitMs = Math.pow(2, attempt - 1) * 1000
-        console.warn(`OpenAI attempt ${attempt} failed. Retrying in ${waitMs}ms...`)
+        console.warn(`Agent Router attempt ${attempt} failed. Retrying in ${waitMs}ms...`)
         await this.sleep(waitMs)
       }
     }
@@ -110,6 +110,72 @@ export class NishonAiClient {
     } catch {
       throw new Error(`Model returned invalid JSON: ${result.content.slice(0, 200)}`)
     }
+  }
+
+  /**
+   * Vision-capable completion — accepts an image (base64) alongside text.
+   * Used for creative scoring and any other multimodal analysis.
+   */
+  async completeVision<T = any>(
+    imageBase64: string,
+    mimeType: string,
+    textPrompt: string,
+    systemPrompt: string,
+    options: CompleteOptions = {}
+  ): Promise<T> {
+    const model = options.model ?? this.defaultModel
+    const maxTokens = options.maxTokens ?? 2000
+
+    let lastError: Error | null = null
+
+    for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
+      try {
+        const response = await this.client.chat.completions.create({
+          model,
+          max_tokens: maxTokens,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            {
+              role: 'user',
+              content: [
+                {
+                  type: 'image_url',
+                  image_url: {
+                    url: `data:${mimeType};base64,${imageBase64}`,
+                    detail: 'high',
+                  },
+                },
+                { type: 'text', text: textPrompt },
+              ],
+            },
+          ],
+        })
+
+        const content = response.choices[0]?.message?.content ?? ''
+        const cleaned = content.replace(/```json\n?|\n?```/g, '').trim()
+        return JSON.parse(cleaned) as T
+
+      } catch (error: any) {
+        lastError = error
+
+        const isRetryable = error?.status === 429 || error?.status >= 500
+        if (!isRetryable || attempt === this.maxRetries) {
+          const detail =
+            error?.error?.message ||
+            error?.message ||
+            String(error)
+          throw new Error(
+            `Agent Router vision API error (status ${error?.status ?? 'unknown'}) after ${attempt} attempt(s): ${detail}`
+          )
+        }
+
+        const waitMs = Math.pow(2, attempt - 1) * 1000
+        console.warn(`Agent Router vision attempt ${attempt} failed. Retrying in ${waitMs}ms...`)
+        await this.sleep(waitMs)
+      }
+    }
+
+    throw lastError
   }
 
   private sleep(ms: number): Promise<void> {

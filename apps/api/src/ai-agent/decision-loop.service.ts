@@ -49,11 +49,13 @@ export class DecisionLoopService {
     @InjectRepository(Workspace)
     private readonly workspaceRepo: Repository<Workspace>,
   ) {
-    const apiKey = this.config.get<string>("OPENROUTER_API_KEY");
+    const apiKey = this.config.get<string>("AGENT_ROUTER_API_KEY") || "";
+    const baseURL =
+      (this.config.get<string>("AGENT_ROUTER_BASE_URL") || "https://api.agentrouter.org").replace(/\/$/, "") + "/v1";
     if (apiKey) {
-      this.aiClient = new NishonAiClient(apiKey);
+      this.aiClient = new NishonAiClient(apiKey, baseURL);
     } else {
-      this.logger.warn("OPENROUTER_API_KEY is not configured - AI decision loop will be unavailable");
+      this.logger.warn("AGENT_ROUTER_API_KEY is not configured - AI decision loop will be unavailable");
     }
   }
 
