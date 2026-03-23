@@ -138,6 +138,9 @@ export const workspaces = {
   setAutopilot: (id: string, mode: string) =>
     apiClient.patch(`/workspaces/${id}/autopilot`, { mode }),
   performance: (id: string) => apiClient.get(`/workspaces/${id}/performance`),
+  getPolicy: (id: string) => apiClient.get(`/workspaces/${id}/policy`),
+  updatePolicy: (id: string, policy: any) =>
+    apiClient.patch(`/workspaces/${id}/policy`, policy),
 }
 
 export const aiAgent = {

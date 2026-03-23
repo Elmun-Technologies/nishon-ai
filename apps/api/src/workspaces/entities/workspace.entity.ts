@@ -62,6 +62,22 @@ export class Workspace {
   @Column({ default: false })
   isOnboardingComplete: boolean;
 
+  /**
+   * Per-workspace auto-optimization policy.
+   * Null = use SAFE_DEFAULTS (nothing auto-applied without approval).
+   * See WorkspacePolicy type in action-policy.ts.
+   */
+  @Column({ type: 'jsonb', nullable: true })
+  optimizationPolicy: {
+    allowAutoBudgetChange: boolean;
+    maxAutoBudgetChangePct: number;
+    allowAutoCreativeRefresh: boolean;
+    allowAutoPauseCreative: boolean;
+    allowAudienceChanges: boolean;
+    protectedCampaignIds: string[];
+    protectedAdSetIds: string[];
+  } | null;
+
   @Column({ length: 100, default: "Uzbekistan" })
   targetLocation: string;
 

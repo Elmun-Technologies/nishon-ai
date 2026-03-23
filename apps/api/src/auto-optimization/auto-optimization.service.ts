@@ -7,6 +7,7 @@ import { scoreAndRankActions } from './action-scorer';
 import { governActions, SAFE_DEFAULTS } from './policy/action-policy';
 import type { WorkspacePolicy } from './policy/action-policy';
 import { OptimizationRun } from './entities/optimization-run.entity';
+import { Workspace } from '../workspaces/entities/workspace.entity';
 import { RunOptimizationDto } from './dto/run-optimization.dto';
 import type {
   OptimizationReport,
@@ -43,6 +44,8 @@ export class AutoOptimizationService {
     private readonly optimizerAgent: OptimizerAgentService,
     @InjectRepository(OptimizationRun)
     private readonly runRepo: Repository<OptimizationRun>,
+    @InjectRepository(Workspace)
+    private readonly workspaceRepo: Repository<Workspace>,
   ) {}
 
   // ─── Main entry point ──────────────────────────────────────────────────────
@@ -50,11 +53,13 @@ export class AutoOptimizationService {
   async runOptimization(
     workspaceId: string,
     dto: RunOptimizationDto,
-    workspacePolicy?: WorkspacePolicy,
   ): Promise<OptimizationReport> {
     const startTime = Date.now();
     const { performance: campaign, mode, goal, constraints } = dto;
-    const policy = workspacePolicy ?? SAFE_DEFAULTS;
+
+    // Load workspace policy from DB — fall back to SAFE_DEFAULTS if not configured
+    const ws = await this.workspaceRepo.findOne({ where: { id: workspaceId } });
+    const policy: WorkspacePolicy = (ws?.optimizationPolicy as WorkspacePolicy) ?? SAFE_DEFAULTS;
 
     this.logger.log(
       `[${workspaceId}] Optimization run started — campaign="${campaign.campaignName}"` +

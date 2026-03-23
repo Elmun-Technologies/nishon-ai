@@ -82,6 +82,22 @@ export class WorkspacesController {
     return this.workspacesService.getPerformanceSummary(id, req.user.id);
   }
 
+  @Get(":id/policy")
+  @ApiOperation({ summary: "Get workspace optimization policy" })
+  async getPolicy(@Request() req: any, @Param("id") id: string) {
+    return this.workspacesService.getPolicy(id, req.user.id);
+  }
+
+  @Patch(":id/policy")
+  @ApiOperation({ summary: "Update workspace optimization policy" })
+  async updatePolicy(
+    @Request() req: any,
+    @Param("id") id: string,
+    @Body() body: Record<string, any>,
+  ) {
+    return this.workspacesService.updatePolicy(id, req.user.id, body);
+  }
+
   @Delete(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: "Delete a workspace and all its data" })

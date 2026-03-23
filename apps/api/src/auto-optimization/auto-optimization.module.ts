@@ -5,6 +5,7 @@ import { AutoOptimizationController } from './auto-optimization.controller';
 import { AutoOptimizationService } from './auto-optimization.service';
 import { OptimizerAgentService } from './optimizer-agent.service';
 import { OptimizationRun } from './entities/optimization-run.entity';
+import { Workspace } from '../workspaces/entities/workspace.entity';
 
 /**
  * AutoOptimizationModule
@@ -20,7 +21,7 @@ import { OptimizationRun } from './entities/optimization-run.entity';
 @Module({
   imports: [
     ConfigModule,
-    TypeOrmModule.forFeature([OptimizationRun]),
+    TypeOrmModule.forFeature([OptimizationRun, Workspace]),
   ],
   controllers: [AutoOptimizationController],
   providers: [
