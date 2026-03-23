@@ -6,6 +6,7 @@ export enum Platform {
   TELEGRAM = 'telegram',
   SNAPCHAT = 'snapchat',
   LINKEDIN = 'linkedin',
+  YANDEX = 'yandex',
 }
 
 export enum PlatformLabel {
@@ -16,4 +17,5 @@ export enum PlatformLabel {
   telegram = 'Telegram Ads',
   snapchat = 'Snapchat Ads',
   linkedin = 'LinkedIn Ads',
+  yandex = 'Yandex Direct',
 }

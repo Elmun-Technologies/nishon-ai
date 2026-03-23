@@ -11,6 +11,7 @@ import * as crypto from "crypto";
 import { ConnectedAccount } from "./entities/connected-account.entity";
 import { Workspace } from "../workspaces/entities/workspace.entity";
 import { MetaConnector } from "./connectors/meta.connector";
+import { YandexConnector } from "./connectors/yandex.connector";
 import { Platform } from "@nishon/shared";
 
 /**
@@ -33,6 +34,7 @@ export class PlatformsService {
     @InjectRepository(Workspace)
     private readonly workspaceRepo: Repository<Workspace>,
     private readonly metaConnector: MetaConnector,
+    private readonly yandexConnector: YandexConnector,
     private readonly config: ConfigService,
   ) {
     // Encryption key must be exactly 32 chars for AES-256
@@ -186,6 +188,61 @@ export class PlatformsService {
     });
     if (!account) throw new NotFoundException("Connected account not found");
     await this.accountRepo.remove(account);
+  }
+
+  // ─── YANDEX DIRECT OAUTH FLOW ─────────────────────────────────────────────
+
+  getYandexOAuthUrl(workspaceId: string): string {
+    return this.yandexConnector.getOAuthUrl(workspaceId);
+  }
+
+  /**
+   * Handle the OAuth callback from Yandex.
+   *
+   * Flow:
+   * 1. User approved on Yandex → Yandex redirects here with ?code=XXX&state=YYY
+   * 2. We decode state to get workspaceId
+   * 3. We exchange the code for an access token
+   * 4. We get the advertiser login associated with the token
+   * 5. We save the token (encrypted) to the database
+   */
+  async handleYandexCallback(
+    code: string,
+    state: string,
+  ): Promise<{ workspaceId: string; accounts: any[] }> {
+    let workspaceId: string;
+
+    try {
+      const decoded = JSON.parse(Buffer.from(state, "base64").toString("utf8"));
+      workspaceId = decoded.workspaceId;
+    } catch {
+      throw new BadRequestException("Invalid state parameter");
+    }
+
+    const workspace = await this.workspaceRepo.findOne({
+      where: { id: workspaceId },
+    });
+    if (!workspace) throw new NotFoundException("Workspace not found");
+
+    const { accessToken, expiresAt } =
+      await this.yandexConnector.exchangeCodeForToken(code);
+
+    const accounts = await this.yandexConnector.getAdAccounts(accessToken);
+    const encryptedToken = this.encrypt(accessToken);
+
+    await this.accountRepo.save(
+      this.accountRepo.create({
+        workspaceId,
+        platform: Platform.YANDEX,
+        accessToken: encryptedToken,
+        externalAccountId: accounts[0]?.id ?? "pending",
+        externalAccountName: accounts[0]?.name ?? "Yandex Direct Account",
+        isActive: true,
+        tokenExpiresAt: expiresAt,
+      }),
+    );
+
+    return { workspaceId, accounts };
   }
 
   // ─── ENCRYPTION HELPERS ───────────────────────────────────────────────────

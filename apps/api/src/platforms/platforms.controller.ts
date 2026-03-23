@@ -88,6 +88,52 @@ export class PlatformsController {
     );
   }
 
+  // ─── YANDEX DIRECT OAUTH ──────────────────────────────────────────────────
+
+  @Get("yandex/connect/:workspaceId")
+  @UseGuards(AuthGuard("jwt"))
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: "Start Yandex Direct OAuth flow — redirects user to Yandex",
+  })
+  @Redirect()
+  connectYandex(@Param("workspaceId") workspaceId: string) {
+    const url = this.platformsService.getYandexOAuthUrl(workspaceId);
+    return { url, statusCode: 302 };
+  }
+
+  @Get("yandex/callback")
+  @ApiOperation({
+    summary:
+      "Yandex Direct OAuth callback — handles code exchange (called by Yandex, not frontend)",
+  })
+  @ApiQuery({
+    name: "code",
+    description: "Temporary authorization code from Yandex",
+  })
+  @ApiQuery({ name: "state", description: "Base64-encoded workspace ID" })
+  async yandexCallback(
+    @Query("code") code: string,
+    @Query("state") state: string,
+    @Query("error") error: string,
+  ) {
+    if (error) {
+      return { success: false, error: "User denied Yandex permissions" };
+    }
+
+    const result = await this.platformsService.handleYandexCallback(
+      code,
+      state,
+    );
+
+    return {
+      success: true,
+      workspaceId: result.workspaceId,
+      accounts: result.accounts,
+      message: "Yandex Direct account connected successfully",
+    };
+  }
+
   // ─── CONNECTED ACCOUNTS ───────────────────────────────────────────────────
 
   @Get("accounts/:workspaceId")
