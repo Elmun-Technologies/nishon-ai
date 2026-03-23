@@ -165,7 +165,22 @@ class AIAgentService {
     }
   }
 
-  async analyzePerformance(data: any): Promise<any> {
+  async estimateBudget(budget: number, objective: string): Promise<{ estimatedClicks: number; estimatedConversions: number; hint: string }> {
+    await new Promise(resolve => setTimeout(resolve, 600))
+    const mult = objective === 'sales' ? 2.0 : objective === 'leads' ? 1.5 : 1.0
+    const clicks = Math.round(budget * 10 * mult)
+    const convs = Math.round(clicks * 0.05)
+    return { estimatedClicks: clicks, estimatedConversions: convs, hint: `~${clicks} klik va ~${convs} konversiya kutiladi` }
+  }
+
+  async generateImagePrompt(productName: string, benefits: string[]): Promise<{ prompt: string }> {
+    await new Promise(resolve => setTimeout(resolve, 800))
+    return {
+      prompt: `Professional product photo of ${productName}, highlighting ${benefits.slice(0, 2).join(' and ')}, clean white background, high-end commercial photography style`
+    }
+  }
+
+  async analyzePerformance(data: unknown): Promise<unknown> {
     // Mock performance analysis
     return {
       suggestions: [

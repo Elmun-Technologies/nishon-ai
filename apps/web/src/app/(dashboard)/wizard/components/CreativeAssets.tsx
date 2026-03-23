@@ -64,14 +64,11 @@ export function CreativeAssets({
   }
 
   const handleImagePromptGeneration = async () => {
-    const prompt = await generateImagePrompt({
-      productName: formData.productName,
-      style: formData.creatives.imageStyle,
-      description: formData.creatives.primaryText,
-      keywords: formData.creatives.keywords,
-      platform: 'meta'
-    })
-    onFormDataChange('creatives', { ...formData.creatives, imagePrompt: prompt })
+    const result = await generateImagePrompt(
+      formData.productName ?? '',
+      formData.creatives.keywords ?? []
+    )
+    if (result) onFormDataChange('creatives', { ...formData.creatives, imagePrompt: result.prompt })
   }
 
   return (
