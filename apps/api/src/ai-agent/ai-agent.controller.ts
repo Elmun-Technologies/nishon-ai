@@ -136,4 +136,41 @@ export class AiAgentController {
   ) {
     return this.aiAgentService.chat(dto);
   }
+
+  @Post("wizard/ad-copy")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: "Generate ad copy for campaign wizard",
+    description: "Returns platform-specific headlines, descriptions, and CTA.",
+  })
+  async generateWizardAdCopy(
+    @Body()
+    dto: {
+      productName: string;
+      benefits: string[];
+      objective: string;
+      audience: string;
+      platform: string;
+    },
+  ) {
+    return this.aiAgentService.generateWizardAdCopy(dto);
+  }
+
+  @Post("wizard/keywords")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: "Generate keyword suggestions for campaign wizard",
+    description: "Returns keywords, negative keywords, and match types.",
+  })
+  async generateWizardKeywords(
+    @Body()
+    dto: {
+      productName: string;
+      niche: string;
+      platform: string;
+      matchType?: string;
+    },
+  ) {
+    return this.aiAgentService.generateWizardKeywords(dto);
+  }
 }
