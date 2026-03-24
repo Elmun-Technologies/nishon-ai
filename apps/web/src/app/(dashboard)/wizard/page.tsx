@@ -7,7 +7,8 @@ import { Card } from '@/components/ui/Card'
 import { PageSpinner } from '@/components/ui/Spinner'
 import { PlatformIcon } from '@/components/ui/PlatformIcon'
 import { formatCurrency } from '@/lib/utils'
-import { aiAgent, AdCopyRequest, KeywordRequest } from '@/lib/ai-agent'
+import { campaigns, aiAgent } from '@/lib/api-client'
+import { useWorkspaceStore } from '@/stores/workspace.store'
 
 // Types
 interface Platform {
@@ -190,6 +191,7 @@ const CURRENCIES = ['UZS', 'USD', 'EUR', 'RUB']
 
 export default function CampaignWizardPage() {
   const router = useRouter()
+  const { currentWorkspace } = useWorkspaceStore()
   const [currentStep, setCurrentStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [aiLoading, setAiLoading] = useState(false)
@@ -332,36 +334,60 @@ export default function CampaignWizardPage() {
   }
 
   const handlePublish = async () => {
+    if (!currentWorkspace?.id) return
     setLoading(true)
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    setLoading(false)
-    router.push('/campaigns')
+    try {
+      const platformsToCreate = formData.platforms.length > 0 ? formData.platforms : ['meta']
+      await Promise.all(
+        platformsToCreate.map((platform) =>
+          campaigns.create(currentWorkspace.id, {
+            name: formData.name,
+            platform,
+            objective: formData.objective,
+            dailyBudget: formData.budget.type === 'daily' ? formData.budget.amount : null,
+            totalBudget: formData.budget.type === 'weekly' ? formData.budget.amount * 7 : null,
+            startDate: formData.schedule.startDate || null,
+            endDate: formData.schedule.alwaysOn ? null : formData.schedule.endDate || null,
+            aiConfig: {
+              strategy: formData.strategy,
+              utm: formData.utm,
+              geoTargeting: formData.geoTargeting,
+              adGroup: formData.adGroup,
+              creative: formData.creative,
+              aiOptimization: formData.aiOptimization,
+            },
+          })
+        )
+      )
+      router.push('/campaigns')
+    } catch (error) {
+      console.error('Error creating campaign:', error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleGenerateKeywords = async () => {
     setAiLoading(true)
     try {
-      const request: KeywordRequest = {
+      const res = await aiAgent.wizardKeywords({
         productName: formData.name || 'Product',
         niche: formData.objective,
         platform: formData.platforms[0] || 'meta',
-        matchType: 'broad'
-      }
-      
-      const response = await aiAgent.generateKeywords(request)
-      
+        matchType: 'broad',
+      })
+      const response = (res as any).data ?? res
       setFormData(prev => ({
         ...prev,
         adGroup: {
           ...prev.adGroup,
           keywords: {
             ...prev.adGroup.keywords,
-            phrases: response.keywords,
-            matchTypes: response.matchTypes
+            phrases: response.keywords || [],
+            matchTypes: response.matchTypes || {},
           },
-          negativeKeywords: response.negativeKeywords
-        }
+          negativeKeywords: response.negativeKeywords || [],
+        },
       }))
     } catch (error) {
       console.error('Error generating keywords:', error)
@@ -373,25 +399,23 @@ export default function CampaignWizardPage() {
   const handleGenerateAdCopy = async () => {
     setAiLoading(true)
     try {
-      const request: AdCopyRequest = {
+      const res = await aiAgent.wizardAdCopy({
         productName: formData.name || 'Product',
         benefits: ['High Quality', 'Fast Delivery', 'Best Price'],
         objective: formData.objective,
         audience: 'Target Audience',
-        platform: formData.platforms[0] || 'meta'
-      }
-      
-      const response = await aiAgent.generateAdCopy(request)
-      
+        platform: formData.platforms[0] || 'meta',
+      })
+      const response = (res as any).data ?? res
       setFormData(prev => ({
         ...prev,
         creative: {
           ...prev.creative,
-          headlines: response.headlines,
-          descriptions: response.descriptions,
-          cta: response.cta,
-          primaryText: response.primaryText || ''
-        }
+          headlines: response.headlines || [],
+          descriptions: response.descriptions || [],
+          cta: response.cta || '',
+          primaryText: response.primaryText || '',
+        },
       }))
     } catch (error) {
       console.error('Error generating ad copy:', error)

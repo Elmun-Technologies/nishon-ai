@@ -155,11 +155,26 @@ export const aiAgent = {
     apiClient.patch(`/ai-agent/decisions/${decisionId}/approve`, {}),
   rejectDecision: (decisionId: string) =>
     apiClient.patch(`/ai-agent/decisions/${decisionId}/reject`, {}),
+  wizardAdCopy: (data: {
+    productName: string
+    benefits: string[]
+    objective: string
+    audience: string
+    platform: string
+  }) => apiClient.post('/ai-agent/wizard/ad-copy', data),
+  wizardKeywords: (data: {
+    productName: string
+    niche: string
+    platform: string
+    matchType?: string
+  }) => apiClient.post('/ai-agent/wizard/keywords', data),
 }
 
 export const campaigns = {
   list: (workspaceId: string) =>
     apiClient.get(`/campaigns/workspace/${workspaceId}`),
+  create: (workspaceId: string, data: any) =>
+    apiClient.post(`/campaigns/workspace/${workspaceId}`, data),
   updateStatus: (id: string, status: string) =>
     apiClient.patch(`/campaigns/${id}/status`, { status }),
   delete: (id: string) =>
