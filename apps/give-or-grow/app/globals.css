@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #0F172A;
+  --surface: #1E293B;
+  --primary-green: #22C55E;
+  --warning-orange: #F97316;
+  --foreground: #F8FAFC;
+  --muted: #94A3B8;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
