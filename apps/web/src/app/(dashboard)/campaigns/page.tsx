@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { useRealtimeRefresh } from '@/hooks/useRealtimeRefresh'
 import { Button } from '@/components/ui/Button'
@@ -35,6 +36,7 @@ const OBJECTIVE_LABELS: Record<string, string> = {
 }
 
 export default function CampaignsPage() {
+  const router = useRouter()
   const { currentWorkspace } = useWorkspaceStore()
   const [items, setItems] = useState<Campaign[]>([])
   const [loading, setLoading] = useState(true)
@@ -108,9 +110,14 @@ export default function CampaignsPage() {
             All advertising campaigns managed by Nishon AI
           </p>
         </div>
-        <Button variant="secondary" size="sm" onClick={fetchCampaigns}>
-          ↻ Refresh
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="secondary" size="sm" onClick={fetchCampaigns}>
+            ↻ Refresh
+          </Button>
+          <Button variant="primary" size="sm" onClick={() => router.push('/wizard')}>
+            + Create Campaign
+          </Button>
+        </div>
       </div>
 
       {error && <Alert variant="error">{error}</Alert>}
@@ -162,10 +169,17 @@ export default function CampaignsPage() {
             title={filter === 'all' ? 'No campaigns yet' : `No ${filter} campaigns`}
             description={
               filter === 'all'
-                ? 'Connect your Meta or Google account to let Nishon AI create and manage campaigns automatically.'
+                ? 'Create your first campaign using the wizard or connect your ad account to sync existing campaigns.'
                 : `You have no campaigns with "${filter}" status right now.`
             }
           />
+          {filter === 'all' && (
+            <div className="flex justify-center pb-6">
+              <Button variant="primary" onClick={() => router.push('/wizard')}>
+                + Create Campaign
+              </Button>
+            </div>
+          )}
         </Card>
       ) : (
         <div className="space-y-3">
