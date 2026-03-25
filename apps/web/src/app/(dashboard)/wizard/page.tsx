@@ -583,39 +583,71 @@ function Step1Platforms({ formData, setFormData }: { formData: CampaignFormData,
   )
 }
 
+const BIDDING_STRATEGIES_BY_PLATFORM: Record<string, { value: string; label: string }[]> = {
+  meta: [
+    { value: 'highest_volume', label: 'Highest Volume' },
+    { value: 'cost_per_result_goal', label: 'Cost per Result Goal' },
+    { value: 'bid_cap', label: 'Bid Cap' },
+    { value: 'roas_goal', label: 'ROAS Goal' },
+  ],
+  google: [
+    { value: 'maximize_clicks', label: 'Maximize Clicks' },
+    { value: 'maximize_conversions', label: 'Maximize Conversions' },
+    { value: 'target_cpa', label: 'Target CPA' },
+    { value: 'target_roas', label: 'Target ROAS' },
+    { value: 'manual_cpc', label: 'Manual CPC' },
+  ],
+  yandex: [
+    { value: 'maximize_clicks', label: 'Maximize Clicks' },
+    { value: 'target_cpa', label: 'Target CPA' },
+    { value: 'target_roas', label: 'Target ROAS' },
+    { value: 'manual', label: 'Manual Bidding' },
+  ],
+  telegram: [
+    { value: 'cpm', label: 'CPM (per 1000 views)' },
+    { value: 'cpc', label: 'CPC (per click)' },
+  ],
+}
+
+const HOURS_24 = Array.from({ length: 24 }, (_, i) => i)
+
 function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFormData, setFormData: React.Dispatch<React.SetStateAction<CampaignFormData>> }) {
+  const primaryPlatform = formData.platforms[0] || 'meta'
+  const biddingOptions = BIDDING_STRATEGIES_BY_PLATFORM[primaryPlatform] || BIDDING_STRATEGIES_BY_PLATFORM.meta
+  const selectedHours: string[] = formData.schedule.hours || []
+
+  const toggleHour = (h: string) => {
+    const next = selectedHours.includes(h)
+      ? selectedHours.filter((x: string) => x !== h)
+      : [...selectedHours, h]
+    setFormData(prev => ({ ...prev, schedule: { ...prev.schedule, hours: next } }))
+  }
+
+  const cls = "w-full px-3 py-2 bg-[#2A2A3A] border border-[#3A3A4A] rounded-lg text-white focus:outline-none focus:border-[#7C3AED]"
+  const lbl = "block text-sm font-medium text-[#6B7280] mb-2"
+
+  const quickLinks: string[] = formData.extensions.quickLinks || []
+  const clarifiers: string[] = formData.extensions.clarifiers || []
+
   return (
     <div className="space-y-8">
-      {/* Basic Settings */}
+      <h2 className="text-xl font-semibold text-white">Campaign Settings</h2>
+
+      {/* ── Basic ── */}
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold text-white">Campaign Settings</h2>
-        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-[#6B7280] mb-2">
-              Campaign Name
-            </label>
-            <input
-              type="text"
-              value={formData.name}
+            <label className={lbl}>Campaign Name</label>
+            <input type="text" value={formData.name}
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              className="w-full px-3 py-2 bg-[#2A2A3A] border border-[#3A3A4A] rounded-lg text-white placeholder-[#6B7280] focus:outline-none focus:border-[#7C3AED]"
-              placeholder="Enter campaign name"
-            />
+              className={`${cls} placeholder-[#6B7280]`} placeholder="Enter campaign name" />
           </div>
-          
           <div>
-            <label className="block text-sm font-medium text-[#6B7280] mb-2">
-              Objective
-            </label>
-            <select
-              value={formData.objective}
+            <label className={lbl}>Objective</label>
+            <select value={formData.objective}
               onChange={(e) => setFormData(prev => ({ ...prev, objective: e.target.value }))}
-              className="w-full px-3 py-2 bg-[#2A2A3A] border border-[#3A3A4A] rounded-lg text-white focus:outline-none focus:border-[#7C3AED]"
-            >
-              {OBJECTIVES.map(obj => (
-                <option key={obj.value} value={obj.value}>{obj.label}</option>
-              ))}
+              className={cls}>
+              {OBJECTIVES.map(obj => <option key={obj.value} value={obj.value}>{obj.label}</option>)}
             </select>
           </div>
         </div>
@@ -623,50 +655,24 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
         {/* Budget */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-[#6B7280] mb-2">
-              Budget Amount
-            </label>
-            <input
-              type="number"
-              value={formData.budget.amount}
-              onChange={(e) => setFormData(prev => ({ 
-                ...prev, 
-                budget: { ...prev.budget, amount: Number(e.target.value) } 
-              }))}
-              className="w-full px-3 py-2 bg-[#2A2A3A] border border-[#3A3A4A] rounded-lg text-white focus:outline-none focus:border-[#7C3AED]"
-            />
+            <label className={lbl}>Budget Amount</label>
+            <input type="number" value={formData.budget.amount}
+              onChange={(e) => setFormData(prev => ({ ...prev, budget: { ...prev.budget, amount: Number(e.target.value) } }))}
+              className={cls} />
           </div>
-          
           <div>
-            <label className="block text-sm font-medium text-[#6B7280] mb-2">
-              Currency
-            </label>
-            <select
-              value={formData.budget.currency}
-              onChange={(e) => setFormData(prev => ({ 
-                ...prev, 
-                budget: { ...prev.budget, currency: e.target.value } 
-              }))}
-              className="w-full px-3 py-2 bg-[#2A2A3A] border border-[#3A3A4A] rounded-lg text-white focus:outline-none focus:border-[#7C3AED]"
-            >
-              {CURRENCIES.map(curr => (
-                <option key={curr} value={curr}>{curr}</option>
-              ))}
+            <label className={lbl}>Currency</label>
+            <select value={formData.budget.currency}
+              onChange={(e) => setFormData(prev => ({ ...prev, budget: { ...prev.budget, currency: e.target.value } }))}
+              className={cls}>
+              {CURRENCIES.map(curr => <option key={curr} value={curr}>{curr}</option>)}
             </select>
           </div>
-          
           <div>
-            <label className="block text-sm font-medium text-[#6B7280] mb-2">
-              Budget Type
-            </label>
-            <select
-              value={formData.budget.type}
-              onChange={(e) => setFormData(prev => ({ 
-                ...prev, 
-                budget: { ...prev.budget, type: e.target.value as 'daily' | 'weekly' } 
-              }))}
-              className="w-full px-3 py-2 bg-[#2A2A3A] border border-[#3A3A4A] rounded-lg text-white focus:outline-none focus:border-[#7C3AED]"
-            >
+            <label className={lbl}>Budget Type</label>
+            <select value={formData.budget.type}
+              onChange={(e) => setFormData(prev => ({ ...prev, budget: { ...prev.budget, type: e.target.value as 'daily' | 'weekly' } }))}
+              className={cls}>
               <option value="daily">Daily</option>
               <option value="weekly">Weekly</option>
             </select>
@@ -676,114 +682,390 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
         {/* Schedule */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-[#6B7280] mb-2">
-              Start Date
-            </label>
-            <input
-              type="date"
-              value={formData.schedule.startDate}
-              onChange={(e) => setFormData(prev => ({ 
-                ...prev, 
-                schedule: { ...prev.schedule, startDate: e.target.value } 
-              }))}
-              className="w-full px-3 py-2 bg-[#2A2A3A] border border-[#3A3A4A] rounded-lg text-white focus:outline-none focus:border-[#7C3AED]"
-            />
+            <label className={lbl}>Start Date</label>
+            <input type="date" value={formData.schedule.startDate}
+              onChange={(e) => setFormData(prev => ({ ...prev, schedule: { ...prev.schedule, startDate: e.target.value } }))}
+              className={cls} />
           </div>
-          
           <div>
-            <label className="block text-sm font-medium text-[#6B7280] mb-2">
-              End Date
-            </label>
-            <input
-              type="date"
-              value={formData.schedule.endDate}
-              onChange={(e) => setFormData(prev => ({ 
-                ...prev, 
-                schedule: { ...prev.schedule, endDate: e.target.value } 
-              }))}
-              className="w-full px-3 py-2 bg-[#2A2A3A] border border-[#3A3A4A] rounded-lg text-white focus:outline-none focus:border-[#7C3AED]"
-            />
+            <label className={lbl}>End Date</label>
+            <input type="date" value={formData.schedule.endDate}
+              disabled={formData.schedule.alwaysOn}
+              onChange={(e) => setFormData(prev => ({ ...prev, schedule: { ...prev.schedule, endDate: e.target.value } }))}
+              className={`${cls} disabled:opacity-40`} />
           </div>
+        </div>
+
+        {/* Always On + hour grid */}
+        <div className="space-y-3">
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input type="checkbox" checked={formData.schedule.alwaysOn}
+              onChange={(e) => setFormData(prev => ({ ...prev, schedule: { ...prev.schedule, alwaysOn: e.target.checked } }))}
+              className="w-4 h-4 accent-[#7C3AED]" />
+            <span className="text-white">Show ad 24/7 (Always On)</span>
+          </label>
+
+          {!formData.schedule.alwaysOn && (
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className={lbl} style={{ marginBottom: 0 }}>Ad Show Hours</span>
+                <button type="button" onClick={() => {
+                  const all = HOURS_24.map(String)
+                  const allSelected = all.every(h => selectedHours.includes(h))
+                  setFormData(prev => ({ ...prev, schedule: { ...prev.schedule, hours: allSelected ? [] : all } }))
+                }} className="text-xs text-[#7C3AED] hover:underline">
+                  {HOURS_24.every(h => selectedHours.includes(String(h))) ? 'Deselect All' : 'Select All'}
+                </button>
+              </div>
+              <div className="grid grid-cols-8 sm:grid-cols-12 gap-1">
+                {HOURS_24.map(h => {
+                  const key = String(h)
+                  const active = selectedHours.includes(key)
+                  return (
+                    <button key={h} type="button" onClick={() => toggleHour(key)}
+                      className={`py-1 rounded text-xs font-mono transition-colors ${active ? 'bg-[#7C3AED] text-white' : 'bg-[#2A2A3A] text-[#9CA3AF] hover:bg-[#3A3A4A]'}`}>
+                      {String(h).padStart(2, '0')}
+                    </button>
+                  )
+                })}
+              </div>
+              <p className="text-xs text-[#6B7280] mt-1">
+                {selectedHours.length === 0 ? 'No hours — ad will not run' : `${selectedHours.length}/24 hours selected`}
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* UTM Parameters */}
+      {/* ── Strategy & Bidding ── */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-white">Strategy & Bidding</h3>
+        {formData.platforms.length > 0 && (
+          <p className="text-xs text-[#6B7280]">
+            Showing strategies for <span className="text-[#7C3AED] capitalize">{primaryPlatform}</span>
+            {formData.platforms.length > 1 && ` (+${formData.platforms.length - 1} more)`}
+          </p>
+        )}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className={lbl}>Bidding Strategy</label>
+            <select value={formData.strategy.type}
+              onChange={(e) => setFormData(prev => ({ ...prev, strategy: { ...prev.strategy, type: e.target.value } }))}
+              className={cls}>
+              {biddingOptions.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className={lbl}>Bid Cap (optional)</label>
+            <input type="number" value={formData.strategy.bidCap || ''}
+              onChange={(e) => setFormData(prev => ({ ...prev, strategy: { ...prev.strategy, bidCap: Number(e.target.value) } }))}
+              placeholder="No cap" className={`${cls} placeholder-[#6B7280]`} />
+          </div>
+        </div>
+
+        {/* Ad Priority (Step 2i) */}
+        <div>
+          <label className={lbl}>Ad Priority</label>
+          <select value={(formData.strategy as any).adPriority || 'medium'}
+            onChange={(e) => setFormData(prev => ({ ...prev, strategy: { ...prev.strategy, adPriority: e.target.value } as any }))}
+            className={cls}>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+          <p className="text-xs text-[#6B7280] mt-1">Higher priority wins same-account auctions.</p>
+        </div>
+
+        {primaryPlatform === 'meta' && (
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input type="checkbox" checked={formData.strategy.advantagePlus}
+              onChange={(e) => setFormData(prev => ({ ...prev, strategy: { ...prev.strategy, advantagePlus: e.target.checked } }))}
+              className="w-4 h-4 accent-[#7C3AED]" />
+            <span className="text-white">Advantage+ Campaign Budget</span>
+          </label>
+        )}
+      </div>
+
+      {/* ── UTM Parameters ── */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-white">UTM Parameters</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input
-            type="text"
-            placeholder="utm_source"
-            value={formData.utm.source}
-            onChange={(e) => setFormData(prev => ({ ...prev, utm: { ...prev.utm, source: e.target.value } }))}
-            className="px-3 py-2 bg-[#2A2A3A] border border-[#3A3A4A] rounded-lg text-white placeholder-[#6B7280] focus:outline-none focus:border-[#7C3AED]"
-          />
-          <input
-            type="text"
-            placeholder="utm_medium"
-            value={formData.utm.medium}
-            onChange={(e) => setFormData(prev => ({ ...prev, utm: { ...prev.utm, medium: e.target.value } }))}
-            className="px-3 py-2 bg-[#2A2A3A] border border-[#3A3A4A] rounded-lg text-white placeholder-[#6B7280] focus:outline-none focus:border-[#7C3AED]"
-          />
-          <input
-            type="text"
-            placeholder="utm_campaign"
-            value={formData.utm.campaign}
-            onChange={(e) => setFormData(prev => ({ ...prev, utm: { ...prev.utm, campaign: e.target.value } }))}
-            className="px-3 py-2 bg-[#2A2A3A] border border-[#3A3A4A] rounded-lg text-white placeholder-[#6B7280] focus:outline-none focus:border-[#7C3AED]"
-          />
-          <input
-            type="text"
-            placeholder="utm_content"
-            value={formData.utm.content}
-            onChange={(e) => setFormData(prev => ({ ...prev, utm: { ...prev.utm, content: e.target.value } }))}
-            className="px-3 py-2 bg-[#2A2A3A] border border-[#3A3A4A] rounded-lg text-white placeholder-[#6B7280] focus:outline-none focus:border-[#7C3AED]"
-          />
+          {(['source', 'medium', 'campaign', 'content', 'term'] as const).map(field => (
+            <input key={field} type="text" placeholder={`utm_${field}`}
+              value={formData.utm[field]}
+              onChange={(e) => setFormData(prev => ({ ...prev, utm: { ...prev.utm, [field]: e.target.value } }))}
+              className={`${cls} placeholder-[#6B7280]`} />
+          ))}
         </div>
+        <p className="text-xs text-[#6B7280]">Dynamic: {'{keyword}'}, {'{campaign_id}'}, {'{placement}'}</p>
       </div>
 
-      {/* AI Optimization */}
+      {/* ── Ad Extensions ── */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-white">Ad Extensions</h3>
+
+        {/* Quick Links */}
+        <div>
+          <label className="flex items-center gap-3 cursor-pointer mb-2">
+            <input type="checkbox" checked={(formData.extensions.quickLinks?.length ?? 0) > 0 || false}
+              onChange={(e) => {
+                if (!e.target.checked) setFormData(prev => ({ ...prev, extensions: { ...prev.extensions, quickLinks: [] } }))
+                else setFormData(prev => ({ ...prev, extensions: { ...prev.extensions, quickLinks: [''] } }))
+              }}
+              className="w-4 h-4 accent-[#7C3AED]" />
+            <span className="text-white">Quick Links (Sitelinks)</span>
+          </label>
+          {(formData.extensions.quickLinks?.length ?? 0) > 0 && (
+            <div className="ml-7 space-y-2">
+              {[0, 1, 2, 3].map(idx => (
+                <input key={idx} type="text" placeholder={`Quick link ${idx + 1} title`}
+                  value={quickLinks[idx] || ''}
+                  onChange={(e) => {
+                    const next = [...quickLinks]
+                    next[idx] = e.target.value
+                    setFormData(prev => ({ ...prev, extensions: { ...prev.extensions, quickLinks: next } }))
+                  }}
+                  className={`${cls} placeholder-[#6B7280]`} />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Clarifiers */}
+        <div>
+          <label className="flex items-center gap-3 cursor-pointer mb-2">
+            <input type="checkbox" checked={(formData.extensions.clarifiers?.length ?? 0) > 0 || false}
+              onChange={(e) => {
+                if (!e.target.checked) setFormData(prev => ({ ...prev, extensions: { ...prev.extensions, clarifiers: [] } }))
+                else setFormData(prev => ({ ...prev, extensions: { ...prev.extensions, clarifiers: [''] } }))
+              }}
+              className="w-4 h-4 accent-[#7C3AED]" />
+            <span className="text-white">Clarifiers (Callouts)</span>
+          </label>
+          {(formData.extensions.clarifiers?.length ?? 0) > 0 && (
+            <div className="ml-7 space-y-2">
+              {[0, 1, 2, 3].map(idx => (
+                <input key={idx} type="text" placeholder={`Clarifier ${idx + 1} (e.g. Free Shipping)`}
+                  value={clarifiers[idx] || ''}
+                  onChange={(e) => {
+                    const next = [...clarifiers]
+                    next[idx] = e.target.value
+                    setFormData(prev => ({ ...prev, extensions: { ...prev.extensions, clarifiers: next } }))
+                  }}
+                  className={`${cls} placeholder-[#6B7280]`} />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Promo Code */}
+        <label className="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" checked={!!formData.extensions.promoCode}
+            onChange={(e) => {
+              if (!e.target.checked) setFormData(prev => ({ ...prev, extensions: { ...prev.extensions, promoCode: '' } }))
+            }}
+            className="w-4 h-4 accent-[#7C3AED]" />
+          <span className="text-white">Promo Code</span>
+        </label>
+        {!!formData.extensions.promoCode && (
+          <input type="text" placeholder="e.g. SAVE20" value={formData.extensions.promoCode}
+            onChange={(e) => setFormData(prev => ({ ...prev, extensions: { ...prev.extensions, promoCode: e.target.value } }))}
+            className={`${cls} placeholder-[#6B7280] ml-7`} />
+        )}
+
+        {/* Delivery */}
+        <label className="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" checked={!!formData.extensions.delivery}
+            onChange={(e) => setFormData(prev => ({ ...prev, extensions: { ...prev.extensions, delivery: e.target.checked } }))}
+            className="w-4 h-4 accent-[#7C3AED]" />
+          <span className="text-white">Delivery Extension</span>
+        </label>
+      </div>
+
+      {/* ── AI Optimization ── */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-white">AI Optimization</h3>
         <div className="space-y-3">
-          <label className="flex items-center gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={formData.aiOptimization.autoReplaceCreatives}
-              onChange={(e) => setFormData(prev => ({ 
-                ...prev, 
-                aiOptimization: { ...prev.aiOptimization, autoReplaceCreatives: e.target.checked } 
-              }))}
-              className="w-4 h-4 text-[#7C3AED] bg-[#2A2A3A] border-[#3A3A4A] rounded focus:ring-[#7C3AED]"
-            />
-            <span className="text-white">Automatically replace underperforming creatives</span>
-          </label>
-          
-          <label className="flex items-center gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={formData.aiOptimization.optimizeAudience}
-              onChange={(e) => setFormData(prev => ({ 
-                ...prev, 
-                aiOptimization: { ...prev.aiOptimization, optimizeAudience: e.target.checked } 
-              }))}
-              className="w-4 h-4 text-[#7C3AED] bg-[#2A2A3A] border-[#3A3A4A] rounded focus:ring-[#7C3AED]"
-            />
-            <span className="text-white">Optimize audience targeting automatically</span>
-          </label>
-          
-          <label className="flex items-center gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={formData.aiOptimization.weeklyBudgetOptimization}
-              onChange={(e) => setFormData(prev => ({ 
-                ...prev, 
-                aiOptimization: { ...prev.aiOptimization, weeklyBudgetOptimization: e.target.checked } 
-              }))}
-              className="w-4 h-4 text-[#7C3AED] bg-[#2A2A3A] border-[#3A3A4A] rounded focus:ring-[#7C3AED]"
-            />
-            <span className="text-white">Weekly budget optimization</span>
-          </label>
+          {([
+            { key: 'autoReplaceCreatives' as const, label: 'Automatically replace underperforming creatives', desc: 'AI replaces low-performing ads with new variants' },
+            { key: 'optimizeAudience' as const, label: 'Optimize audience targeting automatically', desc: 'AI adjusts targeting based on performance' },
+            { key: 'weeklyBudgetOptimization' as const, label: 'Weekly budget optimization', desc: 'AI redistributes budget across days' },
+            { key: 'dynamicText' as const, label: 'Dynamic text adaptation', desc: 'AI adapts ad text to user context' },
+          ]).map(({ key, label, desc }) => (
+            <label key={key} className="flex items-start gap-3 cursor-pointer">
+              <input type="checkbox" checked={formData.aiOptimization[key]}
+                onChange={(e) => setFormData(prev => ({ ...prev, aiOptimization: { ...prev.aiOptimization, [key]: e.target.checked } }))}
+                className="w-4 h-4 accent-[#7C3AED] mt-1" />
+              <div>
+                <span className="text-white">{label}</span>
+                <p className="text-xs text-[#6B7280]">{desc}</p>
+              </div>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Minus Keywords ── */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-white">Minus Keywords (Campaign Level)</h3>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className={lbl}>Match Type</label>
+            <select value={formData.negativeKeywords.matchType}
+              onChange={(e) => setFormData(prev => ({ ...prev, negativeKeywords: { ...prev.negativeKeywords, matchType: e.target.value as any } }))}
+              className={cls}>
+              <option value="broad">Broad</option>
+              <option value="phrase">Phrase</option>
+              <option value="exact">Exact</option>
+            </select>
+          </div>
+        </div>
+        <textarea rows={5} placeholder="Enter negative keywords, one per line..."
+          value={formData.negativeKeywords.keywords.join('\n')}
+          onChange={(e) => setFormData(prev => ({ ...prev, negativeKeywords: { ...prev.negativeKeywords, keywords: e.target.value.split('\n').filter(Boolean) } }))}
+          className={`${cls} resize-none`} />
+      </div>
+
+      {/* ── Bid Adjustments (Campaign) ── */}
+      <details className="group">
+        <summary className="cursor-pointer text-lg font-semibold text-white py-2 flex items-center gap-2">
+          <span>Bid Adjustments (Campaign Level)</span>
+          <span className="text-[#6B7280] text-sm group-open:hidden">▶</span>
+          <span className="text-[#6B7280] text-sm hidden group-open:inline">▼</span>
+        </summary>
+        <div className="space-y-6 mt-4">
+          {/* Age/Gender */}
+          <div>
+            <h4 className="text-sm font-medium text-[#9CA3AF] mb-3">Age & Gender</h4>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {['male', 'female', 'age_18_24', 'age_25_44'].map(k => (
+                <div key={k}>
+                  <label className={lbl}>{k.replace('_', ' ')}</label>
+                  <input type="number" step="0.1" min="0" max="5" placeholder="1.0"
+                    value={formData.bidAdjustments.genderAge[k] ?? 1}
+                    onChange={(e) => setFormData(prev => ({ ...prev, bidAdjustments: { ...prev.bidAdjustments, genderAge: { ...prev.bidAdjustments.genderAge, [k]: Number(e.target.value) } } }))}
+                    className={cls} />
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Devices */}
+          <div>
+            <h4 className="text-sm font-medium text-[#9CA3AF] mb-3">Devices</h4>
+            <div className="grid grid-cols-3 gap-3">
+              {['mobile', 'desktop', 'tablet'].map(k => (
+                <div key={k}>
+                  <label className={lbl}>{k}</label>
+                  <input type="number" step="0.1" min="0" max="5" placeholder="1.0"
+                    value={formData.bidAdjustments.devices[k] ?? 1}
+                    onChange={(e) => setFormData(prev => ({ ...prev, bidAdjustments: { ...prev.bidAdjustments, devices: { ...prev.bidAdjustments.devices, [k]: Number(e.target.value) } } }))}
+                    className={cls} />
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Audience */}
+          <div>
+            <h4 className="text-sm font-medium text-[#9CA3AF] mb-3">Audience Segments</h4>
+            <div className="grid grid-cols-3 gap-3">
+              {['retargeting', 'lookalike', 'custom'].map(k => (
+                <div key={k}>
+                  <label className={lbl}>{k}</label>
+                  <input type="number" step="0.1" min="0" max="5" placeholder="1.0"
+                    value={formData.bidAdjustments.audience[k] ?? 1}
+                    onChange={(e) => setFormData(prev => ({ ...prev, bidAdjustments: { ...prev.bidAdjustments, audience: { ...prev.bidAdjustments.audience, [k]: Number(e.target.value) } } }))}
+                    className={cls} />
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Format */}
+          <div>
+            <h4 className="text-sm font-medium text-[#9CA3AF] mb-3">Ad Format</h4>
+            <div className="grid grid-cols-4 gap-3">
+              {['image', 'video', 'carousel', 'collection'].map(k => (
+                <div key={k}>
+                  <label className={lbl}>{k}</label>
+                  <input type="number" step="0.1" min="0" max="5" placeholder="1.0"
+                    value={formData.bidAdjustments.format[k] ?? 1}
+                    onChange={(e) => setFormData(prev => ({ ...prev, bidAdjustments: { ...prev.bidAdjustments, format: { ...prev.bidAdjustments.format, [k]: Number(e.target.value) } } }))}
+                    className={cls} />
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Income */}
+          <div>
+            <h4 className="text-sm font-medium text-[#9CA3AF] mb-3">Income Level</h4>
+            <div className="grid grid-cols-3 gap-3">
+              {['low', 'medium', 'high'].map(k => (
+                <div key={k}>
+                  <label className={lbl}>{k} income</label>
+                  <input type="number" step="0.1" min="0" max="5" placeholder="1.0"
+                    value={formData.bidAdjustments.income[k] ?? 1}
+                    onChange={(e) => setFormData(prev => ({ ...prev, bidAdjustments: { ...prev.bidAdjustments, income: { ...prev.bidAdjustments.income, [k]: Number(e.target.value) } } }))}
+                    className={cls} />
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Weather */}
+          <div>
+            <h4 className="text-sm font-medium text-[#9CA3AF] mb-3">Weather</h4>
+            <div className="grid grid-cols-3 gap-3">
+              {['sunny', 'rainy', 'cold'].map(k => (
+                <div key={k}>
+                  <label className={lbl}>{k}</label>
+                  <input type="number" step="0.1" min="0" max="5" placeholder="1.0"
+                    value={formData.bidAdjustments.weather[k] ?? 1}
+                    onChange={(e) => setFormData(prev => ({ ...prev, bidAdjustments: { ...prev.bidAdjustments, weather: { ...prev.bidAdjustments.weather, [k]: Number(e.target.value) } } }))}
+                    className={cls} />
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* KPI — 7th type */}
+          <div>
+            <h4 className="text-sm font-medium text-[#9CA3AF] mb-1">KPI Corrections</h4>
+            <p className="text-xs text-[#6B7280] mb-3">Adjust bids when campaign KPI deviates from target</p>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {[
+                { k: 'cpa_above', l: 'CPA above target' },
+                { k: 'cpa_below', l: 'CPA below target' },
+                { k: 'ctr_above', l: 'CTR above avg' },
+                { k: 'ctr_below', l: 'CTR below avg' },
+                { k: 'roas_above', l: 'ROAS above target' },
+                { k: 'roas_below', l: 'ROAS below target' },
+              ].map(({ k, l }) => (
+                <div key={k}>
+                  <label className={lbl}>{l}</label>
+                  <input type="number" step="0.05" min="0" max="3" placeholder="1.0"
+                    value={formData.bidAdjustments.kpi[k] ?? 1}
+                    onChange={(e) => setFormData(prev => ({ ...prev, bidAdjustments: { ...prev.bidAdjustments, kpi: { ...prev.bidAdjustments.kpi, [k]: Number(e.target.value) } } }))}
+                    className={cls} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </details>
+
+      {/* ── Placement Exclusions ── */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-white">Placement Exclusions</h3>
+        <div>
+          <label className={lbl}>Excluded Sites (one per line)</label>
+          <textarea rows={3} placeholder="example.com&#10;bad-site.net"
+            value={formData.exclusions.sites.join('\n')}
+            onChange={(e) => setFormData(prev => ({ ...prev, exclusions: { ...prev.exclusions, sites: e.target.value.split('\n').filter(Boolean) } }))}
+            className={`${cls} resize-none`} />
+        </div>
+        <div>
+          <label className={lbl}>Excluded IPs (one per line)</label>
+          <textarea rows={3} placeholder="192.168.0.1"
+            value={formData.exclusions.ips.join('\n')}
+            onChange={(e) => setFormData(prev => ({ ...prev, exclusions: { ...prev.exclusions, ips: e.target.value.split('\n').filter(Boolean) } }))}
+            className={`${cls} resize-none`} />
         </div>
       </div>
     </div>
