@@ -579,7 +579,7 @@ export function AdGroupSettings({
               value={formData.urlParams.utmContent}
               onChange={(e) => onFormDataChange('urlParams', { ...formData.urlParams, utmContent: e.target.value })}
             />
-            <p className="text-sm text-[#6B7280] mt-1">Dynamic parameter: {ad_group_name}</p>
+            <p className="text-sm text-[#6B7280] mt-1">Dynamic parameter: {'{ad_group_name}'}</p>
           </div>
           
           <div>
