@@ -5,9 +5,10 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        accent: '#7C3AED',
-        surface: '#13131A',
-        border: '#2A2A3A',
+        accent: '#111827',
+        surface: '#ffffff',
+        'surface-2': '#F9FAFB',
+        border: '#E5E7EB',
       },
     },
   },

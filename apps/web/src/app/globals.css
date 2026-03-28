@@ -3,60 +3,66 @@
 @tailwind utilities;
 
 :root {
-  --accent: #7C3AED;
-  --accent-light: #A78BFA;
-  --accent-dark: #5B21B6;
-  --surface: #13131A;
-  --surface-2: #1C1C27;
-  --border: #2A2A3A;
+  --accent: #111827;
+  --accent-light: #374151;
+  --accent-dark: #030712;
+  --surface: #ffffff;
+  --surface-2: #F9FAFB;
+  --border: #E5E7EB;
   --text-muted: #6B7280;
 }
 
 @layer base {
   * { box-sizing: border-box; }
 
+  body {
+    color: #111827;
+    background: #F9FAFB;
+  }
+
   ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: #0A0A0F; }
-  ::-webkit-scrollbar-thumb { background: #2A2A3A; border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: #7C3AED; }
+  ::-webkit-scrollbar-track { background: #F9FAFB; }
+  ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-[#7C3AED] hover:bg-[#6D28D9] text-white px-4 py-2 rounded-lg
+    @apply bg-[#111827] hover:bg-[#1F2937] text-white px-4 py-2 rounded-lg
            font-medium transition-all duration-200 disabled:opacity-50
-           disabled:cursor-not-allowed active:scale-95;
+           disabled:cursor-not-allowed active:scale-95 text-sm;
   }
 
   .btn-secondary {
-    @apply bg-[#1C1C27] hover:bg-[#2A2A3A] text-white px-4 py-2 rounded-lg
-           font-medium transition-all duration-200 border border-[#2A2A3A]
-           active:scale-95;
+    @apply bg-white hover:bg-[#F9FAFB] text-[#111827] px-4 py-2 rounded-lg
+           font-medium transition-all duration-200 border border-[#E5E7EB]
+           active:scale-95 text-sm;
   }
 
   .card {
-    @apply bg-[#13131A] border border-[#2A2A3A] rounded-xl p-6;
+    @apply bg-white border border-[#E5E7EB] rounded-xl p-6;
   }
 
   .input {
-    @apply bg-[#1C1C27] border border-[#2A2A3A] rounded-lg px-4 py-3 w-full
-           text-white placeholder-[#4B5563] focus:outline-none
-           focus:border-[#7C3AED] transition-colors duration-200;
+    @apply bg-white border border-[#E5E7EB] rounded-lg px-4 py-3 w-full
+           text-[#111827] placeholder-[#9CA3AF] focus:outline-none
+           focus:border-[#111827] focus:ring-1 focus:ring-[#111827]/10
+           transition-colors duration-200 text-sm;
   }
 
   .label {
-    @apply block text-sm font-medium text-[#9CA3AF] mb-2;
+    @apply block text-sm font-medium text-[#374151] mb-2;
   }
 
   .badge-active {
-    @apply bg-emerald-500/10 text-emerald-400 text-xs px-2 py-1 rounded-full;
+    @apply bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs px-2 py-1 rounded-full font-medium;
   }
 
   .badge-paused {
-    @apply bg-yellow-500/10 text-yellow-400 text-xs px-2 py-1 rounded-full;
+    @apply bg-amber-50 text-amber-700 border border-amber-200 text-xs px-2 py-1 rounded-full font-medium;
   }
 
   .badge-draft {
-    @apply bg-gray-500/10 text-gray-400 text-xs px-2 py-1 rounded-full;
+    @apply bg-gray-100 text-gray-600 border border-gray-200 text-xs px-2 py-1 rounded-full font-medium;
   }
 }

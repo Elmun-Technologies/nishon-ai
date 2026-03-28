@@ -2,7 +2,6 @@
 import { usePathname } from 'next/navigation'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 
-// Maps route paths to human-readable page titles
 const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   '/dashboard': {
     title: 'Dashboard',
@@ -26,7 +25,7 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   },
   '/competitors': {
     title: 'Competitors',
-    subtitle: "12 bo‘limli audit va SWOT taqqoslash",
+    subtitle: "Audit va SWOT taqqoslash",
   },
   '/creative-scorer': {
     title: 'Creative Scorer',
@@ -48,35 +47,35 @@ export default function Header() {
   const page = PAGE_TITLES[pathname] ?? { title: 'Nishon AI', subtitle: '' }
 
   return (
-    <header className="h-16 bg-[#13131A] border-b border-[#2A2A3A] px-6 flex items-center justify-between shrink-0">
+    <header className="h-14 bg-white border-b border-[#E5E7EB] px-6 flex items-center justify-between shrink-0">
       <div>
-        <h1 className="text-white font-semibold text-base">{page.title}</h1>
+        <h1 className="text-[#111827] font-semibold text-sm">{page.title}</h1>
         {page.subtitle && (
-          <p className="text-[#6B7280] text-xs mt-0.5">{page.subtitle}</p>
+          <p className="text-[#9CA3AF] text-xs mt-0.5">{page.subtitle}</p>
         )}
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         {/* Autopilot mode badge */}
         {currentWorkspace && (
           <div
             className={`
-              flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium
+              flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium
               ${currentWorkspace.autopilotMode === 'full_auto'
-                ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
                 : currentWorkspace.autopilotMode === 'assisted'
-                ? 'bg-amber-500/10 border-amber-500/20 text-amber-400'
-                : 'bg-[#2A2A3A] border-[#3A3A4A] text-[#9CA3AF]'
+                ? 'bg-amber-50 border-amber-200 text-amber-700'
+                : 'bg-gray-100 border-gray-200 text-gray-600'
               }
             `}
           >
             <span
-              className={`w-1.5 h-1.5 rounded-full ${
+              className={`w-1.5 h-1.5 rounded-full shrink-0 ${
                 currentWorkspace.autopilotMode === 'full_auto'
-                  ? 'bg-emerald-400 animate-pulse'
+                  ? 'bg-emerald-500 animate-pulse'
                   : currentWorkspace.autopilotMode === 'assisted'
-                  ? 'bg-amber-400'
-                  : 'bg-[#6B7280]'
+                  ? 'bg-amber-500'
+                  : 'bg-gray-400'
               }`}
             />
             {currentWorkspace.autopilotMode === 'full_auto'

@@ -41,17 +41,17 @@ const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
       <div
         ref={ref}
         className={cn(
-          'bg-[#13131A] border border-[#2A2A3A] rounded-xl p-4 flex flex-col justify-between',
-          accent && 'ring-1 ring-[#7C3AED]/20',
+          'bg-white border border-[#E5E7EB] rounded-xl p-4 flex flex-col justify-between',
+          accent && 'ring-1 ring-[#111827]/10',
           className
         )}
         {...props}
       >
         {/* Top row: label + icon */}
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-3">
           <p className="text-[#6B7280] text-xs font-medium">{label}</p>
           {icon && (
-            <span className="text-base opacity-70" aria-hidden="true">
+            <span className="text-base opacity-60" aria-hidden="true">
               {icon}
             </span>
           )}
@@ -60,9 +60,9 @@ const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
         {/* Value + change badge */}
         <div className="flex items-end justify-between gap-2">
           <div>
-            <p className="text-white text-lg font-semibold leading-tight">
+            <p className="text-[#111827] text-xl font-semibold leading-tight">
               {loading ? (
-                <span className="inline-block h-6 bg-[#2A2A3A] rounded animate-pulse w-20" />
+                <span className="inline-block h-6 bg-[#F3F4F6] rounded animate-pulse w-20" />
               ) : (
                 value
               )}
@@ -70,9 +70,9 @@ const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
             {hasChange && !loading && (
               <span
                 className={cn(
-                  'inline-flex items-center gap-0.5 text-xs font-medium mt-1',
-                  isUp   && 'text-emerald-400',
-                  isDown && 'text-red-400',
+                  'inline-flex items-center gap-0.5 text-xs font-medium mt-1.5',
+                  isUp   && 'text-emerald-600',
+                  isDown && 'text-red-600',
                   !isUp && !isDown && 'text-[#6B7280]'
                 )}
               >
@@ -81,13 +81,13 @@ const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
               </span>
             )}
             {!hasChange && subtext && (
-              <p className="text-[#4B5563] text-xs mt-1">{subtext}</p>
+              <p className="text-[#9CA3AF] text-xs mt-1">{subtext}</p>
             )}
           </div>
 
           {/* Sparkline */}
           {sparkline && sparkline.length >= 2 && !loading && (
-            <div className="shrink-0 opacity-80">
+            <div className="shrink-0 opacity-70">
               <Sparkline
                 data={sparkline}
                 width={64}
