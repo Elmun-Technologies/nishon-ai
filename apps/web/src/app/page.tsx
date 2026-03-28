@@ -1,136 +1,534 @@
 'use client'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
-import { Badge } from '@/components/ui/Badge'
 
-export default function LandingPage() {
+/* ─── tiny helpers ─────────────────────────────────────────────────────── */
+function cn(...classes: (string | false | undefined)[]) {
+  return classes.filter(Boolean).join(' ')
+}
+
+/* ─── data ──────────────────────────────────────────────────────────────── */
+const STATS = [
+  { value: '3.2×', label: 'O\'rtacha ROAS o\'sishi' },
+  { value: '−42%', label: 'CPA kamaytirish' },
+  { value: '24/7', label: 'Avtomatik monitoring' },
+  { value: '4 min', label: 'Kampaniya yaratish vaqti' },
+]
+
+const PLATFORMS = [
+  { name: 'Meta Ads', icon: '📘', color: '#1877F2', desc: 'Facebook · Instagram · Reels' },
+  { name: 'Google Ads', icon: '🔍', color: '#4285F4', desc: 'Search · Display · YouTube' },
+  { name: 'Yandex Direct', icon: '🟡', color: '#FFCC00', desc: 'Search · RSY · Smart Banner' },
+  { name: 'Telegram Ads', icon: '✈️', color: '#2CA5E0', desc: 'Sponsored · Channel Boost' },
+]
+
+const STEPS = [
+  {
+    num: '01',
+    title: 'Mahsulotingizni kiriting',
+    desc: 'Mahsulot nomi, URL va maqsad auditoriyangizni tasvirlab bering. AI qolganini o\'zi tahlil qiladi.',
+    icon: '🛍️',
+  },
+  {
+    num: '02',
+    title: 'AI kampaniya yaratadi',
+    desc: 'Kalit so\'zlar, targetlar, ijodiy matnlar, UTM parametrlar — barchasini AI 4 daqiqada tayyorlaydi.',
+    icon: '🤖',
+  },
+  {
+    num: '03',
+    title: 'Tasdiqlang va kuzating',
+    desc: 'Siz faqat oxirgi qaror qabul qilasiz. AI esa 24/7 optimallashtiradi, hisobot beradi.',
+    icon: '✅',
+  },
+]
+
+const FEATURES = [
+  { icon: '🧠', title: 'Avtonom AI Agent', desc: 'Bid, byudjet, ijodiy kontent va auditoriyani o\'zi boshqaradi. Har 2 soatda optimallashtirish.' },
+  { icon: '⚡', title: '4 daqiqada tayyor', desc: 'Platforma tanlashdan nashr qilishgacha — to\'liq 6 bosqichli wizard. Hech qanday texnik bilim kerak emas.' },
+  { icon: '🎯', title: 'Multi-platform', desc: 'Meta, Google, Yandex, Telegram — bir joydan boshqaring. Har bir platforma uchun alohida strategiya.' },
+  { icon: '📊', title: 'Real-time hisobot', desc: 'Barcha platformalar bo\'yicha birlashtirilgan dashboard. ROAS, CPA, CTR — bir ko\'rinishda.' },
+  { icon: '🔁', title: 'Kreativ rotatsiya', desc: 'Past ko\'rsatkichli reklamalar avtomatik almashtiriladi. A/B test — doim ishlaydi.' },
+  { icon: '🛡️', title: 'Byudjet himoyasi', desc: 'Anomaliya aniqlash: g\'ayritabiiy sarflanish, bot trafik — avtomatik to\'xtatiladi.' },
+  { icon: '📍', title: 'Geo & Vaqt targeting', desc: 'Shahar, radius, soat jadval, ob-havo — bid korreksiyalar 7 tur bo\'yicha.' },
+  { icon: '💬', title: 'AI Maslahatchisi', desc: 'Istalgan vaqt chatga savol bering. AI kampaniyangiz tarixini biladi va maslahat beradi.' },
+]
+
+const PLANS = [
+  {
+    name: 'Starter',
+    price: '49',
+    currency: 'USD',
+    period: 'oyiga',
+    desc: 'Kichik biznes va freylanschilar uchun',
+    highlight: false,
+    features: [
+      '2 ta platforma',
+      '3 ta faol kampaniya',
+      'AI kreativ generatsiya',
+      'Kunlik hisobot',
+      'Email qo\'llab-quvvatlash',
+    ],
+    cta: 'Boshlash',
+  },
+  {
+    name: 'Growth',
+    price: '149',
+    currency: 'USD',
+    period: 'oyiga',
+    desc: 'O\'sib borayotgan e-commerce uchun',
+    highlight: true,
+    badge: 'Eng mashhur',
+    features: [
+      'Barcha 4 ta platforma',
+      'Cheklanmagan kampaniyalar',
+      'Avtonom AI rejimi',
+      'Real-time dashboard',
+      'A/B test avtomatik',
+      'Priority qo\'llab-quvvatlash',
+      'API kirish',
+    ],
+    cta: 'Growth boshlash →',
+  },
+  {
+    name: 'Agency',
+    price: '399',
+    currency: 'USD',
+    period: 'oyiga',
+    desc: 'Agentliklar va katta brendlar uchun',
+    highlight: false,
+    features: [
+      'Cheklanmagan hamma narsa',
+      'White-label dashboard',
+      'Dedicated AI model',
+      'Custom integratsiyalar',
+      'SLA kafolat',
+      'Shaxsiy menejer',
+      'Onboarding training',
+    ],
+    cta: 'Bog\'lanish',
+  },
+]
+
+const TESTIMONIALS = [
+  {
+    text: '"Nishon AI targetologimizni almashtirdi. Birinchi oyda ROAS 2.8x o\'sdi, biz esa kampaniyaga bir soat ham sarflamadik."',
+    name: 'Jasur Toshmatov',
+    role: 'CEO, TechShop Uzbekistan',
+    avatar: 'JT',
+  },
+  {
+    text: '"Google va Meta kampaniyalarini bir joydan boshqarish — bu hayot o\'zgartirdi. Har oy 40+ soat tejayapman."',
+    name: 'Nilufar Karimova',
+    role: 'Marketing Director, Moda.uz',
+    avatar: 'NK',
+  },
+  {
+    text: '"CPA 38% kamaydi. AI har kecha byudjetni qayta taqsimlaydi — ertalab faqat natijalarni ko\'raman."',
+    name: 'Bobur Eshmatov',
+    role: 'Founder, AutoParts24',
+    avatar: 'BE',
+  },
+]
+
+const FAQS = [
+  {
+    q: 'AI kampaniyani to\'liq o\'zi boshqaradimi?',
+    a: 'Ha, avtonom rejimda AI bid, byudjet, kreativ rotatsiya va auditoriyani o\'zi boshqaradi. Siz faqat nashr qilishdan oldin tasdiqlaysiz.'
+  },
+  {
+    q: 'Qanday platformalar qo\'llab-quvvatlanadi?',
+    a: 'Meta Ads (Facebook/Instagram), Google Ads, Yandex Direct va Telegram Ads. Barcha 4 ta platforma bir dashboarddan.'
+  },
+  {
+    q: 'Mavjud kampaniyalarni ko\'chirish mumkinmi?',
+    a: 'Ha, import funksiyasi bor. Meta va Google\'dan mavjud kampaniyalarni import qilib, AI bilan optimallashtirishni davom ettirasiz.'
+  },
+  {
+    q: 'Byudjet minimal nechadan?',
+    a: 'Minimal platforma byudjeti yo\'q — siz belgilagan summa bilan ishlaydi. Nishon AI o\'z narxi oylik obuna.'
+  },
+  {
+    q: 'AI noto\'g\'ri qaror qilsa-chi?',
+    a: 'Har bir katta o\'zgarish (byudjet +20% dan ko\'p) siz tasdiqlashingizni kutadi. Byudjet himoyasi anomaliyalarni avtomatik to\'xtatadi.'
+  },
+]
+
+/* ─── FAQ item ──────────────────────────────────────────────────────────── */
+function FaqItem({ q, a }: { q: string; a: string }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="border-b border-[#2A2A3A]">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between py-5 text-left"
+      >
+        <span className="text-white font-medium">{q}</span>
+        <span className={cn('text-[#7C3AED] text-xl transition-transform', open && 'rotate-45')}>+</span>
+      </button>
+      {open && (
+        <p className="text-[#9CA3AF] text-sm leading-relaxed pb-5">{a}</p>
+      )}
+    </div>
+  )
+}
+
+/* ─── main ──────────────────────────────────────────────────────────────── */
+export default function SellerLandingPage() {
   const router = useRouter()
 
   return (
     <div className="min-h-screen bg-[#0A0A0F] text-white selection:bg-[#7C3AED]/30">
-      
-      {/* ── Navigation Header ── */}
-      {/* [Navigation bar with logo, login/register buttons] */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#2A2A3A] bg-[#0A0A0F]/80 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+
+      {/* ── NAV ─────────────────────────────────────────────────────────── */}
+      <nav className="fixed top-0 inset-x-0 z-50 border-b border-[#2A2A3A]/80 bg-[#0A0A0F]/80 backdrop-blur-lg">
+        <div className="max-w-7xl mx-auto px-6 h-18 flex items-center justify-between py-4">
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight">
+            <span className="text-2xl font-extrabold tracking-tight">
               Nishon <span className="text-[#7C3AED]">AI</span>
-            </h1>
+            </span>
+            <span className="hidden md:inline-flex ml-3 text-xs font-semibold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-2 py-0.5 rounded-full">
+              BETA
+            </span>
           </div>
-          <div className="flex items-center gap-4">
-            <Button variant="secondary" size="sm" onClick={() => router.push('/login')}>
-              Log in
-            </Button>
-            <Button size="sm" onClick={() => router.push('/register')}>
-              Get Started →
-            </Button>
+
+          <div className="hidden md:flex items-center gap-8 text-sm text-[#9CA3AF]">
+            <a href="#features" className="hover:text-white transition-colors">Imkoniyatlar</a>
+            <a href="#how" className="hover:text-white transition-colors">Qanday ishlaydi</a>
+            <a href="#pricing" className="hover:text-white transition-colors">Narxlar</a>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => router.push('/login')}
+              className="hidden sm:block text-sm text-[#9CA3AF] hover:text-white transition-colors px-4 py-2"
+            >
+              Kirish
+            </button>
+            <button
+              onClick={() => router.push('/register')}
+              className="bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-sm font-semibold px-5 py-2.5 rounded-lg shadow-[0_4px_14px_rgba(124,58,237,0.4)] hover:shadow-[0_6px_20px_rgba(124,58,237,0.5)] transition-all"
+            >
+              Bepul boshlash →
+            </button>
           </div>
         </div>
       </nav>
 
-      {/* ── Hero Section ── */}
-      {/* [Hero section with main heading, CTA, and AI status indicator] */}
-      <main className="pt-40 pb-20 px-6">
-        <div className="max-w-5xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-[#7C3AED]/10 border border-[#7C3AED]/20 rounded-full px-5 py-2 mb-8 animate-fade-in">
-            <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_12px_rgba(52,211,153,0.4)]" />
-            <span className="text-[#A78BFA] text-sm font-semibold tracking-wide uppercase">
-              AI Autonomous Mode: ACTIVE
+      {/* ── HERO ────────────────────────────────────────────────────────── */}
+      <section className="relative pt-36 pb-28 px-6 overflow-hidden">
+        {/* bg glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-[#7C3AED]/10 blur-[140px] rounded-full pointer-events-none" />
+        <div className="absolute top-32 left-1/4 w-64 h-64 bg-[#A855F7]/8 blur-[100px] rounded-full pointer-events-none" />
+
+        <div className="relative max-w-5xl mx-auto text-center">
+          {/* pill badge */}
+          <div className="inline-flex items-center gap-2 bg-[#7C3AED]/10 border border-[#7C3AED]/25 rounded-full px-5 py-2 mb-8">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-[#A78BFA] text-sm font-semibold tracking-widest uppercase">
+              AI Autonomous Mode · ACTIVE
             </span>
           </div>
 
-          <h2 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 leading-[1.1]">
-            Stop managing ads.
+          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-[1.08] mb-6">
+            Reklamangizni boshqaring.
             <br />
             <span className="bg-gradient-to-r from-[#7C3AED] via-[#A78BFA] to-[#C084FC] bg-clip-text text-transparent">
-              Start scaling results.
+              Natijangiz o'ssin.
             </span>
-          </h2>
+          </h1>
 
-          <p className="text-[#6B7280] text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed mb-12">
-            Nishon AI is your autonomous advertising agent. It manages, optimizes, 
-            and scales your Meta, Google, and TikTok campaigns 24/7.
+          <p className="text-[#9CA3AF] text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed mb-10">
+            Nishon AI — Meta, Google, Yandex va Telegram reklamalarini <strong className="text-white">avtomatik</strong> boshqaradigan
+            sun'iy intellekt. Targetolog kerak emas.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button size="lg" className="px-10 py-7 text-lg shadow-[0_0_20px_rgba(124,58,237,0.3)] hover:shadow-[0_0_30px_rgba(124,58,237,0.5)] transition-all duration-300" onClick={() => router.push('/onboarding')}>
-              Setup Autonomous AI →
-            </Button>
-            <Button variant="secondary" size="lg" className="px-10 py-7 text-lg border-[#2A2A3A]" onClick={() => router.push('/login')}>
-              View Demo Dashboard
-            </Button>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+            <button
+              onClick={() => router.push('/register')}
+              className="w-full sm:w-auto bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-lg font-semibold px-10 py-4 rounded-xl shadow-[0_0_30px_rgba(124,58,237,0.4)] hover:shadow-[0_0_45px_rgba(124,58,237,0.6)] transition-all duration-300"
+            >
+              Bepul sinash — 14 kun →
+            </button>
+            <button
+              onClick={() => router.push('/login')}
+              className="w-full sm:w-auto bg-[#1C1C27] hover:bg-[#2A2A3A] text-white text-lg font-semibold px-10 py-4 rounded-xl border border-[#2A2A3A] hover:border-[#7C3AED]/30 transition-all"
+            >
+              Demo ko'rish
+            </button>
+          </div>
+
+          {/* trust line */}
+          <p className="text-[#6B7280] text-sm">
+            Kredit karta talab qilinmaydi · O'rnatish kerak emas · 4 daqiqada ishga tushadi
+          </p>
+        </div>
+
+        {/* ── STATS BAR ───────────────────────────────────────────────── */}
+        <div className="relative max-w-4xl mx-auto mt-20 grid grid-cols-2 md:grid-cols-4 gap-px bg-[#2A2A3A] rounded-2xl overflow-hidden border border-[#2A2A3A]">
+          {STATS.map((s) => (
+            <div key={s.label} className="bg-[#13131A] px-6 py-6 text-center">
+              <div className="text-3xl md:text-4xl font-extrabold text-white mb-1">{s.value}</div>
+              <div className="text-[#6B7280] text-sm leading-snug">{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── PLATFORMS ───────────────────────────────────────────────────── */}
+      <section className="py-20 px-6 border-y border-[#2A2A3A]">
+        <div className="max-w-5xl mx-auto">
+          <p className="text-center text-[#6B7280] text-sm font-semibold uppercase tracking-widest mb-10">
+            Qo'llab-quvvatlanadigan platformalar
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {PLATFORMS.map((p) => (
+              <div
+                key={p.name}
+                className="bg-[#13131A] border border-[#2A2A3A] hover:border-[#7C3AED]/30 rounded-xl p-5 text-center transition-all duration-300 group"
+              >
+                <div className="text-4xl mb-3">{p.icon}</div>
+                <div className="text-white font-semibold text-sm mb-1">{p.name}</div>
+                <div className="text-[#6B7280] text-xs">{p.desc}</div>
+              </div>
+            ))}
           </div>
         </div>
+      </section>
 
-        {/* ── Visual Proof Section ── */}
-        {/* [Visual metric cards for ROAS, CPA, and scale improvements] */}
-        <div className="max-w-7xl mx-auto mt-32 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card variant="outlined" padding="lg" className="bg-[#13131A] group hover:border-[#7C3AED]/40 transition-all duration-500">
-            <div className="p-2 mb-4">
-              <span className="text-3xl">📈</span>
-            </div>
-            <h3 className="text-white text-xl font-bold mb-2">3.2x Average ROAS</h3>
-            <p className="text-[#6B7280] leading-relaxed">
-              Our AI optimizes your budget distribution every 2 hours to chase 
-              the highest performing segments across all platforms.
-            </p>
-          </Card>
+      {/* ── HOW IT WORKS ────────────────────────────────────────────────── */}
+      <section id="how" className="py-28 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-[#7C3AED] text-sm font-bold uppercase tracking-widest mb-3">Qanday ishlaydi</p>
+            <h2 className="text-4xl md:text-5xl font-extrabold text-white">
+              3 qadam — kampaniya tayyor
+            </h2>
+          </div>
 
-          <Card variant="outlined" padding="lg" className="bg-[#13131A] group hover:border-[#7C3AED]/40 transition-all duration-500">
-            <div className="p-2 mb-4">
-              <span className="text-3xl">🎯</span>
-            </div>
-            <h3 className="text-white text-xl font-bold mb-2">−40% Lower CPA</h3>
-            <p className="text-[#6B7280] leading-relaxed">
-              By rotating creatives and shifting budget away from poor audiences, 
-              Nishon AI consistently drives down your cost per lead.
-            </p>
-          </Card>
-
-          <Card variant="outlined" padding="lg" className="bg-[#13131A] group hover:border-[#7C3AED]/40 transition-all duration-500">
-            <div className="p-2 mb-4">
-              <span className="text-3xl">🧠</span>
-            </div>
-            <h3 className="text-white text-xl font-bold mb-2">Zero Management</h3>
-            <p className="text-[#6B7280] leading-relaxed">
-              No more manual bidding or daily spreadsheet checking. Our agent 
-              runs autonomously, only waiting for your final approval.
-            </p>
-          </Card>
-        </div>
-
-        {/* ── Testimonial ── */}
-        {/* [Testimonial from a CEO customer] */}
-        <div className="max-w-4xl mx-auto mt-32">
-          <div className="relative p-8 md:p-12 rounded-3xl bg-gradient-to-br from-[#13131A] to-[#0A0A0F] border border-[#2A2A3A] overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-[#7C3AED]/5 blur-[100px] rounded-full" />
-            
-            <p className="text-2xl md:text-3xl text-[#D1D5DB] font-medium leading-[1.3] mb-8 relative z-10 italic">
-              "Nishon AI replaced our targetologist and improved ROAS by 2.8x in the first month. We now spend zero hours on campaign management."
-            </p>
-            
-            <div className="flex items-center gap-4 relative z-10">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#7C3AED] to-[#5B21B6] flex items-center justify-center shadow-lg">
-                <span className="text-xl font-bold text-white">JT</span>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {STEPS.map((step, i) => (
+              <div key={step.num} className="relative">
+                {i < STEPS.length - 1 && (
+                  <div className="hidden md:block absolute top-8 left-full w-full h-px bg-gradient-to-r from-[#7C3AED]/40 to-transparent -translate-x-1/2 z-0" />
+                )}
+                <div className="relative bg-[#13131A] border border-[#2A2A3A] hover:border-[#7C3AED]/30 rounded-2xl p-7 transition-all duration-300">
+                  <div className="flex items-center gap-3 mb-5">
+                    <span className="text-3xl">{step.icon}</span>
+                    <span className="text-[#7C3AED] text-xs font-black uppercase tracking-widest">{step.num}</span>
+                  </div>
+                  <h3 className="text-white font-bold text-lg mb-3">{step.title}</h3>
+                  <p className="text-[#9CA3AF] text-sm leading-relaxed">{step.desc}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-white text-lg font-bold">Jasur Toshmatov</p>
-                <p className="text-[#6B7280]">CEO, TechShop Uzbekistan</p>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── FEATURES ────────────────────────────────────────────────────── */}
+      <section id="features" className="py-28 px-6 bg-[#0D0D14]">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-[#7C3AED] text-sm font-bold uppercase tracking-widest mb-3">Imkoniyatlar</p>
+            <h2 className="text-4xl md:text-5xl font-extrabold text-white">
+              Reklamani boshqarishning <br className="hidden md:block" />
+              <span className="text-[#A78BFA]">yangi darajasi</span>
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {FEATURES.map((f) => (
+              <div
+                key={f.title}
+                className="bg-[#13131A] border border-[#2A2A3A] hover:border-[#7C3AED]/30 rounded-2xl p-6 transition-all duration-300 group hover:bg-[#16162A]"
+              >
+                <div className="text-3xl mb-4">{f.icon}</div>
+                <h3 className="text-white font-semibold mb-2">{f.title}</h3>
+                <p className="text-[#6B7280] text-sm leading-relaxed">{f.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── PRICING ─────────────────────────────────────────────────────── */}
+      <section id="pricing" className="py-28 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-[#7C3AED] text-sm font-bold uppercase tracking-widest mb-3">Narxlar</p>
+            <h2 className="text-4xl md:text-5xl font-extrabold text-white">
+              Biznesingizga mos tarif
+            </h2>
+            <p className="text-[#9CA3AF] mt-4">14 kunlik bepul sinash. Keyin to'laysiz.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {PLANS.map((plan) => (
+              <div
+                key={plan.name}
+                className={cn(
+                  'relative rounded-2xl p-7 border transition-all duration-300',
+                  plan.highlight
+                    ? 'bg-gradient-to-b from-[#1C1028] to-[#13131A] border-[#7C3AED]/50 shadow-[0_0_40px_rgba(124,58,237,0.2)]'
+                    : 'bg-[#13131A] border-[#2A2A3A] hover:border-[#7C3AED]/20'
+                )}
+              >
+                {plan.badge && (
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#7C3AED] text-white text-xs font-bold px-4 py-1 rounded-full">
+                    {plan.badge}
+                  </div>
+                )}
+
+                <div className="mb-6">
+                  <h3 className="text-white font-bold text-xl mb-1">{plan.name}</h3>
+                  <p className="text-[#6B7280] text-sm mb-4">{plan.desc}</p>
+                  <div className="flex items-end gap-1">
+                    <span className="text-white font-extrabold text-4xl">${plan.price}</span>
+                    <span className="text-[#6B7280] text-sm mb-1">/{plan.period}</span>
+                  </div>
+                </div>
+
+                <ul className="space-y-3 mb-8">
+                  {plan.features.map((feat) => (
+                    <li key={feat} className="flex items-center gap-3 text-sm">
+                      <span className="text-emerald-400 font-bold">✓</span>
+                      <span className="text-[#D1D5DB]">{feat}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <button
+                  onClick={() => router.push('/register')}
+                  className={cn(
+                    'w-full py-3 rounded-xl font-semibold text-sm transition-all',
+                    plan.highlight
+                      ? 'bg-[#7C3AED] hover:bg-[#6D28D9] text-white shadow-[0_4px_14px_rgba(124,58,237,0.4)]'
+                      : 'bg-[#1C1C27] hover:bg-[#2A2A3A] text-white border border-[#2A2A3A]'
+                  )}
+                >
+                  {plan.cta}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── TESTIMONIALS ────────────────────────────────────────────────── */}
+      <section className="py-28 px-6 bg-[#0D0D14]">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-[#7C3AED] text-sm font-bold uppercase tracking-widest mb-3">Mijozlar fikri</p>
+            <h2 className="text-4xl md:text-5xl font-extrabold text-white">
+              Ular allaqachon o'sishmoqda
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {TESTIMONIALS.map((t) => (
+              <div
+                key={t.name}
+                className="bg-[#13131A] border border-[#2A2A3A] rounded-2xl p-7 hover:border-[#7C3AED]/30 transition-all duration-300"
+              >
+                {/* stars */}
+                <div className="flex gap-1 mb-5">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <span key={i} className="text-yellow-400 text-sm">★</span>
+                  ))}
+                </div>
+                <p className="text-[#D1D5DB] text-sm leading-relaxed italic mb-6">{t.text}</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#5B21B6] flex items-center justify-center text-xs font-black text-white">
+                    {t.avatar}
+                  </div>
+                  <div>
+                    <div className="text-white font-semibold text-sm">{t.name}</div>
+                    <div className="text-[#6B7280] text-xs">{t.role}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── FAQ ─────────────────────────────────────────────────────────── */}
+      <section className="py-28 px-6">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-14">
+            <p className="text-[#7C3AED] text-sm font-bold uppercase tracking-widest mb-3">Savollar</p>
+            <h2 className="text-4xl font-extrabold text-white">Ko'p so'raladigan savollar</h2>
+          </div>
+          <div className="space-y-0">
+            {FAQS.map((faq) => (
+              <FaqItem key={faq.q} q={faq.q} a={faq.a} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA BANNER ──────────────────────────────────────────────────── */}
+      <section className="py-28 px-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1C1028] via-[#16162A] to-[#0D0D14] border border-[#7C3AED]/30 p-12 md:p-16 text-center">
+            {/* glow */}
+            <div className="absolute inset-0 bg-[#7C3AED]/5 blur-[80px] rounded-full" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-[#A855F7]/10 blur-[120px] rounded-full" />
+
+            <div className="relative">
+              <div className="text-5xl mb-6">🚀</div>
+              <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-5">
+                Bugun boshlang.
+                <br />
+                <span className="text-[#A78BFA]">14 kun bepul.</span>
+              </h2>
+              <p className="text-[#9CA3AF] text-lg mb-10 max-w-xl mx-auto">
+                4 daqiqada kampaniyangizni yarating. Kredit karta talab qilinmaydi.
+              </p>
+
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <button
+                  onClick={() => router.push('/register')}
+                  className="w-full sm:w-auto bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-lg font-bold px-12 py-4 rounded-xl shadow-[0_0_40px_rgba(124,58,237,0.4)] hover:shadow-[0_0_60px_rgba(124,58,237,0.6)] transition-all duration-300"
+                >
+                  Bepul sinash →
+                </button>
+                <button
+                  onClick={() => router.push('/login')}
+                  className="w-full sm:w-auto text-[#A78BFA] hover:text-white text-base font-semibold px-8 py-4 rounded-xl border border-[#7C3AED]/30 hover:border-[#7C3AED]/60 transition-all"
+                >
+                  Demo ko'rish
+                </button>
               </div>
             </div>
           </div>
         </div>
-      </main>
+      </section>
 
-      {/* ── Footer ── */}
-      {/* [Simple footer with copyright] */}
-      <footer className="py-12 border-t border-[#2A2A3A] text-center">
-        <p className="text-[#4B5563] text-sm">
-          © 2025 Nishon AI. All rights reserved. Built for professional advertisers.
-        </p>
+      {/* ── FOOTER ──────────────────────────────────────────────────────── */}
+      <footer className="border-t border-[#2A2A3A] py-12 px-6">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-2">
+            <span className="text-xl font-extrabold">
+              Nishon <span className="text-[#7C3AED]">AI</span>
+            </span>
+            <span className="text-[#4B5563] text-sm ml-2">© 2025</span>
+          </div>
+
+          <div className="flex items-center gap-6 text-sm text-[#6B7280]">
+            <a href="/privacy" className="hover:text-white transition-colors">Maxfiylik siyosati</a>
+            <a href="/terms" className="hover:text-white transition-colors">Foydalanish shartlari</a>
+            <a href="mailto:hello@nishon.ai" className="hover:text-white transition-colors">Aloqa</a>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-[#6B7280] text-sm">Barcha tizimlar ishlayapti</span>
+          </div>
+        </div>
       </footer>
+
     </div>
   )
 }
