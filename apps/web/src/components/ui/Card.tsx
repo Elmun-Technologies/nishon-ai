@@ -23,9 +23,9 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     ref
   ) => {
     const variants = {
-      default: 'bg-[#13131A] border border-[#2A2A3A]',
-      elevated: 'bg-[#13131A] border border-[#2A2A3A] shadow-[0_8px_30px_0_rgba(0,0,0,0.12)]',
-      outlined: 'bg-transparent border border-[#2A2A3A]',
+      default: 'bg-white border border-[#E5E7EB]',
+      elevated: 'bg-white border border-[#E5E7EB] shadow-sm',
+      outlined: 'bg-transparent border border-[#E5E7EB]',
     }
 
     const paddings = {
@@ -42,7 +42,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
           'rounded-xl',
           variants[variant],
           paddings[padding],
-          hoverable && 'cursor-pointer hover:border-[#7C3AED]/30 transition-colors duration-200',
+          hoverable && 'cursor-pointer hover:border-[#D1D5DB] hover:shadow-sm transition-all duration-200',
           className
         )}
         {...props}

@@ -23,15 +23,15 @@ const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
     ref
   ) => {
     const variants = {
-      default: 'bg-[#2A2A3A] border border-[#3A3A4A] text-[#9CA3AF]',
-      secondary: 'bg-[#2A2A3A] border border-[#3A3A4A] text-[#9CA3AF]',
-      gray: 'bg-[#2A2A3A] border border-[#3A3A4A] text-[#9CA3AF]',
-      purple: 'bg-[#7C3AED]/10 border border-[#7C3AED]/20 text-[#A78BFA]',
-      success: 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400',
-      warning: 'bg-amber-500/10 border border-amber-500/20 text-amber-400',
-      error: 'bg-red-500/10 border border-red-500/20 text-red-400',
-      info: 'bg-blue-500/10 border border-blue-500/20 text-blue-400',
-      danger: 'bg-red-500/10 border border-red-500/20 text-red-400',
+      default: 'bg-gray-100 border border-gray-200 text-gray-600',
+      secondary: 'bg-gray-100 border border-gray-200 text-gray-600',
+      gray: 'bg-gray-100 border border-gray-200 text-gray-600',
+      purple: 'bg-violet-50 border border-violet-200 text-violet-700',
+      success: 'bg-emerald-50 border border-emerald-200 text-emerald-700',
+      warning: 'bg-amber-50 border border-amber-200 text-amber-700',
+      error: 'bg-red-50 border border-red-200 text-red-700',
+      info: 'bg-blue-50 border border-blue-200 text-blue-700',
+      danger: 'bg-red-50 border border-red-200 text-red-700',
     }
     const sizes = {
       sm: 'px-1.5 py-0.5 text-[10px]',
@@ -42,7 +42,7 @@ const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
       <div
         ref={ref}
         className={cn(
-          'inline-flex items-center gap-1.5 rounded-lg font-medium border',
+          'inline-flex items-center gap-1.5 rounded-full font-medium border',
           variants[variant],
           sizes[size],
           dot && 'pr-2',
@@ -54,11 +54,11 @@ const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
           <span
             className={cn(
               'w-1.5 h-1.5 rounded-full',
-              variant === 'purple' && 'bg-[#A78BFA]',
-              variant === 'success' && 'bg-emerald-400',
-              variant === 'warning' && 'bg-amber-400',
-              variant === 'error' && 'bg-red-400',
-              (variant === 'default' || variant === 'gray') && 'bg-[#6B7280]'
+              variant === 'purple' && 'bg-violet-500',
+              variant === 'success' && 'bg-emerald-500',
+              variant === 'warning' && 'bg-amber-500',
+              variant === 'error' && 'bg-red-500',
+              (variant === 'default' || variant === 'gray') && 'bg-gray-400'
             )}
           />
         )}
