@@ -634,7 +634,7 @@ export default function CompetitorsPage() {
 
                     {isOpen && (
                       <div className="border-t border-[#E5E7EB]">
-                        <div className="grid grid-cols-[1fr_1fr_1fr] gap-0 px-5 py-2.5 bg-[#0D0D15] border-b border-[#E5E7EB]">
+                        <div className="grid grid-cols-[1fr_1fr_1fr] gap-0 px-5 py-2.5 bg-[#F9FAFB] border-b border-[#E5E7EB]">
                           <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide">Parametr</p>
                           <p className="text-emerald-400 text-xs font-medium pl-3">Siz</p>
                           <p className="text-red-400 text-xs font-medium pl-3">{result.competitor.name}</p>
@@ -646,7 +646,7 @@ export default function CompetitorsPage() {
                             className={`
                               grid grid-cols-[1fr_1fr_1fr] gap-0 px-5 py-3.5
                               border-b border-[#E5E7EB] last:border-0
-                              ${i % 2 === 0 ? '' : 'bg-[#0D0D15]/40'}
+                              ${i % 2 === 0 ? '' : 'bg-[#F9FAFB]/40'}
                             `}
                           >
                             <div className="pr-4">

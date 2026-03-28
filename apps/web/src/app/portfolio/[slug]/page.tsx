@@ -263,7 +263,7 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
 
         {/* ── KEY METRICS (myfxbook style) ── */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3 mb-8">
-          <div className="col-span-2 bg-gradient-to-br from-[#1C1028] to-[#13131A] border border-[#D1D5DB] rounded-xl p-4">
+          <div className="col-span-2 bg-gradient-to-br from-white to-[#F9FAFB] border border-[#D1D5DB] rounded-xl p-4">
             <div className="text-[#9CA3AF] text-xs mb-1">O'rtacha ROAS</div>
             <div className="text-3xl font-extrabold text-[#374151]">{t.stats.avgROAS}x</div>
             <div className="text-xs text-emerald-400 mt-1">En yaxshi: {t.stats.bestROAS}x</div>

@@ -341,7 +341,7 @@ export default function SellerLandingPage() {
             {FEATURES.map((f) => (
               <div
                 key={f.title}
-                className="bg-white border border-[#E5E7EB] hover:border-[#D1D5DB] rounded-2xl p-6 transition-all duration-300 group hover:bg-[#16162A]"
+                className="bg-white border border-[#E5E7EB] hover:border-[#D1D5DB] rounded-2xl p-6 transition-all duration-300 group hover:bg-[#F3F4F6]"
               >
                 <div className="text-3xl mb-4">{f.icon}</div>
                 <h3 className="text-[#111827] font-semibold mb-2">{f.title}</h3>
@@ -370,7 +370,7 @@ export default function SellerLandingPage() {
                 className={cn(
                   'relative rounded-2xl p-7 border transition-all duration-300',
                   plan.highlight
-                    ? 'bg-gradient-to-b from-[#1C1028] to-[#13131A] border-[#111827]/50 shadow-[0_0_40px_rgba(124,58,237,0.2)]'
+                    ? 'bg-gradient-to-b from-white to-[#F9FAFB] border-[#111827]/50 shadow-[0_0_40px_rgba(124,58,237,0.2)]'
                     : 'bg-white border-[#E5E7EB] hover:border-[#D1D5DB]'
                 )}
               >
@@ -471,7 +471,7 @@ export default function SellerLandingPage() {
       {/* ── CTA BANNER ──────────────────────────────────────────────────── */}
       <section className="py-28 px-6">
         <div className="max-w-4xl mx-auto">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1C1028] via-[#16162A] to-[#0D0D14] border border-[#D1D5DB] p-12 md:p-16 text-center">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white via-[#F9FAFB] to-[#F3F4F6] border border-[#D1D5DB] p-12 md:p-16 text-center">
             {/* glow */}
             <div className="absolute inset-0 bg-[#111827]/5 blur-[80px] rounded-full" />
             <div className="absolute top-0 right-0 w-64 h-64 bg-[#A855F7]/10 blur-[120px] rounded-full" />

@@ -317,7 +317,7 @@ export default function AiDecisionsPage() {
                           Before → After
                         </p>
                         <div className="grid grid-cols-2 gap-3">
-                          <div className="bg-[#0D0D15] border border-[#E5E7EB] rounded-xl p-4">
+                          <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4">
                             <p className="text-[#6B7280] text-xs font-medium mb-2 flex items-center gap-1.5">
                               <span className="w-2 h-2 rounded-full bg-red-500/60" />
                               Before
@@ -340,7 +340,7 @@ export default function AiDecisionsPage() {
                             )}
                           </div>
 
-                          <div className="bg-[#0D0D15] border border-emerald-500/20 rounded-xl p-4">
+                          <div className="bg-[#F9FAFB] border border-emerald-500/20 rounded-xl p-4">
                             <p className="text-[#6B7280] text-xs font-medium mb-2 flex items-center gap-1.5">
                               <span className="w-2 h-2 rounded-full bg-emerald-500/60" />
                               After

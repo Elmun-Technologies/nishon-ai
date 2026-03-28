@@ -245,7 +245,7 @@ export default function CampaignsPage() {
                 </Card>
 
                 {isSelected && (
-                  <div className="mt-1 bg-[#0D0D15] border border-[#D1D5DB] border-t-0 rounded-b-xl px-5 py-4">
+                  <div className="mt-1 bg-[#F9FAFB] border border-[#D1D5DB] border-t-0 rounded-b-xl px-5 py-4">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                       {[
                         { label: 'Platform', value: campaign.platform.toUpperCase() },
@@ -334,7 +334,7 @@ export default function CampaignsPage() {
             onClick={() => setShowCreatePanel(false)}
           />
           {/* Panel */}
-          <div className="w-full max-w-lg bg-[#0D0D15] border-l border-[#E5E7EB] flex flex-col shadow-2xl">
+          <div className="w-full max-w-lg bg-[#F9FAFB] border-l border-[#E5E7EB] flex flex-col shadow-2xl">
             {/* Panel header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-[#E5E7EB]">
               <div>

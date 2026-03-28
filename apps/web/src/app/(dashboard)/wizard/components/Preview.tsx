@@ -90,7 +90,7 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
       {/* Search Preview */}
       <Card padding="lg">
         <h4 className="text-md font-semibold text-[#111827] mb-3">Search Ad Preview</h4>
-        <div className="bg-[#0A0A0A] border border-[#E5E7EB] rounded-lg p-4">
+        <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg p-4">
           <div className="text-sm text-[#6B7280] mb-2">Search query: {data.searchQuery}</div>
           <div className="space-y-2">
             <div>
@@ -109,7 +109,7 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
       {/* Banner Preview */}
       <Card padding="lg">
         <h4 className="text-md font-semibold text-[#111827] mb-3">Banner Ad Preview</h4>
-        <div className="bg-[#0A0A0A] border border-[#E5E7EB] rounded-lg p-4">
+        <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg p-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <img 
@@ -131,7 +131,7 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
   const renderGooglePreview = (data: any) => (
     <Card padding="lg">
       <h4 className="text-md font-semibold text-[#111827] mb-3">Search Ad Preview</h4>
-      <div className="bg-[#0A0A0A] border border-[#E5E7EB] rounded-lg p-4">
+      <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg p-4">
         <div className="text-sm text-[#6B7280] mb-2">Search query: {data.searchQuery}</div>
         <div className="space-y-2">
           <div>
@@ -298,7 +298,7 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
       {/* Audience Preview */}
       <Card padding="lg">
         <h4 className="text-sm font-semibold text-[#111827] mb-3">Target Audience</h4>
-        <div className="bg-[#0A0A0A] border border-[#E5E7EB] rounded-lg p-4">
+        <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg p-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <div className="text-[#6B7280] text-xs">Age</div>
@@ -321,7 +321,7 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
   const renderTelegramPreview = (data: any) => (
     <Card padding="lg">
       <h4 className="text-md font-semibold text-[#111827] mb-3">Telegram Ad Preview</h4>
-      <div className="bg-[#0A0A0A] border border-[#E5E7EB] rounded-lg p-4">
+      <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg p-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="md:col-span-1">
             <img 

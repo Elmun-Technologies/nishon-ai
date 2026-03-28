@@ -516,7 +516,7 @@ export default function RoiCalculatorPage() {
       {/* Detailed comparison table */}
       <Card padding="none">
         {/* Table header */}
-        <div className="grid grid-cols-3 gap-4 px-5 py-3 bg-[#0D0D15] border-b border-[#E5E7EB] rounded-t-xl">
+        <div className="grid grid-cols-3 gap-4 px-5 py-3 bg-[#F9FAFB] border-b border-[#E5E7EB] rounded-t-xl">
           <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide">
             Ko'rsatkich
           </p>

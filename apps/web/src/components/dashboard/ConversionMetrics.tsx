@@ -177,7 +177,7 @@ export function ConversionMetrics({
               {trend.map((row) => (
                 <tr
                   key={row.date}
-                  className="border-b border-[#E5E7EB] hover:bg-[#1A1A2E] transition-colors"
+                  className="border-b border-[#E5E7EB] hover:bg-[#F9FAFB] transition-colors"
                 >
                   <td className="py-3 px-4 text-[#111827]">{row.date}</td>
                   <td className="text-right py-3 px-4 text-[#111827] font-medium">

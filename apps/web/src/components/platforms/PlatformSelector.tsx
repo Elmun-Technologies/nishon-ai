@@ -100,7 +100,7 @@ function PlatformCard({ platform, selected, onToggle }: PlatformCardProps) {
         relative w-full text-left p-5 rounded-2xl border transition-all duration-200 cursor-pointer
         ${selected
           ? 'border-opacity-60 bg-white'
-          : 'border-[#E5E7EB] bg-[#0F0F15] hover:border-[#E5E7EB] hover:bg-white'
+          : 'border-[#E5E7EB] bg-white hover:border-[#E5E7EB] hover:bg-white'
         }
       `}
       style={selected ? {

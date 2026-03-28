@@ -1268,7 +1268,7 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
             { key: 'additionalQueries', label: 'Additional', desc: 'Related products' },
             { key: 'alternativeQueries', label: 'Alternative', desc: 'Substitutes' },
           ] as const).map(({ key, label, desc }) => (
-            <label key={key} className="flex items-start gap-3 cursor-pointer bg-[#1A1A2E] border border-[#E5E7EB] rounded-lg p-3 hover:border-[#D1D5DB]">
+            <label key={key} className="flex items-start gap-3 cursor-pointer bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg p-3 hover:border-[#D1D5DB]">
               <input type="checkbox" checked={formData.adGroup.autoTargeting[key] as boolean}
                 onChange={() => toggleAt(key)} className="w-4 h-4 accent-[#7C3AED] mt-0.5" />
               <div>
@@ -1320,7 +1320,7 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
         </div>
         <div className="space-y-1">
           {formData.adGroup.keywords.phrases.map((phrase, i) => (
-            <div key={i} className="flex items-center justify-between bg-[#1A1A2E] border border-[#E5E7EB] rounded-lg px-3 py-2">
+            <div key={i} className="flex items-center justify-between bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-3 py-2">
               <div className="flex items-center gap-2">
                 <span className="text-[#111827] text-sm">{phrase}</span>
                 <span className={`text-xs px-1.5 py-0.5 rounded ${
@@ -1361,7 +1361,7 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
             { key: 'abandonedCart', label: 'Abandoned Cart', desc: 'Added but not bought' },
             { key: 'viewedNotBought', label: 'Viewed Not Bought', desc: 'Saw product, no purchase' },
           ] as const).map(({ key, label, desc }) => (
-            <label key={key} className="flex items-start gap-3 cursor-pointer bg-[#1A1A2E] border border-[#E5E7EB] rounded-lg p-3 hover:border-[#D1D5DB]">
+            <label key={key} className="flex items-start gap-3 cursor-pointer bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg p-3 hover:border-[#D1D5DB]">
               <input type="checkbox" checked={formData.adGroup.audiences[key] as boolean}
                 onChange={() => toggleAud(key)} className="w-4 h-4 accent-[#7C3AED] mt-0.5" />
               <div>
@@ -1911,8 +1911,8 @@ function Step5Preview({ formData }: { formData: CampaignFormData }) {
 
             {/* Telegram Preview */}
             {platform === 'telegram' && (
-              <div className="bg-[#17212B] rounded-xl p-1 max-w-sm mx-auto shadow-lg">
-                <div className="bg-[#17212B] rounded-lg overflow-hidden">
+              <div className="bg-[#F9FAFB] rounded-xl p-1 max-w-sm mx-auto shadow-lg">
+                <div className="bg-[#F9FAFB] rounded-lg overflow-hidden">
                   {/* Channel header */}
                   <div className="flex items-center gap-3 px-4 py-3 border-b border-[#0E1621]">
                     <div className="w-10 h-10 bg-[#2CA5E0] rounded-full flex items-center justify-center text-[#111827] font-bold">N</div>

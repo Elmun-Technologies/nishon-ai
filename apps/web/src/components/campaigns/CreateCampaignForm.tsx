@@ -57,7 +57,7 @@ function TogglePill({
   onChange: (v: string) => void
 }) {
   return (
-    <div className="inline-flex rounded-lg border border-[#E5E7EB] bg-[#0F0F15] p-0.5">
+    <div className="inline-flex rounded-lg border border-[#E5E7EB] bg-white p-0.5">
       {options.map((o) => (
         <button
           key={o.value}
@@ -158,7 +158,7 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
           value={form.name}
           onChange={(e) => set('name', e.target.value)}
           maxLength={255}
-          className="w-full bg-[#0F0F15] border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#111827]/50 focus:ring-1 focus:ring-[#111827]/30 transition-colors"
+          className="w-full bg-white border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#111827]/50 focus:ring-1 focus:ring-[#111827]/30 transition-colors"
         />
       </div>
 
@@ -174,7 +174,7 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
               className={`flex flex-col items-center gap-2 p-4 rounded-xl border text-center transition-all duration-150 ${
                 form.objective === obj.value
                   ? 'border-[#111827]/50 bg-[#F3F4F6] text-[#111827]'
-                  : 'border-[#E5E7EB] bg-[#0F0F15] text-[#9CA3AF] hover:border-[#E5E7EB] hover:text-[#111827]'
+                  : 'border-[#E5E7EB] bg-white text-[#9CA3AF] hover:border-[#E5E7EB] hover:text-[#111827]'
               }`}
             >
               <span className="text-2xl">{obj.icon}</span>
@@ -204,7 +204,7 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
               placeholder="0"
               value={form.budget}
               onChange={(e) => set('budget', e.target.value)}
-              className="w-full bg-[#0F0F15] border border-[#E5E7EB] rounded-xl px-4 py-3 pr-20 text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#111827]/50 focus:ring-1 focus:ring-[#111827]/30 transition-colors"
+              className="w-full bg-white border border-[#E5E7EB] rounded-xl px-4 py-3 pr-20 text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#111827]/50 focus:ring-1 focus:ring-[#111827]/30 transition-colors"
             />
             {/* Currency toggle */}
             <div className="absolute right-2 top-1/2 -translate-y-1/2">
@@ -237,7 +237,7 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
               type="date"
               value={form.startDate}
               onChange={(e) => set('startDate', e.target.value)}
-              className="w-full bg-[#0F0F15] border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm text-[#111827] focus:outline-none focus:border-[#111827]/50 focus:ring-1 focus:ring-[#111827]/30 transition-colors [color-scheme:dark]"
+              className="w-full bg-white border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm text-[#111827] focus:outline-none focus:border-[#111827]/50 focus:ring-1 focus:ring-[#111827]/30 transition-colors [color-scheme:dark]"
             />
           </div>
           <div>
@@ -247,7 +247,7 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
               value={form.endDate}
               min={form.startDate}
               onChange={(e) => set('endDate', e.target.value)}
-              className="w-full bg-[#0F0F15] border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm text-[#111827] focus:outline-none focus:border-[#111827]/50 focus:ring-1 focus:ring-[#111827]/30 transition-colors [color-scheme:dark]"
+              className="w-full bg-white border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm text-[#111827] focus:outline-none focus:border-[#111827]/50 focus:ring-1 focus:ring-[#111827]/30 transition-colors [color-scheme:dark]"
             />
           </div>
         </div>

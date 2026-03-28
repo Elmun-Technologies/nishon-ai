@@ -1463,7 +1463,7 @@ export default function OnboardingPage() {
                             </p>
                             <div className="space-y-3">
                               {scripts.platforms.meta.videoScripts.map((vs) => (
-                                <div key={vs.scriptNumber} className="bg-[#0D0D15] border border-[#E5E7EB] rounded-xl p-4">
+                                <div key={vs.scriptNumber} className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4">
                                   <div className="flex items-center justify-between mb-3">
                                     <span className="text-[#374151] text-xs font-semibold">
                                       Script #{vs.scriptNumber}
@@ -1511,7 +1511,7 @@ export default function OnboardingPage() {
                             </p>
                             <div className="space-y-2">
                               {scripts.platforms.meta.bannerCopies.map((bc) => (
-                                <div key={bc.variant} className="bg-[#0D0D15] border border-[#E5E7EB] rounded-xl p-3">
+                                <div key={bc.variant} className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-3">
                                   <div className="flex items-start justify-between gap-3">
                                     <div className="flex-1 space-y-1">
                                       <p className="text-[#111827] text-sm font-semibold">{bc.headline}</p>
@@ -1538,7 +1538,7 @@ export default function OnboardingPage() {
                             </p>
                             <div className="grid grid-cols-1 gap-2">
                               {scripts.platforms.google.headlines.map((h, i) => (
-                                <div key={i} className="flex items-center gap-3 bg-[#0D0D15] border border-[#E5E7EB] rounded-lg px-3 py-2">
+                                <div key={i} className="flex items-center gap-3 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-3 py-2">
                                   <span className="text-[#6B7280] text-xs w-5 shrink-0">{i + 1}.</span>
                                   <p className="text-[#111827] text-sm">{h}</p>
                                   <span className="text-[#6B7280] text-xs ml-auto shrink-0">
@@ -1554,7 +1554,7 @@ export default function OnboardingPage() {
                             </p>
                             <div className="space-y-2">
                               {scripts.platforms.google.descriptions.map((d, i) => (
-                                <div key={i} className="bg-[#0D0D15] border border-[#E5E7EB] rounded-lg px-3 py-2.5">
+                                <div key={i} className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-3 py-2.5">
                                   <div className="flex items-start justify-between gap-2">
                                     <p className="text-[#374151] text-sm">{d}</p>
                                     <span className="text-[#6B7280] text-xs shrink-0">{d.length}/90</span>
@@ -1573,7 +1573,7 @@ export default function OnboardingPage() {
                             🎵 TikTok UGC Skriptlar (3 ta variant)
                           </p>
                           {scripts.platforms.tiktok.scripts.map((ts) => (
-                            <div key={ts.scriptNumber} className="bg-[#0D0D15] border border-[#E5E7EB] rounded-xl p-4">
+                            <div key={ts.scriptNumber} className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4">
                               <div className="flex items-center gap-2 mb-3">
                                 <span className="text-[#374151] text-xs font-semibold">Script #{ts.scriptNumber}</span>
                                 <span className="text-xs text-[#6B7280] bg-[#F9FAFB] px-2 py-0.5 rounded">{ts.style}</span>
@@ -1620,7 +1620,7 @@ export default function OnboardingPage() {
                           <p className="text-[#9CA3AF] text-xs font-medium uppercase tracking-wide mb-3">
                             ▶️ YouTube Skippable Ad Script
                           </p>
-                          <div className="bg-[#0D0D15] border border-[#E5E7EB] rounded-xl p-4 space-y-3">
+                          <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4 space-y-3">
                             <div>
                               <span className="text-red-400 text-xs font-medium block mb-1">🎣 Hook (0–5 soniya) — Skip qilishdan oldin</span>
                               <p className="text-[#111827] text-sm bg-red-500/5 border border-red-500/10 rounded-lg px-3 py-2">
@@ -1650,7 +1650,7 @@ export default function OnboardingPage() {
                             ✈️ Telegram Post Ads (3 ta variant)
                           </p>
                           {scripts.platforms.telegram.posts.map((post, i) => (
-                            <div key={i} className="bg-[#0D0D15] border border-[#E5E7EB] rounded-xl p-4">
+                            <div key={i} className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4">
                               <span className="text-[#374151] text-xs font-medium block mb-2">Post #{i + 1}</span>
                               <p className="text-[#374151] text-sm leading-relaxed whitespace-pre-line">
                                 {post}

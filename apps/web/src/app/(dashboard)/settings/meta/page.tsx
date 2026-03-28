@@ -90,7 +90,7 @@ function CampaignRow({ campaign }: { campaign: MetaDashboardCampaign }) {
 
       {/* Expanded metrics */}
       {open && (
-        <div className="border-t border-[#E5E7EB] px-4 py-4 bg-[#0A0A10]">
+        <div className="border-t border-[#E5E7EB] px-4 py-4 bg-white">
           <div className="grid grid-cols-5 gap-4 mb-4">
             <Metric label="Spend" value={`$${spend.toFixed(2)}`} />
             <Metric label="Impressions" value={impressions.toLocaleString()} />
@@ -118,7 +118,7 @@ function AccountCard({ account }: { account: MetaDashboardAccount }) {
   const totalClicks = account.campaigns.reduce((s, c) => s + c.metrics.clicks, 0)
 
   return (
-    <div className="rounded-xl border border-[#E5E7EB] bg-[#0F0F15] overflow-hidden">
+    <div className="rounded-xl border border-[#E5E7EB] bg-white overflow-hidden">
       {/* Account header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-[#E5E7EB]">
         <div>
@@ -254,7 +254,7 @@ export default function MetaSettingsPage() {
     return (
       <div className="max-w-4xl mx-auto space-y-4">
         <MetaPageHeader />
-        <div className="rounded-xl border border-[#E5E7EB] bg-[#0F0F15] p-12 flex items-center justify-center">
+        <div className="rounded-xl border border-[#E5E7EB] bg-white p-12 flex items-center justify-center">
           <div className="flex items-center gap-3 text-[#6B7280]">
             <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -308,7 +308,7 @@ export default function MetaSettingsPage() {
     return (
       <div className="max-w-4xl mx-auto space-y-4">
         <MetaPageHeader />
-        <div className="rounded-xl border border-[#E5E7EB] bg-[#0F0F15] p-8 text-center">
+        <div className="rounded-xl border border-[#E5E7EB] bg-white p-8 text-center">
           {/* Meta logo */}
           <div className="w-16 h-16 rounded-2xl bg-[#F9FAFB] border border-[#E5E7EB] flex items-center justify-center mx-auto mb-5">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" className="text-blue-400">
@@ -382,7 +382,7 @@ export default function MetaSettingsPage() {
       )}
 
       {/* Status bar */}
-      <div className="rounded-xl border border-[#E5E7EB] bg-[#0F0F15] px-5 py-4 flex items-center justify-between flex-wrap gap-3">
+      <div className="rounded-xl border border-[#E5E7EB] bg-white px-5 py-4 flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-[#F9FAFB] border border-[#E5E7EB] flex items-center justify-center shrink-0">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-blue-400">
@@ -435,7 +435,7 @@ export default function MetaSettingsPage() {
           { label: 'Campaigns', value: totalCampaigns.toString() },
           { label: 'Total Spend (30d)', value: `$${totalSpend.toFixed(2)}` },
         ].map((stat) => (
-          <div key={stat.label} className="rounded-xl border border-[#E5E7EB] bg-[#0F0F15] px-4 py-4 text-center">
+          <div key={stat.label} className="rounded-xl border border-[#E5E7EB] bg-white px-4 py-4 text-center">
             <p className="text-xl font-bold text-[#111827]">{stat.value}</p>
             <p className="text-xs text-[#6B7280] mt-1">{stat.label}</p>
           </div>
@@ -444,7 +444,7 @@ export default function MetaSettingsPage() {
 
       {/* Accounts & campaigns */}
       {accounts.length === 0 ? (
-        <div className="rounded-xl border border-[#E5E7EB] bg-[#0F0F15] p-10 text-center">
+        <div className="rounded-xl border border-[#E5E7EB] bg-white p-10 text-center">
           <p className="text-sm font-medium text-[#111827] mb-1">No data yet</p>
           <p className="text-xs text-[#6B7280] mb-5">
             Your Meta account is connected but no campaigns have been synced yet.
@@ -473,7 +473,7 @@ export default function MetaSettingsPage() {
       )}
 
       {/* Reconnect */}
-      <div className="rounded-xl border border-[#E5E7EB] bg-[#0F0F15] px-5 py-4 flex items-center justify-between">
+      <div className="rounded-xl border border-[#E5E7EB] bg-white px-5 py-4 flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-[#111827]">Reconnect Meta</p>
           <p className="text-xs text-[#6B7280] mt-0.5">

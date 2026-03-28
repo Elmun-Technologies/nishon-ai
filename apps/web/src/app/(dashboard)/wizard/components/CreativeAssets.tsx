@@ -359,7 +359,7 @@ export function CreativeAssets({
           {formData.creatives.imagePrompt && (
             <div className="mt-4">
               <Label>AI Image Prompt</Label>
-              <div className="bg-[#1F1F2E] p-4 rounded-lg">
+              <div className="bg-[#F9FAFB] p-4 rounded-lg">
                 <p className="text-sm text-[#6B7280]">{formData.creatives.imagePrompt}</p>
               </div>
             </div>

@@ -324,13 +324,13 @@ export default function SettingsPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm text-[#9CA3AF] mb-1.5">Industry</label>
-                      <div className="rounded-lg border border-[#E5E7EB] bg-[#0F0F15] px-3 py-2.5 text-sm text-[#374151]">
+                      <div className="rounded-lg border border-[#E5E7EB] bg-white px-3 py-2.5 text-sm text-[#374151]">
                         {currentWorkspace?.industry ?? '—'}
                       </div>
                     </div>
                     <div>
                       <label className="block text-sm text-[#9CA3AF] mb-1.5">Monthly Budget</label>
-                      <div className="rounded-lg border border-[#E5E7EB] bg-[#0F0F15] px-3 py-2.5 text-sm text-[#374151]">
+                      <div className="rounded-lg border border-[#E5E7EB] bg-white px-3 py-2.5 text-sm text-[#374151]">
                         ${currentWorkspace?.monthlyBudget ?? '—'}
                       </div>
                     </div>
@@ -443,7 +443,7 @@ export default function SettingsPage() {
                 {INTEGRATIONS.map((integration) => (
                   <div
                     key={integration.id}
-                    className="flex items-center gap-4 p-4 rounded-xl border border-[#E5E7EB] bg-[#0F0F15]"
+                    className="flex items-center gap-4 p-4 rounded-xl border border-[#E5E7EB] bg-white"
                   >
                     <div className="w-10 h-10 rounded-xl bg-[#F9FAFB] border border-[#E5E7EB] flex items-center justify-center shrink-0">
                       {integration.logo}
@@ -499,7 +499,7 @@ export default function SettingsPage() {
                 {INTEGRATIONS_STATIC.map((integration) => (
                   <div
                     key={integration.id}
-                    className="flex items-center gap-4 p-4 rounded-xl border border-[#E5E7EB] bg-[#0F0F15] opacity-60"
+                    className="flex items-center gap-4 p-4 rounded-xl border border-[#E5E7EB] bg-white opacity-60"
                   >
                     <div className="w-10 h-10 rounded-xl bg-[#F9FAFB] border border-[#E5E7EB] flex items-center justify-center shrink-0">
                       {integration.logo}
@@ -602,7 +602,7 @@ export default function SettingsPage() {
                 </p>
               </div>
 
-              <div className="bg-[#1A1A2E] border border-[#E5E7EB] rounded-lg p-4 mb-4 text-xs text-[#9CA3AF] space-y-1.5">
+              <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg p-4 mb-4 text-xs text-[#9CA3AF] space-y-1.5">
                 <p className="font-medium text-[#E5E7EB]">Qanday ulash:</p>
                 <p>1. Telegramda <span className="text-[#374151] font-mono">@NishonAIBot</span> ga yozing</p>
                 <p>2. <span className="font-mono text-[#111827]">/start</span> buyrug'ini yuboring</p>
@@ -785,7 +785,7 @@ export default function SettingsPage() {
               </div>
               <div className="space-y-3">
                 {/* Reset strategy */}
-                <div className="flex items-center justify-between p-4 rounded-xl border border-[#E5E7EB] bg-[#0F0F15]">
+                <div className="flex items-center justify-between p-4 rounded-xl border border-[#E5E7EB] bg-white">
                   <div>
                     <p className="text-sm font-medium text-[#111827]">Reset AI Strategy</p>
                     <p className="text-xs text-[#6B7280] mt-0.5">

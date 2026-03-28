@@ -594,7 +594,7 @@ export function AdGroupSettings({
 
           <div>
             <h4 className="text-sm font-medium text-white mb-2">Targeting Logic</h4>
-            <div className="bg-[#1F1F2E] p-3 rounded-lg">
+            <div className="bg-[#F9FAFB] p-3 rounded-lg">
               <p className="text-xs text-[#6B7280]">
                 {activeSegments.length > 0
                   ? activeSegments.join(' OR ')
