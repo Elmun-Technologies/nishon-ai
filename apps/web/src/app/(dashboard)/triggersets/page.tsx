@@ -3,10 +3,10 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useWorkspaceStore } from '@/stores/workspace.store'
-import { Card } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
-import { Alert } from '@/components/ui/Alert'
-import { Input } from '@/components/ui/Input'
+import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Alert } from '@/components/ui/alert'
+import { Input } from '@/components/ui/input'
 import { triggersets as triggersetsApi } from '@/lib/api-client'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -199,7 +199,7 @@ export default function TriggerSetsPage() {
         </Button>
       </div>
 
-      {error && <Alert variant="error">{error}</Alert>}
+      {error && <Alert variant="destructive">{error}</Alert>}
 
       {/* ── Create form ── */}
       {showCreate && (

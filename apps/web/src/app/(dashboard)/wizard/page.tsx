@@ -1,9 +1,9 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/Button'
-import { Badge } from '@/components/ui/Badge'
-import { Card } from '@/components/ui/Card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Card } from '@/components/ui/card'
 import { PageSpinner } from '@/components/ui/Spinner'
 import { PlatformIcon } from '@/components/ui/PlatformIcon'
 import { formatCurrency } from '@/lib/utils'
@@ -516,7 +516,7 @@ export default function CampaignWizardPage() {
       </div>
 
       {/* Step Content */}
-      <Card padding="lg">
+      <Card className="p-8">
         {renderStep()}
       </Card>
 

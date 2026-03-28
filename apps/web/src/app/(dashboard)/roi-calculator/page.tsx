@@ -1,9 +1,9 @@
 'use client'
 import { useState, useMemo } from 'react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
-import { Card } from '@/components/ui/Card'
-import { Badge } from '@/components/ui/Badge'
-import { Button } from '@/components/ui/Button'
+import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { formatCurrency } from '@/lib/utils'
 
@@ -327,7 +327,7 @@ export default function RoiCalculatorPage() {
       <div>
         <div className="flex items-center gap-3 mb-1">
           <h1 className="text-2xl font-bold text-[#111827]">ROI Kalkulyator</h1>
-          <Badge variant="purple">📊 Real hisob-kitob</Badge>
+          <Badge variant="default">📊 Real hisob-kitob</Badge>
         </div>
         <p className="text-[#6B7280] text-sm">
           Reklama byudjetingiz Nishon AI bilan va usiz qancha qaytishini ko'ring —
@@ -514,7 +514,7 @@ export default function RoiCalculatorPage() {
       </Card>
 
       {/* Detailed comparison table */}
-      <Card padding="none">
+      <Card className="p-0">
         {/* Table header */}
         <div className="grid grid-cols-3 gap-4 px-5 py-3 bg-[#F9FAFB] border-b border-[#E5E7EB] rounded-t-xl">
           <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide">
@@ -638,7 +638,7 @@ export default function RoiCalculatorPage() {
       </div>
 
       {/* Disclaimer + CTA */}
-      <Card variant="outlined" padding="sm">
+      <Card className="bg-transparent" padding="sm">
         <div className="flex items-start gap-3 px-2">
           <span className="text-lg mt-0.5 shrink-0">ℹ️</span>
           <div className="flex-1">

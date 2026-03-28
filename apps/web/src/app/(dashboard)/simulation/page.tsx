@@ -1,8 +1,8 @@
 'use client'
 import { useState, useMemo } from 'react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
-import { Card } from '@/components/ui/Card'
-import { Badge } from '@/components/ui/Badge'
+import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { useRouter } from 'next/navigation'
 import { formatCurrency } from '@/lib/utils'
@@ -295,7 +295,7 @@ export default function SimulationPage() {
             <div className="flex items-center gap-2 mb-5">
               <span className="text-lg">📊</span>
               <h2 className="font-semibold text-[#111827]">Platform Breakdown</h2>
-              <Badge variant="gray" size="sm">
+              <Badge variant="secondary" size="sm">
                 {formatCurrency(budget)} total
               </Badge>
             </div>
@@ -345,7 +345,7 @@ export default function SimulationPage() {
           </Card>
 
           {/* Insight box */}
-          <Card variant="outlined" padding="sm">
+          <Card className="bg-transparent" padding="sm">
             <div className="flex items-start gap-3 px-2">
               <span className="text-lg mt-0.5">💡</span>
               <div>

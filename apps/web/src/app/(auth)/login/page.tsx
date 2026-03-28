@@ -2,9 +2,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Input'
-import { Alert } from '@/components/ui/Alert'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Alert } from '@/components/ui/alert'
 import { auth, workspaces as workspacesApi } from '@/lib/api-client'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 
@@ -192,7 +192,7 @@ export default function LoginPage() {
                 leftIcon={<span className="text-sm">🔒</span>}
               />
 
-              {error && <Alert variant="error">{error}</Alert>}
+              {error && <Alert variant="destructive">{error}</Alert>}
 
               <Button type="submit" fullWidth loading={loading} size="lg">
                 Kirish

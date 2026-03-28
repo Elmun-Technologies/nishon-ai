@@ -2,12 +2,12 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { useRealtimeRefresh } from '@/hooks/useRealtimeRefresh'
-import { Badge } from '@/components/ui/Badge'
-import { Card } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
+import { Badge } from '@/components/ui/badge'
+import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { PageSpinner } from '@/components/ui/Spinner'
-import { Alert } from '@/components/ui/Alert'
+import { Alert } from '@/components/ui/alert'
 import { aiDecisions as aiDecisionsApi } from '@/lib/api-client'
 import { timeAgo } from '@/lib/utils'
 
@@ -132,8 +132,8 @@ export default function AiDecisionsPage() {
         </Button>
       </div>
 
-      {fetchError && <Alert variant="error">{fetchError}</Alert>}
-      {actionError && <Alert variant="error">{actionError}</Alert>}
+      {fetchError && <Alert variant="destructive">{fetchError}</Alert>}
+      {actionError && <Alert variant="destructive">{actionError}</Alert>}
 
       {/* ── Pending approval banner ── */}
       {counts.pending > 0 && (
@@ -251,7 +251,7 @@ export default function AiDecisionsPage() {
                               {decision.isExecuted ? 'Executed' : 'Approved'}
                             </Badge>
                           ) : (
-                            <Badge variant="danger">Rejected</Badge>
+                            <Badge variant="destructive">Rejected</Badge>
                           )}
 
                           <span className="text-[#6B7280] text-xs ml-auto">
@@ -373,7 +373,7 @@ export default function AiDecisionsPage() {
         </div>
       )}
 
-      <Card variant="outlined" padding="sm">
+      <Card className="bg-transparent" padding="sm">
         <div className="flex items-start gap-3 px-2">
           <span className="text-lg mt-0.5">🔍</span>
           <div>

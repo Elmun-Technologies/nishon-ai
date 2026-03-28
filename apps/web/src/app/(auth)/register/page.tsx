@@ -2,9 +2,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Input'
-import { Alert } from '@/components/ui/Alert'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Alert } from '@/components/ui/alert'
 import { auth } from '@/lib/api-client'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 
@@ -225,7 +225,7 @@ export default function RegisterPage() {
               required
             />
 
-            {serverError && <Alert variant="error">{serverError}</Alert>}
+            {serverError && <Alert variant="destructive">{serverError}</Alert>}
 
             <Button type="submit" fullWidth loading={loading} size="lg" className="mt-2">
               Bepul hisob yaratish

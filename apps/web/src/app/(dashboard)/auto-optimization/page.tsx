@@ -2,9 +2,9 @@
 import { useState } from 'react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { autoOptimization } from '@/lib/api-client'
-import { Card } from '@/components/ui/Card'
-import { Badge } from '@/components/ui/Badge'
-import { Button } from '@/components/ui/Button'
+import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/Spinner'
 
 // ─── Types (mirrors backend OptimizationReport) ───────────────────────────────
@@ -109,9 +109,9 @@ function RiskDot({ level }: { level: 'low' | 'medium' | 'high' }) {
 }
 
 function SeverityBadge({ severity }: { severity: string }) {
-  if (severity === 'critical') return <Badge variant="danger" size="sm">critical</Badge>
+  if (severity === 'critical') return <Badge variant="destructive" size="sm">critical</Badge>
   if (severity === 'warning') return <Badge variant="warning" size="sm">warning</Badge>
-  return <Badge variant="gray" size="sm">info</Badge>
+  return <Badge variant="secondary" size="sm">info</Badge>
 }
 
 // ─── Health score ring ────────────────────────────────────────────────────────
@@ -497,7 +497,7 @@ function OptimizationResults({ report }: { report: OptimizationReport }) {
         <Card>
           <h3 className="text-[#111827] font-semibold mb-3 flex items-center gap-2">
             Aniqlangan muammolar
-            <Badge variant="danger" size="sm">{problems.length}</Badge>
+            <Badge variant="destructive" size="sm">{problems.length}</Badge>
           </h3>
           <div className="space-y-2">
             {problems.map((p, i) => (
@@ -535,7 +535,7 @@ function OptimizationResults({ report }: { report: OptimizationReport }) {
         <Card>
           <h3 className="text-[#111827] font-semibold mb-3 flex items-center gap-2">
             Harakatlar
-            <Badge variant="gray" size="sm">{governed.length} ta</Badge>
+            <Badge variant="secondary" size="sm">{governed.length} ta</Badge>
           </h3>
           <div className="space-y-2">
             {governed.map((ga, i) => (

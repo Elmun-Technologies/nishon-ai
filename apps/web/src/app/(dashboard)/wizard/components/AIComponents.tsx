@@ -1,13 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
-import { Input } from '@/components/ui/Input'
-import { Textarea } from '@/components/ui/Textarea'
-import { Select } from '@/components/ui/Select'
-import { Label } from '@/components/ui/Label'
-import { Badge } from '@/components/ui/Badge'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Select } from '@/components/ui/select'
+import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
 import { useAiAgent } from '@/hooks/useAiAgent'
 
 interface AIComponentsProps {
@@ -38,7 +38,7 @@ export function AIAdCopyGenerator({ onGenerateAdCopy, aiLoading }: AIComponentsP
   }
 
   return (
-    <Card padding="lg">
+    <Card className="p-8">
       <h3 className="text-lg font-semibold text-[#111827] mb-4">AI Ad Copy Generator</h3>
       <div className="space-y-4">
         <div>
@@ -125,7 +125,7 @@ export function AIKeywordGenerator({ onGenerateKeywords, aiLoading }: AIComponen
   }
 
   return (
-    <Card padding="lg">
+    <Card className="p-8">
       <h3 className="text-lg font-semibold text-[#111827] mb-4">AI Keyword Generator</h3>
       <div className="space-y-4">
         <div>
@@ -203,7 +203,7 @@ export function AIBudgetOptimizer({ onGenerateBudgetOptimization, aiLoading }: A
   }
 
   return (
-    <Card padding="lg">
+    <Card className="p-8">
       <h3 className="text-lg font-semibold text-[#111827] mb-4">AI Budget Optimizer</h3>
       <div className="space-y-4">
         <div>
@@ -293,7 +293,7 @@ export function AIImagePromptGenerator({ onGenerateImagePrompt, aiLoading }: AIC
   }
 
   return (
-    <Card padding="lg">
+    <Card className="p-8">
       <h3 className="text-lg font-semibold text-[#111827] mb-4">AI Image Prompt Generator</h3>
       <div className="space-y-4">
         <div>
@@ -363,7 +363,7 @@ export function AIImagePromptGenerator({ onGenerateImagePrompt, aiLoading }: AIC
 
 export function AIRecommendations({ recommendations }: { recommendations: any[] }) {
   return (
-    <Card padding="lg">
+    <Card className="p-8">
       <h3 className="text-lg font-semibold text-[#111827] mb-4">AI Recommendations</h3>
       <div className="space-y-4">
         {recommendations.length === 0 ? (

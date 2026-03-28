@@ -4,11 +4,11 @@ import { useRouter } from 'next/navigation'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { useRealtimeRefresh } from '@/hooks/useRealtimeRefresh'
 import { MetricCard } from '@/components/ui/MetricCard'
-import { Card } from '@/components/ui/Card'
-import { Badge } from '@/components/ui/Badge'
-import { Button } from '@/components/ui/Button'
+import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/EmptyState'
-import { Alert } from '@/components/ui/Alert'
+import { Alert } from '@/components/ui/alert'
 import { workspaces as workspacesApi, aiAgent, meta as metaApi } from '@/lib/api-client'
 import { formatCurrency, formatNumber } from '@/lib/utils'
 import { SpendForecastChart } from '@/components/ui/SpendForecastChart'
@@ -111,7 +111,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6 max-w-7xl">
 
-      {error && <Alert variant="error">{error}</Alert>}
+      {error && <Alert variant="destructive">{error}</Alert>}
       {optimizeMsg && (
         <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 text-emerald-700 text-sm">
           ✓ {optimizeMsg}
@@ -393,7 +393,7 @@ export default function DashboardPage() {
       </div>
 
       {/* ── Quick actions ── */}
-      <Card padding="sm">
+      <Card className="p-4">
         <div className="flex items-center justify-between px-2">
           <p className="text-[#6B7280] text-sm font-medium">Tezkor amallar</p>
           <div className="flex items-center gap-2 flex-wrap">

@@ -1,15 +1,15 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
-import { Input } from '@/components/ui/Input'
-import { Select } from '@/components/ui/Select'
-import { Textarea } from '@/components/ui/Textarea'
-import { Switch } from '@/components/ui/Switch'
-import { Label } from '@/components/ui/Label'
-import { Checkbox } from '@/components/ui/Checkbox'
-import { Accordion } from '@/components/ui/Accordion'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Select } from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Accordion } from '@/components/ui/accordion'
 import { useAiAgent } from '@/hooks/useAiAgent'
 
 interface AdGroupSettingsProps {
@@ -151,7 +151,7 @@ export function AdGroupSettings({
       <h2 className="text-xl font-semibold text-white">Ad Group Settings</h2>
 
       {/* Basic Info */}
-      <Card padding="lg">
+      <Card className="p-8">
         <h3 className="text-lg font-semibold text-white mb-4">Basic Information</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -183,7 +183,7 @@ export function AdGroupSettings({
       </Card>
 
       {/* Geo Targeting */}
-      <Card padding="lg">
+      <Card className="p-8">
         <h3 className="text-lg font-semibold text-white mb-4">Geo Targeting</h3>
 
         {/* Mode toggle */}
@@ -277,7 +277,7 @@ export function AdGroupSettings({
       </Card>
 
       {/* Auto Targeting */}
-      <Card padding="lg">
+      <Card className="p-8">
         <h3 className="text-lg font-semibold text-white mb-4">Auto Targeting (AI-based)</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[
@@ -323,7 +323,7 @@ export function AdGroupSettings({
       </Card>
 
       {/* Keywords */}
-      <Card padding="lg">
+      <Card className="p-8">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-white">Keywords</h3>
           <Button
@@ -407,7 +407,7 @@ export function AdGroupSettings({
       </Card>
 
       {/* Interests & Habits */}
-      <Card padding="lg">
+      <Card className="p-8">
         <h3 className="text-lg font-semibold text-white mb-4">Interests & Habits</h3>
         <div className="space-y-4">
           <div>
@@ -457,7 +457,7 @@ export function AdGroupSettings({
       </Card>
 
       {/* Audience Segments & Retargeting */}
-      <Card padding="lg">
+      <Card className="p-8">
         <h3 className="text-lg font-semibold text-white mb-4">Audience Segments & Retargeting</h3>
 
         <div className="space-y-4">
@@ -486,7 +486,7 @@ export function AdGroupSettings({
           {/* Custom Rule Builder */}
           <div>
             <h4 className="text-sm font-medium text-white mb-3">Custom Rule Builder</h4>
-            <Card padding="md">
+            <Card className="p-6">
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
@@ -607,7 +607,7 @@ export function AdGroupSettings({
       </Card>
 
       {/* Ad Group Extensions */}
-      <Card padding="lg">
+      <Card className="p-8">
         <h3 className="text-lg font-semibold text-white mb-4">Ad Group Extensions</h3>
         <div className="space-y-4">
 
@@ -717,7 +717,7 @@ export function AdGroupSettings({
       </Card>
 
       {/* URL Parameters */}
-      <Card padding="lg">
+      <Card className="p-8">
         <h3 className="text-lg font-semibold text-white mb-4">Ad Group URL Parameters</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -743,7 +743,7 @@ export function AdGroupSettings({
 
       {/* Bid Adjustments (Group Level) — 7 types */}
       <Accordion type="multiple">
-        <Card padding="lg">
+        <Card className="p-8">
           <Accordion.Item value="group-bid-adjustments">
             <Accordion.Trigger>
               <h3 className="text-lg font-semibold text-white">Ad Group Bid Adjustments (7 tur)</h3>
@@ -870,7 +870,7 @@ export function AdGroupSettings({
       </Accordion>
 
       {/* Content Type */}
-      <Card padding="lg">
+      <Card className="p-8">
         <h3 className="text-lg font-semibold text-white mb-4">Content Type</h3>
         <div className="flex flex-wrap gap-4">
           <div className="flex items-center gap-2">

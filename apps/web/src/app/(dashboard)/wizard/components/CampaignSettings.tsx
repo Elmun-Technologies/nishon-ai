@@ -1,15 +1,15 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
-import { Input } from '@/components/ui/Input'
-import { Select } from '@/components/ui/Select'
-import { Textarea } from '@/components/ui/Textarea'
-import { Switch } from '@/components/ui/Switch'
-import { Label } from '@/components/ui/Label'
-import { Checkbox } from '@/components/ui/Checkbox'
-import { Accordion } from '@/components/ui/Accordion'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Select } from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Accordion } from '@/components/ui/accordion'
 import { useAiAgent } from '@/hooks/useAiAgent'
 
 interface CampaignSettingsProps {
@@ -194,7 +194,7 @@ export function CampaignSettings({
       <h2 className="text-xl font-semibold text-white">Campaign Settings</h2>
 
       {/* Basic Settings */}
-      <Card padding="lg">
+      <Card className="p-8">
         <h3 className="text-lg font-semibold text-white mb-4">Basic Information</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -344,7 +344,7 @@ export function CampaignSettings({
       </Card>
 
       {/* ── Strategy & Bidding ── */}
-      <Card padding="lg">
+      <Card className="p-8">
         <h3 className="text-lg font-semibold text-white mb-1">Strategy & Bidding</h3>
         {formData.platforms?.length > 0 && (
           <p className="text-xs text-[#6B7280] mb-4">
@@ -439,7 +439,7 @@ export function CampaignSettings({
       </Card>
 
       {/* ── UTM Parameters ── */}
-      <Card padding="lg">
+      <Card className="p-8">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-white">UTM Parameters</h3>
           <Button
@@ -467,7 +467,7 @@ export function CampaignSettings({
       </Card>
 
       {/* ── Ad Extensions ── */}
-      <Card padding="lg">
+      <Card className="p-8">
         <h3 className="text-lg font-semibold text-white mb-4">Ad Extensions</h3>
         <div className="space-y-3">
           {/* Quick Links toggle */}
@@ -598,7 +598,7 @@ export function CampaignSettings({
       </Card>
 
       {/* ── AI Optimization ── */}
-      <Card padding="lg">
+      <Card className="p-8">
         <h3 className="text-lg font-semibold text-white mb-4">AI Optimization</h3>
         <div className="space-y-4">
           {/* Master toggle */}
@@ -681,7 +681,7 @@ export function CampaignSettings({
       </Card>
 
       {/* ── Negative Keywords ── */}
-      <Card padding="lg">
+      <Card className="p-8">
         <h3 className="text-lg font-semibold text-white mb-4">Negative Keywords (Campaign Level)</h3>
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -732,7 +732,7 @@ export function CampaignSettings({
 
       {/* Bid Adjustments (Campaign Level) */}
       <Accordion type="multiple">
-        <Card padding="lg">
+        <Card className="p-8">
           <Accordion.Item value="bid-adjustments">
             <Accordion.Trigger>
               <h3 className="text-lg font-semibold text-white">Bid Adjustments (Campaign Level)</h3>
@@ -857,7 +857,7 @@ export function CampaignSettings({
       </Accordion>
 
       {/* ── Additional Settings ── */}
-      <Card padding="lg">
+      <Card className="p-8">
         <h3 className="text-lg font-semibold text-white mb-4">Additional Settings</h3>
         <div className="space-y-4">
           <div className="flex flex-wrap items-center gap-4">

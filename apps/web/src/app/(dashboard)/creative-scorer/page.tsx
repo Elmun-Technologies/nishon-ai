@@ -1,10 +1,10 @@
 'use client'
 import { useState, useRef, useCallback } from 'react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
-import { Button } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
-import { Alert } from '@/components/ui/Alert'
-import { Badge } from '@/components/ui/Badge'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { Alert } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/Spinner'
 import apiClient from '@/lib/api-client'
 
@@ -270,7 +270,7 @@ export default function CreativeScorerPage() {
       <div>
         <div className="flex items-center gap-3 mb-1">
           <h1 className="text-2xl font-bold text-[#111827]">Creative Scorer</h1>
-          <Badge variant="purple">🎨 AI Baholash</Badge>
+          <Badge variant="default">🎨 AI Baholash</Badge>
         </div>
         <p className="text-[#6B7280] text-sm">
           Reklama kreativingizni yuklang — AI 10 parametr bo'yicha baholab,
@@ -284,7 +284,7 @@ export default function CreativeScorerPage() {
         <div className="space-y-4">
 
           {/* File upload zone */}
-          <Card padding="none">
+          <Card className="p-0">
             <div
               onDrop={onDrop}
               onDragOver={onDragOver}
@@ -433,7 +433,7 @@ export default function CreativeScorerPage() {
                 />
               </div>
 
-              {error && <Alert variant="error">{error}</Alert>}
+              {error && <Alert variant="destructive">{error}</Alert>}
 
               <Button
                 fullWidth
@@ -568,7 +568,7 @@ export default function CreativeScorerPage() {
               )}
 
               {/* 10 Parameters */}
-              <Card padding="none">
+              <Card className="p-0">
                 <div className="px-5 py-3 border-b border-[#E5E7EB]">
                   <p className="text-[#111827] font-semibold text-sm">10 Parametr Tahlili</p>
                 </div>
@@ -619,7 +619,7 @@ export default function CreativeScorerPage() {
 
               {/* A/B test suggestion */}
               {result.abTestSuggestion && (
-                <Card variant="outlined">
+                <Card className="bg-transparent">
                   <div className="flex items-start gap-3">
                     <span className="text-xl shrink-0">🔬</span>
                     <div>

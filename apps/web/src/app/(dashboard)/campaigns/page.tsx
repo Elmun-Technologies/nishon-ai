@@ -3,12 +3,12 @@ import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { useRealtimeRefresh } from '@/hooks/useRealtimeRefresh'
-import { Button } from '@/components/ui/Button'
-import { Badge, CampaignStatusBadge } from '@/components/ui/Badge'
-import { Card } from '@/components/ui/Card'
+import { Button } from '@/components/ui/button'
+import { Badge, CampaignStatusBadge } from '@/components/ui/badge'
+import { Card } from '@/components/ui/card'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { PageSpinner } from '@/components/ui/Spinner'
-import { Alert } from '@/components/ui/Alert'
+import { Alert } from '@/components/ui/alert'
 import { PlatformIcon } from '@/components/ui/PlatformIcon'
 import { campaigns as campaignsApi } from '@/lib/api-client'
 import { formatCurrency, timeAgo } from '@/lib/utils'
@@ -106,7 +106,7 @@ export default function CampaignsPage() {
         <div>
           <div className="flex items-center gap-3 mb-1">
             <h1 className="text-2xl font-bold text-[#111827]">Campaigns</h1>
-            <Badge variant="gray">{items.length} total</Badge>
+            <Badge variant="secondary">{items.length} total</Badge>
           </div>
           <p className="text-[#6B7280] text-sm">
             All advertising campaigns managed by Nishon AI
@@ -126,8 +126,8 @@ export default function CampaignsPage() {
         </div>
       </div>
 
-      {error && <Alert variant="error">{error}</Alert>}
-      {actionError && <Alert variant="error">{actionError}</Alert>}
+      {error && <Alert variant="destructive">{error}</Alert>}
+      {actionError && <Alert variant="destructive">{actionError}</Alert>}
 
       {/* ── Filter tabs ── */}
       <div className="flex items-center gap-1 bg-white border border-[#E5E7EB] rounded-xl p-1 w-fit">
@@ -209,7 +209,7 @@ export default function CampaignsPage() {
                           {campaign.name}
                         </h3>
                         {campaign.externalId && (
-                          <Badge variant="gray" size="sm">Synced</Badge>
+                          <Badge variant="secondary" size="sm">Synced</Badge>
                         )}
                       </div>
                       <p className="text-[#6B7280] text-xs">
@@ -283,7 +283,7 @@ export default function CampaignsPage() {
 
                       {campaign.status !== 'stopped' && campaign.status !== 'completed' && (
                         <Button
-                          variant="danger"
+                          variant="destructive"
                           size="sm"
                           loading={isThisLoading}
                           onClick={(e) => { e.stopPropagation(); handleStatusChange(campaign.id, 'stopped') }}
@@ -309,7 +309,7 @@ export default function CampaignsPage() {
       )}
 
       {items.length > 0 && (
-        <Card variant="outlined" padding="sm">
+        <Card className="bg-transparent" padding="sm">
           <div className="flex items-center justify-between px-2">
             <div className="flex items-center gap-3">
               <span className="text-xl">🔗</span>

@@ -1,12 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from '@/components/ui/Button'
-import { Badge } from '@/components/ui/Badge'
-import { Card } from '@/components/ui/Card'
-import { Progress } from '@/components/ui/Progress'
-import { Alert, AlertDescription } from '@/components/ui/Alert'
-import { Label } from '@/components/ui/Label'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Card } from '@/components/ui/card'
+import { Progress } from '@/components/ui/progress'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Label } from '@/components/ui/label'
 
 interface PublishProps {
   formData: any
@@ -45,7 +45,7 @@ export function Publish({
       <h2 className="text-xl font-semibold text-[#111827]">Publish Campaign</h2>
       
       {/* Campaign Summary */}
-      <Card padding="lg">
+      <Card className="p-8">
         <h3 className="text-lg font-semibold text-[#111827] mb-4">Campaign Summary</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
@@ -81,7 +81,7 @@ export function Publish({
       </Card>
 
       {/* Ad Groups Summary */}
-      <Card padding="lg">
+      <Card className="p-8">
         <h3 className="text-lg font-semibold text-[#111827] mb-4">Ad Groups</h3>
         <div className="space-y-4">
           {formData.adGroups.map((adGroup: any, index: number) => (
@@ -110,7 +110,7 @@ export function Publish({
       </Card>
 
       {/* Creative Assets Summary */}
-      <Card padding="lg">
+      <Card className="p-8">
         <h3 className="text-lg font-semibold text-[#111827] mb-4">Creative Assets</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -151,11 +151,11 @@ export function Publish({
 
       {/* Publishing Status */}
       {showProgress && (
-        <Card padding="lg">
+        <Card className="p-8">
           <h3 className="text-lg font-semibold text-[#111827] mb-4">Publishing Progress</h3>
           
           {isPublishing && (
-            <Alert variant="info" className="mb-4">
+            <Alert variant="secondary" className="mb-4">
               <AlertDescription>
                 Publishing campaign to selected platforms. This may take a few minutes.
               </AlertDescription>
@@ -163,7 +163,7 @@ export function Publish({
           )}
           
           {hasErrors && (
-            <Alert variant="error" className="mb-4">
+            <Alert variant="destructive" className="mb-4">
               <AlertDescription>
                 Some platforms encountered errors during publishing. Please check the details below.
               </AlertDescription>
@@ -171,7 +171,7 @@ export function Publish({
           )}
           
           {allPlatformsSuccess && (
-            <Alert variant="success" className="mb-4">
+            <Alert className="mb-4">
               <AlertDescription>
                 Campaign successfully published to all platforms!
               </AlertDescription>
@@ -201,7 +201,7 @@ export function Publish({
                     </div>
                     <div className="flex items-center gap-2">
                       {isSuccess && <Badge variant="success">Success</Badge>}
-                      {isError && <Badge variant="error">Failed</Badge>}
+                      {isError && <Badge variant="destructive">Failed</Badge>}
                       {isPending && <Badge variant="secondary">Pending</Badge>}
                       {isInProgress && <Badge variant="warning">In Progress</Badge>}
                     </div>
@@ -230,7 +230,7 @@ export function Publish({
       )}
 
       {/* Action Buttons */}
-      <Card padding="lg">
+      <Card className="p-8">
         <div className="flex items-center justify-between">
           <div className="flex gap-4">
             <Button 
@@ -258,7 +258,7 @@ export function Publish({
       </Card>
 
       {/* Next Steps */}
-      <Card padding="lg">
+      <Card className="p-8">
         <h3 className="text-lg font-semibold text-[#111827] mb-4">What Happens Next</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="space-y-2">

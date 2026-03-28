@@ -1,8 +1,8 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/Button'
-import { Alert } from '@/components/ui/Alert'
+import { Button } from '@/components/ui/button'
+import { Alert } from '@/components/ui/alert'
 import { Spinner } from '@/components/ui/Spinner'
 import { workspaces, aiAgent } from '@/lib/api-client'
 import apiClient from '@/lib/api-client'
@@ -1682,7 +1682,7 @@ export default function OnboardingPage() {
             {/* Error */}
             {error && (
               <div className="space-y-2">
-                <Alert variant="error">{error}</Alert>
+                <Alert variant="destructive">{error}</Alert>
                 {createdWorkspaceId && (
                   <p className="text-xs text-[#6B7280] text-center">
                     Workspace yaratildi. Dashboard'ga o'tib keyinroq strategiya yaratishingiz mumkin.

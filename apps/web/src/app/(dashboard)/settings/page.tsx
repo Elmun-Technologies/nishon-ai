@@ -4,10 +4,10 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useWorkspaceStore } from '@/stores/workspace.store'
-import { Card } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Input'
-import { Alert } from '@/components/ui/Alert'
+import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Alert } from '@/components/ui/alert'
 import { connectMeta, fetchMetaDashboard } from '@/lib/meta'
 import { workspaces as workspacesApi } from '@/lib/api-client'
 
@@ -291,7 +291,7 @@ export default function SettingsPage() {
         {/* Content */}
         <div className="flex-1 min-w-0 space-y-5">
 
-          {saveError && <Alert variant="error">{saveError}</Alert>}
+          {saveError && <Alert variant="destructive">{saveError}</Alert>}
 
           {/* ── GENERAL ── */}
           {activeTab === 'general' && (
@@ -760,7 +760,7 @@ export default function SettingsPage() {
                 </div>
               </Card>
 
-              <Card variant="outlined" padding="sm">
+              <Card className="bg-transparent" padding="sm">
                 <div className="flex items-start gap-3 px-2">
                   <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#A78BFA" strokeWidth={1.8} className="shrink-0 mt-0.5">
                     <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -792,7 +792,7 @@ export default function SettingsPage() {
                       Clears your current AI strategy. A new one will be generated on next visit.
                     </p>
                   </div>
-                  <Button variant="danger" size="sm" onClick={handleResetStrategy}>
+                  <Button variant="destructive" size="sm" onClick={handleResetStrategy}>
                     Reset
                   </Button>
                 </div>
@@ -805,7 +805,7 @@ export default function SettingsPage() {
                       Permanently deletes this workspace and all associated campaigns, data, and settings.
                     </p>
                   </div>
-                  <Button variant="danger" size="sm" onClick={handleDeleteWorkspace}>
+                  <Button variant="destructive" size="sm" onClick={handleDeleteWorkspace}>
                     Delete
                   </Button>
                 </div>

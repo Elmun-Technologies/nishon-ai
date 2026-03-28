@@ -1,14 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from '@/components/ui/Button'
-import { Badge } from '@/components/ui/Badge'
-import { Card } from '@/components/ui/Card'
-import { Input } from '@/components/ui/Input'
-import { Textarea } from '@/components/ui/Textarea'
-import { Select } from '@/components/ui/Select'
-import { Label } from '@/components/ui/Label'
-import { Switch } from '@/components/ui/Switch'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Card } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Select } from '@/components/ui/select'
+import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
 import { useAiAgent } from '@/hooks/useAiAgent'
 
 interface CreativeAssetsProps {
@@ -76,7 +76,7 @@ export function CreativeAssets({
       <h2 className="text-xl font-semibold text-[#111827]">Creative Assets</h2>
       
       {/* Product Information */}
-      <Card padding="lg">
+      <Card className="p-8">
         <h3 className="text-lg font-semibold text-[#111827] mb-4">Product Information</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -103,7 +103,7 @@ export function CreativeAssets({
       </Card>
 
       {/* Headlines */}
-      <Card padding="lg">
+      <Card className="p-8">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-[#111827]">Headlines</h3>
           <Button 
@@ -160,7 +160,7 @@ export function CreativeAssets({
       </Card>
 
       {/* Descriptions */}
-      <Card padding="lg">
+      <Card className="p-8">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-[#111827]">Descriptions</h3>
           <Button 
@@ -218,7 +218,7 @@ export function CreativeAssets({
       </Card>
 
       {/* Primary Text */}
-      <Card padding="lg">
+      <Card className="p-8">
         <h3 className="text-lg font-semibold text-[#111827] mb-4">Primary Text</h3>
         <div className="space-y-4">
           <div>
@@ -262,7 +262,7 @@ export function CreativeAssets({
       </Card>
 
       {/* Call to Action */}
-      <Card padding="lg">
+      <Card className="p-8">
         <h3 className="text-lg font-semibold text-[#111827] mb-4">Call to Action</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -289,7 +289,7 @@ export function CreativeAssets({
       </Card>
 
       {/* Image Upload */}
-      <Card padding="lg">
+      <Card className="p-8">
         <h3 className="text-lg font-semibold text-[#111827] mb-4">Image Upload</h3>
         <div className="space-y-4">
           <div>
@@ -368,7 +368,7 @@ export function CreativeAssets({
       </Card>
 
       {/* Creative Testing */}
-      <Card padding="lg">
+      <Card className="p-8">
         <h3 className="text-lg font-semibold text-[#111827] mb-4">Creative Testing</h3>
         <div className="space-y-4">
           <div className="flex items-center gap-4">
@@ -440,7 +440,7 @@ export function CreativeAssets({
       </Card>
 
       {/* Platform-Specific Constraints */}
-      <Card padding="lg">
+      <Card className="p-8">
         <h3 className="text-lg font-semibold text-[#111827] mb-4">Platform-Specific Constraints</h3>
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

@@ -1,9 +1,9 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
-import { Card } from '@/components/ui/Card'
-import { Badge } from '@/components/ui/Badge'
-import { Button } from '@/components/ui/Button'
+import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { PageSpinner } from '@/components/ui/Spinner'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { workspaces as workspacesApi } from '@/lib/api-client'
@@ -142,7 +142,7 @@ export default function BudgetPage() {
           <div className="flex items-center gap-2 mb-5">
             <span className="text-lg">📊</span>
             <h2 className="font-semibold text-[#111827]">Platform Split</h2>
-            <Badge variant="purple" size="sm">AI Recommended</Badge>
+            <Badge variant="default" size="sm">AI Recommended</Badge>
           </div>
 
           {platformStats.length === 0 ? (
@@ -262,7 +262,7 @@ export default function BudgetPage() {
           <div className="flex items-center gap-2 mb-4">
             <span className="text-lg">🎨</span>
             <h2 className="font-semibold text-[#111827]">Creative Guidelines</h2>
-            <Badge variant="gray" size="sm">From AI Strategy</Badge>
+            <Badge variant="secondary" size="sm">From AI Strategy</Badge>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4">
@@ -284,7 +284,7 @@ export default function BudgetPage() {
               <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide mb-2">Call to Actions</p>
               <div className="flex flex-wrap gap-2">
                 {(strategy.creativeGuidelines.callToActions ?? []).map((cta: string, i: number) => (
-                  <Badge key={i} variant="purple" size="sm">{cta}</Badge>
+                  <Badge key={i} variant="default" size="sm">{cta}</Badge>
                 ))}
               </div>
             </div>
@@ -294,7 +294,7 @@ export default function BudgetPage() {
 
       {/* ── No strategy prompt ── */}
       {!strategy && !loading && (
-        <Card variant="outlined" padding="sm">
+        <Card className="bg-transparent" padding="sm">
           <div className="flex items-center gap-3 px-2">
             <span className="text-xl">🧠</span>
             <div className="flex-1">

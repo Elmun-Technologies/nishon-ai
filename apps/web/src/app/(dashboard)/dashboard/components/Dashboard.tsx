@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Card } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
-import { Badge } from '@/components/ui/Badge'
-import { Progress } from '@/components/ui/Progress'
+import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
 import { LineChart, BarChart, PieChart } from '@/components/ui/Charts'
 import { useCampaigns } from '@/hooks/useCampaigns'
 
@@ -65,7 +65,7 @@ export function Dashboard() {
     return (
       <div className="space-y-6">
         <h2 className="text-xl font-semibold text-[#111827]">Dashboard</h2>
-        <Card padding="lg">
+        <Card className="p-8">
           <p className="text-red-400">Error loading dashboard data: {error}</p>
           <Button onClick={() => window.location.reload()} className="mt-4">
             Retry
@@ -95,7 +95,7 @@ export function Dashboard() {
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card padding="lg">
+        <Card className="p-8">
           <div className="space-y-2">
             <p className="text-sm text-[#6B7280]">Total Spend</p>
             <p className="text-2xl font-bold text-[#111827]">${totalSpend.toLocaleString()}</p>
@@ -106,7 +106,7 @@ export function Dashboard() {
           </div>
         </Card>
 
-        <Card padding="lg">
+        <Card className="p-8">
           <div className="space-y-2">
             <p className="text-sm text-[#6B7280]">Total Clicks</p>
             <p className="text-2xl font-bold text-[#111827]">{totalClicks.toLocaleString()}</p>
@@ -117,7 +117,7 @@ export function Dashboard() {
           </div>
         </Card>
 
-        <Card padding="lg">
+        <Card className="p-8">
           <div className="space-y-2">
             <p className="text-sm text-[#6B7280]">Total Conversions</p>
             <p className="text-2xl font-bold text-[#111827]">{totalConversions.toLocaleString()}</p>
@@ -128,7 +128,7 @@ export function Dashboard() {
           </div>
         </Card>
 
-        <Card padding="lg">
+        <Card className="p-8">
           <div className="space-y-2">
             <p className="text-sm text-[#6B7280]">Average ROAS</p>
             <p className="text-2xl font-bold text-[#111827]">{avgROAS.toFixed(2)}x</p>
@@ -143,7 +143,7 @@ export function Dashboard() {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Performance Over Time */}
-        <Card padding="lg">
+        <Card className="p-8">
           <h3 className="text-lg font-semibold text-[#111827] mb-4">Performance Over Time</h3>
           <LineChart
             data={performanceData}
@@ -154,7 +154,7 @@ export function Dashboard() {
         </Card>
 
         {/* Platform Distribution */}
-        <Card padding="lg">
+        <Card className="p-8">
           <h3 className="text-lg font-semibold text-[#111827] mb-4">Platform Distribution</h3>
           <div className="space-y-4">
             {(() => {
@@ -183,7 +183,7 @@ export function Dashboard() {
       </div>
 
       {/* Campaign Performance */}
-      <Card padding="lg">
+      <Card className="p-8">
         <h3 className="text-lg font-semibold text-[#111827] mb-4">Campaign Performance</h3>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -234,7 +234,7 @@ export function Dashboard() {
       </Card>
 
       {/* Recommendations */}
-      <Card padding="lg">
+      <Card className="p-8">
         <h3 className="text-lg font-semibold text-[#111827] mb-4">AI Recommendations</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="border border-[#E5E7EB] rounded-lg p-4">
@@ -255,7 +255,7 @@ export function Dashboard() {
           
           <div className="border border-[#E5E7EB] rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
-              <Badge variant="info">Audience Expansion</Badge>
+              <Badge variant="secondary">Audience Expansion</Badge>
               <Badge variant="success">82% confidence</Badge>
             </div>
             <p className="text-[#111827]">Expand audience targeting to include lookalike audiences</p>

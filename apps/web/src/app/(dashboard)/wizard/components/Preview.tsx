@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from '@/components/ui/Button'
-import { Badge } from '@/components/ui/Badge'
-import { Card } from '@/components/ui/Card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Card } from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 interface PreviewProps {
   formData: any
@@ -88,7 +88,7 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
   const renderYandexPreview = (data: any) => (
     <div className="space-y-6">
       {/* Search Preview */}
-      <Card padding="lg">
+      <Card className="p-8">
         <h4 className="text-md font-semibold text-[#111827] mb-3">Search Ad Preview</h4>
         <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg p-4">
           <div className="text-sm text-[#6B7280] mb-2">Search query: {data.searchQuery}</div>
@@ -107,7 +107,7 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
       </Card>
 
       {/* Banner Preview */}
-      <Card padding="lg">
+      <Card className="p-8">
         <h4 className="text-md font-semibold text-[#111827] mb-3">Banner Ad Preview</h4>
         <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg p-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -129,7 +129,7 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
   )
 
   const renderGooglePreview = (data: any) => (
-    <Card padding="lg">
+    <Card className="p-8">
       <h4 className="text-md font-semibold text-[#111827] mb-3">Search Ad Preview</h4>
       <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg p-4">
         <div className="text-sm text-[#6B7280] mb-2">Search query: {data.searchQuery}</div>
@@ -178,7 +178,7 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
 
       {/* Feed Preview */}
       {metaView === 'feed' && (
-        <Card padding="lg">
+        <Card className="p-8">
           <h4 className="text-sm font-semibold text-[#111827] mb-3">Feed Ad Preview</h4>
           {/* Mobile phone mockup */}
           <div className="flex justify-center">
@@ -218,7 +218,7 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
 
       {/* Stories Preview */}
       {metaView === 'stories' && (
-        <Card padding="lg">
+        <Card className="p-8">
           <h4 className="text-sm font-semibold text-[#111827] mb-3">Stories Ad Preview (9:16)</h4>
           <div className="flex justify-center gap-6 flex-wrap">
             {/* Mobile Stories */}
@@ -296,7 +296,7 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
       )}
 
       {/* Audience Preview */}
-      <Card padding="lg">
+      <Card className="p-8">
         <h4 className="text-sm font-semibold text-[#111827] mb-3">Target Audience</h4>
         <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg p-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -319,7 +319,7 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
   )
 
   const renderTelegramPreview = (data: any) => (
-    <Card padding="lg">
+    <Card className="p-8">
       <h4 className="text-md font-semibold text-[#111827] mb-3">Telegram Ad Preview</h4>
       <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg p-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -366,7 +366,7 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
 
             return (
               <TabsContent key={platform} value={platform}>
-                <Card padding="lg">
+                <Card className="p-8">
                   <div className="space-y-6">
                     <div className="flex items-center justify-between">
                       <h3 className="text-lg font-semibold text-[#111827]">{previewData.title}</h3>

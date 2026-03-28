@@ -2,9 +2,9 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
-import { Card } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
-import { Alert } from '@/components/ui/Alert'
+import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Alert } from '@/components/ui/alert'
 import { meta as metaApi } from '@/lib/api-client'
 import { formatCurrency, formatNumber } from '@/lib/utils'
 
@@ -217,7 +217,7 @@ export default function ReportingPage() {
         </div>
       </div>
 
-      {error && <Alert variant="error">{error}</Alert>}
+      {error && <Alert variant="destructive">{error}</Alert>}
 
       {/* ── Summary cards ── */}
       {totals && !loading && (
@@ -236,7 +236,7 @@ export default function ReportingPage() {
       )}
 
       {/* ── Table ── */}
-      <Card padding="none">
+      <Card className="p-0">
         {loading ? (
           <div className="space-y-px">
             {[1, 2, 3, 4].map((i) => (

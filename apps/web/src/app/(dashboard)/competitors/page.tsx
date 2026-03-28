@@ -1,10 +1,10 @@
 'use client'
 import { useMemo, useState } from 'react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
-import { Button } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
-import { Alert } from '@/components/ui/Alert'
-import { Badge } from '@/components/ui/Badge'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { Alert } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/Spinner'
 import apiClient from '@/lib/api-client'
 
@@ -360,7 +360,7 @@ export default function CompetitorsPage() {
       <div>
         <div className="flex items-center gap-3 mb-1">
           <h1 className="text-2xl font-bold text-[#111827]">Raqobatchi Tahlili</h1>
-          <Badge variant="purple">🔥 Audit</Badge>
+          <Badge variant="default">🔥 Audit</Badge>
         </div>
         <p className="text-[#6B7280] text-sm">
           12 ta audit kategoriyasi bo‘yicha siz va raqobatchi solishtiriladi
@@ -429,7 +429,7 @@ export default function CompetitorsPage() {
             </div>
           </div>
 
-          {error && <Alert variant="error">{error}</Alert>}
+          {error && <Alert variant="destructive">{error}</Alert>}
 
           <Button fullWidth size="lg" loading={loading} onClick={handleAnalyze}>
             {loading ? 'Tahlil qilinmoqda (AI 12 bo‘lim)...' : '🔍 Tahlilni boshlash'}
@@ -610,7 +610,7 @@ export default function CompetitorsPage() {
                             <Badge variant="success" size="sm">Siz oldinda</Badge>
                           )}
                           {catWinner === 'comp' && (
-                            <Badge variant="danger" size="sm">Orqadasiz</Badge>
+                            <Badge variant="destructive" size="sm">Orqadasiz</Badge>
                           )}
                         </div>
                         <p className="text-[#6B7280] text-xs">{cat.description}</p>
@@ -678,7 +678,7 @@ export default function CompetitorsPage() {
                 <div className="flex items-center gap-2 mb-5">
                   <span className="text-lg">📅</span>
                   <h2 className="font-semibold text-[#111827]">Yillik Marketing Strategiyasi</h2>
-                  <Badge variant="purple" size="sm">Auditga asoslangan</Badge>
+                  <Badge variant="default" size="sm">Auditga asoslangan</Badge>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {[

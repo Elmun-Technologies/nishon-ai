@@ -1,11 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
-import { Badge } from '@/components/ui/Badge'
-import { Progress } from '@/components/ui/Progress'
-import { Alert, AlertDescription } from '@/components/ui/Alert'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
 interface PlatformAdapterProps {
   platform: string
@@ -44,7 +44,7 @@ export function MetaAdsAdapter({ platform, onConnect, onDisconnect, isConnected,
   }
 
   return (
-    <Card padding="lg">
+    <Card className="p-8">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <Badge variant="secondary">📘</Badge>
@@ -58,7 +58,7 @@ export function MetaAdsAdapter({ platform, onConnect, onDisconnect, isConnected,
             <Badge variant="warning">Connecting...</Badge>
           )}
           {connectionStatus === 'error' && (
-            <Badge variant="error">Error</Badge>
+            <Badge variant="destructive">Error</Badge>
           )}
           {connectionStatus === 'idle' && (
             <Badge variant="secondary">Not Connected</Badge>
@@ -74,7 +74,7 @@ export function MetaAdsAdapter({ platform, onConnect, onDisconnect, isConnected,
       )}
 
       {connectionStatus === 'error' && error && (
-        <Alert variant="error" className="mb-4">
+        <Alert variant="destructive" className="mb-4">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
@@ -142,7 +142,7 @@ export function GoogleAdsAdapter({ platform, onConnect, onDisconnect, isConnecte
   }
 
   return (
-    <Card padding="lg">
+    <Card className="p-8">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <Badge variant="secondary">🔍</Badge>
@@ -156,7 +156,7 @@ export function GoogleAdsAdapter({ platform, onConnect, onDisconnect, isConnecte
             <Badge variant="warning">Connecting...</Badge>
           )}
           {connectionStatus === 'error' && (
-            <Badge variant="error">Error</Badge>
+            <Badge variant="destructive">Error</Badge>
           )}
           {connectionStatus === 'idle' && (
             <Badge variant="secondary">Not Connected</Badge>
@@ -172,7 +172,7 @@ export function GoogleAdsAdapter({ platform, onConnect, onDisconnect, isConnecte
       )}
 
       {connectionStatus === 'error' && error && (
-        <Alert variant="error" className="mb-4">
+        <Alert variant="destructive" className="mb-4">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
@@ -240,7 +240,7 @@ export function YandexDirectAdapter({ platform, onConnect, onDisconnect, isConne
   }
 
   return (
-    <Card padding="lg">
+    <Card className="p-8">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <Badge variant="secondary">📘</Badge>
@@ -254,7 +254,7 @@ export function YandexDirectAdapter({ platform, onConnect, onDisconnect, isConne
             <Badge variant="warning">Connecting...</Badge>
           )}
           {connectionStatus === 'error' && (
-            <Badge variant="error">Error</Badge>
+            <Badge variant="destructive">Error</Badge>
           )}
           {connectionStatus === 'idle' && (
             <Badge variant="secondary">Not Connected</Badge>
@@ -270,7 +270,7 @@ export function YandexDirectAdapter({ platform, onConnect, onDisconnect, isConne
       )}
 
       {connectionStatus === 'error' && error && (
-        <Alert variant="error" className="mb-4">
+        <Alert variant="destructive" className="mb-4">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
@@ -338,7 +338,7 @@ export function TelegramAdsAdapter({ platform, onConnect, onDisconnect, isConnec
   }
 
   return (
-    <Card padding="lg">
+    <Card className="p-8">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <Badge variant="secondary">✈️</Badge>
@@ -352,7 +352,7 @@ export function TelegramAdsAdapter({ platform, onConnect, onDisconnect, isConnec
             <Badge variant="warning">Connecting...</Badge>
           )}
           {connectionStatus === 'error' && (
-            <Badge variant="error">Error</Badge>
+            <Badge variant="destructive">Error</Badge>
           )}
           {connectionStatus === 'idle' && (
             <Badge variant="secondary">Not Connected</Badge>
@@ -368,7 +368,7 @@ export function TelegramAdsAdapter({ platform, onConnect, onDisconnect, isConnec
       )}
 
       {connectionStatus === 'error' && error && (
-        <Alert variant="error" className="mb-4">
+        <Alert variant="destructive" className="mb-4">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
@@ -469,7 +469,7 @@ export function PlatformConnectionManager() {
       </div>
 
       {/* Connection Summary */}
-      <Card padding="lg">
+      <Card className="p-8">
         <h3 className="text-lg font-semibold text-white mb-4">Connection Summary</h3>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {Object.entries(connections).map(([platform, connected]) => (
