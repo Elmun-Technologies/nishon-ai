@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
-import { Badge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
@@ -29,52 +28,161 @@ const OBJECTIVES = [
 
 const CURRENCIES = ['UZS', 'USD', 'EUR', 'RUB']
 
-const BIDDING_STRATEGIES = {
+const BIDDING_STRATEGIES: Record<string, { value: string; label: string }[]> = {
   meta: [
     { value: 'highest_volume', label: 'Highest Volume' },
     { value: 'cost_per_result_goal', label: 'Cost per Result Goal' },
-    { value: 'bid_cap', label: 'Bid Cap' }
+    { value: 'bid_cap', label: 'Bid Cap' },
+    { value: 'roas_goal', label: 'ROAS Goal' }
   ],
   google: [
     { value: 'maximize_clicks', label: 'Maximize Clicks' },
     { value: 'maximize_conversions', label: 'Maximize Conversions' },
-    { value: 'target_cpa', label: 'Target CPA' }
+    { value: 'target_cpa', label: 'Target CPA' },
+    { value: 'target_roas', label: 'Target ROAS' },
+    { value: 'manual_cpc', label: 'Manual CPC' }
   ],
   yandex: [
     { value: 'maximize_clicks', label: 'Maximize Clicks' },
     { value: 'target_cpa', label: 'Target CPA' },
+    { value: 'target_roas', label: 'Target ROAS' },
     { value: 'manual', label: 'Manual Bidding' }
   ]
 }
 
-export function CampaignSettings({ 
-  formData, 
-  onFormDataChange, 
-  onGenerateUTM, 
-  aiLoading 
+const ALL_HOURS = Array.from({ length: 24 }, (_, i) => i)
+
+const AD_PRIORITIES = [
+  { value: 'best_combo', label: 'Eng yaxshi kombinatsiya (tavsiya etiladi)' },
+  { value: 'close_phrase', label: "So'rovga yaqin ibora" },
+  { value: 'exact_match', label: 'Aniq moslik' },
+  { value: 'broad_match', label: 'Keng moslik' }
+]
+
+function BidInput({
+  label,
+  value,
+  onChange,
+}: {
+  label: string
+  value: number
+  onChange: (v: number) => void
+}) {
+  return (
+    <div>
+      <Label>{label}</Label>
+      <Input
+        type="number"
+        step="0.1"
+        min="0"
+        max="10"
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        placeholder="1.0"
+      />
+    </div>
+  )
+}
+
+export function CampaignSettings({
+  formData,
+  onFormDataChange,
+  onGenerateUTM,
+  aiLoading
 }: CampaignSettingsProps) {
   const { generateKeywords } = useAiAgent()
   const [activeExtensions, setActiveExtensions] = useState<string[]>([])
 
   const handleExtensionToggle = (extension: string) => {
-    setActiveExtensions(prev => 
-      prev.includes(extension) 
+    setActiveExtensions(prev =>
+      prev.includes(extension)
         ? prev.filter(e => e !== extension)
         : [...prev, extension]
     )
   }
 
-  const handleBidAdjustment = (category: string, value: number) => {
+  const handleBidAdjustment = (category: string, value: any) => {
     onFormDataChange('bidAdjustments', {
       ...formData.bidAdjustments,
       [category]: value
     })
   }
 
+  // Determine which bidding strategies to show based on selected platforms
+  const activePlatform: string =
+    formData.platforms && formData.platforms.length > 0
+      ? formData.platforms[0]
+      : 'meta'
+  const biddingStrategies =
+    BIDDING_STRATEGIES[activePlatform] ?? BIDDING_STRATEGIES.meta
+
+  // Hour grid helpers
+  const selectedHours: string[] = formData.schedule.hours ?? []
+  const toggleHour = (hour: number) => {
+    const h = String(hour)
+    const updated = selectedHours.includes(h)
+      ? selectedHours.filter(x => x !== h)
+      : [...selectedHours, h]
+    onFormDataChange('schedule', { ...formData.schedule, hours: updated })
+  }
+  const applyHourPreset = (preset: 'work' | 'evening' | 'all') => {
+    let hours: string[] = []
+    if (preset === 'work') hours = ALL_HOURS.filter(h => h >= 9 && h < 18).map(String)
+    else if (preset === 'evening') hours = ALL_HOURS.filter(h => h >= 18).map(String)
+    else hours = ALL_HOURS.map(String)
+    onFormDataChange('schedule', { ...formData.schedule, hours })
+  }
+
+  // Quick links helpers (title + url pairs stored as objects)
+  const quickLinksList: { title: string; url: string; desc: string }[] =
+    formData.extensions.quickLinksList ?? [{ title: '', url: '', desc: '' }]
+  const updateQuickLink = (i: number, field: string, val: string) => {
+    const updated = quickLinksList.map((item, idx) =>
+      idx === i ? { ...item, [field]: val } : item
+    )
+    onFormDataChange('extensions', { ...formData.extensions, quickLinksList: updated })
+  }
+  const addQuickLink = () => {
+    if (quickLinksList.length < 8)
+      onFormDataChange('extensions', {
+        ...formData.extensions,
+        quickLinksList: [...quickLinksList, { title: '', url: '', desc: '' }]
+      })
+  }
+  const removeQuickLink = (i: number) => {
+    onFormDataChange('extensions', {
+      ...formData.extensions,
+      quickLinksList: quickLinksList.filter((_, idx) => idx !== i)
+    })
+  }
+
+  // Clarifiers helpers (plain text list)
+  const clarifiersList: string[] = formData.extensions.clarifiers ?? ['']
+  const updateClarifier = (i: number, val: string) => {
+    const updated = clarifiersList.map((item, idx) => (idx === i ? val : item))
+    onFormDataChange('extensions', { ...formData.extensions, clarifiers: updated })
+  }
+  const addClarifier = () => {
+    if (clarifiersList.length < 8)
+      onFormDataChange('extensions', {
+        ...formData.extensions,
+        clarifiers: [...clarifiersList, '']
+      })
+  }
+  const removeClarifier = (i: number) => {
+    onFormDataChange('extensions', {
+      ...formData.extensions,
+      clarifiers: clarifiersList.filter((_, idx) => idx !== i)
+    })
+  }
+
+  // AI optimization - master toggle
+  const aiEnabled = formData.aiOptimization.enabled ?? false
+
   return (
     <div className="space-y-8">
       <h2 className="text-xl font-semibold text-white">Campaign Settings</h2>
-      
+
       {/* Basic Settings */}
       <Card padding="lg">
         <h3 className="text-lg font-semibold text-white mb-4">Basic Information</h3>
@@ -88,7 +196,7 @@ export function CampaignSettings({
               placeholder="Enter campaign name"
             />
           </div>
-          
+
           <div>
             <Label htmlFor="objective">Objective</Label>
             <Select
@@ -113,7 +221,7 @@ export function CampaignSettings({
               onChange={(e) => onFormDataChange('budget', { ...formData.budget, amount: Number(e.target.value) })}
             />
           </div>
-          
+
           <div>
             <Label htmlFor="currency">Currency</Label>
             <Select
@@ -126,7 +234,7 @@ export function CampaignSettings({
               ))}
             </Select>
           </div>
-          
+
           <div>
             <Label htmlFor="budgetType">Budget Type</Label>
             <Select
@@ -140,6 +248,7 @@ export function CampaignSettings({
           </div>
         </div>
 
+        {/* Schedule */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           <div>
             <Label htmlFor="startDate">Start Date</Label>
@@ -150,7 +259,7 @@ export function CampaignSettings({
               onChange={(e) => onFormDataChange('schedule', { ...formData.schedule, startDate: e.target.value })}
             />
           </div>
-          
+
           <div>
             <Label htmlFor="endDate">End Date</Label>
             <Input
@@ -163,15 +272,50 @@ export function CampaignSettings({
         </div>
 
         <div className="flex items-center gap-4 mt-4">
-          <div className="flex items-center gap-2">
-            <Switch
-              id="alwaysOn"
-              checked={formData.schedule.alwaysOn}
-              onChange={(checked) => onFormDataChange('schedule', { ...formData.schedule, alwaysOn: checked })}
-            />
-            <Label htmlFor="alwaysOn">Always On</Label>
-          </div>
+          <Switch
+            id="alwaysOn"
+            checked={formData.schedule.alwaysOn}
+            onChange={(checked) => onFormDataChange('schedule', { ...formData.schedule, alwaysOn: checked })}
+          />
+          <Label htmlFor="alwaysOn">Always On (24/7)</Label>
         </div>
+
+        {/* Hour Schedule Grid — shown only when alwaysOn is false */}
+        {!formData.schedule.alwaysOn && (
+          <div className="mt-4">
+            <div className="flex items-center justify-between mb-2">
+              <Label>Ko'rsatish soatlari</Label>
+              <div className="flex gap-2">
+                <Button variant="secondary" size="sm" onClick={() => applyHourPreset('work')}>Ish vaqti (9–18)</Button>
+                <Button variant="secondary" size="sm" onClick={() => applyHourPreset('evening')}>Kechki (18–24)</Button>
+                <Button variant="secondary" size="sm" onClick={() => applyHourPreset('all')}>Hammasi</Button>
+              </div>
+            </div>
+            <div className="grid grid-cols-12 gap-1">
+              {ALL_HOURS.map(h => {
+                const active = selectedHours.includes(String(h))
+                return (
+                  <button
+                    key={h}
+                    onClick={() => toggleHour(h)}
+                    className={`py-2 rounded text-xs font-medium transition-colors ${
+                      active
+                        ? 'bg-[#6366F1] text-white'
+                        : 'bg-[#1F2937] text-[#9CA3AF] hover:bg-[#374151]'
+                    }`}
+                  >
+                    {h}
+                  </button>
+                )
+              })}
+            </div>
+            <p className="text-xs text-[#6B7280] mt-1">
+              {selectedHours.length === 0
+                ? 'Hech qaysi soat tanlanmagan'
+                : `${selectedHours.length} soat tanlangan`}
+            </p>
+          </div>
+        )}
       </Card>
 
       {/* Strategy & Bidding */}
@@ -179,32 +323,60 @@ export function CampaignSettings({
         <h3 className="text-lg font-semibold text-white mb-4">Strategy & Bidding</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="biddingStrategy">Bidding Strategy</Label>
+            <Label htmlFor="biddingStrategy">
+              Bidding Strategy
+              {formData.platforms?.length > 1 && (
+                <span className="ml-2 text-xs text-[#6B7280]">
+                  ({activePlatform} uchun)
+                </span>
+              )}
+            </Label>
             <Select
               id="biddingStrategy"
               value={formData.strategy.type}
               onChange={(e) => onFormDataChange('strategy', { ...formData.strategy, type: e.target.value })}
             >
-              {BIDDING_STRATEGIES.meta.map(strategy => (
-                <option key={strategy.value} value={strategy.value}>{strategy.label}</option>
+              {biddingStrategies.map(s => (
+                <option key={s.value} value={s.value}>{s.label}</option>
               ))}
             </Select>
           </div>
-          
-          <div>
-            <Label htmlFor="bidCap">Bid Cap</Label>
-            <Input
-              id="bidCap"
-              type="number"
-              value={formData.strategy.bidCap || ''}
-              onChange={(e) => onFormDataChange('strategy', { ...formData.strategy, bidCap: Number(e.target.value) })}
-              placeholder="Optional bid cap"
-            />
-          </div>
+
+          {(formData.strategy.type === 'bid_cap' ||
+            formData.strategy.type === 'target_cpa' ||
+            formData.strategy.type === 'manual_cpc' ||
+            formData.strategy.type === 'manual') && (
+            <div>
+              <Label htmlFor="bidCap">
+                {formData.strategy.type === 'target_cpa' ? 'Target CPA' : 'Bid Cap'}
+              </Label>
+              <Input
+                id="bidCap"
+                type="number"
+                value={formData.strategy.bidCap || ''}
+                onChange={(e) => onFormDataChange('strategy', { ...formData.strategy, bidCap: Number(e.target.value) })}
+                placeholder="Qiymatni kiriting"
+              />
+            </div>
+          )}
+
+          {formData.strategy.type === 'target_roas' && (
+            <div>
+              <Label htmlFor="targetRoas">Target ROAS (%)</Label>
+              <Input
+                id="targetRoas"
+                type="number"
+                value={formData.strategy.targetRoas || ''}
+                onChange={(e) => onFormDataChange('strategy', { ...formData.strategy, targetRoas: Number(e.target.value) })}
+                placeholder="Masalan: 300"
+              />
+            </div>
+          )}
         </div>
 
-        <div className="flex items-center gap-4 mt-4">
-          <div className="flex items-center gap-2">
+        {/* Advantage+ — only for Meta */}
+        {(formData.platforms?.includes('meta') || !formData.platforms?.length) && (
+          <div className="flex items-center gap-3 mt-4">
             <Switch
               id="advantagePlus"
               checked={formData.strategy.advantagePlus}
@@ -212,6 +384,20 @@ export function CampaignSettings({
             />
             <Label htmlFor="advantagePlus">Advantage+ Campaign Budget</Label>
           </div>
+        )}
+
+        {/* Ad Priority */}
+        <div className="mt-4">
+          <Label htmlFor="adPriority">Reklama prioriteti</Label>
+          <Select
+            id="adPriority"
+            value={formData.strategy.adPriority ?? 'best_combo'}
+            onChange={(e) => onFormDataChange('strategy', { ...formData.strategy, adPriority: e.target.value })}
+          >
+            {AD_PRIORITIES.map(p => (
+              <option key={p.value} value={p.value}>{p.label}</option>
+            ))}
+          </Select>
         </div>
       </Card>
 
@@ -219,9 +405,9 @@ export function CampaignSettings({
       <Card padding="lg">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-white">UTM Parameters</h3>
-          <Button 
-            variant="secondary" 
-            size="sm" 
+          <Button
+            variant="secondary"
+            size="sm"
             onClick={onGenerateUTM}
             disabled={aiLoading}
           >
@@ -260,25 +446,97 @@ export function CampaignSettings({
       {/* Ad Extensions */}
       <Card padding="lg">
         <h3 className="text-lg font-semibold text-white mb-4">Ad Extensions</h3>
-        <div className="space-y-4">
+        <div className="space-y-3">
+          {/* Quick Links toggle */}
           <div className="flex items-center gap-3">
             <Checkbox
               id="quickLinks"
               checked={activeExtensions.includes('quickLinks')}
               onChange={() => handleExtensionToggle('quickLinks')}
             />
-            <Label htmlFor="quickLinks">Quick Links</Label>
+            <Label htmlFor="quickLinks">Quick Links (sitelink extensions)</Label>
           </div>
-          
+
+          {activeExtensions.includes('quickLinks') && (
+            <div className="ml-6 space-y-3">
+              {quickLinksList.map((link, i) => (
+                <div key={i} className="border border-[#374151] rounded-lg p-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-[#9CA3AF]">Quick Link {i + 1}</span>
+                    {quickLinksList.length > 1 && (
+                      <button
+                        onClick={() => removeQuickLink(i)}
+                        className="text-xs text-[#EF4444] hover:text-red-400"
+                      >
+                        O'chirish
+                      </button>
+                    )}
+                  </div>
+                  <Input
+                    placeholder="Sarlavha (maks 25 belgi)"
+                    value={link.title}
+                    onChange={(e) => updateQuickLink(i, 'title', e.target.value)}
+                    maxLength={25}
+                  />
+                  <Input
+                    placeholder="URL (https://...)"
+                    value={link.url}
+                    onChange={(e) => updateQuickLink(i, 'url', e.target.value)}
+                  />
+                  <Input
+                    placeholder="Qisqa tavsif (ixtiyoriy)"
+                    value={link.desc}
+                    onChange={(e) => updateQuickLink(i, 'desc', e.target.value)}
+                  />
+                </div>
+              ))}
+              {quickLinksList.length < 8 && (
+                <Button variant="secondary" size="sm" onClick={addQuickLink}>
+                  + Quick Link qo'shish
+                </Button>
+              )}
+            </div>
+          )}
+
+          {/* Clarifiers toggle */}
           <div className="flex items-center gap-3">
             <Checkbox
               id="clarifiers"
               checked={activeExtensions.includes('clarifiers')}
               onChange={() => handleExtensionToggle('clarifiers')}
             />
-            <Label htmlFor="clarifiers">Clarifiers</Label>
+            <Label htmlFor="clarifiers">Clarifiers (callout extensions)</Label>
           </div>
-          
+
+          {activeExtensions.includes('clarifiers') && (
+            <div className="ml-6 space-y-2">
+              {clarifiersList.map((text, i) => (
+                <div key={i} className="flex gap-2">
+                  <Input
+                    placeholder={`Clarifier ${i + 1} (maks 25 belgi)`}
+                    value={text}
+                    onChange={(e) => updateClarifier(i, e.target.value)}
+                    maxLength={25}
+                  />
+                  {clarifiersList.length > 1 && (
+                    <button
+                      onClick={() => removeClarifier(i)}
+                      className="text-[#EF4444] hover:text-red-400 text-sm px-2"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+              ))}
+              {clarifiersList.length < 8 && (
+                <Button variant="secondary" size="sm" onClick={addClarifier}>
+                  + Clarifier qo'shish
+                </Button>
+              )}
+            </div>
+          )}
+
+          {/* Promo Code toggle */}
           <div className="flex items-center gap-3">
             <Checkbox
               id="promoCode"
@@ -287,99 +545,107 @@ export function CampaignSettings({
             />
             <Label htmlFor="promoCode">Promo Code</Label>
           </div>
-          
+
+          {activeExtensions.includes('promoCode') && (
+            <div className="ml-6">
+              <Input
+                placeholder="Promo kod (masalan: SUMMER25)"
+                value={formData.extensions.promoCode ?? ''}
+                onChange={(e) => onFormDataChange('extensions', { ...formData.extensions, promoCode: e.target.value })}
+              />
+            </div>
+          )}
+
+          {/* Delivery toggle */}
           <div className="flex items-center gap-3">
             <Checkbox
               id="delivery"
               checked={activeExtensions.includes('delivery')}
               onChange={() => handleExtensionToggle('delivery')}
             />
-            <Label htmlFor="delivery">Delivery</Label>
+            <Label htmlFor="delivery">Yetkazib berish extension</Label>
           </div>
         </div>
-
-        {activeExtensions.includes('quickLinks') && (
-          <div className="mt-4 space-y-2">
-            <Label>Quick Links</Label>
-            <Input placeholder="Link 1" />
-            <Input placeholder="Link 2" />
-            <Input placeholder="Link 3" />
-          </div>
-        )}
-
-        {activeExtensions.includes('clarifiers') && (
-          <div className="mt-4 space-y-2">
-            <Label>Clarifiers</Label>
-            <Input placeholder="Clarifier 1" />
-            <Input placeholder="Clarifier 2" />
-          </div>
-        )}
-
-        {activeExtensions.includes('promoCode') && (
-          <div className="mt-4">
-            <Label>Promo Code</Label>
-            <Input placeholder="Enter promo code" />
-          </div>
-        )}
       </Card>
 
       {/* AI Optimization */}
       <Card padding="lg">
         <h3 className="text-lg font-semibold text-white mb-4">AI Optimization</h3>
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Switch
-                id="autoReplaceCreatives"
-                checked={formData.aiOptimization.autoReplaceCreatives}
-                onChange={(checked) => onFormDataChange('aiOptimization', { ...formData.aiOptimization, autoReplaceCreatives: checked })}
-              />
-              <div>
-                <Label htmlFor="autoReplaceCreatives">Automatically replace underperforming creatives</Label>
-                <p className="text-sm text-[#6B7280]">AI will replace low-performing ads with new variants</p>
-              </div>
+          {/* Master toggle */}
+          <div className="flex items-center gap-3 p-3 bg-[#1F2937] rounded-lg">
+            <Switch
+              id="aiEnabled"
+              checked={aiEnabled}
+              onChange={(checked) =>
+                onFormDataChange('aiOptimization', { ...formData.aiOptimization, enabled: checked })
+              }
+            />
+            <div>
+              <Label htmlFor="aiEnabled">AI avtomatik tavsiyalarni qo'llash</Label>
+              <p className="text-xs text-[#6B7280]">Barcha AI optimizatsiya funksiyalarini yoqish/o'chirish</p>
             </div>
           </div>
-          
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Switch
-                id="optimizeAudience"
-                checked={formData.aiOptimization.optimizeAudience}
-                onChange={(checked) => onFormDataChange('aiOptimization', { ...formData.aiOptimization, optimizeAudience: checked })}
-              />
-              <div>
-                <Label htmlFor="optimizeAudience">Optimize audience targeting automatically</Label>
-                <p className="text-sm text-[#6B7280]">AI will adjust targeting based on performance</p>
+
+          {/* Sub-toggles — shown only when master is ON */}
+          {aiEnabled && (
+            <div className="ml-4 space-y-3 border-l-2 border-[#374151] pl-4">
+              <div className="flex items-center gap-3">
+                <Switch
+                  id="autoReplaceCreatives"
+                  checked={formData.aiOptimization.autoReplaceCreatives}
+                  onChange={(checked) =>
+                    onFormDataChange('aiOptimization', { ...formData.aiOptimization, autoReplaceCreatives: checked })
+                  }
+                />
+                <div>
+                  <Label htmlFor="autoReplaceCreatives">Samarasiz kreatiflarni almashtirish</Label>
+                  <p className="text-xs text-[#6B7280]">AI past ko'rsatkichli reklamalarni yangi variantlar bilan almashtiradi</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Switch
+                  id="optimizeAudience"
+                  checked={formData.aiOptimization.optimizeAudience}
+                  onChange={(checked) =>
+                    onFormDataChange('aiOptimization', { ...formData.aiOptimization, optimizeAudience: checked })
+                  }
+                />
+                <div>
+                  <Label htmlFor="optimizeAudience">Auditoriya sozlamalarini optimizatsiya</Label>
+                  <p className="text-xs text-[#6B7280]">AI natijalarga qarab targeting ni moslashtiradi</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Switch
+                  id="weeklyBudgetOptimization"
+                  checked={formData.aiOptimization.weeklyBudgetOptimization}
+                  onChange={(checked) =>
+                    onFormDataChange('aiOptimization', { ...formData.aiOptimization, weeklyBudgetOptimization: checked })
+                  }
+                />
+                <div>
+                  <Label htmlFor="weeklyBudgetOptimization">Haftalik byudjetni taqsimlash</Label>
+                  <p className="text-xs text-[#6B7280]">AI byudjetni kun bo'yicha yaxshi natija uchun qayta taqsimlaydi</p>
+                </div>
               </div>
             </div>
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Switch
-                id="weeklyBudgetOptimization"
-                checked={formData.aiOptimization.weeklyBudgetOptimization}
-                onChange={(checked) => onFormDataChange('aiOptimization', { ...formData.aiOptimization, weeklyBudgetOptimization: checked })}
-              />
-              <div>
-                <Label htmlFor="weeklyBudgetOptimization">Weekly budget optimization</Label>
-                <p className="text-sm text-[#6B7280]">AI will redistribute budget across days for better performance</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Switch
-                id="dynamicText"
-                checked={formData.aiOptimization.dynamicText}
-                onChange={(checked) => onFormDataChange('aiOptimization', { ...formData.aiOptimization, dynamicText: checked })}
-              />
-              <div>
-                <Label htmlFor="dynamicText">Dynamic text adaptation</Label>
-                <p className="text-sm text-[#6B7280]">AI will adapt ad text based on user context</p>
-              </div>
+          )}
+
+          {/* Separate toggle: match text to query */}
+          <div className="flex items-center gap-3 pt-2 border-t border-[#374151]">
+            <Switch
+              id="dynamicText"
+              checked={formData.aiOptimization.dynamicText}
+              onChange={(checked) =>
+                onFormDataChange('aiOptimization', { ...formData.aiOptimization, dynamicText: checked })
+              }
+            />
+            <div>
+              <Label htmlFor="dynamicText">Reklama matnini so'rovga moslashtirish</Label>
+              <p className="text-xs text-[#6B7280]">AI foydalanuvchi so'roviga qarab reklama matnini dinamik o'zgartiradi</p>
             </div>
           </div>
         </div>
@@ -394,34 +660,48 @@ export function CampaignSettings({
               <Label>Match Type</Label>
               <Select
                 value={formData.negativeKeywords.matchType}
-                onChange={(e) => onFormDataChange('negativeKeywords', { ...formData.negativeKeywords, matchType: e.target.value })}
+                onChange={(e) =>
+                  onFormDataChange('negativeKeywords', { ...formData.negativeKeywords, matchType: e.target.value })
+                }
               >
                 <option value="broad">Broad</option>
                 <option value="phrase">Phrase</option>
                 <option value="exact">Exact</option>
               </Select>
             </div>
-            <div>
-              <Button 
-                variant="secondary" 
-                onClick={() => generateKeywords({ productName: formData.name, niche: formData.objective, platform: 'meta', matchType: 'broad' })}
+            <div className="flex items-end">
+              <Button
+                variant="secondary"
+                onClick={() =>
+                  generateKeywords({
+                    productName: formData.name,
+                    niche: formData.objective,
+                    platform: activePlatform,
+                    matchType: 'broad'
+                  })
+                }
                 disabled={aiLoading}
               >
                 {aiLoading ? 'Generating...' : 'AI Generate Keywords'}
               </Button>
             </div>
           </div>
-          
+
           <Textarea
-            placeholder="Enter negative keywords (one per line)..."
+            placeholder="Manfiy kalit so'zlarni kiriting (har biri alohida qatorda)..."
             rows={6}
             value={formData.negativeKeywords.keywords.join('\n')}
-            onChange={(e) => onFormDataChange('negativeKeywords', { ...formData.negativeKeywords, keywords: e.target.value.split('\n').filter(Boolean) })}
+            onChange={(e) =>
+              onFormDataChange('negativeKeywords', {
+                ...formData.negativeKeywords,
+                keywords: e.target.value.split('\n').filter(Boolean)
+              })
+            }
           />
         </div>
       </Card>
 
-      {/* Bid Adjustments */}
+      {/* Bid Adjustments (Campaign Level) */}
       <Accordion type="multiple">
         <Card padding="lg">
           <Accordion.Item value="bid-adjustments">
@@ -429,264 +709,118 @@ export function CampaignSettings({
               <h3 className="text-lg font-semibold text-white">Bid Adjustments (Campaign Level)</h3>
             </Accordion.Trigger>
             <Accordion.Content>
-              <div className="space-y-6">
-                {/* Age/Gender Adjustments */}
+              <div className="space-y-6 pt-4">
+
+                {/* Age/Gender */}
                 <div>
-                  <h4 className="text-md font-medium text-white mb-3">Age & Gender</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div>
-                      <Label>Male</Label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        max="5"
-                        value={formData.bidAdjustments.genderAge.male || 1}
-                        onChange={(e) => handleBidAdjustment('genderAge', { ...formData.bidAdjustments.genderAge, male: Number(e.target.value) })}
-                        placeholder="1.0"
-                      />
-                    </div>
-                    <div>
-                      <Label>Female</Label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        max="5"
-                        value={formData.bidAdjustments.genderAge.female || 1}
-                        onChange={(e) => handleBidAdjustment('genderAge', { ...formData.bidAdjustments.genderAge, female: Number(e.target.value) })}
-                        placeholder="1.0"
-                      />
-                    </div>
+                  <h4 className="text-sm font-medium text-[#9CA3AF] uppercase tracking-wider mb-3">Yosh va Jins</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <BidInput label="Erkak" value={formData.bidAdjustments.genderAge.male ?? 1}
+                      onChange={v => handleBidAdjustment('genderAge', { ...formData.bidAdjustments.genderAge, male: v })} />
+                    <BidInput label="Ayol" value={formData.bidAdjustments.genderAge.female ?? 1}
+                      onChange={v => handleBidAdjustment('genderAge', { ...formData.bidAdjustments.genderAge, female: v })} />
+                    <BidInput label="18–24" value={formData.bidAdjustments.genderAge.age18_24 ?? 1}
+                      onChange={v => handleBidAdjustment('genderAge', { ...formData.bidAdjustments.genderAge, age18_24: v })} />
+                    <BidInput label="25–34" value={formData.bidAdjustments.genderAge.age25_34 ?? 1}
+                      onChange={v => handleBidAdjustment('genderAge', { ...formData.bidAdjustments.genderAge, age25_34: v })} />
+                    <BidInput label="35–44" value={formData.bidAdjustments.genderAge.age35_44 ?? 1}
+                      onChange={v => handleBidAdjustment('genderAge', { ...formData.bidAdjustments.genderAge, age35_44: v })} />
+                    <BidInput label="45–54" value={formData.bidAdjustments.genderAge.age45_54 ?? 1}
+                      onChange={v => handleBidAdjustment('genderAge', { ...formData.bidAdjustments.genderAge, age45_54: v })} />
+                    <BidInput label="55+" value={formData.bidAdjustments.genderAge.age55plus ?? 1}
+                      onChange={v => handleBidAdjustment('genderAge', { ...formData.bidAdjustments.genderAge, age55plus: v })} />
                   </div>
                 </div>
 
-                {/* Device Adjustments */}
+                {/* Devices */}
                 <div>
-                  <h4 className="text-md font-medium text-white mb-3">Devices</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <Label>Mobile</Label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        max="5"
-                        value={formData.bidAdjustments.devices.mobile || 1}
-                        onChange={(e) => handleBidAdjustment('devices', { ...formData.bidAdjustments.devices, mobile: Number(e.target.value) })}
-                        placeholder="1.0"
-                      />
-                    </div>
-                    <div>
-                      <Label>Desktop</Label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        max="5"
-                        value={formData.bidAdjustments.devices.desktop || 1}
-                        onChange={(e) => handleBidAdjustment('devices', { ...formData.bidAdjustments.devices, desktop: Number(e.target.value) })}
-                        placeholder="1.0"
-                      />
-                    </div>
-                    <div>
-                      <Label>Tablet</Label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        max="5"
-                        value={formData.bidAdjustments.devices.tablet || 1}
-                        onChange={(e) => handleBidAdjustment('devices', { ...formData.bidAdjustments.devices, tablet: Number(e.target.value) })}
-                        placeholder="1.0"
-                      />
-                    </div>
+                  <h4 className="text-sm font-medium text-[#9CA3AF] uppercase tracking-wider mb-3">Qurilmalar</h4>
+                  <div className="grid grid-cols-3 gap-3">
+                    <BidInput label="Mobil" value={formData.bidAdjustments.devices.mobile ?? 1}
+                      onChange={v => handleBidAdjustment('devices', { ...formData.bidAdjustments.devices, mobile: v })} />
+                    <BidInput label="Desktop" value={formData.bidAdjustments.devices.desktop ?? 1}
+                      onChange={v => handleBidAdjustment('devices', { ...formData.bidAdjustments.devices, desktop: v })} />
+                    <BidInput label="Tablet" value={formData.bidAdjustments.devices.tablet ?? 1}
+                      onChange={v => handleBidAdjustment('devices', { ...formData.bidAdjustments.devices, tablet: v })} />
                   </div>
                 </div>
 
-                {/* Audience Adjustments */}
+                {/* Audience */}
                 <div>
-                  <h4 className="text-md font-medium text-white mb-3">Audience Segments</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div>
-                      <Label>Retargeting</Label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        max="5"
-                        value={formData.bidAdjustments.audience.retargeting || 1}
-                        onChange={(e) => handleBidAdjustment('audience', { ...formData.bidAdjustments.audience, retargeting: Number(e.target.value) })}
-                        placeholder="1.0"
-                      />
-                    </div>
-                    <div>
-                      <Label>Lookalike</Label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        max="5"
-                        value={formData.bidAdjustments.audience.lookalike || 1}
-                        onChange={(e) => handleBidAdjustment('audience', { ...formData.bidAdjustments.audience, lookalike: Number(e.target.value) })}
-                        placeholder="1.0"
-                      />
-                    </div>
-                    <div>
-                      <Label>Custom</Label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        max="5"
-                        value={formData.bidAdjustments.audience.custom || 1}
-                        onChange={(e) => handleBidAdjustment('audience', { ...formData.bidAdjustments.audience, custom: Number(e.target.value) })}
-                        placeholder="1.0"
-                      />
-                    </div>
+                  <h4 className="text-sm font-medium text-[#9CA3AF] uppercase tracking-wider mb-3">Auditoriya segmentlari</h4>
+                  <div className="grid grid-cols-3 gap-3">
+                    <BidInput label="Retargeting" value={formData.bidAdjustments.audience.retargeting ?? 1}
+                      onChange={v => handleBidAdjustment('audience', { ...formData.bidAdjustments.audience, retargeting: v })} />
+                    <BidInput label="Lookalike" value={formData.bidAdjustments.audience.lookalike ?? 1}
+                      onChange={v => handleBidAdjustment('audience', { ...formData.bidAdjustments.audience, lookalike: v })} />
+                    <BidInput label="Custom" value={formData.bidAdjustments.audience.custom ?? 1}
+                      onChange={v => handleBidAdjustment('audience', { ...formData.bidAdjustments.audience, custom: v })} />
                   </div>
                 </div>
 
-                {/* Format Adjustments */}
+                {/* Ad Format */}
                 <div>
-                  <h4 className="text-md font-medium text-white mb-3">Ad Format</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div>
-                      <Label>Image</Label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        max="5"
-                        value={formData.bidAdjustments.format.image || 1}
-                        onChange={(e) => handleBidAdjustment('format', { ...formData.bidAdjustments.format, image: Number(e.target.value) })}
-                        placeholder="1.0"
-                      />
-                    </div>
-                    <div>
-                      <Label>Video</Label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        max="5"
-                        value={formData.bidAdjustments.format.video || 1}
-                        onChange={(e) => handleBidAdjustment('format', { ...formData.bidAdjustments.format, video: Number(e.target.value) })}
-                        placeholder="1.0"
-                      />
-                    </div>
-                    <div>
-                      <Label>Carousel</Label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        max="5"
-                        value={formData.bidAdjustments.format.carousel || 1}
-                        onChange={(e) => handleBidAdjustment('format', { ...formData.bidAdjustments.format, carousel: Number(e.target.value) })}
-                        placeholder="1.0"
-                      />
-                    </div>
-                    <div>
-                      <Label>Collection</Label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        max="5"
-                        value={formData.bidAdjustments.format.collection || 1}
-                        onChange={(e) => handleBidAdjustment('format', { ...formData.bidAdjustments.format, collection: Number(e.target.value) })}
-                        placeholder="1.0"
-                      />
-                    </div>
+                  <h4 className="text-sm font-medium text-[#9CA3AF] uppercase tracking-wider mb-3">Reklama formatlari</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <BidInput label="Image" value={formData.bidAdjustments.format.image ?? 1}
+                      onChange={v => handleBidAdjustment('format', { ...formData.bidAdjustments.format, image: v })} />
+                    <BidInput label="Video" value={formData.bidAdjustments.format.video ?? 1}
+                      onChange={v => handleBidAdjustment('format', { ...formData.bidAdjustments.format, video: v })} />
+                    <BidInput label="Carousel" value={formData.bidAdjustments.format.carousel ?? 1}
+                      onChange={v => handleBidAdjustment('format', { ...formData.bidAdjustments.format, carousel: v })} />
+                    <BidInput label="Collection" value={formData.bidAdjustments.format.collection ?? 1}
+                      onChange={v => handleBidAdjustment('format', { ...formData.bidAdjustments.format, collection: v })} />
                   </div>
                 </div>
 
-                {/* Income Adjustments */}
+                {/* Income */}
                 <div>
-                  <h4 className="text-md font-medium text-white mb-3">Income Level</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <Label>Low Income</Label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        max="5"
-                        value={formData.bidAdjustments.income.low || 1}
-                        onChange={(e) => handleBidAdjustment('income', { ...formData.bidAdjustments.income, low: Number(e.target.value) })}
-                        placeholder="1.0"
-                      />
-                    </div>
-                    <div>
-                      <Label>Medium Income</Label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        max="5"
-                        value={formData.bidAdjustments.income.medium || 1}
-                        onChange={(e) => handleBidAdjustment('income', { ...formData.bidAdjustments.income, medium: Number(e.target.value) })}
-                        placeholder="1.0"
-                      />
-                    </div>
-                    <div>
-                      <Label>High Income</Label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        max="5"
-                        value={formData.bidAdjustments.income.high || 1}
-                        onChange={(e) => handleBidAdjustment('income', { ...formData.bidAdjustments.income, high: Number(e.target.value) })}
-                        placeholder="1.0"
-                      />
-                    </div>
+                  <h4 className="text-sm font-medium text-[#9CA3AF] uppercase tracking-wider mb-3">Daromad darajasi</h4>
+                  <div className="grid grid-cols-3 gap-3">
+                    <BidInput label="Past" value={formData.bidAdjustments.income.low ?? 1}
+                      onChange={v => handleBidAdjustment('income', { ...formData.bidAdjustments.income, low: v })} />
+                    <BidInput label="O'rta" value={formData.bidAdjustments.income.medium ?? 1}
+                      onChange={v => handleBidAdjustment('income', { ...formData.bidAdjustments.income, medium: v })} />
+                    <BidInput label="Yuqori" value={formData.bidAdjustments.income.high ?? 1}
+                      onChange={v => handleBidAdjustment('income', { ...formData.bidAdjustments.income, high: v })} />
                   </div>
                 </div>
 
-                {/* Weather Adjustments */}
+                {/* Weather */}
                 <div>
-                  <h4 className="text-md font-medium text-white mb-3">Weather Conditions</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div>
-                      <Label>Sunny</Label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        max="5"
-                        value={formData.bidAdjustments.weather.sunny || 1}
-                        onChange={(e) => handleBidAdjustment('weather', { ...formData.bidAdjustments.weather, sunny: Number(e.target.value) })}
-                        placeholder="1.0"
-                      />
-                    </div>
-                    <div>
-                      <Label>Rainy</Label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        max="5"
-                        value={formData.bidAdjustments.weather.rainy || 1}
-                        onChange={(e) => handleBidAdjustment('weather', { ...formData.bidAdjustments.weather, rainy: Number(e.target.value) })}
-                        placeholder="1.0"
-                      />
-                    </div>
-                    <div>
-                      <Label>Cold</Label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        max="5"
-                        value={formData.bidAdjustments.weather.cold || 1}
-                        onChange={(e) => handleBidAdjustment('weather', { ...formData.bidAdjustments.weather, cold: Number(e.target.value) })}
-                        placeholder="1.0"
-                      />
-                    </div>
+                  <h4 className="text-sm font-medium text-[#9CA3AF] uppercase tracking-wider mb-3">Ob-havo sharoiti</h4>
+                  <div className="grid grid-cols-3 gap-3">
+                    <BidInput label="Quyoshli" value={formData.bidAdjustments.weather.sunny ?? 1}
+                      onChange={v => handleBidAdjustment('weather', { ...formData.bidAdjustments.weather, sunny: v })} />
+                    <BidInput label="Yomg'irli" value={formData.bidAdjustments.weather.rainy ?? 1}
+                      onChange={v => handleBidAdjustment('weather', { ...formData.bidAdjustments.weather, rainy: v })} />
+                    <BidInput label="Sovuq" value={formData.bidAdjustments.weather.cold ?? 1}
+                      onChange={v => handleBidAdjustment('weather', { ...formData.bidAdjustments.weather, cold: v })} />
                   </div>
                 </div>
+
+                {/* KPI Correction — 7th type */}
+                <div>
+                  <h4 className="text-sm font-medium text-[#9CA3AF] uppercase tracking-wider mb-3">
+                    KPI Korreksiyasi
+                    <span className="ml-2 text-[#6366F1] text-xs normal-case">(Target CPA/ROAS bo'yicha segmentlash)</span>
+                  </h4>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    <BidInput label="Umumiy KPI" value={formData.bidAdjustments.kpi.general ?? 1}
+                      onChange={v => handleBidAdjustment('kpi', { ...formData.bidAdjustments.kpi, general: v })} />
+                    <BidInput label="Mobil KPI" value={formData.bidAdjustments.kpi.mobile ?? 1}
+                      onChange={v => handleBidAdjustment('kpi', { ...formData.bidAdjustments.kpi, mobile: v })} />
+                    <BidInput label="Desktop KPI" value={formData.bidAdjustments.kpi.desktop ?? 1}
+                      onChange={v => handleBidAdjustment('kpi', { ...formData.bidAdjustments.kpi, desktop: v })} />
+                    <BidInput label="Yangi foydalanuvchi" value={formData.bidAdjustments.kpi.newUser ?? 1}
+                      onChange={v => handleBidAdjustment('kpi', { ...formData.bidAdjustments.kpi, newUser: v })} />
+                    <BidInput label="Qaytuvchi" value={formData.bidAdjustments.kpi.returning ?? 1}
+                      onChange={v => handleBidAdjustment('kpi', { ...formData.bidAdjustments.kpi, returning: v })} />
+                    <BidInput label="Premium segment" value={formData.bidAdjustments.kpi.premium ?? 1}
+                      onChange={v => handleBidAdjustment('kpi', { ...formData.bidAdjustments.kpi, premium: v })} />
+                  </div>
+                </div>
+
               </div>
             </Accordion.Content>
           </Accordion.Item>
@@ -697,14 +831,14 @@ export function CampaignSettings({
       <Card padding="lg">
         <h3 className="text-lg font-semibold text-white mb-4">Additional Settings</h3>
         <div className="space-y-4">
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-2">
               <Switch
                 id="geoExpansion"
                 checked={formData.geoExpansion}
                 onChange={(checked) => onFormDataChange('geoExpansion', checked)}
               />
-              <Label htmlFor="geoExpansion">Enable geo expansion</Label>
+              <Label htmlFor="geoExpansion">Geo kengayishni yoqish</Label>
             </div>
             <div className="flex items-center gap-2">
               <Switch
@@ -712,27 +846,37 @@ export function CampaignSettings({
                 checked={formData.siteMonitoring}
                 onChange={(checked) => onFormDataChange('siteMonitoring', checked)}
               />
-              <Label htmlFor="siteMonitoring">Enable site monitoring</Label>
+              <Label htmlFor="siteMonitoring">Saytni monitoring qilish</Label>
             </div>
           </div>
-          
+
           <div>
             <Label>Placement Exclusions (Sites)</Label>
             <Textarea
-              placeholder="Enter site URLs to exclude (one per line)..."
+              placeholder="Chiqarib tashlanadigan sayt URLlarini kiriting (har biri alohida qatorda)..."
               rows={3}
               value={formData.exclusions.sites.join('\n')}
-              onChange={(e) => onFormDataChange('exclusions', { ...formData.exclusions, sites: e.target.value.split('\n').filter(Boolean) })}
+              onChange={(e) =>
+                onFormDataChange('exclusions', {
+                  ...formData.exclusions,
+                  sites: e.target.value.split('\n').filter(Boolean)
+                })
+              }
             />
           </div>
-          
+
           <div>
             <Label>IP Exclusions</Label>
             <Textarea
-              placeholder="Enter IP addresses to exclude (one per line)..."
+              placeholder="Chiqarib tashlanadigan IP manzillarini kiriting (har biri alohida qatorda)..."
               rows={3}
               value={formData.exclusions.ips.join('\n')}
-              onChange={(e) => onFormDataChange('exclusions', { ...formData.exclusions, ips: e.target.value.split('\n').filter(Boolean) })}
+              onChange={(e) =>
+                onFormDataChange('exclusions', {
+                  ...formData.exclusions,
+                  ips: e.target.value.split('\n').filter(Boolean)
+                })
+              }
             />
           </div>
         </div>
