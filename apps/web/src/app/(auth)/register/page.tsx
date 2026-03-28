@@ -117,21 +117,21 @@ export default function RegisterPage() {
   const passwordStrength = getPasswordStrength(form.password)
 
   return (
-    <div className="min-h-screen bg-[#0A0A0F] flex items-center justify-center p-6">
+    <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center p-6">
       <div className="w-full max-w-md">
 
         {/* Logo */}
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-white">
-            Nishon <span className="text-[#7C3AED]">AI</span>
+          <h1 className="text-2xl font-bold text-[#111827]">
+            Nishon <span className="text-[#374151]">AI</span>
           </h1>
           <p className="text-[#6B7280] text-sm mt-1">
             AI bilan reklama boshqarishni boshlang
           </p>
         </div>
 
-        <div className="bg-[#13131A] border border-[#2A2A3A] rounded-xl p-6">
-          <h2 className="text-xl font-semibold text-white mb-6">
+        <div className="bg-white border border-[#E5E7EB] rounded-xl p-6">
+          <h2 className="text-xl font-semibold text-[#111827] mb-6">
             Hisob yaratish
           </h2>
 
@@ -148,7 +148,7 @@ export default function RegisterPage() {
             <button
               type="button"
               onClick={handleFacebookRegister}
-              className="w-full flex items-center justify-center gap-3 bg-[#1877F2] hover:bg-[#166FE5] text-white font-medium py-2.5 px-4 rounded-lg transition-colors text-sm"
+              className="w-full flex items-center justify-center gap-3 bg-[#1877F2] hover:bg-[#166FE5] text-[#111827] font-medium py-2.5 px-4 rounded-lg transition-colors text-sm"
             >
               <FacebookIcon />
               Facebook orqali ro'yxatdan o'tish
@@ -156,9 +156,9 @@ export default function RegisterPage() {
           </div>
 
           <div className="flex items-center gap-3 mb-4">
-            <div className="flex-1 h-px bg-[#2A2A3A]" />
-            <span className="text-[#4B5563] text-xs">yoki email bilan</span>
-            <div className="flex-1 h-px bg-[#2A2A3A]" />
+            <div className="flex-1 h-px bg-[#F3F4F6]" />
+            <span className="text-[#6B7280] text-xs">yoki email bilan</span>
+            <div className="flex-1 h-px bg-[#F3F4F6]" />
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -204,7 +204,7 @@ export default function RegisterPage() {
                         className={`h-1 flex-1 rounded-full transition-all duration-300 ${
                           level <= passwordStrength.level
                             ? passwordStrength.color
-                            : 'bg-[#2A2A3A]'
+                            : 'bg-[#F3F4F6]'
                         }`}
                       />
                     ))}
@@ -234,7 +234,7 @@ export default function RegisterPage() {
 
           <p className="text-center text-[#6B7280] text-sm mt-5">
             Hisobingiz bormi?{' '}
-            <Link href="/login" className="text-[#A78BFA] hover:text-white transition-colors font-medium">
+            <Link href="/login" className="text-[#374151] hover:text-[#111827] transition-colors font-medium">
               Kirish
             </Link>
           </p>
@@ -244,7 +244,7 @@ export default function RegisterPage() {
           {["Kredit karta shart emas", "Bepul boshlash", 'Istalgan vaqt bekor qilish'].map((item) => (
             <div key={item} className="flex items-center gap-1.5">
               <span className="text-emerald-400 text-xs">✓</span>
-              <span className="text-[#4B5563] text-xs">{item}</span>
+              <span className="text-[#6B7280] text-xs">{item}</span>
             </div>
           ))}
         </div>

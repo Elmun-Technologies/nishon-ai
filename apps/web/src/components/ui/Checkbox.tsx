@@ -26,8 +26,8 @@ export function Checkbox({ checked, onChange, label, description, disabled, id, 
         disabled={disabled}
         onClick={() => !disabled && onChange(!checked)}
         className={cn(
-          'w-4 h-4 rounded border transition-colors duration-200 shrink-0 mt-0.5 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/30',
-          checked ? 'bg-[#7C3AED] border-[#7C3AED]' : 'bg-transparent border-[#2A2A3A]'
+          'w-4 h-4 rounded border transition-colors duration-200 shrink-0 mt-0.5 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[#111827]/30',
+          checked ? 'bg-[#111827] border-[#111827]' : 'bg-transparent border-[#E5E7EB]'
         )}
       >
         {checked && (
@@ -38,7 +38,7 @@ export function Checkbox({ checked, onChange, label, description, disabled, id, 
       </button>
       {(label || description) && (
         <div>
-          {label && <p className="text-sm text-white">{label}</p>}
+          {label && <p className="text-sm text-[#111827]">{label}</p>}
           {description && <p className="text-xs text-[#6B7280] mt-0.5">{description}</p>}
         </div>
       )}

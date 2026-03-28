@@ -39,7 +39,7 @@ export function AIAdCopyGenerator({ onGenerateAdCopy, aiLoading }: AIComponentsP
 
   return (
     <Card padding="lg">
-      <h3 className="text-lg font-semibold text-white mb-4">AI Ad Copy Generator</h3>
+      <h3 className="text-lg font-semibold text-[#111827] mb-4">AI Ad Copy Generator</h3>
       <div className="space-y-4">
         <div>
           <Label>Product Name</Label>
@@ -126,7 +126,7 @@ export function AIKeywordGenerator({ onGenerateKeywords, aiLoading }: AIComponen
 
   return (
     <Card padding="lg">
-      <h3 className="text-lg font-semibold text-white mb-4">AI Keyword Generator</h3>
+      <h3 className="text-lg font-semibold text-[#111827] mb-4">AI Keyword Generator</h3>
       <div className="space-y-4">
         <div>
           <Label>Product Name</Label>
@@ -204,7 +204,7 @@ export function AIBudgetOptimizer({ onGenerateBudgetOptimization, aiLoading }: A
 
   return (
     <Card padding="lg">
-      <h3 className="text-lg font-semibold text-white mb-4">AI Budget Optimizer</h3>
+      <h3 className="text-lg font-semibold text-[#111827] mb-4">AI Budget Optimizer</h3>
       <div className="space-y-4">
         <div>
           <Label>Objective</Label>
@@ -294,7 +294,7 @@ export function AIImagePromptGenerator({ onGenerateImagePrompt, aiLoading }: AIC
 
   return (
     <Card padding="lg">
-      <h3 className="text-lg font-semibold text-white mb-4">AI Image Prompt Generator</h3>
+      <h3 className="text-lg font-semibold text-[#111827] mb-4">AI Image Prompt Generator</h3>
       <div className="space-y-4">
         <div>
           <Label>Product Name</Label>
@@ -364,20 +364,20 @@ export function AIImagePromptGenerator({ onGenerateImagePrompt, aiLoading }: AIC
 export function AIRecommendations({ recommendations }: { recommendations: any[] }) {
   return (
     <Card padding="lg">
-      <h3 className="text-lg font-semibold text-white mb-4">AI Recommendations</h3>
+      <h3 className="text-lg font-semibold text-[#111827] mb-4">AI Recommendations</h3>
       <div className="space-y-4">
         {recommendations.length === 0 ? (
           <p className="text-[#6B7280]">No recommendations available yet</p>
         ) : (
           recommendations.map((recommendation, index) => (
-            <div key={index} className="border border-[#3A3A4A] rounded-lg p-4">
+            <div key={index} className="border border-[#E5E7EB] rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
                 <Badge variant="secondary">{recommendation.type}</Badge>
                 <Badge variant={recommendation.confidenceScore > 0.7 ? "success" : "warning"}>
                   {Math.round(recommendation.confidenceScore * 100)}% confidence
                 </Badge>
               </div>
-              <div className="text-white">{recommendation.data.text}</div>
+              <div className="text-[#111827]">{recommendation.data.text}</div>
               {recommendation.isApplied && (
                 <div className="text-green-400 text-sm mt-2">✓ Applied</div>
               )}

@@ -37,7 +37,7 @@ function ActionBadge({ action }: { action: string }) {
     KILL: 'bg-red-500/10 text-red-400 border-red-500/20',
   }
   return (
-    <span className={`text-xs px-2 py-0.5 rounded-md border ${cfg[action] ?? 'bg-[#1C1C27] text-[#6B7280] border-[#2A2A3A]'}`}>
+    <span className={`text-xs px-2 py-0.5 rounded-md border ${cfg[action] ?? 'bg-[#F9FAFB] text-[#6B7280] border-[#E5E7EB]'}`}>
       {action}
     </span>
   )
@@ -53,7 +53,7 @@ function StatusDot({ status }: { status: string }) {
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div className="text-center">
-      <p className="text-base font-semibold text-white">{value}</p>
+      <p className="text-base font-semibold text-[#111827]">{value}</p>
       <p className="text-xs text-[#6B7280] mt-0.5">{label}</p>
     </div>
   )
@@ -64,25 +64,25 @@ function CampaignRow({ campaign }: { campaign: MetaDashboardCampaign }) {
   const { spend, clicks, impressions, ctr, cpc } = campaign.metrics
 
   return (
-    <div className="border border-[#2A2A3A] rounded-xl overflow-hidden">
+    <div className="border border-[#E5E7EB] rounded-xl overflow-hidden">
       {/* Header row */}
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#1C1C27] transition-colors text-left"
+        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#F9FAFB] transition-colors text-left"
       >
         <StatusDot status={campaign.status} />
-        <span className="flex-1 min-w-0 text-sm text-white truncate">{campaign.name}</span>
+        <span className="flex-1 min-w-0 text-sm text-[#111827] truncate">{campaign.name}</span>
         <HealthBadge health={campaign.ai.health} />
         <ActionBadge action={campaign.ai.action} />
-        <span className="text-sm font-medium text-white ml-2 shrink-0">
+        <span className="text-sm font-medium text-[#111827] ml-2 shrink-0">
           ${spend.toFixed(2)}
         </span>
         {/* Chevron */}
         <svg
           width="16" height="16" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" strokeWidth={2}
-          className={`text-[#4B5563] shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
+          className={`text-[#6B7280] shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
         >
           <path d="M6 9l6 6 6-6" />
         </svg>
@@ -90,7 +90,7 @@ function CampaignRow({ campaign }: { campaign: MetaDashboardCampaign }) {
 
       {/* Expanded metrics */}
       {open && (
-        <div className="border-t border-[#2A2A3A] px-4 py-4 bg-[#0A0A10]">
+        <div className="border-t border-[#E5E7EB] px-4 py-4 bg-white">
           <div className="grid grid-cols-5 gap-4 mb-4">
             <Metric label="Spend" value={`$${spend.toFixed(2)}`} />
             <Metric label="Impressions" value={impressions.toLocaleString()} />
@@ -99,8 +99,8 @@ function CampaignRow({ campaign }: { campaign: MetaDashboardCampaign }) {
             <Metric label="CPC" value={`$${cpc.toFixed(2)}`} />
           </div>
           {campaign.ai.reason && (
-            <div className="flex items-start gap-2 rounded-lg bg-[#1C1C27] border border-[#2A2A3A] p-3">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="text-[#A78BFA] mt-0.5 shrink-0">
+            <div className="flex items-start gap-2 rounded-lg bg-[#F9FAFB] border border-[#E5E7EB] p-3">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="text-[#374151] mt-0.5 shrink-0">
                 <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
               </svg>
               <p className="text-xs text-[#9CA3AF] leading-relaxed">{campaign.ai.reason}</p>
@@ -118,32 +118,32 @@ function AccountCard({ account }: { account: MetaDashboardAccount }) {
   const totalClicks = account.campaigns.reduce((s, c) => s + c.metrics.clicks, 0)
 
   return (
-    <div className="rounded-xl border border-[#2A2A3A] bg-[#0F0F15] overflow-hidden">
+    <div className="rounded-xl border border-[#E5E7EB] bg-white overflow-hidden">
       {/* Account header */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-[#2A2A3A]">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-[#E5E7EB]">
         <div>
-          <p className="text-sm font-semibold text-white">{account.name}</p>
+          <p className="text-sm font-semibold text-[#111827]">{account.name}</p>
           <p className="text-xs text-[#6B7280] mt-0.5">
             {account.id} · {account.currency ?? '—'} · {account.timezone ?? '—'}
           </p>
         </div>
-        <span className="text-xs px-2 py-1 rounded-lg bg-[#1C1C27] border border-[#2A2A3A] text-[#9CA3AF]">
+        <span className="text-xs px-2 py-1 rounded-lg bg-[#F9FAFB] border border-[#E5E7EB] text-[#9CA3AF]">
           {account.campaigns.length} campaign{account.campaigns.length !== 1 ? 's' : ''}
         </span>
       </div>
 
       {/* Aggregate stats */}
-      <div className="grid grid-cols-3 divide-x divide-[#2A2A3A] border-b border-[#2A2A3A]">
+      <div className="grid grid-cols-3 divide-x divide-[#2A2A3A] border-b border-[#E5E7EB]">
         <div className="px-5 py-3 text-center">
-          <p className="text-sm font-semibold text-white">${totalSpend.toFixed(2)}</p>
+          <p className="text-sm font-semibold text-[#111827]">${totalSpend.toFixed(2)}</p>
           <p className="text-xs text-[#6B7280]">Total Spend</p>
         </div>
         <div className="px-5 py-3 text-center">
-          <p className="text-sm font-semibold text-white">{totalImpressions.toLocaleString()}</p>
+          <p className="text-sm font-semibold text-[#111827]">{totalImpressions.toLocaleString()}</p>
           <p className="text-xs text-[#6B7280]">Impressions</p>
         </div>
         <div className="px-5 py-3 text-center">
-          <p className="text-sm font-semibold text-white">{totalClicks.toLocaleString()}</p>
+          <p className="text-sm font-semibold text-[#111827]">{totalClicks.toLocaleString()}</p>
           <p className="text-xs text-[#6B7280]">Clicks</p>
         </div>
       </div>
@@ -254,7 +254,7 @@ export default function MetaSettingsPage() {
     return (
       <div className="max-w-4xl mx-auto space-y-4">
         <MetaPageHeader />
-        <div className="rounded-xl border border-[#2A2A3A] bg-[#0F0F15] p-12 flex items-center justify-center">
+        <div className="rounded-xl border border-[#E5E7EB] bg-white p-12 flex items-center justify-center">
           <div className="flex items-center gap-3 text-[#6B7280]">
             <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -294,7 +294,7 @@ export default function MetaSettingsPage() {
           <button
             type="button"
             onClick={() => { setPageState('loading'); void loadDashboard() }}
-            className="text-xs px-3 py-1.5 rounded-lg border border-[#2A2A3A] text-[#D1D5DB] hover:bg-[#1C1C27] transition-colors shrink-0 ml-4"
+            className="text-xs px-3 py-1.5 rounded-lg border border-[#E5E7EB] text-[#374151] hover:bg-[#F9FAFB] transition-colors shrink-0 ml-4"
           >
             Retry
           </button>
@@ -308,15 +308,15 @@ export default function MetaSettingsPage() {
     return (
       <div className="max-w-4xl mx-auto space-y-4">
         <MetaPageHeader />
-        <div className="rounded-xl border border-[#2A2A3A] bg-[#0F0F15] p-8 text-center">
+        <div className="rounded-xl border border-[#E5E7EB] bg-white p-8 text-center">
           {/* Meta logo */}
-          <div className="w-16 h-16 rounded-2xl bg-[#1C1C27] border border-[#2A2A3A] flex items-center justify-center mx-auto mb-5">
+          <div className="w-16 h-16 rounded-2xl bg-[#F9FAFB] border border-[#E5E7EB] flex items-center justify-center mx-auto mb-5">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" className="text-blue-400">
               <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
             </svg>
           </div>
 
-          <h2 className="text-lg font-semibold text-white mb-2">Connect Meta Ads</h2>
+          <h2 className="text-lg font-semibold text-[#111827] mb-2">Connect Meta Ads</h2>
           <p className="text-sm text-[#6B7280] max-w-sm mx-auto mb-6 leading-relaxed">
             Connect your Meta Business account to sync Facebook and Instagram campaigns, spend, and AI-powered insights.
           </p>
@@ -328,7 +328,7 @@ export default function MetaSettingsPage() {
               { icon: '🤖', label: 'AI health scores' },
               { icon: '🔄', label: 'Auto-sync every 10m' },
             ].map((b) => (
-              <div key={b.label} className="rounded-xl border border-[#2A2A3A] bg-[#13131A] p-3">
+              <div key={b.label} className="rounded-xl border border-[#E5E7EB] bg-white p-3">
                 <div className="text-xl mb-1">{b.icon}</div>
                 <p className="text-xs text-[#9CA3AF]">{b.label}</p>
               </div>
@@ -338,14 +338,14 @@ export default function MetaSettingsPage() {
           <button
             type="button"
             onClick={handleConnect}
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-sm font-medium transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#111827] hover:bg-[#1F2937] text-white text-sm font-medium transition-colors"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="text-white">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="text-[#111827]">
               <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
             </svg>
             Connect with Meta
           </button>
-          <p className="text-xs text-[#4B5563] mt-4">
+          <p className="text-xs text-[#6B7280] mt-4">
             You'll be redirected to Meta to authorize access. No passwords are shared.
           </p>
         </div>
@@ -382,16 +382,16 @@ export default function MetaSettingsPage() {
       )}
 
       {/* Status bar */}
-      <div className="rounded-xl border border-[#2A2A3A] bg-[#0F0F15] px-5 py-4 flex items-center justify-between flex-wrap gap-3">
+      <div className="rounded-xl border border-[#E5E7EB] bg-white px-5 py-4 flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#1C1C27] border border-[#2A2A3A] flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-[#F9FAFB] border border-[#E5E7EB] flex items-center justify-center shrink-0">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-blue-400">
               <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
             </svg>
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-white">Meta Ads</span>
+              <span className="text-sm font-medium text-[#111827]">Meta Ads</span>
               <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-md bg-emerald-400/10 text-emerald-400 border border-emerald-400/20">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                 Connected
@@ -415,7 +415,7 @@ export default function MetaSettingsPage() {
             type="button"
             onClick={() => void handleSync()}
             disabled={syncing}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#2A2A3A] text-sm text-[#D1D5DB] hover:bg-[#1C1C27] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E5E7EB] text-sm text-[#374151] hover:bg-[#F9FAFB] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <svg
               width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
@@ -435,8 +435,8 @@ export default function MetaSettingsPage() {
           { label: 'Campaigns', value: totalCampaigns.toString() },
           { label: 'Total Spend (30d)', value: `$${totalSpend.toFixed(2)}` },
         ].map((stat) => (
-          <div key={stat.label} className="rounded-xl border border-[#2A2A3A] bg-[#0F0F15] px-4 py-4 text-center">
-            <p className="text-xl font-bold text-white">{stat.value}</p>
+          <div key={stat.label} className="rounded-xl border border-[#E5E7EB] bg-white px-4 py-4 text-center">
+            <p className="text-xl font-bold text-[#111827]">{stat.value}</p>
             <p className="text-xs text-[#6B7280] mt-1">{stat.label}</p>
           </div>
         ))}
@@ -444,8 +444,8 @@ export default function MetaSettingsPage() {
 
       {/* Accounts & campaigns */}
       {accounts.length === 0 ? (
-        <div className="rounded-xl border border-[#2A2A3A] bg-[#0F0F15] p-10 text-center">
-          <p className="text-sm font-medium text-white mb-1">No data yet</p>
+        <div className="rounded-xl border border-[#E5E7EB] bg-white p-10 text-center">
+          <p className="text-sm font-medium text-[#111827] mb-1">No data yet</p>
           <p className="text-xs text-[#6B7280] mb-5">
             Your Meta account is connected but no campaigns have been synced yet.
           </p>
@@ -453,7 +453,7 @@ export default function MetaSettingsPage() {
             type="button"
             onClick={() => void handleSync()}
             disabled={syncing}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-sm font-medium disabled:opacity-50 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#111827] hover:bg-[#1F2937] text-white text-sm font-medium disabled:opacity-50 transition-colors"
           >
             <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} className={syncing ? 'animate-spin' : ''}>
               <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
@@ -473,9 +473,9 @@ export default function MetaSettingsPage() {
       )}
 
       {/* Reconnect */}
-      <div className="rounded-xl border border-[#2A2A3A] bg-[#0F0F15] px-5 py-4 flex items-center justify-between">
+      <div className="rounded-xl border border-[#E5E7EB] bg-white px-5 py-4 flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-white">Reconnect Meta</p>
+          <p className="text-sm font-medium text-[#111827]">Reconnect Meta</p>
           <p className="text-xs text-[#6B7280] mt-0.5">
             Refresh your Meta access token or connect a different account.
           </p>
@@ -483,7 +483,7 @@ export default function MetaSettingsPage() {
         <button
           type="button"
           onClick={handleConnect}
-          className="text-xs px-3 py-1.5 rounded-lg border border-[#2A2A3A] text-[#9CA3AF] hover:text-white hover:bg-[#1C1C27] transition-colors shrink-0"
+          className="text-xs px-3 py-1.5 rounded-lg border border-[#E5E7EB] text-[#9CA3AF] hover:text-[#111827] hover:bg-[#F9FAFB] transition-colors shrink-0"
         >
           Reconnect
         </button>
@@ -498,13 +498,13 @@ function MetaPageHeader() {
   return (
     <div>
       <div className="flex items-center gap-2 text-xs text-[#6B7280] mb-4">
-        <a href="/settings" className="hover:text-white transition-colors">Settings</a>
+        <a href="/settings" className="hover:text-[#111827] transition-colors">Settings</a>
         <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path d="M9 18l6-6-6-6" />
         </svg>
         <span className="text-[#9CA3AF]">Meta Integration</span>
       </div>
-      <h1 className="text-2xl font-bold text-white">Meta Ads Integration</h1>
+      <h1 className="text-2xl font-bold text-[#111827]">Meta Ads Integration</h1>
       <p className="mt-1 text-sm text-[#6B7280]">
         Manage your Facebook and Instagram advertising connection.
       </p>

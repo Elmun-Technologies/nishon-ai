@@ -122,7 +122,7 @@ export default function AiDecisionsPage() {
       {/* ── Page header ── */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white mb-1">AI Decisions Log</h1>
+          <h1 className="text-2xl font-bold text-[#111827] mb-1">AI Decisions Log</h1>
           <p className="text-[#6B7280] text-sm">
             Every action Nishon AI has taken or recommended — with full reasoning
           </p>
@@ -158,7 +158,7 @@ export default function AiDecisionsPage() {
       )}
 
       {/* ── Filter tabs ── */}
-      <div className="flex items-center gap-1 bg-[#13131A] border border-[#2A2A3A] rounded-xl p-1 w-fit">
+      <div className="flex items-center gap-1 bg-white border border-[#E5E7EB] rounded-xl p-1 w-fit">
         {(
           [
             { key: 'all', label: 'All' },
@@ -174,8 +174,8 @@ export default function AiDecisionsPage() {
               flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
               transition-all duration-200
               ${filter === tab.key
-                ? 'bg-[#7C3AED] text-white'
-                : 'text-[#6B7280] hover:text-white hover:bg-[#1C1C27]'
+                ? 'bg-[#111827] text-white'
+                : 'text-[#6B7280] hover:text-[#111827] hover:bg-[#F9FAFB]'
               }
             `}
           >
@@ -185,10 +185,10 @@ export default function AiDecisionsPage() {
                 className={`
                   text-xs px-1.5 py-0.5 rounded-full
                   ${filter === tab.key
-                    ? 'bg-white/20 text-white'
+                    ? 'bg-white/20 text-[#111827]'
                     : tab.key === 'pending'
                     ? 'bg-amber-500/20 text-amber-400'
-                    : 'bg-[#2A2A3A] text-[#6B7280]'
+                    : 'bg-[#F3F4F6] text-[#6B7280]'
                   }
                 `}
               >
@@ -231,12 +231,12 @@ export default function AiDecisionsPage() {
                   className={`
                     transition-all duration-200
                     ${isPending ? 'border-amber-500/30' : ''}
-                    ${isExpanded ? 'border-[#7C3AED]/30' : ''}
+                    ${isExpanded ? 'border-[#D1D5DB]' : ''}
                   `}
                 >
                   <div className="p-5">
                     <div className="flex items-start gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-[#1C1C27] border border-[#2A2A3A] flex items-center justify-center text-lg shrink-0 mt-0.5">
+                      <div className="w-10 h-10 rounded-xl bg-[#F9FAFB] border border-[#E5E7EB] flex items-center justify-center text-lg shrink-0 mt-0.5">
                         {config.icon}
                       </div>
 
@@ -254,18 +254,18 @@ export default function AiDecisionsPage() {
                             <Badge variant="danger">Rejected</Badge>
                           )}
 
-                          <span className="text-[#4B5563] text-xs ml-auto">
+                          <span className="text-[#6B7280] text-xs ml-auto">
                             {timeAgo(decision.createdAt)}
                           </span>
                         </div>
 
-                        <p className="text-[#D1D5DB] text-sm leading-relaxed">
+                        <p className="text-[#374151] text-sm leading-relaxed">
                           {decision.reason}
                         </p>
 
                         {decision.estimatedImpact && (
-                          <div className="flex items-start gap-2 mt-2.5 bg-[#1C1C27] rounded-lg px-3 py-2">
-                            <span className="text-[#7C3AED] text-xs font-medium shrink-0 mt-0.5">
+                          <div className="flex items-start gap-2 mt-2.5 bg-[#F9FAFB] rounded-lg px-3 py-2">
+                            <span className="text-[#374151] text-xs font-medium shrink-0 mt-0.5">
                               💡 Expected impact:
                             </span>
                             <p className="text-[#9CA3AF] text-xs leading-relaxed">
@@ -300,7 +300,7 @@ export default function AiDecisionsPage() {
                           (decision.beforeState || decision.afterState) && (
                             <button
                               onClick={() => setExpandedId(isExpanded ? null : decision.id)}
-                              className="text-[#4B5563] hover:text-[#9CA3AF] text-xs flex items-center gap-1 transition-colors"
+                              className="text-[#6B7280] hover:text-[#9CA3AF] text-xs flex items-center gap-1 transition-colors"
                             >
                               {isExpanded ? 'Hide details ↑' : 'Show details ↓'}
                             </button>
@@ -312,12 +312,12 @@ export default function AiDecisionsPage() {
 
                   {isExpanded && (decision.beforeState || decision.afterState) && (
                     <div className="px-5 pb-5 pt-0">
-                      <div className="border-t border-[#2A2A3A] pt-4">
+                      <div className="border-t border-[#E5E7EB] pt-4">
                         <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide mb-3">
                           Before → After
                         </p>
                         <div className="grid grid-cols-2 gap-3">
-                          <div className="bg-[#0D0D15] border border-[#2A2A3A] rounded-xl p-4">
+                          <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4">
                             <p className="text-[#6B7280] text-xs font-medium mb-2 flex items-center gap-1.5">
                               <span className="w-2 h-2 rounded-full bg-red-500/60" />
                               Before
@@ -326,7 +326,7 @@ export default function AiDecisionsPage() {
                               <div className="space-y-1.5">
                                 {Object.entries(decision.beforeState).map(([key, val]) => (
                                   <div key={key} className="flex justify-between text-xs">
-                                    <span className="text-[#4B5563] capitalize">
+                                    <span className="text-[#6B7280] capitalize">
                                       {key.replace(/([A-Z])/g, ' $1').trim()}
                                     </span>
                                     <span className="text-[#9CA3AF] font-mono">
@@ -336,11 +336,11 @@ export default function AiDecisionsPage() {
                                 ))}
                               </div>
                             ) : (
-                              <p className="text-[#4B5563] text-xs">No data</p>
+                              <p className="text-[#6B7280] text-xs">No data</p>
                             )}
                           </div>
 
-                          <div className="bg-[#0D0D15] border border-emerald-500/20 rounded-xl p-4">
+                          <div className="bg-[#F9FAFB] border border-emerald-500/20 rounded-xl p-4">
                             <p className="text-[#6B7280] text-xs font-medium mb-2 flex items-center gap-1.5">
                               <span className="w-2 h-2 rounded-full bg-emerald-500/60" />
                               After
@@ -349,7 +349,7 @@ export default function AiDecisionsPage() {
                               <div className="space-y-1.5">
                                 {Object.entries(decision.afterState).map(([key, val]) => (
                                   <div key={key} className="flex justify-between text-xs">
-                                    <span className="text-[#4B5563] capitalize">
+                                    <span className="text-[#6B7280] capitalize">
                                       {key.replace(/([A-Z])/g, ' $1').trim()}
                                     </span>
                                     <span className="text-emerald-400 font-mono">
@@ -359,7 +359,7 @@ export default function AiDecisionsPage() {
                                 ))}
                               </div>
                             ) : (
-                              <p className="text-[#4B5563] text-xs">Pending execution</p>
+                              <p className="text-[#6B7280] text-xs">Pending execution</p>
                             )}
                           </div>
                         </div>
@@ -377,7 +377,7 @@ export default function AiDecisionsPage() {
         <div className="flex items-start gap-3 px-2">
           <span className="text-lg mt-0.5">🔍</span>
           <div>
-            <p className="text-white text-sm font-medium mb-0.5">
+            <p className="text-[#111827] text-sm font-medium mb-0.5">
               Why does Nishon AI show this log?
             </p>
             <p className="text-[#6B7280] text-xs leading-relaxed">

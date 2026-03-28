@@ -26,8 +26,8 @@ export function Switch({ checked, onChange, label, description, disabled, id, cl
         disabled={disabled}
         onClick={() => !disabled && onChange(!checked)}
         className={cn(
-          'relative w-10 h-6 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/30 shrink-0',
-          checked ? 'bg-[#7C3AED]' : 'bg-[#2A2A3A]'
+          'relative w-10 h-6 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#111827]/30 shrink-0',
+          checked ? 'bg-[#111827]' : 'bg-[#F3F4F6]'
         )}
       >
         <span
@@ -39,7 +39,7 @@ export function Switch({ checked, onChange, label, description, disabled, id, cl
       </button>
       {(label || description) && (
         <div>
-          {label && <p className="text-sm font-medium text-white">{label}</p>}
+          {label && <p className="text-sm font-medium text-[#111827]">{label}</p>}
           {description && <p className="text-xs text-[#6B7280]">{description}</p>}
         </div>
       )}

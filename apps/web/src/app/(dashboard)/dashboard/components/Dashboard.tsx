@@ -38,7 +38,7 @@ export function Dashboard() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-white">Dashboard</h2>
+          <h2 className="text-xl font-semibold text-[#111827]">Dashboard</h2>
           <div className="flex gap-2">
             {['7d', '30d', '90d'].map(range => (
               <Button key={range} variant="secondary" size="sm">
@@ -64,7 +64,7 @@ export function Dashboard() {
   if (error) {
     return (
       <div className="space-y-6">
-        <h2 className="text-xl font-semibold text-white">Dashboard</h2>
+        <h2 className="text-xl font-semibold text-[#111827]">Dashboard</h2>
         <Card padding="lg">
           <p className="text-red-400">Error loading dashboard data: {error}</p>
           <Button onClick={() => window.location.reload()} className="mt-4">
@@ -78,7 +78,7 @@ export function Dashboard() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-white">Dashboard</h2>
+        <h2 className="text-xl font-semibold text-[#111827]">Dashboard</h2>
         <div className="flex gap-2">
           {['7d', '30d', '90d'].map(range => (
             <Button 
@@ -98,7 +98,7 @@ export function Dashboard() {
         <Card padding="lg">
           <div className="space-y-2">
             <p className="text-sm text-[#6B7280]">Total Spend</p>
-            <p className="text-2xl font-bold text-white">${totalSpend.toLocaleString()}</p>
+            <p className="text-2xl font-bold text-[#111827]">${totalSpend.toLocaleString()}</p>
             <div className="flex items-center gap-2">
               <Badge variant="success">+12.5%</Badge>
               <span className="text-sm text-[#6B7280]">vs last period</span>
@@ -109,7 +109,7 @@ export function Dashboard() {
         <Card padding="lg">
           <div className="space-y-2">
             <p className="text-sm text-[#6B7280]">Total Clicks</p>
-            <p className="text-2xl font-bold text-white">{totalClicks.toLocaleString()}</p>
+            <p className="text-2xl font-bold text-[#111827]">{totalClicks.toLocaleString()}</p>
             <div className="flex items-center gap-2">
               <Badge variant="success">+8.2%</Badge>
               <span className="text-sm text-[#6B7280]">vs last period</span>
@@ -120,7 +120,7 @@ export function Dashboard() {
         <Card padding="lg">
           <div className="space-y-2">
             <p className="text-sm text-[#6B7280]">Total Conversions</p>
-            <p className="text-2xl font-bold text-white">{totalConversions.toLocaleString()}</p>
+            <p className="text-2xl font-bold text-[#111827]">{totalConversions.toLocaleString()}</p>
             <div className="flex items-center gap-2">
               <Badge variant="success">+15.7%</Badge>
               <span className="text-sm text-[#6B7280]">vs last period</span>
@@ -131,7 +131,7 @@ export function Dashboard() {
         <Card padding="lg">
           <div className="space-y-2">
             <p className="text-sm text-[#6B7280]">Average ROAS</p>
-            <p className="text-2xl font-bold text-white">{avgROAS.toFixed(2)}x</p>
+            <p className="text-2xl font-bold text-[#111827]">{avgROAS.toFixed(2)}x</p>
             <div className="flex items-center gap-2">
               <Badge variant="warning">+3.1%</Badge>
               <span className="text-sm text-[#6B7280]">vs last period</span>
@@ -144,7 +144,7 @@ export function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Performance Over Time */}
         <Card padding="lg">
-          <h3 className="text-lg font-semibold text-white mb-4">Performance Over Time</h3>
+          <h3 className="text-lg font-semibold text-[#111827] mb-4">Performance Over Time</h3>
           <LineChart
             data={performanceData}
             xKey="date"
@@ -155,7 +155,7 @@ export function Dashboard() {
 
         {/* Platform Distribution */}
         <Card padding="lg">
-          <h3 className="text-lg font-semibold text-white mb-4">Platform Distribution</h3>
+          <h3 className="text-lg font-semibold text-[#111827] mb-4">Platform Distribution</h3>
           <div className="space-y-4">
             {(() => {
               const pd = platformData as Record<string, number>
@@ -169,10 +169,10 @@ export function Dashboard() {
                       platform === 'yandex' ? 'bg-[#FFCC00]' :
                       'bg-[#2CA5E0]'
                     }`}></div>
-                    <span className="text-white capitalize">{platform}</span>
+                    <span className="text-[#111827] capitalize">{platform}</span>
                   </div>
                   <div className="flex items-center gap-4">
-                    <span className="text-white font-medium">{count}</span>
+                    <span className="text-[#111827] font-medium">{count}</span>
                     <Progress value={(count / total) * 100} />
                   </div>
                 </div>
@@ -184,11 +184,11 @@ export function Dashboard() {
 
       {/* Campaign Performance */}
       <Card padding="lg">
-        <h3 className="text-lg font-semibold text-white mb-4">Campaign Performance</h3>
+        <h3 className="text-lg font-semibold text-[#111827] mb-4">Campaign Performance</h3>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-[#3A3A4A]">
+              <tr className="border-b border-[#E5E7EB]">
                 <th className="text-left text-[#6B7280] pb-2">Campaign</th>
                 <th className="text-left text-[#6B7280] pb-2">Platform</th>
                 <th className="text-left text-[#6B7280] pb-2">Spend</th>
@@ -200,9 +200,9 @@ export function Dashboard() {
             </thead>
             <tbody>
               {campaigns?.map(campaign => (
-                <tr key={campaign.id} className="border-b border-[#3A3A4A]">
+                <tr key={campaign.id} className="border-b border-[#E5E7EB]">
                   <td className="py-3">
-                    <div className="text-white font-medium">{campaign.name}</div>
+                    <div className="text-[#111827] font-medium">{campaign.name}</div>
                     <div className="text-sm text-[#6B7280]">{campaign.objective}</div>
                   </td>
                   <td className="py-3">
@@ -214,10 +214,10 @@ export function Dashboard() {
                       ))}
                     </div>
                   </td>
-                  <td className="py-3 text-white">${(campaign.totalSpend || 0).toLocaleString()}</td>
-                  <td className="py-3 text-white">{(campaign.totalClicks || 0).toLocaleString()}</td>
-                  <td className="py-3 text-white">{(campaign.totalConversions || 0).toLocaleString()}</td>
-                  <td className="py-3 text-white">{((campaign.totalConversions || 0) / (campaign.totalSpend || 1)).toFixed(2)}x</td>
+                  <td className="py-3 text-[#111827]">${(campaign.totalSpend || 0).toLocaleString()}</td>
+                  <td className="py-3 text-[#111827]">{(campaign.totalClicks || 0).toLocaleString()}</td>
+                  <td className="py-3 text-[#111827]">{(campaign.totalConversions || 0).toLocaleString()}</td>
+                  <td className="py-3 text-[#111827]">{((campaign.totalConversions || 0) / (campaign.totalSpend || 1)).toFixed(2)}x</td>
                   <td className="py-3">
                     <Badge 
                       variant={campaign.status === 'active' ? 'success' : 
@@ -235,30 +235,30 @@ export function Dashboard() {
 
       {/* Recommendations */}
       <Card padding="lg">
-        <h3 className="text-lg font-semibold text-white mb-4">AI Recommendations</h3>
+        <h3 className="text-lg font-semibold text-[#111827] mb-4">AI Recommendations</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div className="border border-[#3A3A4A] rounded-lg p-4">
+          <div className="border border-[#E5E7EB] rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
               <Badge variant="success">Budget Optimization</Badge>
               <Badge variant="success">95% confidence</Badge>
             </div>
-            <p className="text-white">Increase Meta budget by 20% during weekdays for better ROAS</p>
+            <p className="text-[#111827]">Increase Meta budget by 20% during weekdays for better ROAS</p>
           </div>
           
-          <div className="border border-[#3A3A4A] rounded-lg p-4">
+          <div className="border border-[#E5E7EB] rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
               <Badge variant="warning">Creative Refresh</Badge>
               <Badge variant="warning">78% confidence</Badge>
             </div>
-            <p className="text-white">Update creative assets for campaigns older than 30 days</p>
+            <p className="text-[#111827]">Update creative assets for campaigns older than 30 days</p>
           </div>
           
-          <div className="border border-[#3A3A4A] rounded-lg p-4">
+          <div className="border border-[#E5E7EB] rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
               <Badge variant="info">Audience Expansion</Badge>
               <Badge variant="success">82% confidence</Badge>
             </div>
-            <p className="text-white">Expand audience targeting to include lookalike audiences</p>
+            <p className="text-[#111827]">Expand audience targeting to include lookalike audiences</p>
           </div>
         </div>
       </Card>

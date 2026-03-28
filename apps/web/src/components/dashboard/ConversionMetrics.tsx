@@ -83,9 +83,9 @@ export function ConversionMetrics({
 
   if (loading) {
     return (
-      <div className="bg-[#13131F] border border-[#2A2A3A] rounded-2xl p-6">
+      <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6">
         <div className="flex items-center justify-center h-40">
-          <div className="w-8 h-8 border-2 border-[#7C3AED] border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-[#111827] border-t-transparent rounded-full animate-spin" />
         </div>
       </div>
     )
@@ -93,7 +93,7 @@ export function ConversionMetrics({
 
   if (error || !data) {
     return (
-      <div className="bg-[#13131F] border border-[#2A2A3A] rounded-2xl p-6">
+      <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6">
         <div className="text-center py-8">
           <p className="text-sm text-[#9CA3AF]">
             {error || 'No conversion data available'}
@@ -111,9 +111,9 @@ export function ConversionMetrics({
       {/* Summary Cards */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {/* Total Conversions */}
-        <div className="bg-[#13131F] border border-[#2A2A3A] rounded-xl p-4">
+        <div className="bg-white border border-[#E5E7EB] rounded-xl p-4">
           <div className="text-xs text-[#6B7280] mb-2">Jami Konversiyalar</div>
-          <div className="text-2xl font-bold text-white mb-2">
+          <div className="text-2xl font-bold text-[#111827] mb-2">
             {formatNumber(summary.totalConversions)}
           </div>
           <div className="text-xs text-[#9CA3AF]">
@@ -122,9 +122,9 @@ export function ConversionMetrics({
         </div>
 
         {/* Conversion Value */}
-        <div className="bg-[#13131F] border border-[#2A2A3A] rounded-xl p-4">
+        <div className="bg-white border border-[#E5E7EB] rounded-xl p-4">
           <div className="text-xs text-[#6B7280] mb-2">Konversiya Qiymati</div>
-          <div className="text-2xl font-bold text-white mb-2">
+          <div className="text-2xl font-bold text-[#111827] mb-2">
             {formatCurrency(summary.totalConversionValue)}
           </div>
           <div className="text-xs text-[#9CA3AF]">
@@ -133,9 +133,9 @@ export function ConversionMetrics({
         </div>
 
         {/* Cost Per Conversion (CPA) */}
-        <div className="bg-[#13131F] border border-[#2A2A3A] rounded-xl p-4">
+        <div className="bg-white border border-[#E5E7EB] rounded-xl p-4">
           <div className="text-xs text-[#6B7280] mb-2">CPA (Oqit. Xarajati)</div>
-          <div className="text-2xl font-bold text-white mb-2">
+          <div className="text-2xl font-bold text-[#111827] mb-2">
             {formatCurrency(summary.costPerConversion)}
           </div>
           <div className="text-xs text-[#9CA3AF]">
@@ -144,9 +144,9 @@ export function ConversionMetrics({
         </div>
 
         {/* Conversion Rate */}
-        <div className="bg-[#13131F] border border-[#2A2A3A] rounded-xl p-4">
+        <div className="bg-white border border-[#E5E7EB] rounded-xl p-4">
           <div className="text-xs text-[#6B7280] mb-2">Konversiya Stavkasi</div>
-          <div className="text-2xl font-bold text-white mb-2">
+          <div className="text-2xl font-bold text-[#111827] mb-2">
             {summary.conversionRateByClicks.toFixed(2)}%
           </div>
           <div className="text-xs text-[#9CA3AF]">
@@ -156,16 +156,16 @@ export function ConversionMetrics({
       </div>
 
       {/* Conversion Trend Chart */}
-      <div className="bg-[#13131F] border border-[#2A2A3A] rounded-2xl p-6">
+      <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6">
         <div className="mb-6">
-          <h3 className="text-sm font-semibold text-white">Konversiya Trendi</h3>
+          <h3 className="text-sm font-semibold text-[#111827]">Konversiya Trendi</h3>
           <p className="text-xs text-[#6B7280] mt-1">{startDate} - {endDate}</p>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[#2A2A3A]">
+              <tr className="border-b border-[#E5E7EB]">
                 <th className="text-left py-3 px-4 text-xs font-semibold text-[#6B7280]">Sana</th>
                 <th className="text-right py-3 px-4 text-xs font-semibold text-[#6B7280]">Konversiyalar</th>
                 <th className="text-right py-3 px-4 text-xs font-semibold text-[#6B7280]">Qiymat</th>
@@ -177,19 +177,19 @@ export function ConversionMetrics({
               {trend.map((row) => (
                 <tr
                   key={row.date}
-                  className="border-b border-[#2A2A3A] hover:bg-[#1A1A2E] transition-colors"
+                  className="border-b border-[#E5E7EB] hover:bg-[#F9FAFB] transition-colors"
                 >
-                  <td className="py-3 px-4 text-white">{row.date}</td>
-                  <td className="text-right py-3 px-4 text-white font-medium">
+                  <td className="py-3 px-4 text-[#111827]">{row.date}</td>
+                  <td className="text-right py-3 px-4 text-[#111827] font-medium">
                     {formatNumber(row.conversions)}
                   </td>
-                  <td className="text-right py-3 px-4 text-white">
+                  <td className="text-right py-3 px-4 text-[#111827]">
                     {formatCurrency(row.conversionValue)}
                   </td>
-                  <td className="text-right py-3 px-4 text-white">
+                  <td className="text-right py-3 px-4 text-[#111827]">
                     {formatCurrency(row.spend)}
                   </td>
-                  <td className="text-right py-3 px-4 text-white">
+                  <td className="text-right py-3 px-4 text-[#111827]">
                     {row.conversions > 0
                       ? formatCurrency(row.costPerConversion)
                       : '—'}

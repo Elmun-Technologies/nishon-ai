@@ -30,11 +30,11 @@ const VISIBILITY_OPTIONS = [
 
 function SetupStep({ step, active, done }: { step: typeof STEPS[0]; active: boolean; done: boolean }) {
   return (
-    <div className={`flex items-center gap-3 p-3 rounded-xl transition-all ${active ? 'bg-[#7C3AED]/10 border border-[#7C3AED]/30' : done ? 'opacity-60' : 'opacity-40'}`}>
-      <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm ${done ? 'bg-emerald-500/20 text-emerald-400' : active ? 'bg-[#7C3AED]/20 text-[#A78BFA]' : 'bg-[#1C1C27] text-[#6B7280]'}`}>
+    <div className={`flex items-center gap-3 p-3 rounded-xl transition-all ${active ? 'bg-[#F3F4F6] border border-[#D1D5DB]' : done ? 'opacity-60' : 'opacity-40'}`}>
+      <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm ${done ? 'bg-emerald-500/20 text-emerald-400' : active ? 'bg-[#E5E7EB] text-[#374151]' : 'bg-[#F9FAFB] text-[#6B7280]'}`}>
         {done ? '✓' : step.icon}
       </div>
-      <span className={`text-sm ${active ? 'text-white font-medium' : 'text-[#9CA3AF]'}`}>{step.label}</span>
+      <span className={`text-sm ${active ? 'text-[#111827] font-medium' : 'text-[#9CA3AF]'}`}>{step.label}</span>
     </div>
   )
 }
@@ -92,15 +92,15 @@ export default function PortfolioDashboardPage() {
     return (
       <div className="p-8 max-w-2xl mx-auto text-center">
         <div className="text-6xl mb-4">🎉</div>
-        <h2 className="text-2xl font-bold text-white mb-3">Portfolio nashr qilindi!</h2>
+        <h2 className="text-2xl font-bold text-[#111827] mb-3">Portfolio nashr qilindi!</h2>
         <p className="text-[#9CA3AF] mb-8">
           Profilingiz endi ommaviy katalogda ko'rinmoqda. Tadbirkorlar siz bilan bog'lana olishadi.
         </p>
-        <div className="bg-[#13131A] border border-[#2A2A3A] rounded-xl p-4 mb-8 flex items-center gap-3">
+        <div className="bg-white border border-[#E5E7EB] rounded-xl p-4 mb-8 flex items-center gap-3">
           <span className="text-[#6B7280] text-sm flex-1 truncate">nishon.ai/portfolio/your-name</span>
           <button
             onClick={() => router.push('/portfolio')}
-            className="text-[#7C3AED] text-sm font-semibold hover:text-[#A78BFA] transition-colors"
+            className="text-[#374151] text-sm font-semibold hover:text-[#374151] transition-colors"
           >
             Ko'rish →
           </button>
@@ -108,13 +108,13 @@ export default function PortfolioDashboardPage() {
         <div className="flex gap-3 justify-center">
           <button
             onClick={() => router.push('/portfolio')}
-            className="bg-[#7C3AED] hover:bg-[#6D28D9] text-white px-6 py-3 rounded-xl font-semibold transition-all"
+            className="bg-[#111827] hover:bg-[#1F2937] text-white px-6 py-3 rounded-xl font-semibold transition-all"
           >
             Katalogga o'tish
           </button>
           <button
             onClick={() => setPortfolioLive(false)}
-            className="bg-[#1C1C27] hover:bg-[#2A2A3A] text-white px-6 py-3 rounded-xl border border-[#2A2A3A] transition-all"
+            className="bg-[#F9FAFB] hover:bg-[#F3F4F6] text-[#111827] px-6 py-3 rounded-xl border border-[#E5E7EB] transition-all"
           >
             Sozlamalar
           </button>
@@ -129,7 +129,7 @@ export default function PortfolioDashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-extrabold text-white">Portfolio boshqaruv</h1>
+          <h1 className="text-2xl font-extrabold text-[#111827]">Portfolio boshqaruv</h1>
           <p className="text-[#9CA3AF] text-sm mt-1">
             Natijalaringizni tasdiqlang va tadbirkorlarga ko'rsating
           </p>
@@ -137,7 +137,7 @@ export default function PortfolioDashboardPage() {
         {allDone && (
           <Link
             href="/portfolio"
-            className="text-sm text-[#7C3AED] hover:text-[#A78BFA] border border-[#7C3AED]/30 px-4 py-2 rounded-lg transition-all"
+            className="text-sm text-[#374151] hover:text-[#374151] border border-[#D1D5DB] px-4 py-2 rounded-lg transition-all"
           >
             Jamoatchilik ko'rinishi →
           </Link>
@@ -148,7 +148,7 @@ export default function PortfolioDashboardPage() {
 
         {/* ── STEPS SIDEBAR ── */}
         <div className="lg:col-span-1">
-          <div className="bg-[#13131A] border border-[#2A2A3A] rounded-2xl p-4 sticky top-4">
+          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-4 sticky top-4">
             <p className="text-xs text-[#6B7280] uppercase font-bold tracking-wider mb-3 px-1">Qadamlar</p>
             <div className="space-y-1">
               {STEPS.map(step => (
@@ -162,14 +162,14 @@ export default function PortfolioDashboardPage() {
               ))}
             </div>
             {/* progress */}
-            <div className="mt-4 pt-4 border-t border-[#2A2A3A]">
+            <div className="mt-4 pt-4 border-t border-[#E5E7EB]">
               <div className="flex justify-between text-xs text-[#6B7280] mb-1">
                 <span>Jarayon</span>
                 <span>{completedSteps.length}/{STEPS.length}</span>
               </div>
-              <div className="w-full bg-[#1C1C27] rounded-full h-1.5">
+              <div className="w-full bg-[#F9FAFB] rounded-full h-1.5">
                 <div
-                  className="bg-[#7C3AED] h-1.5 rounded-full transition-all"
+                  className="bg-[#111827] h-1.5 rounded-full transition-all"
                   style={{ width: `${(completedSteps.length / STEPS.length) * 100}%` }}
                 />
               </div>
@@ -182,10 +182,10 @@ export default function PortfolioDashboardPage() {
 
           {/* ── STEP 1: Connect platforms ── */}
           {activeStep === 1 && (
-            <div className="bg-[#13131A] border border-[#2A2A3A] rounded-2xl p-6">
+            <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6">
               <div className="flex items-center gap-3 mb-2">
                 <span className="text-2xl">🔗</span>
-                <h2 className="text-lg font-bold text-white">Ad accountlarini ulash</h2>
+                <h2 className="text-lg font-bold text-[#111827]">Ad accountlarini ulash</h2>
               </div>
               <p className="text-[#9CA3AF] text-sm mb-6">
                 Kamida bitta platformani ulang. Haqiqiy kampaniya natijalari avtomatik tortib olinadi va tasdiqlangan holda ko'rsatiladi.
@@ -198,13 +198,13 @@ export default function PortfolioDashboardPage() {
                     className={`flex items-center justify-between p-4 rounded-xl border transition-all ${
                       p.status === 'connected'
                         ? 'bg-emerald-500/5 border-emerald-500/20'
-                        : 'bg-[#0D0D14] border-[#2A2A3A]'
+                        : 'bg-[#F9FAFB] border-[#E5E7EB]'
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       <span className="text-2xl">{p.icon}</span>
                       <div>
-                        <div className="text-white font-medium text-sm">{p.name}</div>
+                        <div className="text-[#111827] font-medium text-sm">{p.name}</div>
                         {p.status === 'connected' ? (
                           <div className="text-emerald-400 text-xs">✓ Ulangan · {p.accountsCount} ta account</div>
                         ) : (
@@ -224,7 +224,7 @@ export default function PortfolioDashboardPage() {
                       <button
                         onClick={() => handleConnectPlatform(p.id)}
                         disabled={connectingPlatform === p.id}
-                        className="text-sm text-white bg-[#1C1C27] hover:bg-[#2A2A3A] border border-[#2A2A3A] px-4 py-2 rounded-lg transition-all disabled:opacity-50 flex items-center gap-2"
+                        className="text-sm text-[#111827] bg-[#F9FAFB] hover:bg-[#F3F4F6] border border-[#E5E7EB] px-4 py-2 rounded-lg transition-all disabled:opacity-50 flex items-center gap-2"
                       >
                         {connectingPlatform === p.id ? (
                           <><span className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin" /> Ulanmoqda...</>
@@ -237,9 +237,9 @@ export default function PortfolioDashboardPage() {
                 ))}
               </div>
 
-              <div className="mt-4 p-4 bg-[#0D0D14] border border-[#2A2A3A] rounded-xl">
+              <div className="mt-4 p-4 bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl">
                 <div className="flex items-start gap-2">
-                  <span className="text-[#7C3AED] mt-0.5">ℹ</span>
+                  <span className="text-[#374151] mt-0.5">ℹ</span>
                   <p className="text-[#9CA3AF] text-xs leading-relaxed">
                     Faqat o'qish huquqi so'raladi. Nishon AI hech qachon kampaniyalaringizni o'zgartirmaydi yoki to'xtatmaydi.
                     Ma'lumotlar 24 soatda bir marta yangilanadi.
@@ -251,7 +251,7 @@ export default function PortfolioDashboardPage() {
                 <button
                   onClick={() => completeStep(1)}
                   disabled={!platforms.some(p => p.status === 'connected')}
-                  className="bg-[#7C3AED] hover:bg-[#6D28D9] disabled:opacity-40 text-white px-6 py-3 rounded-xl font-semibold transition-all"
+                  className="bg-[#111827] hover:bg-[#1F2937] disabled:opacity-40 text-[#111827] px-6 py-3 rounded-xl font-semibold transition-all"
                 >
                   Davom etish →
                 </button>
@@ -261,10 +261,10 @@ export default function PortfolioDashboardPage() {
 
           {/* ── STEP 2: Profile ── */}
           {activeStep === 2 && (
-            <div className="bg-[#13131A] border border-[#2A2A3A] rounded-2xl p-6">
+            <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6">
               <div className="flex items-center gap-3 mb-2">
                 <span className="text-2xl">👤</span>
-                <h2 className="text-lg font-bold text-white">Profilni to'ldirish</h2>
+                <h2 className="text-lg font-bold text-[#111827]">Profilni to'ldirish</h2>
               </div>
               <p className="text-[#9CA3AF] text-sm mb-6">
                 Tadbirkorlar siz haqingizda bilib olsinlari uchun.
@@ -277,7 +277,7 @@ export default function PortfolioDashboardPage() {
                     value={profile.title}
                     onChange={e => setProfile(p => ({ ...p, title: e.target.value }))}
                     placeholder="Masalan: Senior Meta & Google Ads Specialist"
-                    className="w-full bg-[#0D0D14] border border-[#2A2A3A] rounded-lg px-4 py-3 text-white text-sm placeholder:text-[#6B7280] focus:outline-none focus:border-[#7C3AED]/50"
+                    className="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-4 py-3 text-[#111827] text-sm placeholder:text-[#6B7280] focus:outline-none focus:border-[#111827]/50"
                   />
                 </div>
 
@@ -288,7 +288,7 @@ export default function PortfolioDashboardPage() {
                     onChange={e => setProfile(p => ({ ...p, bio: e.target.value }))}
                     placeholder="Tajribangiz, ixtisosligingiz va natijalari haqida..."
                     rows={4}
-                    className="w-full bg-[#0D0D14] border border-[#2A2A3A] rounded-lg px-4 py-3 text-white text-sm placeholder:text-[#6B7280] focus:outline-none focus:border-[#7C3AED]/50 resize-none"
+                    className="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-4 py-3 text-[#111827] text-sm placeholder:text-[#6B7280] focus:outline-none focus:border-[#111827]/50 resize-none"
                   />
                 </div>
 
@@ -301,7 +301,7 @@ export default function PortfolioDashboardPage() {
                       value={profile.price}
                       onChange={e => setProfile(p => ({ ...p, price: e.target.value }))}
                       placeholder="500"
-                      className="w-40 bg-[#0D0D14] border border-[#2A2A3A] rounded-lg px-4 py-3 text-white text-sm placeholder:text-[#6B7280] focus:outline-none focus:border-[#7C3AED]/50"
+                      className="w-40 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-4 py-3 text-[#111827] text-sm placeholder:text-[#6B7280] focus:outline-none focus:border-[#111827]/50"
                     />
                     <span className="text-[#6B7280] text-sm">dan boshlab</span>
                   </div>
@@ -315,22 +315,22 @@ export default function PortfolioDashboardPage() {
                       onChange={e => setNicheInput(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && addNiche()}
                       placeholder="E-commerce, Fashion... (Enter)"
-                      className="flex-1 bg-[#0D0D14] border border-[#2A2A3A] rounded-lg px-3 py-2 text-white text-sm placeholder:text-[#6B7280] focus:outline-none focus:border-[#7C3AED]/50"
+                      className="flex-1 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-3 py-2 text-[#111827] text-sm placeholder:text-[#6B7280] focus:outline-none focus:border-[#111827]/50"
                     />
                     <button
                       onClick={addNiche}
-                      className="bg-[#1C1C27] border border-[#2A2A3A] text-white text-sm px-4 py-2 rounded-lg hover:bg-[#2A2A3A] transition-all"
+                      className="bg-[#F9FAFB] border border-[#E5E7EB] text-[#111827] text-sm px-4 py-2 rounded-lg hover:bg-[#F3F4F6] transition-all"
                     >
                       Qo'shish
                     </button>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {profile.niches.map(n => (
-                      <span key={n} className="flex items-center gap-1.5 bg-[#1C1C27] border border-[#2A2A3A] text-white text-xs px-3 py-1.5 rounded-lg">
+                      <span key={n} className="flex items-center gap-1.5 bg-[#F9FAFB] border border-[#E5E7EB] text-[#111827] text-xs px-3 py-1.5 rounded-lg">
                         {n}
                         <button
                           onClick={() => setProfile(p => ({ ...p, niches: p.niches.filter(x => x !== n) }))}
-                          className="text-[#6B7280] hover:text-white"
+                          className="text-[#6B7280] hover:text-[#111827]"
                         >
                           ✕
                         </button>
@@ -341,13 +341,13 @@ export default function PortfolioDashboardPage() {
               </div>
 
               <div className="flex justify-between mt-6">
-                <button onClick={() => setActiveStep(1)} className="text-[#9CA3AF] hover:text-white text-sm transition-colors">
+                <button onClick={() => setActiveStep(1)} className="text-[#9CA3AF] hover:text-[#111827] text-sm transition-colors">
                   ← Orqaga
                 </button>
                 <button
                   onClick={() => completeStep(2)}
                   disabled={!profile.title || !profile.bio}
-                  className="bg-[#7C3AED] hover:bg-[#6D28D9] disabled:opacity-40 text-white px-6 py-3 rounded-xl font-semibold transition-all"
+                  className="bg-[#111827] hover:bg-[#1F2937] disabled:opacity-40 text-[#111827] px-6 py-3 rounded-xl font-semibold transition-all"
                 >
                   Davom etish →
                 </button>
@@ -357,10 +357,10 @@ export default function PortfolioDashboardPage() {
 
           {/* ── STEP 3: Visibility ── */}
           {activeStep === 3 && (
-            <div className="bg-[#13131A] border border-[#2A2A3A] rounded-2xl p-6">
+            <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6">
               <div className="flex items-center gap-3 mb-2">
                 <span className="text-2xl">👁️</span>
-                <h2 className="text-lg font-bold text-white">Ko'rinuvchanlikni sozlash</h2>
+                <h2 className="text-lg font-bold text-[#111827]">Ko'rinuvchanlikni sozlash</h2>
               </div>
               <p className="text-[#9CA3AF] text-sm mb-6">
                 Qaysi ma'lumotlar ommaviy ko'rinishida bo'lishini tanlang.
@@ -372,15 +372,15 @@ export default function PortfolioDashboardPage() {
                     key={opt.id}
                     className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-all ${
                       visibility.includes(opt.id)
-                        ? 'bg-[#7C3AED]/5 border-[#7C3AED]/30'
-                        : 'bg-[#0D0D14] border-[#2A2A3A] hover:border-[#3A3A4A]'
+                        ? 'bg-[#111827]/5 border-[#D1D5DB]'
+                        : 'bg-[#F9FAFB] border-[#E5E7EB] hover:border-[#E5E7EB]'
                     }`}
                   >
-                    <span className="text-white text-sm">{opt.label}</span>
+                    <span className="text-[#111827] text-sm">{opt.label}</span>
                     <div
                       onClick={() => toggleVisibility(opt.id)}
                       className={`w-11 h-6 rounded-full transition-colors flex items-center px-0.5 cursor-pointer ${
-                        visibility.includes(opt.id) ? 'bg-[#7C3AED]' : 'bg-[#2A2A3A]'
+                        visibility.includes(opt.id) ? 'bg-[#111827]' : 'bg-[#F3F4F6]'
                       }`}
                     >
                       <div className={`w-5 h-5 bg-white rounded-full transition-transform ${visibility.includes(opt.id) ? 'translate-x-5' : 'translate-x-0'}`} />
@@ -390,11 +390,11 @@ export default function PortfolioDashboardPage() {
               </div>
 
               {/* Preview */}
-              <div className="mt-6 p-4 bg-[#0D0D14] border border-[#2A2A3A] rounded-xl">
+              <div className="mt-6 p-4 bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl">
                 <p className="text-[#9CA3AF] text-xs mb-2">Ko'rinadigan ma'lumotlar:</p>
                 <div className="flex flex-wrap gap-1.5">
                   {visibility.map(v => (
-                    <span key={v} className="text-[10px] bg-[#7C3AED]/10 border border-[#7C3AED]/20 text-[#A78BFA] px-2.5 py-1 rounded-full">
+                    <span key={v} className="text-[10px] bg-[#F3F4F6] border border-[#D1D5DB] text-[#374151] px-2.5 py-1 rounded-full">
                       {VISIBILITY_OPTIONS.find(o => o.id === v)?.label}
                     </span>
                   ))}
@@ -402,12 +402,12 @@ export default function PortfolioDashboardPage() {
               </div>
 
               <div className="flex justify-between mt-6">
-                <button onClick={() => setActiveStep(2)} className="text-[#9CA3AF] hover:text-white text-sm transition-colors">
+                <button onClick={() => setActiveStep(2)} className="text-[#9CA3AF] hover:text-[#111827] text-sm transition-colors">
                   ← Orqaga
                 </button>
                 <button
                   onClick={() => completeStep(3)}
-                  className="bg-[#7C3AED] hover:bg-[#6D28D9] text-white px-6 py-3 rounded-xl font-semibold transition-all"
+                  className="bg-[#111827] hover:bg-[#1F2937] text-white px-6 py-3 rounded-xl font-semibold transition-all"
                 >
                   Davom etish →
                 </button>
@@ -417,10 +417,10 @@ export default function PortfolioDashboardPage() {
 
           {/* ── STEP 4: Publish ── */}
           {activeStep === 4 && (
-            <div className="bg-[#13131A] border border-[#2A2A3A] rounded-2xl p-6">
+            <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6">
               <div className="flex items-center gap-3 mb-2">
                 <span className="text-2xl">🚀</span>
-                <h2 className="text-lg font-bold text-white">Portfolio nashr qilish</h2>
+                <h2 className="text-lg font-bold text-[#111827]">Portfolio nashr qilish</h2>
               </div>
               <p className="text-[#9CA3AF] text-sm mb-6">
                 Hamma narsa tayyor. Nashr qilingandan so'ng profilingiz katalogda ko'rinadi.
@@ -428,10 +428,10 @@ export default function PortfolioDashboardPage() {
 
               {/* Summary */}
               <div className="space-y-3 mb-6">
-                <div className="flex items-center gap-3 p-3 bg-[#0D0D14] border border-[#2A2A3A] rounded-xl">
+                <div className="flex items-center gap-3 p-3 bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl">
                   <span className="text-xl">🔗</span>
                   <div className="flex-1">
-                    <div className="text-white text-sm font-medium">Ulangan platformalar</div>
+                    <div className="text-[#111827] text-sm font-medium">Ulangan platformalar</div>
                     <div className="text-[#9CA3AF] text-xs">
                       {platforms.filter(p => p.status === 'connected').map(p => p.name).join(', ') || 'Hech qaysi'}
                     </div>
@@ -443,23 +443,23 @@ export default function PortfolioDashboardPage() {
                   )}
                 </div>
 
-                <div className="flex items-center gap-3 p-3 bg-[#0D0D14] border border-[#2A2A3A] rounded-xl">
+                <div className="flex items-center gap-3 p-3 bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl">
                   <span className="text-xl">👤</span>
                   <div className="flex-1">
-                    <div className="text-white text-sm font-medium">Profil</div>
+                    <div className="text-[#111827] text-sm font-medium">Profil</div>
                     <div className="text-[#9CA3AF] text-xs">{profile.title || 'To\'ldirilmagan'}</div>
                   </div>
                   {profile.title && profile.bio ? (
                     <span className="text-emerald-400 text-sm">✓</span>
                   ) : (
-                    <button onClick={() => setActiveStep(2)} className="text-[#7C3AED] text-xs">To'ldirish</button>
+                    <button onClick={() => setActiveStep(2)} className="text-[#374151] text-xs">To'ldirish</button>
                   )}
                 </div>
 
-                <div className="flex items-center gap-3 p-3 bg-[#0D0D14] border border-[#2A2A3A] rounded-xl">
+                <div className="flex items-center gap-3 p-3 bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl">
                   <span className="text-xl">👁️</span>
                   <div className="flex-1">
-                    <div className="text-white text-sm font-medium">Ko'rinuvchanlik</div>
+                    <div className="text-[#111827] text-sm font-medium">Ko'rinuvchanlik</div>
                     <div className="text-[#9CA3AF] text-xs">{visibility.length} ta ma'lumot ko'rinadi</div>
                   </div>
                   <span className="text-emerald-400 text-sm">✓</span>
@@ -467,19 +467,19 @@ export default function PortfolioDashboardPage() {
               </div>
 
               {/* Public URL preview */}
-              <div className="p-4 bg-[#0D0D14] border border-[#7C3AED]/20 rounded-xl mb-6">
+              <div className="p-4 bg-[#F9FAFB] border border-[#D1D5DB] rounded-xl mb-6">
                 <p className="text-xs text-[#6B7280] mb-1">Portfolio URL:</p>
-                <p className="text-white font-mono text-sm">nishon.ai/portfolio/your-username</p>
+                <p className="text-[#111827] font-mono text-sm">nishon.ai/portfolio/your-username</p>
               </div>
 
               <div className="flex justify-between">
-                <button onClick={() => setActiveStep(3)} className="text-[#9CA3AF] hover:text-white text-sm transition-colors">
+                <button onClick={() => setActiveStep(3)} className="text-[#9CA3AF] hover:text-[#111827] text-sm transition-colors">
                   ← Orqaga
                 </button>
                 <button
                   onClick={handlePublish}
                   disabled={!platforms.some(p => p.status === 'connected') || !profile.title}
-                  className="bg-[#7C3AED] hover:bg-[#6D28D9] disabled:opacity-40 text-white px-8 py-3 rounded-xl font-bold shadow-[0_0_20px_rgba(124,58,237,0.3)] transition-all"
+                  className="bg-[#111827] hover:bg-[#1F2937] disabled:opacity-40 text-[#111827] px-8 py-3 rounded-xl font-bold shadow-[0_0_20px_rgba(124,58,237,0.3)] transition-all"
                 >
                   🚀 Nashr qilish
                 </button>
@@ -489,10 +489,10 @@ export default function PortfolioDashboardPage() {
 
           {/* ── LIVE TRACKING STATS (shown when at least 1 platform connected) ── */}
           {platforms.some(p => p.status === 'connected') && (
-            <div className="bg-[#13131A] border border-[#2A2A3A] rounded-2xl p-6">
+            <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6">
               <div className="flex items-center gap-2 mb-5">
                 <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                <h3 className="text-white font-bold">Live Ma'lumotlar</h3>
+                <h3 className="text-[#111827] font-bold">Live Ma'lumotlar</h3>
                 <span className="text-xs text-[#6B7280] ml-auto">Oxirgi sync: hozirgina</span>
               </div>
 
@@ -503,9 +503,9 @@ export default function PortfolioDashboardPage() {
                   { label: "O'rtacha ROAS", value: "—", icon: "📈" },
                   { label: "Aktiv accountlar", value: platforms.filter(p => p.status === 'connected').reduce((s, p) => s + p.accountsCount, 0), icon: "🔗" },
                 ].map(s => (
-                  <div key={s.label} className="bg-[#0D0D14] border border-[#2A2A3A] rounded-xl p-3 text-center">
+                  <div key={s.label} className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-3 text-center">
                     <div className="text-2xl mb-1">{s.icon}</div>
-                    <div className="text-white font-bold text-lg">{s.value}</div>
+                    <div className="text-[#111827] font-bold text-lg">{s.value}</div>
                     <div className="text-[#6B7280] text-xs mt-0.5 leading-tight">{s.label}</div>
                   </div>
                 ))}

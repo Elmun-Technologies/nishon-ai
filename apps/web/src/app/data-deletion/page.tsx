@@ -19,43 +19,43 @@ export default function Page() {
           <p className="text-sm text-[#6B7280]">Last updated: March 22, 2026</p>
         </header>
 
-        <section className="space-y-3 rounded-xl border border-[#2A2A3A] bg-[#13131A] p-6">
+        <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
           <h2 className="text-xl font-semibold">Overview</h2>
-          <p className="text-[#D1D5DB]">
+          <p className="text-[#374151]">
             Nishon AI supports user-initiated deletion requests for account and connected
             workspace data. Deletion requests are processed in a controlled workflow to protect
             account security and prevent unauthorized removals.
           </p>
         </section>
 
-        <section className="space-y-3 rounded-xl border border-[#2A2A3A] bg-[#13131A] p-6">
+        <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
           <h2 className="text-xl font-semibold">How to request deletion</h2>
-          <p className="text-[#D1D5DB]">
+          <p className="text-[#374151]">
             Send a request from your registered account email address to:
           </p>
-          <p className="text-[#D1D5DB]">
-            <a className="text-[#A78BFA] hover:text-[#C4B5FD]" href="mailto:elmuntechnologies@gmail.com">
+          <p className="text-[#374151]">
+            <a className="text-[#374151] hover:text-[#C4B5FD]" href="mailto:elmuntechnologies@gmail.com">
               elmuntechnologies@gmail.com
             </a>
           </p>
-          <p className="text-[#D1D5DB]">
+          <p className="text-[#374151]">
             Include your account email, workspace name (if applicable), and a clear statement that
             you request deletion of your Nishon AI data.
           </p>
         </section>
 
-        <section className="space-y-3 rounded-xl border border-[#2A2A3A] bg-[#13131A] p-6">
+        <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
           <h2 className="text-xl font-semibold">Identity verification process</h2>
-          <p className="text-[#D1D5DB]">
+          <p className="text-[#374151]">
             Before processing deletion, we may verify account ownership through the registered
             email and related account metadata. Additional confirmation may be required if the
             request appears incomplete or inconsistent.
           </p>
         </section>
 
-        <section className="space-y-4 rounded-xl border border-[#2A2A3A] bg-[#13131A] p-6">
+        <section className="space-y-4 rounded-xl border border-[#E5E7EB] bg-white p-6">
           <h2 className="text-xl font-semibold">What data will be deleted</h2>
-          <ul className="list-disc space-y-2 pl-5 text-[#D1D5DB]">
+          <ul className="list-disc space-y-2 pl-5 text-[#374151]">
             <li>User account profile and authentication-related records in Nishon AI.</li>
             <li>Workspace configuration and associated campaign operation history.</li>
             <li>Connected OAuth tokens and third-party integration credentials stored by Nishon AI.</li>
@@ -63,40 +63,40 @@ export default function Page() {
           </ul>
 
           <h2 className="text-xl font-semibold">Data that may be retained</h2>
-          <p className="text-[#D1D5DB]">
+          <p className="text-[#374151]">
             Certain records may be retained where required by applicable law, security, fraud
             prevention, dispute resolution, or audit obligations. Retained data is minimized and
             handled under applicable controls.
           </p>
         </section>
 
-        <section className="space-y-3 rounded-xl border border-[#2A2A3A] bg-[#13131A] p-6">
+        <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
           <h2 className="text-xl font-semibold">Processing timeline</h2>
-          <p className="text-[#D1D5DB]">
+          <p className="text-[#374151]">
             After identity verification, we process deletion requests within 3-5 business days.
           </p>
         </section>
 
-        <section className="space-y-3 rounded-xl border border-[#2A2A3A] bg-[#13131A] p-6">
+        <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
           <h2 className="text-xl font-semibold">Third-party connected platform implications</h2>
-          <p className="text-[#D1D5DB]">
+          <p className="text-[#374151]">
             Deleting data in Nishon AI does not automatically delete data held by third-party
             platforms (such as Meta, Google, or TikTok). You may need to separately remove
             applications, revoke tokens, or submit deletion requests directly with those providers.
           </p>
         </section>
 
-        <section className="space-y-4 rounded-xl border border-[#2A2A3A] bg-[#13131A] p-6">
+        <section className="space-y-4 rounded-xl border border-[#E5E7EB] bg-white p-6">
           <h2 className="text-xl font-semibold">Confirmation process</h2>
-          <p className="text-[#D1D5DB]">
+          <p className="text-[#374151]">
             Once the request is completed, Nishon AI sends confirmation to the request email,
             including status details (completed, partially retained for legal reasons, or requiring
             additional information).
           </p>
 
           <h2 className="text-xl font-semibold">Contact email</h2>
-          <p className="text-[#D1D5DB]">
-            <a className="text-[#A78BFA] hover:text-[#C4B5FD]" href="mailto:elmuntechnologies@gmail.com">
+          <p className="text-[#374151]">
+            <a className="text-[#374151] hover:text-[#C4B5FD]" href="mailto:elmuntechnologies@gmail.com">
               elmuntechnologies@gmail.com
             </a>
           </p>

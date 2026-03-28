@@ -56,10 +56,10 @@ export function ValidationDisplay({ results, onFix }: ValidationDisplayProps) {
       )}
 
       {allErrors.length > 0 && (
-        <div className="flex justify-end pt-4 border-t border-[#3A3A4A]">
+        <div className="flex justify-end pt-4 border-t border-[#E5E7EB]">
           <button
             onClick={onFix}
-            className="px-4 py-2 bg-[#7C3AED] text-white rounded-lg hover:bg-[#7C3AED]/90 transition-colors"
+            className="px-4 py-2 bg-[#111827] text-white rounded-lg hover:bg-[#111827]/90 transition-colors"
           >
             Fix Issues
           </button>
@@ -78,7 +78,7 @@ export function ValidationStatus({ status }: ValidationStatusProps) {
     valid: { bg: 'bg-green-500/20', text: 'text-green-400', label: '✓ Valid' },
     warning: { bg: 'bg-yellow-500/20', text: 'text-yellow-400', label: '⚠ Warnings' },
     error: { bg: 'bg-red-500/20', text: 'text-red-400', label: '✗ Errors' },
-    none: { bg: 'bg-[#2A2A3A]', text: 'text-[#6B7280]', label: 'Not validated' }
+    none: { bg: 'bg-[#F3F4F6]', text: 'text-[#6B7280]', label: 'Not validated' }
   }
 
   const { bg, text, label } = config[status]

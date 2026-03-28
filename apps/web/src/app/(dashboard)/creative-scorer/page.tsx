@@ -81,7 +81,7 @@ function ScoreBar({ score, max = 10 }: { score: number; max?: number }) {
     pct >= 40 ? '#F59E0B' : '#EF4444'
   return (
     <div className="flex items-center gap-2">
-      <div className="flex-1 h-1.5 bg-[#2A2A3A] rounded-full overflow-hidden">
+      <div className="flex-1 h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden">
         <div
           className="h-full rounded-full transition-all duration-700"
           style={{ width: `${pct}%`, backgroundColor: color }}
@@ -269,7 +269,7 @@ export default function CreativeScorerPage() {
       {/* Header */}
       <div>
         <div className="flex items-center gap-3 mb-1">
-          <h1 className="text-2xl font-bold text-white">Creative Scorer</h1>
+          <h1 className="text-2xl font-bold text-[#111827]">Creative Scorer</h1>
           <Badge variant="purple">🎨 AI Baholash</Badge>
         </div>
         <p className="text-[#6B7280] text-sm">
@@ -294,10 +294,10 @@ export default function CreativeScorerPage() {
                 relative rounded-xl border-2 border-dashed transition-all duration-200
                 min-h-[240px] flex items-center justify-center
                 ${isDragging
-                  ? 'border-[#7C3AED] bg-[#7C3AED]/10 cursor-copy'
+                  ? 'border-[#111827] bg-[#F3F4F6] cursor-copy'
                   : file
-                  ? 'border-[#2A2A3A] cursor-default'
-                  : 'border-[#2A2A3A] hover:border-[#7C3AED]/50 hover:bg-[#1C1C27]/50 cursor-pointer'
+                  ? 'border-[#E5E7EB] cursor-default'
+                  : 'border-[#E5E7EB] hover:border-[#111827]/50 hover:bg-[#F9FAFB]/50 cursor-pointer'
                 }
               `}
             >
@@ -323,12 +323,12 @@ export default function CreativeScorerPage() {
                       e.stopPropagation()
                       handleReset()
                     }}
-                    className="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-lg hover:bg-black/80 transition-colors"
+                    className="absolute top-2 right-2 bg-black/60 text-[#111827] text-xs px-2 py-1 rounded-lg hover:bg-black/80 transition-colors"
                   >
                     ✕ O'chirish
                   </button>
                   {/* File info */}
-                  <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded-lg">
+                  <div className="absolute bottom-2 left-2 bg-black/60 text-[#111827] text-xs px-2 py-1 rounded-lg">
                     {file?.name} · {((file?.size ?? 0) / 1024).toFixed(0)}KB
                   </div>
                 </div>
@@ -337,16 +337,16 @@ export default function CreativeScorerPage() {
                   <div className="text-5xl mb-3">
                     {isDragging ? '📂' : '🖼'}
                   </div>
-                  <p className="text-white font-medium text-sm mb-1">
+                  <p className="text-[#111827] font-medium text-sm mb-1">
                     {isDragging
                       ? 'Faylni bu yerga tashlang'
                       : 'Rasm yoki video yuklang'}
                   </p>
-                  <p className="text-[#4B5563] text-xs mb-3">
+                  <p className="text-[#6B7280] text-xs mb-3">
                     Suring yoki bosing · JPG, PNG, WebP, MP4 · Max 10MB
                   </p>
-                  <div className="inline-flex items-center gap-2 bg-[#7C3AED]/10 border border-[#7C3AED]/20 rounded-lg px-3 py-1.5">
-                    <span className="text-[#A78BFA] text-xs">Fayl tanlash</span>
+                  <div className="inline-flex items-center gap-2 bg-[#F3F4F6] border border-[#D1D5DB] rounded-lg px-3 py-1.5">
+                    <span className="text-[#374151] text-xs">Fayl tanlash</span>
                   </div>
                 </div>
               )}
@@ -377,16 +377,16 @@ export default function CreativeScorerPage() {
                       className={`
                         flex items-center gap-2.5 px-3 py-2.5 rounded-xl border text-sm transition-all text-left
                         ${platform === p.value
-                          ? 'border-[#7C3AED] bg-[#7C3AED]/10 text-white'
-                          : 'border-[#2A2A3A] text-[#6B7280] hover:border-[#7C3AED]/40'
+                          ? 'border-[#111827] bg-[#F3F4F6] text-[#111827]'
+                          : 'border-[#E5E7EB] text-[#6B7280] hover:border-[#D1D5DB]'
                         }
                       `}
                     >
                       <span className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
-                        platform === p.value ? 'border-[#7C3AED]' : 'border-[#4B5563]'
+                        platform === p.value ? 'border-[#111827]' : 'border-[#4B5563]'
                       }`}>
                         {platform === p.value && (
-                          <span className="w-2 h-2 rounded-full bg-[#7C3AED] block" />
+                          <span className="w-2 h-2 rounded-full bg-[#111827] block" />
                         )}
                       </span>
                       {p.label}
@@ -408,8 +408,8 @@ export default function CreativeScorerPage() {
                       className={`
                         px-3 py-2 rounded-lg border text-xs font-medium transition-all
                         ${creativeType === ct.value
-                          ? 'border-[#7C3AED] bg-[#7C3AED]/10 text-[#A78BFA]'
-                          : 'border-[#2A2A3A] text-[#6B7280] hover:border-[#7C3AED]/40'
+                          ? 'border-[#111827] bg-[#F3F4F6] text-[#374151]'
+                          : 'border-[#E5E7EB] text-[#6B7280] hover:border-[#D1D5DB]'
                         }
                       `}
                     >
@@ -429,7 +429,7 @@ export default function CreativeScorerPage() {
                   value={goal}
                   onChange={(e) => setGoal(e.target.value)}
                   placeholder="Masalan: telefon sotish, kurs ro'yxatdan o'tkazish..."
-                  className="w-full bg-[#1C1C27] border border-[#2A2A3A] rounded-xl px-4 py-3 text-white placeholder:text-[#4B5563] focus:outline-none focus:border-[#7C3AED] transition-all text-sm"
+                  className="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl px-4 py-3 text-[#111827] placeholder:text-[#6B7280] focus:outline-none focus:border-[#111827] transition-all text-sm"
                 />
               </div>
 
@@ -456,7 +456,7 @@ export default function CreativeScorerPage() {
             <Card>
               <div className="py-12 text-center">
                 <div className="text-5xl mb-4">🎨</div>
-                <p className="text-white font-medium mb-2">
+                <p className="text-[#111827] font-medium mb-2">
                   Kreativingizni baholaymiz
                 </p>
                 <p className="text-[#6B7280] text-sm leading-relaxed max-w-xs mx-auto mb-6">
@@ -465,7 +465,7 @@ export default function CreativeScorerPage() {
                 </p>
                 <div className="space-y-1.5 text-left max-w-xs mx-auto">
                   {Object.entries(PARAMETER_ICONS).map(([name, icon]) => (
-                    <div key={name} className="flex items-center gap-2 text-xs text-[#4B5563]">
+                    <div key={name} className="flex items-center gap-2 text-xs text-[#6B7280]">
                       <span>{icon}</span> {name}
                     </div>
                   ))}
@@ -478,10 +478,10 @@ export default function CreativeScorerPage() {
           {loading && (
             <Card>
               <div className="py-12 text-center">
-                <div className="w-16 h-16 rounded-2xl bg-[#7C3AED]/10 border border-[#7C3AED]/20 flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 rounded-2xl bg-[#F3F4F6] border border-[#D1D5DB] flex items-center justify-center mx-auto mb-4">
                   <Spinner size="lg" />
                 </div>
-                <p className="text-white font-medium mb-1">
+                <p className="text-[#111827] font-medium mb-1">
                   Kreativ tahlil qilinmoqda...
                 </p>
                 <p className="text-[#6B7280] text-sm mb-4">
@@ -495,7 +495,7 @@ export default function CreativeScorerPage() {
                     'Platform talablari solishtirilmoqda...',
                     'Natija tayyorlanmoqda...',
                   ].map((msg, i) => (
-                    <p key={i} className="text-[#4B5563] text-xs">{msg}</p>
+                    <p key={i} className="text-[#6B7280] text-xs">{msg}</p>
                   ))}
                 </div>
               </div>
@@ -516,7 +516,7 @@ export default function CreativeScorerPage() {
                        result.verdict === 'needs_work' ? '⚠️ Yaxshilash kerak' :
                        '❌ Reklamaga tayyor emas'}
                     </div>
-                    <p className="text-white text-sm font-medium mb-1">
+                    <p className="text-[#111827] text-sm font-medium mb-1">
                       {GRADE_CONFIG[result.grade].label}
                     </p>
                     <p className="text-[#9CA3AF] text-xs leading-relaxed">
@@ -524,7 +524,7 @@ export default function CreativeScorerPage() {
                     </p>
                     <div className="flex items-center gap-3 mt-2">
                       <span className="text-xs text-[#6B7280]">
-                        Est. CTR: <span className="text-[#A78BFA] font-medium">{result.estimatedCtr}</span>
+                        Est. CTR: <span className="text-[#374151] font-medium">{result.estimatedCtr}</span>
                       </span>
                     </div>
                   </div>
@@ -551,7 +551,7 @@ export default function CreativeScorerPage() {
                               {score}%
                             </span>
                           </div>
-                          <div className="h-1.5 bg-[#2A2A3A] rounded-full overflow-hidden">
+                          <div className="h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden">
                             <div
                               className="h-full rounded-full transition-all duration-700"
                               style={{
@@ -569,8 +569,8 @@ export default function CreativeScorerPage() {
 
               {/* 10 Parameters */}
               <Card padding="none">
-                <div className="px-5 py-3 border-b border-[#2A2A3A]">
-                  <p className="text-white font-semibold text-sm">10 Parametr Tahlili</p>
+                <div className="px-5 py-3 border-b border-[#E5E7EB]">
+                  <p className="text-[#111827] font-semibold text-sm">10 Parametr Tahlili</p>
                 </div>
                 <div className="divide-y divide-[#1C1C27]">
                   {result.parameters.map((param, i) => (
@@ -579,7 +579,7 @@ export default function CreativeScorerPage() {
                         <StatusDot status={param.status} />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-1.5">
-                            <p className="text-white text-xs font-medium">
+                            <p className="text-[#111827] text-xs font-medium">
                               {PARAMETER_ICONS[param.name] || '•'} {param.name}
                             </p>
                           </div>
@@ -588,7 +588,7 @@ export default function CreativeScorerPage() {
                             {param.feedback}
                           </p>
                           {param.status !== 'good' && (
-                            <p className="text-[#7C3AED] text-xs mt-1 flex items-start gap-1">
+                            <p className="text-[#374151] text-xs mt-1 flex items-start gap-1">
                               <span className="shrink-0">→</span>
                               {param.tip}
                             </p>
@@ -610,7 +610,7 @@ export default function CreativeScorerPage() {
                     {result.improvements.map((imp, i) => (
                       <div key={i} className="flex items-start gap-2.5 text-sm">
                         <span className="text-amber-400 font-bold shrink-0">{i + 1}.</span>
-                        <p className="text-[#D1D5DB]">{imp}</p>
+                        <p className="text-[#374151]">{imp}</p>
                       </div>
                     ))}
                   </div>
@@ -623,7 +623,7 @@ export default function CreativeScorerPage() {
                   <div className="flex items-start gap-3">
                     <span className="text-xl shrink-0">🔬</span>
                     <div>
-                      <p className="text-white text-sm font-medium mb-1">A/B Test tavsiyasi</p>
+                      <p className="text-[#111827] text-sm font-medium mb-1">A/B Test tavsiyasi</p>
                       <p className="text-[#9CA3AF] text-sm leading-relaxed">
                         {result.abTestSuggestion}
                       </p>

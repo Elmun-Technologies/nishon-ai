@@ -100,7 +100,7 @@ export default function SimulationPage() {
 
       {/* ── Page header ── */}
       <div>
-        <h1 className="text-2xl font-bold text-white mb-1">
+        <h1 className="text-2xl font-bold text-[#111827] mb-1">
           Simulation & Forecast
         </h1>
         <p className="text-[#6B7280] text-sm">
@@ -115,11 +115,11 @@ export default function SimulationPage() {
           {/* Budget slider */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <label className="text-white font-medium text-sm">
+              <label className="text-[#111827] font-medium text-sm">
                 Monthly budget
               </label>
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold text-[#A78BFA]">
+                <span className="text-2xl font-bold text-[#374151]">
                   {formatCurrency(budget)}
                 </span>
                 {budgetDelta !== 0 && (
@@ -140,19 +140,19 @@ export default function SimulationPage() {
               step={50}
               value={budget}
               onChange={(e) => setBudget(Number(e.target.value))}
-              className="w-full h-2 bg-[#2A2A3A] rounded-full appearance-none cursor-pointer
+              className="w-full h-2 bg-[#F3F4F6] rounded-full appearance-none cursor-pointer
                 [&::-webkit-slider-thumb]:appearance-none
                 [&::-webkit-slider-thumb]:w-5
                 [&::-webkit-slider-thumb]:h-5
                 [&::-webkit-slider-thumb]:rounded-full
-                [&::-webkit-slider-thumb]:bg-[#7C3AED]
+                [&::-webkit-slider-thumb]:bg-[#111827]
                 [&::-webkit-slider-thumb]:cursor-pointer
                 [&::-webkit-slider-thumb]:border-2
                 [&::-webkit-slider-thumb]:border-white/20"
             />
 
             {/* Scale reference points */}
-            <div className="flex justify-between text-xs text-[#4B5563] mt-2">
+            <div className="flex justify-between text-xs text-[#6B7280] mt-2">
               <span>$50</span>
               <span>$500</span>
               <span>$1,000</span>
@@ -169,8 +169,8 @@ export default function SimulationPage() {
                   className={`
                     text-xs px-3 py-1.5 rounded-lg border transition-all duration-200
                     ${budget === preset
-                      ? 'border-[#7C3AED] bg-[#7C3AED]/10 text-[#A78BFA] font-medium'
-                      : 'border-[#2A2A3A] text-[#6B7280] hover:border-[#7C3AED]/50 hover:text-white'
+                      ? 'border-[#111827] bg-[#F3F4F6] text-[#374151] font-medium'
+                      : 'border-[#E5E7EB] text-[#6B7280] hover:border-[#111827]/50 hover:text-[#111827]'
                     }
                   `}
                 >
@@ -182,7 +182,7 @@ export default function SimulationPage() {
 
           {/* Scenario selector */}
           <div>
-            <label className="text-white font-medium text-sm block mb-3">
+            <label className="text-[#111827] font-medium text-sm block mb-3">
               Scenario
             </label>
             <div className="grid grid-cols-3 gap-3">
@@ -199,8 +199,8 @@ export default function SimulationPage() {
                     key: 'realistic',
                     label: '😊 Realistic',
                     desc: 'Based on industry averages for your market',
-                    color: 'border-[#2A2A3A] hover:border-[#7C3AED]/30',
-                    active: 'border-[#7C3AED] bg-[#7C3AED]/10',
+                    color: 'border-[#E5E7EB] hover:border-[#D1D5DB]',
+                    active: 'border-[#111827] bg-[#F3F4F6]',
                   },
                   {
                     key: 'optimistic',
@@ -219,7 +219,7 @@ export default function SimulationPage() {
                     ${scenario === s.key ? s.active : s.color}
                   `}
                 >
-                  <p className="font-medium text-white text-sm mb-1">{s.label}</p>
+                  <p className="font-medium text-[#111827] text-sm mb-1">{s.label}</p>
                   <p className="text-[#6B7280] text-xs leading-relaxed">{s.desc}</p>
                 </button>
               ))}
@@ -232,7 +232,7 @@ export default function SimulationPage() {
       {projection && (
         <>
           <div>
-            <h2 className="text-white font-semibold mb-3 flex items-center gap-2">
+            <h2 className="text-[#111827] font-semibold mb-3 flex items-center gap-2">
               Projected Results
               <Badge
                 variant={
@@ -258,7 +258,7 @@ export default function SimulationPage() {
                   label: 'Est. Leads',
                   value: projection.leads,
                   sub: 'per month',
-                  color: 'text-white',
+                  color: 'text-[#111827]',
                   icon: '🎯',
                 },
                 {
@@ -272,7 +272,7 @@ export default function SimulationPage() {
                   label: 'Est. CPA',
                   value: formatCurrency(projection.cpa),
                   sub: 'cost per acquisition',
-                  color: 'text-white',
+                  color: 'text-[#111827]',
                   icon: '💰',
                 },
               ].map(({ label, value, sub, color, icon }) => (
@@ -284,7 +284,7 @@ export default function SimulationPage() {
                     </p>
                   </div>
                   <p className={`text-2xl font-bold ${color}`}>{value}</p>
-                  <p className="text-[#4B5563] text-xs mt-1">{sub}</p>
+                  <p className="text-[#6B7280] text-xs mt-1">{sub}</p>
                 </Card>
               ))}
             </div>
@@ -294,7 +294,7 @@ export default function SimulationPage() {
           <Card>
             <div className="flex items-center gap-2 mb-5">
               <span className="text-lg">📊</span>
-              <h2 className="font-semibold text-white">Platform Breakdown</h2>
+              <h2 className="font-semibold text-[#111827]">Platform Breakdown</h2>
               <Badge variant="gray" size="sm">
                 {formatCurrency(budget)} total
               </Badge>
@@ -312,7 +312,7 @@ export default function SimulationPage() {
                             className="w-2.5 h-2.5 rounded-full"
                             style={{ backgroundColor: color }}
                           />
-                          <span className="text-white text-sm capitalize font-medium">
+                          <span className="text-[#111827] text-sm capitalize font-medium">
                             {platform}
                           </span>
                           <span className="text-[#6B7280] text-xs">
@@ -320,15 +320,15 @@ export default function SimulationPage() {
                           </span>
                         </div>
                         <div className="text-right">
-                          <span className="text-white text-sm font-medium">
+                          <span className="text-[#111827] text-sm font-medium">
                             {formatCurrency(spend)}
                           </span>
-                          <span className="text-[#4B5563] text-xs ml-2">
+                          <span className="text-[#6B7280] text-xs ml-2">
                             ~{estLeads} leads
                           </span>
                         </div>
                       </div>
-                      <div className="h-1.5 bg-[#2A2A3A] rounded-full overflow-hidden">
+                      <div className="h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden">
                         <div
                           className="h-full rounded-full transition-all duration-500"
                           style={{
@@ -349,7 +349,7 @@ export default function SimulationPage() {
             <div className="flex items-start gap-3 px-2">
               <span className="text-lg mt-0.5">💡</span>
               <div>
-                <p className="text-white text-sm font-medium mb-1">
+                <p className="text-[#111827] text-sm font-medium mb-1">
                   What this simulation tells you
                 </p>
                 <p className="text-[#6B7280] text-xs leading-relaxed">

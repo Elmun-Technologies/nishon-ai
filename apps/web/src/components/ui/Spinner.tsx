@@ -15,7 +15,7 @@ export function Spinner({ size = 'md', className }: SpinnerProps) {
   return (
     <div
       className={cn(
-        'rounded-full border-[#2A2A3A] border-t-[#7C3AED] animate-spin',
+        'rounded-full border-[#E5E7EB] border-t-[#7C3AED] animate-spin',
         sizes[size],
         className
       )}

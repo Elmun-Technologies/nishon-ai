@@ -14,11 +14,11 @@ interface AccordionItemSimpleProps {
 export function AccordionItem({ title, children, defaultOpen = false, className }: AccordionItemSimpleProps) {
   const [open, setOpen] = React.useState(defaultOpen)
   return (
-    <div className={cn('border border-[#2A2A3A] rounded-lg overflow-hidden', className)}>
+    <div className={cn('border border-[#E5E7EB] rounded-lg overflow-hidden', className)}>
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-white hover:bg-[#1C1C27] transition-colors"
+        className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-[#111827] hover:bg-[#F9FAFB] transition-colors"
       >
         {title}
         <svg
@@ -29,7 +29,7 @@ export function AccordionItem({ title, children, defaultOpen = false, className 
         </svg>
       </button>
       {open && (
-        <div className="px-4 pb-4 pt-1 border-t border-[#2A2A3A]">
+        <div className="px-4 pb-4 pt-1 border-t border-[#E5E7EB]">
           {children}
         </div>
       )}
@@ -90,7 +90,7 @@ function Item({ value = '', children, className }: CompoundItemProps) {
   const { openItems } = React.useContext(AccordionContext)
   return (
     <ItemContext.Provider value={{ value, isOpen: openItems.has(value) }}>
-      <div className={cn('border border-[#2A2A3A] rounded-lg overflow-hidden', className)}>
+      <div className={cn('border border-[#E5E7EB] rounded-lg overflow-hidden', className)}>
         {children}
       </div>
     </ItemContext.Provider>
@@ -105,7 +105,7 @@ function Trigger({ children, className }: CompoundTriggerProps) {
       type="button"
       onClick={() => toggle(value)}
       className={cn(
-        'w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-white hover:bg-[#1C1C27] transition-colors',
+        'w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-[#111827] hover:bg-[#F9FAFB] transition-colors',
         className
       )}
     >
@@ -124,7 +124,7 @@ function Content({ children, className }: CompoundContentProps) {
   const { isOpen } = React.useContext(ItemContext)
   if (!isOpen) return null
   return (
-    <div className={cn('px-4 pb-4 pt-1 border-t border-[#2A2A3A]', className)}>
+    <div className={cn('px-4 pb-4 pt-1 border-t border-[#E5E7EB]', className)}>
       {children}
     </div>
   )

@@ -156,8 +156,8 @@ function CompareRow({
   const nishonWins = higherIsBetter ? withNum > withoutNum : withNum < withoutNum
 
   return (
-    <div className={`grid grid-cols-3 gap-4 px-5 py-3.5 border-b border-[#1C1C27] last:border-0 ${
-      highlight ? 'bg-[#7C3AED]/5' : ''
+    <div className={`grid grid-cols-3 gap-4 px-5 py-3.5 border-b border-[#E5E7EB] last:border-0 ${
+      highlight ? 'bg-[#111827]/5' : ''
     }`}>
       <p className="text-[#9CA3AF] text-sm">{label}</p>
 
@@ -202,7 +202,7 @@ function BigDiffCard({
 }) {
   const colors = {
     emerald: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
-    purple: 'text-[#A78BFA] bg-[#7C3AED]/10 border-[#7C3AED]/20',
+    purple: 'text-[#374151] bg-[#F3F4F6] border-[#D1D5DB]',
     amber: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
     blue: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
   }
@@ -326,7 +326,7 @@ export default function RoiCalculatorPage() {
       {/* Header */}
       <div>
         <div className="flex items-center gap-3 mb-1">
-          <h1 className="text-2xl font-bold text-white">ROI Kalkulyator</h1>
+          <h1 className="text-2xl font-bold text-[#111827]">ROI Kalkulyator</h1>
           <Badge variant="purple">📊 Real hisob-kitob</Badge>
         </div>
         <p className="text-[#6B7280] text-sm">
@@ -344,8 +344,8 @@ export default function RoiCalculatorPage() {
             <label className="block text-sm font-medium text-[#9CA3AF] mb-3">
               Oylik reklama byudjeti
             </label>
-            <div className="bg-[#1C1C27] border border-[#2A2A3A] rounded-xl p-3 mb-2">
-              <p className="text-2xl font-bold text-[#A78BFA] text-center">
+            <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-3 mb-2">
+              <p className="text-2xl font-bold text-[#374151] text-center">
                 {formatCurrency(budget)}
               </p>
             </div>
@@ -356,7 +356,7 @@ export default function RoiCalculatorPage() {
               onChange={(e) => setBudget(Number(e.target.value))}
               className="w-full accent-[#7C3AED]"
             />
-            <div className="flex justify-between text-xs text-[#4B5563] mt-1">
+            <div className="flex justify-between text-xs text-[#6B7280] mt-1">
               <span>$50</span>
               <span>$5,000</span>
             </div>
@@ -370,10 +370,10 @@ export default function RoiCalculatorPage() {
             <select
               value={industry}
               onChange={(e) => setIndustry(e.target.value)}
-              className="w-full bg-[#1C1C27] border border-[#2A2A3A] rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#7C3AED] transition-all"
+              className="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl px-4 py-3 text-[#111827] text-sm focus:outline-none focus:border-[#111827] transition-all"
             >
               {Object.entries(INDUSTRY_DATA).map(([key, val]) => (
-                <option key={key} value={key} className="bg-[#1C1C27]">
+                <option key={key} value={key} className="bg-[#F9FAFB]">
                   {val.label}
                 </option>
               ))}
@@ -392,8 +392,8 @@ export default function RoiCalculatorPage() {
                   onClick={() => setMonths(m)}
                   className={`py-2.5 rounded-lg border text-sm font-medium transition-all ${
                     months === m
-                      ? 'border-[#7C3AED] bg-[#7C3AED]/10 text-[#A78BFA]'
-                      : 'border-[#2A2A3A] text-[#6B7280] hover:border-[#7C3AED]/40'
+                      ? 'border-[#111827] bg-[#F3F4F6] text-[#374151]'
+                      : 'border-[#E5E7EB] text-[#6B7280] hover:border-[#D1D5DB]'
                   }`}
                 >
                   {m}oy
@@ -418,15 +418,15 @@ export default function RoiCalculatorPage() {
                   onClick={() => setPlatform(p.value)}
                   className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg border text-xs transition-all ${
                     platform === p.value
-                      ? 'border-[#7C3AED] bg-[#7C3AED]/10 text-white'
-                      : 'border-[#2A2A3A] text-[#6B7280] hover:border-[#7C3AED]/40'
+                      ? 'border-[#111827] bg-[#F3F4F6] text-[#111827]'
+                      : 'border-[#E5E7EB] text-[#6B7280] hover:border-[#D1D5DB]'
                   }`}
                 >
                   <span className={`w-3 h-3 rounded-full border shrink-0 flex items-center justify-center ${
-                    platform === p.value ? 'border-[#7C3AED]' : 'border-[#4B5563]'
+                    platform === p.value ? 'border-[#111827]' : 'border-[#4B5563]'
                   }`}>
                     {platform === p.value && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#7C3AED] block" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#111827] block" />
                     )}
                   </span>
                   {p.label}
@@ -506,7 +506,7 @@ export default function RoiCalculatorPage() {
           </div>
           <div className="text-center">
             <p className="text-[#6B7280] text-xs mb-1">To'lovni qoplash muddati</p>
-            <p className="text-white text-2xl font-bold">
+            <p className="text-[#111827] text-2xl font-bold">
               {results.paybackDays} kun
             </p>
           </div>
@@ -516,14 +516,14 @@ export default function RoiCalculatorPage() {
       {/* Detailed comparison table */}
       <Card padding="none">
         {/* Table header */}
-        <div className="grid grid-cols-3 gap-4 px-5 py-3 bg-[#0D0D15] border-b border-[#2A2A3A] rounded-t-xl">
-          <p className="text-[#4B5563] text-xs font-medium uppercase tracking-wide">
+        <div className="grid grid-cols-3 gap-4 px-5 py-3 bg-[#F9FAFB] border-b border-[#E5E7EB] rounded-t-xl">
+          <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide">
             Ko'rsatkich
           </p>
           <p className="text-[#9CA3AF] text-xs font-medium text-center">
             ❌ Usiz (oddiy targetolog)
           </p>
-          <p className="text-[#A78BFA] text-xs font-medium text-center">
+          <p className="text-[#374151] text-xs font-medium text-center">
             ✅ Nishon AI bilan
           </p>
         </div>
@@ -599,17 +599,17 @@ export default function RoiCalculatorPage() {
           <p className="text-[#6B7280] text-xs uppercase tracking-wide mb-2">
             {months} oyda usiz
           </p>
-          <p className="text-2xl font-bold text-white mb-1">
+          <p className="text-2xl font-bold text-[#111827] mb-1">
             {formatCurrency(results.without.monthlyRevenue * months)}
           </p>
-          <p className="text-[#4B5563] text-xs">
+          <p className="text-[#6B7280] text-xs">
             {(results.without.monthlyLeads * months).toLocaleString()} lead ·{' '}
             {(results.without.monthlySales * months).toLocaleString()} sotuv
           </p>
         </Card>
 
-        <Card className="border-[#7C3AED]/30 bg-[#7C3AED]/5">
-          <p className="text-[#A78BFA] text-xs uppercase tracking-wide mb-2">
+        <Card className="border-[#D1D5DB] bg-[#111827]/5">
+          <p className="text-[#374151] text-xs uppercase tracking-wide mb-2">
             {months} oyda Nishon AI bilan
           </p>
           <p className="text-2xl font-bold text-emerald-400 mb-1">
@@ -631,7 +631,7 @@ export default function RoiCalculatorPage() {
             {results.periodNetBenefit > 0 ? '+' : ''}
             {formatCurrency(results.periodNetBenefit)}
           </p>
-          <p className="text-[#4B5563] text-xs">
+          <p className="text-[#6B7280] text-xs">
             To'lov {results.paybackDays} kunda qaytadi
           </p>
         </Card>
@@ -646,7 +646,7 @@ export default function RoiCalculatorPage() {
               Bu hisob-kitob O'zbekiston va MDH bozorining real o'rtacha ko'rsatkichlariga
               asoslangan. Natijalar mahsulot sifati, kreativ materiallar va bozor sharoitiga
               qarab farq qilishi mumkin. Nishon AI foydalanuvchilarining o'rtacha ROAS
-              ko'rsatkichi <span className="text-white">3.2x</span> ni tashkil etadi.
+              ko'rsatkichi <span className="text-[#111827]">3.2x</span> ni tashkil etadi.
             </p>
           </div>
           <Button

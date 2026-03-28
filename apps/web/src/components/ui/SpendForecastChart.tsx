@@ -199,7 +199,7 @@ export function SpendForecastChart({
       {/* Legend */}
       <div className="flex items-center gap-5 mt-2 px-1">
         <div className="flex items-center gap-1.5">
-          <span className="w-5 h-0.5 bg-[#7C3AED] rounded-full inline-block" />
+          <span className="w-5 h-0.5 bg-[#111827] rounded-full inline-block" />
           <span className="text-xs text-[#6B7280]">
             Haqiqiy xarajat — {formatK(spendToDate)}
           </span>

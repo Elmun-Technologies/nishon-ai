@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 :root {
+  color-scheme: light;
   --accent: #111827;
   --accent-light: #374151;
   --accent-dark: #030712;
@@ -15,9 +16,27 @@
 @layer base {
   * { box-sizing: border-box; }
 
+  html {
+    color-scheme: light;
+  }
+
   body {
     color: #111827;
     background: #F9FAFB;
+  }
+
+  /* Force all inputs/textareas to light theme regardless of OS dark mode */
+  input,
+  textarea,
+  select {
+    color-scheme: light;
+    background-color: white;
+    color: #111827;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: #9CA3AF;
   }
 
   ::-webkit-scrollbar { width: 6px; }

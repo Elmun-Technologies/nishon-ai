@@ -17,7 +17,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
         <select
           ref={ref}
           className={cn(
-            'flex w-full rounded-lg border border-[#2A2A3A] bg-[#1C1C27] px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/20 focus:border-[#7C3AED]/30 transition-all duration-200 [color-scheme:dark]',
+            'flex w-full rounded-lg border border-[#E5E7EB] bg-[#F9FAFB] px-3 py-2.5 text-sm text-[#111827] focus:outline-none focus:ring-2 focus:ring-[#111827]/20 focus:border-[#D1D5DB] transition-all duration-200 [color-scheme:light]',
             error && 'border-red-500/30',
             className
           )}

@@ -57,7 +57,7 @@ function TogglePill({
   onChange: (v: string) => void
 }) {
   return (
-    <div className="inline-flex rounded-lg border border-[#2A2A3A] bg-[#0F0F15] p-0.5">
+    <div className="inline-flex rounded-lg border border-[#E5E7EB] bg-white p-0.5">
       {options.map((o) => (
         <button
           key={o.value}
@@ -65,8 +65,8 @@ function TogglePill({
           onClick={() => onChange(o.value)}
           className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-150 ${
             value === o.value
-              ? 'bg-[#7C3AED] text-white shadow'
-              : 'text-[#6B7280] hover:text-white'
+              ? 'bg-[#111827] text-white shadow'
+              : 'text-[#6B7280] hover:text-[#111827]'
           }`}
         >
           {o.label}
@@ -158,7 +158,7 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
           value={form.name}
           onChange={(e) => set('name', e.target.value)}
           maxLength={255}
-          className="w-full bg-[#0F0F15] border border-[#2A2A3A] rounded-xl px-4 py-3 text-sm text-white placeholder-[#4B5563] focus:outline-none focus:border-[#7C3AED]/50 focus:ring-1 focus:ring-[#7C3AED]/30 transition-colors"
+          className="w-full bg-white border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#111827]/50 focus:ring-1 focus:ring-[#111827]/30 transition-colors"
         />
       </div>
 
@@ -173,8 +173,8 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
               onClick={() => set('objective', obj.value)}
               className={`flex flex-col items-center gap-2 p-4 rounded-xl border text-center transition-all duration-150 ${
                 form.objective === obj.value
-                  ? 'border-[#7C3AED]/50 bg-[#7C3AED]/10 text-white'
-                  : 'border-[#2A2A3A] bg-[#0F0F15] text-[#9CA3AF] hover:border-[#3A3A4A] hover:text-white'
+                  ? 'border-[#111827]/50 bg-[#F3F4F6] text-[#111827]'
+                  : 'border-[#E5E7EB] bg-white text-[#9CA3AF] hover:border-[#E5E7EB] hover:text-[#111827]'
               }`}
             >
               <span className="text-2xl">{obj.icon}</span>
@@ -204,7 +204,7 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
               placeholder="0"
               value={form.budget}
               onChange={(e) => set('budget', e.target.value)}
-              className="w-full bg-[#0F0F15] border border-[#2A2A3A] rounded-xl px-4 py-3 pr-20 text-sm text-white placeholder-[#4B5563] focus:outline-none focus:border-[#7C3AED]/50 focus:ring-1 focus:ring-[#7C3AED]/30 transition-colors"
+              className="w-full bg-white border border-[#E5E7EB] rounded-xl px-4 py-3 pr-20 text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#111827]/50 focus:ring-1 focus:ring-[#111827]/30 transition-colors"
             />
             {/* Currency toggle */}
             <div className="absolute right-2 top-1/2 -translate-y-1/2">
@@ -237,7 +237,7 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
               type="date"
               value={form.startDate}
               onChange={(e) => set('startDate', e.target.value)}
-              className="w-full bg-[#0F0F15] border border-[#2A2A3A] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#7C3AED]/50 focus:ring-1 focus:ring-[#7C3AED]/30 transition-colors [color-scheme:dark]"
+              className="w-full bg-white border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm text-[#111827] focus:outline-none focus:border-[#111827]/50 focus:ring-1 focus:ring-[#111827]/30 transition-colors [color-scheme:dark]"
             />
           </div>
           <div>
@@ -247,7 +247,7 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
               value={form.endDate}
               min={form.startDate}
               onChange={(e) => set('endDate', e.target.value)}
-              className="w-full bg-[#0F0F15] border border-[#2A2A3A] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#7C3AED]/50 focus:ring-1 focus:ring-[#7C3AED]/30 transition-colors [color-scheme:dark]"
+              className="w-full bg-white border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm text-[#111827] focus:outline-none focus:border-[#111827]/50 focus:ring-1 focus:ring-[#111827]/30 transition-colors [color-scheme:dark]"
             />
           </div>
         </div>
@@ -272,7 +272,7 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
                   key={preset.label}
                   type="button"
                   onClick={() => applyHourPreset(preset.hours)}
-                  className="text-xs px-3 py-1.5 rounded-lg border border-[#2A2A3A] text-[#9CA3AF] hover:border-[#7C3AED]/40 hover:text-white transition-colors"
+                  className="text-xs px-3 py-1.5 rounded-lg border border-[#E5E7EB] text-[#9CA3AF] hover:border-[#D1D5DB] hover:text-[#111827] transition-colors"
                 >
                   {preset.label}
                 </button>
@@ -281,7 +281,7 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
                 <button
                   type="button"
                   onClick={() => set('schedule', { ...form.schedule, hours: [] })}
-                  className="text-xs px-3 py-1.5 rounded-lg border border-[#2A2A3A] text-[#6B7280] hover:text-red-400 transition-colors"
+                  className="text-xs px-3 py-1.5 rounded-lg border border-[#E5E7EB] text-[#6B7280] hover:text-red-400 transition-colors"
                 >
                   Tozalash
                 </button>
@@ -299,8 +299,8 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
                     onClick={() => toggleHour(h)}
                     className={`py-2 rounded-lg text-xs font-medium transition-all duration-100 ${
                       selected
-                        ? 'bg-[#7C3AED] text-white'
-                        : 'bg-[#1C1C27] text-[#6B7280] hover:bg-[#2A2A3A] hover:text-white'
+                        ? 'bg-[#111827] text-white'
+                        : 'bg-[#F9FAFB] text-[#6B7280] hover:bg-[#F3F4F6] hover:text-[#111827]'
                     }`}
                   >
                     {h.toString().padStart(2, '0')}
@@ -331,11 +331,11 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
       )}
 
       {/* ── Actions ──────────────────────────────────────────────── */}
-      <div className="flex items-center justify-end gap-3 pt-2 border-t border-[#2A2A3A]">
+      <div className="flex items-center justify-end gap-3 pt-2 border-t border-[#E5E7EB]">
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 text-sm text-[#6B7280] hover:text-white transition-colors"
+          className="px-4 py-2 text-sm text-[#6B7280] hover:text-[#111827] transition-colors"
         >
           Bekor qilish
         </button>
@@ -345,8 +345,8 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
           onClick={handleSubmit}
           className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
             isValid && !saving
-              ? 'bg-[#7C3AED] hover:bg-[#6D28D9] text-white shadow-lg shadow-[#7C3AED]/25'
-              : 'bg-[#1C1C27] text-[#4B5563] border border-[#2A2A3A] cursor-not-allowed'
+              ? 'bg-[#111827] hover:bg-[#1F2937] text-white shadow-lg shadow-gray-200'
+              : 'bg-[#F9FAFB] text-[#6B7280] border border-[#E5E7EB] cursor-not-allowed'
           }`}
         >
           {saving ? 'Yaratilmoqda…' : 'Kampaniya yaratish'}
