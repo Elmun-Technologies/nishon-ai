@@ -120,6 +120,15 @@ const NAV_ITEMS = [
     ),
   },
   {
+    href: '/my-portfolio',
+    label: 'Portfolio',
+    icon: (
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M16 8v8m-4-5v5m-4-2v2M3 20h18M3 4h18M3 12h18" />
+      </svg>
+    ),
+  },
+  {
     href: '/settings',
     label: 'Settings',
     icon: (
