@@ -367,27 +367,6 @@ export default function CampaignWizardPage() {
     }
   }
 
-  const handleSaveDraft = async () => {
-    setLoading(true)
-    try {
-      const res = await fetch('/api/campaigns/draft', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, status: 'draft', savedAt: new Date().toISOString() }),
-      })
-      if (!res.ok) throw new Error(`Draft save failed: ${res.status}`)
-      const data = await res.json()
-      // Update URL to include draft ID so user can return to it
-      router.replace(`/wizard?draft=${data.id}`)
-    } catch (err) {
-      console.error('Draft save error:', err)
-      // Fallback: save to localStorage
-      localStorage.setItem('wizard_draft', JSON.stringify({ ...formData, savedAt: new Date().toISOString() }))
-    } finally {
-      setLoading(false)
-    }
-  }
-
   const handleGenerateKeywords = async () => {
     setAiLoading(true)
     try {
