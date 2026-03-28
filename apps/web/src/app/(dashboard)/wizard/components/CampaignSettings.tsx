@@ -23,7 +23,7 @@ const OBJECTIVES = [
   { value: 'leads', label: 'Leads', icon: '📈' },
   { value: 'traffic', label: 'Traffic', icon: '🚗' },
   { value: 'sales', label: 'Sales', icon: '💰' },
-  { value: 'awareness', label: 'Awareness', icon: '👁️' }
+  { value: 'awareness', label: 'Awareness', icon: '👁️' },
 ]
 
 const CURRENCIES = ['UZS', 'USD', 'EUR', 'RUB']
@@ -91,7 +91,17 @@ export function CampaignSettings({
   aiLoading
 }: CampaignSettingsProps) {
   const { generateKeywords } = useAiAgent()
-  const [activeExtensions, setActiveExtensions] = useState<string[]>([])
+  const [activeExtensions, setActiveExtensions] = useState<string[]>([
+    ...(formData.extensions?.quickLinks?.length ? ['quickLinks'] : []),
+    ...(formData.extensions?.clarifiers?.length ? ['clarifiers'] : []),
+    ...(formData.extensions?.promoCode ? ['promoCode'] : []),
+    ...(formData.extensions?.delivery ? ['delivery'] : []),
+  ])
+
+  // Detect primary platform for bidding strategy options
+  const primaryPlatform = formData.platforms?.[0] || 'meta'
+  const biddingOptions =
+    BIDDING_STRATEGIES[primaryPlatform] || BIDDING_STRATEGIES.meta
 
   const handleExtensionToggle = (extension: string) => {
     setActiveExtensions(prev =>
@@ -104,7 +114,7 @@ export function CampaignSettings({
   const handleBidAdjustment = (category: string, value: any) => {
     onFormDataChange('bidAdjustments', {
       ...formData.bidAdjustments,
-      [category]: value
+      [category]: value,
     })
   }
 
@@ -204,8 +214,10 @@ export function CampaignSettings({
               value={formData.objective}
               onChange={(e) => onFormDataChange('objective', e.target.value)}
             >
-              {OBJECTIVES.map(obj => (
-                <option key={obj.value} value={obj.value}>{obj.label}</option>
+              {OBJECTIVES.map((obj) => (
+                <option key={obj.value} value={obj.value}>
+                  {obj.icon} {obj.label}
+                </option>
               ))}
             </Select>
           </div>
@@ -218,7 +230,9 @@ export function CampaignSettings({
               id="budgetAmount"
               type="number"
               value={formData.budget.amount}
-              onChange={(e) => onFormDataChange('budget', { ...formData.budget, amount: Number(e.target.value) })}
+              onChange={(e) =>
+                onFormDataChange('budget', { ...formData.budget, amount: Number(e.target.value) })
+              }
             />
           </div>
 
@@ -227,10 +241,14 @@ export function CampaignSettings({
             <Select
               id="currency"
               value={formData.budget.currency}
-              onChange={(e) => onFormDataChange('budget', { ...formData.budget, currency: e.target.value })}
+              onChange={(e) =>
+                onFormDataChange('budget', { ...formData.budget, currency: e.target.value })
+              }
             >
-              {CURRENCIES.map(curr => (
-                <option key={curr} value={curr}>{curr}</option>
+              {CURRENCIES.map((curr) => (
+                <option key={curr} value={curr}>
+                  {curr}
+                </option>
               ))}
             </Select>
           </div>
@@ -240,7 +258,9 @@ export function CampaignSettings({
             <Select
               id="budgetType"
               value={formData.budget.type}
-              onChange={(e) => onFormDataChange('budget', { ...formData.budget, type: e.target.value })}
+              onChange={(e) =>
+                onFormDataChange('budget', { ...formData.budget, type: e.target.value })
+              }
             >
               <option value="daily">Daily</option>
               <option value="weekly">Weekly</option>
@@ -256,7 +276,9 @@ export function CampaignSettings({
               id="startDate"
               type="date"
               value={formData.schedule.startDate}
-              onChange={(e) => onFormDataChange('schedule', { ...formData.schedule, startDate: e.target.value })}
+              onChange={(e) =>
+                onFormDataChange('schedule', { ...formData.schedule, startDate: e.target.value })
+              }
             />
           </div>
 
@@ -265,8 +287,11 @@ export function CampaignSettings({
             <Input
               id="endDate"
               type="date"
+              disabled={formData.schedule.alwaysOn}
               value={formData.schedule.endDate}
-              onChange={(e) => onFormDataChange('schedule', { ...formData.schedule, endDate: e.target.value })}
+              onChange={(e) =>
+                onFormDataChange('schedule', { ...formData.schedule, endDate: e.target.value })
+              }
             />
           </div>
         </div>
@@ -318,9 +343,17 @@ export function CampaignSettings({
         )}
       </Card>
 
-      {/* Strategy & Bidding */}
+      {/* ── Strategy & Bidding ── */}
       <Card padding="lg">
-        <h3 className="text-lg font-semibold text-white mb-4">Strategy & Bidding</h3>
+        <h3 className="text-lg font-semibold text-white mb-1">Strategy & Bidding</h3>
+        {formData.platforms?.length > 0 && (
+          <p className="text-xs text-[#6B7280] mb-4">
+            Showing strategies for{' '}
+            <span className="text-[#7C3AED] capitalize">{primaryPlatform}</span>
+            {formData.platforms.length > 1 && ` (+${formData.platforms.length - 1} more)`}
+          </p>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <Label htmlFor="biddingStrategy">
@@ -334,7 +367,9 @@ export function CampaignSettings({
             <Select
               id="biddingStrategy"
               value={formData.strategy.type}
-              onChange={(e) => onFormDataChange('strategy', { ...formData.strategy, type: e.target.value })}
+              onChange={(e) =>
+                onFormDataChange('strategy', { ...formData.strategy, type: e.target.value })
+              }
             >
               {biddingStrategies.map(s => (
                 <option key={s.value} value={s.value}>{s.label}</option>
@@ -380,9 +415,11 @@ export function CampaignSettings({
             <Switch
               id="advantagePlus"
               checked={formData.strategy.advantagePlus}
-              onChange={(checked) => onFormDataChange('strategy', { ...formData.strategy, advantagePlus: checked })}
+              onChange={(checked) =>
+                onFormDataChange('strategy', { ...formData.strategy, advantagePlus: checked })
+              }
             />
-            <Label htmlFor="advantagePlus">Advantage+ Campaign Budget</Label>
+            <Label htmlFor="advantagePlus">Advantage+ Campaign Budget (Meta)</Label>
           </div>
         )}
 
@@ -401,7 +438,7 @@ export function CampaignSettings({
         </div>
       </Card>
 
-      {/* UTM Parameters */}
+      {/* ── UTM Parameters ── */}
       <Card padding="lg">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-white">UTM Parameters</h3>
@@ -415,35 +452,21 @@ export function CampaignSettings({
           </Button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input
-            placeholder="utm_source"
-            value={formData.utm.source}
-            onChange={(e) => onFormDataChange('utm', { ...formData.utm, source: e.target.value })}
-          />
-          <Input
-            placeholder="utm_medium"
-            value={formData.utm.medium}
-            onChange={(e) => onFormDataChange('utm', { ...formData.utm, medium: e.target.value })}
-          />
-          <Input
-            placeholder="utm_campaign"
-            value={formData.utm.campaign}
-            onChange={(e) => onFormDataChange('utm', { ...formData.utm, campaign: e.target.value })}
-          />
-          <Input
-            placeholder="utm_content"
-            value={formData.utm.content}
-            onChange={(e) => onFormDataChange('utm', { ...formData.utm, content: e.target.value })}
-          />
-          <Input
-            placeholder="utm_term"
-            value={formData.utm.term}
-            onChange={(e) => onFormDataChange('utm', { ...formData.utm, term: e.target.value })}
-          />
+          {(['source', 'medium', 'campaign', 'content', 'term'] as const).map((field) => (
+            <Input
+              key={field}
+              placeholder={`utm_${field}`}
+              value={formData.utm[field]}
+              onChange={(e) => onFormDataChange('utm', { ...formData.utm, [field]: e.target.value })}
+            />
+          ))}
         </div>
+        <p className="text-xs text-[#6B7280] mt-2">
+          Dynamic params: {'{keyword}'}, {'{campaign_id}'}, {'{placement}'}
+        </p>
       </Card>
 
-      {/* Ad Extensions */}
+      {/* ── Ad Extensions ── */}
       <Card padding="lg">
         <h3 className="text-lg font-semibold text-white mb-4">Ad Extensions</h3>
         <div className="space-y-3">
@@ -561,14 +584,20 @@ export function CampaignSettings({
             <Checkbox
               id="delivery"
               checked={activeExtensions.includes('delivery')}
-              onChange={() => handleExtensionToggle('delivery')}
+              onChange={() => {
+                handleExtensionToggle('delivery')
+                onFormDataChange('extensions', {
+                  ...formData.extensions,
+                  delivery: !activeExtensions.includes('delivery'),
+                })
+              }}
             />
             <Label htmlFor="delivery">Yetkazib berish extension</Label>
           </div>
         </div>
       </Card>
 
-      {/* AI Optimization */}
+      {/* ── AI Optimization ── */}
       <Card padding="lg">
         <h3 className="text-lg font-semibold text-white mb-4">AI Optimization</h3>
         <div className="space-y-4">
@@ -651,7 +680,7 @@ export function CampaignSettings({
         </div>
       </Card>
 
-      {/* Negative Keywords */}
+      {/* ── Negative Keywords ── */}
       <Card padding="lg">
         <h3 className="text-lg font-semibold text-white mb-4">Negative Keywords (Campaign Level)</h3>
         <div className="space-y-4">
@@ -827,7 +856,7 @@ export function CampaignSettings({
         </Card>
       </Accordion>
 
-      {/* Additional Settings */}
+      {/* ── Additional Settings ── */}
       <Card padding="lg">
         <h3 className="text-lg font-semibold text-white mb-4">Additional Settings</h3>
         <div className="space-y-4">

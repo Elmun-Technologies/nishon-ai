@@ -18,7 +18,7 @@ export function Dashboard() {
   const avgROAS = totalSpend > 0 ? (totalConversions / totalSpend) : 0
 
   const platformData = campaigns?.reduce((acc, campaign) => {
-    campaign.platforms?.forEach(platform => {
+    campaign.platforms?.forEach((platform: string) => {
       acc[platform] = (acc[platform] || 0) + 1
     })
     return acc
@@ -157,23 +157,27 @@ export function Dashboard() {
         <Card padding="lg">
           <h3 className="text-lg font-semibold text-white mb-4">Platform Distribution</h3>
           <div className="space-y-4">
-            {Object.entries(platformData).map(([platform, count]) => (
-              <div key={platform} className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`w-3 h-3 rounded-full ${
-                    platform === 'meta' ? 'bg-[#1877F2]' :
-                    platform === 'google' ? 'bg-[#4285F4]' :
-                    platform === 'yandex' ? 'bg-[#FFCC00]' :
-                    'bg-[#2CA5E0]'
-                  }`}></div>
-                  <span className="text-white capitalize">{platform}</span>
+            {(() => {
+              const pd = platformData as Record<string, number>
+              const total = Object.values(pd).reduce((a: number, b: number) => a + b, 0) || 1
+              return Object.entries(pd).map(([platform, count]: [string, number]) => (
+                <div key={platform} className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-3 h-3 rounded-full ${
+                      platform === 'meta' ? 'bg-[#1877F2]' :
+                      platform === 'google' ? 'bg-[#4285F4]' :
+                      platform === 'yandex' ? 'bg-[#FFCC00]' :
+                      'bg-[#2CA5E0]'
+                    }`}></div>
+                    <span className="text-white capitalize">{platform}</span>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className="text-white font-medium">{count}</span>
+                    <Progress value={(count / total) * 100} />
+                  </div>
                 </div>
-                <div className="flex items-center gap-4">
-                  <span className="text-white font-medium">{count}</span>
-                  <Progress value={(count / Object.values(platformData).reduce((a, b) => a + b, 0)) * 100} />
-                </div>
-              </div>
-            ))}
+              ))
+            })()}
           </div>
         </Card>
       </div>
@@ -203,7 +207,7 @@ export function Dashboard() {
                   </td>
                   <td className="py-3">
                     <div className="flex gap-1">
-                      {campaign.platforms?.map(platform => (
+                      {campaign.platforms?.map((platform: string) => (
                         <Badge key={platform} variant="secondary" size="sm">
                           {platform}
                         </Badge>

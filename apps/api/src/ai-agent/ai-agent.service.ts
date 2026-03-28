@@ -524,4 +524,99 @@ Write all feedback in Uzbek language.
       { taskType: 'vision', agentName: 'CreativeScorer' },
     )
   }
+
+  /**
+   * Wizard: Generate ad copy (headlines + descriptions) for the campaign wizard.
+   * Returns platform-specific headlines and descriptions ready to use in the form.
+   */
+  async generateWizardAdCopy(dto: {
+    productName: string
+    benefits: string[]
+    objective: string
+    audience: string
+    platform: string
+  }): Promise<{
+    headlines: string[]
+    descriptions: string[]
+    cta: string
+    primaryText?: string
+  }> {
+    const charLimits: Record<string, { headline: number; description: number }> = {
+      google: { headline: 30, description: 90 },
+      yandex: { headline: 56, description: 81 },
+      meta: { headline: 40, description: 125 },
+    }
+    const limits = charLimits[dto.platform] || charLimits.meta
+
+    const systemPrompt = `You are a professional ad copywriter.
+Generate ad copy for the given product and platform.
+Respond with VALID JSON ONLY matching this exact structure:
+{
+  "headlines": ["headline1", "headline2", ...],
+  "descriptions": ["desc1", "desc2", ...],
+  "cta": "CTA text",
+  "primaryText": "primary text for social ads"
+}
+Rules:
+- Each headline must be max ${limits.headline} characters
+- Each description must be max ${limits.description} characters
+- Generate 5 headlines and 3 descriptions
+- Write in the same language as the product name (Uzbek/Russian/English)`
+
+    const userMessage = `
+Platform: ${dto.platform}
+Product: ${dto.productName}
+Benefits: ${dto.benefits.join(', ')}
+Objective: ${dto.objective}
+Target audience: ${dto.audience}`
+
+    const result = await this.aiClient.completeJson<{
+      headlines: string[]
+      descriptions: string[]
+      cta: string
+      primaryText?: string
+    }>(userMessage, systemPrompt, { taskType: 'creative', agentName: 'WizardAdCopy' })
+
+    return result
+  }
+
+  /**
+   * Wizard: Generate keyword suggestions for the campaign wizard.
+   */
+  async generateWizardKeywords(dto: {
+    productName: string
+    niche: string
+    platform: string
+    matchType?: string
+  }): Promise<{
+    keywords: string[]
+    negativeKeywords: string[]
+    matchTypes: Record<string, string>
+  }> {
+    const systemPrompt = `You are a PPC keyword research expert.
+Generate keyword suggestions for the given product and niche.
+Respond with VALID JSON ONLY:
+{
+  "keywords": ["keyword1", "keyword2", ...],
+  "negativeKeywords": ["neg1", "neg2", ...],
+  "matchTypes": {"keyword1": "broad", "keyword2": "exact", ...}
+}
+Rules:
+- Generate 10-15 relevant keywords
+- Generate 5-8 negative keywords
+- Assign appropriate match types (broad/phrase/exact)
+- Write keywords in the same language as product name`
+
+    const userMessage = `
+Product: ${dto.productName}
+Niche: ${dto.niche}
+Platform: ${dto.platform}
+Preferred match type: ${dto.matchType || 'broad'}`
+
+    return this.aiClient.completeJson<{
+      keywords: string[]
+      negativeKeywords: string[]
+      matchTypes: Record<string, string>
+    }>(userMessage, systemPrompt, { taskType: 'creative', agentName: 'WizardKeywords' })
+  }
 }

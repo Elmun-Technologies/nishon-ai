@@ -24,6 +24,7 @@ const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
   ) => {
     const variants = {
       default: 'bg-[#2A2A3A] border border-[#3A3A4A] text-[#9CA3AF]',
+      secondary: 'bg-[#2A2A3A] border border-[#3A3A4A] text-[#9CA3AF]',
       gray: 'bg-[#2A2A3A] border border-[#3A3A4A] text-[#9CA3AF]',
       purple: 'bg-[#7C3AED]/10 border border-[#7C3AED]/20 text-[#A78BFA]',
       success: 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400',
