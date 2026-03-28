@@ -496,7 +496,7 @@ export default function CampaignWizardPage() {
             Cancel
           </Button>
           <Button variant="secondary" onClick={handleSaveDraft} disabled={loading}>
-            {loading ? 'Saving...' : 'Save Draft'}
+            {loading ? 'Saqlanmoqda...' : 'Save Draft'}
           </Button>
         </div>
       </div>

@@ -67,7 +67,13 @@ export class CampaignsService {
     if (workspace.userId !== userId)
       throw new ForbiddenException("Access denied");
 
-    const campaign = this.campaignRepo.create({ ...dto, workspaceId });
+    const campaign = this.campaignRepo.create({
+      ...dto,
+      workspaceId,
+      // Map user-facing budget to dailyBudget for backward compat
+      dailyBudget: dto.budgetType === 'weekly' ? (dto.budget ?? 0) / 7 : (dto.budget ?? 0),
+      totalBudget: null,
+    });
     return this.campaignRepo.save(campaign);
   }
 

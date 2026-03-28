@@ -15,3 +15,13 @@ export enum CampaignObjective {
   ENGAGEMENT = 'engagement',
   APP_INSTALLS = 'app_installs',
 }
+
+export enum BudgetType {
+  DAILY = 'daily',
+  WEEKLY = 'weekly',
+}
+
+export enum CampaignCurrency {
+  USD = 'USD',
+  UZS = 'UZS',
+}

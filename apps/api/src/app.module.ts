@@ -16,6 +16,7 @@ import { MetaModule } from "./meta/meta.module";
 import { EventsModule } from "./events/events.module";
 import { AutoOptimizationModule } from "./auto-optimization/auto-optimization.module";
 import { TriggersetModule } from "./triggersets/triggersets.module";
+import { ConversionsModule } from "./conversions/conversions.module";
 import { validateEnv } from "./config/env.validation";
 import { HealthController } from "./health/health.controller";
 import { HealthService } from "./health/health.service";
@@ -71,6 +72,7 @@ import { RequestLoggingInterceptor } from "./common/interceptors/request-logging
     EventsModule,
     AutoOptimizationModule,
     TriggersetModule,
+    ConversionsModule,
   ],
   controllers: [HealthController],
   providers: [

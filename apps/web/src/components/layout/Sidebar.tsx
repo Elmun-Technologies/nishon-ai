@@ -17,6 +17,15 @@ const NAV_ITEMS = [
     ),
   },
   {
+    href: '/platforms',
+    label: 'Platformalar',
+    icon: (
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"/>
+      </svg>
+    ),
+  },
+  {
     href: '/campaigns',
     label: 'Campaigns',
     icon: (
@@ -107,6 +116,15 @@ const NAV_ITEMS = [
     icon: (
       <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
         <path d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+      </svg>
+    ),
+  },
+  {
+    href: '/my-portfolio',
+    label: 'Portfolio',
+    icon: (
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M16 8v8m-4-5v5m-4-2v2M3 20h18M3 4h18M3 12h18" />
       </svg>
     ),
   },

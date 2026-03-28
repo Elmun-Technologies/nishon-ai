@@ -1,30 +1,48 @@
 'use client'
+import * as React from 'react'
+import { cn } from '@/lib/utils'
 
-interface SwitchProps {
-  id?: string
-  checked?: boolean
-  onChange?: (checked: boolean) => void
+export interface SwitchProps {
+  checked: boolean
+  onChange: (checked: boolean) => void
+  label?: string
+  description?: string
   disabled?: boolean
+  id?: string
+  className?: string
 }
 
-export function Switch({ id, checked, onChange, disabled }: SwitchProps) {
+export function Switch({ checked, onChange, label, description, disabled, id, className }: SwitchProps) {
   return (
-    <button
-      id={id}
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      disabled={disabled}
-      onClick={() => onChange?.(!checked)}
-      className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none ${
-        checked ? 'bg-[#7C3AED]' : 'bg-[#3A3A4A]'
-      } ${disabled ? 'opacity-40 cursor-not-allowed' : ''}`}
+    <label
+      htmlFor={id}
+      className={cn('flex items-center gap-3 cursor-pointer', disabled && 'opacity-50 cursor-not-allowed', className)}
     >
-      <span
-        className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
-          checked ? 'translate-x-4' : 'translate-x-0'
-        }`}
-      />
-    </button>
+      <button
+        id={id}
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        disabled={disabled}
+        onClick={() => !disabled && onChange(!checked)}
+        className={cn(
+          'relative w-10 h-6 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/30 shrink-0',
+          checked ? 'bg-[#7C3AED]' : 'bg-[#2A2A3A]'
+        )}
+      >
+        <span
+          className={cn(
+            'absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200',
+            checked && 'translate-x-4'
+          )}
+        />
+      </button>
+      {(label || description) && (
+        <div>
+          {label && <p className="text-sm font-medium text-white">{label}</p>}
+          {description && <p className="text-xs text-[#6B7280]">{description}</p>}
+        </div>
+      )}
+    </label>
   )
 }

@@ -36,6 +36,11 @@ const PLATFORM_CONFIG: Record<
     bg: 'bg-sky-500/10',
     border: 'border-sky-500/20',
   },
+  yandex: {
+    emoji: '🔴',
+    bg: 'bg-red-600/10',
+    border: 'border-red-600/20',
+  },
 }
 
 const DEFAULT_CONFIG = {

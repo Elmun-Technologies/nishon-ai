@@ -13,6 +13,7 @@ interface PreviewProps {
 
 export function Preview({ formData, selectedPlatforms }: PreviewProps) {
   const [activePlatform, setActivePlatform] = useState<string | null>(null)
+  const [metaView, setMetaView] = useState<'feed' | 'stories'>('feed')
 
   const getPreviewData = (platform: string) => {
     switch (platform) {
@@ -158,45 +159,157 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
 
   const renderMetaPreview = (data: any) => (
     <div className="space-y-6">
-      {/* Feed Ad Preview */}
-      <Card padding="lg">
-        <h4 className="text-md font-semibold text-white mb-3">Feed Ad Preview</h4>
-        <div className="bg-[#0A0A0A] border border-[#3A3A4A] rounded-lg p-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="md:col-span-1">
-              <img 
-                src={data.ad.image} 
-                alt="Ad image"
-                className="w-full h-40 object-cover rounded"
-              />
-            </div>
-            <div className="md:col-span-2 space-y-2">
-              <div className="text-white font-semibold text-lg">{data.ad.headline}</div>
-              <div className="text-[#6B7280] text-sm">{data.ad.description}</div>
-              <div className="text-white">{data.ad.primaryText}</div>
-              <div className="flex gap-2 mt-2">
-                <Badge variant="secondary">{data.ad.cta}</Badge>
+      {/* Sub-tabs: Feed vs Stories */}
+      <div className="flex gap-2">
+        {['feed', 'stories'].map(view => (
+          <button
+            key={view}
+            onClick={() => setMetaView(view as 'feed' | 'stories')}
+            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              metaView === view
+                ? 'bg-[#6366F1] text-white'
+                : 'bg-[#1F2937] text-[#9CA3AF] hover:bg-[#374151]'
+            }`}
+          >
+            {view === 'feed' ? '📰 Feed' : '📱 Stories'}
+          </button>
+        ))}
+      </div>
+
+      {/* Feed Preview */}
+      {metaView === 'feed' && (
+        <Card padding="lg">
+          <h4 className="text-sm font-semibold text-white mb-3">Feed Ad Preview</h4>
+          {/* Mobile phone mockup */}
+          <div className="flex justify-center">
+            <div className="w-72 bg-white rounded-3xl overflow-hidden shadow-2xl">
+              {/* Phone top bar */}
+              <div className="bg-white px-4 pt-3 pb-2 flex items-center gap-2 border-b border-gray-100">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500" />
+                <div>
+                  <div className="text-xs font-semibold text-gray-900">Your Brand</div>
+                  <div className="text-[10px] text-gray-400">Sponsored</div>
+                </div>
+                <div className="ml-auto text-gray-400 text-lg">···</div>
+              </div>
+              {/* Image */}
+              <div className="w-full h-72 bg-gradient-to-br from-[#6366F1] to-[#A855F7] flex items-center justify-center">
+                <span className="text-white text-4xl">🖼️</span>
+              </div>
+              {/* Actions */}
+              <div className="px-3 py-2 flex items-center gap-4 border-b border-gray-100">
+                <span className="text-gray-700 text-xl">♡</span>
+                <span className="text-gray-700 text-xl">💬</span>
+                <span className="text-gray-700 text-xl">↗</span>
+              </div>
+              {/* Content */}
+              <div className="px-3 py-2 bg-white">
+                <div className="font-semibold text-gray-900 text-sm">{data.ad.headline}</div>
+                <div className="text-gray-500 text-xs mt-0.5">{data.ad.description}</div>
+                <div className="text-gray-700 text-xs mt-1 line-clamp-2">{data.ad.primaryText}</div>
+                <button className="mt-2 w-full bg-[#1877F2] text-white text-xs py-2 rounded-lg font-semibold">
+                  {data.ad.cta.replace(/_/g, ' ').toUpperCase()}
+                </button>
               </div>
             </div>
           </div>
-        </div>
-      </Card>
+        </Card>
+      )}
+
+      {/* Stories Preview */}
+      {metaView === 'stories' && (
+        <Card padding="lg">
+          <h4 className="text-sm font-semibold text-white mb-3">Stories Ad Preview (9:16)</h4>
+          <div className="flex justify-center gap-6 flex-wrap">
+            {/* Mobile Stories */}
+            <div>
+              <p className="text-xs text-[#9CA3AF] text-center mb-2">Mobile</p>
+              <div className="w-44 h-80 rounded-2xl overflow-hidden shadow-2xl relative bg-gradient-to-br from-[#6366F1] to-[#A855F7]">
+                {/* Top gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
+                {/* Progress bars */}
+                <div className="absolute top-3 left-2 right-2 flex gap-1">
+                  <div className="flex-1 h-0.5 bg-white rounded-full" />
+                  <div className="flex-1 h-0.5 bg-white/40 rounded-full" />
+                  <div className="flex-1 h-0.5 bg-white/40 rounded-full" />
+                </div>
+                {/* Top bar */}
+                <div className="absolute top-6 left-2 right-2 flex items-center gap-1.5">
+                  <div className="w-5 h-5 rounded-full bg-white/30" />
+                  <span className="text-white text-[9px] font-semibold">Your Brand</span>
+                  <span className="text-white/60 text-[8px] ml-0.5">• Sponsored</span>
+                </div>
+                {/* Center content */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center px-3">
+                  <div className="text-white text-4xl mb-3">🖼️</div>
+                  <div className="text-white font-bold text-xs text-center leading-tight">
+                    {data.ad.headline}
+                  </div>
+                  <div className="text-white/80 text-[9px] text-center mt-1">
+                    {data.ad.description}
+                  </div>
+                </div>
+                {/* CTA swipe up */}
+                <div className="absolute bottom-4 left-2 right-2">
+                  <div className="text-center">
+                    <div className="text-white text-xs">↑</div>
+                    <button className="w-full bg-white text-[#1877F2] text-[10px] font-bold py-1.5 rounded-full mt-1">
+                      {data.ad.cta.replace(/_/g, ' ').toUpperCase()}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Desktop Stories (wider) */}
+            <div>
+              <p className="text-xs text-[#9CA3AF] text-center mb-2">Desktop</p>
+              <div className="w-56 h-80 rounded-2xl overflow-hidden shadow-2xl relative bg-gradient-to-br from-[#A855F7] to-[#EC4899]">
+                <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
+                <div className="absolute top-3 left-2 right-2 flex gap-1">
+                  <div className="flex-1 h-0.5 bg-white rounded-full" />
+                  <div className="flex-1 h-0.5 bg-white/40 rounded-full" />
+                </div>
+                <div className="absolute top-6 left-2 right-2 flex items-center gap-1.5">
+                  <div className="w-5 h-5 rounded-full bg-white/30" />
+                  <span className="text-white text-[9px] font-semibold">Your Brand</span>
+                  <span className="text-white/60 text-[8px]">• Sponsored</span>
+                </div>
+                <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
+                  <div className="text-white text-5xl mb-3">🖼️</div>
+                  <div className="text-white font-bold text-sm text-center leading-tight">
+                    {data.ad.headline}
+                  </div>
+                  <div className="text-white/80 text-[10px] text-center mt-2">
+                    {data.ad.primaryText?.substring(0, 60)}...
+                  </div>
+                </div>
+                <div className="absolute bottom-4 left-3 right-3">
+                  <button className="w-full bg-white text-[#1877F2] text-xs font-bold py-2 rounded-full">
+                    {data.ad.cta.replace(/_/g, ' ').toUpperCase()}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
 
       {/* Audience Preview */}
       <Card padding="lg">
-        <h4 className="text-md font-semibold text-white mb-3">Target Audience</h4>
+        <h4 className="text-sm font-semibold text-white mb-3">Target Audience</h4>
         <div className="bg-[#0A0A0A] border border-[#3A3A4A] rounded-lg p-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <div className="text-[#6B7280] text-sm">Age</div>
-              <div className="text-white">{data.audience.age}</div>
+              <div className="text-[#6B7280] text-xs">Age</div>
+              <div className="text-white text-sm">{data.audience.age}</div>
             </div>
             <div>
-              <div className="text-[#6B7280] text-sm">Interests</div>
+              <div className="text-[#6B7280] text-xs">Interests</div>
               <div className="text-white text-sm">{data.audience.interests}</div>
             </div>
             <div>
-              <div className="text-[#6B7280] text-sm">Location</div>
+              <div className="text-[#6B7280] text-xs">Location</div>
               <div className="text-white text-sm">{data.audience.location}</div>
             </div>
           </div>

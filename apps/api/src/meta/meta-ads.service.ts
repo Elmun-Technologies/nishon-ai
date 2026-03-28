@@ -53,6 +53,8 @@ export type MetaInsightRow = {
   clicks: number;
   ctr: number;
   cpc: number;
+  conversions: number;
+  conversionValue: number;
 };
 
 const GRAPH_BASE = "https://graph.facebook.com/v20.0";
@@ -170,10 +172,12 @@ export class MetaAdsService {
       clicks: string;
       ctr: string;
       cpc: string;
+      actions?: Array<{ action_type: string; value: string }>;
+      action_value?: string;
     }>(
       `${GRAPH_BASE}/${accountPath}/insights`,
       {
-        fields: "campaign_id,date_start,spend,impressions,clicks,ctr,cpc",
+        fields: "campaign_id,date_start,spend,impressions,clicks,ctr,cpc,actions,action_value",
         level: "campaign",
         date_preset: datePreset,
         time_increment: 1, // daily breakdown — one row per campaign per day
@@ -188,15 +192,30 @@ export class MetaAdsService {
       rows: items.length,
     });
 
-    return items.map((row) => ({
-      campaignId: row.campaign_id,
-      date: row.date_start,
-      spend: parseFloat(row.spend) || 0,
-      impressions: parseInt(row.impressions, 10) || 0,
-      clicks: parseInt(row.clicks, 10) || 0,
-      ctr: parseFloat(row.ctr) || 0,
-      cpc: parseFloat(row.cpc) || 0,
-    }));
+    return items.map((row) => {
+      // Extract conversions from actions array (if present)
+      let conversions = 0;
+      if (row.actions && Array.isArray(row.actions)) {
+        const purchaseAction = row.actions.find(
+          (a) => a.action_type === "purchase" || a.action_type === "offsite_conversion.fb_pixel_purchase",
+        );
+        if (purchaseAction) {
+          conversions = parseInt(purchaseAction.value, 10) || 0;
+        }
+      }
+
+      return {
+        campaignId: row.campaign_id,
+        date: row.date_start,
+        spend: parseFloat(row.spend) || 0,
+        impressions: parseInt(row.impressions, 10) || 0,
+        clicks: parseInt(row.clicks, 10) || 0,
+        ctr: parseFloat(row.ctr) || 0,
+        cpc: parseFloat(row.cpc) || 0,
+        conversions: conversions,
+        conversionValue: parseFloat(row.action_value) || 0,
+      };
+    });
   }
 
   // ─── Pagination ──────────────────────────────────────────────────────────────

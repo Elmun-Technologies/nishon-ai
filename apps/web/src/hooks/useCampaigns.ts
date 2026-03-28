@@ -1,33 +1,47 @@
-'use client'
-
-import { useState, useEffect } from 'react'
-import { campaigns as campaignsApi } from '@/lib/api-client'
+import { useState, useEffect, useCallback } from 'react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
+import { campaigns as campaignsApi } from '@/lib/api-client'
+
+export interface CampaignRow {
+  id: string
+  name: string
+  platform: string
+  platforms?: string[]
+  status: string
+  objective: string
+  dailyBudget: number
+  totalBudget: number
+  totalSpend?: number
+  totalClicks?: number
+  totalConversions?: number
+  externalId?: string | null
+  createdAt: string
+  adSets?: unknown[]
+}
 
 export function useCampaigns() {
-  const { currentWorkspace: activeWorkspace } = useWorkspaceStore()
-  const [data, setData] = useState<any[]>([])
+  const { currentWorkspace } = useWorkspaceStore()
+  const [campaigns, setCampaigns] = useState<CampaignRow[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (!activeWorkspace?.id) {
-      setLoading(false)
-      return
-    }
+  const fetch = useCallback(async () => {
+    if (!currentWorkspace?.id) return
     setLoading(true)
-    campaignsApi
-      .list(activeWorkspace.id)
-      .then((res: any) => {
-        const list = Array.isArray(res) ? res : res?.data ?? []
-        setData(list)
-        setError(null)
-      })
-      .catch((err: any) => {
-        setError(err?.message ?? 'Failed to load campaigns')
-      })
-      .finally(() => setLoading(false))
-  }, [activeWorkspace?.id])
+    setError(null)
+    try {
+      const res = await campaignsApi.list(currentWorkspace.id)
+      setCampaigns((res.data as CampaignRow[]) ?? [])
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Failed to load campaigns')
+    } finally {
+      setLoading(false)
+    }
+  }, [currentWorkspace?.id])
 
-  return { campaigns: data, loading, error }
+  useEffect(() => {
+    fetch()
+  }, [fetch])
+
+  return { campaigns, loading, error, refetch: fetch }
 }

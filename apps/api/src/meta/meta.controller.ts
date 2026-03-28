@@ -20,6 +20,7 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiOperation,
+  ApiParam,
   ApiQuery,
   ApiResponse,
   ApiTags,
@@ -35,6 +36,7 @@ import { MetaCampaignSync } from "./entities/meta-campaign-sync.entity";
 import { MetaInsight } from "./entities/meta-insight.entity";
 import { Workspace } from "../workspaces/entities/workspace.entity";
 import { User } from "../users/entities/user.entity";
+import { ConversionAnalyticsService } from "../analytics/conversion-analytics.service";
 
 // Maps the user-facing range shorthand to Meta's date_preset values
 const RANGE_TO_DATE_PRESET: Record<string, string> = {
@@ -64,6 +66,7 @@ export class MetaController {
     private readonly metaAdsService: MetaAdsService,
     private readonly metaSyncService: MetaSyncService,
     private readonly aiEngine: MetaAiEngineService,
+    private readonly conversionAnalytics: ConversionAnalyticsService,
     @InjectRepository(MetaAdAccount)
     private readonly adAccountRepo: Repository<MetaAdAccount>,
     @InjectRepository(MetaCampaignSync)
@@ -588,6 +591,147 @@ export class MetaController {
 
     const total = active + learning + limited + paused;
     return { total, active, learning, limited, paused };
+  }
+
+  // ─── Conversion Analytics ───────────────────────────────────────────────────────
+
+  @Get("campaigns/:campaignId/conversion-analytics")
+  @ApiOperation({
+    summary: "Get conversion metrics and analytics for a campaign",
+    description:
+      "Retrieve conversion summary, cost per conversion, and trends from Meta insights data",
+  })
+  @ApiParam({
+    name: "campaignId",
+    description: "Meta campaign ID",
+    type: String,
+  })
+  @ApiQuery({
+    name: "workspaceId",
+    description: "Workspace ID",
+    required: true,
+    type: String,
+  })
+  @ApiQuery({
+    name: "startDate",
+    description: "Start date (YYYY-MM-DD)",
+    required: true,
+    type: String,
+  })
+  @ApiQuery({
+    name: "endDate",
+    description: "End date (YYYY-MM-DD)",
+    required: true,
+    type: String,
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Conversion analytics returned successfully",
+  })
+  async getConversionAnalytics(
+    @Param("campaignId") campaignId: string,
+    @Query("workspaceId") workspaceId: string | undefined,
+    @Query("startDate") startDate: string,
+    @Query("endDate") endDate: string,
+    @Req() req: Request,
+  ) {
+    if (!workspaceId) throw new BadRequestException("workspaceId is required");
+    await this.assertWorkspaceOwnership(workspaceId, this.getRequestUserId(req));
+
+    const start = new Date(startDate + "T00:00:00Z");
+    const end = new Date(endDate + "T23:59:59Z");
+
+    const summary = await this.conversionAnalytics.getConversionSummary(
+      workspaceId,
+      campaignId,
+      start,
+      end,
+    );
+
+    const trend = await this.conversionAnalytics.getConversionTrend(
+      workspaceId,
+      campaignId,
+      start,
+      end,
+    );
+
+    return {
+      success: true,
+      campaignId,
+      startDate,
+      endDate,
+      summary,
+      trend,
+    };
+  }
+
+  @Get("campaigns/:campaignId/top-converting")
+  @ApiOperation({
+    summary: "Get top converting campaigns in a workspace",
+    description: "Sorted by conversion count",
+  })
+  @ApiParam({
+    name: "campaignId",
+    description: "Campaign ID (used for context, optional filtering)",
+    type: String,
+  })
+  @ApiQuery({
+    name: "workspaceId",
+    description: "Workspace ID",
+    required: true,
+    type: String,
+  })
+  @ApiQuery({
+    name: "startDate",
+    description: "Start date (YYYY-MM-DD)",
+    required: true,
+    type: String,
+  })
+  @ApiQuery({
+    name: "endDate",
+    description: "End date (YYYY-MM-DD)",
+    required: true,
+    type: String,
+  })
+  @ApiQuery({
+    name: "limit",
+    description: "Number of campaigns to return (default: 10)",
+    required: false,
+    type: Number,
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Top converting campaigns returned",
+  })
+  async getTopConvertingCampaigns(
+    @Param("campaignId") _campaignId: string, // used for route consistency
+    @Query("workspaceId") workspaceId: string | undefined,
+    @Query("startDate") startDate: string,
+    @Query("endDate") endDate: string,
+    @Query("limit") limitStr?: string,
+    @Req() req?: Request,
+  ) {
+    if (!workspaceId) throw new BadRequestException("workspaceId is required");
+    if (req) await this.assertWorkspaceOwnership(workspaceId, this.getRequestUserId(req));
+
+    const start = new Date(startDate + "T00:00:00Z");
+    const end = new Date(endDate + "T23:59:59Z");
+    const limit = limitStr ? parseInt(limitStr) : 10;
+
+    const topCampaigns = await this.conversionAnalytics.getTopConvertingCampaigns(
+      workspaceId,
+      start,
+      end,
+      limit,
+    );
+
+    return {
+      success: true,
+      startDate,
+      endDate,
+      limit,
+      campaigns: topCampaigns,
+    };
   }
 
   // ─── Campaign Tags ────────────────────────────────────────────────────────────

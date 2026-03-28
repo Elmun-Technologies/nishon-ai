@@ -199,6 +199,8 @@ export class MetaSyncService {
             clicks: row.clicks,
             ctr: row.ctr,
             cpc: row.cpc,
+            conversions: row.conversions,
+            conversionValue: row.conversionValue,
             pagingCursor: null,
             // Tenant isolation: tag every row with the workspace it belongs to
             workspaceId,

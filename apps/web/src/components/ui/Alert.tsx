@@ -43,12 +43,12 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
 
 Alert.displayName = 'Alert'
 
-export function AlertDescription({ children, className = '' }: { children?: React.ReactNode; className?: string }) {
-  return <p className={`text-sm ${className}`}>{children}</p>
+export function AlertDescription({ children, className }: { children: React.ReactNode; className?: string }) {
+  return <p className={cn('text-sm mt-1 opacity-90', className)}>{children}</p>
 }
 
-export function AlertTitle({ children, className = '' }: { children?: React.ReactNode; className?: string }) {
-  return <p className={`font-semibold text-sm mb-1 ${className}`}>{children}</p>
+export function AlertTitle({ children, className }: { children: React.ReactNode; className?: string }) {
+  return <p className={cn('text-sm font-semibold', className)}>{children}</p>
 }
 
 export { Alert }

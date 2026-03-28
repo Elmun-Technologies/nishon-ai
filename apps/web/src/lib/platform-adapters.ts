@@ -384,7 +384,7 @@ export class CampaignPublisher {
 
       return results
     } catch (error) {
-      throw new Error(`Campaign creation failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      throw new Error(`Campaign creation failed: ${error instanceof Error ? error.message : String(error)}`)
     }
   }
 

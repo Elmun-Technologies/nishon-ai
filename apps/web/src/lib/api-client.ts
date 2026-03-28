@@ -173,8 +173,8 @@ export const aiAgent = {
 export const campaigns = {
   list: (workspaceId: string) =>
     apiClient.get(`/campaigns/workspace/${workspaceId}`),
-  create: (workspaceId: string, data: any) =>
-    apiClient.post(`/campaigns/workspace/${workspaceId}`, data),
+  create: (workspaceId: string, dto: Record<string, unknown>) =>
+    apiClient.post(`/campaigns/workspace/${workspaceId}`, dto),
   updateStatus: (id: string, status: string) =>
     apiClient.patch(`/campaigns/${id}/status`, { status }),
   delete: (id: string) =>
@@ -220,6 +220,14 @@ export const meta = {
     apiClient.get(`/meta/spend-forecast?workspaceId=${encodeURIComponent(workspaceId)}`),
   learningMonitor: (workspaceId: string) =>
     apiClient.get(`/meta/learning-monitor?workspaceId=${encodeURIComponent(workspaceId)}`),
+  getConversionAnalytics: (campaignId: string, workspaceId: string, startDate: string, endDate: string) =>
+    apiClient.get(
+      `/meta/campaigns/${campaignId}/conversion-analytics?workspaceId=${encodeURIComponent(workspaceId)}&startDate=${startDate}&endDate=${endDate}`
+    ),
+  getTopConvertingCampaigns: (campaignId: string, workspaceId: string, startDate: string, endDate: string, limit = 10) =>
+    apiClient.get(
+      `/meta/campaigns/${campaignId}/top-converting?workspaceId=${encodeURIComponent(workspaceId)}&startDate=${startDate}&endDate=${endDate}&limit=${limit}`
+    ),
   setTags: (campaignId: string, workspaceId: string, tags: string[]) =>
     apiClient.post(`/meta/campaigns/${campaignId}/tags?workspaceId=${encodeURIComponent(workspaceId)}`, { tags }),
 }

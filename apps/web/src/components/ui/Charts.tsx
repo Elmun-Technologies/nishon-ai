@@ -1,204 +1,141 @@
 'use client'
+import * as React from 'react'
+import { cn } from '@/lib/utils'
 
-// ─── LineChart ────────────────────────────────────────────────────────────────
-interface LineChartProps {
-  data: Record<string, any>[]
-  xKey: string
-  yKeys: string[]
-  colors?: string[]
-  height?: number
+interface DataPoint {
+  label?: string
+  value?: number
+  [key: string]: unknown
 }
 
-export function LineChart({ data, xKey, yKeys, colors = ['#7C3AED', '#4285F4', '#FFCC00'], height = 200 }: LineChartProps) {
-  if (!data || data.length === 0) {
-    return <div className="flex items-center justify-center text-[#6B7280] text-sm" style={{ height }}>(No data)</div>
-  }
-
-  const W = 600
-  const H = height
-  const pad = { top: 16, right: 16, bottom: 32, left: 48 }
-  const chartW = W - pad.left - pad.right
-  const chartH = H - pad.top - pad.bottom
-
-  const allValues = yKeys.flatMap(k => data.map(d => Number(d[k]) || 0))
-  const maxVal = Math.max(...allValues, 1)
-  const minVal = Math.min(...allValues, 0)
-  const range = maxVal - minVal || 1
-
-  const toX = (i: number) => (i / (data.length - 1)) * chartW
-  const toY = (v: number) => chartH - ((v - minVal) / range) * chartH
-
-  const ticks = 4
-  const yTickVals = Array.from({ length: ticks + 1 }, (_, i) => minVal + (range / ticks) * i)
-
-  return (
-    <div className="w-full overflow-x-auto">
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height }}>
-        <g transform={`translate(${pad.left},${pad.top})`}>
-          {/* Grid lines */}
-          {yTickVals.map((v, i) => (
-            <g key={i}>
-              <line x1={0} x2={chartW} y1={toY(v)} y2={toY(v)} stroke="#2A2A3A" strokeDasharray="4 4" />
-              <text x={-6} y={toY(v) + 4} textAnchor="end" fill="#6B7280" fontSize={10}>
-                {v >= 1000 ? `${(v / 1000).toFixed(1)}k` : Math.round(v)}
-              </text>
-            </g>
-          ))}
-
-          {/* X labels */}
-          {data.map((d, i) => (
-            i % Math.max(1, Math.floor(data.length / 5)) === 0 && (
-              <text key={i} x={toX(i)} y={chartH + 18} textAnchor="middle" fill="#6B7280" fontSize={10}>
-                {String(d[xKey]).slice(5)}
-              </text>
-            )
-          ))}
-
-          {/* Lines */}
-          {yKeys.map((k, ki) => {
-            const pts = data.map((d, i) => `${toX(i)},${toY(Number(d[k]) || 0)}`).join(' ')
-            return (
-              <polyline key={k} points={pts} fill="none" stroke={colors[ki] ?? '#7C3AED'} strokeWidth={2} strokeLinejoin="round" />
-            )
-          })}
-
-          {/* Dots */}
-          {yKeys.map((k, ki) =>
-            data.map((d, i) => (
-              <circle key={`${k}${i}`} cx={toX(i)} cy={toY(Number(d[k]) || 0)} r={3} fill={colors[ki] ?? '#7C3AED'} />
-            ))
-          )}
-        </g>
-      </svg>
-
-      {/* Legend */}
-      <div className="flex gap-4 mt-2 flex-wrap">
-        {yKeys.map((k, ki) => (
-          <div key={k} className="flex items-center gap-1 text-xs text-[#9CA3AF]">
-            <span className="w-3 h-3 rounded-full inline-block" style={{ backgroundColor: colors[ki] ?? '#7C3AED' }} />
-            {k}
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-// ─── BarChart ────────────────────────────────────────────────────────────────
-interface BarChartProps {
-  data: Record<string, any>[]
-  xKey: string
-  yKey: string
+// ── Bar Chart ──────────────────────────────────────────────
+export interface BarChartProps {
+  data: DataPoint[]
+  className?: string
   color?: string
-  height?: number
 }
 
-export function BarChart({ data, xKey, yKey, color = '#7C3AED', height = 200 }: BarChartProps) {
-  if (!data || data.length === 0) {
-    return <div className="flex items-center justify-center text-[#6B7280] text-sm" style={{ height }}>(No data)</div>
-  }
-
-  const W = 600
-  const H = height
-  const pad = { top: 16, right: 16, bottom: 32, left: 48 }
-  const chartW = W - pad.left - pad.right
-  const chartH = H - pad.top - pad.bottom
-
-  const values = data.map(d => Number(d[yKey]) || 0)
-  const maxVal = Math.max(...values, 1)
-
-  const barW = (chartW / data.length) * 0.7
-  const gap = chartW / data.length
-
+export function BarChart({ data, className, color = '#7C3AED' }: BarChartProps) {
+  const max = Math.max(...data.map((d) => Number(d.value) || 0), 1)
   return (
-    <div className="w-full overflow-x-auto">
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height }}>
-        <g transform={`translate(${pad.left},${pad.top})`}>
-          {/* Grid */}
-          {[0, 0.25, 0.5, 0.75, 1].map((t, i) => (
-            <g key={i}>
-              <line x1={0} x2={chartW} y1={chartH * (1 - t)} y2={chartH * (1 - t)} stroke="#2A2A3A" strokeDasharray="4 4" />
-              <text x={-6} y={chartH * (1 - t) + 4} textAnchor="end" fill="#6B7280" fontSize={10}>
-                {Math.round(maxVal * t)}
-              </text>
-            </g>
-          ))}
-
-          {/* Bars */}
-          {data.map((d, i) => {
-            const v = Number(d[yKey]) || 0
-            const bh = (v / maxVal) * chartH
-            const x = i * gap + (gap - barW) / 2
-            return (
-              <g key={i}>
-                <rect x={x} y={chartH - bh} width={barW} height={bh} rx={3} fill={color} opacity={0.85} />
-                <text x={x + barW / 2} y={chartH + 18} textAnchor="middle" fill="#6B7280" fontSize={9}>
-                  {String(d[xKey]).slice(-5)}
-                </text>
-              </g>
-            )
-          })}
-        </g>
-      </svg>
+    <div className={cn('flex items-end gap-1 h-32', className)}>
+      {data.map((d, i) => (
+        <div key={i} className="flex-1 flex flex-col items-center gap-1">
+          <div
+            className="w-full rounded-sm transition-all duration-300"
+            style={{ height: `${(Number(d.value || 0) / max) * 100}%`, backgroundColor: color, minHeight: 2 }}
+          />
+          {d.label && <span className="text-[10px] text-[#6B7280] truncate w-full text-center">{d.label}</span>}
+        </div>
+      ))}
     </div>
   )
 }
 
-// ─── PieChart ────────────────────────────────────────────────────────────────
-interface PieChartProps {
-  data: { label: string; value: number; color?: string }[]
-  size?: number
+// ── Line Chart ─────────────────────────────────────────────
+export interface LineChartProps {
+  data: DataPoint[]
+  /** If provided, use this key for X labels; otherwise use index */
+  xKey?: string
+  /** If provided, render multiple lines with these keys; otherwise use 'value' */
+  yKeys?: string[]
+  colors?: string[]
+  className?: string
+  color?: string
 }
 
-export function PieChart({ data, size = 200 }: PieChartProps) {
-  if (!data || data.length === 0) {
-    return <div className="flex items-center justify-center text-[#6B7280] text-sm" style={{ width: size, height: size }}>(No data)</div>
-  }
+export function LineChart({ data, xKey, yKeys, colors, className, color = '#7C3AED' }: LineChartProps) {
+  const W = 300
+  const H = 80
+  if (data.length < 2) return null
 
-  const DEFAULT_COLORS = ['#7C3AED', '#4285F4', '#FFCC00', '#2CA5E0', '#10B981', '#F59E0B']
+  const keys = yKeys ?? ['value']
+  const lineColors = colors ?? [color]
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className={cn('w-full', className)}>
+      {keys.map((key, ki) => {
+        const vals = data.map((d) => Number(d[key]) || 0)
+        const max = Math.max(...vals, 1)
+        const pts = vals.map((v, i) => ({
+          x: (i / (data.length - 1)) * W,
+          y: H - (v / max) * H,
+        }))
+        const path = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ')
+        return (
+          <path
+            key={key}
+            d={path}
+            fill="none"
+            stroke={lineColors[ki] ?? '#7C3AED'}
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        )
+      })}
+      {/* X labels */}
+      {xKey && data.map((d, i) => (
+        <text
+          key={i}
+          x={(i / (data.length - 1)) * W}
+          y={H}
+          textAnchor="middle"
+          fontSize="8"
+          fill="#6B7280"
+        >
+          {String(d[xKey] ?? '')}
+        </text>
+      ))}
+    </svg>
+  )
+}
+
+// ── Pie Chart (simple SVG donut) ───────────────────────────
+export interface PieChartProps {
+  data: { label: string; value: number; color?: string }[]
+  className?: string
+}
+
+export function PieChart({ data, className }: PieChartProps) {
   const total = data.reduce((s, d) => s + d.value, 0) || 1
-  const cx = size / 2
-  const cy = size / 2
-  const r = size * 0.38
-  const innerR = r * 0.55
+  const defaultColors = ['#7C3AED', '#4285F4', '#FFCC00', '#34D399', '#F87171']
+  let cumAngle = 0
+  const R = 40
+  const cx = 50
+  const cy = 50
 
-  let angle = -Math.PI / 2
   const slices = data.map((d, i) => {
-    const theta = (d.value / total) * 2 * Math.PI
-    const start = angle
-    angle += theta
-    return { ...d, start, end: angle, color: d.color ?? DEFAULT_COLORS[i % DEFAULT_COLORS.length] }
+    const angle = (d.value / total) * 2 * Math.PI
+    const x1 = cx + R * Math.sin(cumAngle)
+    const y1 = cy - R * Math.cos(cumAngle)
+    cumAngle += angle
+    const x2 = cx + R * Math.sin(cumAngle)
+    const y2 = cy - R * Math.cos(cumAngle)
+    const largeArc = angle > Math.PI ? 1 : 0
+    const color = d.color ?? defaultColors[i % defaultColors.length]
+    return { x1, y1, x2, y2, largeArc, color, label: d.label, value: d.value }
   })
 
-  const arc = (startA: number, endA: number, outerR: number, innerRad: number) => {
-    const x1 = cx + outerR * Math.cos(startA)
-    const y1 = cy + outerR * Math.sin(startA)
-    const x2 = cx + outerR * Math.cos(endA)
-    const y2 = cy + outerR * Math.sin(endA)
-    const x3 = cx + innerRad * Math.cos(endA)
-    const y3 = cy + innerRad * Math.sin(endA)
-    const x4 = cx + innerRad * Math.cos(startA)
-    const y4 = cy + innerRad * Math.sin(startA)
-    const large = endA - startA > Math.PI ? 1 : 0
-    return `M${x1},${y1} A${outerR},${outerR} 0 ${large} 1 ${x2},${y2} L${x3},${y3} A${innerRad},${innerRad} 0 ${large} 0 ${x4},${y4} Z`
-  }
-
   return (
-    <div className="flex items-center gap-6 flex-wrap">
-      <svg width={size} height={size}>
+    <div className={cn('flex items-center gap-4', className)}>
+      <svg viewBox="0 0 100 100" className="w-24 h-24 shrink-0">
         {slices.map((s, i) => (
-          <path key={i} d={arc(s.start, s.end, r, innerR)} fill={s.color} stroke="#0B0B0F" strokeWidth={2} />
+          <path
+            key={i}
+            d={`M ${cx} ${cy} L ${s.x1} ${s.y1} A ${R} ${R} 0 ${s.largeArc} 1 ${s.x2} ${s.y2} Z`}
+            fill={s.color}
+            opacity={0.85}
+          />
         ))}
-        <text x={cx} y={cy} textAnchor="middle" dominantBaseline="middle" fill="#fff" fontSize={14} fontWeight="bold">
-          {total >= 1000 ? `${(total / 1000).toFixed(1)}k` : total}
-        </text>
+        <circle cx={cx} cy={cy} r={R * 0.55} fill="#0D0D15" />
       </svg>
-      <div className="space-y-2">
-        {slices.map((s, i) => (
-          <div key={i} className="flex items-center gap-2 text-sm">
-            <span className="w-3 h-3 rounded-full" style={{ backgroundColor: s.color }} />
-            <span className="text-[#9CA3AF]">{s.label}</span>
-            <span className="text-white font-medium">{((s.value / total) * 100).toFixed(1)}%</span>
+      <div className="space-y-1">
+        {data.map((d, i) => (
+          <div key={i} className="flex items-center gap-2 text-xs">
+            <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: d.color ?? defaultColors[i % defaultColors.length] }} />
+            <span className="text-[#9CA3AF]">{d.label}</span>
+            <span className="text-white font-medium ml-auto">{d.value}</span>
           </div>
         ))}
       </div>

@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 
 export interface BadgeProps
   extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'secondary' | 'gray' | 'purple' | 'success' | 'warning' | 'error' | 'info' | 'danger'
+  variant?: 'default' | 'gray' | 'purple' | 'success' | 'warning' | 'error' | 'info' | 'danger' | 'secondary'
   size?: 'sm' | 'md'
   dot?: boolean
 }

@@ -1,83 +1,138 @@
 'use client'
+import * as React from 'react'
+import { cn } from '@/lib/utils'
 
-import React, { createContext, useContext, useState } from 'react'
+// ── Simple usage: <AccordionItem title="...">...</AccordionItem> ───────────
 
-interface AccordionCtxValue {
-  type: 'single' | 'multiple'
-  openItems: string[]
-  toggle: (value: string) => void
+interface AccordionItemSimpleProps {
+  title: string
+  children: React.ReactNode
+  defaultOpen?: boolean
+  className?: string
 }
 
-const AccordionCtx = createContext<AccordionCtxValue>({
-  type: 'single',
-  openItems: [],
-  toggle: () => {},
-})
+export function AccordionItem({ title, children, defaultOpen = false, className }: AccordionItemSimpleProps) {
+  const [open, setOpen] = React.useState(defaultOpen)
+  return (
+    <div className={cn('border border-[#2A2A3A] rounded-lg overflow-hidden', className)}>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-white hover:bg-[#1C1C27] transition-colors"
+      >
+        {title}
+        <svg
+          width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+          className={cn('text-[#6B7280] transition-transform duration-200', open && 'rotate-180')}
+        >
+          <path d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      {open && (
+        <div className="px-4 pb-4 pt-1 border-t border-[#2A2A3A]">
+          {children}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Compound usage: <Accordion><Accordion.Item value="..."><Accordion.Trigger>...</Accordion.Trigger><Accordion.Content>...</Accordion.Content></Accordion.Item></Accordion> ───
 
 interface AccordionProps {
-  type?: 'single' | 'multiple'
-  defaultValue?: string | string[]
+  children: React.ReactNode
+  className?: string
+  type?: string
+}
+
+interface CompoundItemProps {
+  value?: string
   children: React.ReactNode
   className?: string
 }
 
-function AccordionRoot({ type = 'single', defaultValue, children, className = '' }: AccordionProps) {
-  const initial = defaultValue
-    ? Array.isArray(defaultValue) ? defaultValue : [defaultValue]
-    : []
-  const [openItems, setOpenItems] = useState<string[]>(initial)
+interface CompoundTriggerProps {
+  children: React.ReactNode
+  className?: string
+}
 
-  const toggle = (value: string) => {
-    if (type === 'single') {
-      setOpenItems(prev => prev.includes(value) ? [] : [value])
-    } else {
-      setOpenItems(prev => prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value])
-    }
-  }
+interface CompoundContentProps {
+  children: React.ReactNode
+  className?: string
+}
 
+const AccordionContext = React.createContext<{
+  openItems: Set<string>
+  toggle: (v: string) => void
+}>({ openItems: new Set(), toggle: () => {} })
+
+const ItemContext = React.createContext<{ value: string; isOpen: boolean }>({
+  value: '',
+  isOpen: false,
+})
+
+function AccordionRoot({ children, className }: AccordionProps) {
+  const [openItems, setOpenItems] = React.useState<Set<string>>(new Set())
+  const toggle = (v: string) =>
+    setOpenItems((prev) => {
+      const next = new Set(prev)
+      next.has(v) ? next.delete(v) : next.add(v)
+      return next
+    })
   return (
-    <AccordionCtx.Provider value={{ type, openItems, toggle }}>
-      <div className={className}>{children}</div>
-    </AccordionCtx.Provider>
+    <AccordionContext.Provider value={{ openItems, toggle }}>
+      <div className={cn('space-y-2', className)}>{children}</div>
+    </AccordionContext.Provider>
   )
 }
 
-interface AccordionItemCtxValue { value: string }
-const AccordionItemCtx = createContext<AccordionItemCtxValue>({ value: '' })
-
-function AccordionItem({ value, children, className = '' }: { value: string; children: React.ReactNode; className?: string }) {
+function Item({ value = '', children, className }: CompoundItemProps) {
+  const { openItems } = React.useContext(AccordionContext)
   return (
-    <AccordionItemCtx.Provider value={{ value }}>
-      <div className={className}>{children}</div>
-    </AccordionItemCtx.Provider>
+    <ItemContext.Provider value={{ value, isOpen: openItems.has(value) }}>
+      <div className={cn('border border-[#2A2A3A] rounded-lg overflow-hidden', className)}>
+        {children}
+      </div>
+    </ItemContext.Provider>
   )
 }
 
-function AccordionTrigger({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  const { openItems, toggle } = useContext(AccordionCtx)
-  const { value } = useContext(AccordionItemCtx)
-  const isOpen = openItems.includes(value)
+function Trigger({ children, className }: CompoundTriggerProps) {
+  const { value, isOpen } = React.useContext(ItemContext)
+  const { toggle } = React.useContext(AccordionContext)
   return (
     <button
       type="button"
       onClick={() => toggle(value)}
-      className={`w-full flex items-center justify-between text-left py-2 ${className}`}
+      className={cn(
+        'w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-white hover:bg-[#1C1C27] transition-colors',
+        className
+      )}
     >
       {children}
-      <span className={`text-[#6B7280] text-sm transition-transform ${isOpen ? 'rotate-180' : ''}`}>▼</span>
+      <svg
+        width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+        className={cn('text-[#6B7280] transition-transform duration-200 shrink-0', isOpen && 'rotate-180')}
+      >
+        <path d="M19 9l-7 7-7-7" />
+      </svg>
     </button>
   )
 }
 
-function AccordionContent({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  const { openItems } = useContext(AccordionCtx)
-  const { value } = useContext(AccordionItemCtx)
-  if (!openItems.includes(value)) return null
-  return <div className={`mt-2 ${className}`}>{children}</div>
+function Content({ children, className }: CompoundContentProps) {
+  const { isOpen } = React.useContext(ItemContext)
+  if (!isOpen) return null
+  return (
+    <div className={cn('px-4 pb-4 pt-1 border-t border-[#2A2A3A]', className)}>
+      {children}
+    </div>
+  )
 }
 
-export const Accordion = Object.assign(AccordionRoot, {
-  Item: AccordionItem,
-  Trigger: AccordionTrigger,
-  Content: AccordionContent,
-})
+// Attach sub-components
+AccordionRoot.Item = Item
+AccordionRoot.Trigger = Trigger
+AccordionRoot.Content = Content
+
+export const Accordion = AccordionRoot
