@@ -40,7 +40,7 @@ export function Tabs({ tabs, activeTab, onChange, value, onValueChange, children
 
   // Simple usage
   return (
-    <div className={cn('flex items-center gap-1 bg-[#13131A] border border-[#2A2A3A] rounded-xl p-1 w-fit', className)}>
+    <div className={cn('flex items-center gap-1 bg-white border border-[#E5E7EB] rounded-xl p-1 w-fit', className)}>
       {(tabs ?? []).map((tab) => (
         <button
           key={tab.key}
@@ -49,8 +49,8 @@ export function Tabs({ tabs, activeTab, onChange, value, onValueChange, children
           className={cn(
             'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200',
             (activeTab ?? value) === tab.key
-              ? 'bg-[#7C3AED] text-white'
-              : 'text-[#6B7280] hover:text-white hover:bg-[#1C1C27]'
+              ? 'bg-[#111827] text-white'
+              : 'text-[#6B7280] hover:text-[#111827] hover:bg-[#F9FAFB]'
           )}
         >
           {tab.icon}
@@ -66,7 +66,7 @@ export function Tabs({ tabs, activeTab, onChange, value, onValueChange, children
 export interface TabsListProps { children: React.ReactNode; className?: string }
 export function TabsList({ children, className }: TabsListProps) {
   return (
-    <div className={cn('flex items-center gap-1 bg-[#13131A] border border-[#2A2A3A] rounded-xl p-1 w-fit', className)}>
+    <div className={cn('flex items-center gap-1 bg-white border border-[#E5E7EB] rounded-xl p-1 w-fit', className)}>
       {children}
     </div>
   )
@@ -81,7 +81,7 @@ export function TabsTrigger({ value, children, className }: TabsTriggerProps) {
       onClick={() => ctx.onChange(value)}
       className={cn(
         'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200',
-        ctx.value === value ? 'bg-[#7C3AED] text-white' : 'text-[#6B7280] hover:text-white hover:bg-[#1C1C27]'
+        ctx.value === value ? 'bg-[#111827] text-white' : 'text-[#6B7280] hover:text-[#111827] hover:bg-[#F9FAFB]'
       )}
     >
       {children}

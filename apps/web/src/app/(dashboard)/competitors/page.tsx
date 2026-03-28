@@ -272,7 +272,7 @@ function ScoreCircle({ score, label, color }: { score: number; label: string; co
     <div className={`flex flex-col items-center p-4 rounded-xl border ${bg} ${border}`}>
       <span className={`text-4xl font-black ${text}`}>{score}</span>
       <span className="text-[#9CA3AF] text-xs mt-1 text-center">{label}</span>
-      <div className="w-full bg-[#2A2A3A] rounded-full h-1.5 mt-2">
+      <div className="w-full bg-[#F3F4F6] rounded-full h-1.5 mt-2">
         <div className="h-full rounded-full" style={{ width: `${score}%`, backgroundColor: c }} />
       </div>
     </div>
@@ -359,7 +359,7 @@ export default function CompetitorsPage() {
     <div className="space-y-6 max-w-5xl">
       <div>
         <div className="flex items-center gap-3 mb-1">
-          <h1 className="text-2xl font-bold text-white">Raqobatchi Tahlili</h1>
+          <h1 className="text-2xl font-bold text-[#111827]">Raqobatchi Tahlili</h1>
           <Badge variant="purple">🔥 Audit</Badge>
         </div>
         <p className="text-[#6B7280] text-sm">
@@ -370,7 +370,7 @@ export default function CompetitorsPage() {
       <Card>
         <div className="flex items-center gap-2 mb-5">
           <span className="text-xl">⚔️</span>
-          <h2 className="font-semibold text-white">Raqobatchi ma’lumotlari</h2>
+          <h2 className="font-semibold text-[#111827]">Raqobatchi ma’lumotlari</h2>
         </div>
 
         <div className="space-y-4">
@@ -383,7 +383,7 @@ export default function CompetitorsPage() {
               value={form.name}
               onChange={(e) => update('name', e.target.value)}
               placeholder="Masalan: Texnomart, MediaPark, ..."
-              className="w-full bg-[#1C1C27] border border-[#2A2A3A] rounded-xl px-4 py-3 text-white placeholder:text-[#4B5563] focus:outline-none focus:border-[#7C3AED] transition-all"
+              className="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl px-4 py-3 text-[#111827] placeholder:text-[#6B7280] focus:outline-none focus:border-[#111827] transition-all"
             />
           </div>
 
@@ -391,7 +391,7 @@ export default function CompetitorsPage() {
             <div>
               <label className="block text-sm font-medium text-[#9CA3AF] mb-2">
                 Instagram <span className="text-red-400">*</span>
-                <span className="text-[#4B5563] font-normal ml-1">
+                <span className="text-[#6B7280] font-normal ml-1">
                   (@username yoki URL)
                 </span>
               </label>
@@ -404,7 +404,7 @@ export default function CompetitorsPage() {
                   value={form.instagram}
                   onChange={(e) => update('instagram', e.target.value)}
                   placeholder="@texnomart_uz"
-                  className="w-full bg-[#1C1C27] border border-[#2A2A3A] rounded-xl pl-10 pr-4 py-3 text-white placeholder:text-[#4B5563] focus:outline-none focus:border-[#7C3AED] transition-all"
+                  className="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl pl-10 pr-4 py-3 text-[#111827] placeholder:text-[#6B7280] focus:outline-none focus:border-[#111827] transition-all"
                 />
               </div>
             </div>
@@ -412,7 +412,7 @@ export default function CompetitorsPage() {
             <div>
               <label className="block text-sm font-medium text-[#9CA3AF] mb-2">
                 Veb-sayt <span className="text-red-400">*</span>
-                <span className="text-[#4B5563] font-normal ml-1">(URL)</span>
+                <span className="text-[#6B7280] font-normal ml-1">(URL)</span>
               </label>
               <div className="relative">
                 <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-lg">
@@ -423,7 +423,7 @@ export default function CompetitorsPage() {
                   value={form.website}
                   onChange={(e) => update('website', e.target.value)}
                   placeholder="https://texnomart.uz"
-                  className="w-full bg-[#1C1C27] border border-[#2A2A3A] rounded-xl pl-10 pr-4 py-3 text-white placeholder:text-[#4B5563] focus:outline-none focus:border-[#7C3AED] transition-all"
+                  className="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl pl-10 pr-4 py-3 text-[#111827] placeholder:text-[#6B7280] focus:outline-none focus:border-[#111827] transition-all"
                 />
               </div>
             </div>
@@ -440,10 +440,10 @@ export default function CompetitorsPage() {
       {loading && (
         <Card>
           <div className="py-10 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-[#7C3AED]/10 border border-[#7C3AED]/20 flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 rounded-2xl bg-[#F3F4F6] border border-[#D1D5DB] flex items-center justify-center mx-auto mb-4">
               <Spinner size="lg" />
             </div>
-            <h3 className="text-white font-semibold mb-1">
+            <h3 className="text-[#111827] font-semibold mb-1">
               Tahlil qilinmoqda...
             </h3>
             <p className="text-[#6B7280] text-sm mb-5">
@@ -468,7 +468,7 @@ export default function CompetitorsPage() {
                 ? 'border-emerald-500/40'
                 : result.overallWinner === 'competitor'
                   ? 'border-red-500/30'
-                  : 'border-[#7C3AED]/30'
+                  : 'border-[#D1D5DB]'
             }`}
           >
             <div className="flex flex-col md:flex-row items-center gap-6 p-4">
@@ -486,7 +486,7 @@ export default function CompetitorsPage() {
                       ? 'text-emerald-400'
                       : result.overallWinner === 'competitor'
                         ? 'text-red-400'
-                        : 'text-[#A78BFA]'
+                        : 'text-[#374151]'
                   }`}
                 >
                   {result.overallWinner === 'you'
@@ -506,7 +506,7 @@ export default function CompetitorsPage() {
                   label={currentWorkspace?.name ?? 'Siz'}
                   color="green"
                 />
-                <div className="text-[#4B5563] font-bold text-xl">vs</div>
+                <div className="text-[#6B7280] font-bold text-xl">vs</div>
                 <ScoreCircle
                   score={result.overallScore.competitor}
                   label={result.competitor.name}
@@ -523,7 +523,7 @@ export default function CompetitorsPage() {
               </p>
               <ul className="space-y-1.5">
                 {result.topStrengths.map((s, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-[#D1D5DB]">
+                  <li key={i} className="flex items-start gap-2 text-sm text-[#374151]">
                     <span className="text-emerald-400 shrink-0">✓</span> {s}
                   </li>
                 ))}
@@ -535,7 +535,7 @@ export default function CompetitorsPage() {
               </p>
               <ul className="space-y-1.5">
                 {result.topWeaknesses.map((w, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-[#D1D5DB]">
+                  <li key={i} className="flex items-start gap-2 text-sm text-[#374151]">
                     <span className="text-red-400 shrink-0">!</span> {w}
                   </li>
                 ))}
@@ -559,13 +559,13 @@ export default function CompetitorsPage() {
                   <span className="text-amber-400 font-bold text-sm shrink-0 mt-0.5">
                     {i + 1}
                   </span>
-                  <p className="text-[#D1D5DB] text-sm">{fix}</p>
+                  <p className="text-[#374151] text-sm">{fix}</p>
                 </div>
               ))}
             </div>
           </Card>
 
-          <div className="flex gap-1 bg-[#13131A] border border-[#2A2A3A] rounded-xl p-1 w-fit">
+          <div className="flex gap-1 bg-white border border-[#E5E7EB] rounded-xl p-1 w-fit">
             {[
               { key: 'audit', label: '📋 12 bo‘lim tahlili' },
               { key: 'strategy', label: '📅 Yillik strategiya' },
@@ -577,8 +577,8 @@ export default function CompetitorsPage() {
                   px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200
                   ${
                     activeTab === tab.key
-                      ? 'bg-[#7C3AED] text-white'
-                      : 'text-[#6B7280] hover:text-white hover:bg-[#1C1C27]'
+                      ? 'bg-[#111827] text-white'
+                      : 'text-[#6B7280] hover:text-[#111827] hover:bg-[#F9FAFB]'
                   }
                 `}
               >
@@ -604,8 +604,8 @@ export default function CompetitorsPage() {
                       <span className="text-2xl shrink-0">{cat.icon}</span>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5">
-                          <span className="text-[#4B5563] text-xs font-medium">{cat.id}.</span>
-                          <h3 className="font-semibold text-white text-sm">{cat.title}</h3>
+                          <span className="text-[#6B7280] text-xs font-medium">{cat.id}.</span>
+                          <h3 className="font-semibold text-[#111827] text-sm">{cat.title}</h3>
                           {catWinner === 'you' && (
                             <Badge variant="success" size="sm">Siz oldinda</Badge>
                           )}
@@ -613,7 +613,7 @@ export default function CompetitorsPage() {
                             <Badge variant="danger" size="sm">Orqadasiz</Badge>
                           )}
                         </div>
-                        <p className="text-[#4B5563] text-xs">{cat.description}</p>
+                        <p className="text-[#6B7280] text-xs">{cat.description}</p>
                       </div>
 
                       <div className="flex items-center gap-4 shrink-0">
@@ -621,21 +621,21 @@ export default function CompetitorsPage() {
                           <span className="text-emerald-400 font-bold text-base block">
                             {yourGood}/{cat.subParams.length}
                           </span>
-                          <span className="text-[#4B5563] text-xs">Siz</span>
+                          <span className="text-[#6B7280] text-xs">Siz</span>
                         </div>
                         <div className="text-center">
                           <span className="text-red-400 font-bold text-base block">
                             {compGood}/{cat.subParams.length}
                           </span>
-                          <span className="text-[#4B5563] text-xs">Raqobatchi</span>
+                          <span className="text-[#6B7280] text-xs">Raqobatchi</span>
                         </div>
                       </div>
                     </button>
 
                     {isOpen && (
-                      <div className="border-t border-[#2A2A3A]">
-                        <div className="grid grid-cols-[1fr_1fr_1fr] gap-0 px-5 py-2.5 bg-[#0D0D15] border-b border-[#1C1C27]">
-                          <p className="text-[#4B5563] text-xs font-medium uppercase tracking-wide">Parametr</p>
+                      <div className="border-t border-[#E5E7EB]">
+                        <div className="grid grid-cols-[1fr_1fr_1fr] gap-0 px-5 py-2.5 bg-[#0D0D15] border-b border-[#E5E7EB]">
+                          <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide">Parametr</p>
                           <p className="text-emerald-400 text-xs font-medium pl-3">Siz</p>
                           <p className="text-red-400 text-xs font-medium pl-3">{result.competitor.name}</p>
                         </div>
@@ -645,7 +645,7 @@ export default function CompetitorsPage() {
                             key={i}
                             className={`
                               grid grid-cols-[1fr_1fr_1fr] gap-0 px-5 py-3.5
-                              border-b border-[#1C1C27] last:border-0
+                              border-b border-[#E5E7EB] last:border-0
                               ${i % 2 === 0 ? '' : 'bg-[#0D0D15]/40'}
                             `}
                           >
@@ -655,12 +655,12 @@ export default function CompetitorsPage() {
 
                             <div className="pl-3 pr-4 flex items-start gap-2">
                               <StatusIcon status={sub.yourStatus} size="sm" />
-                              <p className="text-xs text-[#D1D5DB] leading-relaxed">{sub.yourNote}</p>
+                              <p className="text-xs text-[#374151] leading-relaxed">{sub.yourNote}</p>
                             </div>
 
                             <div className="pl-3 flex items-start gap-2">
                               <StatusIcon status={sub.competitorStatus} size="sm" />
-                              <p className="text-xs text-[#D1D5DB] leading-relaxed">{sub.competitorNote}</p>
+                              <p className="text-xs text-[#374151] leading-relaxed">{sub.competitorNote}</p>
                             </div>
                           </div>
                         ))}
@@ -677,7 +677,7 @@ export default function CompetitorsPage() {
               <Card>
                 <div className="flex items-center gap-2 mb-5">
                   <span className="text-lg">📅</span>
-                  <h2 className="font-semibold text-white">Yillik Marketing Strategiyasi</h2>
+                  <h2 className="font-semibold text-[#111827]">Yillik Marketing Strategiyasi</h2>
                   <Badge variant="purple" size="sm">Auditga asoslangan</Badge>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -691,9 +691,9 @@ export default function CompetitorsPage() {
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-xl">{q.icon}</span>
                         <span className={`font-bold text-lg ${q.tc}`}>{q.key.toUpperCase()}</span>
-                        <span className="text-[#4B5563] text-xs">{q.months}</span>
+                        <span className="text-[#6B7280] text-xs">{q.months}</span>
                       </div>
-                      <p className="text-[#D1D5DB] text-sm leading-relaxed">{q.text}</p>
+                      <p className="text-[#374151] text-sm leading-relaxed">{q.text}</p>
                     </div>
                   ))}
                 </div>
@@ -702,15 +702,15 @@ export default function CompetitorsPage() {
               <Card>
                 <div className="flex items-center gap-2 mb-4">
                   <span className="text-lg">🎯</span>
-                  <h3 className="font-semibold text-white">Asosiy harakatlar</h3>
+                  <h3 className="font-semibold text-[#111827]">Asosiy harakatlar</h3>
                 </div>
                 <div className="space-y-2">
                   {result.annualStrategy.keyActions.map((action, i) => (
-                    <div key={i} className="flex items-start gap-3 bg-[#1C1C27] rounded-xl px-4 py-3">
-                      <div className="w-6 h-6 rounded-lg bg-[#7C3AED]/20 flex items-center justify-center shrink-0">
-                        <span className="text-[#A78BFA] text-xs font-bold">{i + 1}</span>
+                    <div key={i} className="flex items-start gap-3 bg-[#F9FAFB] rounded-xl px-4 py-3">
+                      <div className="w-6 h-6 rounded-lg bg-[#E5E7EB] flex items-center justify-center shrink-0">
+                        <span className="text-[#374151] text-xs font-bold">{i + 1}</span>
                       </div>
-                      <p className="text-[#D1D5DB] text-sm leading-relaxed">{action}</p>
+                      <p className="text-[#374151] text-sm leading-relaxed">{action}</p>
                     </div>
                   ))}
                 </div>
@@ -719,9 +719,9 @@ export default function CompetitorsPage() {
               <Card>
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-lg">💰</span>
-                  <h3 className="font-semibold text-white">Byudjet tavsiyasi</h3>
+                  <h3 className="font-semibold text-[#111827]">Byudjet tavsiyasi</h3>
                 </div>
-                <p className="text-[#D1D5DB] text-sm leading-relaxed">
+                <p className="text-[#374151] text-sm leading-relaxed">
                   {result.annualStrategy.budgetAdvice}
                 </p>
               </Card>

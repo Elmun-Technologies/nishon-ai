@@ -142,7 +142,7 @@ function HealthScore({ score }: { score: number }) {
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-xl font-bold text-white">{score}</span>
+          <span className="text-xl font-bold text-[#111827]">{score}</span>
         </div>
       </div>
       <p className="text-[#6B7280] text-xs mt-2">Health Score</p>
@@ -301,7 +301,7 @@ export default function AutoOptimizationPage() {
 
       {/* ── Header ── */}
       <div>
-        <h1 className="text-2xl font-bold text-white mb-1">Auto-Optimallashtirish</h1>
+        <h1 className="text-2xl font-bold text-[#111827] mb-1">Auto-Optimallashtirish</h1>
         <p className="text-[#6B7280] text-sm">
           AI reklama kampaniyangizni tahlil qiladi, muammolarni aniqlaydi va harakatlarni tavsiya qiladi.
           Har bir harakat xavf darajasi va tasdiqlash talabiga qarab boshqariladi.
@@ -309,15 +309,15 @@ export default function AutoOptimizationPage() {
       </div>
 
       {/* ── Tabs ── */}
-      <div className="flex gap-1 bg-[#1C1C27] border border-[#2A2A3A] rounded-xl p-1 w-fit">
+      <div className="flex gap-1 bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-1 w-fit">
         {(['run', 'history'] as Tab[]).map(t => (
           <button
             key={t}
             onClick={() => handleTabChange(t)}
             className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
               tab === t
-                ? 'bg-[#7C3AED] text-white'
-                : 'text-[#6B7280] hover:text-white'
+                ? 'bg-[#111827] text-white'
+                : 'text-[#6B7280] hover:text-[#111827]'
             }`}
           >
             {t === 'run' ? 'Tahlil' : 'Tarix'}
@@ -330,7 +330,7 @@ export default function AutoOptimizationPage() {
         <>
           {/* Config card */}
           <Card>
-            <h2 className="text-white font-semibold mb-4">Sozlamalar</h2>
+            <h2 className="text-[#111827] font-semibold mb-4">Sozlamalar</h2>
 
             {/* Mode selector */}
             <div className="mb-5">
@@ -340,11 +340,11 @@ export default function AutoOptimizationPage() {
                   onClick={() => setMode('recommend')}
                   className={`text-left p-4 rounded-xl border transition-all ${
                     mode === 'recommend'
-                      ? 'border-[#7C3AED] bg-[#7C3AED]/10'
-                      : 'border-[#2A2A3A] hover:border-[#7C3AED]/40'
+                      ? 'border-[#111827] bg-[#F3F4F6]'
+                      : 'border-[#E5E7EB] hover:border-[#D1D5DB]'
                   }`}
                 >
-                  <p className="text-white font-medium text-sm mb-1">Tavsiya rejimi</p>
+                  <p className="text-[#111827] font-medium text-sm mb-1">Tavsiya rejimi</p>
                   <p className="text-[#6B7280] text-xs leading-relaxed">
                     AI tavsiyalar beradi — siz tasdiqlaysiz. Eng xavfsiz variant.
                   </p>
@@ -354,10 +354,10 @@ export default function AutoOptimizationPage() {
                   className={`text-left p-4 rounded-xl border transition-all ${
                     mode === 'auto_apply'
                       ? 'border-amber-500 bg-amber-500/10'
-                      : 'border-[#2A2A3A] hover:border-amber-500/40'
+                      : 'border-[#E5E7EB] hover:border-amber-500/40'
                   }`}
                 >
-                  <p className="text-white font-medium text-sm mb-1">
+                  <p className="text-[#111827] font-medium text-sm mb-1">
                     Avtomatik rejim
                     <span className="ml-2 text-xs text-amber-400 font-normal">xavf bor</span>
                   </p>
@@ -369,7 +369,7 @@ export default function AutoOptimizationPage() {
             </div>
 
             {/* Demo notice */}
-            <div className="flex items-start gap-2 bg-[#1C1C27] border border-[#2A2A3A] rounded-lg p-3 mb-5">
+            <div className="flex items-start gap-2 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg p-3 mb-5">
               <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#A78BFA" strokeWidth={1.8} className="shrink-0 mt-0.5">
                 <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -466,7 +466,7 @@ function OptimizationResults({ report }: { report: OptimizationReport }) {
             </p>
             <div className="flex flex-wrap gap-1 justify-end">
               {report.completedSteps.map(s => (
-                <span key={s} className="px-2 py-0.5 rounded-full bg-[#1C1C27] border border-[#2A2A3A] text-[#6B7280] text-xs">
+                <span key={s} className="px-2 py-0.5 rounded-full bg-[#F9FAFB] border border-[#E5E7EB] text-[#6B7280] text-xs">
                   {s}
                 </span>
               ))}
@@ -475,7 +475,7 @@ function OptimizationResults({ report }: { report: OptimizationReport }) {
         </div>
 
         {report.summary && (
-          <p className="text-[#9CA3AF] text-sm leading-relaxed mt-4 pt-4 border-t border-[#2A2A3A]">
+          <p className="text-[#9CA3AF] text-sm leading-relaxed mt-4 pt-4 border-t border-[#E5E7EB]">
             {report.summary}
           </p>
         )}
@@ -495,17 +495,17 @@ function OptimizationResults({ report }: { report: OptimizationReport }) {
       {/* Problems */}
       {problems.length > 0 && (
         <Card>
-          <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+          <h3 className="text-[#111827] font-semibold mb-3 flex items-center gap-2">
             Aniqlangan muammolar
             <Badge variant="danger" size="sm">{problems.length}</Badge>
           </h3>
           <div className="space-y-2">
             {problems.map((p, i) => (
-              <div key={i} className="flex items-start gap-3 p-3 bg-[#1C1C27] border border-[#2A2A3A] rounded-lg">
+              <div key={i} className="flex items-start gap-3 p-3 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg">
                 <SeverityBadge severity={p.severity} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-white text-sm">{p.message}</p>
-                  <p className="text-[#4B5563] text-xs mt-0.5">
+                  <p className="text-[#111827] text-sm">{p.message}</p>
+                  <p className="text-[#6B7280] text-xs mt-0.5">
                     {p.targetType} · {p.targetId}
                   </p>
                 </div>
@@ -518,11 +518,11 @@ function OptimizationResults({ report }: { report: OptimizationReport }) {
       {/* AI insights */}
       {insights.length > 0 && (
         <Card>
-          <h3 className="text-white font-semibold mb-3">AI tavsiyalar</h3>
+          <h3 className="text-[#111827] font-semibold mb-3">AI tavsiyalar</h3>
           <ul className="space-y-2">
             {insights.map((insight, i) => (
               <li key={i} className="flex items-start gap-2">
-                <span className="text-[#7C3AED] mt-0.5 shrink-0">›</span>
+                <span className="text-[#374151] mt-0.5 shrink-0">›</span>
                 <p className="text-[#9CA3AF] text-sm leading-relaxed">{insight}</p>
               </li>
             ))}
@@ -533,7 +533,7 @@ function OptimizationResults({ report }: { report: OptimizationReport }) {
       {/* Governed actions */}
       {governed.length > 0 && (
         <Card>
-          <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+          <h3 className="text-[#111827] font-semibold mb-3 flex items-center gap-2">
             Harakatlar
             <Badge variant="gray" size="sm">{governed.length} ta</Badge>
           </h3>
@@ -553,16 +553,16 @@ function OptimizationResults({ report }: { report: OptimizationReport }) {
                   <RiskDot level={ga.riskLevel} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <span className="text-white text-sm font-medium">
+                      <span className="text-[#111827] text-sm font-medium">
                         {ga.action.type.replace(/_/g, ' ')}
                       </span>
                       <GovBadge decision={ga.governance} />
-                      <span className="text-[#4B5563] text-xs">
+                      <span className="text-[#6B7280] text-xs">
                         {ga.action.targetType} · {ga.action.targetId}
                       </span>
                     </div>
                     <p className="text-[#9CA3AF] text-xs leading-relaxed">{ga.action.reason}</p>
-                    <p className="text-[#4B5563] text-xs mt-1 italic">{ga.governanceReason}</p>
+                    <p className="text-[#6B7280] text-xs mt-1 italic">{ga.governanceReason}</p>
                   </div>
                   <Badge
                     variant={
@@ -584,8 +584,8 @@ function OptimizationResults({ report }: { report: OptimizationReport }) {
       {/* Creative refresh */}
       {creatives && (
         <Card>
-          <h3 className="text-white font-semibold mb-3">Kreativ yangilanish takliflari</h3>
-          <pre className="text-[#9CA3AF] text-xs leading-relaxed whitespace-pre-wrap bg-[#1C1C27] p-4 rounded-lg border border-[#2A2A3A]">
+          <h3 className="text-[#111827] font-semibold mb-3">Kreativ yangilanish takliflari</h3>
+          <pre className="text-[#9CA3AF] text-xs leading-relaxed whitespace-pre-wrap bg-[#F9FAFB] p-4 rounded-lg border border-[#E5E7EB]">
             {typeof creatives === 'string' ? creatives : JSON.stringify(creatives, null, 2)}
           </pre>
         </Card>
@@ -645,17 +645,17 @@ function HistoryTab({
                     : run.healthScore >= 45 ? 'text-amber-400'
                     : 'text-red-400'
                   }`}>{run.healthScore}</p>
-                  <p className="text-[#4B5563] text-xs">sog'liq</p>
+                  <p className="text-[#6B7280] text-xs">sog'liq</p>
                 </>
               ) : (
-                <p className="text-[#4B5563] text-sm">—</p>
+                <p className="text-[#6B7280] text-sm">—</p>
               )}
             </div>
 
             {/* Details */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap mb-1">
-                <span className="text-white text-sm font-medium capitalize">{run.platform}</span>
+                <span className="text-[#111827] text-sm font-medium capitalize">{run.platform}</span>
                 <Badge variant={run.mode === 'auto_apply' ? 'warning' : 'purple'} size="sm">
                   {run.mode === 'auto_apply' ? 'auto' : 'recommend'}
                 </Badge>
@@ -674,8 +674,8 @@ function HistoryTab({
 
             {/* Time */}
             <div className="text-right shrink-0">
-              <p className="text-[#4B5563] text-xs">{new Date(run.createdAt).toLocaleDateString('uz-UZ')}</p>
-              <p className="text-[#4B5563] text-xs">{run.durationMs}ms</p>
+              <p className="text-[#6B7280] text-xs">{new Date(run.createdAt).toLocaleDateString('uz-UZ')}</p>
+              <p className="text-[#6B7280] text-xs">{run.durationMs}ms</p>
             </div>
           </div>
         </Card>

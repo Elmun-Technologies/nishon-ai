@@ -21,7 +21,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   }, [accessToken, router])
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#0A0A0F]">
+    <div className="flex h-screen overflow-hidden bg-[#F9FAFB]">
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Header />

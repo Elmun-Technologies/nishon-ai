@@ -108,7 +108,7 @@ const INTEGRATIONS_STATIC = [
     name: 'TikTok Ads',
     description: 'Short-form video advertising on TikTok for Gen Z and Millennial audiences.',
     logo: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-white">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-[#111827]">
         <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.78a4.85 4.85 0 01-1.01-.09z"/>
       </svg>
     ),
@@ -253,7 +253,7 @@ export default function SettingsPage() {
     <div className="max-w-5xl mx-auto">
       {/* Page header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">Settings</h1>
+        <h1 className="text-2xl font-bold text-[#111827]">Settings</h1>
         <p className="mt-1 text-sm text-[#6B7280]">
           Manage your workspace preferences, integrations, and account.
         </p>
@@ -273,14 +273,14 @@ export default function SettingsPage() {
                 ${activeTab === tab.id
                   ? tab.danger
                     ? 'bg-red-500/10 text-red-400 border border-red-500/20'
-                    : 'bg-[#7C3AED]/10 text-white border border-[#7C3AED]/20'
+                    : 'bg-[#F3F4F6] text-[#111827] border border-[#D1D5DB]'
                   : tab.danger
                   ? 'text-red-400/60 hover:text-red-400 hover:bg-red-500/5 border border-transparent'
-                  : 'text-[#6B7280] hover:text-white hover:bg-[#1C1C27] border border-transparent'
+                  : 'text-[#6B7280] hover:text-[#111827] hover:bg-[#F9FAFB] border border-transparent'
                 }
               `}
             >
-              <span className={activeTab === tab.id ? (tab.danger ? 'text-red-400' : 'text-[#A78BFA]') : ''}>
+              <span className={activeTab === tab.id ? (tab.danger ? 'text-red-400' : 'text-[#374151]') : ''}>
                 {tab.icon}
               </span>
               {tab.label}
@@ -300,10 +300,10 @@ export default function SettingsPage() {
               <Card>
                 <div className="flex items-start justify-between mb-5">
                   <div>
-                    <h2 className="text-base font-semibold text-white">Workspace</h2>
+                    <h2 className="text-base font-semibold text-[#111827]">Workspace</h2>
                     <p className="text-xs text-[#6B7280] mt-0.5">Basic workspace configuration.</p>
                   </div>
-                  <span className="text-xs text-[#4B5563] bg-[#1C1C27] border border-[#2A2A3A] px-2 py-1 rounded-lg">
+                  <span className="text-xs text-[#6B7280] bg-[#F9FAFB] border border-[#E5E7EB] px-2 py-1 rounded-lg">
                     ID: {currentWorkspace?.id?.slice(0, 8) ?? '—'}
                   </span>
                 </div>
@@ -324,13 +324,13 @@ export default function SettingsPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm text-[#9CA3AF] mb-1.5">Industry</label>
-                      <div className="rounded-lg border border-[#2A2A3A] bg-[#0F0F15] px-3 py-2.5 text-sm text-[#D1D5DB]">
+                      <div className="rounded-lg border border-[#E5E7EB] bg-[#0F0F15] px-3 py-2.5 text-sm text-[#374151]">
                         {currentWorkspace?.industry ?? '—'}
                       </div>
                     </div>
                     <div>
                       <label className="block text-sm text-[#9CA3AF] mb-1.5">Monthly Budget</label>
-                      <div className="rounded-lg border border-[#2A2A3A] bg-[#0F0F15] px-3 py-2.5 text-sm text-[#D1D5DB]">
+                      <div className="rounded-lg border border-[#E5E7EB] bg-[#0F0F15] px-3 py-2.5 text-sm text-[#374151]">
                         ${currentWorkspace?.monthlyBudget ?? '—'}
                       </div>
                     </div>
@@ -341,7 +341,7 @@ export default function SettingsPage() {
               {/* Autopilot Mode */}
               <Card>
                 <div className="mb-5">
-                  <h2 className="text-base font-semibold text-white">Autopilot Mode</h2>
+                  <h2 className="text-base font-semibold text-[#111827]">Autopilot Mode</h2>
                   <p className="text-xs text-[#6B7280] mt-0.5">
                     Control how much the AI acts on your behalf.
                   </p>
@@ -356,23 +356,23 @@ export default function SettingsPage() {
                         w-full flex items-start gap-4 p-4 rounded-xl border text-left
                         transition-all duration-150
                         ${autopilotMode === mode.value
-                          ? 'border-[#7C3AED]/40 bg-[#7C3AED]/5'
-                          : 'border-[#2A2A3A] hover:border-[#7C3AED]/20 hover:bg-[#1C1C27]'
+                          ? 'border-[#111827]/40 bg-[#111827]/5'
+                          : 'border-[#E5E7EB] hover:border-[#D1D5DB] hover:bg-[#F9FAFB]'
                         }
                       `}
                     >
                       {/* Radio circle */}
                       <div className={`
                         mt-0.5 w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center
-                        ${autopilotMode === mode.value ? 'border-[#7C3AED]' : 'border-[#4B5563]'}
+                        ${autopilotMode === mode.value ? 'border-[#111827]' : 'border-[#4B5563]'}
                       `}>
                         {autopilotMode === mode.value && (
-                          <div className="w-2 h-2 rounded-full bg-[#7C3AED]" />
+                          <div className="w-2 h-2 rounded-full bg-[#111827]" />
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className={`flex items-center gap-1.5 text-sm font-medium ${autopilotMode === mode.value ? 'text-white' : 'text-[#D1D5DB]'}`}>
+                          <span className={`flex items-center gap-1.5 text-sm font-medium ${autopilotMode === mode.value ? 'text-[#111827]' : 'text-[#374151]'}`}>
                             <span className={`w-2 h-2 rounded-full ${mode.dotColor}`} />
                             {mode.label}
                           </span>
@@ -392,19 +392,19 @@ export default function SettingsPage() {
               {/* Account Info */}
               <Card>
                 <div className="mb-5">
-                  <h2 className="text-base font-semibold text-white">Account</h2>
+                  <h2 className="text-base font-semibold text-[#111827]">Account</h2>
                   <p className="text-xs text-[#6B7280] mt-0.5">Your personal account details.</p>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-[#7C3AED]/20 border border-[#7C3AED]/30 flex items-center justify-center shrink-0">
-                    <span className="text-[#A78BFA] text-lg font-bold">
+                  <div className="w-12 h-12 rounded-full bg-[#E5E7EB] border border-[#D1D5DB] flex items-center justify-center shrink-0">
+                    <span className="text-[#374151] text-lg font-bold">
                       {user?.name?.charAt(0)?.toUpperCase() ?? 'U'}
                     </span>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-white">{user?.name ?? '—'}</p>
+                    <p className="text-sm font-medium text-[#111827]">{user?.name ?? '—'}</p>
                     <p className="text-xs text-[#6B7280]">{user?.email ?? '—'}</p>
-                    <span className="inline-block mt-1 text-xs px-2 py-0.5 rounded-md bg-[#7C3AED]/10 text-[#A78BFA] border border-[#7C3AED]/20 capitalize">
+                    <span className="inline-block mt-1 text-xs px-2 py-0.5 rounded-md bg-[#F3F4F6] text-[#374151] border border-[#D1D5DB] capitalize">
                       {user?.plan ?? 'free'} plan
                     </span>
                   </div>
@@ -432,7 +432,7 @@ export default function SettingsPage() {
           {activeTab === 'integrations' && (
             <Card>
               <div className="mb-5">
-                <h2 className="text-base font-semibold text-white">Advertising Platforms</h2>
+                <h2 className="text-base font-semibold text-[#111827]">Advertising Platforms</h2>
                 <p className="text-xs text-[#6B7280] mt-0.5">
                   Connect your ad accounts to enable campaign management and analytics.
                 </p>
@@ -443,17 +443,17 @@ export default function SettingsPage() {
                 {INTEGRATIONS.map((integration) => (
                   <div
                     key={integration.id}
-                    className="flex items-center gap-4 p-4 rounded-xl border border-[#2A2A3A] bg-[#0F0F15]"
+                    className="flex items-center gap-4 p-4 rounded-xl border border-[#E5E7EB] bg-[#0F0F15]"
                   >
-                    <div className="w-10 h-10 rounded-xl bg-[#1C1C27] border border-[#2A2A3A] flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-[#F9FAFB] border border-[#E5E7EB] flex items-center justify-center shrink-0">
                       {integration.logo}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <p className="text-sm font-medium text-white">{integration.name}</p>
+                        <p className="text-sm font-medium text-[#111827]">{integration.name}</p>
                         {/* Dynamic connection status */}
                         {metaConnected === null && (
-                          <span className="text-xs px-1.5 py-0.5 rounded-md bg-[#1C1C27] text-[#4B5563] border border-[#2A2A3A]">
+                          <span className="text-xs px-1.5 py-0.5 rounded-md bg-[#F9FAFB] text-[#6B7280] border border-[#E5E7EB]">
                             Checking…
                           </span>
                         )}
@@ -470,7 +470,7 @@ export default function SettingsPage() {
                     {metaConnected === true ? (
                       <Link
                         href={integration.href}
-                        className="text-xs px-3 py-1.5 rounded-lg border border-[#7C3AED]/30 text-[#A78BFA] hover:bg-[#7C3AED]/10 transition-colors shrink-0"
+                        className="text-xs px-3 py-1.5 rounded-lg border border-[#D1D5DB] text-[#374151] hover:bg-[#F3F4F6] transition-colors shrink-0"
                       >
                         Manage
                       </Link>
@@ -480,13 +480,13 @@ export default function SettingsPage() {
                           type="button"
                           onClick={() => currentWorkspace?.id && connectMeta(currentWorkspace.id)}
                           disabled={!currentWorkspace?.id}
-                          className="text-xs px-3 py-1.5 rounded-lg border border-[#7C3AED]/30 text-[#A78BFA] hover:bg-[#7C3AED]/10 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                          className="text-xs px-3 py-1.5 rounded-lg border border-[#D1D5DB] text-[#374151] hover:bg-[#F3F4F6] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                         >
                           Connect
                         </button>
                         <Link
                           href={integration.href}
-                          className="text-xs px-3 py-1.5 rounded-lg border border-[#2A2A3A] text-[#6B7280] hover:text-white hover:bg-[#1C1C27] transition-colors"
+                          className="text-xs px-3 py-1.5 rounded-lg border border-[#E5E7EB] text-[#6B7280] hover:text-[#111827] hover:bg-[#F9FAFB] transition-colors"
                         >
                           Details
                         </Link>
@@ -499,21 +499,21 @@ export default function SettingsPage() {
                 {INTEGRATIONS_STATIC.map((integration) => (
                   <div
                     key={integration.id}
-                    className="flex items-center gap-4 p-4 rounded-xl border border-[#2A2A3A] bg-[#0F0F15] opacity-60"
+                    className="flex items-center gap-4 p-4 rounded-xl border border-[#E5E7EB] bg-[#0F0F15] opacity-60"
                   >
-                    <div className="w-10 h-10 rounded-xl bg-[#1C1C27] border border-[#2A2A3A] flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-[#F9FAFB] border border-[#E5E7EB] flex items-center justify-center shrink-0">
                       {integration.logo}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <p className="text-sm font-medium text-white">{integration.name}</p>
-                        <span className="text-xs px-1.5 py-0.5 rounded-md bg-[#1C1C27] text-[#6B7280] border border-[#2A2A3A]">
+                        <p className="text-sm font-medium text-[#111827]">{integration.name}</p>
+                        <span className="text-xs px-1.5 py-0.5 rounded-md bg-[#F9FAFB] text-[#6B7280] border border-[#E5E7EB]">
                           Coming soon
                         </span>
                       </div>
                       <p className="text-xs text-[#6B7280] mt-0.5">{integration.description}</p>
                     </div>
-                    <button disabled className="text-xs px-3 py-1.5 rounded-lg border border-[#2A2A3A] text-[#4B5563] cursor-not-allowed shrink-0">
+                    <button disabled className="text-xs px-3 py-1.5 rounded-lg border border-[#E5E7EB] text-[#6B7280] cursor-not-allowed shrink-0">
                       Connect
                     </button>
                   </div>
@@ -528,7 +528,7 @@ export default function SettingsPage() {
             <div className="space-y-4">
             <Card>
               <div className="mb-5">
-                <h2 className="text-base font-semibold text-white">Notification Preferences</h2>
+                <h2 className="text-base font-semibold text-[#111827]">Notification Preferences</h2>
                 <p className="text-xs text-[#6B7280] mt-0.5">
                   Choose what updates you want to receive.
                 </p>
@@ -559,7 +559,7 @@ export default function SettingsPage() {
                 ].map((item) => (
                   <div key={item.key} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
                     <div>
-                      <p className="text-sm font-medium text-white">{item.label}</p>
+                      <p className="text-sm font-medium text-[#111827]">{item.label}</p>
                       <p className="text-xs text-[#6B7280] mt-0.5">{item.description}</p>
                     </div>
                     {/* Toggle */}
@@ -568,7 +568,7 @@ export default function SettingsPage() {
                       onClick={() => item.onChange((v: boolean) => !v)}
                       className={`
                         relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 shrink-0 ml-6
-                        ${item.value ? 'bg-[#7C3AED]' : 'bg-[#2A2A3A]'}
+                        ${item.value ? 'bg-[#111827]' : 'bg-[#F3F4F6]'}
                       `}
                     >
                       <span
@@ -582,7 +582,7 @@ export default function SettingsPage() {
                 ))}
               </div>
 
-              <div className="mt-5 pt-5 border-t border-[#2A2A3A] flex justify-end">
+              <div className="mt-5 pt-5 border-t border-[#E5E7EB] flex justify-end">
                 <Button onClick={handleSave} loading={saving}>
                   {saving ? 'Saving…' : 'Save Preferences'}
                 </Button>
@@ -593,19 +593,19 @@ export default function SettingsPage() {
 
             <Card>
               <div className="mb-4">
-                <h2 className="text-base font-semibold text-white flex items-center gap-2">
+                <h2 className="text-base font-semibold text-[#111827] flex items-center gap-2">
                   <span>Telegram Kunlik Hisobot</span>
-                  <span className="text-xs bg-[#7C3AED]/20 text-[#A78BFA] px-2 py-0.5 rounded-full font-normal">Tavsiya etiladi</span>
+                  <span className="text-xs bg-[#E5E7EB] text-[#374151] px-2 py-0.5 rounded-full font-normal">Tavsiya etiladi</span>
                 </h2>
                 <p className="text-xs text-[#6B7280] mt-1">
                   Har kuni soat 09:00 da kampaniya natijalari Telegramga yuboriladi. Bot orqali Chat ID oling.
                 </p>
               </div>
 
-              <div className="bg-[#1A1A2E] border border-[#2A2A3A] rounded-lg p-4 mb-4 text-xs text-[#9CA3AF] space-y-1.5">
+              <div className="bg-[#1A1A2E] border border-[#E5E7EB] rounded-lg p-4 mb-4 text-xs text-[#9CA3AF] space-y-1.5">
                 <p className="font-medium text-[#E5E7EB]">Qanday ulash:</p>
-                <p>1. Telegramda <span className="text-[#A78BFA] font-mono">@NishonAIBot</span> ga yozing</p>
-                <p>2. <span className="font-mono text-white">/start</span> buyrug'ini yuboring</p>
+                <p>1. Telegramda <span className="text-[#374151] font-mono">@NishonAIBot</span> ga yozing</p>
+                <p>2. <span className="font-mono text-[#111827]">/start</span> buyrug'ini yuboring</p>
                 <p>3. Bot sizga Chat ID ni ko'rsatadi — uni quyida kiriting</p>
               </div>
 
@@ -648,7 +648,7 @@ export default function SettingsPage() {
             <div className="space-y-4">
               <Card>
                 <div className="mb-5">
-                  <h2 className="text-base font-semibold text-white">Avtomatik optimallashtirish ruxsatlari</h2>
+                  <h2 className="text-base font-semibold text-[#111827]">Avtomatik optimallashtirish ruxsatlari</h2>
                   <p className="text-xs text-[#6B7280] mt-0.5">
                     Auto-apply rejimida AI qanday harakatlarni avtomatik bajarishi mumkinligini nazorat qiling.
                     Tasdiq talab qiladiganlar sizning roziligingizni kutadi.
@@ -656,7 +656,7 @@ export default function SettingsPage() {
                 </div>
 
                 {policyLoading ? (
-                  <div className="py-8 flex justify-center"><div className="w-5 h-5 border-2 border-[#7C3AED] border-t-transparent rounded-full animate-spin" /></div>
+                  <div className="py-8 flex justify-center"><div className="w-5 h-5 border-2 border-[#111827] border-t-transparent rounded-full animate-spin" /></div>
                 ) : (
                   <div className="space-y-0 divide-y divide-[#2A2A3A]">
                     {[
@@ -688,7 +688,7 @@ export default function SettingsPage() {
                       <div key={item.key} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
                         <div className="flex-1 min-w-0 pr-4">
                           <div className="flex items-center gap-2 mb-0.5">
-                            <p className="text-sm font-medium text-white">{item.label}</p>
+                            <p className="text-sm font-medium text-[#111827]">{item.label}</p>
                             <span className={`text-xs px-1.5 py-0.5 rounded-full border ${
                               item.risk === 'low'
                                 ? 'text-emerald-400 border-emerald-500/20 bg-emerald-500/10'
@@ -703,7 +703,7 @@ export default function SettingsPage() {
                           type="button"
                           onClick={() => setPolicy((p) => ({ ...p, [item.key]: !p[item.key] }))}
                           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 shrink-0 ${
-                            policy[item.key] ? 'bg-[#7C3AED]' : 'bg-[#2A2A3A]'
+                            policy[item.key] ? 'bg-[#111827]' : 'bg-[#F3F4F6]'
                           }`}
                         >
                           <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200 ${
@@ -717,19 +717,19 @@ export default function SettingsPage() {
                     {policy.allowAutoBudgetChange && (
                       <div className="py-4">
                         <div className="flex items-center justify-between mb-2">
-                          <p className="text-sm text-white">Maksimal byudjet o'zgarishi</p>
-                          <span className="text-[#A78BFA] font-semibold text-sm">{policy.maxAutoBudgetChangePct}%</span>
+                          <p className="text-sm text-[#111827]">Maksimal byudjet o'zgarishi</p>
+                          <span className="text-[#374151] font-semibold text-sm">{policy.maxAutoBudgetChangePct}%</span>
                         </div>
                         <input
                           type="range" min={5} max={50} step={5}
                           value={policy.maxAutoBudgetChangePct}
                           onChange={(e) => setPolicy((p) => ({ ...p, maxAutoBudgetChangePct: Number(e.target.value) }))}
-                          className="w-full h-2 bg-[#2A2A3A] rounded-full appearance-none cursor-pointer
+                          className="w-full h-2 bg-[#F3F4F6] rounded-full appearance-none cursor-pointer
                             [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4
                             [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full
-                            [&::-webkit-slider-thumb]:bg-[#7C3AED] [&::-webkit-slider-thumb]:cursor-pointer"
+                            [&::-webkit-slider-thumb]:bg-[#111827] [&::-webkit-slider-thumb]:cursor-pointer"
                         />
-                        <div className="flex justify-between text-xs text-[#4B5563] mt-1">
+                        <div className="flex justify-between text-xs text-[#6B7280] mt-1">
                           <span>5%</span><span>25%</span><span>50%</span>
                         </div>
                       </div>
@@ -737,8 +737,8 @@ export default function SettingsPage() {
                   </div>
                 )}
 
-                <div className="mt-5 pt-5 border-t border-[#2A2A3A] flex items-center justify-between">
-                  <p className="text-xs text-[#4B5563]">
+                <div className="mt-5 pt-5 border-t border-[#E5E7EB] flex items-center justify-between">
+                  <p className="text-xs text-[#6B7280]">
                     O'zgartirilmagan sozlamalar xavfsiz standartlardan foydalanadi
                   </p>
                   <Button
@@ -785,9 +785,9 @@ export default function SettingsPage() {
               </div>
               <div className="space-y-3">
                 {/* Reset strategy */}
-                <div className="flex items-center justify-between p-4 rounded-xl border border-[#2A2A3A] bg-[#0F0F15]">
+                <div className="flex items-center justify-between p-4 rounded-xl border border-[#E5E7EB] bg-[#0F0F15]">
                   <div>
-                    <p className="text-sm font-medium text-white">Reset AI Strategy</p>
+                    <p className="text-sm font-medium text-[#111827]">Reset AI Strategy</p>
                     <p className="text-xs text-[#6B7280] mt-0.5">
                       Clears your current AI strategy. A new one will be generated on next visit.
                     </p>

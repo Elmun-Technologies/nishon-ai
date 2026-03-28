@@ -73,11 +73,11 @@ export function CreativeAssets({
 
   return (
     <div className="space-y-8">
-      <h2 className="text-xl font-semibold text-white">Creative Assets</h2>
+      <h2 className="text-xl font-semibold text-[#111827]">Creative Assets</h2>
       
       {/* Product Information */}
       <Card padding="lg">
-        <h3 className="text-lg font-semibold text-white mb-4">Product Information</h3>
+        <h3 className="text-lg font-semibold text-[#111827] mb-4">Product Information</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <Label htmlFor="productName">Product Name</Label>
@@ -105,7 +105,7 @@ export function CreativeAssets({
       {/* Headlines */}
       <Card padding="lg">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-white">Headlines</h3>
+          <h3 className="text-lg font-semibold text-[#111827]">Headlines</h3>
           <Button 
             variant="secondary" 
             size="sm" 
@@ -162,7 +162,7 @@ export function CreativeAssets({
       {/* Descriptions */}
       <Card padding="lg">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-white">Descriptions</h3>
+          <h3 className="text-lg font-semibold text-[#111827]">Descriptions</h3>
           <Button 
             variant="secondary" 
             size="sm" 
@@ -219,7 +219,7 @@ export function CreativeAssets({
 
       {/* Primary Text */}
       <Card padding="lg">
-        <h3 className="text-lg font-semibold text-white mb-4">Primary Text</h3>
+        <h3 className="text-lg font-semibold text-[#111827] mb-4">Primary Text</h3>
         <div className="space-y-4">
           <div>
             <Label>Primary Text</Label>
@@ -263,7 +263,7 @@ export function CreativeAssets({
 
       {/* Call to Action */}
       <Card padding="lg">
-        <h3 className="text-lg font-semibold text-white mb-4">Call to Action</h3>
+        <h3 className="text-lg font-semibold text-[#111827] mb-4">Call to Action</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <Label>CTA Button</Label>
@@ -290,7 +290,7 @@ export function CreativeAssets({
 
       {/* Image Upload */}
       <Card padding="lg">
-        <h3 className="text-lg font-semibold text-white mb-4">Image Upload</h3>
+        <h3 className="text-lg font-semibold text-[#111827] mb-4">Image Upload</h3>
         <div className="space-y-4">
           <div>
             <Label>Recommended Aspect Ratio</Label>
@@ -308,7 +308,7 @@ export function CreativeAssets({
               <input
                 type="file"
                 accept="image/*"
-                className="w-full px-3 py-2 bg-[#2A2A3A] border border-[#3A3A4A] rounded-lg text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#7C3AED] file:text-white hover:file:bg-[#6B2FB8]"
+                className="w-full px-3 py-2 bg-[#F3F4F6] border border-[#E5E7EB] rounded-lg text-[#111827] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#111827] file:text-[#111827] hover:file:bg-[#6B2FB8]"
                 onChange={(e) => {
                   const file = e.target.files?.[0]
                   if (file) {
@@ -346,7 +346,7 @@ export function CreativeAssets({
           {formData.creatives.imageUrl && (
             <div className="mt-4">
               <Label>Preview</Label>
-              <div className="border border-[#3A3A4A] rounded-lg p-4">
+              <div className="border border-[#E5E7EB] rounded-lg p-4">
                 <img 
                   src={formData.creatives.imageUrl} 
                   alt="Creative preview"
@@ -369,7 +369,7 @@ export function CreativeAssets({
 
       {/* Creative Testing */}
       <Card padding="lg">
-        <h3 className="text-lg font-semibold text-white mb-4">Creative Testing</h3>
+        <h3 className="text-lg font-semibold text-[#111827] mb-4">Creative Testing</h3>
         <div className="space-y-4">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
@@ -384,7 +384,7 @@ export function CreativeAssets({
           
           {formData.creatives.enableTesting && (
             <div>
-              <h4 className="text-md font-medium text-white mb-3">Test Variants</h4>
+              <h4 className="text-md font-medium text-[#111827] mb-3">Test Variants</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="flex items-center gap-3">
                   <Switch
@@ -441,7 +441,7 @@ export function CreativeAssets({
 
       {/* Platform-Specific Constraints */}
       <Card padding="lg">
-        <h3 className="text-lg font-semibold text-white mb-4">Platform-Specific Constraints</h3>
+        <h3 className="text-lg font-semibold text-[#111827] mb-4">Platform-Specific Constraints</h3>
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
@@ -449,7 +449,7 @@ export function CreativeAssets({
               <p className="text-sm text-[#6B7280]">125 characters</p>
               <div className="w-full bg-[#3A3A4A] rounded-full h-2 mt-2">
                 <div 
-                  className="bg-[#7C3AED] h-2 rounded-full" 
+                  className="bg-[#111827] h-2 rounded-full" 
                   style={{ width: `${(formData.creatives.headlines[0]?.length || 0) / 125 * 100}%` }}
                 ></div>
               </div>

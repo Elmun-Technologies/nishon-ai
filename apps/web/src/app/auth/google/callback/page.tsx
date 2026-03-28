@@ -56,12 +56,12 @@ export default function GoogleCallbackPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#0A0A0F] flex items-center justify-center p-6">
+      <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center p-6">
         <div className="text-center">
           <p className="text-red-400 mb-4">{error}</p>
           <button
             onClick={() => router.push('/login')}
-            className="text-[#A78BFA] hover:text-white text-sm underline"
+            className="text-[#374151] hover:text-[#111827] text-sm underline"
           >
             Loginga qaytish
           </button>
@@ -71,7 +71,7 @@ export default function GoogleCallbackPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0F] flex flex-col items-center justify-center gap-4">
+    <div className="min-h-screen bg-[#F9FAFB] flex flex-col items-center justify-center gap-4">
       <Spinner />
       <p className="text-[#6B7280] text-sm">Google orqali kirilmoqda...</p>
     </div>

@@ -99,8 +99,8 @@ function PlatformCard({ platform, selected, onToggle }: PlatformCardProps) {
       className={`
         relative w-full text-left p-5 rounded-2xl border transition-all duration-200 cursor-pointer
         ${selected
-          ? 'border-opacity-60 bg-[#13131F]'
-          : 'border-[#2A2A3A] bg-[#0F0F15] hover:border-[#3A3A4A] hover:bg-[#13131F]'
+          ? 'border-opacity-60 bg-white'
+          : 'border-[#E5E7EB] bg-[#0F0F15] hover:border-[#E5E7EB] hover:bg-white'
         }
       `}
       style={selected ? {
@@ -143,7 +143,7 @@ function PlatformCard({ platform, selected, onToggle }: PlatformCardProps) {
       {/* Platform info */}
       <div>
         <div className="flex items-center gap-2 mb-1">
-          <span className="text-sm font-semibold text-white">{platform.name}</span>
+          <span className="text-sm font-semibold text-[#111827]">{platform.name}</span>
         </div>
         <p className="text-xs text-[#6B7280] leading-relaxed">{platform.description}</p>
 
@@ -215,7 +215,7 @@ export function PlatformSelector({
 
       {/* Selection summary */}
       {selected.length > 0 && (
-        <div className="mt-4 p-3 rounded-xl bg-[#13131F] border border-[#2A2A3A] flex items-center gap-3">
+        <div className="mt-4 p-3 rounded-xl bg-white border border-[#E5E7EB] flex items-center gap-3">
           <div className="flex -space-x-2">
             {selected.map((id) => {
               const p = platforms.find((pl) => pl.id === id)!
@@ -232,13 +232,13 @@ export function PlatformSelector({
             })}
           </div>
           <p className="text-xs text-[#9CA3AF]">
-            <span className="text-white font-medium">{selected.length}</span> ta platforma tanlandi
+            <span className="text-[#111827] font-medium">{selected.length}</span> ta platforma tanlandi
           </p>
         </div>
       )}
 
       {selected.length === 0 && (
-        <p className="mt-4 text-xs text-center text-[#4B5563]">
+        <p className="mt-4 text-xs text-center text-[#6B7280]">
           Kamida {minSelect} ta platformani tanlang
         </p>
       )}

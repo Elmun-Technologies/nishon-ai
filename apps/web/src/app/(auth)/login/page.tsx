@@ -72,25 +72,25 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0F] flex">
+    <div className="min-h-screen bg-[#F9FAFB] flex">
 
       {/* Left panel */}
-      <div className="hidden lg:flex lg:w-1/2 bg-[#13131A] border-r border-[#2A2A3A] flex-col justify-between p-12">
+      <div className="hidden lg:flex lg:w-1/2 bg-white border-r border-[#E5E7EB] flex-col justify-between p-12">
         <div>
-          <h1 className="text-2xl font-bold text-white">
-            Nishon <span className="text-[#7C3AED]">AI</span>
+          <h1 className="text-2xl font-bold text-[#111827]">
+            Nishon <span className="text-[#374151]">AI</span>
           </h1>
         </div>
 
         <div>
           <div className="mb-8">
-            <div className="inline-flex items-center gap-2 bg-[#7C3AED]/10 border border-[#7C3AED]/20 rounded-full px-4 py-2 mb-6">
+            <div className="inline-flex items-center gap-2 bg-[#F3F4F6] border border-[#D1D5DB] rounded-full px-4 py-2 mb-6">
               <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-[#A78BFA] text-sm font-medium">AI Agent Active</span>
+              <span className="text-[#374151] text-sm font-medium">AI Agent Active</span>
             </div>
-            <h2 className="text-4xl font-bold text-white leading-tight mb-4">
+            <h2 className="text-4xl font-bold text-[#111827] leading-tight mb-4">
               Reklamalaringiz<br />
-              <span className="text-[#7C3AED]">o'zi ishlaydi.</span>
+              <span className="text-[#374151]">o'zi ishlaydi.</span>
             </h2>
             <p className="text-[#6B7280] text-lg leading-relaxed">
               Nishon AI Meta, Google va TikTok kampaniyalaringizni
@@ -104,31 +104,31 @@ export default function LoginPage() {
               { value: '−40%', label: "Past CPA" },
               { value: '24/7', label: "AI monitoring" },
             ].map((stat) => (
-              <div key={stat.label} className="bg-[#1C1C27] rounded-xl p-4 border border-[#2A2A3A]">
-                <p className="text-2xl font-bold text-[#A78BFA]">{stat.value}</p>
+              <div key={stat.label} className="bg-[#F9FAFB] rounded-xl p-4 border border-[#E5E7EB]">
+                <p className="text-2xl font-bold text-[#374151]">{stat.value}</p>
                 <p className="text-[#6B7280] text-xs mt-1">{stat.label}</p>
               </div>
             ))}
           </div>
 
-          <div className="bg-[#1C1C27] rounded-xl p-5 border border-[#2A2A3A]">
-            <p className="text-[#D1D5DB] text-sm leading-relaxed mb-3">
+          <div className="bg-[#F9FAFB] rounded-xl p-5 border border-[#E5E7EB]">
+            <p className="text-[#374151] text-sm leading-relaxed mb-3">
               "Nishon AI targetologimizni almashtirdi va birinchi oyda ROAS 2.8x oshdi.
               Endi kampaniya boshqarishga 0 soat sarflaymiz."
             </p>
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-[#7C3AED]/20 border border-[#7C3AED]/30 flex items-center justify-center">
-                <span className="text-xs font-bold text-[#A78BFA]">JT</span>
+              <div className="w-8 h-8 rounded-full bg-[#E5E7EB] border border-[#D1D5DB] flex items-center justify-center">
+                <span className="text-xs font-bold text-[#374151]">JT</span>
               </div>
               <div>
-                <p className="text-white text-xs font-medium">Jasur Toshmatov</p>
+                <p className="text-[#111827] text-xs font-medium">Jasur Toshmatov</p>
                 <p className="text-[#6B7280] text-xs">CEO, TechShop Uzbekistan</p>
               </div>
             </div>
           </div>
         </div>
 
-        <p className="text-[#4B5563] text-xs">© 2025 Nishon AI. All rights reserved.</p>
+        <p className="text-[#6B7280] text-xs">© 2025 Nishon AI. All rights reserved.</p>
       </div>
 
       {/* Right panel — form */}
@@ -137,13 +137,13 @@ export default function LoginPage() {
 
           {/* Mobile logo */}
           <div className="lg:hidden text-center mb-8">
-            <h1 className="text-2xl font-bold text-white">
-              Nishon <span className="text-[#7C3AED]">AI</span>
+            <h1 className="text-2xl font-bold text-[#111827]">
+              Nishon <span className="text-[#374151]">AI</span>
             </h1>
           </div>
 
-          <div className="bg-[#13131A] border border-[#2A2A3A] rounded-xl p-6">
-            <h2 className="text-xl font-semibold text-white mb-6">Xush kelibsiz</h2>
+          <div className="bg-white border border-[#E5E7EB] rounded-xl p-6">
+            <h2 className="text-xl font-semibold text-[#111827] mb-6">Xush kelibsiz</h2>
 
             {/* Social login buttons */}
             <div className="flex flex-col gap-2 mb-4">
@@ -158,7 +158,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={handleFacebookLogin}
-                className="w-full flex items-center justify-center gap-3 bg-[#1877F2] hover:bg-[#166FE5] text-white font-medium py-2.5 px-4 rounded-lg transition-colors text-sm"
+                className="w-full flex items-center justify-center gap-3 bg-[#1877F2] hover:bg-[#166FE5] text-[#111827] font-medium py-2.5 px-4 rounded-lg transition-colors text-sm"
               >
                 <FacebookIcon />
                 Facebook orqali kirish
@@ -166,9 +166,9 @@ export default function LoginPage() {
             </div>
 
             <div className="flex items-center gap-3 mb-4">
-              <div className="flex-1 h-px bg-[#2A2A3A]" />
-              <span className="text-[#4B5563] text-xs">yoki email bilan</span>
-              <div className="flex-1 h-px bg-[#2A2A3A]" />
+              <div className="flex-1 h-px bg-[#F3F4F6]" />
+              <span className="text-[#6B7280] text-xs">yoki email bilan</span>
+              <div className="flex-1 h-px bg-[#F3F4F6]" />
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -201,7 +201,7 @@ export default function LoginPage() {
 
             <p className="text-center text-[#6B7280] text-sm mt-5">
               Hisobingiz yo'qmi?{' '}
-              <Link href="/register" className="text-[#A78BFA] hover:text-white transition-colors font-medium">
+              <Link href="/register" className="text-[#374151] hover:text-[#111827] transition-colors font-medium">
                 Ro'yxatdan o'ting
               </Link>
             </p>

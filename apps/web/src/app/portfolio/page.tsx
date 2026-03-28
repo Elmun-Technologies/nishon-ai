@@ -28,7 +28,7 @@ function VerifiedBadge() {
 
 function ProBadge() {
   return (
-    <span className="inline-flex items-center gap-1 bg-[#7C3AED]/15 border border-[#7C3AED]/30 text-[#A78BFA] text-[10px] font-bold px-2 py-0.5 rounded-full">
+    <span className="inline-flex items-center gap-1 bg-[#111827]/15 border border-[#D1D5DB] text-[#374151] text-[10px] font-bold px-2 py-0.5 rounded-full">
       ⭐ PRO
     </span>
   )
@@ -38,7 +38,7 @@ function StarRating({ rating }: { rating: number }) {
   return (
     <div className="flex items-center gap-1">
       <span className="text-yellow-400 text-sm">★</span>
-      <span className="text-white font-semibold text-sm">{rating.toFixed(1)}</span>
+      <span className="text-[#111827] font-semibold text-sm">{rating.toFixed(1)}</span>
     </div>
   )
 }
@@ -71,17 +71,17 @@ function RoasTrend({ data }: { data: { month: string; roas: number }[] }) {
 function TargetologistCard({ t }: { t: PortfolioTargetologist }) {
   return (
     <Link href={`/portfolio/${t.slug}`} className="block group">
-      <div className="bg-[#13131A] border border-[#2A2A3A] group-hover:border-[#7C3AED]/40 rounded-2xl p-6 transition-all duration-300 group-hover:shadow-[0_0_30px_rgba(124,58,237,0.1)]">
+      <div className="bg-white border border-[#E5E7EB] group-hover:border-[#D1D5DB] rounded-2xl p-6 transition-all duration-300 group-hover:shadow-[0_0_30px_rgba(124,58,237,0.1)]">
 
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${t.avatarColor} flex items-center justify-center text-sm font-black text-white shadow-lg`}>
+            <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${t.avatarColor} flex items-center justify-center text-sm font-black text-[#111827] shadow-lg`}>
               {t.avatar}
             </div>
             <div>
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-white font-bold">{t.name}</span>
+                <span className="text-[#111827] font-bold">{t.name}</span>
                 {t.verified && <VerifiedBadge />}
                 {t.proMember && <ProBadge />}
               </div>
@@ -105,8 +105,8 @@ function TargetologistCard({ t }: { t: PortfolioTargetologist }) {
             { label: 'Kampaniya', value: t.stats.totalCampaigns },
             { label: 'Muvaffaqiyat', value: `${t.stats.successRate}%` },
           ].map(m => (
-            <div key={m.label} className="bg-[#0D0D14] rounded-lg p-2 text-center">
-              <div className={`text-sm font-bold ${m.highlight ? 'text-[#A78BFA]' : 'text-white'}`}>{m.value}</div>
+            <div key={m.label} className="bg-[#F9FAFB] rounded-lg p-2 text-center">
+              <div className={`text-sm font-bold ${m.highlight ? 'text-[#374151]' : 'text-[#111827]'}`}>{m.value}</div>
               <div className="text-[#6B7280] text-[10px] mt-0.5">{m.label}</div>
             </div>
           ))}
@@ -116,7 +116,7 @@ function TargetologistCard({ t }: { t: PortfolioTargetologist }) {
         <div className="flex items-center justify-between mb-4">
           <div>
             <div className="text-[#6B7280] text-xs">Jami boshqarilgan byudjet</div>
-            <div className="text-white font-bold text-lg">{formatSpend(t.stats.totalSpendManaged)}</div>
+            <div className="text-[#111827] font-bold text-lg">{formatSpend(t.stats.totalSpendManaged)}</div>
           </div>
           <RoasTrend data={t.monthlyPerformance} />
         </div>
@@ -128,8 +128,8 @@ function TargetologistCard({ t }: { t: PortfolioTargetologist }) {
               key={p.id}
               className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded-full border ${
                 p.verified
-                  ? 'bg-[#1C1C27] border-[#3A3A4A] text-white'
-                  : 'bg-[#1C1C27] border-[#2A2A3A] text-[#6B7280]'
+                  ? 'bg-[#F9FAFB] border-[#E5E7EB] text-[#111827]'
+                  : 'bg-[#F9FAFB] border-[#E5E7EB] text-[#6B7280]'
               }`}
             >
               {p.icon} {p.name}
@@ -141,7 +141,7 @@ function TargetologistCard({ t }: { t: PortfolioTargetologist }) {
         {/* Niches */}
         <div className="flex flex-wrap gap-1.5 mb-5">
           {t.niches.slice(0, 3).map(n => (
-            <span key={n} className="text-[10px] bg-[#1C1C27] text-[#9CA3AF] px-2 py-0.5 rounded-md border border-[#2A2A3A]">
+            <span key={n} className="text-[10px] bg-[#F9FAFB] text-[#9CA3AF] px-2 py-0.5 rounded-md border border-[#E5E7EB]">
               {n}
             </span>
           ))}
@@ -151,13 +151,13 @@ function TargetologistCard({ t }: { t: PortfolioTargetologist }) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-4 border-t border-[#2A2A3A]">
+        <div className="flex items-center justify-between pt-4 border-t border-[#E5E7EB]">
           <div>
             <span className="text-[#6B7280] text-xs">Narxi: </span>
-            <span className="text-white font-semibold text-sm">${t.price.from}</span>
+            <span className="text-[#111827] font-semibold text-sm">${t.price.from}</span>
             <span className="text-[#6B7280] text-xs">/{t.price.unit}</span>
           </div>
-          <span className="text-[#7C3AED] text-sm font-semibold group-hover:text-[#A78BFA] transition-colors">
+          <span className="text-[#374151] text-sm font-semibold group-hover:text-[#374151] transition-colors">
             Profil ko'rish →
           </span>
         </div>
@@ -218,24 +218,24 @@ export default function PortfolioPage() {
   }), [])
 
   return (
-    <div className="min-h-screen bg-[#0A0A0F] text-white">
+    <div className="min-h-screen bg-[#F9FAFB] text-[#111827]">
 
       {/* ── NAV ── */}
-      <nav className="sticky top-0 z-50 border-b border-[#2A2A3A] bg-[#0A0A0F]/90 backdrop-blur-lg">
+      <nav className="sticky top-0 z-50 border-b border-[#E5E7EB] bg-[#F9FAFB]/90 backdrop-blur-lg">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <button onClick={() => router.push('/')} className="text-xl font-extrabold">
-            Nishon <span className="text-[#7C3AED]">AI</span>
+            Nishon <span className="text-[#374151]">AI</span>
           </button>
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.push('/portfolio/setup')}
-              className="text-sm text-[#9CA3AF] hover:text-white transition-colors px-4 py-2 border border-[#2A2A3A] rounded-lg"
+              className="text-sm text-[#9CA3AF] hover:text-[#111827] transition-colors px-4 py-2 border border-[#E5E7EB] rounded-lg"
             >
               Targetolog bo'lish →
             </button>
             <button
               onClick={() => router.push('/login')}
-              className="text-sm bg-[#7C3AED] hover:bg-[#6D28D9] text-white px-5 py-2.5 rounded-lg font-semibold transition-all"
+              className="text-sm bg-[#111827] hover:bg-[#1F2937] text-white px-5 py-2.5 rounded-lg font-semibold transition-all"
             >
               Kirish
             </button>
@@ -244,14 +244,14 @@ export default function PortfolioPage() {
       </nav>
 
       {/* ── HERO ── */}
-      <div className="relative py-16 px-6 text-center border-b border-[#2A2A3A] overflow-hidden">
+      <div className="relative py-16 px-6 text-center border-b border-[#E5E7EB] overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-[#7C3AED]/5 to-transparent pointer-events-none" />
         <div className="relative max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 bg-[#7C3AED]/10 border border-[#7C3AED]/20 rounded-full px-4 py-1.5 mb-5">
+          <div className="inline-flex items-center gap-2 bg-[#F3F4F6] border border-[#D1D5DB] rounded-full px-4 py-1.5 mb-5">
             <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-            <span className="text-[#A78BFA] text-xs font-bold uppercase tracking-widest">Live Portfolio Tracking</span>
+            <span className="text-[#374151] text-xs font-bold uppercase tracking-widest">Live Portfolio Tracking</span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-[#111827] mb-4">
             Tasdiqlangan targetologlar
           </h1>
           <p className="text-[#9CA3AF] text-lg max-w-xl mx-auto mb-8">
@@ -259,15 +259,15 @@ export default function PortfolioPage() {
           </p>
 
           {/* aggregate stats */}
-          <div className="inline-grid grid-cols-4 gap-px bg-[#2A2A3A] rounded-2xl overflow-hidden border border-[#2A2A3A]">
+          <div className="inline-grid grid-cols-4 gap-px bg-[#F3F4F6] rounded-2xl overflow-hidden border border-[#E5E7EB]">
             {[
               { v: totals.targetologists, l: 'Targetolog' },
               { v: formatSpend(totals.spendManaged), l: 'Boshqarilgan' },
               { v: `${totals.avgROAS}x`, l: "O'rtacha ROAS" },
               { v: totals.campaigns, l: 'Kampaniyalar' },
             ].map(s => (
-              <div key={s.l} className="bg-[#13131A] px-6 py-4 text-center">
-                <div className="text-2xl font-extrabold text-white">{s.v}</div>
+              <div key={s.l} className="bg-white px-6 py-4 text-center">
+                <div className="text-2xl font-extrabold text-[#111827]">{s.v}</div>
                 <div className="text-[#6B7280] text-xs mt-0.5">{s.l}</div>
               </div>
             ))}
@@ -288,7 +288,7 @@ export default function PortfolioPage() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Ism yoki niche..."
-                className="w-full bg-[#13131A] border border-[#2A2A3A] rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-[#6B7280] focus:outline-none focus:border-[#7C3AED]/50"
+                className="w-full bg-white border border-[#E5E7EB] rounded-lg px-3 py-2.5 text-sm text-[#111827] placeholder:text-[#6B7280] focus:outline-none focus:border-[#111827]/50"
               />
             </div>
 
@@ -296,11 +296,11 @@ export default function PortfolioPage() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setVerifiedOnly(!verifiedOnly)}
-                className={`w-10 h-5 rounded-full transition-colors ${verifiedOnly ? 'bg-[#7C3AED]' : 'bg-[#2A2A3A]'}`}
+                className={`w-10 h-5 rounded-full transition-colors ${verifiedOnly ? 'bg-[#111827]' : 'bg-[#F3F4F6]'}`}
               >
                 <div className={`w-4 h-4 rounded-full bg-white mx-0.5 transition-transform ${verifiedOnly ? 'translate-x-5' : 'translate-x-0'}`} />
               </button>
-              <span className="text-sm text-white">Faqat tasdiqlangan</span>
+              <span className="text-sm text-[#111827]">Faqat tasdiqlangan</span>
             </div>
 
             {/* Platforms */}
@@ -313,13 +313,13 @@ export default function PortfolioPage() {
                     onClick={() => togglePlatform(p.id)}
                     className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all ${
                       selectedPlatforms.includes(p.id)
-                        ? 'bg-[#7C3AED]/15 border border-[#7C3AED]/40 text-white'
-                        : 'bg-[#13131A] border border-[#2A2A3A] text-[#9CA3AF] hover:border-[#3A3A4A]'
+                        ? 'bg-[#111827]/15 border border-[#111827]/40 text-[#111827]'
+                        : 'bg-white border border-[#E5E7EB] text-[#9CA3AF] hover:border-[#E5E7EB]'
                     }`}
                   >
                     <span>{p.icon}</span>
                     <span>{p.name}</span>
-                    {selectedPlatforms.includes(p.id) && <span className="ml-auto text-[#7C3AED] font-bold">✓</span>}
+                    {selectedPlatforms.includes(p.id) && <span className="ml-auto text-[#374151] font-bold">✓</span>}
                   </button>
                 ))}
               </div>
@@ -328,7 +328,7 @@ export default function PortfolioPage() {
             {/* Min ROAS */}
             <div>
               <label className="text-[#9CA3AF] text-xs font-semibold uppercase tracking-wider block mb-2">
-                Min ROAS: <span className="text-white">{minROAS > 0 ? `${minROAS}x` : 'Hammasi'}</span>
+                Min ROAS: <span className="text-[#111827]">{minROAS > 0 ? `${minROAS}x` : 'Hammasi'}</span>
               </label>
               <input
                 type="range" min={0} max={6} step={0.5}
@@ -351,8 +351,8 @@ export default function PortfolioPage() {
                     onClick={() => toggleNiche(n)}
                     className={`text-xs px-2.5 py-1 rounded-full border transition-all ${
                       selectedNiches.includes(n)
-                        ? 'bg-[#7C3AED]/20 border-[#7C3AED]/50 text-white'
-                        : 'bg-[#13131A] border-[#2A2A3A] text-[#9CA3AF] hover:border-[#3A3A4A]'
+                        ? 'bg-[#E5E7EB] border-[#111827]/50 text-[#111827]'
+                        : 'bg-white border-[#E5E7EB] text-[#9CA3AF] hover:border-[#E5E7EB]'
                     }`}
                   >
                     {n}
@@ -377,14 +377,14 @@ export default function PortfolioPage() {
             {/* Sort + count */}
             <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
               <p className="text-[#9CA3AF] text-sm">
-                <span className="text-white font-semibold">{filtered.length}</span> targetolog topildi
+                <span className="text-[#111827] font-semibold">{filtered.length}</span> targetolog topildi
               </p>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-[#6B7280]">Saralash:</span>
                 <select
                   value={sortBy}
                   onChange={e => setSortBy(e.target.value)}
-                  className="bg-[#13131A] border border-[#2A2A3A] text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-[#7C3AED]/50"
+                  className="bg-white border border-[#E5E7EB] text-[#111827] text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-[#111827]/50"
                 >
                   {SORT_OPTIONS.map(o => (
                     <option key={o.value} value={o.value}>{o.label}</option>
@@ -399,7 +399,7 @@ export default function PortfolioPage() {
                 <p className="text-[#9CA3AF]">Hech qanday targetolog topilmadi</p>
                 <button
                   onClick={() => { setSelectedPlatforms([]); setSelectedNiches([]); setVerifiedOnly(false); setMinROAS(0); setSearch('') }}
-                  className="mt-4 text-[#7C3AED] hover:text-[#A78BFA] text-sm"
+                  className="mt-4 text-[#374151] hover:text-[#374151] text-sm"
                 >
                   Filtrlarni tozalash
                 </button>
@@ -416,15 +416,15 @@ export default function PortfolioPage() {
       </div>
 
       {/* ── CTA for targetologists ── */}
-      <div className="border-t border-[#2A2A3A] py-16 px-6 text-center">
+      <div className="border-t border-[#E5E7EB] py-16 px-6 text-center">
         <div className="max-w-2xl mx-auto">
-          <h2 className="text-3xl font-extrabold text-white mb-4">Targetolmisiz?</h2>
+          <h2 className="text-3xl font-extrabold text-[#111827] mb-4">Targetolmisiz?</h2>
           <p className="text-[#9CA3AF] mb-8">
             Nishon AI ga qo'shiling — natijalaringizni real-time da ko'rsating va ko'proq mijoz toping.
           </p>
           <button
             onClick={() => router.push('/register')}
-            className="bg-[#7C3AED] hover:bg-[#6D28D9] text-white font-bold px-10 py-4 rounded-xl shadow-[0_0_30px_rgba(124,58,237,0.3)] hover:shadow-[0_0_50px_rgba(124,58,237,0.5)] transition-all"
+            className="bg-[#111827] hover:bg-[#1F2937] text-white font-bold px-10 py-4 rounded-xl shadow-[0_0_30px_rgba(124,58,237,0.3)] hover:shadow-[0_0_50px_rgba(124,58,237,0.5)] transition-all"
           >
             Portfolio yaratish — bepul →
           </button>

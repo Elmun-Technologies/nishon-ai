@@ -105,7 +105,7 @@ export default function CampaignsPage() {
       <div className="flex items-start justify-between">
         <div>
           <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-2xl font-bold text-white">Campaigns</h1>
+            <h1 className="text-2xl font-bold text-[#111827]">Campaigns</h1>
             <Badge variant="gray">{items.length} total</Badge>
           </div>
           <p className="text-[#6B7280] text-sm">
@@ -118,7 +118,7 @@ export default function CampaignsPage() {
           </Button>
           <button
             onClick={() => setShowCreatePanel(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-sm font-semibold transition-colors shadow-lg shadow-[#7C3AED]/25"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#111827] hover:bg-[#1F2937] text-white text-sm font-semibold transition-colors shadow-lg shadow-gray-200"
           >
             <span className="text-base leading-none">+</span>
             Kampaniya yaratish
@@ -130,7 +130,7 @@ export default function CampaignsPage() {
       {actionError && <Alert variant="error">{actionError}</Alert>}
 
       {/* ── Filter tabs ── */}
-      <div className="flex items-center gap-1 bg-[#13131A] border border-[#2A2A3A] rounded-xl p-1 w-fit">
+      <div className="flex items-center gap-1 bg-white border border-[#E5E7EB] rounded-xl p-1 w-fit">
         {(
           [
             { key: 'all', label: 'All' },
@@ -146,8 +146,8 @@ export default function CampaignsPage() {
               flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
               transition-all duration-200
               ${filter === tab.key
-                ? 'bg-[#7C3AED] text-white'
-                : 'text-[#6B7280] hover:text-white hover:bg-[#1C1C27]'
+                ? 'bg-[#111827] text-white'
+                : 'text-[#6B7280] hover:text-[#111827] hover:bg-[#F9FAFB]'
               }
             `}
           >
@@ -156,8 +156,8 @@ export default function CampaignsPage() {
               className={`
                 text-xs px-1.5 py-0.5 rounded-full
                 ${filter === tab.key
-                  ? 'bg-white/20 text-white'
-                  : 'bg-[#2A2A3A] text-[#6B7280]'
+                  ? 'bg-white/20 text-[#111827]'
+                  : 'bg-[#F3F4F6] text-[#6B7280]'
                 }
               `}
             >
@@ -197,7 +197,7 @@ export default function CampaignsPage() {
                 <Card
                   hoverable
                   onClick={() => setSelectedId(isSelected ? null : campaign.id)}
-                  className={`transition-all duration-200 ${isSelected ? 'border-[#7C3AED]/40 bg-[#7C3AED]/5' : ''}`}
+                  className={`transition-all duration-200 ${isSelected ? 'border-[#111827]/40 bg-[#111827]/5' : ''}`}
                   padding="none"
                 >
                   <div className="flex items-center gap-4 p-5">
@@ -205,7 +205,7 @@ export default function CampaignsPage() {
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-white text-sm truncate">
+                        <h3 className="font-semibold text-[#111827] text-sm truncate">
                           {campaign.name}
                         </h3>
                         {campaign.externalId && (
@@ -223,11 +223,11 @@ export default function CampaignsPage() {
                     </div>
 
                     <div className="text-right shrink-0">
-                      <p className="text-white text-sm font-semibold">
+                      <p className="text-[#111827] text-sm font-semibold">
                         {formatCurrency(campaign.dailyBudget)}
                         <span className="text-[#6B7280] font-normal">/day</span>
                       </p>
-                      <p className="text-[#4B5563] text-xs mt-0.5">
+                      <p className="text-[#6B7280] text-xs mt-0.5">
                         {formatCurrency(campaign.totalBudget)} total
                       </p>
                     </div>
@@ -236,7 +236,7 @@ export default function CampaignsPage() {
                       <CampaignStatusBadge status={campaign.status} />
                     </div>
 
-                    <div className={`text-[#4B5563] transition-transform duration-200 shrink-0 ${isSelected ? 'rotate-180' : ''}`}>
+                    <div className={`text-[#6B7280] transition-transform duration-200 shrink-0 ${isSelected ? 'rotate-180' : ''}`}>
                       <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path d="M19 9l-7 7-7-7" />
                       </svg>
@@ -245,7 +245,7 @@ export default function CampaignsPage() {
                 </Card>
 
                 {isSelected && (
-                  <div className="mt-1 bg-[#0D0D15] border border-[#7C3AED]/20 border-t-0 rounded-b-xl px-5 py-4">
+                  <div className="mt-1 bg-[#0D0D15] border border-[#D1D5DB] border-t-0 rounded-b-xl px-5 py-4">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                       {[
                         { label: 'Platform', value: campaign.platform.toUpperCase() },
@@ -254,13 +254,13 @@ export default function CampaignsPage() {
                         { label: 'Total Budget', value: formatCurrency(campaign.totalBudget) },
                       ].map(({ label, value }) => (
                         <div key={label}>
-                          <p className="text-[#4B5563] text-xs mb-1 uppercase tracking-wide">{label}</p>
-                          <p className="text-white text-sm font-medium">{value}</p>
+                          <p className="text-[#6B7280] text-xs mb-1 uppercase tracking-wide">{label}</p>
+                          <p className="text-[#111827] text-sm font-medium">{value}</p>
                         </div>
                       ))}
                     </div>
 
-                    <div className="flex items-center gap-2 pt-3 border-t border-[#2A2A3A]">
+                    <div className="flex items-center gap-2 pt-3 border-t border-[#E5E7EB]">
                       {campaign.status === 'active' ? (
                         <Button
                           variant="secondary"
@@ -294,7 +294,7 @@ export default function CampaignsPage() {
 
                       <div className="ml-auto">
                         {campaign.externalId && (
-                          <p className="text-[#4B5563] text-xs">
+                          <p className="text-[#6B7280] text-xs">
                             Platform ID: {campaign.externalId}
                           </p>
                         )}
@@ -314,7 +314,7 @@ export default function CampaignsPage() {
             <div className="flex items-center gap-3">
               <span className="text-xl">🔗</span>
               <div>
-                <p className="text-white text-sm font-medium">Ko'proq platformalar ulash</p>
+                <p className="text-[#111827] text-sm font-medium">Ko'proq platformalar ulash</p>
                 <p className="text-[#6B7280] text-xs">Google, TikTok yoki Telegram qo'shib qamrovni kengaytiring</p>
               </div>
             </div>
@@ -334,16 +334,16 @@ export default function CampaignsPage() {
             onClick={() => setShowCreatePanel(false)}
           />
           {/* Panel */}
-          <div className="w-full max-w-lg bg-[#0D0D15] border-l border-[#2A2A3A] flex flex-col shadow-2xl">
+          <div className="w-full max-w-lg bg-[#0D0D15] border-l border-[#E5E7EB] flex flex-col shadow-2xl">
             {/* Panel header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[#2A2A3A]">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#E5E7EB]">
               <div>
-                <h2 className="text-white font-semibold">Yangi kampaniya</h2>
+                <h2 className="text-[#111827] font-semibold">Yangi kampaniya</h2>
                 <p className="text-[#6B7280] text-xs mt-0.5">{currentWorkspace?.name}</p>
               </div>
               <button
                 onClick={() => setShowCreatePanel(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-lg text-[#6B7280] hover:text-white hover:bg-[#1C1C27] transition-colors"
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-[#6B7280] hover:text-[#111827] hover:bg-[#F9FAFB] transition-colors"
               >
                 ✕
               </button>

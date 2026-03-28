@@ -59,7 +59,7 @@ export function PlatformSelection({ selectedPlatforms, onPlatformToggle }: Platf
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-white mb-2">Select Platforms</h2>
+        <h2 className="text-xl font-semibold text-[#111827] mb-2">Select Platforms</h2>
         <p className="text-[#6B7280]">Choose where you want to run your campaign</p>
       </div>
       
@@ -71,7 +71,7 @@ export function PlatformSelection({ selectedPlatforms, onPlatformToggle }: Platf
             onClick={() => onPlatformToggle(platform.id)}
             className={`cursor-pointer transition-all ${
               selectedPlatforms.includes(platform.id) 
-                ? 'border-[#7C3AED]/40 bg-[#7C3AED]/5' 
+                ? 'border-[#111827]/40 bg-[#111827]/5' 
                 : ''
             }`}
           >
@@ -79,7 +79,7 @@ export function PlatformSelection({ selectedPlatforms, onPlatformToggle }: Platf
               <PlatformIcon platform={platform.name} size="lg" />
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-semibold text-white">{platform.displayName}</h3>
+                  <h3 className="font-semibold text-[#111827]">{platform.displayName}</h3>
                   {!platform.connected && (
                     <Badge variant="warning" size="sm">Not Connected</Badge>
                   )}
@@ -90,11 +90,11 @@ export function PlatformSelection({ selectedPlatforms, onPlatformToggle }: Platf
               </div>
               <div className={`w-4 h-4 rounded border-2 ${
                 selectedPlatforms.includes(platform.id) 
-                  ? 'bg-[#7C3AED] border-[#7C3AED]' 
-                  : 'border-[#3A3A4A] bg-[#2A2A3A]'
+                  ? 'bg-[#111827] border-[#111827]' 
+                  : 'border-[#E5E7EB] bg-[#F3F4F6]'
               }`}>
                 {selectedPlatforms.includes(platform.id) && (
-                  <svg className="w-3 h-3 text-white mt-0.5 ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-3 h-3 text-[#111827] mt-0.5 ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                   </svg>
                 )}
