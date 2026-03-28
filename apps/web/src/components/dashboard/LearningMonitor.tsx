@@ -1,5 +1,4 @@
 'use client'
-
 import { useEffect, useState } from 'react'
 import { DonutChart } from '@/components/ui/DonutChart'
 import { meta as metaApi } from '@/lib/api-client'
@@ -13,10 +12,10 @@ interface MonitorData {
 }
 
 const LEGEND = [
-  { key: 'active',   label: 'Aktiv',     color: '#10B981' },
-  { key: 'learning', label: 'O\'rganmoqda', color: '#7C3AED' },
-  { key: 'limited',  label: 'Cheklangan', color: '#F59E0B' },
-  { key: 'paused',   label: 'To\'xtatilgan', color: '#6B7280' },
+  { key: 'active',   label: 'Aktiv',       color: '#10B981' },
+  { key: 'learning', label: "O'rganmoqda", color: '#6366F1' },
+  { key: 'limited',  label: 'Cheklangan',  color: '#F59E0B' },
+  { key: 'paused',   label: "To'xtatilgan", color: '#9CA3AF' },
 ] as const
 
 interface Props {
@@ -41,15 +40,15 @@ export function LearningMonitor({ workspaceId }: Props) {
   }))
 
   return (
-    <div className="bg-[#13131F] border border-[#2A2A3A] rounded-2xl p-5">
+    <div className="bg-white border border-[#E5E7EB] rounded-2xl p-5">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-white">Learning Monitor</h3>
-        <span className="text-xs text-[#6B7280]">Kampaniyalar</span>
+        <h3 className="text-sm font-semibold text-[#111827]">Learning Monitor</h3>
+        <span className="text-xs text-[#9CA3AF]">Kampaniyalar</span>
       </div>
 
       {loading ? (
         <div className="flex items-center justify-center h-32">
-          <div className="w-8 h-8 border-2 border-[#7C3AED] border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-[#111827] border-t-transparent rounded-full animate-spin" />
         </div>
       ) : (
         <div className="flex items-center gap-6">
@@ -64,7 +63,7 @@ export function LearningMonitor({ workspaceId }: Props) {
             />
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center mt-1">
-                <div className="text-lg font-bold text-white">{data?.total ?? 0}</div>
+                <div className="text-lg font-bold text-[#111827]">{data?.total ?? 0}</div>
               </div>
             </div>
           </div>
@@ -75,9 +74,9 @@ export function LearningMonitor({ workspaceId }: Props) {
               <div key={l.key} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: l.color }} />
-                  <span className="text-xs text-[#9CA3AF]">{l.label}</span>
+                  <span className="text-xs text-[#6B7280]">{l.label}</span>
                 </div>
-                <span className="text-xs font-semibold text-white">{data?.[l.key] ?? 0}</span>
+                <span className="text-xs font-semibold text-[#111827]">{data?.[l.key] ?? 0}</span>
               </div>
             ))}
           </div>

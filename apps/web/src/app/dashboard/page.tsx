@@ -65,11 +65,9 @@ export default function DashboardPage() {
     if (!currentWorkspace?.id) { setLoadingPerf(false); return }
     setLoadingPerf(true)
     loadPerformance()
-    // Load top performing campaigns
     metaApi.topAds(currentWorkspace.id, 5)
       .then((res) => setTopAds((res.data as any) ?? []))
       .catch(() => {})
-    // Load spend forecast
     metaApi.spendForecast(currentWorkspace.id)
       .then((res) => setForecast(res.data))
       .catch(() => {})
@@ -100,7 +98,7 @@ export default function DashboardPage() {
       <div className="flex items-center justify-center h-full">
         <Card className="max-w-md w-full text-center p-8">
           <span className="text-4xl block mb-4">🚀</span>
-          <h2 className="text-white text-xl font-bold mb-2">Welcome to Nishon AI</h2>
+          <h2 className="text-[#111827] text-xl font-bold mb-2">Welcome to Nishon AI</h2>
           <p className="text-[#6B7280] text-sm mb-6">
             Complete onboarding to create your first workspace and let AI manage your ad campaigns.
           </p>
@@ -115,7 +113,7 @@ export default function DashboardPage() {
 
       {error && <Alert variant="error">{error}</Alert>}
       {optimizeMsg && (
-        <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-4 py-3 text-emerald-400 text-sm">
+        <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 text-emerald-700 text-sm">
           ✓ {optimizeMsg}
         </div>
       )}
@@ -124,8 +122,8 @@ export default function DashboardPage() {
       {performance?.metaConnected && (
         <div className="flex items-center gap-2 text-xs text-[#9CA3AF]">
           <span className="w-2 h-2 rounded-full bg-[#1877F2] shrink-0" />
-          <span>Ko'rsatkichlar <span className="text-white font-medium">Meta Ads</span> dan real vaqt rejimida olinmoqda</span>
-          <a href="/settings/meta" className="text-[#7C3AED] hover:underline ml-1">sozlamalar →</a>
+          <span>Ko'rsatkichlar <span className="text-[#111827] font-medium">Meta Ads</span> dan real vaqt rejimida olinmoqda</span>
+          <a href="/settings/meta" className="text-[#374151] hover:underline ml-1">sozlamalar →</a>
         </div>
       )}
 
@@ -185,51 +183,50 @@ export default function DashboardPage() {
         {currentWorkspace && (
           <LearningMonitor workspaceId={currentWorkspace.id} />
         )}
-        {/* Spend Forecast (Smartly-style) — takes 2/3 columns */}
         {forecast && forecast.daily?.length > 0 && (
-        <div className="lg:col-span-2">
-          <Card>
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h2 className="text-base font-semibold text-white">Oylik xarajat bashorati</h2>
-                <p className="text-xs text-[#6B7280] mt-0.5">
-                  {forecast.daysElapsed} kun o'tdi · {forecast.daysTotal} kunlik oy
-                </p>
-              </div>
-              <div className="flex items-center gap-4 text-right">
+          <div className="lg:col-span-2">
+            <Card>
+              <div className="flex items-start justify-between mb-4">
                 <div>
-                  <p className="text-xs text-[#6B7280]">Hozircha sarflandi</p>
-                  <p className="text-white font-bold text-lg">${forecast.spendToDate?.toFixed(0)}</p>
+                  <h2 className="text-base font-semibold text-[#111827]">Oylik xarajat bashorati</h2>
+                  <p className="text-xs text-[#9CA3AF] mt-0.5">
+                    {forecast.daysElapsed} kun o'tdi · {forecast.daysTotal} kunlik oy
+                  </p>
                 </div>
-                <div>
-                  <p className="text-xs text-[#6B7280]">Oy oxiriga bashorat</p>
-                  <p className="text-[#A78BFA] font-bold text-lg">${forecast.predictedTotal?.toFixed(0)}</p>
+                <div className="flex items-center gap-4 text-right">
+                  <div>
+                    <p className="text-xs text-[#9CA3AF]">Hozircha sarflandi</p>
+                    <p className="text-[#111827] font-bold text-lg">${forecast.spendToDate?.toFixed(0)}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-[#9CA3AF]">Oy oxiriga bashorat</p>
+                    <p className="text-[#374151] font-bold text-lg">${forecast.predictedTotal?.toFixed(0)}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-            <SpendForecastChart
-              daily={forecast.daily}
-              spendToDate={forecast.spendToDate}
-              predictedTotal={forecast.predictedTotal}
-            />
-          </Card>
-        </div>
+              <SpendForecastChart
+                daily={forecast.daily}
+                spendToDate={forecast.spendToDate}
+                predictedTotal={forecast.predictedTotal}
+              />
+            </Card>
+          </div>
         )}
       </div>
 
-      {/* ── Best performing ads (Smartly-style) ── */}
+      {/* ── Best performing ads ── */}
       {topAds.length > 0 && (
         <Card>
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-base font-semibold text-white flex items-center gap-2">
+              <h2 className="text-base font-semibold text-[#111827] flex items-center gap-2">
                 🏆 Eng yaxshi kampaniyalar
               </h2>
-              <p className="text-xs text-[#6B7280] mt-0.5">
+              <p className="text-xs text-[#9CA3AF] mt-0.5">
                 CTR bo'yicha top {topAds.length} ta · so'nggi 30 kun
               </p>
             </div>
-            <Button variant="ghost" size="sm" onClick={() => router.push('/settings/meta')}>
+            <Button variant="secondary" size="sm" onClick={() => router.push('/settings/meta')}>
               Barchasi →
             </Button>
           </div>
@@ -238,42 +235,38 @@ export default function DashboardPage() {
             {topAds.map((ad, idx) => (
               <div
                 key={ad.campaignId}
-                className="bg-[#0D0D14] border border-[#2A2A3A] rounded-xl p-3 hover:border-[#7C3AED]/40 transition-colors"
+                className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-3 hover:border-[#D1D5DB] hover:shadow-sm transition-all"
               >
-                {/* Rank badge */}
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-bold text-[#7C3AED] bg-[#7C3AED]/10 px-1.5 py-0.5 rounded">
+                  <span className="text-[10px] font-bold text-[#374151] bg-[#E5E7EB] px-1.5 py-0.5 rounded">
                     #{idx + 1}
                   </span>
                   <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
                     ad.status === 'ACTIVE'
-                      ? 'bg-emerald-500/10 text-emerald-400'
-                      : 'bg-[#2A2A3A] text-[#6B7280]'
+                      ? 'bg-emerald-50 text-emerald-700'
+                      : 'bg-gray-100 text-gray-500'
                   }`}>
                     {ad.status}
                   </span>
                 </div>
 
-                {/* Campaign name */}
-                <p className="text-white text-xs font-medium leading-tight mb-3 line-clamp-2 min-h-[2.5rem]">
+                <p className="text-[#111827] text-xs font-medium leading-tight mb-3 line-clamp-2 min-h-[2.5rem]">
                   {ad.name}
                 </p>
 
-                {/* CTR — primary metric (Smartly style) */}
                 <div className="mb-2">
-                  <p className="text-[#6B7280] text-[10px]">CTR</p>
-                  <p className="text-white text-base font-bold">{ad.ctr.toFixed(2)}%</p>
+                  <p className="text-[#9CA3AF] text-[10px]">CTR</p>
+                  <p className="text-[#111827] text-base font-bold">{ad.ctr.toFixed(2)}%</p>
                 </div>
 
-                {/* Secondary metrics */}
-                <div className="grid grid-cols-2 gap-1 pt-2 border-t border-[#1C1C27]">
+                <div className="grid grid-cols-2 gap-1 pt-2 border-t border-[#E5E7EB]">
                   <div>
-                    <p className="text-[#4B5563] text-[10px]">Xarajat</p>
-                    <p className="text-[#9CA3AF] text-xs font-medium">{formatCurrency(ad.spend)}</p>
+                    <p className="text-[#9CA3AF] text-[10px]">Xarajat</p>
+                    <p className="text-[#374151] text-xs font-medium">{formatCurrency(ad.spend)}</p>
                   </div>
                   <div>
-                    <p className="text-[#4B5563] text-[10px]">Kliklar</p>
-                    <p className="text-[#9CA3AF] text-xs font-medium">{formatNumber(ad.clicks)}</p>
+                    <p className="text-[#9CA3AF] text-[10px]">Kliklar</p>
+                    <p className="text-[#374151] text-xs font-medium">{formatNumber(ad.clicks)}</p>
                   </div>
                 </div>
               </div>
@@ -290,37 +283,37 @@ export default function DashboardPage() {
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-lg">🤖</span>
-                <h2 className="font-semibold text-white">AI Strategy</h2>
-                {ws.aiStrategy && <Badge variant="purple" dot>Active</Badge>}
+                <h2 className="font-semibold text-[#111827]">AI Strategy</h2>
+                {ws.aiStrategy && <Badge variant="success" dot>Active</Badge>}
               </div>
               <p className="text-[#6B7280] text-sm">
                 Generated by Nishon AI based on your business profile
               </p>
             </div>
-            <Button variant="ghost" size="sm" onClick={handleRunOptimization} loading={optimizing}>
+            <Button variant="secondary" size="sm" onClick={handleRunOptimization} loading={optimizing}>
               Run optimization
             </Button>
           </div>
 
           {ws.aiStrategy ? (
             <div className="space-y-4">
-              <div className="bg-[#1C1C27] rounded-xl p-4 border border-[#2A2A3A]">
-                <p className="text-[#D1D5DB] text-sm leading-relaxed">{ws.aiStrategy.summary}</p>
+              <div className="bg-[#F9FAFB] rounded-xl p-4 border border-[#E5E7EB]">
+                <p className="text-[#374151] text-sm leading-relaxed">{ws.aiStrategy.summary}</p>
               </div>
 
               {ws.aiStrategy.budgetAllocation && (
                 <div className="space-y-2.5">
-                  <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide">
+                  <p className="text-[#9CA3AF] text-xs font-medium uppercase tracking-wide">
                     Budget allocation
                   </p>
                   {Object.entries(ws.aiStrategy.budgetAllocation).map(([platform, pct]) => (
                     <div key={platform}>
                       <div className="flex justify-between text-sm mb-1">
-                        <span className="text-[#9CA3AF] capitalize">{platform}</span>
-                        <span className="text-white font-medium">{String(pct)}%</span>
+                        <span className="text-[#6B7280] capitalize">{platform}</span>
+                        <span className="text-[#111827] font-medium">{String(pct)}%</span>
                       </div>
-                      <div className="h-1.5 bg-[#2A2A3A] rounded-full overflow-hidden">
-                        <div className="h-full bg-[#7C3AED] rounded-full" style={{ width: `${pct}%` }} />
+                      <div className="h-1.5 bg-[#E5E7EB] rounded-full overflow-hidden">
+                        <div className="h-full bg-[#111827] rounded-full" style={{ width: `${pct}%` }} />
                       </div>
                     </div>
                   ))}
@@ -340,7 +333,7 @@ export default function DashboardPage() {
         <Card>
           <div className="flex items-center gap-2 mb-4">
             <span className="text-lg">⚡</span>
-            <h2 className="font-semibold text-white">Autopilot</h2>
+            <h2 className="font-semibold text-[#111827]">Autopilot</h2>
           </div>
 
           <div className="space-y-2">
@@ -357,20 +350,20 @@ export default function DashboardPage() {
                   className={`
                     p-3 rounded-xl border transition-all duration-200 cursor-pointer
                     ${isActive
-                      ? 'border-[#7C3AED] bg-[#7C3AED]/10'
-                      : 'border-[#2A2A3A] hover:border-[#7C3AED]/30'
+                      ? 'border-[#111827] bg-[#F3F4F6]'
+                      : 'border-[#E5E7EB] hover:border-[#D1D5DB] hover:bg-[#F9FAFB]'
                     }
                   `}
                 >
                   <div className="flex items-center gap-2.5">
                     <span className="text-lg">{option.icon}</span>
                     <div className="flex-1">
-                      <p className={`text-sm font-medium ${isActive ? 'text-white' : 'text-[#9CA3AF]'}`}>
+                      <p className={`text-sm font-medium ${isActive ? 'text-[#111827]' : 'text-[#6B7280]'}`}>
                         {option.label}
                       </p>
-                      <p className="text-[#4B5563] text-xs">{option.desc}</p>
+                      <p className="text-[#9CA3AF] text-xs">{option.desc}</p>
                     </div>
-                    {isActive && <span className="w-2 h-2 rounded-full bg-[#7C3AED] shrink-0" />}
+                    {isActive && <span className="w-2 h-2 rounded-full bg-[#111827] shrink-0" />}
                   </div>
                 </div>
               )
@@ -378,8 +371,8 @@ export default function DashboardPage() {
           </div>
 
           {ws.aiStrategy?.monthlyForecast && (
-            <div className="mt-4 pt-4 border-t border-[#2A2A3A]">
-              <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide mb-3">
+            <div className="mt-4 pt-4 border-t border-[#E5E7EB]">
+              <p className="text-[#9CA3AF] text-xs font-medium uppercase tracking-wide mb-3">
                 Monthly forecast
               </p>
               <div className="space-y-2">
@@ -390,7 +383,7 @@ export default function DashboardPage() {
                 ].map(({ label, value }) => (
                   <div key={label} className="flex justify-between text-sm">
                     <span className="text-[#6B7280]">{label}</span>
-                    <span className="text-[#A78BFA] font-medium">{value ?? '—'}</span>
+                    <span className="text-[#374151] font-medium">{value ?? '—'}</span>
                   </div>
                 ))}
               </div>
@@ -411,7 +404,7 @@ export default function DashboardPage() {
               { label: 'Qoidalar', href: '/triggersets', icon: '⚡' },
               { label: 'Simulyatsiya', href: '/simulation', icon: '🔮' },
             ].map((action) => (
-              <Button key={action.href} variant="ghost" size="sm" onClick={() => router.push(action.href)}>
+              <Button key={action.href} variant="secondary" size="sm" onClick={() => router.push(action.href)}>
                 {action.icon} {action.label}
               </Button>
             ))}
