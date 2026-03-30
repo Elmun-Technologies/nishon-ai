@@ -205,6 +205,17 @@ export const platforms = {
   },
 }
 
+export const landingPages = {
+  generate: (workspaceId: string) =>
+    apiClient.post(`/landing-pages/workspace/${workspaceId}/generate`),
+  getByWorkspace: (workspaceId: string) =>
+    apiClient.get(`/landing-pages/workspace/${workspaceId}`),
+  update: (id: string, data: any) =>
+    apiClient.patch(`/landing-pages/${id}`, data),
+  togglePublish: (id: string) =>
+    apiClient.patch(`/landing-pages/${id}/publish`),
+}
+
 export const meta = {
   dashboard: (workspaceId: string) =>
     apiClient.get(`/meta/dashboard?workspaceId=${encodeURIComponent(workspaceId)}`),

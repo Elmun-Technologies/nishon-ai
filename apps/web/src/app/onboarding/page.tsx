@@ -1799,13 +1799,22 @@ export default function OnboardingPage() {
               )}
 
               {step === 7 ? (
-                <Button
-                  fullWidth
-                  size="lg"
-                  onClick={() => router.push('/dashboard')}
-                >
-                  Dashboardni ochish →
-                </Button>
+                <div className="flex flex-col gap-2 w-full">
+                  <Button
+                    fullWidth
+                    size="lg"
+                    onClick={() => router.push('/landing-page')}
+                    className="bg-[#111827] text-white"
+                  >
+                    🚀 Landing Page yaratish →
+                  </Button>
+                  <button
+                    onClick={() => router.push('/dashboard')}
+                    className="text-xs text-[#9CA3AF] text-center py-1 hover:text-[#6B7280] transition-colors"
+                  >
+                    Keyinroq — Dashboardga o'tish
+                  </button>
+                </div>
               ) : (
                 <div className="flex gap-2 flex-1">
                   {/* Show "Go to Dashboard" if workspace was created but strategy failed */}
