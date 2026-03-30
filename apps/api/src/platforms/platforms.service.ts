@@ -135,6 +135,7 @@ export class PlatformsService {
     pendingAccount.externalAccountId = adAccountId;
     pendingAccount.externalAccountName = adAccountName;
     pendingAccount.isActive = true;
+    pendingAccount.trackingStartedAt = new Date();
 
     return this.accountRepo.save(pendingAccount);
   }
@@ -239,6 +240,7 @@ export class PlatformsService {
         externalAccountName: accounts[0]?.name ?? "Yandex Direct Account",
         isActive: true,
         tokenExpiresAt: expiresAt,
+        trackingStartedAt: new Date(),
       }),
     );
 

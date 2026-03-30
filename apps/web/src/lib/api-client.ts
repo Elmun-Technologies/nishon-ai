@@ -260,6 +260,8 @@ export const agents = {
   /** Leave review */
   addReview: (engagementId: string, data: { rating: number; text: string; authorName: string; authorCompany?: string }) =>
     apiClient.post(`/agents/engagement/${engagementId}/review`, data),
+  /** My subscription plan, limits, and current usage */
+  myPlan: () => apiClient.get('/agents/my-plan'),
 }
 
 export const meta = {

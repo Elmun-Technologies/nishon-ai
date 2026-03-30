@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  BadRequestException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -9,6 +10,8 @@ import { Workspace } from "./entities/workspace.entity";
 import { Budget } from "../budget/entities/budget.entity";
 import { BudgetPeriod } from "../budget/entities/budget.entity";
 import { MetaInsight } from "../meta/entities/meta-insight.entity";
+import { User } from "../users/entities/user.entity";
+import { getLimits } from "../config/plan-limits.config";
 import {
   CreateWorkspaceDto,
   UpdateWorkspaceDto,
@@ -24,6 +27,8 @@ export class WorkspacesService {
     private readonly budgetRepo: Repository<Budget>,
     @InjectRepository(MetaInsight)
     private readonly metaInsightRepo: Repository<MetaInsight>,
+    @InjectRepository(User)
+    private readonly userRepo: Repository<User>,
   ) {}
 
   /**
@@ -32,6 +37,19 @@ export class WorkspacesService {
    * We default to Meta 60% / Google 40% — statistically best for most SMBs.
    */
   async create(userId: string, dto: CreateWorkspaceDto): Promise<Workspace> {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (user) {
+      const limits = getLimits(user.plan);
+      if (limits.maxWorkspaces !== -1) {
+        const count = await this.workspaceRepo.count({ where: { userId } });
+        if (count >= limits.maxWorkspaces) {
+          throw new BadRequestException(
+            `Sizning ${user.plan} tarifingiz maksimal ${limits.maxWorkspaces} ta workspace yaratishga ruxsat beradi. Yangilash uchun subscription'ni upgrade qiling.`
+          );
+        }
+      }
+    }
+
     const workspace = this.workspaceRepo.create({
       ...dto,
       userId,

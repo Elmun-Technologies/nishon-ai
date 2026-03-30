@@ -5,9 +5,10 @@ import { WorkspacesController } from "./workspaces.controller";
 import { Workspace } from "./entities/workspace.entity";
 import { Budget } from "../budget/entities/budget.entity";
 import { MetaInsight } from "../meta/entities/meta-insight.entity";
+import { User } from "../users/entities/user.entity";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Workspace, Budget, MetaInsight])],
+  imports: [TypeOrmModule.forFeature([Workspace, Budget, MetaInsight, User])],
   controllers: [WorkspacesController],
   providers: [WorkspacesService],
   exports: [WorkspacesService, TypeOrmModule],

@@ -3,14 +3,18 @@ import {
   Logger,
   NotFoundException,
   BadRequestException,
+  ForbiddenException,
   OnModuleInit,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
+import { Cron, CronExpression } from "@nestjs/schedule";
 import { AgentProfile } from "./entities/agent-profile.entity";
 import { ServiceEngagement } from "./entities/service-engagement.entity";
 import { AgentReview } from "./entities/agent-review.entity";
 import { Workspace } from "../workspaces/entities/workspace.entity";
+import { User } from "../users/entities/user.entity";
+import { getLimits } from "../config/plan-limits.config";
 
 function slugify(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -126,6 +130,8 @@ export class AgentsService implements OnModuleInit {
     private readonly reviewRepo: Repository<AgentReview>,
     @InjectRepository(Workspace)
     private readonly workspaceRepo: Repository<Workspace>,
+    @InjectRepository(User)
+    private readonly userRepo: Repository<User>,
   ) {}
 
   async onModuleInit() {
@@ -238,6 +244,25 @@ export class AgentsService implements OnModuleInit {
     });
   }
 
+  /** GET /subscriptions/my-plan — returns plan info + limits + current usage */
+  async getMyPlan(userId: string) {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) throw new NotFoundException("User topilmadi");
+
+    const limits = getLimits(user.plan);
+    const workspaceCount = await this.workspaceRepo.count({ where: { userId } });
+    const agentProfileCount = await this.agentRepo.count({ where: { ownerId: userId } });
+
+    return {
+      plan: user.plan,
+      limits,
+      usage: {
+        workspaces: workspaceCount,
+        agentProfiles: agentProfileCount,
+      },
+    };
+  }
+
   async create(
     userId: string,
     dto: {
@@ -257,6 +282,18 @@ export class AgentsService implements OnModuleInit {
       aiConfig?: any;
     },
   ): Promise<AgentProfile> {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (user) {
+      const limits = getLimits(user.plan);
+      const canCreate = dto.agentType === "ai" ? limits.canBuildAiAgent : limits.canCreateAgentProfile;
+      if (!canCreate) {
+        const required = dto.agentType === "ai" ? "Pro" : "Growth";
+        throw new ForbiddenException(
+          `${dto.agentType === "ai" ? "AI agent" : "Targetolog"} profil yaratish uchun kamida ${required} tarifi kerak. Hozirgi tarif: ${user.plan}.`
+        );
+      }
+    }
+
     const slug = slugify(`${dto.displayName}-${Math.random().toString(36).slice(2, 6)}`);
     const agent = this.agentRepo.create({
       ...dto,
@@ -296,6 +333,16 @@ export class AgentsService implements OnModuleInit {
     userId: string,
     notes?: string,
   ): Promise<ServiceEngagement> {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (user) {
+      const limits = getLimits(user.plan);
+      if (!limits.canHireAgents) {
+        throw new ForbiddenException(
+          `Agent yollash uchun kamida Starter tarifi kerak. Hozirgi tarif: ${user.plan}. Yangilang.`
+        );
+      }
+    }
+
     const workspace = await this.workspaceRepo.findOne({ where: { id: workspaceId, userId } });
     if (!workspace) throw new NotFoundException("Workspace topilmadi");
 
@@ -413,6 +460,65 @@ export class AgentsService implements OnModuleInit {
       cachedRating: Math.round(avg * 10) / 10,
       cachedReviewCount: reviews.length,
     });
+  }
+
+  /**
+   * Hourly cron: aggregate real campaign stats for AI agents that are currently
+   * managing workspaces, and update their cachedStats / monthlyPerformance.
+   */
+  @Cron(CronExpression.EVERY_HOUR)
+  async syncAgentStats() {
+    this.logger.log("Syncing agent stats...");
+
+    // Find all active engagements with AI agents
+    const activeEngagements = await this.engagementRepo
+      .createQueryBuilder("e")
+      .innerJoinAndSelect("e.agentProfile", "ap")
+      .where("e.status = :status", { status: "active" })
+      .andWhere("ap.agent_type = :type", { type: "ai" })
+      .getMany();
+
+    // Group by agentProfileId
+    const agentWorkspaces = new Map<string, string[]>();
+    for (const eng of activeEngagements) {
+      const list = agentWorkspaces.get(eng.agentProfileId) || [];
+      list.push(eng.workspaceId);
+      agentWorkspaces.set(eng.agentProfileId, list);
+    }
+
+    for (const [agentId, workspaceIds] of agentWorkspaces.entries()) {
+      try {
+        // Count total active campaigns across all managed workspaces
+        const statsRow = await this.workspaceRepo
+          .createQueryBuilder("ws")
+          .leftJoin("ws.campaigns", "c")
+          .where("ws.id IN (:...ids)", { ids: workspaceIds })
+          .select([
+            'COUNT(DISTINCT c.id) AS "totalCampaigns"',
+            'COUNT(DISTINCT CASE WHEN c.status = \'active\' THEN c.id END) AS "activeCampaigns"',
+          ])
+          .getRawOne();
+
+        const agent = await this.agentRepo.findOne({ where: { id: agentId } });
+        if (!agent) continue;
+
+        const existing = (agent.cachedStats as any) || {};
+        await this.agentRepo.update(agentId, {
+          cachedStats: {
+            ...existing,
+            activeCampaigns: parseInt(statsRow?.activeCampaigns || "0"),
+            totalCampaigns: Math.max(
+              existing.totalCampaigns || 0,
+              parseInt(statsRow?.totalCampaigns || "0"),
+            ),
+          },
+        });
+      } catch (err) {
+        this.logger.error(`Failed to sync stats for agent ${agentId}: ${err}`);
+      }
+    }
+
+    this.logger.log(`Agent stats synced for ${agentWorkspaces.size} agents.`);
   }
 
   private async findOwned(id: string, userId: string): Promise<AgentProfile> {

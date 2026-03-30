@@ -1,21 +1,15 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { formatSpend } from '@/lib/portfolio-data'
+import { agents } from '@/lib/api-client'
+import { Spinner } from '@/components/ui/Spinner'
+import { Alert } from '@/components/ui/Alert'
 
 const STEPS = [
-  { id: 1, label: 'Ad account ulash', icon: '🔗', done: false },
-  { id: 2, label: 'Profil to\'ldirish', icon: '👤', done: false },
-  { id: 3, label: 'Ko\'rinuvchanlik sozlash', icon: '👁️', done: false },
-  { id: 4, label: 'Tasdiqlash kutish', icon: '✓', done: false },
-]
-
-const CONNECTED_PLATFORMS = [
-  { id: 'meta', name: 'Meta Ads', icon: '📘', color: '#1877F2', status: 'connected', accountsCount: 0, spend: 0 },
-  { id: 'google', name: 'Google Ads', icon: '🔍', color: '#4285F4', status: 'disconnected', accountsCount: 0, spend: 0 },
-  { id: 'yandex', name: 'Yandex Direct', icon: '🟡', color: '#FFCC00', status: 'disconnected', accountsCount: 0, spend: 0 },
-  { id: 'telegram', name: 'Telegram Ads', icon: '✈️', color: '#2CA5E0', status: 'disconnected', accountsCount: 0, spend: 0 },
+  { id: 1, label: 'Profil to\'ldirish', icon: '👤' },
+  { id: 2, label: 'Ko\'rinuvchanlik', icon: '👁️' },
+  { id: 3, label: 'Nashr qilish', icon: '🚀' },
 ]
 
 const VISIBILITY_OPTIONS = [
@@ -28,10 +22,13 @@ const VISIBILITY_OPTIONS = [
   { id: 'recent', label: 'So\'nggi kampaniyalar (anonimlashtrilgan)' },
 ]
 
+const NICHE_SUGGESTIONS = ['E-commerce', 'Fashion', 'Beauty & Cosmetics', 'Food & Beverage', 'Real Estate', 'Education', 'B2B SaaS', 'Healthcare', 'Finance']
+const PLATFORM_OPTIONS = ['meta', 'google', 'yandex', 'telegram', 'tiktok', 'youtube']
+
 function SetupStep({ step, active, done }: { step: typeof STEPS[0]; active: boolean; done: boolean }) {
   return (
     <div className={`flex items-center gap-3 p-3 rounded-xl transition-all ${active ? 'bg-[#F3F4F6] border border-[#D1D5DB]' : done ? 'opacity-60' : 'opacity-40'}`}>
-      <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm ${done ? 'bg-emerald-500/20 text-emerald-400' : active ? 'bg-[#E5E7EB] text-[#374151]' : 'bg-[#F9FAFB] text-[#6B7280]'}`}>
+      <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm ${done ? 'bg-emerald-100 text-emerald-600' : active ? 'bg-[#E5E7EB] text-[#374151]' : 'bg-[#F9FAFB] text-[#6B7280]'}`}>
         {done ? '✓' : step.icon}
       </div>
       <span className={`text-sm ${active ? 'text-[#111827] font-medium' : 'text-[#9CA3AF]'}`}>{step.label}</span>
@@ -41,40 +38,62 @@ function SetupStep({ step, active, done }: { step: typeof STEPS[0]; active: bool
 
 export default function PortfolioDashboardPage() {
   const router = useRouter()
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+  const [existingProfile, setExistingProfile] = useState<any>(null)
   const [activeStep, setActiveStep] = useState(1)
   const [completedSteps, setCompletedSteps] = useState<number[]>([])
-  const [platforms, setPlatforms] = useState(CONNECTED_PLATFORMS)
-  const [visibility, setVisibility] = useState<string[]>(['roas', 'cpa', 'campaigns', 'niches'])
-  const [profile, setProfile] = useState({
-    title: '',
-    bio: '',
-    price: '',
-    niches: [] as string[],
-    isPublic: false,
-  })
-  const [nicheInput, setNicheInput] = useState('')
-  const [connectingPlatform, setConnectingPlatform] = useState<string | null>(null)
   const [portfolioLive, setPortfolioLive] = useState(false)
 
-  const allDone = completedSteps.length >= 3
+  const [profile, setProfile] = useState({
+    displayName: '',
+    title: '',
+    bio: '',
+    location: '',
+    monthlyRate: '',
+    commissionRate: '',
+    pricingModel: 'fixed' as 'fixed' | 'commission' | 'hybrid',
+    niches: [] as string[],
+    platforms: [] as string[],
+  })
+  const [nicheInput, setNicheInput] = useState('')
+  const [visibility, setVisibility] = useState<string[]>(['roas', 'cpa', 'campaigns', 'niches'])
+
+  // Load existing profile on mount
+  useEffect(() => {
+    agents.mine()
+      .then(res => {
+        const list = res.data as any[]
+        if (list && list.length > 0) {
+          const p = list[0]
+          setExistingProfile(p)
+          setProfile({
+            displayName: p.displayName || '',
+            title: p.title || '',
+            bio: p.bio || '',
+            location: p.location || '',
+            monthlyRate: String(p.monthlyRate || ''),
+            commissionRate: String(p.commissionRate || ''),
+            pricingModel: p.pricingModel || 'fixed',
+            niches: p.niches || [],
+            platforms: p.platforms || [],
+          })
+          if (p.isPublished) {
+            setPortfolioLive(true)
+          }
+          setCompletedSteps([1, 2])
+        }
+      })
+      .catch(() => { /* no profile yet */ })
+      .finally(() => setLoading(false))
+  }, [])
 
   const completeStep = (step: number) => {
     if (!completedSteps.includes(step)) setCompletedSteps(prev => [...prev, step])
-    if (step < 4) setActiveStep(step + 1)
+    if (step < STEPS.length) setActiveStep(step + 1)
   }
-
-  const handleConnectPlatform = async (id: string) => {
-    setConnectingPlatform(id)
-    // Simulate OAuth flow
-    await new Promise(r => setTimeout(r, 1500))
-    setPlatforms(prev => prev.map(p =>
-      p.id === id ? { ...p, status: 'connected', accountsCount: Math.floor(Math.random() * 5) + 1 } : p
-    ))
-    setConnectingPlatform(null)
-  }
-
-  const toggleVisibility = (id: string) =>
-    setVisibility(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
 
   const addNiche = () => {
     const v = nicheInput.trim()
@@ -84,23 +103,99 @@ export default function PortfolioDashboardPage() {
     }
   }
 
-  const handlePublish = async () => {
-    setPortfolioLive(true)
+  const togglePlatform = (p: string) => {
+    setProfile(prev => ({
+      ...prev,
+      platforms: prev.platforms.includes(p) ? prev.platforms.filter(x => x !== p) : [...prev.platforms, p],
+    }))
   }
 
-  if (portfolioLive) {
+  const toggleVisibility = (id: string) =>
+    setVisibility(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
+
+  const handlePublish = async () => {
+    setSaving(true)
+    setError('')
+    try {
+      const dto = {
+        agentType: 'human' as const,
+        displayName: profile.displayName || profile.title,
+        title: profile.title,
+        bio: profile.bio,
+        location: profile.location,
+        monthlyRate: profile.monthlyRate ? Number(profile.monthlyRate) : 0,
+        commissionRate: profile.commissionRate ? Number(profile.commissionRate) : 0,
+        pricingModel: profile.pricingModel,
+        niches: profile.niches,
+        platforms: profile.platforms,
+      }
+
+      let savedProfile: any
+      if (existingProfile) {
+        // Update existing
+        const res = await agents.update(existingProfile.id, dto)
+        savedProfile = res.data
+      } else {
+        // Create new
+        const res = await agents.create(dto)
+        savedProfile = res.data
+        setExistingProfile(savedProfile)
+      }
+
+      // Publish if not already published
+      if (!savedProfile.isPublished) {
+        await agents.togglePublish(savedProfile.id)
+      }
+
+      setPortfolioLive(true)
+      setSuccess('Portfolio muvaffaqiyatli nashr qilindi!')
+    } catch (e: any) {
+      setError(e?.message || 'Xatolik yuz berdi')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleUnpublish = async () => {
+    if (!existingProfile) return
+    setSaving(true)
+    try {
+      await agents.togglePublish(existingProfile.id)
+      setPortfolioLive(false)
+      setSuccess('Portfolio yashirildi.')
+      setTimeout(() => setSuccess(''), 3000)
+    } catch (e: any) {
+      setError(e?.message || 'Xatolik')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <Spinner size="lg" />
+      </div>
+    )
+  }
+
+  if (portfolioLive && existingProfile) {
     return (
       <div className="p-8 max-w-2xl mx-auto text-center">
         <div className="text-6xl mb-4">🎉</div>
         <h2 className="text-2xl font-bold text-[#111827] mb-3">Portfolio nashr qilindi!</h2>
-        <p className="text-[#9CA3AF] mb-8">
+        <p className="text-[#6B7280] mb-8">
           Profilingiz endi ommaviy katalogda ko'rinmoqda. Tadbirkorlar siz bilan bog'lana olishadi.
         </p>
+        {success && <Alert variant="success" className="mb-4">{success}</Alert>}
+        {error && <Alert variant="error" className="mb-4">{error}</Alert>}
         <div className="bg-white border border-[#E5E7EB] rounded-xl p-4 mb-8 flex items-center gap-3">
-          <span className="text-[#6B7280] text-sm flex-1 truncate">nishon.ai/portfolio/your-name</span>
+          <span className="text-[#6B7280] text-sm flex-1 truncate">
+            nishon.ai/portfolio/{existingProfile.slug}
+          </span>
           <button
-            onClick={() => router.push('/portfolio')}
-            className="text-[#374151] text-sm font-semibold hover:text-[#374151] transition-colors"
+            onClick={() => router.push(`/portfolio/${existingProfile.slug}`)}
+            className="text-[#374151] text-sm font-semibold hover:text-[#111827] transition-colors"
           >
             Ko'rish →
           </button>
@@ -113,10 +208,17 @@ export default function PortfolioDashboardPage() {
             Katalogga o'tish
           </button>
           <button
-            onClick={() => setPortfolioLive(false)}
+            onClick={() => { setPortfolioLive(false); setActiveStep(1) }}
             className="bg-[#F9FAFB] hover:bg-[#F3F4F6] text-[#111827] px-6 py-3 rounded-xl border border-[#E5E7EB] transition-all"
           >
-            Sozlamalar
+            Tahrirlash
+          </button>
+          <button
+            onClick={handleUnpublish}
+            disabled={saving}
+            className="text-red-500 hover:text-red-700 text-sm border border-red-200 px-4 py-3 rounded-xl hover:bg-red-50 transition-all"
+          >
+            {saving ? '...' : 'Yashirish'}
           </button>
         </div>
       </div>
@@ -129,20 +231,25 @@ export default function PortfolioDashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-extrabold text-[#111827]">Portfolio boshqaruv</h1>
+          <h1 className="text-2xl font-extrabold text-[#111827]">
+            {existingProfile ? 'Profil tahrirlash' : 'Portfolio yaratish'}
+          </h1>
           <p className="text-[#9CA3AF] text-sm mt-1">
-            Natijalaringizni tasdiqlang va tadbirkorlarga ko'rsating
+            Natijalaringizni ko'rsating va tadbirkorlardan buyurtma oling
           </p>
         </div>
-        {allDone && (
+        {existingProfile && (
           <Link
-            href="/portfolio"
-            className="text-sm text-[#374151] hover:text-[#374151] border border-[#D1D5DB] px-4 py-2 rounded-lg transition-all"
+            href={`/portfolio/${existingProfile.slug}`}
+            className="text-sm text-[#374151] hover:text-[#111827] border border-[#D1D5DB] px-4 py-2 rounded-lg transition-all"
           >
             Jamoatchilik ko'rinishi →
           </Link>
         )}
       </div>
+
+      {error && <Alert variant="error" className="mb-4">{error}</Alert>}
+      {success && <Alert variant="success" className="mb-4">{success}</Alert>}
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
 
@@ -161,7 +268,6 @@ export default function PortfolioDashboardPage() {
                 </button>
               ))}
             </div>
-            {/* progress */}
             <div className="mt-4 pt-4 border-t border-[#E5E7EB]">
               <div className="flex justify-between text-xs text-[#6B7280] mb-1">
                 <span>Jarayon</span>
@@ -180,87 +286,8 @@ export default function PortfolioDashboardPage() {
         {/* ── MAIN CONTENT ── */}
         <div className="lg:col-span-3 space-y-6">
 
-          {/* ── STEP 1: Connect platforms ── */}
+          {/* ── STEP 1: Profile ── */}
           {activeStep === 1 && (
-            <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6">
-              <div className="flex items-center gap-3 mb-2">
-                <span className="text-2xl">🔗</span>
-                <h2 className="text-lg font-bold text-[#111827]">Ad accountlarini ulash</h2>
-              </div>
-              <p className="text-[#9CA3AF] text-sm mb-6">
-                Kamida bitta platformani ulang. Haqiqiy kampaniya natijalari avtomatik tortib olinadi va tasdiqlangan holda ko'rsatiladi.
-              </p>
-
-              <div className="space-y-3">
-                {platforms.map(p => (
-                  <div
-                    key={p.id}
-                    className={`flex items-center justify-between p-4 rounded-xl border transition-all ${
-                      p.status === 'connected'
-                        ? 'bg-emerald-500/5 border-emerald-500/20'
-                        : 'bg-[#F9FAFB] border-[#E5E7EB]'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{p.icon}</span>
-                      <div>
-                        <div className="text-[#111827] font-medium text-sm">{p.name}</div>
-                        {p.status === 'connected' ? (
-                          <div className="text-emerald-400 text-xs">✓ Ulangan · {p.accountsCount} ta account</div>
-                        ) : (
-                          <div className="text-[#6B7280] text-xs">Ulanmagan</div>
-                        )}
-                      </div>
-                    </div>
-
-                    {p.status === 'connected' ? (
-                      <button
-                        onClick={() => setPlatforms(prev => prev.map(x => x.id === p.id ? { ...x, status: 'disconnected', accountsCount: 0 } : x))}
-                        className="text-xs text-[#EF4444] hover:text-red-300 border border-[#EF4444]/20 px-3 py-1.5 rounded-lg transition-all"
-                      >
-                        Uzish
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => handleConnectPlatform(p.id)}
-                        disabled={connectingPlatform === p.id}
-                        className="text-sm text-[#111827] bg-[#F9FAFB] hover:bg-[#F3F4F6] border border-[#E5E7EB] px-4 py-2 rounded-lg transition-all disabled:opacity-50 flex items-center gap-2"
-                      >
-                        {connectingPlatform === p.id ? (
-                          <><span className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin" /> Ulanmoqda...</>
-                        ) : (
-                          'Ulash'
-                        )}
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-4 p-4 bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl">
-                <div className="flex items-start gap-2">
-                  <span className="text-[#374151] mt-0.5">ℹ</span>
-                  <p className="text-[#9CA3AF] text-xs leading-relaxed">
-                    Faqat o'qish huquqi so'raladi. Nishon AI hech qachon kampaniyalaringizni o'zgartirmaydi yoki to'xtatmaydi.
-                    Ma'lumotlar 24 soatda bir marta yangilanadi.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex justify-end mt-6">
-                <button
-                  onClick={() => completeStep(1)}
-                  disabled={!platforms.some(p => p.status === 'connected')}
-                  className="bg-[#111827] hover:bg-[#1F2937] disabled:opacity-40 text-[#111827] px-6 py-3 rounded-xl font-semibold transition-all"
-                >
-                  Davom etish →
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* ── STEP 2: Profile ── */}
-          {activeStep === 2 && (
             <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6">
               <div className="flex items-center gap-3 mb-2">
                 <span className="text-2xl">👤</span>
@@ -271,6 +298,16 @@ export default function PortfolioDashboardPage() {
               </p>
 
               <div className="space-y-5">
+                <div>
+                  <label className="text-[#9CA3AF] text-xs font-semibold uppercase tracking-wider block mb-2">To'liq ism *</label>
+                  <input
+                    value={profile.displayName}
+                    onChange={e => setProfile(p => ({ ...p, displayName: e.target.value }))}
+                    placeholder="Ism Familiya"
+                    className="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-4 py-3 text-[#111827] text-sm placeholder:text-[#6B7280] focus:outline-none focus:border-[#111827]/50"
+                  />
+                </div>
+
                 <div>
                   <label className="text-[#9CA3AF] text-xs font-semibold uppercase tracking-wider block mb-2">Sarlavha *</label>
                   <input
@@ -293,20 +330,86 @@ export default function PortfolioDashboardPage() {
                 </div>
 
                 <div>
-                  <label className="text-[#9CA3AF] text-xs font-semibold uppercase tracking-wider block mb-2">Narx (oyiga, USD)</label>
-                  <div className="flex gap-2 items-center">
-                    <span className="text-[#6B7280]">$</span>
-                    <input
-                      type="number"
-                      value={profile.price}
-                      onChange={e => setProfile(p => ({ ...p, price: e.target.value }))}
-                      placeholder="500"
-                      className="w-40 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-4 py-3 text-[#111827] text-sm placeholder:text-[#6B7280] focus:outline-none focus:border-[#111827]/50"
-                    />
-                    <span className="text-[#6B7280] text-sm">dan boshlab</span>
+                  <label className="text-[#9CA3AF] text-xs font-semibold uppercase tracking-wider block mb-2">Shahar</label>
+                  <input
+                    value={profile.location}
+                    onChange={e => setProfile(p => ({ ...p, location: e.target.value }))}
+                    placeholder="Toshkent, O'zbekiston"
+                    className="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-4 py-3 text-[#111827] text-sm placeholder:text-[#6B7280] focus:outline-none focus:border-[#111827]/50"
+                  />
+                </div>
+
+                {/* Pricing */}
+                <div>
+                  <label className="text-[#9CA3AF] text-xs font-semibold uppercase tracking-wider block mb-2">Narx modeli</label>
+                  <div className="grid grid-cols-3 gap-2 mb-3">
+                    {[
+                      { id: 'fixed', label: 'Oylik to\'lov' },
+                      { id: 'commission', label: 'Komissiya' },
+                      { id: 'hybrid', label: 'Aralash' },
+                    ].map(opt => (
+                      <button
+                        key={opt.id}
+                        onClick={() => setProfile(p => ({ ...p, pricingModel: opt.id as any }))}
+                        className={`py-2 rounded-lg text-xs font-medium border transition-all ${
+                          profile.pricingModel === opt.id
+                            ? 'bg-[#111827] text-white border-[#111827]'
+                            : 'bg-[#F9FAFB] text-[#6B7280] border-[#E5E7EB] hover:border-[#D1D5DB]'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {(profile.pricingModel === 'fixed' || profile.pricingModel === 'hybrid') && (
+                    <div className="flex gap-2 items-center mb-2">
+                      <span className="text-[#6B7280] text-sm">$</span>
+                      <input
+                        type="number"
+                        value={profile.monthlyRate}
+                        onChange={e => setProfile(p => ({ ...p, monthlyRate: e.target.value }))}
+                        placeholder="500"
+                        className="w-32 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-3 py-2 text-[#111827] text-sm placeholder:text-[#6B7280] focus:outline-none focus:border-[#111827]/50"
+                      />
+                      <span className="text-[#6B7280] text-sm">/oy</span>
+                    </div>
+                  )}
+                  {(profile.pricingModel === 'commission' || profile.pricingModel === 'hybrid') && (
+                    <div className="flex gap-2 items-center">
+                      <input
+                        type="number"
+                        value={profile.commissionRate}
+                        onChange={e => setProfile(p => ({ ...p, commissionRate: e.target.value }))}
+                        placeholder="15"
+                        className="w-24 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-3 py-2 text-[#111827] text-sm placeholder:text-[#6B7280] focus:outline-none focus:border-[#111827]/50"
+                      />
+                      <span className="text-[#6B7280] text-sm">% komissiya</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Platforms */}
+                <div>
+                  <label className="text-[#9CA3AF] text-xs font-semibold uppercase tracking-wider block mb-2">Platformalar</label>
+                  <div className="flex flex-wrap gap-2">
+                    {PLATFORM_OPTIONS.map(p => (
+                      <button
+                        key={p}
+                        onClick={() => togglePlatform(p)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                          profile.platforms.includes(p)
+                            ? 'bg-[#111827] text-white border-[#111827]'
+                            : 'bg-[#F9FAFB] text-[#6B7280] border-[#E5E7EB] hover:border-[#D1D5DB]'
+                        }`}
+                      >
+                        {p}
+                      </button>
+                    ))}
                   </div>
                 </div>
 
+                {/* Niches */}
                 <div>
                   <label className="text-[#9CA3AF] text-xs font-semibold uppercase tracking-wider block mb-2">Niche ixtisoslashuv</label>
                   <div className="flex gap-2 mb-3">
@@ -321,8 +424,19 @@ export default function PortfolioDashboardPage() {
                       onClick={addNiche}
                       className="bg-[#F9FAFB] border border-[#E5E7EB] text-[#111827] text-sm px-4 py-2 rounded-lg hover:bg-[#F3F4F6] transition-all"
                     >
-                      Qo'shish
+                      +
                     </button>
+                  </div>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {NICHE_SUGGESTIONS.filter(n => !profile.niches.includes(n)).slice(0, 6).map(n => (
+                      <button
+                        key={n}
+                        onClick={() => setProfile(p => ({ ...p, niches: [...p.niches, n] }))}
+                        className="text-[10px] px-2 py-1 rounded bg-[#F3F4F6] text-[#6B7280] hover:bg-[#E5E7EB] transition-all"
+                      >
+                        + {n}
+                      </button>
+                    ))}
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {profile.niches.map(n => (
@@ -340,14 +454,11 @@ export default function PortfolioDashboardPage() {
                 </div>
               </div>
 
-              <div className="flex justify-between mt-6">
-                <button onClick={() => setActiveStep(1)} className="text-[#9CA3AF] hover:text-[#111827] text-sm transition-colors">
-                  ← Orqaga
-                </button>
+              <div className="flex justify-end mt-6">
                 <button
-                  onClick={() => completeStep(2)}
-                  disabled={!profile.title || !profile.bio}
-                  className="bg-[#111827] hover:bg-[#1F2937] disabled:opacity-40 text-[#111827] px-6 py-3 rounded-xl font-semibold transition-all"
+                  onClick={() => completeStep(1)}
+                  disabled={!profile.title || !profile.bio || !profile.displayName}
+                  className="bg-[#111827] hover:bg-[#1F2937] disabled:opacity-40 text-white px-6 py-3 rounded-xl font-semibold transition-all"
                 >
                   Davom etish →
                 </button>
@@ -355,8 +466,8 @@ export default function PortfolioDashboardPage() {
             </div>
           )}
 
-          {/* ── STEP 3: Visibility ── */}
-          {activeStep === 3 && (
+          {/* ── STEP 2: Visibility ── */}
+          {activeStep === 2 && (
             <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6">
               <div className="flex items-center gap-3 mb-2">
                 <span className="text-2xl">👁️</span>
@@ -373,40 +484,28 @@ export default function PortfolioDashboardPage() {
                     className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-all ${
                       visibility.includes(opt.id)
                         ? 'bg-[#111827]/5 border-[#D1D5DB]'
-                        : 'bg-[#F9FAFB] border-[#E5E7EB] hover:border-[#E5E7EB]'
+                        : 'bg-[#F9FAFB] border-[#E5E7EB] hover:border-[#D1D5DB]'
                     }`}
                   >
                     <span className="text-[#111827] text-sm">{opt.label}</span>
                     <div
                       onClick={() => toggleVisibility(opt.id)}
                       className={`w-11 h-6 rounded-full transition-colors flex items-center px-0.5 cursor-pointer ${
-                        visibility.includes(opt.id) ? 'bg-[#111827]' : 'bg-[#F3F4F6]'
+                        visibility.includes(opt.id) ? 'bg-[#111827]' : 'bg-[#E5E7EB]'
                       }`}
                     >
-                      <div className={`w-5 h-5 bg-white rounded-full transition-transform ${visibility.includes(opt.id) ? 'translate-x-5' : 'translate-x-0'}`} />
+                      <div className={`w-5 h-5 bg-white rounded-full transition-transform shadow ${visibility.includes(opt.id) ? 'translate-x-5' : 'translate-x-0'}`} />
                     </div>
                   </label>
                 ))}
               </div>
 
-              {/* Preview */}
-              <div className="mt-6 p-4 bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl">
-                <p className="text-[#9CA3AF] text-xs mb-2">Ko'rinadigan ma'lumotlar:</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {visibility.map(v => (
-                    <span key={v} className="text-[10px] bg-[#F3F4F6] border border-[#D1D5DB] text-[#374151] px-2.5 py-1 rounded-full">
-                      {VISIBILITY_OPTIONS.find(o => o.id === v)?.label}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
               <div className="flex justify-between mt-6">
-                <button onClick={() => setActiveStep(2)} className="text-[#9CA3AF] hover:text-[#111827] text-sm transition-colors">
+                <button onClick={() => setActiveStep(1)} className="text-[#9CA3AF] hover:text-[#111827] text-sm transition-colors">
                   ← Orqaga
                 </button>
                 <button
-                  onClick={() => completeStep(3)}
+                  onClick={() => completeStep(2)}
                   className="bg-[#111827] hover:bg-[#1F2937] text-white px-6 py-3 rounded-xl font-semibold transition-all"
                 >
                   Davom etish →
@@ -415,8 +514,8 @@ export default function PortfolioDashboardPage() {
             </div>
           )}
 
-          {/* ── STEP 4: Publish ── */}
-          {activeStep === 4 && (
+          {/* ── STEP 3: Publish ── */}
+          {activeStep === 3 && (
             <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6">
               <div className="flex items-center gap-3 mb-2">
                 <span className="text-2xl">🚀</span>
@@ -429,91 +528,59 @@ export default function PortfolioDashboardPage() {
               {/* Summary */}
               <div className="space-y-3 mb-6">
                 <div className="flex items-center gap-3 p-3 bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl">
-                  <span className="text-xl">🔗</span>
-                  <div className="flex-1">
-                    <div className="text-[#111827] text-sm font-medium">Ulangan platformalar</div>
-                    <div className="text-[#9CA3AF] text-xs">
-                      {platforms.filter(p => p.status === 'connected').map(p => p.name).join(', ') || 'Hech qaysi'}
-                    </div>
-                  </div>
-                  {platforms.some(p => p.status === 'connected') ? (
-                    <span className="text-emerald-400 text-sm">✓</span>
-                  ) : (
-                    <span className="text-[#EF4444] text-sm">✗</span>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-3 p-3 bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl">
                   <span className="text-xl">👤</span>
                   <div className="flex-1">
-                    <div className="text-[#111827] text-sm font-medium">Profil</div>
-                    <div className="text-[#9CA3AF] text-xs">{profile.title || 'To\'ldirilmagan'}</div>
+                    <div className="text-[#111827] text-sm font-medium">{profile.displayName || 'Ism kiritilmagan'}</div>
+                    <div className="text-[#9CA3AF] text-xs">{profile.title || 'Sarlavha kiritilmagan'}</div>
                   </div>
-                  {profile.title && profile.bio ? (
-                    <span className="text-emerald-400 text-sm">✓</span>
-                  ) : (
-                    <button onClick={() => setActiveStep(2)} className="text-[#374151] text-xs">To'ldirish</button>
-                  )}
+                  {profile.title && profile.bio ? <span className="text-emerald-500 text-sm">✓</span> : <button onClick={() => setActiveStep(1)} className="text-[#374151] text-xs">To'ldirish</button>}
                 </div>
 
                 <div className="flex items-center gap-3 p-3 bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl">
-                  <span className="text-xl">👁️</span>
+                  <span className="text-xl">📢</span>
                   <div className="flex-1">
-                    <div className="text-[#111827] text-sm font-medium">Ko'rinuvchanlik</div>
-                    <div className="text-[#9CA3AF] text-xs">{visibility.length} ta ma'lumot ko'rinadi</div>
+                    <div className="text-[#111827] text-sm font-medium">Platformalar</div>
+                    <div className="text-[#9CA3AF] text-xs">{profile.platforms.length > 0 ? profile.platforms.join(', ') : 'Tanlanmagan'}</div>
                   </div>
-                  <span className="text-emerald-400 text-sm">✓</span>
+                  <span className="text-emerald-500 text-sm">✓</span>
                 </div>
-              </div>
 
-              {/* Public URL preview */}
-              <div className="p-4 bg-[#F9FAFB] border border-[#D1D5DB] rounded-xl mb-6">
-                <p className="text-xs text-[#6B7280] mb-1">Portfolio URL:</p>
-                <p className="text-[#111827] font-mono text-sm">nishon.ai/portfolio/your-username</p>
+                <div className="flex items-center gap-3 p-3 bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl">
+                  <span className="text-xl">💰</span>
+                  <div className="flex-1">
+                    <div className="text-[#111827] text-sm font-medium">Narx</div>
+                    <div className="text-[#9CA3AF] text-xs">
+                      {profile.pricingModel === 'commission'
+                        ? `${profile.commissionRate || 0}% komissiya`
+                        : profile.pricingModel === 'hybrid'
+                          ? `$${profile.monthlyRate || 0}/oy + ${profile.commissionRate || 0}% komissiya`
+                          : `$${profile.monthlyRate || 0}/oy`}
+                    </div>
+                  </div>
+                  <span className="text-emerald-500 text-sm">✓</span>
+                </div>
+
+                <div className="flex items-center gap-3 p-3 bg-amber-50 border border-amber-200 rounded-xl">
+                  <span className="text-xl">⏳</span>
+                  <div className="flex-1">
+                    <div className="text-[#111827] text-sm font-medium">Tasdiqlash</div>
+                    <div className="text-amber-600 text-xs">Profil moderatsiyadan o'tgandan keyin ko'rinadi</div>
+                  </div>
+                </div>
               </div>
 
               <div className="flex justify-between">
-                <button onClick={() => setActiveStep(3)} className="text-[#9CA3AF] hover:text-[#111827] text-sm transition-colors">
+                <button onClick={() => setActiveStep(2)} className="text-[#9CA3AF] hover:text-[#111827] text-sm transition-colors">
                   ← Orqaga
                 </button>
                 <button
                   onClick={handlePublish}
-                  disabled={!platforms.some(p => p.status === 'connected') || !profile.title}
-                  className="bg-[#111827] hover:bg-[#1F2937] disabled:opacity-40 text-[#111827] px-8 py-3 rounded-xl font-bold shadow-[0_0_20px_rgba(124,58,237,0.3)] transition-all"
+                  disabled={saving || !profile.title || !profile.bio}
+                  className="bg-[#111827] hover:bg-[#1F2937] disabled:opacity-40 text-white px-8 py-3 rounded-xl font-bold transition-all flex items-center gap-2"
                 >
-                  🚀 Nashr qilish
+                  {saving ? <><Spinner size="sm" /> Saqlanmoqda...</> : '🚀 Nashr qilish'}
                 </button>
               </div>
-            </div>
-          )}
-
-          {/* ── LIVE TRACKING STATS (shown when at least 1 platform connected) ── */}
-          {platforms.some(p => p.status === 'connected') && (
-            <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6">
-              <div className="flex items-center gap-2 mb-5">
-                <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                <h3 className="text-[#111827] font-bold">Live Ma'lumotlar</h3>
-                <span className="text-xs text-[#6B7280] ml-auto">Oxirgi sync: hozirgina</span>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {[
-                  { label: "Faol kampaniyalar", value: "—", icon: "🎯" },
-                  { label: "Bu oylik sarflangan", value: "—", icon: "💰" },
-                  { label: "O'rtacha ROAS", value: "—", icon: "📈" },
-                  { label: "Aktiv accountlar", value: platforms.filter(p => p.status === 'connected').reduce((s, p) => s + p.accountsCount, 0), icon: "🔗" },
-                ].map(s => (
-                  <div key={s.label} className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-3 text-center">
-                    <div className="text-2xl mb-1">{s.icon}</div>
-                    <div className="text-[#111827] font-bold text-lg">{s.value}</div>
-                    <div className="text-[#6B7280] text-xs mt-0.5 leading-tight">{s.label}</div>
-                  </div>
-                ))}
-              </div>
-
-              <p className="text-[#6B7280] text-xs mt-4 text-center">
-                Haqiqiy statistika accountlar to'liq ulanganidan so'ng 24 soat ichida ko'rinadi
-              </p>
             </div>
           )}
         </div>

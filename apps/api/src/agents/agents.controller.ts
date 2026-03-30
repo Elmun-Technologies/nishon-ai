@@ -68,6 +68,14 @@ export class AgentsController {
     return this.agentsService.findMine(req.user.id);
   }
 
+  @Get("my-plan")
+  @UseGuards(AuthGuard("jwt"))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Get my subscription plan, limits, and current usage" })
+  getMyPlan(@Request() req: any) {
+    return this.agentsService.getMyPlan(req.user.id);
+  }
+
   @Post()
   @UseGuards(AuthGuard("jwt"))
   @ApiBearerAuth()
