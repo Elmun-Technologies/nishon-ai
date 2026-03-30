@@ -17,6 +17,14 @@ export interface StrategyInput {
   monthlyBudget: number;
   goal: string;
   location: string;
+  productStrengths?: string[];
+  uniqueAdvantage?: string[];
+  ageGroups?: string[];
+  genders?: string[];
+  interests?: string[];
+  audienceIncome?: string;
+  priceRange?: { min: number; max: number };
+  productCategory?: string;
 }
 
 export interface StrategyResult {
@@ -29,6 +37,17 @@ export interface StrategyResult {
   };
   recommendedPlatforms: string[];
   budgetAllocation: Record<string, number>;
+  channelBreakdown: Array<{
+    channel: string;
+    channelName: string;
+    emoji: string;
+    percentage: number;
+    monthlyAmount: number;
+    priority: 'primary' | 'secondary' | 'optional';
+    rationale: string;
+    tactics: string[];
+    expectedResult: string;
+  }>;
   monthlyForecast: {
     estimatedLeads: number;
     estimatedSales: number;
