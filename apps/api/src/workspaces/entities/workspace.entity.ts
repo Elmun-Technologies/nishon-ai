@@ -89,6 +89,19 @@ export class Workspace {
   @Column({ type: 'varchar', length: 64, nullable: true })
   telegramChatId: string | null;
 
+  /**
+   * How the workspace is managed:
+   *   'self'        — user manages campaigns themselves
+   *   'human_agent' — a real targetologist from marketplace manages it
+   *   'ai_agent'    — an AI agent (Nishon or custom) manages it
+   */
+  @Column({ type: 'varchar', length: 20, default: 'self', name: 'service_type' })
+  serviceType: 'self' | 'human_agent' | 'ai_agent';
+
+  /** ID of the assigned AgentProfile (null if self-service) */
+  @Column({ type: 'varchar', nullable: true, name: 'assigned_agent_id' })
+  assignedAgentId: string | null;
+
   @CreateDateColumn()
   createdAt: Date;
 

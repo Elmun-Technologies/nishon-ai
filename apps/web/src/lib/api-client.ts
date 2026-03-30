@@ -216,6 +216,52 @@ export const landingPages = {
     apiClient.patch(`/landing-pages/${id}/publish`),
 }
 
+export const agents = {
+  /** Public marketplace listing */
+  list: (query?: {
+    type?: 'all' | 'human' | 'ai'
+    platform?: string
+    niche?: string
+    verified?: boolean
+    sortBy?: string
+    limit?: number
+    offset?: number
+  }) => {
+    const params = new URLSearchParams()
+    if (query?.type && query.type !== 'all') params.set('type', query.type)
+    if (query?.platform) params.set('platform', query.platform)
+    if (query?.niche) params.set('niche', query.niche)
+    if (query?.verified) params.set('verified', 'true')
+    if (query?.sortBy) params.set('sortBy', query.sortBy)
+    if (query?.limit) params.set('limit', String(query.limit))
+    if (query?.offset) params.set('offset', String(query.offset))
+    return apiClient.get(`/agents?${params.toString()}`)
+  },
+  /** Public profile by slug */
+  getBySlug: (slug: string) => apiClient.get(`/agents/slug/${slug}`),
+  /** Reviews for an agent */
+  getReviews: (agentId: string) => apiClient.get(`/agents/${agentId}/reviews`),
+  /** My own agent profiles (targetologist) */
+  mine: () => apiClient.get('/agents/mine'),
+  /** Create agent profile */
+  create: (data: any) => apiClient.post('/agents', data),
+  /** Update agent profile */
+  update: (id: string, data: any) => apiClient.patch(`/agents/${id}`, data),
+  /** Publish/unpublish profile */
+  togglePublish: (id: string) => apiClient.patch(`/agents/${id}/publish`),
+  /** Hire an agent for a workspace */
+  hire: (workspaceId: string, agentId: string, notes?: string) =>
+    apiClient.post(`/agents/${agentId}/hire/workspace/${workspaceId}`, { notes }),
+  /** Current active engagement for workspace */
+  getCurrentEngagement: (workspaceId: string) =>
+    apiClient.get(`/agents/engagement/workspace/${workspaceId}`),
+  /** Cancel engagement */
+  cancelEngagement: (id: string) => apiClient.patch(`/agents/engagement/${id}/cancel`),
+  /** Leave review */
+  addReview: (engagementId: string, data: { rating: number; text: string; authorName: string; authorCompany?: string }) =>
+    apiClient.post(`/agents/engagement/${engagementId}/review`, data),
+}
+
 export const meta = {
   dashboard: (workspaceId: string) =>
     apiClient.get(`/meta/dashboard?workspaceId=${encodeURIComponent(workspaceId)}`),

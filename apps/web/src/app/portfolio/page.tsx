@@ -1,8 +1,72 @@
 'use client'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { MOCK_TARGETOLOGISTS, formatSpend, type PortfolioTargetologist } from '@/lib/portfolio-data'
+
+const PLATFORM_META: Record<string, { name: string; icon: string; color: string }> = {
+  meta:     { name: 'Meta',     icon: '📘', color: 'from-blue-100 to-blue-200' },
+  google:   { name: 'Google',   icon: '🔍', color: 'from-red-100 to-red-200' },
+  yandex:   { name: 'Yandex',   icon: '🟡', color: 'from-yellow-100 to-yellow-200' },
+  telegram: { name: 'Telegram', icon: '✈️', color: 'from-blue-100 to-cyan-200' },
+  tiktok:   { name: 'TikTok',   icon: '🎵', color: 'from-pink-100 to-rose-200' },
+}
+
+function apiAgentToPortfolio(a: any): PortfolioTargetologist {
+  const stats = a.cachedStats || {}
+  return {
+    id: a.id,
+    slug: a.slug,
+    name: a.displayName,
+    avatar: a.avatar || (a.agentType === 'ai' ? '🤖' : '👤'),
+    avatarColor: a.avatarColor || 'from-gray-200 to-gray-300',
+    title: a.title,
+    location: a.location || 'O\'zbekiston',
+    bio: a.bio || '',
+    verified: a.isVerified,
+    proMember: a.isProMember,
+    joinedAt: a.createdAt,
+    responseTime: a.responseTime || (a.agentType === 'ai' ? 'Darhol' : '2 soat'),
+    rating: a.cachedRating || 0,
+    reviewCount: a.cachedReviewCount || 0,
+    price: {
+      from: Number(a.monthlyRate) || 0,
+      currency: 'USD',
+      unit: a.pricingModel === 'commission' ? `${a.commissionRate}% komissiya` : 'oy',
+    },
+    platforms: (a.platforms || []).map((p: string) => ({
+      id: p,
+      name: PLATFORM_META[p]?.name || p,
+      icon: PLATFORM_META[p]?.icon || '📢',
+      color: PLATFORM_META[p]?.color || 'from-gray-100 to-gray-200',
+      verified: a.isVerified,
+    })),
+    stats: {
+      totalSpendManaged: stats.totalSpendManaged || 0,
+      avgROAS: stats.avgROAS || 0,
+      avgCPA: stats.avgCPA || 0,
+      avgCTR: stats.avgCTR || 0,
+      totalCampaigns: stats.totalCampaigns || 0,
+      activeCampaigns: stats.activeCampaigns || 0,
+      successRate: stats.successRate || 0,
+      bestROAS: stats.bestROAS || 0,
+    },
+    niches: a.niches || [],
+    monthlyPerformance: a.monthlyPerformance || [
+      { month: 'Yan', roas: 0 }, { month: 'Feb', roas: 0 },
+      { month: 'Mar', roas: 0 }, { month: 'Apr', roas: 0 },
+      { month: 'May', roas: 0 }, { month: 'Jun', roas: 0 },
+    ],
+    platformSplit: (a.platforms || []).map((p: string, i: number) => ({
+      platform: PLATFORM_META[p]?.name || p,
+      percent: Math.floor(100 / (a.platforms?.length || 1)),
+      color: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'][i] || '#6B7280',
+    })),
+    recentCampaigns: [],
+    reviews: [],
+    agentType: a.agentType,
+  } as any
+}
 
 const ALL_NICHES = ['E-commerce', 'Fashion', 'Beauty & Cosmetics', 'Real Estate', 'B2B SaaS', 'Mobile App', 'Food & Beverage', 'Finance', 'Education', 'Healthcare']
 const ALL_PLATFORMS = [
@@ -84,6 +148,11 @@ function TargetologistCard({ t }: { t: PortfolioTargetologist }) {
                 <span className="text-[#111827] font-bold">{t.name}</span>
                 {t.verified && <VerifiedBadge />}
                 {t.proMember && <ProBadge />}
+                {(t as any).agentType === 'ai' && (
+                  <span className="inline-flex items-center gap-1 bg-violet-50 border border-violet-200 text-violet-600 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                    🤖 AI
+                  </span>
+                )}
               </div>
               <div className="text-[#6B7280] text-xs mt-0.5">{t.title}</div>
             </div>
@@ -174,6 +243,20 @@ export default function PortfolioPage() {
   const [sortBy, setSortBy] = useState('roas')
   const [verifiedOnly, setVerifiedOnly] = useState(false)
   const [minROAS, setMinROAS] = useState(0)
+  const [agentTypeFilter, setAgentTypeFilter] = useState<'all' | 'ai' | 'human'>('all')
+  const [allAgents, setAllAgents] = useState<PortfolioTargetologist[]>(MOCK_TARGETOLOGISTS)
+
+  useEffect(() => {
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+    fetch(`${apiBase}/agents?limit=50`)
+      .then(r => r.json())
+      .then(data => {
+        if (data?.agents?.length) {
+          setAllAgents(data.agents.map(apiAgentToPortfolio))
+        }
+      })
+      .catch(() => { /* keep mock data */ })
+  }, [])
 
   const togglePlatform = (id: string) =>
     setSelectedPlatforms(prev => prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id])
@@ -182,7 +265,10 @@ export default function PortfolioPage() {
     setSelectedNiches(prev => prev.includes(n) ? prev.filter(x => x !== n) : [...prev, n])
 
   const filtered = useMemo(() => {
-    let list = [...MOCK_TARGETOLOGISTS]
+    let list = [...allAgents]
+    if (agentTypeFilter !== 'all') {
+      list = list.filter(t => (t as any).agentType === agentTypeFilter)
+    }
 
     if (search) {
       const q = search.toLowerCase()
@@ -211,11 +297,11 @@ export default function PortfolioPage() {
 
   // aggregate totals
   const totals = useMemo(() => ({
-    targetologists: MOCK_TARGETOLOGISTS.length,
-    spendManaged: MOCK_TARGETOLOGISTS.reduce((s, t) => s + t.stats.totalSpendManaged, 0),
-    avgROAS: (MOCK_TARGETOLOGISTS.reduce((s, t) => s + t.stats.avgROAS, 0) / MOCK_TARGETOLOGISTS.length).toFixed(1),
-    campaigns: MOCK_TARGETOLOGISTS.reduce((s, t) => s + t.stats.totalCampaigns, 0),
-  }), [])
+    targetologists: allAgents.length,
+    spendManaged: allAgents.reduce((s, t) => s + (t.stats?.totalSpendManaged || 0), 0),
+    avgROAS: allAgents.length ? (allAgents.reduce((s, t) => s + (t.stats?.avgROAS || 0), 0) / allAgents.length).toFixed(1) : '0',
+    campaigns: allAgents.reduce((s, t) => s + (t.stats?.totalCampaigns || 0), 0),
+  }), [allAgents])
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] text-[#111827]">
@@ -374,10 +460,33 @@ export default function PortfolioPage() {
 
           {/* ── MAIN LIST ── */}
           <div className="flex-1 min-w-0">
+
+            {/* Agent type tabs */}
+            <div className="flex gap-2 mb-5">
+              {[
+                { key: 'all', label: 'Hammasi' },
+                { key: 'ai', label: '🤖 AI Agentlar' },
+                { key: 'human', label: '👤 Jonli Targetologlar' },
+              ].map(t => (
+                <button
+                  key={t.key}
+                  onClick={() => setAgentTypeFilter(t.key as any)}
+                  className={`px-4 py-2 text-sm font-medium rounded-xl transition-all ${
+                    agentTypeFilter === t.key
+                      ? 'bg-[#111827] text-white'
+                      : 'bg-white border border-[#E5E7EB] text-[#6B7280] hover:text-[#111827]'
+                  }`}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+
             {/* Sort + count */}
             <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
               <p className="text-[#9CA3AF] text-sm">
-                <span className="text-[#111827] font-semibold">{filtered.length}</span> targetolog topildi
+                <span className="text-[#111827] font-semibold">{filtered.length}</span>{' '}
+                {agentTypeFilter === 'ai' ? 'AI agent' : agentTypeFilter === 'human' ? 'targetolog' : 'natija'} topildi
               </p>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-[#6B7280]">Saralash:</span>
