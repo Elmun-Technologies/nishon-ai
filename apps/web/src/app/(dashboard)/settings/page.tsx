@@ -88,6 +88,19 @@ const AUTOPILOT_MODES = [
 ]
 
 const INTEGRATIONS_STATIC = [
+  // Ad Platforms
+  {
+    id: 'yandex',
+    name: 'Yandex Direct',
+    description: 'Search advertising and smart banners on Yandex.',
+    logo: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-yellow-500">
+        <path d="M6 2h3v14c0 2.21-1.79 4-4 4H2V2h4zm8 0h3v20h-3V2z"/>
+      </svg>
+    ),
+    href: '#',
+    comingSoon: true,
+  },
   {
     id: 'google',
     name: 'Google Ads',
@@ -110,6 +123,81 @@ const INTEGRATIONS_STATIC = [
     logo: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-[#111827]">
         <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.78a4.85 4.85 0 01-1.01-.09z"/>
+      </svg>
+    ),
+    href: '#',
+    comingSoon: true,
+  },
+  // CRM Integrations
+  {
+    id: 'amocrm',
+    name: 'AmoCRM',
+    description: 'Customer management system for sales teams.',
+    logo: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-red-500">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+      </svg>
+    ),
+    href: '#',
+    comingSoon: true,
+  },
+  {
+    id: 'bitrix24',
+    name: 'Bitrix24',
+    description: 'All-in-one business management platform.',
+    logo: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-blue-600">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+      </svg>
+    ),
+    href: '#',
+    comingSoon: true,
+  },
+  // Analytics
+  {
+    id: 'ga4',
+    name: 'Google Analytics 4',
+    description: 'Advanced analytics and conversion tracking.',
+    logo: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-orange-500">
+        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+      </svg>
+    ),
+    href: '#',
+    comingSoon: true,
+  },
+  {
+    id: 'yandex-metrica',
+    name: 'Yandex Metrica',
+    description: 'Yandex analytics and conversion tracking.',
+    logo: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-yellow-600">
+        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/>
+      </svg>
+    ),
+    href: '#',
+    comingSoon: true,
+  },
+  // Messengers & Communication
+  {
+    id: 'telegram-bot',
+    name: 'Telegram Bot',
+    description: 'Automated notifications and reports via Telegram.',
+    logo: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-blue-400">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.43-1.12 7.21-.16.85-.48 1.13-.78 1.16-.66.07-1.16-.44-1.8-.86-1.01-.66-1.57-1.06-2.55-1.7-.57-.37-1-1.02-.1-1.62.91-.6 5.05-4.63 5.14-5.02.02-.08.03-.38-.14-.54-.18-.15-.44-.1-.62-.05-.27.07-4.56 2.85-6.46 3.78-.61.33-1.16.49-1.66.48-.55-.01-1.6-.3-2.38-.55-.96-.3-1.72-.46-1.65-.97.03-.51.68-.99 1.87-1.48 7.4-3.24 9.74-4.27 10.33-4.27.23 0 .37.05.48.15.11.1.14.24.15.35z"/>
+      </svg>
+    ),
+    href: '#',
+    comingSoon: true,
+  },
+  {
+    id: 'whatsapp-business',
+    name: 'WhatsApp Business',
+    description: 'Send messages and notifications via WhatsApp.',
+    logo: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-green-500">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371 0-.57 0-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004a9.87 9.87 0 00-4.928 1.227.11.11 0 00-.044.197l1.453 1.77a.11.11 0 00.176.023 6.466 6.466 0 015.192-2.48h.004a6.466 6.466 0 015.457 3.06.11.11 0 00.177-.013l1.449-1.773a.11.11 0 00-.044-.197 9.87 9.87 0 00-8.292-1.614z"/>
       </svg>
     ),
     href: '#',
@@ -430,14 +518,16 @@ export default function SettingsPage() {
 
           {/* ── INTEGRATIONS ── */}
           {activeTab === 'integrations' && (
-            <Card>
-              <div className="mb-5">
-                <h2 className="text-base font-semibold text-[#111827]">Advertising Platforms</h2>
-                <p className="text-xs text-[#6B7280] mt-0.5">
-                  Connect your ad accounts to enable campaign management and analytics.
-                </p>
-              </div>
-              <div className="space-y-3">
+            <div className="space-y-6">
+              {/* Advertising Platforms */}
+              <Card>
+                <div className="mb-5">
+                  <h2 className="text-base font-semibold text-[#111827]">📢 Reklama Platformalari</h2>
+                  <p className="text-xs text-[#6B7280] mt-0.5">
+                    Reklama accountingizni ulang va kampaniyalarni boshqaring
+                  </p>
+                </div>
+                <div className="space-y-3">
 
                 {/* ── Meta (live connection status) ── */}
                 {INTEGRATIONS.map((integration) => (
@@ -495,32 +585,101 @@ export default function SettingsPage() {
                   </div>
                 ))}
 
-                {/* ── Coming soon platforms ── */}
-                {INTEGRATIONS_STATIC.map((integration) => (
-                  <div
-                    key={integration.id}
-                    className="flex items-center gap-4 p-4 rounded-xl border border-[#E5E7EB] bg-white opacity-60"
-                  >
-                    <div className="w-10 h-10 rounded-xl bg-[#F9FAFB] border border-[#E5E7EB] flex items-center justify-center shrink-0">
-                      {integration.logo}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm font-medium text-[#111827]">{integration.name}</p>
-                        <span className="text-xs px-1.5 py-0.5 rounded-md bg-[#F9FAFB] text-[#6B7280] border border-[#E5E7EB]">
-                          Coming soon
-                        </span>
-                      </div>
-                      <p className="text-xs text-[#6B7280] mt-0.5">{integration.description}</p>
-                    </div>
-                    <button disabled className="text-xs px-3 py-1.5 rounded-lg border border-[#E5E7EB] text-[#6B7280] cursor-not-allowed shrink-0">
-                      Connect
-                    </button>
-                  </div>
-                ))}
-
               </div>
-            </Card>
+              </Card>
+
+              {/* Coming Soon Integrations - by Category */}
+              <div className="space-y-5">
+                {/* Ad Platforms */}
+                <Card>
+                  <h3 className="text-sm font-semibold text-[#6B7280] uppercase tracking-wider mb-4">🔜 Tez orada: Reklama Platformalari</h3>
+                  <div className="space-y-2">
+                    {INTEGRATIONS_STATIC.slice(0, 3).map((integration) => (
+                      <div key={integration.id} className="flex items-center gap-4 p-3 rounded-lg border border-[#E5E7EB] bg-[#F9FAFB]">
+                        <div className="w-9 h-9 rounded-lg bg-white border border-[#E5E7EB] flex items-center justify-center shrink-0">
+                          {integration.logo}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium text-[#111827]">{integration.name}</p>
+                            <span className="text-xs px-1.5 py-0.5 rounded-md bg-amber-100/50 text-amber-700 border border-amber-200">
+                              Tez orada
+                            </span>
+                          </div>
+                          <p className="text-xs text-[#6B7280] mt-0.5">{integration.description}</p>
+                        </div>
+                        <button disabled className="text-xs px-3 py-1.5 rounded-lg bg-[#E5E7EB] text-[#6B7280] cursor-not-allowed shrink-0">
+                          Ulash
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+
+                {/* CRM Integrations */}
+                <Card>
+                  <h3 className="text-sm font-semibold text-[#6B7280] uppercase tracking-wider mb-4">🔜 Tez orada: CRM Sistemalari</h3>
+                  <div className="space-y-2">
+                    {INTEGRATIONS_STATIC.slice(3, 5).map((integration) => (
+                      <div key={integration.id} className="flex items-center gap-4 p-3 rounded-lg border border-[#E5E7EB] bg-[#F9FAFB]">
+                        <div className="w-9 h-9 rounded-lg bg-white border border-[#E5E7EB] flex items-center justify-center shrink-0">
+                          {integration.logo}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-[#111827]">{integration.name}</p>
+                          <p className="text-xs text-[#6B7280] mt-0.5">{integration.description}</p>
+                        </div>
+                        <button disabled className="text-xs px-3 py-1.5 rounded-lg bg-[#E5E7EB] text-[#6B7280] cursor-not-allowed shrink-0">
+                          Ulash
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+
+                {/* Analytics */}
+                <Card>
+                  <h3 className="text-sm font-semibold text-[#6B7280] uppercase tracking-wider mb-4">🔜 Tez orada: Analitika</h3>
+                  <div className="space-y-2">
+                    {INTEGRATIONS_STATIC.slice(5, 7).map((integration) => (
+                      <div key={integration.id} className="flex items-center gap-4 p-3 rounded-lg border border-[#E5E7EB] bg-[#F9FAFB]">
+                        <div className="w-9 h-9 rounded-lg bg-white border border-[#E5E7EB] flex items-center justify-center shrink-0">
+                          {integration.logo}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-[#111827]">{integration.name}</p>
+                          <p className="text-xs text-[#6B7280] mt-0.5">{integration.description}</p>
+                        </div>
+                        <button disabled className="text-xs px-3 py-1.5 rounded-lg bg-[#E5E7EB] text-[#6B7280] cursor-not-allowed shrink-0">
+                          Ulash
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+
+                {/* Messengers */}
+                <Card>
+                  <h3 className="text-sm font-semibold text-[#6B7280] uppercase tracking-wider mb-4">🔜 Tez orada: Xabarlar va Bildirishnomalar</h3>
+                  <div className="space-y-2">
+                    {INTEGRATIONS_STATIC.slice(7).map((integration) => (
+                      <div key={integration.id} className="flex items-center gap-4 p-3 rounded-lg border border-[#E5E7EB] bg-[#F9FAFB]">
+                        <div className="w-9 h-9 rounded-lg bg-white border border-[#E5E7EB] flex items-center justify-center shrink-0">
+                          {integration.logo}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-[#111827]">{integration.name}</p>
+                          <p className="text-xs text-[#6B7280] mt-0.5">{integration.description}</p>
+                        </div>
+                        <button disabled className="text-xs px-3 py-1.5 rounded-lg bg-[#E5E7EB] text-[#6B7280] cursor-not-allowed shrink-0">
+                          Ulash
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              </div>
+            </div>
           )}
 
           {/* ── NOTIFICATIONS ── */}

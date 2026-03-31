@@ -1384,6 +1384,99 @@ export default function OnboardingPage() {
                   ))}
                 </div>
 
+                {/* ══ BUDGET DISTRIBUTION ══ */}
+                {strategy.channelBreakdown && strategy.channelBreakdown.length > 0 && (
+                  <div className="border-t border-[#E5E7EB] pt-5">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xl">💰</span>
+                      <h3 className="font-semibold text-[#111827]">Byudjet taqsimoti</h3>
+                      <span className="bg-[#F3F4F6] text-[#374151] text-xs px-2 py-0.5 rounded-full border border-[#D1D5DB]">
+                        ${form.monthlyBudget.toLocaleString()}/oy
+                      </span>
+                    </div>
+                    <p className="text-[#6B7280] text-xs mb-4">
+                      AI sizning biznesingiz va auditoriyangizdan kelib chiqib byudjetni quyidagicha taqsimlashni tavsiya qiladi
+                    </p>
+                    <div className="space-y-3">
+                      {strategy.channelBreakdown.map((ch: any, idx: number) => {
+                        const isPrimary = ch.priority === 'primary'
+                        const isSecondary = ch.priority === 'secondary'
+                        return (
+                          <div
+                            key={idx}
+                            className={`rounded-xl border p-3.5 ${
+                              isPrimary
+                                ? 'bg-[#F0FDF4] border-emerald-200'
+                                : isSecondary
+                                  ? 'bg-[#F9FAFB] border-[#E5E7EB]'
+                                  : 'bg-white border-[#F3F4F6]'
+                            }`}
+                          >
+                            {/* Channel header */}
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                <span className="text-lg">{ch.emoji || '📊'}</span>
+                                <span className="font-semibold text-[#111827] text-sm">
+                                  {ch.channelName}
+                                </span>
+                                {isPrimary && (
+                                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">
+                                    Asosiy
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-right">
+                                <span className="text-[#111827] font-bold text-sm">
+                                  ${(ch.monthlyAmount || Math.round(form.monthlyBudget * ch.percentage / 100)).toLocaleString()}
+                                </span>
+                                <span className="text-[#6B7280] text-xs ml-1">/ oy</span>
+                              </div>
+                            </div>
+
+                            {/* Progress bar */}
+                            <div className="h-1.5 bg-[#E5E7EB] rounded-full mb-2 overflow-hidden">
+                              <div
+                                className={`h-full rounded-full transition-all duration-700 ${
+                                  isPrimary ? 'bg-emerald-500' : 'bg-[#6B7280]'
+                                }`}
+                                style={{ width: `${ch.percentage}%` }}
+                              />
+                            </div>
+
+                            <div className="flex items-center justify-between mb-2">
+                              <p className="text-[#6B7280] text-xs leading-relaxed flex-1 pr-4">
+                                {ch.rationale}
+                              </p>
+                              <span className={`text-xs font-semibold shrink-0 ${isPrimary ? 'text-emerald-600' : 'text-[#374151]'}`}>
+                                {ch.percentage}%
+                              </span>
+                            </div>
+
+                            {/* Tactics & expected result */}
+                            {ch.tactics && ch.tactics.length > 0 && (
+                              <div className="flex flex-wrap gap-1 mt-1">
+                                {ch.tactics.slice(0, 3).map((t: string, ti: number) => (
+                                  <span
+                                    key={ti}
+                                    className="text-[10px] px-2 py-0.5 rounded-full bg-white border border-[#E5E7EB] text-[#6B7280]"
+                                  >
+                                    {t}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                            {ch.expectedResult && (
+                              <p className="text-[10px] text-[#9CA3AF] mt-1.5">
+                                📈 {ch.expectedResult}
+                              </p>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 {/* SCRIPTS SECTION */}
                 <div className="border-t border-[#E5E7EB] pt-5">
                   <div className="flex items-center gap-2 mb-4">
@@ -1706,13 +1799,22 @@ export default function OnboardingPage() {
               )}
 
               {step === 7 ? (
-                <Button
-                  fullWidth
-                  size="lg"
-                  onClick={() => router.push('/dashboard')}
-                >
-                  Dashboardni ochish →
-                </Button>
+                <div className="flex flex-col gap-2 w-full">
+                  <Button
+                    fullWidth
+                    size="lg"
+                    onClick={() => router.push('/landing-page')}
+                    className="bg-[#111827] text-white"
+                  >
+                    🚀 Landing Page yaratish →
+                  </Button>
+                  <button
+                    onClick={() => router.push('/dashboard')}
+                    className="text-xs text-[#9CA3AF] text-center py-1 hover:text-[#6B7280] transition-colors"
+                  >
+                    Keyinroq — Dashboardga o'tish
+                  </button>
+                </div>
               ) : (
                 <div className="flex gap-2 flex-1">
                   {/* Show "Go to Dashboard" if workspace was created but strategy failed */}

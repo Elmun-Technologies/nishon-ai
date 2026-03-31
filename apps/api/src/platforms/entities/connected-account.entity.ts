@@ -47,6 +47,14 @@ export class ConnectedAccount {
   @Column({ type: "timestamp", nullable: true })
   tokenExpiresAt: Date | null;
 
+  /**
+   * When real statistics tracking officially began for this account.
+   * Set to the current timestamp when the account is first activated (isActive = true).
+   * Null until then — means no real analytics data before this date.
+   */
+  @Column({ type: "timestamp", nullable: true, name: "tracking_started_at" })
+  trackingStartedAt: Date | null;
+
   @CreateDateColumn()
   createdAt: Date;
 

@@ -1,7 +1,80 @@
 'use client'
-import { useState, use } from 'react'
+import { useState, use, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { MOCK_TARGETOLOGISTS, formatSpend, type PortfolioTargetologist } from '@/lib/portfolio-data'
+import { agents as agentsApi } from '@/lib/api-client'
+
+const PLATFORM_META: Record<string, { name: string; icon: string; color: string }> = {
+  meta:     { name: 'Meta Ads',      icon: '📘', color: '#1877F2' },
+  google:   { name: 'Google Ads',    icon: '🔍', color: '#4285F4' },
+  yandex:   { name: 'Yandex Direct', icon: '🟡', color: '#FFCC00' },
+  telegram: { name: 'Telegram Ads',  icon: '✈️', color: '#2CA5E0' },
+  tiktok:   { name: 'TikTok Ads',    icon: '🎵', color: '#000000' },
+  youtube:  { name: 'YouTube Ads',   icon: '▶️', color: '#FF0000' },
+}
+
+function apiAgentToPortfolio(a: any, reviews: any[]): PortfolioTargetologist {
+  const stats = a.cachedStats || {}
+  const platforms = (a.platforms || []).map((p: string, i: number) => ({
+    id: p,
+    name: PLATFORM_META[p]?.name || p,
+    icon: PLATFORM_META[p]?.icon || '📢',
+    color: PLATFORM_META[p]?.color || '#888',
+    verified: a.isVerified,
+    accountsConnected: stats.activeCampaigns || 0,
+  }))
+
+  const platformColors = ['#1877F2', '#4285F4', '#FFCC00', '#2CA5E0', '#000000', '#FF0000']
+  const platformSplit = platforms.length > 0
+    ? platforms.map((p: any, i: number) => ({
+        platform: p.name,
+        percent: Math.floor(100 / platforms.length),
+        color: platformColors[i % platformColors.length],
+      }))
+    : [{ platform: 'Meta', percent: 100, color: '#1877F2' }]
+
+  return {
+    id: a.id,
+    slug: a.slug,
+    name: a.displayName,
+    avatar: a.avatar || a.displayName?.slice(0, 2)?.toUpperCase() || '??',
+    avatarColor: a.avatarColor || 'from-[#7C3AED] to-[#5B21B6]',
+    title: a.title || '',
+    location: a.location || "O'zbekiston",
+    bio: a.bio || '',
+    verified: a.isVerified,
+    proMember: a.isProMember,
+    joinedAt: a.createdAt ? new Date(a.createdAt).toLocaleDateString('uz-UZ', { year: 'numeric', month: '2-digit' }) : '—',
+    responseTime: a.responseTime || '24 soat ichida',
+    rating: a.cachedRating || 0,
+    reviewCount: a.cachedReviewCount || 0,
+    price: { from: a.monthlyRate || 0, currency: 'USD', unit: 'oyiga' },
+    platforms,
+    stats: {
+      totalSpendManaged: stats.totalSpendManaged || 0,
+      avgROAS: stats.avgROAS || 0,
+      avgCPA: stats.avgCPA || 0,
+      avgCTR: stats.avgCTR || 0,
+      totalCampaigns: stats.totalCampaigns || 0,
+      activeCampaigns: stats.activeCampaigns || 0,
+      successRate: stats.successRate || 0,
+      bestROAS: stats.bestROAS || 0,
+    },
+    niches: a.niches || [],
+    monthlyPerformance: a.monthlyPerformance || [],
+    platformSplit,
+    recentCampaigns: [],
+    reviews: reviews.map(r => ({
+      id: r.id,
+      author: r.authorName,
+      company: r.authorCompany || '',
+      rating: r.rating,
+      text: r.text,
+      date: r.createdAt ? new Date(r.createdAt).toLocaleDateString('uz-UZ') : '',
+      verified: r.isVerified,
+    })),
+  }
+}
 
 /* ── helpers ── */
 function StatCard({ label, value, sub, accent }: { label: string; value: string | number; sub?: string; accent?: boolean }) {
@@ -151,8 +224,43 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
   const router = useRouter()
   const [tab, setTab] = useState<'overview' | 'campaigns' | 'reviews'>('overview')
   const [contactOpen, setContactOpen] = useState(false)
+  const [loadedProfile, setLoadedProfile] = useState<PortfolioTargetologist | null>(null)
+  const [loading, setLoading] = useState(true)
 
-  const t = MOCK_TARGETOLOGISTS.find(x => x.slug === slug)
+  useEffect(() => {
+    agentsApi.getBySlug(slug)
+      .then(async (res: any) => {
+        const agent = res.data
+        if (agent) {
+          let reviews: any[] = []
+          try {
+            const rev = await agentsApi.getReviews(agent.id)
+            reviews = (rev.data as any) || []
+          } catch { /* no reviews yet */ }
+          setLoadedProfile(apiAgentToPortfolio(agent, reviews))
+        } else {
+          // Fall back to mock
+          const mock = MOCK_TARGETOLOGISTS.find(x => x.slug === slug)
+          setLoadedProfile(mock || null)
+        }
+      })
+      .catch(() => {
+        // API error — fall back to mock
+        const mock = MOCK_TARGETOLOGISTS.find(x => x.slug === slug)
+        setLoadedProfile(mock || null)
+      })
+      .finally(() => setLoading(false))
+  }, [slug])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-[#111827] border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  const t = loadedProfile
 
   if (!t) {
     return (

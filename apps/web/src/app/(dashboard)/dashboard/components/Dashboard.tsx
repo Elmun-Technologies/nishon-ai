@@ -8,6 +8,12 @@ import { Progress } from '@/components/ui/Progress'
 import { LineChart, BarChart, PieChart } from '@/components/ui/Charts'
 import { useCampaigns } from '@/hooks/useCampaigns'
 
+const PLATFORM_COLORS: Record<string, { bg: string; accent: string; icon: string }> = {
+  meta:   { bg: 'from-blue-500/10 to-blue-600/10', accent: 'text-blue-500', icon: '📘' },
+  google: { bg: 'from-red-500/10 to-blue-500/10', accent: 'text-red-500', icon: '🔍' },
+  yandex: { bg: 'from-yellow-500/10 to-orange-500/10', accent: 'text-yellow-600', icon: '🟡' },
+}
+
 export function Dashboard() {
   const { campaigns, loading, error } = useCampaigns()
   const [timeRange, setTimeRange] = useState('7d')
@@ -17,12 +23,18 @@ export function Dashboard() {
   const totalConversions = campaigns?.reduce((sum, campaign) => sum + (campaign.totalConversions || 0), 0) || 0
   const avgROAS = totalSpend > 0 ? (totalConversions / totalSpend) : 0
 
-  const platformData = campaigns?.reduce((acc, campaign) => {
-    campaign.platforms?.forEach((platform: string) => {
-      acc[platform] = (acc[platform] || 0) + 1
-    })
+  // Per-platform breakdown
+  const platformStats = (campaigns || []).reduce((acc, campaign) => {
+    const platform = campaign.platform as string
+    if (!acc[platform]) {
+      acc[platform] = { campaigns: 0, spend: 0, clicks: 0, conversions: 0 }
+    }
+    acc[platform].campaigns += 1
+    acc[platform].spend += campaign.totalSpend || 0
+    acc[platform].clicks += campaign.totalClicks || 0
+    acc[platform].conversions += campaign.totalConversions || 0
     return acc
-  }, {} as Record<string, number>) || {}
+  }, {} as Record<string, any>)
 
   const performanceData = [
     { date: '2024-01-01', spend: 1000, clicks: 150, conversions: 15 },
@@ -77,13 +89,14 @@ export function Dashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold text-[#111827]">Dashboard</h2>
         <div className="flex gap-2">
           {['7d', '30d', '90d'].map(range => (
-            <Button 
-              key={range} 
-              variant={timeRange === range ? "primary" : "secondary"} 
+            <Button
+              key={range}
+              variant={timeRange === range ? "primary" : "secondary"}
               size="sm"
               onClick={() => setTimeRange(range)}
             >
@@ -94,15 +107,12 @@ export function Dashboard() {
       </div>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card padding="lg">
           <div className="space-y-2">
             <p className="text-sm text-[#6B7280]">Total Spend</p>
             <p className="text-2xl font-bold text-[#111827]">${totalSpend.toLocaleString()}</p>
-            <div className="flex items-center gap-2">
-              <Badge variant="success">+12.5%</Badge>
-              <span className="text-sm text-[#6B7280]">vs last period</span>
-            </div>
+            <Badge variant="success">+12.5% vs last period</Badge>
           </div>
         </Card>
 
@@ -110,21 +120,15 @@ export function Dashboard() {
           <div className="space-y-2">
             <p className="text-sm text-[#6B7280]">Total Clicks</p>
             <p className="text-2xl font-bold text-[#111827]">{totalClicks.toLocaleString()}</p>
-            <div className="flex items-center gap-2">
-              <Badge variant="success">+8.2%</Badge>
-              <span className="text-sm text-[#6B7280]">vs last period</span>
-            </div>
+            <Badge variant="success">+8.2% vs last period</Badge>
           </div>
         </Card>
 
         <Card padding="lg">
           <div className="space-y-2">
-            <p className="text-sm text-[#6B7280]">Total Conversions</p>
+            <p className="text-sm text-[#6B7280]">Conversions</p>
             <p className="text-2xl font-bold text-[#111827]">{totalConversions.toLocaleString()}</p>
-            <div className="flex items-center gap-2">
-              <Badge variant="success">+15.7%</Badge>
-              <span className="text-sm text-[#6B7280]">vs last period</span>
-            </div>
+            <Badge variant="success">+15.7% vs last period</Badge>
           </div>
         </Card>
 
@@ -132,134 +136,82 @@ export function Dashboard() {
           <div className="space-y-2">
             <p className="text-sm text-[#6B7280]">Average ROAS</p>
             <p className="text-2xl font-bold text-[#111827]">{avgROAS.toFixed(2)}x</p>
-            <div className="flex items-center gap-2">
-              <Badge variant="warning">+3.1%</Badge>
-              <span className="text-sm text-[#6B7280]">vs last period</span>
-            </div>
+            <Badge variant="warning">+3.1% vs last period</Badge>
           </div>
         </Card>
       </div>
 
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Performance Over Time */}
-        <Card padding="lg">
-          <h3 className="text-lg font-semibold text-[#111827] mb-4">Performance Over Time</h3>
-          <LineChart
-            data={performanceData}
-            xKey="date"
-            yKeys={['spend', 'clicks', 'conversions']}
-            colors={['#7C3AED', '#4285F4', '#FFCC00']}
-          />
-        </Card>
-
-        {/* Platform Distribution */}
-        <Card padding="lg">
-          <h3 className="text-lg font-semibold text-[#111827] mb-4">Platform Distribution</h3>
-          <div className="space-y-4">
-            {(() => {
-              const pd = platformData as Record<string, number>
-              const total = Object.values(pd).reduce((a: number, b: number) => a + b, 0) || 1
-              return Object.entries(pd).map(([platform, count]: [string, number]) => (
-                <div key={platform} className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-3 h-3 rounded-full ${
-                      platform === 'meta' ? 'bg-[#1877F2]' :
-                      platform === 'google' ? 'bg-[#4285F4]' :
-                      platform === 'yandex' ? 'bg-[#FFCC00]' :
-                      'bg-[#2CA5E0]'
-                    }`}></div>
-                    <span className="text-[#111827] capitalize">{platform}</span>
+      {/* Per-Platform Tracking */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {Object.entries(PLATFORM_COLORS).map(([platform, colors]) => {
+          const stats = platformStats[platform]
+          if (!stats) return null
+          return (
+            <Card key={platform} padding="lg" className={`bg-gradient-to-br ${colors.bg} border-l-4`} style={{ borderLeftColor: colors.accent }}>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-2xl">{colors.icon}</span>
+                  <span className="text-xs font-semibold text-[#6B7280] uppercase">{stats.campaigns} kampaniya</span>
+                </div>
+                <div>
+                  <p className="text-[#6B7280] text-xs">Sarflandi</p>
+                  <p className="text-lg font-bold text-[#111827]">${stats.spend.toLocaleString()}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div>
+                    <p className="text-[#6B7280]">Kliklar</p>
+                    <p className="font-semibold text-[#111827]">{stats.clicks.toLocaleString()}</p>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <span className="text-[#111827] font-medium">{count}</span>
-                    <Progress value={(count / total) * 100} />
+                  <div>
+                    <p className="text-[#6B7280]">Konversiya</p>
+                    <p className="font-semibold text-[#111827]">{stats.conversions.toLocaleString()}</p>
                   </div>
                 </div>
-              ))
-            })()}
-          </div>
-        </Card>
+              </div>
+            </Card>
+          )
+        })}
       </div>
 
-      {/* Campaign Performance */}
+      {/* Performance Chart */}
       <Card padding="lg">
-        <h3 className="text-lg font-semibold text-[#111827] mb-4">Campaign Performance</h3>
+        <h3 className="text-lg font-semibold text-[#111827] mb-4">Performance Over Time</h3>
+        <LineChart
+          data={performanceData}
+          xKey="date"
+          yKeys={['spend', 'clicks', 'conversions']}
+          colors={['#7C3AED', '#4285F4', '#FFCC00']}
+        />
+      </Card>
+
+      {/* Recent Campaigns */}
+      <Card padding="lg">
+        <h3 className="text-lg font-semibold text-[#111827] mb-4">Recent Campaigns</h3>
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-[#E5E7EB]">
-                <th className="text-left text-[#6B7280] pb-2">Campaign</th>
-                <th className="text-left text-[#6B7280] pb-2">Platform</th>
-                <th className="text-left text-[#6B7280] pb-2">Spend</th>
-                <th className="text-left text-[#6B7280] pb-2">Clicks</th>
-                <th className="text-left text-[#6B7280] pb-2">Conversions</th>
-                <th className="text-left text-[#6B7280] pb-2">ROAS</th>
-                <th className="text-left text-[#6B7280] pb-2">Status</th>
+                <th className="text-left text-[#6B7280] pb-3 font-semibold">Campaign</th>
+                <th className="text-left text-[#6B7280] pb-3 font-semibold">Platform</th>
+                <th className="text-left text-[#6B7280] pb-3 font-semibold">Spend</th>
+                <th className="text-left text-[#6B7280] pb-3 font-semibold">Clicks</th>
+                <th className="text-left text-[#6B7280] pb-3 font-semibold">Conv</th>
+                <th className="text-left text-[#6B7280] pb-3 font-semibold">ROAS</th>
               </tr>
             </thead>
             <tbody>
-              {campaigns?.map(campaign => (
-                <tr key={campaign.id} className="border-b border-[#E5E7EB]">
-                  <td className="py-3">
-                    <div className="text-[#111827] font-medium">{campaign.name}</div>
-                    <div className="text-sm text-[#6B7280]">{campaign.objective}</div>
-                  </td>
-                  <td className="py-3">
-                    <div className="flex gap-1">
-                      {campaign.platforms?.map((platform: string) => (
-                        <Badge key={platform} variant="secondary" size="sm">
-                          {platform}
-                        </Badge>
-                      ))}
-                    </div>
-                  </td>
+              {campaigns?.slice(0, 5).map(campaign => (
+                <tr key={campaign.id} className="border-b border-[#E5E7EB] hover:bg-[#F9FAFB]">
+                  <td className="py-3 text-[#111827] font-medium">{campaign.name}</td>
+                  <td className="py-3"><Badge variant="secondary" size="sm">{campaign.platform.toUpperCase()}</Badge></td>
                   <td className="py-3 text-[#111827]">${(campaign.totalSpend || 0).toLocaleString()}</td>
                   <td className="py-3 text-[#111827]">{(campaign.totalClicks || 0).toLocaleString()}</td>
                   <td className="py-3 text-[#111827]">{(campaign.totalConversions || 0).toLocaleString()}</td>
-                  <td className="py-3 text-[#111827]">{((campaign.totalConversions || 0) / (campaign.totalSpend || 1)).toFixed(2)}x</td>
-                  <td className="py-3">
-                    <Badge 
-                      variant={campaign.status === 'active' ? 'success' : 
-                             campaign.status === 'paused' ? 'warning' : 'error'}
-                    >
-                      {campaign.status}
-                    </Badge>
-                  </td>
+                  <td className="py-3 text-[#111827] font-semibold">{((campaign.totalConversions || 0) / (campaign.totalSpend || 1)).toFixed(2)}x</td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
-      </Card>
-
-      {/* Recommendations */}
-      <Card padding="lg">
-        <h3 className="text-lg font-semibold text-[#111827] mb-4">AI Recommendations</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div className="border border-[#E5E7EB] rounded-lg p-4">
-            <div className="flex items-center justify-between mb-2">
-              <Badge variant="success">Budget Optimization</Badge>
-              <Badge variant="success">95% confidence</Badge>
-            </div>
-            <p className="text-[#111827]">Increase Meta budget by 20% during weekdays for better ROAS</p>
-          </div>
-          
-          <div className="border border-[#E5E7EB] rounded-lg p-4">
-            <div className="flex items-center justify-between mb-2">
-              <Badge variant="warning">Creative Refresh</Badge>
-              <Badge variant="warning">78% confidence</Badge>
-            </div>
-            <p className="text-[#111827]">Update creative assets for campaigns older than 30 days</p>
-          </div>
-          
-          <div className="border border-[#E5E7EB] rounded-lg p-4">
-            <div className="flex items-center justify-between mb-2">
-              <Badge variant="info">Audience Expansion</Badge>
-              <Badge variant="success">82% confidence</Badge>
-            </div>
-            <p className="text-[#111827]">Expand audience targeting to include lookalike audiences</p>
-          </div>
         </div>
       </Card>
     </div>
