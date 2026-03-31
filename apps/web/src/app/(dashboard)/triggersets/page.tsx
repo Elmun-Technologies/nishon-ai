@@ -184,6 +184,26 @@ export default function TriggerSetsPage() {
   return (
     <div className="space-y-5 max-w-5xl">
 
+      {/* ── Reporting redirect notice ── */}
+      <div className="flex items-start gap-4 bg-violet-50 border border-violet-200 rounded-2xl px-5 py-4">
+        <span className="text-2xl shrink-0">📊</span>
+        <div className="flex-1 min-w-0">
+          <p className="text-violet-800 font-semibold text-sm mb-0.5">
+            Triggersetlar endi Hisobotda mavjud
+          </p>
+          <p className="text-violet-600 text-xs leading-relaxed">
+            Ko'rsatkichlar bo'yicha avtomatik qoidalarni Hisobot bo'limidan drag-and-drop
+            orqali sozlashingiz mumkin. Bu yerda ham yaratish va boshqarish imkoni saqlanadi.
+          </p>
+        </div>
+        <button
+          onClick={() => router.push('/reporting')}
+          className="shrink-0 text-xs font-medium text-violet-700 bg-violet-100 hover:bg-violet-200 border border-violet-300 px-3 py-1.5 rounded-lg transition-colors"
+        >
+          Hisobotga o'tish →
+        </button>
+      </div>
+
       {/* ── Header ── */}
       <div className="flex items-center justify-between">
         <div>

@@ -3,7 +3,6 @@ import { useState, useMemo } from 'react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
-import { EmptyState } from '@/components/ui/EmptyState'
 import { useRouter } from 'next/navigation'
 import { formatCurrency } from '@/lib/utils'
 
@@ -104,8 +103,28 @@ export default function SimulationPage() {
           Simulation & Forecast
         </h1>
         <p className="text-[#6B7280] text-sm">
-          Adjust your budget and scenario to forecast results before committing
+          Byudjetingizni o'zgartirsa qanday natijalar bo'lishini oldindan ko'ring
         </p>
+      </div>
+
+      {/* ── Reporting embed notice ── */}
+      <div className="flex items-start gap-4 bg-emerald-50 border border-emerald-200 rounded-2xl px-5 py-4">
+        <span className="text-2xl shrink-0">💡</span>
+        <div className="flex-1 min-w-0">
+          <p className="text-emerald-800 font-semibold text-sm mb-0.5">
+            Simulyatsiya endi Hisobot ichida ham mavjud
+          </p>
+          <p className="text-emerald-600 text-xs leading-relaxed">
+            Hisobot bo'limida "Byudjet Simulyatsiyasi" paneli orqali real kampaniya
+            ko'rsatkichlariga asoslangan prognoz qilishingiz mumkin.
+          </p>
+        </div>
+        <button
+          onClick={() => router.push('/reporting')}
+          className="shrink-0 text-xs font-medium text-emerald-700 bg-emerald-100 hover:bg-emerald-200 border border-emerald-300 px-3 py-1.5 rounded-lg transition-colors"
+        >
+          Hisobotga o'tish →
+        </button>
       </div>
 
       {/* ── Controls ── */}
