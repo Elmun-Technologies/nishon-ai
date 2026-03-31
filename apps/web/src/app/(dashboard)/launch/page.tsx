@@ -1,0 +1,570 @@
+'use client'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useWorkspaceStore } from '@/stores/workspace.store'
+import { campaigns as campaignsApi } from '@/lib/api-client'
+import { Alert } from '@/components/ui/Alert'
+
+type Platform = 'meta' | 'google' | 'yandex'
+type MetaStep = 1 | 2 | 3 | 4 | 5
+type GoogleStep = 1 | 2 | 3 | 4 | 5
+type YandexStep = 1 | 2 | 3 | 4
+
+const PLATFORMS = [
+  { id: 'meta', name: '📘 Meta (Facebook/Instagram)', desc: 'Reklama qo\'yish Facebookda, Instagramda', color: 'from-blue-400 to-blue-600' },
+  { id: 'google', name: '🔍 Google Ads', desc: 'Qidiruv, Display, Smart kampaniyalar', color: 'from-red-400 to-blue-500' },
+  { id: 'yandex', name: '🟡 Yandex Direct', desc: 'Yandex-da qidiruv va reklama', color: 'from-yellow-400 to-orange-500' },
+]
+
+export default function LaunchPage() {
+  const router = useRouter()
+  const { currentWorkspace } = useWorkspaceStore()
+  const [platform, setPlatform] = useState<Platform | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+
+  // Meta form state
+  const [metaStep, setMetaStep] = useState<MetaStep>(1)
+  const [metaData, setMetaData] = useState({
+    name: '',
+    objective: 'leads',
+    minAge: 18,
+    maxAge: 65,
+    location: 'UZ',
+    dailyBudget: '',
+    campaignDuration: 7,
+    creativeName: '',
+    creativeUrl: '',
+    creativeText: '',
+    ctaButton: 'learn_more',
+  })
+
+  // Google form state
+  const [googleStep, setGoogleStep] = useState<GoogleStep>(1)
+  const [googleData, setGoogleData] = useState({
+    name: '',
+    campaignType: 'search',
+    objective: 'leads',
+    keywords: '',
+    headline1: '',
+    headline2: '',
+    headline3: '',
+    description1: '',
+    description2: '',
+    finalUrl: '',
+    dailyBudget: '',
+    biddingStrategy: 'target_cpa',
+  })
+
+  // Yandex form state
+  const [yandexStep, setYandexStep] = useState<YandexStep>(1)
+  const [yandexData, setYandexData] = useState({
+    name: '',
+    campaignType: 'search',
+    keywords: '',
+    negativeKeywords: '',
+    headline: '',
+    description: '',
+    url: '',
+    dailyBudget: '',
+    strategy: 'average_cpc',
+  })
+
+  const handleMetaLaunch = async () => {
+    setSaving(true)
+    setError('')
+    try {
+      const campaign = await campaignsApi.create(currentWorkspace?.id ?? '', {
+        name: metaData.name,
+        platform: 'meta',
+        objective: metaData.objective,
+        dailyBudget: Number(metaData.dailyBudget),
+        totalBudget: Number(metaData.dailyBudget) * metaData.campaignDuration,
+      })
+      router.push(`/campaigns`)
+    } catch (err: any) {
+      setError(err?.message || 'Kampaniya yaratishda xatolik')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleGoogleLaunch = async () => {
+    setSaving(true)
+    setError('')
+    try {
+      const campaign = await campaignsApi.create(currentWorkspace?.id ?? '', {
+        name: googleData.name,
+        platform: 'google',
+        objective: googleData.objective,
+        dailyBudget: Number(googleData.dailyBudget),
+        totalBudget: Number(googleData.dailyBudget) * 30,
+      })
+      router.push(`/campaigns`)
+    } catch (err: any) {
+      setError(err?.message || 'Kampaniya yaratishda xatolik')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleYandexLaunch = async () => {
+    setSaving(true)
+    setError('')
+    try {
+      const campaign = await campaignsApi.create(currentWorkspace?.id ?? '', {
+        name: yandexData.name,
+        platform: 'yandex',
+        objective: 'leads',
+        dailyBudget: Number(yandexData.dailyBudget),
+        totalBudget: Number(yandexData.dailyBudget) * 30,
+      })
+      router.push(`/campaigns`)
+    } catch (err: any) {
+      setError(err?.message || 'Kampaniya yaratishda xatolik')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (!platform) {
+    return (
+      <div className="max-w-4xl mx-auto space-y-6 py-6">
+        <div>
+          <h1 className="text-2xl font-bold text-[#111827] mb-1">🚀 Reklama Yoqish</h1>
+          <p className="text-[#6B7280] text-sm">Platforma tanlang va qadamma-qadam reklama yoqing</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {PLATFORMS.map(p => (
+            <button
+              key={p.id}
+              onClick={() => setPlatform(p.id as Platform)}
+              className="group relative overflow-hidden rounded-2xl border-2 border-[#E5E7EB] bg-white p-6 text-left transition-all hover:border-[#D1D5DB] hover:shadow-lg"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br opacity-0 transition-opacity group-hover:opacity-5" style={{
+                backgroundImage: `linear-gradient(to bottom right, var(--tw-gradient-stops))`,
+              }} />
+              <div className="relative space-y-3">
+                <h3 className="text-lg font-bold text-[#111827]">{p.name}</h3>
+                <p className="text-sm text-[#6B7280]">{p.desc}</p>
+                <div className="pt-3">
+                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#374151]">
+                    Boshlash →
+                  </span>
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  // ── META FORM ──────────────────────────────────────────────────────────
+
+  if (platform === 'meta') {
+    return (
+      <div className="max-w-2xl mx-auto space-y-6 py-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <button onClick={() => setPlatform(null)} className="text-[#6B7280] hover:text-[#111827] text-sm mb-2 flex items-center gap-1">
+              ← Orqaga
+            </button>
+            <h1 className="text-2xl font-bold text-[#111827]">📘 Meta Kampaniyasi</h1>
+            <p className="text-[#6B7280] text-sm mt-1">Qadam {metaStep}/5</p>
+          </div>
+        </div>
+
+        {error && <Alert variant="error">{error}</Alert>}
+
+        {/* Progress bar */}
+        <div className="bg-[#F3F4F6] rounded-full h-2">
+          <div className="bg-[#111827] h-2 rounded-full transition-all" style={{ width: `${(metaStep / 5) * 100}%` }} />
+        </div>
+
+        {/* Step 1: Objective */}
+        {metaStep === 1 && (
+          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 space-y-5">
+            <div>
+              <h2 className="text-lg font-bold text-[#111827] mb-2">Maqsad tanlang</h2>
+              <p className="text-[#6B7280] text-sm">Reklama orqali nima erishmoqchisiz?</p>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { value: 'leads', label: 'Lead yig\'ish', icon: '🎯' },
+                { value: 'traffic', label: 'Sayt trafigi', icon: '🌐' },
+                { value: 'sales', label: 'Sotuvlar', icon: '🛒' },
+                { value: 'awareness', label: 'Xabardorlik', icon: '📣' },
+              ].map(opt => (
+                <button
+                  key={opt.value}
+                  onClick={() => setMetaData(d => ({ ...d, objective: opt.value }))}
+                  className={`p-4 rounded-xl border-2 transition-all text-left ${
+                    metaData.objective === opt.value
+                      ? 'border-[#111827] bg-[#F3F4F6]'
+                      : 'border-[#E5E7EB] hover:border-[#D1D5DB]'
+                  }`}
+                >
+                  <span className="text-2xl block mb-1">{opt.icon}</span>
+                  <span className="font-semibold text-sm text-[#111827]">{opt.label}</span>
+                </button>
+              ))}
+            </div>
+            <button onClick={() => setMetaStep(2)} className="w-full bg-[#111827] hover:bg-[#1F2937] text-white py-3 rounded-xl font-semibold">
+              Davom etish →
+            </button>
+          </div>
+        )}
+
+        {/* Step 2: Audience */}
+        {metaStep === 2 && (
+          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 space-y-5">
+            <div>
+              <h2 className="text-lg font-bold text-[#111827] mb-2">Auditoriya</h2>
+              <p className="text-[#6B7280] text-sm">Kim sizning reklama ko'radi?</p>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-[#6B7280] mb-2">Yosh: {metaData.minAge}–{metaData.maxAge}</label>
+                <div className="flex gap-2">
+                  <input type="number" value={metaData.minAge} onChange={e => setMetaData(d => ({ ...d, minAge: Number(e.target.value) }))} className="w-20 border border-[#E5E7EB] rounded-lg px-3 py-2" />
+                  <span className="flex items-center">–</span>
+                  <input type="number" value={metaData.maxAge} onChange={e => setMetaData(d => ({ ...d, maxAge: Number(e.target.value) }))} className="w-20 border border-[#E5E7EB] rounded-lg px-3 py-2" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-[#6B7280] mb-2">Joylashuv</label>
+                <select value={metaData.location} onChange={e => setMetaData(d => ({ ...d, location: e.target.value }))} className="w-full border border-[#E5E7EB] rounded-lg px-4 py-2">
+                  <option value="UZ">O'zbekiston</option>
+                  <option value="KZ">Qozog'iston</option>
+                  <option value="TJ">Tojikiston</option>
+                  <option value="TM">Turkmaniston</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => setMetaStep(1)} className="flex-1 bg-[#F3F4F6] hover:bg-[#E5E7EB] text-[#111827] py-3 rounded-xl font-semibold">
+                ← Orqaga
+              </button>
+              <button onClick={() => setMetaStep(3)} className="flex-1 bg-[#111827] hover:bg-[#1F2937] text-white py-3 rounded-xl font-semibold">
+                Davom etish →
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 3: Budget */}
+        {metaStep === 3 && (
+          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 space-y-5">
+            <div>
+              <h2 className="text-lg font-bold text-[#111827] mb-2">Byudjet</h2>
+              <p className="text-[#6B7280] text-sm">Reklama uchun qancha pul sarflaysiz?</p>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-[#6B7280] mb-2">Kunlik byudjet (USD)</label>
+                <div className="flex items-center gap-2">
+                  <span className="text-[#6B7280]">$</span>
+                  <input type="number" value={metaData.dailyBudget} onChange={e => setMetaData(d => ({ ...d, dailyBudget: e.target.value }))} placeholder="100" className="flex-1 border border-[#E5E7EB] rounded-lg px-4 py-2" />
+                  <span className="text-[#6B7280] text-sm">/kun</span>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-[#6B7280] mb-2">Kampaniya davomiyligi: {metaData.campaignDuration} kun</label>
+                <input type="range" min="1" max="90" value={metaData.campaignDuration} onChange={e => setMetaData(d => ({ ...d, campaignDuration: Number(e.target.value) }))} className="w-full" />
+                <p className="text-xs text-[#6B7280] mt-2">Jami: ${(Number(metaData.dailyBudget) * metaData.campaignDuration || 0).toLocaleString()}</p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => setMetaStep(2)} className="flex-1 bg-[#F3F4F6] hover:bg-[#E5E7EB] text-[#111827] py-3 rounded-xl font-semibold">
+                ← Orqaga
+              </button>
+              <button onClick={() => setMetaStep(4)} className="flex-1 bg-[#111827] hover:bg-[#1F2937] text-white py-3 rounded-xl font-semibold">
+                Davom etish →
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 4: Creative */}
+        {metaStep === 4 && (
+          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 space-y-5">
+            <div>
+              <h2 className="text-lg font-bold text-[#111827] mb-2">Kreativ</h2>
+              <p className="text-[#6B7280] text-sm">Reklama tasviri va matni</p>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-[#6B7280] mb-2">Rasm/Video URL</label>
+                <input type="text" value={metaData.creativeUrl} onChange={e => setMetaData(d => ({ ...d, creativeUrl: e.target.value }))} placeholder="https://..." className="w-full border border-[#E5E7EB] rounded-lg px-4 py-2" />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-[#6B7280] mb-2">Tekst</label>
+                <textarea value={metaData.creativeText} onChange={e => setMetaData(d => ({ ...d, creativeText: e.target.value }))} placeholder="Reklama matni..." rows={3} className="w-full border border-[#E5E7EB] rounded-lg px-4 py-2" />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-[#6B7280] mb-2">CTA tugmasi</label>
+                <select value={metaData.ctaButton} onChange={e => setMetaData(d => ({ ...d, ctaButton: e.target.value }))} className="w-full border border-[#E5E7EB] rounded-lg px-4 py-2">
+                  <option value="learn_more">Batafsil</option>
+                  <option value="contact_us">Bog'lanish</option>
+                  <option value="shop_now">Sotib olish</option>
+                  <option value="sign_up">Ro'yxatdan o'tish</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => setMetaStep(3)} className="flex-1 bg-[#F3F4F6] hover:bg-[#E5E7EB] text-[#111827] py-3 rounded-xl font-semibold">
+                ← Orqaga
+              </button>
+              <button onClick={() => setMetaStep(5)} className="flex-1 bg-[#111827] hover:bg-[#1F2937] text-white py-3 rounded-xl font-semibold">
+                Ko'rib chiqish →
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 5: Review */}
+        {metaStep === 5 && (
+          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 space-y-5">
+            <div>
+              <h2 className="text-lg font-bold text-[#111827] mb-2">Ko'rib chiqing</h2>
+              <p className="text-[#6B7280] text-sm">Barcha ma'lumotlar to'g'rimi?</p>
+            </div>
+            <div className="bg-[#F9FAFB] rounded-xl p-4 space-y-3 text-sm">
+              <div className="flex justify-between"><span className="text-[#6B7280]">Maqsad:</span> <span className="font-semibold text-[#111827]">{metaData.objective}</span></div>
+              <div className="flex justify-between"><span className="text-[#6B7280]">Yosh:</span> <span className="font-semibold text-[#111827]">{metaData.minAge}–{metaData.maxAge}</span></div>
+              <div className="flex justify-between"><span className="text-[#6B7280]">Kunlik byudjet:</span> <span className="font-semibold text-[#111827]">${metaData.dailyBudget}</span></div>
+              <div className="flex justify-between"><span className="text-[#6B7280]">Davom:</span> <span className="font-semibold text-[#111827]">{metaData.campaignDuration} kun</span></div>
+              <div className="flex justify-between"><span className="text-[#6B7280]">Jami:</span> <span className="font-semibold text-[#111827] text-base">${(Number(metaData.dailyBudget) * metaData.campaignDuration)}</span></div>
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => setMetaStep(4)} className="flex-1 bg-[#F3F4F6] hover:bg-[#E5E7EB] text-[#111827] py-3 rounded-xl font-semibold">
+                ← Tahrir qilish
+              </button>
+              <button onClick={handleMetaLaunch} disabled={saving} className="flex-1 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white py-3 rounded-xl font-semibold">
+                {saving ? '⏳' : '🚀'} Ishga tushirish
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // ── GOOGLE FORM ────────────────────────────────────────────────────────
+
+  if (platform === 'google') {
+    return (
+      <div className="max-w-2xl mx-auto space-y-6 py-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <button onClick={() => setPlatform(null)} className="text-[#6B7280] hover:text-[#111827] text-sm mb-2 flex items-center gap-1">
+              ← Orqaga
+            </button>
+            <h1 className="text-2xl font-bold text-[#111827]">🔍 Google Ads Kampaniyasi</h1>
+            <p className="text-[#6B7280] text-sm mt-1">Qadam {googleStep}/5</p>
+          </div>
+        </div>
+
+        {error && <Alert variant="error">{error}</Alert>}
+
+        <div className="bg-[#F3F4F6] rounded-full h-2">
+          <div className="bg-[#111827] h-2 rounded-full transition-all" style={{ width: `${(googleStep / 5) * 100}%` }} />
+        </div>
+
+        {googleStep === 1 && (
+          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 space-y-5">
+            <h2 className="text-lg font-bold text-[#111827]">Kampaniya turi</h2>
+            <div className="grid grid-cols-1 gap-3">
+              {[
+                { value: 'search', label: 'Qidiruv', desc: 'Google qidiruv natijalarida' },
+                { value: 'display', label: 'Displey', desc: 'Veb-saytlar va applarida' },
+                { value: 'smart', label: 'Smart', desc: 'AI avtomatik optimallashtirish' },
+              ].map(opt => (
+                <button key={opt.value} onClick={() => setGoogleData(d => ({ ...d, campaignType: opt.value }))} className={`p-4 rounded-xl border-2 text-left transition-all ${googleData.campaignType === opt.value ? 'border-[#111827] bg-[#F3F4F6]' : 'border-[#E5E7EB]'}`}>
+                  <div className="font-semibold text-[#111827]">{opt.label}</div>
+                  <div className="text-sm text-[#6B7280]">{opt.desc}</div>
+                </button>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => setPlatform(null)} className="flex-1 bg-[#F3F4F6] hover:bg-[#E5E7EB] text-[#111827] py-3 rounded-xl font-semibold">
+                ← Orqaga
+              </button>
+              <button onClick={() => setGoogleStep(2)} className="flex-1 bg-[#111827] hover:bg-[#1F2937] text-white py-3 rounded-xl font-semibold">
+                Davom →
+              </button>
+            </div>
+          </div>
+        )}
+
+        {googleStep === 2 && (
+          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 space-y-5">
+            <h2 className="text-lg font-bold text-[#111827]">Kalit so'zlar</h2>
+            <textarea value={googleData.keywords} onChange={e => setGoogleData(d => ({ ...d, keywords: e.target.value }))} placeholder="Har bir kalit so'zni yangi qatorga yozing..." rows={4} className="w-full border border-[#E5E7EB] rounded-lg px-4 py-2" />
+            <div className="flex gap-2">
+              <button onClick={() => setGoogleStep(1)} className="flex-1 bg-[#F3F4F6] hover:bg-[#E5E7EB] text-[#111827] py-3 rounded-xl font-semibold">←</button>
+              <button onClick={() => setGoogleStep(3)} className="flex-1 bg-[#111827] hover:bg-[#1F2937] text-white py-3 rounded-xl font-semibold">→</button>
+            </div>
+          </div>
+        )}
+
+        {googleStep === 3 && (
+          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 space-y-5">
+            <h2 className="text-lg font-bold text-[#111827]">Reklama matni</h2>
+            <div className="space-y-3">
+              <input type="text" value={googleData.headline1} onChange={e => setGoogleData(d => ({ ...d, headline1: e.target.value }))} placeholder="Sarlavha 1" className="w-full border border-[#E5E7EB] rounded-lg px-4 py-2" />
+              <input type="text" value={googleData.headline2} onChange={e => setGoogleData(d => ({ ...d, headline2: e.target.value }))} placeholder="Sarlavha 2" className="w-full border border-[#E5E7EB] rounded-lg px-4 py-2" />
+              <input type="text" value={googleData.headline3} onChange={e => setGoogleData(d => ({ ...d, headline3: e.target.value }))} placeholder="Sarlavha 3" className="w-full border border-[#E5E7EB] rounded-lg px-4 py-2" />
+              <textarea value={googleData.description1} onChange={e => setGoogleData(d => ({ ...d, description1: e.target.value }))} placeholder="Tavsif 1" rows={2} className="w-full border border-[#E5E7EB] rounded-lg px-4 py-2" />
+              <textarea value={googleData.description2} onChange={e => setGoogleData(d => ({ ...d, description2: e.target.value }))} placeholder="Tavsif 2" rows={2} className="w-full border border-[#E5E7EB] rounded-lg px-4 py-2" />
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => setGoogleStep(2)} className="flex-1 bg-[#F3F4F6] hover:bg-[#E5E7EB] text-[#111827] py-3 rounded-xl font-semibold">←</button>
+              <button onClick={() => setGoogleStep(4)} className="flex-1 bg-[#111827] hover:bg-[#1F2937] text-white py-3 rounded-xl font-semibold">→</button>
+            </div>
+          </div>
+        )}
+
+        {googleStep === 4 && (
+          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 space-y-5">
+            <h2 className="text-lg font-bold text-[#111827]">Byudjet va taklif</h2>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-semibold text-[#6B7280] mb-2">Kunlik byudjet ($)</label>
+                <input type="number" value={googleData.dailyBudget} onChange={e => setGoogleData(d => ({ ...d, dailyBudget: e.target.value }))} placeholder="50" className="w-full border border-[#E5E7EB] rounded-lg px-4 py-2" />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-[#6B7280] mb-2">Taklif strategiyasi</label>
+                <select value={googleData.biddingStrategy} onChange={e => setGoogleData(d => ({ ...d, biddingStrategy: e.target.value }))} className="w-full border border-[#E5E7EB] rounded-lg px-4 py-2">
+                  <option value="target_cpa">Target CPA</option>
+                  <option value="maximize">Maksimal konversiyalar</option>
+                  <option value="manual">Qo'lda</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => setGoogleStep(3)} className="flex-1 bg-[#F3F4F6] hover:bg-[#E5E7EB] text-[#111827] py-3 rounded-xl font-semibold">←</button>
+              <button onClick={() => setGoogleStep(5)} className="flex-1 bg-[#111827] hover:bg-[#1F2937] text-white py-3 rounded-xl font-semibold">Ko'rib chiqing →</button>
+            </div>
+          </div>
+        )}
+
+        {googleStep === 5 && (
+          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 space-y-5">
+            <h2 className="text-lg font-bold text-[#111827]">Ko'rib chiqing</h2>
+            <div className="bg-[#F9FAFB] rounded-xl p-4 space-y-2 text-sm">
+              <div className="flex justify-between"><span className="text-[#6B7280]">Turi:</span> <span className="font-semibold">{googleData.campaignType}</span></div>
+              <div className="flex justify-between"><span className="text-[#6B7280]">Byudjet:</span> <span className="font-semibold">${googleData.dailyBudget}/kun</span></div>
+              <div className="flex justify-between"><span className="text-[#6B7280]">Reklama soni:</span> <span className="font-semibold">3 sarlavha, 2 tavsif</span></div>
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => setGoogleStep(4)} className="flex-1 bg-[#F3F4F6] hover:bg-[#E5E7EB] text-[#111827] py-3 rounded-xl font-semibold">← Tahrir</button>
+              <button onClick={handleGoogleLaunch} disabled={saving} className="flex-1 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white py-3 rounded-xl font-semibold">
+                {saving ? '⏳' : '🚀'} Ishga tushirish
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // ── YANDEX FORM ────────────────────────────────────────────────────────
+
+  if (platform === 'yandex') {
+    return (
+      <div className="max-w-2xl mx-auto space-y-6 py-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <button onClick={() => setPlatform(null)} className="text-[#6B7280] hover:text-[#111827] text-sm mb-2">
+              ← Orqaga
+            </button>
+            <h1 className="text-2xl font-bold text-[#111827]">🟡 Yandex Direct Kampaniyasi</h1>
+            <p className="text-[#6B7280] text-sm mt-1">Qadam {yandexStep}/4</p>
+          </div>
+        </div>
+
+        {error && <Alert variant="error">{error}</Alert>}
+
+        <div className="bg-[#F3F4F6] rounded-full h-2">
+          <div className="bg-[#111827] h-2 rounded-full transition-all" style={{ width: `${(yandexStep / 4) * 100}%` }} />
+        </div>
+
+        {yandexStep === 1 && (
+          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 space-y-5">
+            <h2 className="text-lg font-bold text-[#111827]">Kampaniya turi</h2>
+            <div className="space-y-3">
+              {[
+                { value: 'search', label: 'Qidiruv', desc: 'Yandex qidiruv natijalarida' },
+                { value: 'smart', label: 'Smart bannerlar', desc: 'Avtomatik reklama joylarida' },
+              ].map(opt => (
+                <button key={opt.value} onClick={() => setYandexData(d => ({ ...d, campaignType: opt.value }))} className={`p-4 rounded-xl border-2 text-left ${yandexData.campaignType === opt.value ? 'border-[#111827] bg-[#F3F4F6]' : 'border-[#E5E7EB]'}`}>
+                  <div className="font-semibold">{opt.label}</div>
+                  <div className="text-sm text-[#6B7280]">{opt.desc}</div>
+                </button>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => setPlatform(null)} className="flex-1 bg-[#F3F4F6] py-3 rounded-xl font-semibold">← Orqaga</button>
+              <button onClick={() => setYandexStep(2)} className="flex-1 bg-[#111827] text-white py-3 rounded-xl font-semibold">Davom →</button>
+            </div>
+          </div>
+        )}
+
+        {yandexStep === 2 && (
+          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 space-y-5">
+            <h2 className="text-lg font-bold text-[#111827]">Kalit so'zlar</h2>
+            <textarea value={yandexData.keywords} onChange={e => setYandexData(d => ({ ...d, keywords: e.target.value }))} placeholder="Kalit so'zlar..." rows={4} className="w-full border border-[#E5E7EB] rounded-lg px-4 py-2" />
+            <textarea value={yandexData.negativeKeywords} onChange={e => setYandexData(d => ({ ...d, negativeKeywords: e.target.value }))} placeholder="Salbiy kalit so'zlar (ixtiyoriy)..." rows={2} className="w-full border border-[#E5E7EB] rounded-lg px-4 py-2" />
+            <div className="flex gap-2">
+              <button onClick={() => setYandexStep(1)} className="flex-1 bg-[#F3F4F6] py-3 rounded-xl">←</button>
+              <button onClick={() => setYandexStep(3)} className="flex-1 bg-[#111827] text-white py-3 rounded-xl">→</button>
+            </div>
+          </div>
+        )}
+
+        {yandexStep === 3 && (
+          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 space-y-5">
+            <h2 className="text-lg font-bold text-[#111827]">Reklama matni</h2>
+            <input type="text" value={yandexData.headline} onChange={e => setYandexData(d => ({ ...d, headline: e.target.value }))} placeholder="Sarlavha" className="w-full border border-[#E5E7EB] rounded-lg px-4 py-2" />
+            <textarea value={yandexData.description} onChange={e => setYandexData(d => ({ ...d, description: e.target.value }))} placeholder="Tavsif" rows={3} className="w-full border border-[#E5E7EB] rounded-lg px-4 py-2" />
+            <input type="text" value={yandexData.url} onChange={e => setYandexData(d => ({ ...d, url: e.target.value }))} placeholder="Sayt manzili" className="w-full border border-[#E5E7EB] rounded-lg px-4 py-2" />
+            <div className="flex gap-2">
+              <button onClick={() => setYandexStep(2)} className="flex-1 bg-[#F3F4F6] py-3 rounded-xl">←</button>
+              <button onClick={() => setYandexStep(4)} className="flex-1 bg-[#111827] text-white py-3 rounded-xl">Ko'rib chiqing →</button>
+            </div>
+          </div>
+        )}
+
+        {yandexStep === 4 && (
+          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 space-y-5">
+            <h2 className="text-lg font-bold text-[#111827]">Byudjet va strategiya</h2>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-semibold text-[#6B7280] mb-2">Kunlik chegaralash ($)</label>
+                <input type="number" value={yandexData.dailyBudget} onChange={e => setYandexData(d => ({ ...d, dailyBudget: e.target.value }))} placeholder="50" className="w-full border border-[#E5E7EB] rounded-lg px-4 py-2" />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-[#6B7280] mb-2">Taklif strategiyasi</label>
+                <select value={yandexData.strategy} onChange={e => setYandexData(d => ({ ...d, strategy: e.target.value }))} className="w-full border border-[#E5E7EB] rounded-lg px-4 py-2">
+                  <option value="average_cpc">O'rtacha CPC</option>
+                  <option value="highest_position">Eng yuqori pozitsiya</option>
+                  <option value="weekly_budget">Haftada bir</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => setYandexStep(3)} className="flex-1 bg-[#F3F4F6] py-3 rounded-xl">← Tahrir</button>
+              <button onClick={handleYandexLaunch} disabled={saving} className="flex-1 bg-emerald-600 text-white py-3 rounded-xl font-semibold">
+                {saving ? '⏳' : '🚀'} Ishga tushirish
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
+}
