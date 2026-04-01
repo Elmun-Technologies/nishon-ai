@@ -62,9 +62,9 @@ export default function BudgetPage() {
       {/* ── Page header ── */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#111827] mb-1">Budget Allocation</h1>
+          <h1 className="text-2xl font-bold text-[#111827] mb-1">Byudjet Taqsimoti</h1>
           <p className="text-[#6B7280] text-sm">
-            AI-optimized budget distribution across your ad platforms
+            AI tomonidan optimallashtirilgan platforma byudjet taqsimoti
           </p>
         </div>
         {strategy?.autoRebalance && (
@@ -76,27 +76,27 @@ export default function BudgetPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
           {
-            label: 'Monthly Budget',
+            label: 'Oylik Byudjet',
             value: formatCurrency(totalBudget),
-            sub: 'per month',
+            sub: 'har oy',
             icon: '💰',
           },
           {
-            label: 'Daily Budget',
+            label: 'Kunlik Byudjet',
             value: formatCurrency(totalBudget / 30),
-            sub: 'per day average',
+            sub: "kuniga o'rtacha",
             icon: '📅',
           },
           {
-            label: 'Platforms',
+            label: 'Platformalar',
             value: platformStats.length || '—',
-            sub: 'active channels',
+            sub: 'faol kanallar',
             icon: '📢',
           },
           {
-            label: 'Active Campaigns',
+            label: 'Aktiv Kampaniyalar',
             value: performance?.activeCampaigns ?? '—',
-            sub: `of ${performance?.totalCampaigns ?? '—'} total`,
+            sub: `jami ${performance?.totalCampaigns ?? '—'} ta`,
             icon: '📊',
           },
         ].map(({ label, value, sub, icon }) => (
@@ -116,15 +116,15 @@ export default function BudgetPage() {
         <Card>
           <div className="flex items-center gap-2 mb-5">
             <span className="text-lg">📈</span>
-            <h2 className="font-semibold text-[#111827]">Live Performance</h2>
-            <Badge variant="success" size="sm" dot>Real data</Badge>
+            <h2 className="font-semibold text-[#111827]">Joriy Ko'rsatkichlar</h2>
+            <Badge variant="success" size="sm" dot>Real ma'lumot</Badge>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { label: 'Total Spend', value: performance.totalSpend !== undefined ? formatCurrency(performance.totalSpend) : '—', color: 'text-[#111827]' },
-              { label: 'Avg ROAS', value: performance.avgRoas !== undefined ? `${Number(performance.avgRoas).toFixed(1)}x` : '—', color: 'text-emerald-400' },
-              { label: 'Avg CPA', value: performance.avgCpa !== undefined ? formatCurrency(performance.avgCpa) : '—', color: 'text-[#111827]' },
-              { label: 'Avg CTR', value: performance.avgCtr !== undefined ? `${(Number(performance.avgCtr) * 100).toFixed(2)}%` : '—', color: 'text-[#111827]' },
+              { label: 'Jami Xarajat', value: performance.totalSpend !== undefined ? formatCurrency(performance.totalSpend) : '—', color: 'text-[#111827]' },
+              { label: "O'rt. ROAS", value: performance.avgRoas !== undefined ? `${Number(performance.avgRoas).toFixed(1)}x` : '—', color: 'text-emerald-400' },
+              { label: "O'rt. CPA", value: performance.avgCpa !== undefined ? formatCurrency(performance.avgCpa) : '—', color: 'text-[#111827]' },
+              { label: "O'rt. CTR", value: performance.avgCtr !== undefined ? `${(Number(performance.avgCtr) * 100).toFixed(2)}%` : '—', color: 'text-[#111827]' },
             ].map(({ label, value, color }) => (
               <div key={label} className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4">
                 <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide mb-2">{label}</p>
@@ -141,15 +141,15 @@ export default function BudgetPage() {
         <Card>
           <div className="flex items-center gap-2 mb-5">
             <span className="text-lg">📊</span>
-            <h2 className="font-semibold text-[#111827]">Platform Split</h2>
-            <Badge variant="purple" size="sm">AI Recommended</Badge>
+            <h2 className="font-semibold text-[#111827]">Platforma Taqsimoti</h2>
+            <Badge variant="purple" size="sm">AI Tavsiyasi</Badge>
           </div>
 
           {platformStats.length === 0 ? (
             <EmptyState
               icon="📊"
-              title="No allocation set"
-              description="Complete onboarding to get AI budget recommendations."
+              title="Taqsimot belgilanmagan"
+              description="AI byudjet tavsiyalarini olish uchun onboardingni yakunlang."
             />
           ) : (
             <div className="space-y-5">
@@ -204,35 +204,35 @@ export default function BudgetPage() {
         <Card>
           <div className="flex items-center gap-2 mb-5">
             <span className="text-lg">🎯</span>
-            <h2 className="font-semibold text-[#111827]">Monthly Forecast</h2>
+            <h2 className="font-semibold text-[#111827]">Oylik Prognoz</h2>
           </div>
 
           {forecast ? (
             <div className="space-y-4">
               {[
-                { label: 'Estimated Leads', value: forecast.estimatedLeads ?? '—', icon: '🎯', color: 'text-[#111827]' },
-                { label: 'Estimated Sales', value: forecast.estimatedSales ?? '—', icon: '🛒', color: 'text-[#111827]' },
+                { label: 'Taxminiy Lidlar', value: forecast.estimatedLeads ?? '—', icon: '🎯', color: 'text-[#111827]' },
+                { label: 'Taxminiy Sotuvlar', value: forecast.estimatedSales ?? '—', icon: '🛒', color: 'text-[#111827]' },
                 {
-                  label: 'Estimated ROAS',
+                  label: 'Taxminiy ROAS',
                   value: forecast.estimatedRoas ? `${Number(forecast.estimatedRoas).toFixed(1)}x` : '—',
                   icon: '📈',
                   color: 'text-emerald-400',
                 },
                 {
-                  label: 'Estimated CPA',
+                  label: 'Taxminiy CPA',
                   value: forecast.estimatedCpa ? formatCurrency(forecast.estimatedCpa) : '—',
                   icon: '💵',
                   color: 'text-[#111827]',
                 },
                 {
-                  label: 'Estimated CTR',
+                  label: 'Taxminiy CTR',
                   value: forecast.estimatedCtr
                     ? `${(Number(forecast.estimatedCtr) * 100).toFixed(2)}%`
                     : '—',
                   icon: '👆',
                   color: 'text-[#111827]',
                 },
-                { label: 'Confidence', value: forecast.confidence ?? '—', icon: '🎲', color: 'text-[#374151]' },
+                { label: 'Ishonch darajasi', value: forecast.confidence ?? '—', icon: '🎲', color: 'text-[#374151]' },
               ].map(({ label, value, icon, color }) => (
                 <div
                   key={label}
@@ -249,8 +249,8 @@ export default function BudgetPage() {
           ) : (
             <EmptyState
               icon="🧠"
-              title="No forecast yet"
-              description="Generate an AI strategy during onboarding to see your KPI forecast."
+              title="Hali prognoz yo'q"
+              description="KPI prognozini ko'rish uchun onboarding davomida AI strategiyasini yarating."
             />
           )}
         </Card>
@@ -261,16 +261,16 @@ export default function BudgetPage() {
         <Card>
           <div className="flex items-center gap-2 mb-4">
             <span className="text-lg">🎨</span>
-            <h2 className="font-semibold text-[#111827]">Creative Guidelines</h2>
-            <Badge variant="gray" size="sm">From AI Strategy</Badge>
+            <h2 className="font-semibold text-[#111827]">Kreativ Ko'rsatmalar</h2>
+            <Badge variant="gray" size="sm">AI Strategiyadan</Badge>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4">
-              <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide mb-2">Tone</p>
+              <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide mb-2">Ton</p>
               <p className="text-[#111827] text-sm">{strategy.creativeGuidelines.tone ?? '—'}</p>
             </div>
             <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4">
-              <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide mb-2">Key Messages</p>
+              <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide mb-2">Asosiy Xabarlar</p>
               <ul className="space-y-1">
                 {(strategy.creativeGuidelines.keyMessages ?? []).map((msg: string, i: number) => (
                   <li key={i} className="text-[#111827] text-sm flex items-start gap-2">
@@ -281,7 +281,7 @@ export default function BudgetPage() {
               </ul>
             </div>
             <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4">
-              <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide mb-2">Call to Actions</p>
+              <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide mb-2">Harakatga Chaqiruv</p>
               <div className="flex flex-wrap gap-2">
                 {(strategy.creativeGuidelines.callToActions ?? []).map((cta: string, i: number) => (
                   <Badge key={i} variant="purple" size="sm">{cta}</Badge>
@@ -298,11 +298,11 @@ export default function BudgetPage() {
           <div className="flex items-center gap-3 px-2">
             <span className="text-xl">🧠</span>
             <div className="flex-1">
-              <p className="text-[#111827] text-sm font-medium">No AI strategy yet</p>
-              <p className="text-[#6B7280] text-xs">Go to Settings to generate your first AI strategy and budget plan.</p>
+              <p className="text-[#111827] text-sm font-medium">AI strategiya hali yo'q</p>
+              <p className="text-[#6B7280] text-xs">Birinchi AI strategiya va byudjet rejasini yaratish uchun Sozlamalarga o'ting.</p>
             </div>
             <Button variant="secondary" size="sm" onClick={() => window.location.href = '/settings'}>
-              Go to Settings
+              Sozlamalarga o'tish
             </Button>
           </div>
         </Card>

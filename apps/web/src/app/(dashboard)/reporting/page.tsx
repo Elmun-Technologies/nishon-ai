@@ -71,6 +71,17 @@ function downloadCSV(csv: string, filename: string) {
 
 const DAY_OPTIONS = [7, 14, 30, 60, 90]
 
+const AVAILABLE_METRICS = [
+  { id: 'roas',        label: 'ROAS',           icon: '💰', value: '2.4x',     trend: '+0.3x',  positive: true  },
+  { id: 'cpa',         label: 'CPA',             icon: '🎯', value: '$18.50',   trend: '-$2.1',  positive: true  },
+  { id: 'ctr',         label: 'CTR',             icon: '📊', value: '2.14%',    trend: '+0.4%',  positive: true  },
+  { id: 'frequency',   label: 'Chastota',        icon: '🔁', value: '3.2x',     trend: '+0.8x',  positive: false },
+  { id: 'cpm',         label: 'CPM',             icon: '👁️', value: '$8.40',    trend: '-$1.2',  positive: true  },
+  { id: 'reach',       label: 'Reach',           icon: '📡', value: '12,400',   trend: '+2,100', positive: true  },
+  { id: 'leads',       label: 'Lidlar',          icon: '🙋', value: '84',       trend: '+12',    positive: true  },
+  { id: 'conv_rate',   label: 'Konversiya %',    icon: '✅', value: '4.8%',     trend: '+0.6%',  positive: true  },
+]
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ReportingPage() {
@@ -85,6 +96,10 @@ export default function ReportingPage() {
   const [campaignTags, setCampaignTags] = useState<Record<string, string[]>>({})
   const [editingTagId, setEditingTagId] = useState<string | null>(null)
   const [tagInput, setTagInput] = useState('')
+  // Custom metrics panel
+  const [activeMetrics, setActiveMetrics] = useState<string[]>(['roas', 'cpa', 'ctr', 'frequency'])
+  const [showSimulation, setShowSimulation] = useState(false)
+  const [simBudget, setSimBudget] = useState(1500)
 
   const load = useCallback(() => {
     if (!currentWorkspace?.id) return
@@ -234,6 +249,112 @@ export default function ReportingPage() {
           ))}
         </div>
       )}
+
+      {/* ── Custom Metrics Panel ── */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-semibold text-[#111827] flex items-center gap-2">
+            📌 Mening Ko'rsatkichlarim
+            <span className="text-xs text-[#9CA3AF] font-normal">— keraklisini tanlang</span>
+          </h2>
+          <div className="flex gap-1 flex-wrap justify-end">
+            {AVAILABLE_METRICS.map((m) => (
+              <button
+                key={m.id}
+                onClick={() => setActiveMetrics((prev) =>
+                  prev.includes(m.id) ? prev.filter((x) => x !== m.id) : [...prev, m.id]
+                )}
+                className={`text-xs px-2.5 py-1 rounded-full border transition-all ${
+                  activeMetrics.includes(m.id)
+                    ? 'bg-[#111827] text-white border-[#111827]'
+                    : 'bg-white text-[#6B7280] border-[#E5E7EB] hover:border-[#D1D5DB]'
+                }`}
+              >
+                {m.icon} {m.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {activeMetrics.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            {AVAILABLE_METRICS.filter((m) => activeMetrics.includes(m.id)).map((m) => (
+              <div key={m.id} className="bg-white border border-[#E5E7EB] rounded-xl p-4 relative group">
+                <button
+                  onClick={() => setActiveMetrics((prev) => prev.filter((x) => x !== m.id))}
+                  className="absolute top-2 right-2 text-[#D1D5DB] hover:text-[#9CA3AF] opacity-0 group-hover:opacity-100 transition-opacity text-xs leading-none"
+                >
+                  ×
+                </button>
+                <p className="text-[#6B7280] text-xs mb-1">{m.icon} {m.label}</p>
+                <p className="text-[#111827] text-xl font-bold">{m.value}</p>
+                <p className={`text-xs mt-0.5 ${m.positive ? 'text-emerald-500' : 'text-red-400'}`}>
+                  {m.trend} vs oldingi davr
+                </p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="border border-dashed border-[#E5E7EB] rounded-xl p-6 text-center">
+            <p className="text-[#9CA3AF] text-sm">Yuqoridan ko'rsatkichlarni tanlang</p>
+          </div>
+        )}
+      </div>
+
+      {/* ── Budget Simulation ── */}
+      <div className="bg-white border border-[#E5E7EB] rounded-xl overflow-hidden">
+        <button
+          onClick={() => setShowSimulation(!showSimulation)}
+          className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-[#F9FAFB] transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <span>🔮</span>
+            <span className="text-[#111827] font-medium text-sm">Byudjet Simulyatsiyasi</span>
+            <span className="text-xs text-[#9CA3AF]">— byudjet o'zgartirsa nima bo'ladi?</span>
+          </div>
+          <span className={`text-[#6B7280] text-sm transition-transform duration-200 ${showSimulation ? 'rotate-180' : ''}`}>▾</span>
+        </button>
+
+        {showSimulation && (
+          <div className="px-5 pb-5 border-t border-[#E5E7EB]">
+            <div className="pt-4 space-y-4">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-sm text-[#374151] font-medium">Oylik byudjet</label>
+                  <span className="text-[#111827] font-bold text-lg">${simBudget.toLocaleString()}</span>
+                </div>
+                <input
+                  type="range"
+                  min={500}
+                  max={10000}
+                  step={100}
+                  value={simBudget}
+                  onChange={(e) => setSimBudget(parseInt(e.target.value))}
+                  className="w-full accent-[#111827]"
+                />
+                <div className="flex justify-between text-xs text-[#9CA3AF] mt-1">
+                  <span>$500</span><span>$10,000</span>
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { label: 'Pessimistik', mult: 0.65, color: 'text-red-500', bg: 'bg-red-50 border-red-100' },
+                  { label: 'Realistik',   mult: 1.0,  color: 'text-[#374151]', bg: 'bg-[#F9FAFB] border-[#E5E7EB]' },
+                  { label: 'Optimistik',  mult: 1.35, color: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-100' },
+                ].map((s) => (
+                  <div key={s.label} className={`border rounded-xl p-3 ${s.bg}`}>
+                    <p className="text-[#6B7280] text-xs mb-2">{s.label}</p>
+                    <p className={`text-lg font-bold ${s.color}`}>{Math.round(simBudget / 18.5 * s.mult)} lid</p>
+                    <p className="text-[#9CA3AF] text-xs">ROAS: {(2.4 * s.mult).toFixed(1)}x</p>
+                    <p className="text-[#9CA3AF] text-xs">CPA: ${(18.5 / s.mult).toFixed(0)}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="text-[#9CA3AF] text-xs">* Hisoblash joriy kampaniyalar ko'rsatkichlariga asoslangan</p>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* ── Table ── */}
       <Card padding="none">

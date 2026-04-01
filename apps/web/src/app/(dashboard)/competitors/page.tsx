@@ -279,6 +279,112 @@ function ScoreCircle({ score, label, color }: { score: number; label: string; co
   )
 }
 
+const MOCK_RESULT: CompetitorAnalysis = {
+  competitor: {
+    name: 'Texnomart',
+    instagram: '@texnomart_uz',
+    website: 'texnomart.uz',
+    overallSummary: "Texnomart O'zbekistondagi yirik elektronika do'konlar zanjiri. Kuchli brend taniqliligiga ega, lekin raqamli marketing strategiyasida bir nechta zaif tomonlari bor.",
+    estimatedAdSpend: '$3,000–5,000/oy',
+  },
+  categories: [
+    {
+      id: 1, icon: '📸', title: 'Instagram identikasi', description: 'Profil, bio, vizual, CTA, business account',
+      yourScore: 65, competitorScore: 78,
+      subParams: [
+        { name: 'Profil nomlanishi', yourStatus: 'good', competitorStatus: 'good', yourNote: 'Brend nomiga mos, oson topiladi', competitorNote: 'Keng auditoriyaga tanish nom' },
+        { name: 'Bio va positioning', yourStatus: 'medium', competitorStatus: 'good', yourNote: 'Bio mavjud lekin foyda unchalik aniq emas', competitorNote: 'Aniq positioning va kontakt mavjud' },
+        { name: "Vizual uyg'unlik", yourStatus: 'good', competitorStatus: 'medium', yourNote: "Ranglar va uslub bir xil", competitorNote: 'Vizual har xil, izchillik yo\'q' },
+        { name: 'CTA aniqligi', yourStatus: 'bad', competitorStatus: 'good', yourNote: "Harakatga chaqiruv yo'q", competitorNote: 'Har postda aniq CTA bor' },
+        { name: 'Business account', yourStatus: 'good', competitorStatus: 'good', yourNote: 'Barcha funksiyalar yoqilgan', competitorNote: 'Barcha funksiyalar yoqilgan' },
+        { name: 'Raqobatchilar tahlili', yourStatus: 'bad', competitorStatus: 'medium', yourNote: "Tahlil o'tkazilmagan", competitorNote: 'Qisman kuzatiladi' },
+      ],
+    },
+    {
+      id: 2, icon: '📊', title: 'Statistika', description: 'Engagement, oxvat, kontent samaradorligi',
+      yourScore: 58, competitorScore: 71,
+      subParams: [
+        { name: 'Obunachilar sifati', yourStatus: 'good', competitorStatus: 'medium', yourNote: 'Real auditoriya, bot kam', competitorNote: 'Bot shubhali akkauntlar bor' },
+        { name: 'Engagement darajasi', yourStatus: 'medium', competitorStatus: 'good', yourNote: 'Engagement 2.1% — normadan past', competitorNote: 'Engagement 4.3% — yaxshi' },
+        { name: 'Oxvat tendensiyasi', yourStatus: 'medium', competitorStatus: 'good', yourNote: "Oxvat barqaror lekin o'smayapti", competitorNote: "Oxvat oyiga 12% o'sib bormoqda" },
+        { name: 'Kontent samaradorligi', yourStatus: 'bad', competitorStatus: 'medium', yourNote: "Top postlar aniqlanmagan, tahlil yo'q", competitorNote: 'Samarali formatlar takrorlanadi' },
+        { name: 'Post vaqtlari', yourStatus: 'bad', competitorStatus: 'good', yourNote: "Vaqt rejasi yo'q", competitorNote: 'Optimal vaqtlarda post qilinadi' },
+        { name: "Story ko'rishlar", yourStatus: 'medium', competitorStatus: 'good', yourNote: "O'rtacha 15% view rate", competitorNote: '28% story view rate' },
+      ],
+    },
+    {
+      id: 3, icon: '📅', title: 'SMM tizimi', description: 'Reels, carousel, story intizomi',
+      yourScore: 45, competitorScore: 80,
+      subParams: [
+        { name: 'Reels muntazamligi', yourStatus: 'bad', competitorStatus: 'good', yourNote: 'Haftada 0-1 Reels', competitorNote: 'Haftada 4-5 Reels' },
+        { name: 'Carousel format', yourStatus: 'medium', competitorStatus: 'good', yourNote: 'Oyda 2-3 carousel', competitorNote: 'Haftada 3+ carousel' },
+        { name: 'Story intizomi', yourStatus: 'bad', competitorStatus: 'good', yourNote: "Kunlik story yo'q", competitorNote: 'Kunda 5-7 story' },
+        { name: 'Kontent struktura', yourStatus: 'bad', competitorStatus: 'medium', yourNote: "Rejalashtirilmagan, tartibsiz", competitorNote: 'Haftalik reja bor' },
+        { name: 'Post tayyorlash', yourStatus: 'medium', competitorStatus: 'good', yourNote: 'Kontent bor, chiqish qiyin', competitorNote: 'Kontent ishlab chiqarish tizimi bor' },
+        { name: 'Hashtag strategiyasi', yourStatus: 'medium', competitorStatus: 'good', yourNote: 'Umumiy hashtaglar ishlatiladi', competitorNote: 'Lokal va niche hashtaglar' },
+      ],
+    },
+    {
+      id: 4, icon: '🎯', title: 'Target reklama', description: 'Active reklamalar, kampaniya logikasi',
+      yourScore: 55, competitorScore: 68,
+      subParams: [
+        { name: 'Active reklamalar', yourStatus: 'medium', competitorStatus: 'good', yourNote: '1 aktiv kampaniya', competitorNote: '5-7 aktiv kampaniya' },
+        { name: 'Targeting sifati', yourStatus: 'medium', competitorStatus: 'good', yourNote: 'Keng targeting, kam aniqlik', competitorNote: 'Segmentlashtirilgan auditoriyalar' },
+        { name: 'Kampaniya logikasi', yourStatus: 'bad', competitorStatus: 'medium', yourNote: "Funnel yo'q", competitorNote: 'Qisman funnel bor' },
+        { name: 'Pixel tracking', yourStatus: 'bad', competitorStatus: 'good', yourNote: "Pixel o'rnatilmagan", competitorNote: 'Pixel va conversion events sozlangan' },
+        { name: 'Creative materials', yourStatus: 'medium', competitorStatus: 'good', yourNote: "Rasm sifati o'rtacha", competitorNote: 'Professional video va rasmlar' },
+        { name: 'Retargeting', yourStatus: 'bad', competitorStatus: 'medium', yourNote: "Retargeting yo'q", competitorNote: 'Asosiy retargeting bor' },
+      ],
+    },
+    {
+      id: 5, icon: '⚡', title: 'Javob tezligi', description: 'Direct, comment javoblar, monitoring',
+      yourScore: 72, competitorScore: 60,
+      subParams: [
+        { name: 'Direct javob vaqti', yourStatus: 'good', competitorStatus: 'medium', yourNote: '15-20 daqiqada javob', competitorNote: '1-2 soatda javob' },
+        { name: 'Comment javob', yourStatus: 'good', competitorStatus: 'medium', yourNote: '90% commentlarga javob', competitorNote: '60% commentlarga javob' },
+        { name: 'Telegram monitoring', yourStatus: 'good', competitorStatus: 'bad', yourNote: 'Tezkor javob tizimi bor', competitorNote: "Telegram kanal bor lekin javob yo'q" },
+        { name: 'Facebook monitoring', yourStatus: 'medium', competitorStatus: 'good', yourNote: 'Kech javob', competitorNote: 'Tez javob tizimi' },
+        { name: 'YouTube & TikTok', yourStatus: 'bad', competitorStatus: 'medium', yourNote: "Kuzatilmaydi", competitorNote: 'Qisman monitoring' },
+        { name: 'Javob standartlari', yourStatus: 'medium', competitorStatus: 'good', yourNote: "Skript yo'q", competitorNote: 'Skript va standartlar bor' },
+      ],
+    },
+  ],
+  overallScore: { you: 59, competitor: 71 },
+  overallWinner: 'competitor',
+  topStrengths: [
+    "Javob tezligi va mijozlar bilan muloqotda ustunlik",
+    'Vizual uygunlik va brend izchilligi',
+    "Real auditoriya — bot kam, sifatli obunachilar",
+  ],
+  topWeaknesses: [
+    "SMM tizimi yo'q — Reels va Story muntazam chiqmaydi",
+    "Meta Pixel o'rnatilmagan, konversiyalar kuzatilmaydi",
+    "Haftalik kontent reja yo'q, tartibsiz postlar",
+    "Funnel reklamalar yo'q, faqat 1 kampaniya aktiv",
+  ],
+  urgentFixes: [
+    "Meta Pixel'ni zudlik bilan o'rnating — har bir reklama puli isrof bo'lmoqda",
+    "Haftalik kontent rejasi tuzing: 3 Reels + 2 Carousel + kunlik Story",
+    "CTA qo'shing: har bir postda 'DM yuboring', 'Saytga o'ting' kabi aniq chaqiruv",
+    "Retargeting kampaniya yarating — saytga kelgan foydalanuvchilarni qayta targetlang",
+    "Instagram Bio'ni yangilang: nima sotasiz + asosiy foyda + kontakt",
+  ],
+  annualStrategy: {
+    q1: "Asosiy bazani mustahkamlash: Meta Pixel o'rnatish, kontent kalendarini yaratish, SMM tizimini joriy etish. Maqsad: engagement 3.5%ga yetkazish.",
+    q2: "O'sish fazasi: Haftalik Reels seriyasi, A/B test reklamalar, retargeting kampaniyalar. Maqsad: oxvat 2x oshirish.",
+    q3: "Kengayish: TikTok va YouTube kanalini ochish, influencer hamkorliklar, Ramazon va yozgi aksiyalar.",
+    q4: "Yil oxiri kampaniyalar: Yangi yil, chegirma sezoni, mijozlar sadoqat dasturi. Maqsad: yillik ROI 3.5x.",
+    keyActions: [
+      "Meta Pixel o'rnatish va barcha conversion eventlarni sozlash",
+      "Oylik kontent kalendarini yaratish va jamoaga taqsimlash",
+      "Lookalike + Retargeting funnel reklamalarini ishga tushirish",
+      "Haftada 3-4 Reels chiqarish uchun video studio sozlash",
+      "Competitor monitoring dashboardi yaratish",
+    ],
+    budgetAdvice: "Hozirgi byudjetning 60%ini Meta/Instagram reklamalariga, 25%ini Google Ads, 15%ini kontent ishlab chiqarishga yo'naltiring. Eng kam $1,500/oy zarur samarali natija uchun.",
+  },
+}
+
 export default function CompetitorsPage() {
   const { currentWorkspace } = useWorkspaceStore()
 
@@ -289,7 +395,7 @@ export default function CompetitorsPage() {
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [result, setResult] = useState<CompetitorAnalysis | null>(null)
+  const [result, setResult] = useState<CompetitorAnalysis | null>(MOCK_RESULT)
   const [openCategory, setOpenCategory] = useState<number | null>(null)
   const [activeTab, setActiveTab] = useState<'audit' | 'strategy'>('audit')
 
@@ -432,7 +538,7 @@ export default function CompetitorsPage() {
           {error && <Alert variant="error">{error}</Alert>}
 
           <Button fullWidth size="lg" loading={loading} onClick={handleAnalyze}>
-            {loading ? 'Tahlil qilinmoqda (AI 12 bo‘lim)...' : '🔍 Tahlilni boshlash'}
+            {loading ? "Tahlil qilinmoqda (AI 12 bo’lim)..." : ‘🔍 Yangi tahlilni boshlash’}
           </Button>
         </div>
       </Card>
@@ -462,6 +568,14 @@ export default function CompetitorsPage() {
 
       {result && !loading && (
         <div className="space-y-5">
+          {result === MOCK_RESULT && (
+            <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+              <span className="text-amber-500 text-lg shrink-0">💡</span>
+              <p className="text-amber-700 text-sm">
+                <span className="font-medium">Demo natija</span> — Texnomart bilan solishtirish ko'rsatilmoqda. Haqiqiy tahlil uchun raqobatchi ma'lumotlarini yuqorida kiriting.
+              </p>
+            </div>
+          )}
           <Card
             className={`border-2 ${
               result.overallWinner === 'you'

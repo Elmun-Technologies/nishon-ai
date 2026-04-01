@@ -116,7 +116,7 @@ function CircularScore({ score, grade }: { score: number; grade: keyof typeof GR
     <div className="relative inline-flex items-center justify-center">
       <svg width="120" height="120" viewBox="0 0 120 120">
         {/* Background circle */}
-        <circle cx="60" cy="60" r="45" fill="none" stroke="#2A2A3A" strokeWidth="8"/>
+        <circle cx="60" cy="60" r="45" fill="none" stroke="#E5E7EB" strokeWidth="8"/>
         {/* Score arc */}
         <circle
           cx="60" cy="60" r="45"
@@ -141,6 +141,37 @@ function CircularScore({ score, grade }: { score: number; grade: keyof typeof GR
   )
 }
 
+// ─── DEMO SCORE ───────────────────────────────────────────────────────────────
+
+const DEMO_SCORE: CreativeScore = {
+  overallScore: 72,
+  grade: 'B',
+  verdict: 'needs_work',
+  verdictText: "Kreativ yaxshi bazaga ega, ammo hook kuchi va CTA aniqligi yaxshilanishi lozim. Platform talablariga asosan kichik o'zgarishlar bilan reklamaga tayyor bo'ladi.",
+  parameters: [
+    { name: 'Hook kuchi',          score: 6, status: 'medium', feedback: "Birinchi 3 soniyada diqqatni tortish o'rtacha darajada", tip: "Kuchli savol yoki ajablanarli statistika bilan boshlang" },
+    { name: 'Vizual sifat',        score: 8, status: 'good',   feedback: "Rasm aniqligi va kompozitsiya juda yaxshi", tip: "" },
+    { name: "Matn o'qilishi",      score: 7, status: 'good',   feedback: "Shrift o'lchami va kontrast maqbul", tip: "" },
+    { name: 'CTA aniqligi',        score: 5, status: 'medium', feedback: "Harakatga chaqiruv unchalik aniq emas", tip: "'Hozir buyurtma bering' yoki 'Bepul sinab ko'ring' kabi aniq CTA qo'shing" },
+    { name: 'Rang psixologiyasi',  score: 8, status: 'good',   feedback: "Ranglar brend bilan uyg'un va ishonch uyg'otadi", tip: "" },
+    { name: 'Brend izchilligi',    score: 9, status: 'good',   feedback: "Logo va korporativ uslub to'g'ri ishlatilgan", tip: "" },
+    { name: 'Auditoriya mosligi',  score: 7, status: 'good',   feedback: "Target auditoriyaga mos vizual til", tip: "" },
+    { name: 'Raqobat farqi',       score: 6, status: 'medium', feedback: "Raqobatchilardan farq qiluvchi element kam", tip: "Noyob USP ni vizual ko'rsating" },
+    { name: 'Mobil optimizatsiya', score: 8, status: 'good',   feedback: "Mobil ekranda yaxshi ko'rinadi", tip: "" },
+    { name: 'Platform talablari',  score: 4, status: 'bad',    feedback: "Story formatida matn xavfsiz zonadan chiqib ketgan", tip: "Matnni pastki va yuqori 15% dan uzoqlashtirib joylashtiring" },
+  ],
+  topStrengths: ['Vizual sifat yuqori', 'Brend izchilligi mukammal', 'Mobil optimizatsiya yaxshi'],
+  topIssues: ["CTA aniq emas", 'Hook kuchi zaif', 'Platform talablariga to\'liq mos emas'],
+  improvements: [
+    "CTA ni aniqlashtiring: 'Hozir buyurtma bering' kabi to'g'ridan-to'g'ri chaqiruv qo'shing",
+    "Story formatida matnni xavfsiz zonaga olib keling (15% qoida)",
+    "Birinchi 3 soniyaga kuchli hook qo'shing — savol yoki hayratlanarli fakt",
+  ],
+  platformFit: { meta: 78, tiktok: 55, google: 82, youtube: 60, telegram: 88 },
+  estimatedCtr: '1.4–2.1%',
+  abTestSuggestion: "Joriy kreativni hook kuchsiz versiya deb olib, CTA va Hook o'zgartirilgan B varianti bilan A/B test o'tkazing. 3 kun test muddati tavsiya etiladi.",
+}
+
 // ─── MAIN PAGE ────────────────────────────────────────────────────────────────
 
 export default function CreativeScorerPage() {
@@ -154,7 +185,7 @@ export default function CreativeScorerPage() {
   const [goal, setGoal]               = useState('')
   const [loading, setLoading]         = useState(false)
   const [error, setError]             = useState('')
-  const [result, setResult]           = useState<CreativeScore | null>(null)
+  const [result, setResult]           = useState<CreativeScore | null>(DEMO_SCORE)
   const [isDragging, setIsDragging]   = useState(false)
 
   // ─── FILE HANDLING ───────────────────────────────────────────────────────
@@ -529,6 +560,13 @@ export default function CreativeScorerPage() {
                     </div>
                   </div>
                 </div>
+                {!file && (
+                  <div className="mt-3 pt-3 border-t border-[#E5E7EB]">
+                    <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                      📌 Demo natija ko'rsatilmoqda — chap tarafdan o'z kreativingizni yuklang
+                    </p>
+                  </div>
+                )}
               </Card>
 
               {/* Platform fit */}
@@ -572,7 +610,7 @@ export default function CreativeScorerPage() {
                 <div className="px-5 py-3 border-b border-[#E5E7EB]">
                   <p className="text-[#111827] font-semibold text-sm">10 Parametr Tahlili</p>
                 </div>
-                <div className="divide-y divide-[#1C1C27]">
+                <div className="divide-y divide-[#F3F4F6]">
                   {result.parameters.map((param, i) => (
                     <div key={i} className="px-5 py-3">
                       <div className="flex items-start gap-3">

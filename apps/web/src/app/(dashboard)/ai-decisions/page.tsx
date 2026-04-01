@@ -122,37 +122,56 @@ export default function AiDecisionsPage() {
       {/* ── Page header ── */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#111827] mb-1">AI Decisions Log</h1>
+          <h1 className="text-2xl font-bold text-[#111827] mb-1">AI Qarorlar Jurnali</h1>
           <p className="text-[#6B7280] text-sm">
-            Every action Nishon AI has taken or recommended — with full reasoning
+            Nishon AI qilgan va tavsiya etgan har bir harakat — to'liq asoslama bilan
           </p>
         </div>
         <Button variant="secondary" size="sm" onClick={fetchDecisions}>
-          ↻ Refresh
+          ↻ Yangilash
         </Button>
       </div>
 
       {fetchError && <Alert variant="error">{fetchError}</Alert>}
       {actionError && <Alert variant="error">{actionError}</Alert>}
 
+      {/* ── Stats summary ── */}
+      <div className="grid grid-cols-4 gap-3">
+        {[
+          { label: 'Jami', value: counts.all,      color: 'text-[#111827]', bg: 'bg-white' },
+          { label: 'Kutilmoqda', value: counts.pending,  color: 'text-amber-600', bg: 'bg-amber-50 border-amber-200' },
+          { label: 'Tasdiqlangan', value: counts.approved, color: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-200' },
+          { label: 'Rad etilgan', value: counts.rejected, color: 'text-red-500',    bg: 'bg-red-50 border-red-200' },
+        ].map((s) => (
+          <button
+            key={s.label}
+            onClick={() => setFilter(s.label === 'Jami' ? 'all' : s.label === 'Kutilmoqda' ? 'pending' : s.label === 'Tasdiqlangan' ? 'approved' : 'rejected')}
+            className={`border rounded-xl p-3 text-left transition-all hover:shadow-sm ${s.bg}`}
+          >
+            <p className="text-[#6B7280] text-xs mb-1">{s.label}</p>
+            <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
+          </button>
+        ))}
+      </div>
+
       {/* ── Pending approval banner ── */}
       {counts.pending > 0 && (
-        <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 flex items-center gap-4">
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center gap-4">
           <span className="text-2xl">⏳</span>
           <div className="flex-1">
-            <p className="text-amber-400 font-medium text-sm">
-              {counts.pending} decision{counts.pending !== 1 ? 's' : ''} waiting for your approval
+            <p className="text-amber-700 font-medium text-sm">
+              {counts.pending} ta qaror sizning tasdiqlashingizni kutmoqda
             </p>
-            <p className="text-[#6B7280] text-xs mt-0.5">
-              You are in Assisted mode — AI waits for your confirmation before acting.
+            <p className="text-amber-600 text-xs mt-0.5">
+              Siz Yordamlashish rejimdasiz — AI harakatni amalga oshirishdan oldin sizni kutadi.
             </p>
           </div>
           <Button
             size="sm"
             onClick={() => setFilter('pending')}
-            className="bg-amber-500/20 text-amber-400 border border-amber-500/30 hover:bg-amber-500/30 shrink-0"
+            className="bg-amber-100 text-amber-700 border border-amber-300 hover:bg-amber-200 shrink-0"
           >
-            Review now →
+            Ko'rib chiqish →
           </Button>
         </div>
       )}
@@ -161,10 +180,10 @@ export default function AiDecisionsPage() {
       <div className="flex items-center gap-1 bg-white border border-[#E5E7EB] rounded-xl p-1 w-fit">
         {(
           [
-            { key: 'all', label: 'All' },
-            { key: 'pending', label: 'Pending' },
-            { key: 'approved', label: 'Approved' },
-            { key: 'rejected', label: 'Rejected' },
+            { key: 'all', label: 'Barchasi' },
+            { key: 'pending', label: 'Kutilmoqda' },
+            { key: 'approved', label: 'Tasdiqlangan' },
+            { key: 'rejected', label: 'Rad etilgan' },
           ] as const
         ).map((tab) => (
           <button
@@ -204,11 +223,11 @@ export default function AiDecisionsPage() {
         <Card>
           <EmptyState
             icon="🤖"
-            title={filter === 'all' ? 'No AI decisions yet' : `No ${filter} decisions`}
+            title={filter === 'all' ? 'Hali AI qarorlari yo\'q' : `${filter} qarorlar yo\'q`}
             description={
               filter === 'all'
-                ? 'The optimization loop runs every few hours. Once it analyzes your campaigns, all decisions will appear here with full explanations.'
-                : `No decisions with "${filter}" status right now.`
+                ? 'Optimizatsiya tsikli har bir necha soatda ishlaydi. Kampaniyalaringizni tahlil qilgach, barcha qarorlar bu yerda to\'liq izohlari bilan ko\'rinadi.'
+                : `Hozirda "${filter}" holatidagi qarorlar yo\'q.`
             }
           />
         </Card>
@@ -245,13 +264,13 @@ export default function AiDecisionsPage() {
                           <Badge variant={config.variant}>{config.label}</Badge>
 
                           {isPending ? (
-                            <Badge variant="warning" dot>Awaiting approval</Badge>
+                            <Badge variant="warning" dot>Tasdiq kutilmoqda</Badge>
                           ) : decision.isApproved ? (
                             <Badge variant="success" dot>
-                              {decision.isExecuted ? 'Executed' : 'Approved'}
+                              {decision.isExecuted ? 'Bajarildi' : 'Tasdiqlandi'}
                             </Badge>
                           ) : (
-                            <Badge variant="danger">Rejected</Badge>
+                            <Badge variant="danger">Rad etildi</Badge>
                           )}
 
                           <span className="text-[#6B7280] text-xs ml-auto">
@@ -266,7 +285,7 @@ export default function AiDecisionsPage() {
                         {decision.estimatedImpact && (
                           <div className="flex items-start gap-2 mt-2.5 bg-[#F9FAFB] rounded-lg px-3 py-2">
                             <span className="text-[#374151] text-xs font-medium shrink-0 mt-0.5">
-                              💡 Expected impact:
+                              💡 Kutilayotgan ta'sir:
                             </span>
                             <p className="text-[#9CA3AF] text-xs leading-relaxed">
                               {decision.estimatedImpact}
@@ -283,26 +302,26 @@ export default function AiDecisionsPage() {
                               variant="secondary"
                               loading={isThisLoading}
                               onClick={() => handleReject(decision.id)}
-                              className="text-red-400 border-red-500/20 hover:bg-red-500/10"
+                              className="text-red-500 border-red-200 hover:bg-red-50"
                             >
-                              ✗ Reject
+                              ✗ Rad etish
                             </Button>
                             <Button
                               size="sm"
                               loading={isThisLoading}
                               onClick={() => handleApprove(decision.id)}
-                              className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20"
+                              className="bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100"
                             >
-                              ✓ Approve
+                              ✓ Tasdiqlash
                             </Button>
                           </div>
                         ) : (
                           (decision.beforeState || decision.afterState) && (
                             <button
                               onClick={() => setExpandedId(isExpanded ? null : decision.id)}
-                              className="text-[#6B7280] hover:text-[#9CA3AF] text-xs flex items-center gap-1 transition-colors"
+                              className="text-[#6B7280] hover:text-[#374151] text-xs flex items-center gap-1 transition-colors"
                             >
-                              {isExpanded ? 'Hide details ↑' : 'Show details ↓'}
+                              {isExpanded ? 'Yopish ↑' : 'Batafsil ↓'}
                             </button>
                           )
                         )}
@@ -314,13 +333,13 @@ export default function AiDecisionsPage() {
                     <div className="px-5 pb-5 pt-0">
                       <div className="border-t border-[#E5E7EB] pt-4">
                         <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide mb-3">
-                          Before → After
+                          Oldin → Keyin
                         </p>
                         <div className="grid grid-cols-2 gap-3">
                           <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4">
                             <p className="text-[#6B7280] text-xs font-medium mb-2 flex items-center gap-1.5">
-                              <span className="w-2 h-2 rounded-full bg-red-500/60" />
-                              Before
+                              <span className="w-2 h-2 rounded-full bg-red-400" />
+                              Oldin
                             </p>
                             {decision.beforeState ? (
                               <div className="space-y-1.5">
@@ -336,14 +355,14 @@ export default function AiDecisionsPage() {
                                 ))}
                               </div>
                             ) : (
-                              <p className="text-[#6B7280] text-xs">No data</p>
+                              <p className="text-[#6B7280] text-xs">Ma'lumot yo'q</p>
                             )}
                           </div>
 
                           <div className="bg-[#F9FAFB] border border-emerald-500/20 rounded-xl p-4">
                             <p className="text-[#6B7280] text-xs font-medium mb-2 flex items-center gap-1.5">
-                              <span className="w-2 h-2 rounded-full bg-emerald-500/60" />
-                              After
+                              <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                              Keyin
                             </p>
                             {decision.afterState ? (
                               <div className="space-y-1.5">
@@ -359,7 +378,7 @@ export default function AiDecisionsPage() {
                                 ))}
                               </div>
                             ) : (
-                              <p className="text-[#6B7280] text-xs">Pending execution</p>
+                              <p className="text-[#6B7280] text-xs">Bajarilishi kutilmoqda</p>
                             )}
                           </div>
                         </div>
@@ -378,13 +397,12 @@ export default function AiDecisionsPage() {
           <span className="text-lg mt-0.5">🔍</span>
           <div>
             <p className="text-[#111827] text-sm font-medium mb-0.5">
-              Why does Nishon AI show this log?
+              Nishon AI nima uchun bu jurnalni ko'rsatadi?
             </p>
             <p className="text-[#6B7280] text-xs leading-relaxed">
-              Transparency is core to how we operate. Every optimization decision
-              the AI makes is recorded here with its reasoning, expected impact,
-              and outcome. You should always know what&apos;s happening with your
-              ad budget — and why.
+              Shaffoflik bizning asosiy tamoyilimiz. AI qilgan har bir optimizatsiya
+              qarori bu yerda asoslamasi, kutilayotgan ta'siri va natijasi bilan qayd etiladi.
+              Reklama byudjetingiz bilan nima bo'layotganini — va nima uchun — doimo bilishingiz kerak.
             </p>
           </div>
         </div>

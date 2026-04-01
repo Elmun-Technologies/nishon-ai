@@ -249,11 +249,13 @@ const DEMO_PAYLOAD = {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 type Tab = 'run' | 'history'
+type OptimizationApproach = 'ai_agent' | 'specialist' | 'self'
 
 export default function AutoOptimizationPage() {
   const { currentWorkspace } = useWorkspaceStore()
 
   const [tab, setTab] = useState<Tab>('run')
+  const [approach, setApproach] = useState<OptimizationApproach>('ai_agent')
   const [mode, setMode] = useState<'recommend' | 'auto_apply'>('recommend')
   const [loading, setLoading] = useState(false)
   const [historyLoading, setHistoryLoading] = useState(false)
@@ -308,25 +310,147 @@ export default function AutoOptimizationPage() {
         </p>
       </div>
 
-      {/* ── Tabs ── */}
-      <div className="flex gap-1 bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-1 w-fit">
-        {(['run', 'history'] as Tab[]).map(t => (
+      {/* ── Approach selector ── */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {[
+          {
+            key: 'ai_agent' as const,
+            icon: '🤖',
+            title: 'AI Agent',
+            subtitle: 'Avtomatik rejim',
+            desc: "AI reklamalaringizni 24/7 kuzatadi, muammolarni aniqlaydi va tavsiyalar beradi. Sizning tasdiqlashingiz bilan amalga oshiriladi.",
+            badge: 'Eng mashhur',
+            badgeColor: 'bg-violet-100 text-violet-700 border-violet-200',
+            borderActive: 'border-violet-500 bg-violet-50',
+          },
+          {
+            key: 'specialist' as const,
+            icon: '👨‍💼',
+            title: 'Mutaxassis',
+            subtitle: 'Inson ekspert',
+            desc: "Sertifikatlangan targetolog reklamalaringizni qo'lda boshqaradi. Haftalik hisobot va strategik maslahatlar.",
+            badge: 'Premium',
+            badgeColor: 'bg-amber-100 text-amber-700 border-amber-200',
+            borderActive: 'border-amber-500 bg-amber-50',
+          },
+          {
+            key: 'self' as const,
+            icon: '🎛️',
+            title: 'Mustaqil',
+            subtitle: 'O\'zingiz boshqaring',
+            desc: "AI tahlil va tavsiyalaridan foydalanib, barcha qarorlarni o'zingiz qabul qilasiz. To'liq nazorat.",
+            badge: null,
+            badgeColor: '',
+            borderActive: 'border-[#374151] bg-[#F9FAFB]',
+          },
+        ].map((opt) => (
           <button
-            key={t}
-            onClick={() => handleTabChange(t)}
-            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
-              tab === t
-                ? 'bg-[#111827] text-white'
-                : 'text-[#6B7280] hover:text-[#111827]'
+            key={opt.key}
+            onClick={() => setApproach(opt.key)}
+            className={`text-left p-5 rounded-2xl border-2 transition-all ${
+              approach === opt.key ? opt.borderActive : 'border-[#E5E7EB] hover:border-[#D1D5DB]'
             }`}
           >
-            {t === 'run' ? 'Tahlil' : 'Tarix'}
+            <div className="flex items-start justify-between mb-3">
+              <span className="text-3xl">{opt.icon}</span>
+              {opt.badge && (
+                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${opt.badgeColor}`}>
+                  {opt.badge}
+                </span>
+              )}
+            </div>
+            <p className="text-[#111827] font-semibold text-sm mb-0.5">{opt.title}</p>
+            <p className="text-[#6B7280] text-xs mb-2">{opt.subtitle}</p>
+            <p className="text-[#9CA3AF] text-xs leading-relaxed">{opt.desc}</p>
           </button>
         ))}
       </div>
 
+      {/* ── Tabs (only for AI agent and self modes) ── */}
+      {(approach === 'ai_agent' || approach === 'self') && (
+        <div className="flex gap-1 bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-1 w-fit">
+          {(['run', 'history'] as Tab[]).map(t => (
+            <button
+              key={t}
+              onClick={() => handleTabChange(t)}
+              className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                tab === t
+                  ? 'bg-[#111827] text-white'
+                  : 'text-[#6B7280] hover:text-[#111827]'
+              }`}
+            >
+              {t === 'run' ? 'Tahlil' : 'Tarix'}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* ══ APPROACH: SPECIALIST ══════════════════════════════════════════════════ */}
+      {approach === 'specialist' && (
+        <div className="space-y-4">
+          <Card className="border-amber-200 bg-amber-50">
+            <div className="flex items-start gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-amber-100 border border-amber-200 flex items-center justify-center text-2xl shrink-0">
+                👨‍💼
+              </div>
+              <div className="flex-1">
+                <h3 className="text-[#111827] font-semibold mb-1">Sertifikatlangan Targetolog</h3>
+                <p className="text-[#6B7280] text-sm leading-relaxed mb-3">
+                  Meta Ads va Google Ads bo'yicha tajribali mutaxassis reklamalaringizni qo'lda
+                  boshqaradi. Haftalik yig'ilishlar, hisobotlar va strategik maslahatlar.
+                </p>
+                <div className="grid grid-cols-2 gap-2 mb-4">
+                  {[
+                    { icon: '📊', text: 'Haftalik hisobot' },
+                    { icon: '📞', text: 'Haftada 1 video qo\'ng\'iroq' },
+                    { icon: '⚡', text: '24-soat ichida javob' },
+                    { icon: '🎯', text: 'A/B testlar va optimizatsiya' },
+                  ].map((f) => (
+                    <div key={f.text} className="flex items-center gap-2 text-sm text-[#374151]">
+                      <span>{f.icon}</span> {f.text}
+                    </div>
+                  ))}
+                </div>
+                <div className="flex items-center gap-3">
+                  <Button size="sm">
+                    Mutaxassis bilan bog'lanish →
+                  </Button>
+                  <span className="text-[#6B7280] text-xs">$299/oy dan boshlab</span>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              { name: 'Starter', price: '$299/oy', features: ['1 platforma', '5 kampaniya', 'Haftalik hisobot', 'Email support'] },
+              { name: 'Growth', price: '$599/oy', features: ['3 platforma', '15 kampaniya', 'Kunlik monitoring', 'Video call'], highlight: true },
+              { name: 'Enterprise', price: 'So\'rovnoma', features: ['Cheksiz platforma', 'Dedikatsiya', 'Onsite xizmat', 'SLA kafolat'] },
+            ].map((plan) => (
+              <Card key={plan.name} className={plan.highlight ? 'border-amber-400 bg-amber-50' : ''}>
+                <div className="mb-3">
+                  {plan.highlight && <span className="text-[10px] font-semibold text-amber-600 bg-amber-100 border border-amber-200 px-2 py-0.5 rounded-full">Eng mashhur</span>}
+                  <p className="text-[#111827] font-bold text-lg mt-1">{plan.name}</p>
+                  <p className="text-[#374151] font-semibold text-base">{plan.price}</p>
+                </div>
+                <ul className="space-y-1.5 mb-4">
+                  {plan.features.map((f) => (
+                    <li key={f} className="text-[#6B7280] text-xs flex items-center gap-1.5">
+                      <span className="text-emerald-500">✓</span> {f}
+                    </li>
+                  ))}
+                </ul>
+                <Button variant={plan.highlight ? 'primary' : 'secondary'} size="sm" fullWidth>
+                  {plan.name === 'Enterprise' ? 'So\'rovnoma yuborish' : 'Boshlash'}
+                </Button>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* ══ TAB: RUN ════════════════════════════════════════════════════════════ */}
-      {tab === 'run' && (
+      {(approach === 'ai_agent' || approach === 'self') && tab === 'run' && (
         <>
           {/* Config card */}
           <Card>
@@ -406,7 +530,7 @@ export default function AutoOptimizationPage() {
       )}
 
       {/* ══ TAB: HISTORY ════════════════════════════════════════════════════════ */}
-      {tab === 'history' && (
+      {(approach === 'ai_agent' || approach === 'self') && tab === 'history' && (
         <HistoryTab
           history={history}
           loading={historyLoading}
