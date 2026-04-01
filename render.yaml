@@ -3,11 +3,80 @@ services:
     name: nishon-ai-api
     env: node
     plan: free
-    buildCommand: NODE_ENV=development pnpm install --frozen-lockfile && pnpm --filter @nishon/shared build && pnpm --filter @nishon/ai-sdk build && NODE_OPTIONS='--max-old-space-size=400' pnpm --filter api build
-    startCommand: pnpm start:prod
+    rootDir: .
+    buildCommand: >
+      NODE_ENV=development pnpm install --frozen-lockfile &&
+      pnpm --filter @nishon/shared build &&
+      pnpm --filter @nishon/ai-sdk build &&
+      NODE_OPTIONS='--max-old-space-size=400' pnpm --filter api build
+    startCommand: pnpm --filter api start:prod
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 10000
+
+      # ── Public URLs ────────────────────────────────────────────────────────
+      # Set these to YOUR actual Render service URL and Vercel URL
+      - key: API_BASE_URL
+        value: https://nishon-ai-api.onrender.com   # ← change to your Render URL
+      - key: FRONTEND_URL
+        value: https://nishon-ai.vercel.app          # ← change to your Vercel URL
+
+      # ── Database ───────────────────────────────────────────────────────────
+      - key: DATABASE_URL
+        sync: false   # set manually in Render dashboard
+
+      # ── Redis ──────────────────────────────────────────────────────────────
+      - key: REDIS_URL
+        sync: false
+
+      # ── Auth ───────────────────────────────────────────────────────────────
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_REFRESH_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 15m
+      - key: JWT_REFRESH_EXPIRES_IN
+        value: 7d
+      - key: ENCRYPTION_KEY
+        sync: false
+
+      # ── OpenAI ─────────────────────────────────────────────────────────────
+      - key: OPENAI_API_KEY
+        sync: false
+
+      # ── Google OAuth (Sign-In) ─────────────────────────────────────────────
+      # callbackURL is auto-built from API_BASE_URL; no need to set separately
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_DEVELOPER_TOKEN
+        sync: false
+
+      # ── Meta ───────────────────────────────────────────────────────────────
+      - key: META_APP_ID
+        sync: false
+      - key: META_APP_SECRET
+        sync: false
+      - key: META_CALLBACK_URL
+        value: https://nishon-ai-api.onrender.com/platforms/meta/callback
+
+      # ── TikTok ─────────────────────────────────────────────────────────────
+      - key: TIKTOK_APP_ID
+        sync: false
+      - key: TIKTOK_APP_SECRET
+        sync: false
+
+      # ── Yandex ─────────────────────────────────────────────────────────────
+      - key: YANDEX_CLIENT_ID
+        sync: false
+      - key: YANDEX_CLIENT_SECRET
+        sync: false
+
+      # ── Telegram (optional) ────────────────────────────────────────────────
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
