@@ -101,7 +101,7 @@ export default function LandingPagePublic() {
   const [notFound, setNotFound] = useState(false)
 
   useEffect(() => {
-    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+    const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || ''
     fetch(`${apiBase}/landing-pages/public/${params.slug}`)
       .then(r => r.json())
       .then(data => {

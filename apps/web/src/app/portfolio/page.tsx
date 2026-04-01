@@ -247,7 +247,7 @@ export default function PortfolioPage() {
   const [allAgents, setAllAgents] = useState<PortfolioTargetologist[]>(MOCK_TARGETOLOGISTS)
 
   useEffect(() => {
-    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+    const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || ''
     fetch(`${apiBase}/agents?limit=50`)
       .then(r => r.json())
       .then(data => {

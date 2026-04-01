@@ -88,7 +88,7 @@ export class LandingPagesService {
       content = await this.aiClient.completeJson(
         prompt,
         LANDING_PAGE_SYSTEM_PROMPT,
-        { taskType: "script", agentName: "LandingPageEngine", temperature: 0.6 },
+        { taskType: "creative", agentName: "LandingPageEngine", temperature: 0.6 },
       );
     } catch (err: any) {
       this.logger.error({ message: "Landing page AI generation failed", error: err?.message });

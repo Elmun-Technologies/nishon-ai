@@ -147,7 +147,7 @@ export class AgentsService implements OnModuleInit {
     for (const data of NISHON_AI_AGENTS) {
       const exists = await this.agentRepo.findOne({ where: { slug: data.slug } });
       if (!exists) {
-        const agent = this.agentRepo.create({ ...data, agentType: "ai", ownerId: null });
+        const agent = this.agentRepo.create({ ...(data as any), agentType: "ai", ownerId: null });
         await this.agentRepo.save(agent);
       }
     }
