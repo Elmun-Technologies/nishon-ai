@@ -107,7 +107,7 @@ export class AuthController {
     const { accessToken, refreshToken, user } = req.user as AuthResponseDto;
     const frontendUrl = this.config.get<string>(
       "FRONTEND_URL",
-      "http://localhost:3000",
+      "http://localhost:3000", // override with FRONTEND_URL on Render
     );
 
     const isNew = !user; // won't happen — always exists after findOrCreate
