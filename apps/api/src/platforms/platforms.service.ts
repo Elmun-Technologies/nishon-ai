@@ -11,6 +11,8 @@ import * as crypto from "crypto";
 import { ConnectedAccount } from "./entities/connected-account.entity";
 import { Workspace } from "../workspaces/entities/workspace.entity";
 import { MetaConnector } from "./connectors/meta.connector";
+import { GoogleConnector } from "./connectors/google.connector";
+import { TiktokConnector } from "./connectors/tiktok.connector";
 import { YandexConnector } from "./connectors/yandex.connector";
 import { Platform } from "@nishon/shared";
 
@@ -34,6 +36,8 @@ export class PlatformsService {
     @InjectRepository(Workspace)
     private readonly workspaceRepo: Repository<Workspace>,
     private readonly metaConnector: MetaConnector,
+    private readonly googleConnector: GoogleConnector,
+    private readonly tiktokConnector: TiktokConnector,
     private readonly yandexConnector: YandexConnector,
     private readonly config: ConfigService,
   ) {
@@ -189,6 +193,127 @@ export class PlatformsService {
     });
     if (!account) throw new NotFoundException("Connected account not found");
     await this.accountRepo.remove(account);
+  }
+
+  // ─── GOOGLE ADS OAUTH FLOW ───────────────────────────────────────────────
+
+  getGoogleOAuthUrl(workspaceId: string): string {
+    return this.googleConnector.getOAuthUrl(workspaceId);
+  }
+
+  /**
+   * Handle Google OAuth callback.
+   * Stores access + refresh tokens encrypted. Returns accessible customer accounts.
+   */
+  async handleGoogleCallback(
+    code: string,
+    state: string,
+  ): Promise<{ workspaceId: string; accounts: any[] }> {
+    let workspaceId: string;
+    try {
+      const decoded = JSON.parse(Buffer.from(state, "base64").toString("utf8"));
+      workspaceId = decoded.workspaceId;
+    } catch {
+      throw new BadRequestException("Invalid state parameter");
+    }
+
+    const workspace = await this.workspaceRepo.findOne({ where: { id: workspaceId } });
+    if (!workspace) throw new NotFoundException("Workspace not found");
+
+    const { accessToken, refreshToken, expiresAt } =
+      await this.googleConnector.exchangeCodeForToken(code);
+
+    const accounts = await this.googleConnector.getAccessibleCustomers(accessToken);
+    const encryptedToken = this.encrypt(accessToken);
+    const encryptedRefresh = this.encrypt(refreshToken);
+
+    // Save with first account as default (user can switch later)
+    await this.accountRepo.save(
+      this.accountRepo.create({
+        workspaceId,
+        platform: Platform.GOOGLE,
+        accessToken: encryptedToken,
+        refreshToken: encryptedRefresh,
+        externalAccountId: accounts[0]?.id ?? "pending",
+        externalAccountName: accounts[0]?.descriptiveName ?? "Google Ads Account",
+        isActive: accounts.length > 0,
+        tokenExpiresAt: expiresAt,
+        trackingStartedAt: accounts.length > 0 ? new Date() : null,
+      }),
+    );
+
+    return { workspaceId, accounts };
+  }
+
+  /**
+   * Select a specific Google Ads customer account after OAuth.
+   */
+  async selectGoogleCustomer(
+    workspaceId: string,
+    customerId: string,
+    customerName: string,
+  ): Promise<ConnectedAccount> {
+    const account = await this.accountRepo.findOne({
+      where: { workspaceId, platform: Platform.GOOGLE },
+    });
+
+    if (!account) {
+      throw new NotFoundException("No Google Ads account connected. Please reconnect.");
+    }
+
+    account.externalAccountId = customerId;
+    account.externalAccountName = customerName;
+    account.isActive = true;
+    account.trackingStartedAt = account.trackingStartedAt ?? new Date();
+
+    return this.accountRepo.save(account);
+  }
+
+  // ─── TIKTOK ADS OAUTH FLOW ────────────────────────────────────────────────
+
+  getTiktokOAuthUrl(workspaceId: string): string {
+    return this.tiktokConnector.getOAuthUrl(workspaceId);
+  }
+
+  /**
+   * Handle TikTok OAuth callback.
+   * TikTok returns the advertiser_id directly in the token response.
+   */
+  async handleTiktokCallback(
+    code: string,
+    state: string,
+  ): Promise<{ workspaceId: string; accounts: any[] }> {
+    let workspaceId: string;
+    try {
+      const decoded = JSON.parse(Buffer.from(state, "base64").toString("utf8"));
+      workspaceId = decoded.workspaceId;
+    } catch {
+      throw new BadRequestException("Invalid state parameter");
+    }
+
+    const workspace = await this.workspaceRepo.findOne({ where: { id: workspaceId } });
+    if (!workspace) throw new NotFoundException("Workspace not found");
+
+    const { accessToken, advertiserId, expiresAt } =
+      await this.tiktokConnector.exchangeCodeForToken(code);
+
+    const accounts = await this.tiktokConnector.getAdvertiserAccounts(accessToken);
+    const encryptedToken = this.encrypt(accessToken);
+
+    await this.accountRepo.save(
+      this.accountRepo.create({
+        workspaceId,
+        platform: Platform.TIKTOK,
+        accessToken: encryptedToken,
+        externalAccountId: advertiserId || accounts[0]?.id || "pending",
+        externalAccountName: accounts[0]?.name ?? "TikTok Ads Account",
+        isActive: true,
+        tokenExpiresAt: expiresAt,
+        trackingStartedAt: new Date(),
+      }),
+    );
+
+    return { workspaceId, accounts };
   }
 
   // ─── YANDEX DIRECT OAUTH FLOW ─────────────────────────────────────────────

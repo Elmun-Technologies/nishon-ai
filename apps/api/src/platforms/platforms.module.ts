@@ -26,6 +26,6 @@ import { Campaign } from "../campaigns/entities/campaign.entity";
     TiktokConnector,
     YandexConnector,
   ],
-  exports: [PlatformsService, MetaConnector, YandexConnector],
+  exports: [PlatformsService, MetaConnector, GoogleConnector, TiktokConnector, YandexConnector],
 })
 export class PlatformsModule {}

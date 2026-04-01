@@ -2,14 +2,20 @@ import { Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { ConfigService } from "@nestjs/config";
+import * as crypto from "crypto";
 import { AiDecision } from "../ai-decisions/entities/ai-decision.entity";
 import { Campaign } from "../campaigns/entities/campaign.entity";
 import { Workspace } from "../workspaces/entities/workspace.entity";
+import { ConnectedAccount } from "../platforms/entities/connected-account.entity";
+import { MetaConnector } from "../platforms/connectors/meta.connector";
+import { GoogleConnector } from "../platforms/connectors/google.connector";
+import { TiktokConnector } from "../platforms/connectors/tiktok.connector";
 import { NishonAiClient, OPTIMIZATION_SYSTEM_PROMPT } from "@nishon/ai-sdk";
 import {
   AiDecisionAction,
   AutopilotMode,
   CampaignStatus,
+  Platform,
 } from "@nishon/shared";
 
 interface OptimizationDecision {
@@ -48,6 +54,11 @@ export class DecisionLoopService {
     private readonly campaignRepo: Repository<Campaign>,
     @InjectRepository(Workspace)
     private readonly workspaceRepo: Repository<Workspace>,
+    @InjectRepository(ConnectedAccount)
+    private readonly accountRepo: Repository<ConnectedAccount>,
+    private readonly metaConnector: MetaConnector,
+    private readonly googleConnector: GoogleConnector,
+    private readonly tiktokConnector: TiktokConnector,
   ) {
     const apiKey = this.config.get<string>("AGENT_ROUTER_API_KEY") || "";
     const baseURL =
@@ -150,27 +161,150 @@ export class DecisionLoopService {
   }
 
   /**
-   * Execute a previously saved decision.
-   * This is called either immediately (FULL_AUTO) or after user approval (ASSISTED).
+   * Execute a previously saved decision by routing to the correct platform connector.
+   * Called immediately in FULL_AUTO mode or after user approval in ASSISTED mode.
    *
-   * TODO: In Prompt 9, this will actually call the platform APIs
-   * (Meta, Google, TikTok) to execute the changes.
-   * For now it marks the decision as executed and logs it.
+   * Routing logic:
+   *   1. Load the campaign associated with this decision
+   *   2. Look up the workspace's connected account for that platform
+   *   3. Decrypt the token and call the platform API
+   *   4. Mark decision as executed
    */
   async executeDecision(decision: AiDecision): Promise<void> {
-    this.logger.log(
-      `Executing decision: ${decision.actionType} (${decision.id})`,
-    );
+    this.logger.log(`Executing decision: ${decision.actionType} (${decision.id})`);
 
-    // TODO: Route to appropriate platform connector based on campaign platform
-    // await this.metaConnector.pauseAd(decision.targetId)
-    // await this.googleConnector.scaleBudget(decision.targetId, newBudget)
+    try {
+      if (decision.campaignId) {
+        const campaign = await this.campaignRepo.findOne({
+          where: { id: decision.campaignId },
+        });
 
-    await this.decisionRepo.update(decision.id, {
-      isExecuted: true,
-      isApproved: true,
-      afterState: { executedAt: new Date(), status: "completed" } as any,
+        if (campaign?.platform && campaign.externalId && campaign.workspaceId) {
+          await this.dispatchToConnector(decision, campaign);
+        }
+      }
+
+      await this.decisionRepo.update(decision.id, {
+        isExecuted: true,
+        isApproved: true,
+        afterState: {
+          executedAt: new Date(),
+          status: "completed",
+          actionType: decision.actionType,
+        } as any,
+      });
+    } catch (error: any) {
+      this.logger.error(
+        `Decision execution failed [${decision.id}]: ${error.message}`,
+      );
+      await this.decisionRepo.update(decision.id, {
+        afterState: {
+          executedAt: new Date(),
+          status: "failed",
+          error: error.message,
+        } as any,
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Route a decision to the appropriate platform connector.
+   * Maps AiDecisionAction enum values to specific API calls.
+   */
+  private async dispatchToConnector(
+    decision: AiDecision,
+    campaign: Campaign,
+  ): Promise<void> {
+    const platform = campaign.platform!;
+    const externalId = campaign.externalId!;
+    const workspaceId = campaign.workspaceId!;
+
+    const account = await this.accountRepo.findOne({
+      where: { workspaceId, platform, isActive: true },
     });
+
+    if (!account) {
+      this.logger.warn(
+        `No active ${platform} account for workspace ${workspaceId} — skipping execution`,
+      );
+      return;
+    }
+
+    const encryptionKey = this.config.get<string>("ENCRYPTION_KEY", "00000000000000000000000000000000");
+    const accessToken = this.decryptToken(account.accessToken, encryptionKey);
+    const advertiserId = account.externalAccountId;
+
+    const newBudget = (campaign.dailyBudget ?? 0) * 1.3; // 30% scale-up
+
+    switch (decision.actionType) {
+      case AiDecisionAction.PAUSE_AD:
+      case AiDecisionAction.STOP_CAMPAIGN:
+        await this.pauseOnPlatform(platform, externalId, advertiserId, accessToken);
+        break;
+
+      case AiDecisionAction.SCALE_BUDGET:
+        await this.scaleBudgetOnPlatform(platform, externalId, advertiserId, accessToken, newBudget, account);
+        break;
+
+      case AiDecisionAction.SHIFT_BUDGET:
+        // Reduce budget by 20% — handled like a budget adjustment
+        const reducedBudget = (campaign.dailyBudget ?? 0) * 0.8;
+        await this.scaleBudgetOnPlatform(platform, externalId, advertiserId, accessToken, reducedBudget, account);
+        break;
+
+      default:
+        // Actions like GENERATE_STRATEGY, ADJUST_TARGETING, ROTATE_CREATIVE
+        // are informational — log them but don't call platform APIs
+        this.logger.log(`Decision type ${decision.actionType} noted (no direct API call)`);
+        break;
+    }
+  }
+
+  private async pauseOnPlatform(
+    platform: Platform,
+    externalId: string,
+    advertiserId: string,
+    accessToken: string,
+  ): Promise<void> {
+    if (platform === Platform.META) {
+      await this.metaConnector.pauseCampaign(externalId, accessToken);
+    } else if (platform === Platform.GOOGLE) {
+      const [customerId, campaignId] = externalId.includes(":") ? externalId.split(":") : [advertiserId, externalId];
+      await this.googleConnector.updateCampaignStatus(customerId, accessToken, campaignId, "PAUSED");
+    } else if (platform === Platform.TIKTOK) {
+      await this.tiktokConnector.pauseCampaign(advertiserId, accessToken, externalId);
+    }
+    this.logger.log(`Paused campaign ${externalId} on ${platform}`);
+  }
+
+  private async scaleBudgetOnPlatform(
+    platform: Platform,
+    externalId: string,
+    advertiserId: string,
+    accessToken: string,
+    newBudgetUsd: number,
+    account: ConnectedAccount,
+  ): Promise<void> {
+    if (platform === Platform.META) {
+      await this.metaConnector.updateCampaignBudget(externalId, accessToken, newBudgetUsd);
+    } else if (platform === Platform.GOOGLE) {
+      const [customerId, budgetId] = externalId.includes(":") ? externalId.split(":") : [advertiserId, externalId];
+      await this.googleConnector.updateCampaignBudget(customerId, accessToken, budgetId, newBudgetUsd);
+    } else if (platform === Platform.TIKTOK) {
+      await this.tiktokConnector.updateCampaignBudget(advertiserId, accessToken, externalId, newBudgetUsd);
+    }
+    this.logger.log(`Updated budget for campaign ${externalId} on ${platform} → $${newBudgetUsd}`);
+  }
+
+  private decryptToken(encryptedText: string, encryptionKey: string): string {
+    const [ivHex, encrypted] = encryptedText.split(":");
+    if (!ivHex || !encrypted) throw new Error("Invalid encrypted token format");
+    const iv = new Uint8Array(Buffer.from(ivHex, "hex"));
+    const decipher = crypto.createDecipheriv("aes-256-cbc", encryptionKey, iv);
+    let decrypted = decipher.update(encrypted, "hex", "utf8");
+    decrypted += decipher.final("utf8");
+    return decrypted;
   }
 
   /**

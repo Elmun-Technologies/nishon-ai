@@ -3,22 +3,27 @@ import { BullModule } from "@nestjs/bull";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { ScheduleModule } from "@nestjs/schedule";
+import { HttpModule } from "@nestjs/axios";
 import { CampaignSyncProcessor } from "./processors/campaign-sync.processor";
 import { OptimizationProcessor } from "./processors/optimization.processor";
 import { ReportProcessor } from "./processors/report.processor";
 import { QueueService } from "./queue.service";
 import { CronService } from "./cron.service";
 import { Workspace } from "../workspaces/entities/workspace.entity";
+import { Campaign } from "../campaigns/entities/campaign.entity";
 import { AiDecision } from "../ai-decisions/entities/ai-decision.entity";
 import { PerformanceMetric } from "../analytics/entities/performance-metric.entity";
+import { ConnectedAccount } from "../platforms/entities/connected-account.entity";
 import { AiAgentModule } from "../ai-agent/ai-agent.module";
 import { TriggersetModule } from "../triggersets/triggersets.module";
+import { PlatformsModule } from "../platforms/platforms.module";
 import { QUEUE_NAMES } from "./queue.constants";
 
 @Module({
   imports: [
     ConfigModule,
-    TypeOrmModule.forFeature([Workspace, AiDecision, PerformanceMetric]),
+    TypeOrmModule.forFeature([Workspace, Campaign, AiDecision, PerformanceMetric, ConnectedAccount]),
+    HttpModule,
     // Register Bull queues — each connects to Redis automatically
     BullModule.forRootAsync({
       imports: [ConfigModule],
@@ -49,6 +54,7 @@ import { QUEUE_NAMES } from "./queue.constants";
     ),
     AiAgentModule,
     TriggersetModule,
+    PlatformsModule,
     ScheduleModule.forRoot(),
   ],
   providers: [

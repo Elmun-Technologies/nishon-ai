@@ -88,6 +88,90 @@ export class PlatformsController {
     );
   }
 
+  // ─── GOOGLE ADS OAUTH ─────────────────────────────────────────────────────
+
+  @Get("google/connect/:workspaceId")
+  @UseGuards(AuthGuard("jwt"))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Start Google Ads OAuth flow — redirects user to Google" })
+  @Redirect()
+  connectGoogle(@Param("workspaceId") workspaceId: string) {
+    const url = this.platformsService.getGoogleOAuthUrl(workspaceId);
+    return { url, statusCode: 302 };
+  }
+
+  @Get("google/callback")
+  @ApiOperation({ summary: "Google Ads OAuth callback (called by Google)" })
+  @ApiQuery({ name: "code", description: "Authorization code from Google" })
+  @ApiQuery({ name: "state", description: "Base64-encoded workspace ID" })
+  async googleCallback(
+    @Query("code") code: string,
+    @Query("state") state: string,
+    @Query("error") error: string,
+  ) {
+    if (error) {
+      return { success: false, error: "User denied Google Ads permissions" };
+    }
+
+    const result = await this.platformsService.handleGoogleCallback(code, state);
+
+    return {
+      success: true,
+      workspaceId: result.workspaceId,
+      accounts: result.accounts,
+      message: "Select a customer account using POST /platforms/google/select-account",
+    };
+  }
+
+  @Post("google/select-account")
+  @UseGuards(AuthGuard("jwt"))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Select which Google Ads customer account to use after OAuth" })
+  async selectGoogleAccount(
+    @Body() body: { workspaceId: string; customerId: string; customerName: string },
+  ) {
+    return this.platformsService.selectGoogleCustomer(
+      body.workspaceId,
+      body.customerId,
+      body.customerName,
+    );
+  }
+
+  // ─── TIKTOK ADS OAUTH ─────────────────────────────────────────────────────
+
+  @Get("tiktok/connect/:workspaceId")
+  @UseGuards(AuthGuard("jwt"))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Start TikTok Ads OAuth flow — redirects user to TikTok" })
+  @Redirect()
+  connectTiktok(@Param("workspaceId") workspaceId: string) {
+    const url = this.platformsService.getTiktokOAuthUrl(workspaceId);
+    return { url, statusCode: 302 };
+  }
+
+  @Get("tiktok/callback")
+  @ApiOperation({ summary: "TikTok Ads OAuth callback (called by TikTok)" })
+  @ApiQuery({ name: "code", description: "Authorization code from TikTok" })
+  @ApiQuery({ name: "state", description: "Base64-encoded workspace ID" })
+  async tiktokCallback(
+    @Query("code") code: string,
+    @Query("state") state: string,
+    @Query("error") error: string,
+  ) {
+    if (error) {
+      return { success: false, error: "User denied TikTok Ads permissions" };
+    }
+
+    const result = await this.platformsService.handleTiktokCallback(code, state);
+
+    return {
+      success: true,
+      workspaceId: result.workspaceId,
+      accounts: result.accounts,
+      message: "TikTok Ads account connected successfully",
+    };
+  }
+
   // ─── YANDEX DIRECT OAUTH ──────────────────────────────────────────────────
 
   @Get("yandex/connect/:workspaceId")
