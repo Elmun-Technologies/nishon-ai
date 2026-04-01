@@ -40,8 +40,9 @@ export function ChatWidget() {
     setLoading(true)
 
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('nishon_token') : null
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/ai-agent/chat`, {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('nishon_access_token') : null
+      const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || ''
+      const res = await fetch(`${apiBase}/ai-agent/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

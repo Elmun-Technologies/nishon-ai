@@ -3,13 +3,14 @@ type EnvRecord = Record<string, string | undefined>;
 const REQUIRED_ENV_VARS = [
   "DATABASE_URL",
   "JWT_SECRET",
-  "META_APP_ID",
-  "META_APP_SECRET",
   "ENCRYPTION_KEY",
+  "OPENAI_API_KEY",
 ] as const;
 
 const WARN_ENV_VARS = [
   "FRONTEND_URL",
+  "META_APP_ID",
+  "META_APP_SECRET",
   "META_CALLBACK_URL",
 ] as const;
 

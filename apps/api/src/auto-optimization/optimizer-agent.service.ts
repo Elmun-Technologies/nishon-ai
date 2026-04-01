@@ -35,11 +35,9 @@ export class OptimizerAgentService {
   private readonly aiClient: NishonAiClient;
 
   constructor(private readonly config: ConfigService) {
-    const apiKey  = config.get<string>('AGENT_ROUTER_API_KEY', '');
-    const baseURL =
-      (config.get<string>('AGENT_ROUTER_BASE_URL') || 'https://agentrouter.org')
-        .replace(/\/$/, '') + '/v1';
-    this.aiClient = new NishonAiClient(apiKey, baseURL);
+    const apiKey  = config.get<string>('OPENAI_API_KEY', '');
+    const baseURL = config.get<string>('OPENAI_BASE_URL', '');
+    this.aiClient = new NishonAiClient(apiKey, baseURL || undefined);
   }
 
   // ─── Main optimization analysis ─────────────────────────────────────────────

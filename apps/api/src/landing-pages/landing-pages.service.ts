@@ -39,12 +39,10 @@ export class LandingPagesService {
     private readonly workspaceRepo: Repository<Workspace>,
     private readonly config: ConfigService,
   ) {
-    const apiKey = this.config.get<string>("AGENT_ROUTER_API_KEY") || "";
-    const baseURL =
-      (this.config.get<string>("AGENT_ROUTER_BASE_URL") || "https://agentrouter.org")
-        .replace(/\/$/, "") + "/v1";
+    const apiKey  = this.config.get<string>("OPENAI_API_KEY", "");
+    const baseURL = this.config.get<string>("OPENAI_BASE_URL", "");
     if (apiKey) {
-      this.aiClient = new NishonAiClient(apiKey, baseURL);
+      this.aiClient = new NishonAiClient(apiKey, baseURL || undefined);
     }
   }
 
@@ -63,7 +61,7 @@ export class LandingPagesService {
     }
 
     if (!this.aiClient) {
-      throw new BadRequestException("AI funksiyalar mavjud emas: AGENT_ROUTER_API_KEY sozlanmagan");
+      throw new BadRequestException("AI funksiyalar mavjud emas: OPENAI_API_KEY sozlanmagan");
     }
 
     const strategy = workspace.aiStrategy as any;
@@ -90,7 +88,7 @@ export class LandingPagesService {
       content = await this.aiClient.completeJson(
         prompt,
         LANDING_PAGE_SYSTEM_PROMPT,
-        { taskType: "script", agentName: "LandingPageEngine", temperature: 0.6 },
+        { taskType: "creative", agentName: "LandingPageEngine", temperature: 0.6 },
       );
     } catch (err: any) {
       this.logger.error({ message: "Landing page AI generation failed", error: err?.message });

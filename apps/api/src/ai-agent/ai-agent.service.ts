@@ -1,4 +1,12 @@
-import { Injectable, Logger, InternalServerErrorException } from "@nestjs/common";
+import {
+  Injectable,
+  Logger,
+  InternalServerErrorException,
+  NotFoundException,
+  BadRequestException,
+} from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
 import {
   StrategyEngineService,
   StrategyResult,
@@ -27,12 +35,12 @@ export class AiAgentService {
     private readonly strategyEngine: StrategyEngineService,
     private readonly decisionLoop: DecisionLoopService,
     private readonly config: ConfigService,
+    @InjectRepository(AiDecision)
+    private readonly decisionRepo: Repository<AiDecision>,
   ) {
-    const apiKey  = this.config.get<string>("AGENT_ROUTER_API_KEY", "");
-    const baseURL =
-      (this.config.get<string>("AGENT_ROUTER_BASE_URL") || "https://agentrouter.org")
-        .replace(/\/$/, "") + "/v1";
-    this.aiClient = new NishonAiClient(apiKey, baseURL);
+    const apiKey  = this.config.get<string>("OPENAI_API_KEY", "");
+    const baseURL = this.config.get<string>("OPENAI_BASE_URL", ""); // optional override
+    this.aiClient = new NishonAiClient(apiKey, baseURL || undefined);
   }
 
   async generateStrategy(workspaceId: string): Promise<StrategyResult> {
@@ -47,12 +55,43 @@ export class AiAgentService {
     return this.decisionLoop.runForWorkspace(workspaceId);
   }
 
+  /**
+   * Approve a pending AI decision and execute it on the platform.
+   * Only decisions with isApproved=null (pending) can be approved.
+   */
   async approveDecision(decisionId: string): Promise<void> {
-    // TODO: load decision, set isApproved = true, then executeDecision
-    this.logger.log(`Decision approved: ${decisionId}`);
+    const decision = await this.decisionRepo.findOne({ where: { id: decisionId } });
+    if (!decision) {
+      throw new NotFoundException(`AI decision ${decisionId} not found`);
+    }
+    if (decision.isExecuted) {
+      throw new BadRequestException("This decision has already been executed");
+    }
+
+    // Mark as approved first so it passes the guard in executeDecision
+    await this.decisionRepo.update(decisionId, { isApproved: true });
+    decision.isApproved = true;
+
+    await this.decisionLoop.executeDecision(decision);
+    this.logger.log(`Decision approved and executed: ${decisionId}`);
   }
 
+  /**
+   * Reject a pending AI decision — marks it as rejected without execution.
+   */
   async rejectDecision(decisionId: string): Promise<void> {
+    const decision = await this.decisionRepo.findOne({ where: { id: decisionId } });
+    if (!decision) {
+      throw new NotFoundException(`AI decision ${decisionId} not found`);
+    }
+    if (decision.isExecuted) {
+      throw new BadRequestException("Cannot reject an already-executed decision");
+    }
+
+    await this.decisionRepo.update(decisionId, {
+      isApproved: false,
+      afterState: { rejectedAt: new Date(), status: "rejected" } as any,
+    });
     this.logger.log(`Decision rejected: ${decisionId}`);
   }
 

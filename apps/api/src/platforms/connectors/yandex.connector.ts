@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger, BadRequestException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { HttpService } from "@nestjs/axios";
 import { firstValueFrom } from "rxjs";
@@ -133,71 +133,337 @@ export class YandexConnector {
    * Yandex Direct campaign hierarchy:
    *   Campaign → AdGroup → Ad (keyword/autotargeting conditions per group)
    *
-   * TODO: Implement full campaign creation with ad groups and ads.
+   * Yandex API v5 JSON-RPC: POST https://api.direct.yandex.com/json/v5/campaigns
    */
   async createCampaign(
     accessToken: string,
     params: {
       name: string;
-      startDate: string;
+      startDate: string; // YYYY-MM-DD
       dailyBudget?: number;
       currency?: string;
     },
   ): Promise<{ id: string }> {
-    this.logger.log(`Yandex Direct campaign creation stub: ${params.name}`);
+    this.logger.log(`Creating Yandex Direct campaign: ${params.name}`);
 
-    // TODO: Implement via POST https://api.direct.yandex.com/json/v5/campaigns
-    // Body example:
-    // {
-    //   "method": "add",
-    //   "params": {
-    //     "Campaigns": [{
-    //       "Name": params.name,
-    //       "StartDate": params.startDate,
-    //       "Type": "TEXT_CAMPAIGN",
-    //       "TextCampaign": {
-    //         "BiddingStrategy": { "Search": { "OptimizingConversion": { "GoalId": 0, "AttributionModel": "LYDC" } } },
-    //         "Settings": []
-    //       }
-    //     }]
-    //   }
-    // }
+    const campaignData: Record<string, any> = {
+      Name: params.name,
+      StartDate: params.startDate,
+      Type: "TEXT_CAMPAIGN",
+      TextCampaign: {
+        BiddingStrategy: {
+          Search: {
+            WbMaximumClicks: {
+              WeeklySpendLimit: params.dailyBudget
+                ? params.dailyBudget * 7 * 1_000_000 // micros
+                : undefined,
+              BidCeiling: undefined,
+            },
+          },
+          Network: { ServingScope: "MAXIMUM_COVERAGE" },
+        },
+        Settings: [],
+      },
+    };
 
-    return { id: "yandex-stub-id" };
+    if (params.dailyBudget) {
+      campaignData.DailyBudget = {
+        Amount: Math.round(params.dailyBudget * 1_000_000), // Yandex uses micros
+        Mode: "STANDARD",
+      };
+    }
+
+    const response = await this.jsonRpc(accessToken, "campaigns", "add", {
+      Campaigns: [campaignData],
+    });
+
+    const campaignId = response.AddResults?.[0]?.Id;
+    if (!campaignId) {
+      const error = response.AddResults?.[0]?.Errors?.[0];
+      throw new BadRequestException(
+        `Yandex Direct campaign creation failed: ${error?.Message ?? "Unknown error"}`,
+      );
+    }
+
+    this.logger.log(`Yandex Direct campaign created: ${campaignId}`);
+    return { id: String(campaignId) };
   }
 
   /**
-   * Get campaign performance insights from Yandex Direct.
+   * Pause a campaign.
+   */
+  async pauseCampaign(accessToken: string, campaignId: string): Promise<void> {
+    await this.jsonRpc(accessToken, "campaigns", "suspend", {
+      SelectionCriteria: { Ids: [Number(campaignId)] },
+    });
+    this.logger.log(`Yandex Direct campaign paused: ${campaignId}`);
+  }
+
+  /**
+   * Resume a campaign.
+   */
+  async resumeCampaign(accessToken: string, campaignId: string): Promise<void> {
+    await this.jsonRpc(accessToken, "campaigns", "resume", {
+      SelectionCriteria: { Ids: [Number(campaignId)] },
+    });
+    this.logger.log(`Yandex Direct campaign resumed: ${campaignId}`);
+  }
+
+  /**
+   * Update campaign daily budget.
+   */
+  async updateCampaignBudget(
+    accessToken: string,
+    campaignId: string,
+    dailyBudgetAmount: number,
+  ): Promise<void> {
+    await this.jsonRpc(accessToken, "campaigns", "update", {
+      Campaigns: [{
+        Id: Number(campaignId),
+        DailyBudget: {
+          Amount: Math.round(dailyBudgetAmount * 1_000_000),
+          Mode: "STANDARD",
+        },
+      }],
+    });
+    this.logger.log(`Yandex Direct budget updated: ${campaignId} → ${dailyBudgetAmount}`);
+  }
+
+  /**
+   * Get campaign performance insights from Yandex Direct Reports API.
    *
-   * Uses the Reports API (not JSON API v5) — separate endpoint.
-   * Reports are created asynchronously: POST → poll for readiness → GET.
-   *
-   * TODO: Implement async report generation and polling.
+   * Reports API is separate from JSON API v5.
+   * For short ranges (< 7 days), reports are returned synchronously.
+   * For longer ranges, the API returns 201/202 and we poll until ready.
    */
   async getInsights(
     accessToken: string,
     accountLogin: string,
-  ): Promise<any[]> {
-    this.logger.log(
-      `Yandex Direct getInsights stub for account: ${accountLogin}`,
-    );
-    // TODO: Implement via https://api.direct.yandex.com/v5/reports
-    return [];
+    params?: { since?: string; until?: string; campaignIds?: string[] },
+  ): Promise<Array<{
+    campaignId: string;
+    date: string;
+    impressions: number;
+    clicks: number;
+    cost: number;
+    conversions: number;
+    ctr: number;
+  }>> {
+    this.logger.log(`Fetching Yandex Direct insights for: ${accountLogin}`);
+
+    const selection: Record<string, any> = {
+      DateRangeType: "CUSTOM_DATE",
+      DateFrom: params?.since ?? this.daysAgo(7),
+      DateTo: params?.until ?? this.daysAgo(1),
+    };
+
+    if (params?.campaignIds?.length) {
+      selection.Filter = [{
+        Field: "CampaignId",
+        Operator: "IN",
+        Values: params.campaignIds,
+      }];
+    }
+
+    const reportBody = JSON.stringify({
+      params: {
+        SelectionCriteria: selection,
+        FieldNames: [
+          "Date",
+          "CampaignId",
+          "CampaignName",
+          "Impressions",
+          "Clicks",
+          "Cost",
+          "Conversions",
+          "Ctr",
+        ],
+        ReportName: `NishonAI_Report_${Date.now()}`,
+        ReportType: "CAMPAIGN_PERFORMANCE_REPORT",
+        DateRangeType: "CUSTOM_DATE",
+        Format: "TSV",
+        IncludeVAT: "NO",
+        IncludeDiscount: "NO",
+      },
+    });
+
+    try {
+      // Poll for the report (Yandex returns 200 when ready, 201/202 when processing)
+      let tsvData: string | null = null;
+      let attempts = 0;
+
+      while (!tsvData && attempts < 10) {
+        const response = await firstValueFrom(
+          this.http.post(
+            `${this.apiBase}/reports`,
+            reportBody,
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Client-Login": accountLogin,
+                "Accept-Language": "ru",
+                "processingMode": "auto",
+                "returnMoneyInMicros": "false",
+              },
+              responseType: "text",
+            },
+          ),
+        );
+
+        if (response.status === 200) {
+          tsvData = response.data as string;
+        } else if (response.status === 201 || response.status === 202) {
+          // Report is being prepared — wait and retry
+          await new Promise((resolve) => setTimeout(resolve, 5000));
+          attempts++;
+        } else {
+          this.logger.warn(`Yandex report unexpected status: ${response.status}`);
+          return [];
+        }
+      }
+
+      if (!tsvData) {
+        this.logger.warn("Yandex report not ready after polling — returning empty");
+        return [];
+      }
+
+      return this.parseTsvReport(tsvData);
+    } catch (error: any) {
+      const detail = error.response?.data || error.message;
+      this.logger.error(`Yandex Direct getInsights failed: ${detail}`);
+      return [];
+    }
   }
 
   /**
    * Upload an image to Yandex Direct creative library.
-   * Supports JPG, PNG, GIF — up to 10MB, minimum 450×450px, up to 5 variants.
-   *
-   * TODO: Implement via POST https://api.direct.yandex.com/json/v5/adimages
+   * Supports JPG, PNG, GIF — up to 10MB, minimum 450×450px.
+   * Returns image hash for use in ad creatives.
    */
   async uploadImage(
     accessToken: string,
     imageBase64: string,
     filename: string,
   ): Promise<{ imageHash: string }> {
-    this.logger.log(`Yandex Direct uploadImage stub: ${filename}`);
-    // TODO: Implement image upload
-    return { imageHash: "stub-hash" };
+    this.logger.log(`Uploading image to Yandex Direct: ${filename}`);
+
+    const response = await this.jsonRpc(accessToken, "adimages", "add", {
+      AdImages: [{
+        ImageData: imageBase64,
+        Name: filename,
+      }],
+    });
+
+    const imageHash = response.AddResults?.[0]?.AdImageHash;
+    if (!imageHash) {
+      const error = response.AddResults?.[0]?.Errors?.[0];
+      throw new BadRequestException(
+        `Yandex Direct image upload failed: ${error?.Message ?? "Unknown error"}`,
+      );
+    }
+
+    this.logger.log(`Yandex Direct image uploaded: ${imageHash}`);
+    return { imageHash };
+  }
+
+  // ─── PRIVATE HELPERS ──────────────────────────────────────────────────────
+
+  /**
+   * Send a JSON-RPC v5 request to Yandex Direct API.
+   * All Yandex Direct v5 methods follow the same pattern:
+   *   POST /json/v5/{service}
+   *   Body: { method, params }
+   */
+  private async jsonRpc(
+    accessToken: string,
+    service: string,
+    method: string,
+    params: Record<string, any>,
+  ): Promise<any> {
+    try {
+      const response = await firstValueFrom(
+        this.http.post(
+          `${this.apiBase}/${service}`,
+          { method, params },
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              "Content-Type": "application/json",
+              "Accept-Language": "ru",
+            },
+          },
+        ),
+      );
+
+      if (response.data.error) {
+        const err = response.data.error;
+        throw new BadRequestException(
+          `Yandex Direct API error [${err.error_code}]: ${err.error_detail || err.error_string}`,
+        );
+      }
+
+      return response.data.result ?? response.data;
+    } catch (error: any) {
+      if (error instanceof BadRequestException) throw error;
+      const detail = error.response?.data?.error?.error_detail || error.message;
+      this.logger.error(`Yandex Direct JSON-RPC error [${service}.${method}]: ${detail}`);
+      throw new BadRequestException(`Yandex Direct request failed: ${detail}`);
+    }
+  }
+
+  /**
+   * Parse TSV report from Yandex Direct Reports API.
+   * Format: tab-separated values with a header row and a totals row at the end.
+   */
+  private parseTsvReport(tsv: string): Array<{
+    campaignId: string;
+    date: string;
+    impressions: number;
+    clicks: number;
+    cost: number;
+    conversions: number;
+    ctr: number;
+  }> {
+    const lines = tsv.split("\n").filter((l) => l.trim());
+    if (lines.length < 2) return [];
+
+    // Skip the report name line (first line) and use second line as header
+    const headerLine = lines.find((l) => l.includes("Date") || l.includes("CampaignId"));
+    if (!headerLine) return [];
+
+    const headers = headerLine.split("\t").map((h) => h.trim().toLowerCase());
+    const dataLines = lines.slice(lines.indexOf(headerLine) + 1);
+
+    const results = [];
+
+    for (const line of dataLines) {
+      const cols = line.split("\t");
+      if (cols.length < 3) continue;
+
+      const row: Record<string, string> = {};
+      headers.forEach((h, i) => { row[h] = cols[i]?.trim() ?? ""; });
+
+      // Skip totals row
+      if (row["date"] === "Total" || row["campaignid"] === "Total") continue;
+
+      results.push({
+        campaignId: row["campaignid"] ?? "",
+        date: row["date"] ?? "",
+        impressions: parseFloat(row["impressions"] ?? "0") || 0,
+        clicks: parseFloat(row["clicks"] ?? "0") || 0,
+        cost: parseFloat(row["cost"] ?? "0") || 0,
+        conversions: parseFloat(row["conversions"] ?? "0") || 0,
+        ctr: parseFloat(row["ctr"] ?? "0") || 0,
+      });
+    }
+
+    return results;
+  }
+
+  /** Returns date string N days ago in YYYY-MM-DD format */
+  private daysAgo(n: number): string {
+    const d = new Date();
+    d.setDate(d.getDate() - n);
+    return d.toISOString().split("T")[0];
   }
 }
