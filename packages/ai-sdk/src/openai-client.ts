@@ -51,18 +51,21 @@ export class NishonAiClient {
   private readonly fallbackModel = 'gpt-4o-mini'
   private readonly maxRetries = 3
 
-  constructor(apiKey: string, baseURL: string) {
-    this.openai = new OpenAI({
+  /**
+   * @param apiKey   OpenAI API key (OPENAI_API_KEY)
+   * @param baseURL  Optional — override the API base URL (e.g. for Azure, local proxy).
+   *                 Defaults to the official OpenAI endpoint.
+   */
+  constructor(apiKey: string, baseURL?: string) {
+    const config: ConstructorParameters<typeof OpenAI>[0] = {
       apiKey,
-      baseURL,
-      timeout: 45_000,  // 45 s — prevents Render 504 timeouts
-      maxRetries: 0,    // retries are handled manually below
-      defaultHeaders: {
-        'User-Agent': 'NishonAI/1.0 (compatible; OpenAI-client)',
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-    })
+      timeout: 60_000,  // 60 s — generous timeout for complex prompts
+      maxRetries: 0,    // retries handled manually with backoff below
+    }
+    if (baseURL) {
+      config.baseURL = baseURL
+    }
+    this.openai = new OpenAI(config)
   }
 
   // ─── Public API ───────────────────────────────────────────────────────────

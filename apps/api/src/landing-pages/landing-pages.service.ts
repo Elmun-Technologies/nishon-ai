@@ -39,12 +39,10 @@ export class LandingPagesService {
     private readonly workspaceRepo: Repository<Workspace>,
     private readonly config: ConfigService,
   ) {
-    const apiKey = this.config.get<string>("AGENT_ROUTER_API_KEY") || "";
-    const baseURL =
-      (this.config.get<string>("AGENT_ROUTER_BASE_URL") || "https://agentrouter.org")
-        .replace(/\/$/, "") + "/v1";
+    const apiKey  = this.config.get<string>("OPENAI_API_KEY", "");
+    const baseURL = this.config.get<string>("OPENAI_BASE_URL", "");
     if (apiKey) {
-      this.aiClient = new NishonAiClient(apiKey, baseURL);
+      this.aiClient = new NishonAiClient(apiKey, baseURL || undefined);
     }
   }
 
@@ -63,7 +61,7 @@ export class LandingPagesService {
     }
 
     if (!this.aiClient) {
-      throw new BadRequestException("AI funksiyalar mavjud emas: AGENT_ROUTER_API_KEY sozlanmagan");
+      throw new BadRequestException("AI funksiyalar mavjud emas: OPENAI_API_KEY sozlanmagan");
     }
 
     const strategy = workspace.aiStrategy as any;

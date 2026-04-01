@@ -55,7 +55,7 @@ export class CronService implements OnModuleInit {
   @Cron(CronExpression.EVERY_HOUR)
   async syncPlatformMetrics(): Promise<void> {
     this.logger.log("Cron: Hourly platform metrics sync");
-    // TODO: Schedule sync jobs for all active workspaces
+    await this.queueService.scheduleSyncForAllWorkspaces();
   }
 
   /**

@@ -51,7 +51,8 @@ describe("AutoOptimizationService", () => {
           provide: ConfigService,
           useValue: {
             get: jest.fn((key: string, def?: any) => {
-              if (key === "AGENT_ROUTER_API_KEY") return "test-key";
+              if (key === "OPENAI_API_KEY") return "sk-test-key";
+              if (key === "OPENAI_BASE_URL") return "";
               return def ?? "";
             }),
           },

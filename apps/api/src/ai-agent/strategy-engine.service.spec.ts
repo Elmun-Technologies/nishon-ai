@@ -80,8 +80,8 @@ describe("StrategyEngineService", () => {
           provide: ConfigService,
           useValue: {
             get: jest.fn((key: string, def?: any) => {
-              if (key === "AGENT_ROUTER_API_KEY") return "test-api-key";
-              if (key === "AGENT_ROUTER_BASE_URL") return "https://agentrouter.org";
+              if (key === "OPENAI_API_KEY") return "sk-test-api-key";
+              if (key === "OPENAI_BASE_URL") return "";
               return def ?? "";
             }),
           },

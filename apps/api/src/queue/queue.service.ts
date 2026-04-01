@@ -88,6 +88,52 @@ export class QueueService {
   }
 
   /**
+   * Schedule platform metrics sync for ALL active workspaces.
+   * Called by the hourly cron job.
+   * Creates one sync job per connected platform per workspace.
+   */
+  async scheduleSyncForAllWorkspaces(): Promise<void> {
+    const workspaces = await this.workspaceRepo.find({
+      where: { isOnboardingComplete: true },
+    });
+
+    this.logger.log(
+      `Scheduling metrics sync for ${workspaces.length} workspaces`,
+    );
+
+    let delay = 0;
+    for (const workspace of workspaces) {
+      await this.syncQueue.add(
+        "sync-all-platforms",
+        { workspaceId: workspace.id },
+        {
+          delay,
+          jobId: `sync-all-${workspace.id}-${Date.now()}`,
+          // Don't retry sync jobs aggressively — they run every hour anyway
+          attempts: 2,
+          backoff: { type: "fixed", delay: 30_000 },
+        },
+      );
+      delay += 3000; // 3 s stagger to avoid hitting platform rate limits simultaneously
+    }
+  }
+
+  /**
+   * Schedule immediate sync for a single workspace.
+   * Called when a user connects a new platform account.
+   */
+  async scheduleSyncNow(workspaceId: string, platform?: string): Promise<void> {
+    await this.syncQueue.add(
+      platform ? "sync-campaign-metrics" : "sync-all-platforms",
+      { workspaceId, platform },
+      { priority: 1 },
+    );
+    this.logger.log(
+      `Immediate sync scheduled: workspace=${workspaceId} platform=${platform ?? "all"}`,
+    );
+  }
+
+  /**
    * Get queue statistics — used in admin dashboard to monitor health.
    */
   async getQueueStats() {

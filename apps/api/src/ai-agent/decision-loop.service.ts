@@ -60,13 +60,12 @@ export class DecisionLoopService {
     private readonly googleConnector: GoogleConnector,
     private readonly tiktokConnector: TiktokConnector,
   ) {
-    const apiKey = this.config.get<string>("AGENT_ROUTER_API_KEY") || "";
-    const baseURL =
-      (this.config.get<string>("AGENT_ROUTER_BASE_URL") || "https://agentrouter.org").replace(/\/$/, "") + "/v1";
+    const apiKey  = this.config.get<string>("OPENAI_API_KEY", "");
+    const baseURL = this.config.get<string>("OPENAI_BASE_URL", "");
     if (apiKey) {
-      this.aiClient = new NishonAiClient(apiKey, baseURL);
+      this.aiClient = new NishonAiClient(apiKey, baseURL || undefined);
     } else {
-      this.logger.warn("AGENT_ROUTER_API_KEY is not configured - AI decision loop will be unavailable");
+      this.logger.warn("OPENAI_API_KEY is not configured — AI decision loop will be unavailable");
     }
   }
 
