@@ -7,6 +7,7 @@ import {
   ManyToOne,
   OneToMany,
   JoinColumn,
+  Index,
 } from "typeorm";
 import { Workspace } from "../../workspaces/entities/workspace.entity";
 import { AdSet } from "../../ad-sets/entities/ad-set.entity";
@@ -21,6 +22,9 @@ import type { CampaignSchedule } from "@nishon/shared";
  * aiConfig stores the AI-generated targeting and optimization parameters.
  */
 @Entity("campaigns")
+@Index("idx_campaign_workspace", ["workspaceId"])
+@Index("idx_campaign_workspace_status", ["workspaceId", "status"])
+@Index("idx_campaign_workspace_platform", ["workspaceId", "platform"])
 export class Campaign {
   @PrimaryGeneratedColumn("uuid")
   id: string;
