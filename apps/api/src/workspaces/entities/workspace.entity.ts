@@ -7,6 +7,7 @@ import {
   ManyToOne,
   OneToMany,
   JoinColumn,
+  Index,
 } from "typeorm";
 import { User } from "../../users/entities/user.entity";
 import { Campaign } from "../../campaigns/entities/campaign.entity";
@@ -22,6 +23,7 @@ import { AutopilotMode, CampaignObjective } from "@nishon/shared";
  * This design allows agency accounts to manage multiple clients under one login.
  */
 @Entity("workspaces")
+@Index("idx_workspace_user", ["userId"])
 export class Workspace {
   @PrimaryGeneratedColumn("uuid")
   id: string;
