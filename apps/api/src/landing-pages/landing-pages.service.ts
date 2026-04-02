@@ -39,10 +39,17 @@ export class LandingPagesService {
     private readonly workspaceRepo: Repository<Workspace>,
     private readonly config: ConfigService,
   ) {
-    const apiKey  = this.config.get<string>("OPENAI_API_KEY", "");
-    const baseURL = this.config.get<string>("OPENAI_BASE_URL", "");
+    const provider = this.config.get<string>("AI_PROVIDER", "openai").toLowerCase() === "anthropic"
+      ? "anthropic"
+      : "openai";
+    const apiKey = provider === "anthropic"
+      ? this.config.get<string>("ANTHROPIC_API_KEY", "")
+      : this.config.get<string>("OPENAI_API_KEY", "");
+    const baseURL = provider === "anthropic"
+      ? this.config.get<string>("ANTHROPIC_BASE_URL", "")
+      : this.config.get<string>("OPENAI_BASE_URL", "");
     if (apiKey) {
-      this.aiClient = new NishonAiClient(apiKey, baseURL || undefined);
+      this.aiClient = new NishonAiClient(apiKey, baseURL || undefined, provider);
     }
   }
 
@@ -61,7 +68,7 @@ export class LandingPagesService {
     }
 
     if (!this.aiClient) {
-      throw new BadRequestException("AI funksiyalar mavjud emas: OPENAI_API_KEY sozlanmagan");
+      throw new BadRequestException("AI funksiyalar mavjud emas: API key sozlanmagan");
     }
 
     const strategy = workspace.aiStrategy as any;

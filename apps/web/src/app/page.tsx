@@ -3,10 +3,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-function cn(...classes: (string | false | undefined)[]) {
-  return classes.filter(Boolean).join(' ')
-}
-
 const ticker = ['Summit 26 · Stockholm', 'Wednesday April 15, 2026', 'Request Your Ticket Now']
 
 const capabilities = [
@@ -63,6 +59,190 @@ const reviews = [
       '“Approval, finance va analytics bir tizimga tushgani uchun agentlik-client ishlashi ancha tezlashdi.”',
     name: 'Akmal T.',
     role: 'COO, Digital Agency',
+  },
+]
+
+const funnelStages = [
+  {
+    name: 'Acquisition Prospecting',
+    pct: 60,
+    audience: "Brendingizni hali bilmaydigan yangi auditoriya",
+    tactic: 'Keng target + creative test + broad/lookalike sinovlari',
+    color: 'from-cyan-300 to-cyan-500',
+  },
+  {
+    name: 'Acquisition Re-Engagement',
+    pct: 20,
+    audience: "Kontentga tegilgan, lekin saytga kirmagan auditoriya",
+    tactic: 'Engager/Video viewers retarget va click-driving creatives',
+    color: 'from-pink-400 to-pink-500',
+  },
+  {
+    name: 'Retargeting',
+    pct: 15,
+    audience: 'Saytga kirgan, lekin xarid qilmagan issiq auditoriya',
+    tactic: 'Pixel event asosida DPA/offer reminder va urgency xabarlari',
+    color: 'from-blue-400 to-blue-500',
+  },
+  {
+    name: 'Retention',
+    pct: 5,
+    audience: 'Oldin xarid qilgan mavjud mijozlar',
+    tactic: 'Cross-sell, upsell, qayta xarid triggerlari va LTV optimizatsiya',
+    color: 'from-indigo-300 to-indigo-500',
+  },
+]
+
+const funnelMetrics = [
+  {
+    stage: 'Prospecting',
+    spendShare: '58.4%',
+    roas: '4.9',
+    cpa: '$22.8',
+    ctr: '0.92%',
+    trend: '+12%',
+  },
+  {
+    stage: 'Re-Engagement',
+    spendShare: '18.9%',
+    roas: '6.1',
+    cpa: '$17.3',
+    ctr: '1.18%',
+    trend: '+8%',
+  },
+  {
+    stage: 'Retargeting',
+    spendShare: '16.2%',
+    roas: '8.4',
+    cpa: '$12.1',
+    ctr: '1.44%',
+    trend: '+15%',
+  },
+  {
+    stage: 'Retention',
+    spendShare: '6.5%',
+    roas: '10.7',
+    cpa: '$9.2',
+    ctr: '1.91%',
+    trend: '+6%',
+  },
+]
+
+const workspaceTabs = [
+  {
+    tab: 'Ad accounts',
+    points: [
+      'Meta/Google akkauntlarini ulash yoki uzish',
+      'Reconnect (reauthenticate) va status nazorati',
+      'Page, Pixel va default audience exclusion sozlamalari',
+    ],
+  },
+  {
+    tab: 'Products & Usage',
+    points: [
+      'Obuna paketi va usage limitini kuzatish',
+      'Add-on larni yoqish/o‘chirish',
+      'Plan o‘zgartirish va ad account bundle boshqaruvi',
+    ],
+  },
+  {
+    tab: 'Payments',
+    points: [
+      'Billing history va invoice yuklab olish',
+      'Bir nechta payment method ulash',
+      'Billing information (kompaniya rekvizitlari) tahrirlash',
+    ],
+  },
+  {
+    tab: 'User Profile',
+    points: [
+      'User ID, email va telefonni ko‘rish',
+      'Aloqa ma’lumotlarini yangilash',
+      'Team access uchun profil boshqaruvi',
+    ],
+  },
+  {
+    tab: 'Team Members',
+    points: [
+      'Jamoa a’zolarini taklif qilish',
+      'Workspace bo‘yicha role va ruxsatlarni taqsimlash',
+      'Agentlik uchun bir nechta workspace ochish',
+    ],
+  },
+]
+
+const launchFlow = [
+  {
+    step: '1. Create New Ad',
+    what: 'Creatives menyusidan Ad Launcher → Create New Ad',
+    details: [
+      'Identity, format, page va ad copy bir oynada sozlanadi',
+      'Ad preview real-time ko‘rinadi',
+      'Save qilib keyingi audience bosqichiga o‘tiladi',
+    ],
+  },
+  {
+    step: '2. Audience Launcher',
+    what: 'ARR bosqichlari bo‘yicha audience preset tanlash',
+    details: [
+      'Acquisition / Re-Engagement / Retargeting / Retention filterlari',
+      'Bir vaqtning o‘zida bir nechta audience tanlab launch qilish',
+      'Audience kesimida ad biriktirish va save changes',
+    ],
+  },
+  {
+    step: '3. Campaign Setup',
+    what: 'Campaign objective, budget type, naming structure',
+    details: [
+      'Split by funnel stage yoki single campaign tanlovi',
+      'ABO/CBO tanlash (default tavsiya: ABO)',
+      'Location, age, gender, device va placementlarni audience kesimida sozlash',
+    ],
+  },
+  {
+    step: '4. Summary & Launch',
+    what: 'Final tekshiruv va nashr',
+    details: [
+      'Launch time: now / midnight / schedule',
+      'Ad set naming template va yakuniy review',
+      'Launch bosilgach kampaniyalar Meta’ga yuboriladi',
+    ],
+  },
+]
+
+const teamFlow = [
+  'Workspace yaratish (onboarding yoki workspace switcher orqali)',
+  'Invite Team Member modalida email(lar) kiritish (ko‘p email uchun Enter)',
+  'Pending invite holatini kuzatish va kerak bo‘lsa invitation link nusxalash',
+  'Qabul qilingandan keyin ad account access (checkbox + Add Now) berish',
+  '3-dot menyudan rolni yangilash: Advertiser → Admin',
+  'Zarur bo‘lsa workspace removal jarayoni (active subscription bo‘lsa schedule)',
+]
+
+const permissionMatrix = [
+  {
+    role: 'Owner',
+    rights: [
+      'Workspace va subscription ustidan to‘liq nazorat',
+      'Ad account ulash/uzish, billing va team management',
+      'Admin/Advertiser rollarni tayinlash va workspace o‘chirish',
+    ],
+  },
+  {
+    role: 'Admin',
+    rights: [
+      'Ownerga yaqin operatsion huquqlar (team, billing docs, settings)',
+      'Owner subscriptioniga ulangan akkauntlar doirasida ishlaydi',
+      'Strategik/operatsion boshqaruvda ownerga yordam beradi',
+    ],
+  },
+  {
+    role: 'Advertiser',
+    rights: [
+      'Faqat tayinlangan ad accountlarga kirish',
+      'O‘z subscriptioni shart emas (owner planidan foydalanadi)',
+      'Kampaniya boshqaruvi bor, lekin workspace-level boshqaruv cheklangan',
+    ],
   },
 ]
 
@@ -129,6 +309,10 @@ export default function SellerLandingPage() {
           <div className="hidden rounded-full border border-white/15 bg-white/[0.03] px-8 py-3 md:flex md:items-center md:gap-8 text-lg text-slate-200">
             <a href="#hero" className="hover:text-emerald-300">Home</a>
             <a href="#capabilities" className="hover:text-emerald-300">Solutions</a>
+            <a href="#funnel" className="hover:text-emerald-300">ARR Funnel</a>
+            <a href="#workspace-settings" className="hover:text-emerald-300">Workspace</a>
+            <a href="#meta-launch-flow" className="hover:text-emerald-300">Meta Launch</a>
+            <a href="#team-workflow" className="hover:text-emerald-300">Team</a>
             <a href="#reviews" className="hover:text-emerald-300">Clients</a>
             <a href="#contact" className="hover:text-emerald-300">About</a>
           </div>
@@ -194,6 +378,166 @@ export default function SellerLandingPage() {
             {capabilities.map((item) => (
               <CapabilityCard key={item.title} {...item} />
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="funnel" className="px-6 pb-20">
+        <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-[#050d22] p-8 md:p-12">
+          <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">ARR framework</p>
+          <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Budget allocation across the funnel</h2>
+          <p className="mt-4 max-w-4xl text-lg text-slate-300">
+            Madgicx uslubidagi funnel modelini bizning platformaga moslashtirdik: Acquisition (80%), Retargeting (15%),
+            Retention (5%). SaaS yoki lead-gen bo‘lsa Retention bosqichini qayta taqsimlash mumkin.
+          </p>
+
+          <div className="mt-10 space-y-4">
+            {funnelStages.map((stage) => (
+              <div key={stage.name} className="relative overflow-hidden rounded-3xl border border-white/15 bg-[#1b2140] px-6 py-6">
+                <div
+                  className={`pointer-events-none absolute inset-y-0 left-1/2 -translate-x-1/2 bg-gradient-to-b ${stage.color} opacity-85`}
+                  style={{ width: `${Math.max(stage.pct * 1.6, 8)}%`, clipPath: 'polygon(20% 0%, 80% 0%, 65% 100%, 35% 100%)' }}
+                />
+                <div className="relative z-10 grid gap-3 md:grid-cols-[1.6fr_auto_1.6fr] md:items-center">
+                  <div>
+                    <h3 className="text-3xl font-medium">{stage.name}</h3>
+                    <p className="mt-1 text-slate-300">{stage.tactic}</p>
+                  </div>
+                  <div className="text-6xl font-semibold text-cyan-300">{stage.pct}%</div>
+                  <div className="text-right text-xl text-slate-100">{stage.audience}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-10 overflow-hidden rounded-3xl border border-white/10">
+            <table className="min-w-full text-left text-sm">
+              <thead className="bg-white/[0.04] text-slate-200">
+                <tr>
+                  <th className="px-5 py-4">Stage</th>
+                  <th className="px-5 py-4">% Spend</th>
+                  <th className="px-5 py-4">ROAS</th>
+                  <th className="px-5 py-4">CPA</th>
+                  <th className="px-5 py-4">CTR</th>
+                  <th className="px-5 py-4">Trend (7d)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {funnelMetrics.map((row) => (
+                  <tr key={row.stage} className="border-t border-white/10 text-slate-300">
+                    <td className="px-5 py-4 font-medium text-white">{row.stage}</td>
+                    <td className="px-5 py-4">{row.spendShare}</td>
+                    <td className="px-5 py-4">{row.roas}</td>
+                    <td className="px-5 py-4">{row.cpa}</td>
+                    <td className="px-5 py-4">{row.ctr}</td>
+                    <td className="px-5 py-4 text-emerald-300">{row.trend}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="workspace-settings" className="px-6 pb-20">
+        <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-[#090b23] p-8 md:p-12">
+          <p className="text-sm uppercase tracking-[0.24em] text-violet-300">Workspace settings</p>
+          <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Madgicx uslubidagi boshqaruvni Nishon AI ga moslashtirdik</h2>
+          <p className="mt-4 max-w-4xl text-lg text-slate-300">
+            Profil menyusidan Workspace Settings’ga kirib, ad account, obuna, billing, user profile va team members
+            bo‘limlarini bir joydan boshqarish mumkin. Productionda bu bo‘limlar real API bilan ishlaydi.
+          </p>
+
+          <div className="mt-8 grid gap-4 md:grid-cols-5">
+            {workspaceTabs.map((item, index) => (
+              <article
+                key={item.tab}
+                className={`rounded-2xl border p-5 ${
+                  index === 0 ? 'border-violet-300/60 bg-violet-400/10' : 'border-white/10 bg-white/[0.02]'
+                }`}
+              >
+                <h3 className="text-xl font-semibold text-white">{item.tab}</h3>
+                <ul className="mt-3 space-y-2 text-sm text-slate-300">
+                  {item.points.map((point) => (
+                    <li key={point} className="flex gap-2">
+                      <span className="mt-1 h-1.5 w-1.5 rounded-full bg-violet-300" />
+                      <span>{point}</span>
+                    </li>
+                  ))}
+                </ul>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="meta-launch-flow" className="px-6 pb-20">
+        <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-[#0a1520] p-8 md:p-12">
+          <p className="text-sm uppercase tracking-[0.24em] text-sky-300">Meta campaign launch</p>
+          <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Madgicx uslubidagi launch flow — Nishon AI roadmap</h2>
+          <p className="mt-4 max-w-4xl text-lg text-slate-300">
+            Siz yuborgan “Create New Ad → Audience Launcher → Setup → Summary” oqimini bizning platformaga moslab
+            bosqichma-bosqich berdik. Hozir landingda feature map, keyingi bosqichda real interface/pages.
+          </p>
+
+          <div className="mt-8 grid gap-4 md:grid-cols-2">
+            {launchFlow.map((item) => (
+              <article key={item.step} className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
+                <h3 className="text-2xl font-semibold text-white">{item.step}</h3>
+                <p className="mt-2 text-base text-sky-200">{item.what}</p>
+                <ul className="mt-4 space-y-2 text-sm text-slate-300">
+                  {item.details.map((detail) => (
+                    <li key={detail} className="flex items-start gap-2">
+                      <span className="mt-1 h-1.5 w-1.5 rounded-full bg-sky-300" />
+                      <span>{detail}</span>
+                    </li>
+                  ))}
+                </ul>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="team-workflow" className="px-6 pb-20">
+        <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-[#12102a] p-8 md:p-12">
+          <p className="text-sm uppercase tracking-[0.24em] text-fuchsia-300">Team members workflow</p>
+          <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Madgicx’dagi team management oqimi — professional darajada</h2>
+          <p className="mt-4 max-w-4xl text-lg text-slate-300">
+            Create workspace, invite, accept invite, role berish, ad-account access taqsimlash va removal jarayonini
+            Nishon AI roadmapiga kiritdik. Bu bo‘lim agency va multi-account ishlash uchun asosiy blok.
+          </p>
+
+          <div className="mt-8 grid gap-4 md:grid-cols-2">
+            <article className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
+              <h3 className="text-2xl font-semibold text-white">End-to-end team flow</h3>
+              <ol className="mt-4 space-y-3 text-sm text-slate-300">
+                {teamFlow.map((item, index) => (
+                  <li key={item} className="flex gap-3">
+                    <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-fuchsia-400/20 text-xs text-fuchsia-300">
+                      {index + 1}
+                    </span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ol>
+            </article>
+
+            <article className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
+              <h3 className="text-2xl font-semibold text-white">Permissions matrix</h3>
+              <div className="mt-4 space-y-3">
+                {permissionMatrix.map((item) => (
+                  <div key={item.role} className="rounded-xl border border-white/10 bg-black/20 p-4">
+                    <p className="text-lg font-semibold text-fuchsia-200">{item.role}</p>
+                    <ul className="mt-2 space-y-1 text-sm text-slate-300">
+                      {item.rights.map((right) => (
+                        <li key={right}>• {right}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </article>
           </div>
         </div>
       </section>

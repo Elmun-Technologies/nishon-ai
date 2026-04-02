@@ -4,7 +4,6 @@ const REQUIRED_ENV_VARS = [
   "DATABASE_URL",
   "JWT_SECRET",
   "ENCRYPTION_KEY",
-  "OPENAI_API_KEY",
 ] as const;
 
 const WARN_ENV_VARS = [
@@ -15,10 +14,18 @@ const WARN_ENV_VARS = [
 ] as const;
 
 export function validateEnv(config: EnvRecord): EnvRecord {
+  const provider = (config["AI_PROVIDER"] || "openai").toLowerCase();
+  const providerKey =
+    provider === "anthropic" ? "ANTHROPIC_API_KEY" : "OPENAI_API_KEY";
+
   const missing = REQUIRED_ENV_VARS.filter((key) => {
     const value = config[key];
     return !value || value.trim().length === 0;
   });
+  const providerApiKey = config[providerKey];
+  if (!providerApiKey || providerApiKey.trim().length === 0) {
+    missing.push(providerKey as any);
+  }
 
   if (missing.length > 0) {
     throw new Error(
