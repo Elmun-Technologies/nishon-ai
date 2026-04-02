@@ -538,7 +538,7 @@ export default function CompetitorsPage() {
           {error && <Alert variant="error">{error}</Alert>}
 
           <Button fullWidth size="lg" loading={loading} onClick={handleAnalyze}>
-            {loading ? "Tahlil qilinmoqda (AI 12 bo’lim)..." : ‘🔍 Yangi tahlilni boshlash’}
+            {loading ? "Tahlil qilinmoqda (AI 12 bo‘lim)..." : "🔍 Yangi tahlilni boshlash"}
           </Button>
         </div>
       </Card>

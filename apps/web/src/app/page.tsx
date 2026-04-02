@@ -1,534 +1,614 @@
 'use client'
+
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-/* ─── tiny helpers ─────────────────────────────────────────────────────── */
-function cn(...classes: (string | false | undefined)[]) {
-  return classes.filter(Boolean).join(' ')
-}
+const ticker = ['Summit 26 · Stockholm', 'Wednesday April 15, 2026', 'Request Your Ticket Now']
 
-/* ─── data ──────────────────────────────────────────────────────────────── */
-const STATS = [
-  { value: '3.2×', label: 'O\'rtacha ROAS o\'sishi' },
-  { value: '−42%', label: 'CPA kamaytirish' },
-  { value: '24/7', label: 'Avtomatik monitoring' },
-  { value: '4 min', label: 'Kampaniya yaratish vaqti' },
-]
-
-const PLATFORMS = [
-  { name: 'Meta Ads', icon: '📘', color: '#1877F2', desc: 'Facebook · Instagram · Reels' },
-  { name: 'Google Ads', icon: '🔍', color: '#4285F4', desc: 'Search · Display · YouTube' },
-  { name: 'Yandex Direct', icon: '🟡', color: '#FFCC00', desc: 'Search · RSY · Smart Banner' },
-  { name: 'Telegram Ads', icon: '✈️', color: '#2CA5E0', desc: 'Sponsored · Channel Boost' },
-]
-
-const STEPS = [
+const capabilities = [
   {
-    num: '01',
-    title: 'Mahsulotingizni kiriting',
-    desc: 'Mahsulot nomi, URL va maqsad auditoriyangizni tasvirlab bering. AI qolganini o\'zi tahlil qiladi.',
-    icon: '🛍️',
+    title: 'Campaign Management',
+    desc: 'Kampaniyani yaratish, auditoriya segmentatsiyasi, budget pacing va publishingni bitta panelda boshqaring.',
+    bullets: ['1-click launch', 'Smart budget split', 'Audience layering'],
   },
   {
-    num: '02',
-    title: 'AI kampaniya yaratadi',
-    desc: 'Kalit so\'zlar, targetlar, ijodiy matnlar, UTM parametrlar — barchasini AI 4 daqiqada tayyorlaydi.',
-    icon: '🤖',
+    title: 'Creative Management',
+    desc: 'AI copy, banner variantlar, approval jarayoni va A/B testlar bir joyda, jamoa bilan real-time hamkorlikda.',
+    bullets: ['AI ad copy', 'Creative approval flow', 'Auto A/B rotation'],
   },
   {
-    num: '03',
-    title: 'Tasdiqlang va kuzating',
-    desc: 'Siz faqat oxirgi qaror qabul qilasiz. AI esa 24/7 optimallashtiradi, hisobot beradi.',
-    icon: '✅',
+    title: 'Reporting & Analytics',
+    desc: 'ROAS, CPA, CTR, CAC, LTV kabi KPIlarni live kuzating va kampaniya darajasida chuqur breakdown oling.',
+    bullets: ['Unified dashboard', 'Hourly anomaly alerts', 'Attribution snapshots'],
+  },
+  {
+    title: 'Finance & Control',
+    desc: 'Byudjet limitlari, spend guardrail, access control va workflow approval bilan xavfsiz o‘sishni ta’minlang.',
+    bullets: ['Budget guardrails', 'Role-based permissions', 'Approval gates'],
   },
 ]
 
-const FEATURES = [
-  { icon: '🧠', title: 'Avtonom AI Agent', desc: 'Bid, byudjet, ijodiy kontent va auditoriyani o\'zi boshqaradi. Har 2 soatda optimallashtirish.' },
-  { icon: '⚡', title: '4 daqiqada tayyor', desc: 'Platforma tanlashdan nashr qilishgacha — to\'liq 6 bosqichli wizard. Hech qanday texnik bilim kerak emas.' },
-  { icon: '🎯', title: 'Multi-platform', desc: 'Meta, Google, Yandex, Telegram — bir joydan boshqaring. Har bir platforma uchun alohida strategiya.' },
-  { icon: '📊', title: 'Real-time hisobot', desc: 'Barcha platformalar bo\'yicha birlashtirilgan dashboard. ROAS, CPA, CTR — bir ko\'rinishda.' },
-  { icon: '🔁', title: 'Kreativ rotatsiya', desc: 'Past ko\'rsatkichli reklamalar avtomatik almashtiriladi. A/B test — doim ishlaydi.' },
-  { icon: '🛡️', title: 'Byudjet himoyasi', desc: 'Anomaliya aniqlash: g\'ayritabiiy sarflanish, bot trafik — avtomatik to\'xtatiladi.' },
-  { icon: '📍', title: 'Geo & Vaqt targeting', desc: 'Shahar, radius, soat jadval, ob-havo — bid korreksiyalar 7 tur bo\'yicha.' },
-  { icon: '💬', title: 'AI Maslahatchisi', desc: 'Istalgan vaqt chatga savol bering. AI kampaniyangiz tarixini biladi va maslahat beradi.' },
+const stats = [
+  { value: '60%', text: 'sales vaqtini admin ishlar yeb yuboradi' },
+  { value: '43%', text: 'reklamachilar yomon UX sabab drop qiladi' },
+  { value: '50%', text: 'global ad spend Big Techga ketadi' },
 ]
 
-const PLANS = [
+const suites = [
+  'Publisher Suite',
+  'Advertiser Suite',
+  'Solution Services',
+  'For Developers',
+]
+
+const reviews = [
   {
-    name: 'Starter',
-    price: '49',
-    currency: 'USD',
-    period: 'oyiga',
-    desc: 'Kichik biznes va freylanschilar uchun',
-    highlight: false,
-    features: [
-      '2 ta platforma',
-      '3 ta faol kampaniya',
-      'AI kreativ generatsiya',
-      'Kunlik hisobot',
-      'Email qo\'llab-quvvatlash',
+    quote:
+      '“Nishon AI bilan launch muddati haftalardan kunlarga tushdi. Sotuv jamoamiz kampaniya setup o‘rniga strategiyaga vaqt ajratmoqda.”',
+    name: 'Dilshod R.',
+    role: 'Head of Growth, Retail Group',
+  },
+  {
+    quote:
+      '“Biz 4 ta platformani alohida boshqarardik. Endi barchasi bir panelda, har tong actionable insight olamiz.”',
+    name: 'Saida K.',
+    role: 'Marketing Director, Auto Brand',
+  },
+  {
+    quote:
+      '“Approval, finance va analytics bir tizimga tushgani uchun agentlik-client ishlashi ancha tezlashdi.”',
+    name: 'Akmal T.',
+    role: 'COO, Digital Agency',
+  },
+]
+
+const funnelStages = [
+  {
+    name: 'Acquisition Prospecting',
+    pct: 60,
+    audience: "Brendingizni hali bilmaydigan yangi auditoriya",
+    tactic: 'Keng target + creative test + broad/lookalike sinovlari',
+    color: 'from-cyan-300 to-cyan-500',
+  },
+  {
+    name: 'Acquisition Re-Engagement',
+    pct: 20,
+    audience: "Kontentga tegilgan, lekin saytga kirmagan auditoriya",
+    tactic: 'Engager/Video viewers retarget va click-driving creatives',
+    color: 'from-pink-400 to-pink-500',
+  },
+  {
+    name: 'Retargeting',
+    pct: 15,
+    audience: 'Saytga kirgan, lekin xarid qilmagan issiq auditoriya',
+    tactic: 'Pixel event asosida DPA/offer reminder va urgency xabarlari',
+    color: 'from-blue-400 to-blue-500',
+  },
+  {
+    name: 'Retention',
+    pct: 5,
+    audience: 'Oldin xarid qilgan mavjud mijozlar',
+    tactic: 'Cross-sell, upsell, qayta xarid triggerlari va LTV optimizatsiya',
+    color: 'from-indigo-300 to-indigo-500',
+  },
+]
+
+const funnelMetrics = [
+  {
+    stage: 'Prospecting',
+    spendShare: '58.4%',
+    roas: '4.9',
+    cpa: '$22.8',
+    ctr: '0.92%',
+    trend: '+12%',
+  },
+  {
+    stage: 'Re-Engagement',
+    spendShare: '18.9%',
+    roas: '6.1',
+    cpa: '$17.3',
+    ctr: '1.18%',
+    trend: '+8%',
+  },
+  {
+    stage: 'Retargeting',
+    spendShare: '16.2%',
+    roas: '8.4',
+    cpa: '$12.1',
+    ctr: '1.44%',
+    trend: '+15%',
+  },
+  {
+    stage: 'Retention',
+    spendShare: '6.5%',
+    roas: '10.7',
+    cpa: '$9.2',
+    ctr: '1.91%',
+    trend: '+6%',
+  },
+]
+
+const workspaceTabs = [
+  {
+    tab: 'Ad accounts',
+    points: [
+      'Meta/Google akkauntlarini ulash yoki uzish',
+      'Reconnect (reauthenticate) va status nazorati',
+      'Page, Pixel va default audience exclusion sozlamalari',
     ],
-    cta: 'Boshlash',
   },
   {
-    name: 'Growth',
-    price: '149',
-    currency: 'USD',
-    period: 'oyiga',
-    desc: 'O\'sib borayotgan e-commerce uchun',
-    highlight: true,
-    badge: 'Eng mashhur',
-    features: [
-      'Barcha 4 ta platforma',
-      'Cheklanmagan kampaniyalar',
-      'Avtonom AI rejimi',
-      'Real-time dashboard',
-      'A/B test avtomatik',
-      'Priority qo\'llab-quvvatlash',
-      'API kirish',
+    tab: 'Products & Usage',
+    points: [
+      'Obuna paketi va usage limitini kuzatish',
+      'Add-on larni yoqish/o‘chirish',
+      'Plan o‘zgartirish va ad account bundle boshqaruvi',
     ],
-    cta: 'Growth boshlash →',
   },
   {
-    name: 'Agency',
-    price: '399',
-    currency: 'USD',
-    period: 'oyiga',
-    desc: 'Agentliklar va katta brendlar uchun',
-    highlight: false,
-    features: [
-      'Cheklanmagan hamma narsa',
-      'White-label dashboard',
-      'Dedicated AI model',
-      'Custom integratsiyalar',
-      'SLA kafolat',
-      'Shaxsiy menejer',
-      'Onboarding training',
+    tab: 'Payments',
+    points: [
+      'Billing history va invoice yuklab olish',
+      'Bir nechta payment method ulash',
+      'Billing information (kompaniya rekvizitlari) tahrirlash',
     ],
-    cta: 'Bog\'lanish',
+  },
+  {
+    tab: 'User Profile',
+    points: [
+      'User ID, email va telefonni ko‘rish',
+      'Aloqa ma’lumotlarini yangilash',
+      'Team access uchun profil boshqaruvi',
+    ],
+  },
+  {
+    tab: 'Team Members',
+    points: [
+      'Jamoa a’zolarini taklif qilish',
+      'Workspace bo‘yicha role va ruxsatlarni taqsimlash',
+      'Agentlik uchun bir nechta workspace ochish',
+    ],
   },
 ]
 
-const TESTIMONIALS = [
+const launchFlow = [
   {
-    text: '"Nishon AI targetologimizni almashtirdi. Birinchi oyda ROAS 2.8x o\'sdi, biz esa kampaniyaga bir soat ham sarflamadik."',
-    name: 'Jasur Toshmatov',
-    role: 'CEO, TechShop Uzbekistan',
-    avatar: 'JT',
+    step: '1. Create New Ad',
+    what: 'Creatives menyusidan Ad Launcher → Create New Ad',
+    details: [
+      'Identity, format, page va ad copy bir oynada sozlanadi',
+      'Ad preview real-time ko‘rinadi',
+      'Save qilib keyingi audience bosqichiga o‘tiladi',
+    ],
   },
   {
-    text: '"Google va Meta kampaniyalarini bir joydan boshqarish — bu hayot o\'zgartirdi. Har oy 40+ soat tejayapman."',
-    name: 'Nilufar Karimova',
-    role: 'Marketing Director, Moda.uz',
-    avatar: 'NK',
+    step: '2. Audience Launcher',
+    what: 'ARR bosqichlari bo‘yicha audience preset tanlash',
+    details: [
+      'Acquisition / Re-Engagement / Retargeting / Retention filterlari',
+      'Bir vaqtning o‘zida bir nechta audience tanlab launch qilish',
+      'Audience kesimida ad biriktirish va save changes',
+    ],
   },
   {
-    text: '"CPA 38% kamaydi. AI har kecha byudjetni qayta taqsimlaydi — ertalab faqat natijalarni ko\'raman."',
-    name: 'Bobur Eshmatov',
-    role: 'Founder, AutoParts24',
-    avatar: 'BE',
-  },
-]
-
-const FAQS = [
-  {
-    q: 'AI kampaniyani to\'liq o\'zi boshqaradimi?',
-    a: 'Ha, avtonom rejimda AI bid, byudjet, kreativ rotatsiya va auditoriyani o\'zi boshqaradi. Siz faqat nashr qilishdan oldin tasdiqlaysiz.'
+    step: '3. Campaign Setup',
+    what: 'Campaign objective, budget type, naming structure',
+    details: [
+      'Split by funnel stage yoki single campaign tanlovi',
+      'ABO/CBO tanlash (default tavsiya: ABO)',
+      'Location, age, gender, device va placementlarni audience kesimida sozlash',
+    ],
   },
   {
-    q: 'Qanday platformalar qo\'llab-quvvatlanadi?',
-    a: 'Meta Ads (Facebook/Instagram), Google Ads, Yandex Direct va Telegram Ads. Barcha 4 ta platforma bir dashboarddan.'
-  },
-  {
-    q: 'Mavjud kampaniyalarni ko\'chirish mumkinmi?',
-    a: 'Ha, import funksiyasi bor. Meta va Google\'dan mavjud kampaniyalarni import qilib, AI bilan optimallashtirishni davom ettirasiz.'
-  },
-  {
-    q: 'Byudjet minimal nechadan?',
-    a: 'Minimal platforma byudjeti yo\'q — siz belgilagan summa bilan ishlaydi. Nishon AI o\'z narxi oylik obuna.'
-  },
-  {
-    q: 'AI noto\'g\'ri qaror qilsa-chi?',
-    a: 'Har bir katta o\'zgarish (byudjet +20% dan ko\'p) siz tasdiqlashingizni kutadi. Byudjet himoyasi anomaliyalarni avtomatik to\'xtatadi.'
+    step: '4. Summary & Launch',
+    what: 'Final tekshiruv va nashr',
+    details: [
+      'Launch time: now / midnight / schedule',
+      'Ad set naming template va yakuniy review',
+      'Launch bosilgach kampaniyalar Meta’ga yuboriladi',
+    ],
   },
 ]
 
-/* ─── FAQ item ──────────────────────────────────────────────────────────── */
-function FaqItem({ q, a }: { q: string; a: string }) {
+const teamFlow = [
+  'Workspace yaratish (onboarding yoki workspace switcher orqali)',
+  'Invite Team Member modalida email(lar) kiritish (ko‘p email uchun Enter)',
+  'Pending invite holatini kuzatish va kerak bo‘lsa invitation link nusxalash',
+  'Qabul qilingandan keyin ad account access (checkbox + Add Now) berish',
+  '3-dot menyudan rolni yangilash: Advertiser → Admin',
+  'Zarur bo‘lsa workspace removal jarayoni (active subscription bo‘lsa schedule)',
+]
+
+const permissionMatrix = [
+  {
+    role: 'Owner',
+    rights: [
+      'Workspace va subscription ustidan to‘liq nazorat',
+      'Ad account ulash/uzish, billing va team management',
+      'Admin/Advertiser rollarni tayinlash va workspace o‘chirish',
+    ],
+  },
+  {
+    role: 'Admin',
+    rights: [
+      'Ownerga yaqin operatsion huquqlar (team, billing docs, settings)',
+      'Owner subscriptioniga ulangan akkauntlar doirasida ishlaydi',
+      'Strategik/operatsion boshqaruvda ownerga yordam beradi',
+    ],
+  },
+  {
+    role: 'Advertiser',
+    rights: [
+      'Faqat tayinlangan ad accountlarga kirish',
+      'O‘z subscriptioni shart emas (owner planidan foydalanadi)',
+      'Kampaniya boshqaruvi bor, lekin workspace-level boshqaruv cheklangan',
+    ],
+  },
+]
+
+function CapabilityCard({
+  title,
+  desc,
+  bullets,
+}: {
+  title: string
+  desc: string
+  bullets: string[]
+}) {
   const [open, setOpen] = useState(false)
+
   return (
-    <div className="border-b border-[#E5E7EB]">
+    <article className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur-sm transition hover:border-emerald-400/40 hover:bg-white/[0.06]">
+      <h3 className="text-2xl font-semibold text-white">{title}</h3>
+      <p className="mt-3 text-sm leading-relaxed text-slate-300">{desc}</p>
+
+      <ul className="mt-4 space-y-2 text-sm text-slate-200">
+        {bullets.map((item) => (
+          <li key={item} className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+            {item}
+          </li>
+        ))}
+      </ul>
+
       <button
-        onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between py-5 text-left"
+        onClick={() => setOpen((prev) => !prev)}
+        className="mt-6 inline-flex items-center rounded-full border border-white/20 px-4 py-2 text-sm text-white hover:border-emerald-400/60"
       >
-        <span className="text-[#111827] font-medium">{q}</span>
-        <span className={cn('text-[#374151] text-xl transition-transform', open && 'rotate-45')}>+</span>
+        {open ? 'Yopish' : 'Batafsil ko‘rish'}
       </button>
+
       {open && (
-        <p className="text-[#9CA3AF] text-sm leading-relaxed pb-5">{a}</p>
+        <div className="mt-4 rounded-2xl border border-emerald-400/20 bg-emerald-400/5 p-4 text-sm text-slate-200">
+          Bu bo‘limda jamoangiz workflow, approval va natijalarni tartib bilan yuritadi. Har bir imkoniyat platforma kesimida alohida nazorat qilinadi.
+        </div>
       )}
-    </div>
+    </article>
   )
 }
 
-/* ─── main ──────────────────────────────────────────────────────────────── */
 export default function SellerLandingPage() {
   const router = useRouter()
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB] text-[#111827] selection:bg-[#111827]/30">
+    <div className="min-h-screen bg-[#031314] text-white">
+      <div className="border-b border-emerald-300/20 bg-[#123436] py-2">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-8 px-6 text-sm text-emerald-50/90">
+          {ticker.map((item, idx) => (
+            <span key={`${item}-${idx}`}>{item}</span>
+          ))}
+        </div>
+      </div>
 
-      {/* ── NAV ─────────────────────────────────────────────────────────── */}
-      <nav className="fixed top-0 inset-x-0 z-50 border-b border-[#E5E7EB]/80 bg-[#F9FAFB]/80 backdrop-blur-lg">
-        <div className="max-w-7xl mx-auto px-6 h-18 flex items-center justify-between py-4">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl font-extrabold tracking-tight">
-              Nishon <span className="text-[#374151]">AI</span>
-            </span>
-            <span className="hidden md:inline-flex ml-3 text-xs font-semibold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-2 py-0.5 rounded-full">
-              BETA
-            </span>
+      <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#071c1e]/95 backdrop-blur-xl">
+        <div className="mx-auto flex h-24 max-w-7xl items-center justify-between px-6">
+          <button onClick={() => router.push('/')} className="text-4xl font-black tracking-tight">
+            Nishon <span className="text-emerald-400">AI</span>
+          </button>
+
+          <div className="hidden rounded-full border border-white/15 bg-white/[0.03] px-8 py-3 md:flex md:items-center md:gap-8 text-lg text-slate-200">
+            <a href="#hero" className="hover:text-emerald-300">Home</a>
+            <a href="#capabilities" className="hover:text-emerald-300">Solutions</a>
+            <a href="#funnel" className="hover:text-emerald-300">ARR Funnel</a>
+            <a href="#workspace-settings" className="hover:text-emerald-300">Workspace</a>
+            <a href="#meta-launch-flow" className="hover:text-emerald-300">Meta Launch</a>
+            <a href="#team-workflow" className="hover:text-emerald-300">Team</a>
+            <a href="#reviews" className="hover:text-emerald-300">Clients</a>
+            <a href="#contact" className="hover:text-emerald-300">About</a>
           </div>
 
-          <div className="hidden md:flex items-center gap-8 text-sm text-[#9CA3AF]">
-            <a href="#features" className="hover:text-[#111827] transition-colors">Imkoniyatlar</a>
-            <a href="#how" className="hover:text-[#111827] transition-colors">Qanday ishlaydi</a>
-            <a href="#pricing" className="hover:text-[#111827] transition-colors">Narxlar</a>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => router.push('/login')}
-              className="hidden sm:block text-sm text-[#9CA3AF] hover:text-[#111827] transition-colors px-4 py-2"
-            >
-              Kirish
-            </button>
-            <button
-              onClick={() => router.push('/register')}
-              className="bg-[#111827] hover:bg-[#1F2937] text-white text-sm font-semibold px-5 py-2.5 rounded-lg shadow-[0_4px_14px_rgba(124,58,237,0.4)] hover:shadow-[0_6px_20px_rgba(124,58,237,0.5)] transition-all"
-            >
-              Bepul boshlash →
-            </button>
-          </div>
+          <button
+            onClick={() => router.push('/register')}
+            className="rounded-full border border-emerald-300/60 bg-emerald-500/20 px-7 py-3 text-lg font-medium text-white transition hover:bg-emerald-500/35"
+          >
+            Contact Us ↗
+          </button>
         </div>
       </nav>
 
-      {/* ── HERO ────────────────────────────────────────────────────────── */}
-      <section className="relative pt-36 pb-28 px-6 overflow-hidden">
-        {/* bg glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-[#F3F4F6] blur-[140px] rounded-full pointer-events-none" />
-        <div className="absolute top-32 left-1/4 w-64 h-64 bg-[#A855F7]/8 blur-[100px] rounded-full pointer-events-none" />
-
-        <div className="relative max-w-5xl mx-auto text-center">
-          {/* pill badge */}
-          <div className="inline-flex items-center gap-2 bg-[#F3F4F6] border border-[#111827]/25 rounded-full px-5 py-2 mb-8">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-[#374151] text-sm font-semibold tracking-widest uppercase">
-              AI Autonomous Mode · ACTIVE
-            </span>
-          </div>
-
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-[1.08] mb-6">
-            Reklamangizni boshqaring.
-            <br />
-            <span className="bg-gradient-to-r from-[#7C3AED] via-[#A78BFA] to-[#C084FC] bg-clip-text text-transparent">
-              Natijangiz o'ssin.
-            </span>
+      <section id="hero" className="relative overflow-hidden px-6 pb-20 pt-16">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_70%_10%,rgba(52,211,153,0.25),transparent_38%),radial-gradient(circle_at_20%_40%,rgba(16,185,129,0.12),transparent_42%)]" />
+        <div className="relative mx-auto max-w-7xl">
+          <h1 className="max-w-5xl text-5xl font-semibold leading-tight md:text-7xl">
+            Built for efficiency. <span className="text-emerald-300">Designed for control.</span>
           </h1>
-
-          <p className="text-[#9CA3AF] text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed mb-10">
-            Nishon AI — Meta, Google, Yandex va Telegram reklamalarini <strong className="text-[#111827]">avtomatik</strong> boshqaradigan
-            sun'iy intellekt. Targetolog kerak emas.
+          <p className="mt-6 max-w-4xl text-xl text-slate-200">
+            Nishon AI reklama operatsiyasini tartib bilan boshqaradi: kampaniya yaratishdan tortib publishing,
+            optimization va reportinggacha. Maqsad — jamoaga kamroq qo‘l mehnati, ko‘proq aniq natija.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+          <div className="mt-10 flex flex-wrap gap-4">
             <button
               onClick={() => router.push('/register')}
-              className="w-full sm:w-auto bg-[#111827] hover:bg-[#1F2937] text-white text-lg font-semibold px-10 py-4 rounded-xl shadow-[0_0_30px_rgba(124,58,237,0.4)] hover:shadow-[0_0_45px_rgba(124,58,237,0.6)] transition-all duration-300"
+              className="rounded-full bg-emerald-500 px-8 py-4 text-lg font-semibold text-white transition hover:bg-emerald-400"
             >
-              Bepul sinash — 14 kun →
+              Explore the Platform ↗
             </button>
             <button
               onClick={() => router.push('/login')}
-              className="w-full sm:w-auto bg-[#F9FAFB] hover:bg-[#F3F4F6] text-[#111827] text-lg font-semibold px-10 py-4 rounded-xl border border-[#E5E7EB] hover:border-[#D1D5DB] transition-all"
+              className="rounded-full border border-white/20 bg-white/10 px-8 py-4 text-lg text-white transition hover:bg-white/20"
             >
-              Demo ko'rish
+              Book a demo ⊕
             </button>
           </div>
-
-          {/* trust line */}
-          <p className="text-[#6B7280] text-sm">
-            Kredit karta talab qilinmaydi · O'rnatish kerak emas · 4 daqiqada ishga tushadi
-          </p>
         </div>
+      </section>
 
-        {/* ── STATS BAR ───────────────────────────────────────────────── */}
-        <div className="relative max-w-4xl mx-auto mt-20 grid grid-cols-2 md:grid-cols-4 gap-px bg-[#F3F4F6] rounded-2xl overflow-hidden border border-[#E5E7EB]">
-          {STATS.map((s) => (
-            <div key={s.label} className="bg-white px-6 py-6 text-center">
-              <div className="text-3xl md:text-4xl font-extrabold text-[#111827] mb-1">{s.value}</div>
-              <div className="text-[#6B7280] text-sm leading-snug">{s.label}</div>
+      <section className="px-6 pb-20">
+        <div className="mx-auto grid max-w-7xl gap-6 md:grid-cols-3">
+          {stats.map((s) => (
+            <div key={s.value} className="rounded-3xl border border-white/10 bg-black/25 p-8 text-center backdrop-blur-sm">
+              <div className="text-7xl font-semibold text-white">{s.value}</div>
+              <p className="mt-4 text-2xl leading-tight text-slate-200">{s.text}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ── PLATFORMS ───────────────────────────────────────────────────── */}
-      <section className="py-20 px-6 border-y border-[#E5E7EB]">
-        <div className="max-w-5xl mx-auto">
-          <p className="text-center text-[#6B7280] text-sm font-semibold uppercase tracking-widest mb-10">
-            Qo'llab-quvvatlanadigan platformalar
+      <section id="capabilities" className="px-6 pb-20">
+        <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-white/[0.02] p-8 md:p-12">
+          <p className="text-sm uppercase tracking-[0.24em] text-emerald-300">Core capabilities</p>
+          <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Loyihaning imkoniyatlari aniq va tartibli</h2>
+          <p className="mt-4 max-w-4xl text-lg text-slate-300">
+            Har bir modul sotuvchi jamoa uchun alohida qiymat beradi: operatsion tezlik, nazorat, hamkorlik va
+            rentabellik. Pastdagi kartalarda nima berishini oddiy tilda ko‘rasiz.
           </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {PLATFORMS.map((p) => (
-              <div
-                key={p.name}
-                className="bg-white border border-[#E5E7EB] hover:border-[#D1D5DB] rounded-xl p-5 text-center transition-all duration-300 group"
-              >
-                <div className="text-4xl mb-3">{p.icon}</div>
-                <div className="text-[#111827] font-semibold text-sm mb-1">{p.name}</div>
-                <div className="text-[#6B7280] text-xs">{p.desc}</div>
-              </div>
+
+          <div className="mt-10 grid gap-5 md:grid-cols-2">
+            {capabilities.map((item) => (
+              <CapabilityCard key={item.title} {...item} />
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ────────────────────────────────────────────────── */}
-      <section id="how" className="py-28 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <p className="text-[#374151] text-sm font-bold uppercase tracking-widest mb-3">Qanday ishlaydi</p>
-            <h2 className="text-4xl md:text-5xl font-extrabold text-[#111827]">
-              3 qadam — kampaniya tayyor
-            </h2>
-          </div>
+      <section id="funnel" className="px-6 pb-20">
+        <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-[#050d22] p-8 md:p-12">
+          <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">ARR framework</p>
+          <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Budget allocation across the funnel</h2>
+          <p className="mt-4 max-w-4xl text-lg text-slate-300">
+            Madgicx uslubidagi funnel modelini bizning platformaga moslashtirdik: Acquisition (80%), Retargeting (15%),
+            Retention (5%). SaaS yoki lead-gen bo‘lsa Retention bosqichini qayta taqsimlash mumkin.
+          </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {STEPS.map((step, i) => (
-              <div key={step.num} className="relative">
-                {i < STEPS.length - 1 && (
-                  <div className="hidden md:block absolute top-8 left-full w-full h-px bg-gradient-to-r from-[#7C3AED]/40 to-transparent -translate-x-1/2 z-0" />
-                )}
-                <div className="relative bg-white border border-[#E5E7EB] hover:border-[#D1D5DB] rounded-2xl p-7 transition-all duration-300">
-                  <div className="flex items-center gap-3 mb-5">
-                    <span className="text-3xl">{step.icon}</span>
-                    <span className="text-[#374151] text-xs font-black uppercase tracking-widest">{step.num}</span>
+          <div className="mt-10 space-y-4">
+            {funnelStages.map((stage) => (
+              <div key={stage.name} className="relative overflow-hidden rounded-3xl border border-white/15 bg-[#1b2140] px-6 py-6">
+                <div
+                  className={`pointer-events-none absolute inset-y-0 left-1/2 -translate-x-1/2 bg-gradient-to-b ${stage.color} opacity-85`}
+                  style={{ width: `${Math.max(stage.pct * 1.6, 8)}%`, clipPath: 'polygon(20% 0%, 80% 0%, 65% 100%, 35% 100%)' }}
+                />
+                <div className="relative z-10 grid gap-3 md:grid-cols-[1.6fr_auto_1.6fr] md:items-center">
+                  <div>
+                    <h3 className="text-3xl font-medium">{stage.name}</h3>
+                    <p className="mt-1 text-slate-300">{stage.tactic}</p>
                   </div>
-                  <h3 className="text-[#111827] font-bold text-lg mb-3">{step.title}</h3>
-                  <p className="text-[#9CA3AF] text-sm leading-relaxed">{step.desc}</p>
+                  <div className="text-6xl font-semibold text-cyan-300">{stage.pct}%</div>
+                  <div className="text-right text-xl text-slate-100">{stage.audience}</div>
                 </div>
               </div>
             ))}
           </div>
+
+          <div className="mt-10 overflow-hidden rounded-3xl border border-white/10">
+            <table className="min-w-full text-left text-sm">
+              <thead className="bg-white/[0.04] text-slate-200">
+                <tr>
+                  <th className="px-5 py-4">Stage</th>
+                  <th className="px-5 py-4">% Spend</th>
+                  <th className="px-5 py-4">ROAS</th>
+                  <th className="px-5 py-4">CPA</th>
+                  <th className="px-5 py-4">CTR</th>
+                  <th className="px-5 py-4">Trend (7d)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {funnelMetrics.map((row) => (
+                  <tr key={row.stage} className="border-t border-white/10 text-slate-300">
+                    <td className="px-5 py-4 font-medium text-white">{row.stage}</td>
+                    <td className="px-5 py-4">{row.spendShare}</td>
+                    <td className="px-5 py-4">{row.roas}</td>
+                    <td className="px-5 py-4">{row.cpa}</td>
+                    <td className="px-5 py-4">{row.ctr}</td>
+                    <td className="px-5 py-4 text-emerald-300">{row.trend}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
-      {/* ── FEATURES ────────────────────────────────────────────────────── */}
-      <section id="features" className="py-28 px-6 bg-[#F9FAFB]">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <p className="text-[#374151] text-sm font-bold uppercase tracking-widest mb-3">Imkoniyatlar</p>
-            <h2 className="text-4xl md:text-5xl font-extrabold text-[#111827]">
-              Reklamani boshqarishning <br className="hidden md:block" />
-              <span className="text-[#374151]">yangi darajasi</span>
-            </h2>
-          </div>
+      <section id="workspace-settings" className="px-6 pb-20">
+        <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-[#090b23] p-8 md:p-12">
+          <p className="text-sm uppercase tracking-[0.24em] text-violet-300">Workspace settings</p>
+          <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Madgicx uslubidagi boshqaruvni Nishon AI ga moslashtirdik</h2>
+          <p className="mt-4 max-w-4xl text-lg text-slate-300">
+            Profil menyusidan Workspace Settings’ga kirib, ad account, obuna, billing, user profile va team members
+            bo‘limlarini bir joydan boshqarish mumkin. Productionda bu bo‘limlar real API bilan ishlaydi.
+          </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {FEATURES.map((f) => (
-              <div
-                key={f.title}
-                className="bg-white border border-[#E5E7EB] hover:border-[#D1D5DB] rounded-2xl p-6 transition-all duration-300 group hover:bg-[#F3F4F6]"
+          <div className="mt-8 grid gap-4 md:grid-cols-5">
+            {workspaceTabs.map((item, index) => (
+              <article
+                key={item.tab}
+                className={`rounded-2xl border p-5 ${
+                  index === 0 ? 'border-violet-300/60 bg-violet-400/10' : 'border-white/10 bg-white/[0.02]'
+                }`}
               >
-                <div className="text-3xl mb-4">{f.icon}</div>
-                <h3 className="text-[#111827] font-semibold mb-2">{f.title}</h3>
-                <p className="text-[#6B7280] text-sm leading-relaxed">{f.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── PRICING ─────────────────────────────────────────────────────── */}
-      <section id="pricing" className="py-28 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <p className="text-[#374151] text-sm font-bold uppercase tracking-widest mb-3">Narxlar</p>
-            <h2 className="text-4xl md:text-5xl font-extrabold text-[#111827]">
-              Biznesingizga mos tarif
-            </h2>
-            <p className="text-[#9CA3AF] mt-4">14 kunlik bepul sinash. Keyin to'laysiz.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {PLANS.map((plan) => (
-              <div
-                key={plan.name}
-                className={cn(
-                  'relative rounded-2xl p-7 border transition-all duration-300',
-                  plan.highlight
-                    ? 'bg-gradient-to-b from-white to-[#F9FAFB] border-[#111827]/50 shadow-[0_0_40px_rgba(124,58,237,0.2)]'
-                    : 'bg-white border-[#E5E7EB] hover:border-[#D1D5DB]'
-                )}
-              >
-                {plan.badge && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#111827] text-white text-xs font-bold px-4 py-1 rounded-full">
-                    {plan.badge}
-                  </div>
-                )}
-
-                <div className="mb-6">
-                  <h3 className="text-[#111827] font-bold text-xl mb-1">{plan.name}</h3>
-                  <p className="text-[#6B7280] text-sm mb-4">{plan.desc}</p>
-                  <div className="flex items-end gap-1">
-                    <span className="text-[#111827] font-extrabold text-4xl">${plan.price}</span>
-                    <span className="text-[#6B7280] text-sm mb-1">/{plan.period}</span>
-                  </div>
-                </div>
-
-                <ul className="space-y-3 mb-8">
-                  {plan.features.map((feat) => (
-                    <li key={feat} className="flex items-center gap-3 text-sm">
-                      <span className="text-emerald-400 font-bold">✓</span>
-                      <span className="text-[#374151]">{feat}</span>
+                <h3 className="text-xl font-semibold text-white">{item.tab}</h3>
+                <ul className="mt-3 space-y-2 text-sm text-slate-300">
+                  {item.points.map((point) => (
+                    <li key={point} className="flex gap-2">
+                      <span className="mt-1 h-1.5 w-1.5 rounded-full bg-violet-300" />
+                      <span>{point}</span>
                     </li>
                   ))}
                 </ul>
-
-                <button
-                  onClick={() => router.push('/register')}
-                  className={cn(
-                    'w-full py-3 rounded-xl font-semibold text-sm transition-all',
-                    plan.highlight
-                      ? 'bg-[#111827] hover:bg-[#1F2937] text-white shadow-[0_4px_14px_rgba(124,58,237,0.4)]'
-                      : 'bg-[#F9FAFB] hover:bg-[#F3F4F6] text-[#111827] border border-[#E5E7EB]'
-                  )}
-                >
-                  {plan.cta}
-                </button>
-              </div>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── TESTIMONIALS ────────────────────────────────────────────────── */}
-      <section className="py-28 px-6 bg-[#F9FAFB]">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <p className="text-[#374151] text-sm font-bold uppercase tracking-widest mb-3">Mijozlar fikri</p>
-            <h2 className="text-4xl md:text-5xl font-extrabold text-[#111827]">
-              Ular allaqachon o'sishmoqda
-            </h2>
-          </div>
+      <section id="meta-launch-flow" className="px-6 pb-20">
+        <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-[#0a1520] p-8 md:p-12">
+          <p className="text-sm uppercase tracking-[0.24em] text-sky-300">Meta campaign launch</p>
+          <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Madgicx uslubidagi launch flow — Nishon AI roadmap</h2>
+          <p className="mt-4 max-w-4xl text-lg text-slate-300">
+            Siz yuborgan “Create New Ad → Audience Launcher → Setup → Summary” oqimini bizning platformaga moslab
+            bosqichma-bosqich berdik. Hozir landingda feature map, keyingi bosqichda real interface/pages.
+          </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {TESTIMONIALS.map((t) => (
-              <div
-                key={t.name}
-                className="bg-white border border-[#E5E7EB] rounded-2xl p-7 hover:border-[#D1D5DB] transition-all duration-300"
-              >
-                {/* stars */}
-                <div className="flex gap-1 mb-5">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <span key={i} className="text-yellow-400 text-sm">★</span>
+          <div className="mt-8 grid gap-4 md:grid-cols-2">
+            {launchFlow.map((item) => (
+              <article key={item.step} className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
+                <h3 className="text-2xl font-semibold text-white">{item.step}</h3>
+                <p className="mt-2 text-base text-sky-200">{item.what}</p>
+                <ul className="mt-4 space-y-2 text-sm text-slate-300">
+                  {item.details.map((detail) => (
+                    <li key={detail} className="flex items-start gap-2">
+                      <span className="mt-1 h-1.5 w-1.5 rounded-full bg-sky-300" />
+                      <span>{detail}</span>
+                    </li>
                   ))}
-                </div>
-                <p className="text-[#374151] text-sm leading-relaxed italic mb-6">{t.text}</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#5B21B6] flex items-center justify-center text-xs font-black text-[#111827]">
-                    {t.avatar}
-                  </div>
-                  <div>
-                    <div className="text-[#111827] font-semibold text-sm">{t.name}</div>
-                    <div className="text-[#6B7280] text-xs">{t.role}</div>
-                  </div>
-                </div>
-              </div>
+                </ul>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── FAQ ─────────────────────────────────────────────────────────── */}
-      <section className="py-28 px-6">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-14">
-            <p className="text-[#374151] text-sm font-bold uppercase tracking-widest mb-3">Savollar</p>
-            <h2 className="text-4xl font-extrabold text-[#111827]">Ko'p so'raladigan savollar</h2>
+      <section id="team-workflow" className="px-6 pb-20">
+        <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-[#12102a] p-8 md:p-12">
+          <p className="text-sm uppercase tracking-[0.24em] text-fuchsia-300">Team members workflow</p>
+          <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Madgicx’dagi team management oqimi — professional darajada</h2>
+          <p className="mt-4 max-w-4xl text-lg text-slate-300">
+            Create workspace, invite, accept invite, role berish, ad-account access taqsimlash va removal jarayonini
+            Nishon AI roadmapiga kiritdik. Bu bo‘lim agency va multi-account ishlash uchun asosiy blok.
+          </p>
+
+          <div className="mt-8 grid gap-4 md:grid-cols-2">
+            <article className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
+              <h3 className="text-2xl font-semibold text-white">End-to-end team flow</h3>
+              <ol className="mt-4 space-y-3 text-sm text-slate-300">
+                {teamFlow.map((item, index) => (
+                  <li key={item} className="flex gap-3">
+                    <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-fuchsia-400/20 text-xs text-fuchsia-300">
+                      {index + 1}
+                    </span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ol>
+            </article>
+
+            <article className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
+              <h3 className="text-2xl font-semibold text-white">Permissions matrix</h3>
+              <div className="mt-4 space-y-3">
+                {permissionMatrix.map((item) => (
+                  <div key={item.role} className="rounded-xl border border-white/10 bg-black/20 p-4">
+                    <p className="text-lg font-semibold text-fuchsia-200">{item.role}</p>
+                    <ul className="mt-2 space-y-1 text-sm text-slate-300">
+                      {item.rights.map((right) => (
+                        <li key={right}>• {right}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </article>
           </div>
-          <div className="space-y-0">
-            {FAQS.map((faq) => (
-              <FaqItem key={faq.q} q={faq.q} a={faq.a} />
+        </div>
+      </section>
+
+      <section className="px-6 pb-20">
+        <div className="mx-auto grid max-w-7xl gap-0 overflow-hidden rounded-[2rem] border border-white/10 md:grid-cols-2">
+          <div className="bg-slate-100 p-10 text-slate-800 md:p-16">
+            <p className="text-sm uppercase tracking-[0.2em] text-slate-500">Our story</p>
+            <h3 className="mt-4 text-4xl font-semibold leading-tight text-slate-900 md:text-5xl">
+              Case Study Highlight
+            </h3>
+            <p className="mt-6 text-xl leading-relaxed text-slate-700">
+              Mijozimiz kampaniya setup vaqtini 4 baravar qisqartirdi, approval jarayonini avtomatlashtirdi va
+              marketing jamoasi strategik ishga qaytdi. Bu landingda aynan shu biznes qiymatini ochiq ko‘rsatdik.
+            </p>
+            <button className="mt-8 rounded-full bg-emerald-600 px-7 py-3 text-lg font-medium text-white hover:bg-emerald-500">
+              Read more ↗
+            </button>
+          </div>
+          <div className="flex items-end bg-[linear-gradient(140deg,#0f172a,#052e2b,#111827)] p-10 md:p-16">
+            <p className="max-w-lg text-4xl font-medium leading-tight text-white">
+              “How teams reduce ops load and focus on performance growth with Nishon AI.”
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="reviews" className="px-6 pb-24">
+        <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-[#02191a] p-10">
+          <h2 className="text-center text-5xl font-semibold md:text-6xl">
+            Reviews from our <span className="text-emerald-300">clients</span>
+          </h2>
+          <p className="mx-auto mt-5 max-w-4xl text-center text-xl text-slate-300">
+            Mijoz feedbacklari loyihaning amaliy qiymatini ko‘rsatadi: tezroq ish, yaxshiroq nazorat va barqaror o‘sish.
+          </p>
+
+          <div className="mt-10 grid gap-5 md:grid-cols-3">
+            {reviews.map((review) => (
+              <article key={review.name} className="rounded-3xl border border-white/10 bg-white/[0.03] p-7">
+                <p className="text-2xl leading-relaxed text-slate-200">{review.quote}</p>
+                <div className="mt-10 border-t border-white/10 pt-5">
+                  <p className="text-lg font-semibold text-white">{review.name}</p>
+                  <p className="text-sm text-slate-400">{review.role}</p>
+                </div>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── CTA BANNER ──────────────────────────────────────────────────── */}
-      <section className="py-28 px-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white via-[#F9FAFB] to-[#F3F4F6] border border-[#D1D5DB] p-12 md:p-16 text-center">
-            {/* glow */}
-            <div className="absolute inset-0 bg-[#111827]/5 blur-[80px] rounded-full" />
-            <div className="absolute top-0 right-0 w-64 h-64 bg-[#A855F7]/10 blur-[120px] rounded-full" />
+      <section id="contact" className="border-t border-white/10 px-6 py-16">
+        <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-10 md:flex-row md:items-center">
+          <div>
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-300">For publishers</p>
+            <h3 className="mt-3 text-4xl font-semibold">Hammasi bitta platformada</h3>
+            <ul className="mt-5 grid gap-2 text-lg text-slate-300 sm:grid-cols-2">
+              {suites.map((suite) => (
+                <li key={suite}>• {suite}</li>
+              ))}
+            </ul>
+          </div>
 
-            <div className="relative">
-              <div className="text-5xl mb-6">🚀</div>
-              <h2 className="text-4xl md:text-5xl font-extrabold text-[#111827] mb-5">
-                Bugun boshlang.
-                <br />
-                <span className="text-[#374151]">14 kun bepul.</span>
-              </h2>
-              <p className="text-[#9CA3AF] text-lg mb-10 max-w-xl mx-auto">
-                4 daqiqada kampaniyangizni yarating. Kredit karta talab qilinmaydi.
-              </p>
-
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <button
-                  onClick={() => router.push('/register')}
-                  className="w-full sm:w-auto bg-[#111827] hover:bg-[#1F2937] text-white text-lg font-bold px-12 py-4 rounded-xl shadow-[0_0_40px_rgba(124,58,237,0.4)] hover:shadow-[0_0_60px_rgba(124,58,237,0.6)] transition-all duration-300"
-                >
-                  Bepul sinash →
-                </button>
-                <button
-                  onClick={() => router.push('/login')}
-                  className="w-full sm:w-auto text-[#374151] hover:text-[#111827] text-base font-semibold px-8 py-4 rounded-xl border border-[#D1D5DB] hover:border-[#111827]/60 transition-all"
-                >
-                  Demo ko'rish
-                </button>
-              </div>
-            </div>
+          <div className="w-full max-w-xl rounded-3xl border border-white/10 bg-white/[0.03] p-7">
+            <h4 className="text-4xl font-semibold">Newsletter</h4>
+            <p className="mt-3 text-lg text-slate-300">Nishon AI yangiliklari, case study va amaliy guide’larni oling.</p>
+            <button className="mt-6 rounded-full border border-white/25 px-6 py-3 text-lg hover:border-emerald-300/70">
+              Sign Up ↗
+            </button>
           </div>
         </div>
       </section>
-
-      {/* ── FOOTER ──────────────────────────────────────────────────────── */}
-      <footer className="border-t border-[#E5E7EB] py-12 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-2">
-            <span className="text-xl font-extrabold">
-              Nishon <span className="text-[#374151]">AI</span>
-            </span>
-            <span className="text-[#6B7280] text-sm ml-2">© 2025</span>
-          </div>
-
-          <div className="flex items-center gap-6 text-sm text-[#6B7280]">
-            <a href="/privacy" className="hover:text-[#111827] transition-colors">Maxfiylik siyosati</a>
-            <a href="/terms" className="hover:text-[#111827] transition-colors">Foydalanish shartlari</a>
-            <a href="mailto:hello@nishon.ai" className="hover:text-[#111827] transition-colors">Aloqa</a>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-[#6B7280] text-sm">Barcha tizimlar ishlayapti</span>
-          </div>
-        </div>
-      </footer>
-
     </div>
   )
 }

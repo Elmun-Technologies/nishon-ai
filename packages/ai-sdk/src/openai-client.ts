@@ -34,6 +34,8 @@ export interface CompleteResult {
   durationMs: number
 }
 
+export type AiProvider = 'openai' | 'anthropic'
+
 /**
  * NishonAI client powered by Agent Router.
  *
@@ -47,25 +49,34 @@ export interface CompleteResult {
  *   })
  */
 export class NishonAiClient {
-  private readonly openai: OpenAI
+  private readonly openai?: OpenAI
+  private readonly provider: AiProvider
+  private readonly apiKey: string
+  private readonly anthropicBaseUrl: string
   private readonly fallbackModel = 'gpt-4o-mini'
   private readonly maxRetries = 3
 
   /**
-   * @param apiKey   OpenAI API key (OPENAI_API_KEY)
+   * @param apiKey   Provider API key (OPENAI_API_KEY or ANTHROPIC_API_KEY)
    * @param baseURL  Optional — override the API base URL (e.g. for Azure, local proxy).
-   *                 Defaults to the official OpenAI endpoint.
+   *                 Defaults to provider's official endpoint.
    */
-  constructor(apiKey: string, baseURL?: string) {
-    const config: ConstructorParameters<typeof OpenAI>[0] = {
-      apiKey,
-      timeout: 60_000,  // 60 s — generous timeout for complex prompts
-      maxRetries: 0,    // retries handled manually with backoff below
+  constructor(apiKey: string, baseURL?: string, provider: AiProvider = 'openai') {
+    this.provider = provider
+    this.apiKey = apiKey
+    this.anthropicBaseUrl = baseURL || 'https://api.anthropic.com/v1'
+
+    if (this.provider === 'openai') {
+      const config: ConstructorParameters<typeof OpenAI>[0] = {
+        apiKey,
+        timeout: 60_000,  // 60 s — generous timeout for complex prompts
+        maxRetries: 0,    // retries handled manually with backoff below
+      }
+      if (baseURL) {
+        config.baseURL = baseURL
+      }
+      this.openai = new OpenAI(config)
     }
-    if (baseURL) {
-      config.baseURL = baseURL
-    }
-    this.openai = new OpenAI(config)
   }
 
   // ─── Public API ───────────────────────────────────────────────────────────
@@ -82,34 +93,10 @@ export class NishonAiClient {
 
     return this.executeWithRetry(
       async () => {
-        const response = await this.openai.chat.completions.create({
-          model,
-          temperature,
-          max_tokens: maxTokens,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user',   content: prompt },
-          ],
-        })
-        // Detect WAF / HTML block responses (e.g. Alibaba Cloud WAF)
-        const rawStr = JSON.stringify(response)
-        if (!response.choices || response.choices.length === 0) {
-          const isHtmlBlock = rawStr.includes('<!doctype') || rawStr.includes('<html') || rawStr.includes('aliyun_waf')
-          if (isHtmlBlock) {
-            throw new Error('AI provider is temporarily unavailable (network block). Please try again in a few minutes.')
-          }
-          throw new Error(`Empty response from AI provider: ${rawStr.slice(0, 200)}`)
+        if (this.provider === 'anthropic') {
+          return this.completeAnthropic(prompt, systemPrompt, model, maxTokens, temperature)
         }
-        const content = response.choices[0]?.message?.content ?? ''
-        // Also guard against HTML content being returned as the model message
-        if (content.includes('<!doctype') || content.includes('<html') || content.includes('aliyun_waf')) {
-          throw new Error('AI provider is temporarily unavailable (network block). Please try again in a few minutes.')
-        }
-        return {
-          content,
-          tokensUsed: response.usage?.total_tokens ?? 0,
-          model,
-        }
+        return this.completeOpenAi(prompt, systemPrompt, model, maxTokens, temperature)
       },
       options,
     )
@@ -158,6 +145,9 @@ export class NishonAiClient {
 
     return this.executeWithRetry(
       async () => {
+        if (!this.openai) {
+          throw new Error('Vision completion is currently supported with OpenAI provider.')
+        }
         const response = await this.openai.chat.completions.create({
           model,
           max_tokens: maxTokens,
@@ -198,8 +188,9 @@ export class NishonAiClient {
    * Priority: explicit option value > task-type default > hard-coded fallback.
    */
   private resolveOptions(options: CompleteOptions) {
+    const providerDefaultModel = this.provider === 'anthropic' ? 'claude-3-7-sonnet-20250219' : this.fallbackModel
     const model = options.model
-      ?? (options.taskType ? getModelByTask(options.taskType) : this.fallbackModel)
+      ?? (options.taskType ? getModelByTask(options.taskType) : providerDefaultModel)
 
     const maxTokens = options.maxTokens
       ?? (options.taskType ? getTokenLimitByTask(options.taskType) : 2000)
@@ -277,5 +268,88 @@ export class NishonAiClient {
 
   private sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms))
+  }
+
+  private async completeOpenAi(
+    prompt: string,
+    systemPrompt: string,
+    model: string,
+    maxTokens: number,
+    temperature: number,
+  ): Promise<{ content: string; tokensUsed: number; model: string }> {
+    if (!this.openai) {
+      throw new Error('OpenAI client is not initialized.')
+    }
+
+    const response = await this.openai.chat.completions.create({
+      model,
+      temperature,
+      max_tokens: maxTokens,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: prompt },
+      ],
+    })
+
+    const rawStr = JSON.stringify(response)
+    if (!response.choices || response.choices.length === 0) {
+      const isHtmlBlock = rawStr.includes('<!doctype') || rawStr.includes('<html') || rawStr.includes('aliyun_waf')
+      if (isHtmlBlock) {
+        throw new Error('AI provider is temporarily unavailable (network block). Please try again in a few minutes.')
+      }
+      throw new Error(`Empty response from AI provider: ${rawStr.slice(0, 200)}`)
+    }
+
+    const content = response.choices[0]?.message?.content ?? ''
+    if (content.includes('<!doctype') || content.includes('<html') || content.includes('aliyun_waf')) {
+      throw new Error('AI provider is temporarily unavailable (network block). Please try again in a few minutes.')
+    }
+
+    return {
+      content,
+      tokensUsed: response.usage?.total_tokens ?? 0,
+      model,
+    }
+  }
+
+  private async completeAnthropic(
+    prompt: string,
+    systemPrompt: string,
+    model: string,
+    maxTokens: number,
+    temperature: number,
+  ): Promise<{ content: string; tokensUsed: number; model: string }> {
+    const response = await fetch(`${this.anthropicBaseUrl}/messages`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': this.apiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model,
+        system: systemPrompt,
+        max_tokens: maxTokens,
+        temperature,
+        messages: [{ role: 'user', content: prompt }],
+      }),
+    })
+
+    const rawText = await response.text()
+    if (!response.ok) {
+      throw new Error(`Anthropic API error ${response.status}: ${rawText.slice(0, 200)}`)
+    }
+
+    const data = JSON.parse(rawText) as {
+      content?: Array<{ type: string; text?: string }>
+      usage?: { input_tokens?: number; output_tokens?: number }
+    }
+
+    const text = data.content?.find((item) => item.type === 'text')?.text ?? ''
+    return {
+      content: text,
+      tokensUsed: (data.usage?.input_tokens ?? 0) + (data.usage?.output_tokens ?? 0),
+      model,
+    }
   }
 }
