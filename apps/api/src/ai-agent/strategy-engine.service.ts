@@ -104,12 +104,19 @@ export class StrategyEngineService {
     @InjectRepository(Workspace)
     private readonly workspaceRepo: Repository<Workspace>,
   ) {
-    const apiKey  = this.config.get<string>("OPENAI_API_KEY", "");
-    const baseURL = this.config.get<string>("OPENAI_BASE_URL", "");
+    const provider = this.config.get<string>("AI_PROVIDER", "openai").toLowerCase() === "anthropic"
+      ? "anthropic"
+      : "openai";
+    const apiKey = provider === "anthropic"
+      ? this.config.get<string>("ANTHROPIC_API_KEY", "")
+      : this.config.get<string>("OPENAI_API_KEY", "");
+    const baseURL = provider === "anthropic"
+      ? this.config.get<string>("ANTHROPIC_BASE_URL", "")
+      : this.config.get<string>("OPENAI_BASE_URL", "");
     if (apiKey) {
-      this.aiClient = new NishonAiClient(apiKey, baseURL || undefined);
+      this.aiClient = new NishonAiClient(apiKey, baseURL || undefined, provider);
     } else {
-      this.logger.warn("OPENAI_API_KEY is not configured — AI strategy generation will be unavailable");
+      this.logger.warn("AI provider API key is not configured — AI strategy generation will be unavailable");
     }
   }
 
@@ -178,7 +185,7 @@ export class StrategyEngineService {
    */
   async generateStrategy(input: StrategyInput): Promise<StrategyResult> {
     if (!this.aiClient) {
-      throw new BadRequestException("AI features are not available: OPENAI_API_KEY is not configured");
+      throw new BadRequestException("AI features are not available: API key is not configured");
     }
 
     const prompt = buildStrategyPrompt(input);

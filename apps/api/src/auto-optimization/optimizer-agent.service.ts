@@ -35,9 +35,16 @@ export class OptimizerAgentService {
   private readonly aiClient: NishonAiClient;
 
   constructor(private readonly config: ConfigService) {
-    const apiKey  = config.get<string>('OPENAI_API_KEY', '');
-    const baseURL = config.get<string>('OPENAI_BASE_URL', '');
-    this.aiClient = new NishonAiClient(apiKey, baseURL || undefined);
+    const provider = config.get<string>('AI_PROVIDER', 'openai').toLowerCase() === 'anthropic'
+      ? 'anthropic'
+      : 'openai';
+    const apiKey = provider === 'anthropic'
+      ? config.get<string>('ANTHROPIC_API_KEY', '')
+      : config.get<string>('OPENAI_API_KEY', '');
+    const baseURL = provider === 'anthropic'
+      ? config.get<string>('ANTHROPIC_BASE_URL', '')
+      : config.get<string>('OPENAI_BASE_URL', '');
+    this.aiClient = new NishonAiClient(apiKey, baseURL || undefined, provider);
   }
 
   // ─── Main optimization analysis ─────────────────────────────────────────────

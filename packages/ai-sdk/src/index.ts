@@ -1,5 +1,5 @@
 export { NishonAiClient } from './openai-client'
-export type { CompleteOptions, CompleteResult } from './openai-client'
+export type { CompleteOptions, CompleteResult, AiProvider } from './openai-client'
 export {
   getModelByTask,
   getTokenLimitByTask,

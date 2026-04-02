@@ -38,9 +38,16 @@ export class AiAgentService {
     @InjectRepository(AiDecision)
     private readonly decisionRepo: Repository<AiDecision>,
   ) {
-    const apiKey  = this.config.get<string>("OPENAI_API_KEY", "");
-    const baseURL = this.config.get<string>("OPENAI_BASE_URL", ""); // optional override
-    this.aiClient = new NishonAiClient(apiKey, baseURL || undefined);
+    const provider = this.config.get<string>("AI_PROVIDER", "openai").toLowerCase() === "anthropic"
+      ? "anthropic"
+      : "openai";
+    const apiKey = provider === "anthropic"
+      ? this.config.get<string>("ANTHROPIC_API_KEY", "")
+      : this.config.get<string>("OPENAI_API_KEY", "");
+    const baseURL = provider === "anthropic"
+      ? this.config.get<string>("ANTHROPIC_BASE_URL", "")
+      : this.config.get<string>("OPENAI_BASE_URL", "");
+    this.aiClient = new NishonAiClient(apiKey, baseURL || undefined, provider);
   }
 
   async generateStrategy(workspaceId: string): Promise<StrategyResult> {
