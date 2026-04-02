@@ -1027,6 +1027,34 @@ export function AdsManagerPanel() {
                   </p>
                 </div>
               </div>
+              <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm">
+                <p className="font-medium text-amber-900">
+                  Default exclusion policy (must-have)
+                </p>
+                <ul className="list-disc pl-5 mt-2 space-y-1 text-amber-900/90">
+                  <li>
+                    Always exclude recent purchasers from top and middle funnel
+                    campaigns by default.
+                  </li>
+                  <li>
+                    Add email-based exclusions from{" "}
+                    <span className="font-medium">Shopify</span>,{" "}
+                    <span className="font-medium">Klaviyo</span>, or manual CSV
+                    uploads.
+                  </li>
+                  <li>
+                    Apply this baseline to{" "}
+                    <span className="font-medium">Prospecting</span>,{" "}
+                    <span className="font-medium">Re-Engagement</span>, and{" "}
+                    <span className="font-medium">Retargeting</span>.
+                  </li>
+                  <li>
+                    Focus only on required audience sets first (do not launch
+                    all 76 at once).
+                  </li>
+                </ul>
+              </div>
+
               <div className="mt-4 rounded-lg border border-[#E2E8F0] p-3">
                 <p className="font-medium text-sm">Step-by-step launch flow</p>
                 <ol className="list-decimal pl-5 mt-2 text-sm text-[#475569] space-y-1">
