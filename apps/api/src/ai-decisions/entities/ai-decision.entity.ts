@@ -8,7 +8,7 @@ import {
 } from "typeorm";
 import { Workspace } from "../../workspaces/entities/workspace.entity";
 import { Campaign } from "../../campaigns/entities/campaign.entity";
-import { AiDecisionAction } from "@nishon/shared";
+import { AiDecisionAction } from "@performa/shared";
 
 /**
  * Every action the AI takes (or recommends) is logged here as an AiDecision.

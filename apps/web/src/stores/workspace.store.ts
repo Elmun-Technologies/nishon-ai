@@ -53,19 +53,19 @@ export const useWorkspaceStore = create<WorkspaceStore>()(
       setWorkspaces: (workspaces) => set({ workspaces }),
       setAccessToken: (token) => {
         set({ accessToken: token })
-        if (token) localStorage.setItem('nishon_access_token', token)
-        else localStorage.removeItem('nishon_access_token')
+        if (token) localStorage.setItem('performa_access_token', token)
+        else localStorage.removeItem('performa_access_token')
       },
       setLoading: (isLoading) => set({ isLoading }),
       setSelectedPlatforms: (selectedPlatforms) => set({ selectedPlatforms }),
       logout: () => {
-        localStorage.removeItem('nishon_access_token')
-        localStorage.removeItem('nishon_refresh_token')
+        localStorage.removeItem('performa_access_token')
+        localStorage.removeItem('performa_refresh_token')
         set({ user: null, currentWorkspace: null, workspaces: [], accessToken: null, selectedPlatforms: [] })
       },
     }),
     {
-      name: 'nishon-workspace-store',
+      name: 'performa-workspace-store',
       partialize: (state) => ({
         user: state.user,
         currentWorkspace: state.currentWorkspace,

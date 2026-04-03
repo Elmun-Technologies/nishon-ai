@@ -20,11 +20,11 @@ function slugify(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
-/** Default Nishon-owned AI agents seeded on startup */
+/** Default Performa-owned AI agents seeded on startup */
 const NISHON_AI_AGENTS = [
   {
-    slug: "nishon-full-auto-ai",
-    displayName: "Nishon Full-Auto AI",
+    slug: "performa-full-auto-ai",
+    displayName: "Performa Full-Auto AI",
     title: "Barcha platformalar uchun to'liq avtomatik AI agent",
     bio: "Meta, Google, Yandex, TikTok va Telegram — barcha kanallarda ishlaydi. Kampaniyani o'zi yaratadi, optimallaydi va ROAS ni maksimallaydi. Avtomatik byudjet taqsimoti va kreativ rotatsiya bilan.",
     avatar: "🤖",
@@ -54,7 +54,7 @@ const NISHON_AI_AGENTS = [
     ],
   },
   {
-    slug: "nishon-meta-ai",
+    slug: "performa-meta-ai",
     displayName: "Meta & Instagram AI",
     title: "Instagram va Facebook uchun maxsus AI specialist",
     bio: "Reels, Stories va Feed formatlarida yuqori konversiyali kampaniyalar. Lookalike auditoriyalar, retargeting, dinamik kreativlar. E-commerce va lead generation uchun optimal.",
@@ -85,7 +85,7 @@ const NISHON_AI_AGENTS = [
     ],
   },
   {
-    slug: "nishon-search-ai",
+    slug: "performa-search-ai",
     displayName: "Google & Yandex AI Expert",
     title: "Qidiruv reklamalari uchun maxsus AI agent",
     bio: "Google Ads va Yandex Direct'da maksimal niyat auditoriyasini ushlaydi. Smart Bidding, RSA/DSA, salbiy kalit so'zlar, konversiya tracking. B2B, xizmat sohasi, ko'chmas mulk uchun.",
@@ -135,15 +135,15 @@ export class AgentsService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    await this.seedNishonAgents();
+    await this.seedPerformaAgents();
   }
 
-  /** Create Nishon's default AI agents if they don't exist */
-  private async seedNishonAgents() {
+  /** Create Performa's default AI agents if they don't exist */
+  private async seedPerformaAgents() {
     const existing = await this.agentRepo.count({ where: { ownerId: null, agentType: "ai" } });
     if (existing >= NISHON_AI_AGENTS.length) return;
 
-    this.logger.log("Seeding Nishon default AI agents...");
+    this.logger.log("Seeding Performa default AI agents...");
     for (const data of NISHON_AI_AGENTS) {
       const exists = await this.agentRepo.findOne({ where: { slug: data.slug } });
       if (!exists) {
@@ -151,7 +151,7 @@ export class AgentsService implements OnModuleInit {
         await this.agentRepo.save(agent);
       }
     }
-    this.logger.log("Nishon AI agents seeded.");
+    this.logger.log("Performa agents seeded.");
   }
 
   // ─── PUBLIC MARKETPLACE ──────────────────────────────────────────────────

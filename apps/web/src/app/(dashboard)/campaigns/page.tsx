@@ -115,7 +115,7 @@ export default function CampaignsPage() {
             <Badge variant="gray">{items.length} total</Badge>
           </div>
           <p className="text-[#6B7280] text-sm">
-            All advertising campaigns managed by Nishon AI
+            All advertising campaigns managed by Performa
           </p>
         </div>
         <div className="flex items-center gap-2">

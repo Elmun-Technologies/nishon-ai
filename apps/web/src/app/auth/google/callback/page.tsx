@@ -28,8 +28,8 @@ export default function GoogleCallbackPage() {
     async function finish() {
       try {
         // Store tokens
-        localStorage.setItem('nishon_access_token', accessToken!)
-        localStorage.setItem('nishon_refresh_token', refreshToken!)
+        localStorage.setItem('performa_access_token', accessToken!)
+        localStorage.setItem('performa_refresh_token', refreshToken!)
         setAccessToken(accessToken!)
 
         // Fetch current user (apiClient reads token from localStorage automatically)

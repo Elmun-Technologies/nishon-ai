@@ -124,7 +124,7 @@ export default function AiDecisionsPage() {
         <div>
           <h1 className="text-2xl font-bold text-[#111827] mb-1">AI Qarorlar Jurnali</h1>
           <p className="text-[#6B7280] text-sm">
-            Nishon AI qilgan va tavsiya etgan har bir harakat — to'liq asoslama bilan
+            Performa qilgan va tavsiya etgan har bir harakat — to'liq asoslama bilan
           </p>
         </div>
         <Button variant="secondary" size="sm" onClick={fetchDecisions}>
@@ -397,7 +397,7 @@ export default function AiDecisionsPage() {
           <span className="text-lg mt-0.5">🔍</span>
           <div>
             <p className="text-[#111827] text-sm font-medium mb-0.5">
-              Nishon AI nima uchun bu jurnalni ko'rsatadi?
+              Performa nima uchun bu jurnalni ko'rsatadi?
             </p>
             <p className="text-[#6B7280] text-xs leading-relaxed">
               Shaffoflik bizning asosiy tamoyilimiz. AI qilgan har bir optimizatsiya

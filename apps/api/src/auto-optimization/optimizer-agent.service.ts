@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { NishonAiClient } from '@nishon/ai-sdk';
+import { PerformaAiClient } from '@performa/ai-sdk';
 import {
   CampaignPerformance,
   OptimizationGoal,
@@ -32,7 +32,7 @@ import {
 @Injectable()
 export class OptimizerAgentService {
   private readonly logger = new Logger(OptimizerAgentService.name);
-  private readonly aiClient: NishonAiClient;
+  private readonly aiClient: PerformaAiClient;
 
   constructor(private readonly config: ConfigService) {
     const provider = config.get<string>('AI_PROVIDER', 'openai').toLowerCase() === 'anthropic'
@@ -44,7 +44,7 @@ export class OptimizerAgentService {
     const baseURL = provider === 'anthropic'
       ? config.get<string>('ANTHROPIC_BASE_URL', '')
       : config.get<string>('OPENAI_BASE_URL', '');
-    this.aiClient = new NishonAiClient(apiKey, baseURL || undefined, provider);
+    this.aiClient = new PerformaAiClient(apiKey, baseURL || undefined, provider);
   }
 
   // ─── Main optimization analysis ─────────────────────────────────────────────

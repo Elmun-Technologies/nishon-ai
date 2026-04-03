@@ -3,7 +3,7 @@ const nextConfig = {
   experimental: {
     externalDir: true,
   },
-  transpilePackages: ['@nishon/shared'],
+  transpilePackages: ['@performa/shared'],
 }
 
 module.exports = nextConfig

@@ -12,7 +12,7 @@ import { Workspace } from '../workspaces/entities/workspace.entity';
  *
  * Self-contained feature module for the auto-optimization engine.
  * Does NOT import AiAgentModule to stay decoupled — it uses the shared
- * NishonAiClient directly via OptimizerAgentService.
+ * PerformaAiClient directly via OptimizerAgentService.
  *
  * Exposed services:
  * - AutoOptimizationService  — run pipeline + query history

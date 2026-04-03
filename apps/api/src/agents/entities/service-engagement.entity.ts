@@ -21,13 +21,13 @@ export type EngagementStatus =
  * ServiceEngagement — created when a workspace "hires" an agent.
  *
  * Revenue flow:
- *   Client pays agreedMonthlyRate to Nishon.
- *   Nishon pays (agreedMonthlyRate * (1 - platformCommissionPct/100)) to the agent owner.
- *   Nishon keeps platformCommissionPct of every payment.
+ *   Client pays agreedMonthlyRate to Performa.
+ *   Performa pays (agreedMonthlyRate * (1 - platformCommissionPct/100)) to the agent owner.
+ *   Performa keeps platformCommissionPct of every payment.
  *
- *   For Nishon's own AI agents (ownerId=null): 100% goes to Nishon.
- *   For human agents: owner gets ~85%, Nishon gets ~15%.
- *   For user AI agents: owner gets ~80%, Nishon gets ~20%.
+ *   For Performa's own AI agents (ownerId=null): 100% goes to Performa.
+ *   For human agents: owner gets ~85%, Performa gets ~15%.
+ *   For user AI agents: owner gets ~80%, Performa gets ~20%.
  */
 @Entity("service_engagements")
 export class ServiceEngagement {
@@ -67,7 +67,7 @@ export class ServiceEngagement {
   @Column({ type: "varchar", length: 20, default: "fixed", name: "agreed_pricing_model" })
   agreedPricingModel: string;
 
-  /** Nishon's commission rate locked at hire time */
+  /** Performa's commission rate locked at hire time */
   @Column({ type: "decimal", precision: 5, scale: 2, default: 15, name: "platform_commission_pct" })
   platformCommissionPct: number;
 

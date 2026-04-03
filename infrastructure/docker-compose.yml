@@ -3,26 +3,26 @@ version: '3.8'
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: nishon_postgres
+    container_name: performa_postgres
     environment:
-      POSTGRES_DB: nishon_ai_db
-      POSTGRES_USER: nishon
-      POSTGRES_PASSWORD: nishon_secret
+      POSTGRES_DB: performa_ai_db
+      POSTGRES_USER: performa
+      POSTGRES_PASSWORD: performa_secret
     ports:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U nishon -d nishon_ai_db']
+      test: ['CMD-SHELL', 'pg_isready -U performa -d performa_ai_db']
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
-      - nishon_network
+      - performa_network
 
   redis:
     image: redis:7-alpine
-    container_name: nishon_redis
+    container_name: performa_redis
     ports:
       - '6379:6379'
     volumes:
@@ -33,13 +33,13 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - nishon_network
+      - performa_network
 
   api:
     build:
       context: ../apps/api
       dockerfile: Dockerfile
-    container_name: nishon_api
+    container_name: performa_api
     ports:
       - '3001:3001'
     env_file:
@@ -50,7 +50,7 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - nishon_network
+      - performa_network
     volumes:
       - ../apps/api:/app
       - /app/node_modules
@@ -59,7 +59,7 @@ services:
     build:
       context: ../apps/web
       dockerfile: Dockerfile
-    container_name: nishon_web
+    container_name: performa_web
     ports:
       - '3000:3000'
     environment:
@@ -67,7 +67,7 @@ services:
     depends_on:
       - api
     networks:
-      - nishon_network
+      - performa_network
     volumes:
       - ../apps/web:/app
       - /app/node_modules
@@ -78,5 +78,5 @@ volumes:
   redis_data:
 
 networks:
-  nishon_network:
+  performa_network:
     driver: bridge

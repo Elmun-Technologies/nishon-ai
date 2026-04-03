@@ -310,7 +310,7 @@ export default function PortfolioPage() {
       <nav className="sticky top-0 z-50 border-b border-[#E5E7EB] bg-[#F9FAFB]/90 backdrop-blur-lg">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <button onClick={() => router.push('/')} className="text-xl font-extrabold">
-            Nishon <span className="text-[#374151]">AI</span>
+            Performa <span className="text-[#374151]">AI</span>
           </button>
           <div className="flex items-center gap-3">
             <button
@@ -529,7 +529,7 @@ export default function PortfolioPage() {
         <div className="max-w-2xl mx-auto">
           <h2 className="text-3xl font-extrabold text-[#111827] mb-4">Targetolmisiz?</h2>
           <p className="text-[#9CA3AF] mb-8">
-            Nishon AI ga qo'shiling — natijalaringizni real-time da ko'rsating va ko'proq mijoz toping.
+            Performa ga qo'shiling — natijalaringizni real-time da ko'rsating va ko'proq mijoz toping.
           </p>
           <button
             onClick={() => router.push('/register')}

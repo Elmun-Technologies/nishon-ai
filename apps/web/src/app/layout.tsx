@@ -5,7 +5,7 @@ import './globals.css'
 const inter = { className: 'font-sans' }
 
 export const metadata: Metadata = {
-  title: 'Nishon AI — Autonomous Advertising Agent',
+  title: 'Performa — Autonomous Advertising Agent',
   description: 'AI-powered platform that manages your ads better than a human targetolog',
 }
 

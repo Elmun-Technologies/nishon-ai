@@ -11,10 +11,10 @@ import { ConfigService } from "@nestjs/config";
 import { LandingPage } from "./entities/landing-page.entity";
 import { Workspace } from "../workspaces/entities/workspace.entity";
 import {
-  NishonAiClient,
+  PerformaAiClient,
   LANDING_PAGE_SYSTEM_PROMPT,
   buildLandingPagePrompt,
-} from "@nishon/ai-sdk";
+} from "@performa/ai-sdk";
 
 function generateSlug(name: string): string {
   const base = name
@@ -30,7 +30,7 @@ function generateSlug(name: string): string {
 @Injectable()
 export class LandingPagesService {
   private readonly logger = new Logger(LandingPagesService.name);
-  private readonly aiClient: NishonAiClient;
+  private readonly aiClient: PerformaAiClient;
 
   constructor(
     @InjectRepository(LandingPage)
@@ -49,7 +49,7 @@ export class LandingPagesService {
       ? this.config.get<string>("ANTHROPIC_BASE_URL", "")
       : this.config.get<string>("OPENAI_BASE_URL", "");
     if (apiKey) {
-      this.aiClient = new NishonAiClient(apiKey, baseURL || undefined, provider);
+      this.aiClient = new PerformaAiClient(apiKey, baseURL || undefined, provider);
     }
   }
 

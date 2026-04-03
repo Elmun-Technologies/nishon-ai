@@ -17,7 +17,7 @@ export enum UserPlan {
 }
 
 /**
- * Represents a registered user of the Nishon AI platform.
+ * Represents a registered user of the Performa platform.
  * A user can own multiple workspaces (one per business they manage).
  * Authentication is handled via JWT — password is always stored hashed.
  */
