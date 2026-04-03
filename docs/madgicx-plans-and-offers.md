@@ -1,4 +1,4 @@
-# Nishon rejalar va takliflar — trial’dan to‘liq rejaga o‘tish
+# Performa rejalar va takliflar — trial’dan to‘liq rejaga o‘tish
 
 Ushbu maqolada quyidagilarni tushuntiramiz:
 
@@ -6,11 +6,11 @@ Ushbu maqolada quyidagilarni tushuntiramiz:
 - Qo‘shimcha **add-on**lar va ularning narxlari
 - Trial’dan to‘liq kirishga qanday o‘tish
 
-> Eslatma: bu hujjat to‘liq **Nishon** brendi va mahsulot terminologiyasiga moslashtirildi.
+> Eslatma: bu hujjat to‘liq **Performa** brendi va mahsulot terminologiyasiga moslashtirildi.
 
-## Nishon Pro Complete rejasida nimalar bor
+## Performa Pro Complete rejasida nimalar bor
 
-**Nishon Pro Complete** reklama boshqaruvining asosiy yo‘nalishlarini qamrab oladi: optimizatsiya, analitika, kreativlar, audience targeting, ad creation va avtomatlashtirish.
+**Performa Pro Complete** reklama boshqaruvining asosiy yo‘nalishlarini qamrab oladi: optimizatsiya, analitika, kreativlar, audience targeting, ad creation va avtomatlashtirish.
 
 ### 1) Optimizatsiya vositalari
 
@@ -90,5 +90,5 @@ To‘lov hujjatlarini yuklab olish uchun:
 4. **Billing History** jadvalidagi **Download** ustunida kerakli qatordagi yuklab olish ikonkasini bosing.
 5. Invoice fayli **PDF** formatida yuklab olinadi.
 
-> Eslatma: UI’da ayrim bo‘lim nomlari hali eski label bilan chiqishi mumkin (masalan, “My Madgicx”), ammo bu yo‘riqnoma Nishon ichki billing jarayoni uchun amal qiladi.
+> Eslatma: UI’da ayrim bo‘lim nomlari hali eski label bilan chiqishi mumkin (masalan, “My Madgicx”), ammo bu yo‘riqnoma Performa ichki billing jarayoni uchun amal qiladi.
 

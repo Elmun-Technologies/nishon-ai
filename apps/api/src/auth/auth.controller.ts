@@ -24,7 +24,7 @@ import {
   LoginDto,
   RefreshTokenDto,
   AuthResponseDto,
-} from "@nishon/shared";
+} from "@performa/shared";
 
 @ApiTags("Authentication")
 @Controller("auth")

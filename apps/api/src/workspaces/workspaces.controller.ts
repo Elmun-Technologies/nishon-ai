@@ -23,7 +23,7 @@ import {
   CreateWorkspaceDto,
   UpdateWorkspaceDto,
   UpdateAutopilotDto,
-} from "@nishon/shared";
+} from "@performa/shared";
 
 @ApiTags("Workspaces")
 @Controller("workspaces")

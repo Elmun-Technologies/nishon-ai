@@ -1,4 +1,4 @@
--- Nishon AI — Complete Database Schema
+-- Performa — Complete Database Schema
 -- Run this for fresh deployments. For existing production databases,
 -- run migrate-meta-workspace-id.sql instead to add missing columns.
 --

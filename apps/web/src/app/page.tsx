@@ -44,7 +44,7 @@ const suites = [
 const reviews = [
   {
     quote:
-      '“Nishon AI bilan launch muddati haftalardan kunlarga tushdi. Sotuv jamoamiz kampaniya setup o‘rniga strategiyaga vaqt ajratmoqda.”',
+      '“Performa bilan launch muddati haftalardan kunlarga tushdi. Sotuv jamoamiz kampaniya setup o‘rniga strategiyaga vaqt ajratmoqda.”',
     name: 'Dilshod R.',
     role: 'Head of Growth, Retail Group',
   },
@@ -303,7 +303,7 @@ export default function SellerLandingPage() {
       <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#071c1e]/95 backdrop-blur-xl">
         <div className="mx-auto flex h-24 max-w-7xl items-center justify-between px-6">
           <button onClick={() => router.push('/')} className="text-4xl font-black tracking-tight">
-            Nishon <span className="text-emerald-400">AI</span>
+            Performa <span className="text-emerald-400">AI</span>
           </button>
 
           <div className="hidden rounded-full border border-white/15 bg-white/[0.03] px-8 py-3 md:flex md:items-center md:gap-8 text-lg text-slate-200">
@@ -333,7 +333,7 @@ export default function SellerLandingPage() {
             Built for efficiency. <span className="text-emerald-300">Designed for control.</span>
           </h1>
           <p className="mt-6 max-w-4xl text-xl text-slate-200">
-            Nishon AI reklama operatsiyasini tartib bilan boshqaradi: kampaniya yaratishdan tortib publishing,
+            Performa reklama operatsiyasini tartib bilan boshqaradi: kampaniya yaratishdan tortib publishing,
             optimization va reportinggacha. Maqsad — jamoaga kamroq qo‘l mehnati, ko‘proq aniq natija.
           </p>
 
@@ -442,7 +442,7 @@ export default function SellerLandingPage() {
       <section id="workspace-settings" className="px-6 pb-20">
         <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-[#090b23] p-8 md:p-12">
           <p className="text-sm uppercase tracking-[0.24em] text-violet-300">Workspace settings</p>
-          <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Madgicx uslubidagi boshqaruvni Nishon AI ga moslashtirdik</h2>
+          <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Madgicx uslubidagi boshqaruvni Performa ga moslashtirdik</h2>
           <p className="mt-4 max-w-4xl text-lg text-slate-300">
             Profil menyusidan Workspace Settings’ga kirib, ad account, obuna, billing, user profile va team members
             bo‘limlarini bir joydan boshqarish mumkin. Productionda bu bo‘limlar real API bilan ishlaydi.
@@ -474,7 +474,7 @@ export default function SellerLandingPage() {
       <section id="meta-launch-flow" className="px-6 pb-20">
         <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-[#0a1520] p-8 md:p-12">
           <p className="text-sm uppercase tracking-[0.24em] text-sky-300">Meta campaign launch</p>
-          <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Madgicx uslubidagi launch flow — Nishon AI roadmap</h2>
+          <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Madgicx uslubidagi launch flow — Performa roadmap</h2>
           <p className="mt-4 max-w-4xl text-lg text-slate-300">
             Siz yuborgan “Create New Ad → Audience Launcher → Setup → Summary” oqimini bizning platformaga moslab
             bosqichma-bosqich berdik. Hozir landingda feature map, keyingi bosqichda real interface/pages.
@@ -505,7 +505,7 @@ export default function SellerLandingPage() {
           <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Madgicx’dagi team management oqimi — professional darajada</h2>
           <p className="mt-4 max-w-4xl text-lg text-slate-300">
             Create workspace, invite, accept invite, role berish, ad-account access taqsimlash va removal jarayonini
-            Nishon AI roadmapiga kiritdik. Bu bo‘lim agency va multi-account ishlash uchun asosiy blok.
+            Performa roadmapiga kiritdik. Bu bo‘lim agency va multi-account ishlash uchun asosiy blok.
           </p>
 
           <div className="mt-8 grid gap-4 md:grid-cols-2">
@@ -559,7 +559,7 @@ export default function SellerLandingPage() {
           </div>
           <div className="flex items-end bg-[linear-gradient(140deg,#0f172a,#052e2b,#111827)] p-10 md:p-16">
             <p className="max-w-lg text-4xl font-medium leading-tight text-white">
-              “How teams reduce ops load and focus on performance growth with Nishon AI.”
+              “How teams reduce ops load and focus on performance growth with Performa.”
             </p>
           </div>
         </div>
@@ -602,7 +602,7 @@ export default function SellerLandingPage() {
 
           <div className="w-full max-w-xl rounded-3xl border border-white/10 bg-white/[0.03] p-7">
             <h4 className="text-4xl font-semibold">Newsletter</h4>
-            <p className="mt-3 text-lg text-slate-300">Nishon AI yangiliklari, case study va amaliy guide’larni oling.</p>
+            <p className="mt-3 text-lg text-slate-300">Performa yangiliklari, case study va amaliy guide’larni oling.</p>
             <button className="mt-6 rounded-full border border-white/25 px-6 py-3 text-lg hover:border-emerald-300/70">
               Sign Up ↗
             </button>

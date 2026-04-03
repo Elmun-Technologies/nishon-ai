@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 
-console.log('🔍 Testing Nishon AI Project Structure...\n');
+console.log('🔍 Testing Performa Project Structure...\n');
 
 const requiredFiles = [
   // Root files
@@ -115,7 +115,7 @@ try {
   console.log('❌ Error reading docker-compose.yml:', error.message);
 }
 
-console.log('\n🎉 Nishon AI project structure test completed!');
+console.log('\n🎉 Performa project structure test completed!');
 console.log('\nNext steps:');
 console.log('1. Run `npm install` to install dependencies');
 console.log('2. Run `docker-compose up -d postgres redis` to start database services');

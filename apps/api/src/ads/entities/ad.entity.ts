@@ -10,7 +10,7 @@ import {
 } from "typeorm";
 import { AdSet } from "../../ad-sets/entities/ad-set.entity";
 import { PerformanceMetric } from "../../analytics/entities/performance-metric.entity";
-import { CampaignStatus } from "@nishon/shared";
+import { CampaignStatus } from "@performa/shared";
 
 export enum CreativeType {
   IMAGE = "image",

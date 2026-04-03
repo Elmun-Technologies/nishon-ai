@@ -1,8 +1,8 @@
-# 🎯 Nishon AI Campaign Wizard - Implementation Summary
+# 🎯 Performa Campaign Wizard - Implementation Summary
 
 ## 📊 Project Overview
 
-**Nishon AI Campaign Wizard** is a comprehensive advertising campaign management system that enables users to create, manage, and optimize multi-platform advertising campaigns through an intuitive wizard interface with AI-powered automation.
+**Performa Campaign Wizard** is a comprehensive advertising campaign management system that enables users to create, manage, and optimize multi-platform advertising campaigns through an intuitive wizard interface with AI-powered automation.
 
 ## ✅ Completed Implementation
 

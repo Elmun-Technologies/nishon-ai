@@ -54,9 +54,9 @@ import { RequestLoggingInterceptor } from "./common/interceptors/request-logging
             : {
                 host: config.get<string>("DATABASE_HOST", "postgres"),
                 port: Number(config.get<string>("DATABASE_PORT", "5432")),
-                username: config.get<string>("DATABASE_USERNAME", "nishon"),
-                password: config.get<string>("DATABASE_PASSWORD", "nishon_secret"),
-                database: config.get<string>("DATABASE_NAME", "nishon_ai_db"),
+                username: config.get<string>("DATABASE_USERNAME", "performa"),
+                password: config.get<string>("DATABASE_PASSWORD", "performa_secret"),
+                database: config.get<string>("DATABASE_NAME", "performa_ai_db"),
               }),
           ssl: (isProduction || databaseUrl) ? { rejectUnauthorized: false } : false,
           entities: [__dirname + "/**/*.entity{.ts,.js}"],

@@ -520,7 +520,7 @@ export default function CreateAgentPage() {
           <p className="text-xs text-amber-700 font-medium mb-1">💡 Monetizatsiya</p>
           <p className="text-xs text-amber-600 leading-relaxed">
             Sizning AI agentingiz tadbirkorlarga ijaraga beriladi. Har bir to'lovdan siz <b>80%</b> olasiz,
-            Nishon platformasi <b>20%</b> komissiya oladi. Agent qanchalik ko'p foydalanilsa, daromad shunchalik ko'p.
+            Performa platformasi <b>20%</b> komissiya oladi. Agent qanchalik ko'p foydalanilsa, daromad shunchalik ko'p.
           </p>
         </div>
       )}

@@ -155,7 +155,7 @@ export default function Sidebar() {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-[#111827] font-semibold text-sm leading-tight truncate">
-              {currentWorkspace?.name ?? 'Nishon AI'}
+              {currentWorkspace?.name ?? 'Performa'}
             </p>
             {currentWorkspace && (
               <p className="text-[#9CA3AF] text-xs truncate">Workspace</p>

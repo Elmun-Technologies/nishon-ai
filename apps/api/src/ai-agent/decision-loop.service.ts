@@ -10,13 +10,13 @@ import { ConnectedAccount } from "../platforms/entities/connected-account.entity
 import { MetaConnector } from "../platforms/connectors/meta.connector";
 import { GoogleConnector } from "../platforms/connectors/google.connector";
 import { TiktokConnector } from "../platforms/connectors/tiktok.connector";
-import { NishonAiClient, OPTIMIZATION_SYSTEM_PROMPT } from "@nishon/ai-sdk";
+import { PerformaAiClient, OPTIMIZATION_SYSTEM_PROMPT } from "@performa/ai-sdk";
 import {
   AiDecisionAction,
   AutopilotMode,
   CampaignStatus,
   Platform,
-} from "@nishon/shared";
+} from "@performa/shared";
 
 interface OptimizationDecision {
   action: string;
@@ -44,7 +44,7 @@ interface OptimizationDecision {
 @Injectable()
 export class DecisionLoopService {
   private readonly logger = new Logger(DecisionLoopService.name);
-  private readonly aiClient: NishonAiClient;
+  private readonly aiClient: PerformaAiClient;
 
   constructor(
     private readonly config: ConfigService,
@@ -70,7 +70,7 @@ export class DecisionLoopService {
       ? this.config.get<string>("ANTHROPIC_BASE_URL", "")
       : this.config.get<string>("OPENAI_BASE_URL", "");
     if (apiKey) {
-      this.aiClient = new NishonAiClient(apiKey, baseURL || undefined, provider);
+      this.aiClient = new PerformaAiClient(apiKey, baseURL || undefined, provider);
     } else {
       this.logger.warn("AI provider API key is not configured — AI decision loop will be unavailable");
     }

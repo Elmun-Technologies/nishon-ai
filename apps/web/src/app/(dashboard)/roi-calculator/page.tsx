@@ -125,7 +125,7 @@ const INDUSTRY_DATA: Record<string, {
   },
 }
 
-// Nishon AI improvement multipliers based on platform data
+// Performa improvement multipliers based on platform data
 const NISHON_IMPROVEMENT = {
   conversionRateBoost: 1.85,   // 85% better conversion rate
   ctrBoost: 1.60,              // 60% better CTR
@@ -139,21 +139,21 @@ const NISHON_IMPROVEMENT = {
 function CompareRow({
   label,
   without,
-  withNishon,
+  withPerforma,
   unit = '',
   higherIsBetter = true,
   highlight = false,
 }: {
   label: string
   without: string | number
-  withNishon: string | number
+  withPerforma: string | number
   unit?: string
   higherIsBetter?: boolean
   highlight?: boolean
 }) {
   const withoutNum = typeof without === 'number' ? without : 0
-  const withNum = typeof withNishon === 'number' ? withNishon : 0
-  const nishonWins = higherIsBetter ? withNum > withoutNum : withNum < withoutNum
+  const withNum = typeof withPerforma === 'number' ? withPerforma : 0
+  const performaWins = higherIsBetter ? withNum > withoutNum : withNum < withoutNum
 
   return (
     <div className={`grid grid-cols-3 gap-4 px-5 py-3.5 border-b border-[#E5E7EB] last:border-0 ${
@@ -161,21 +161,21 @@ function CompareRow({
     }`}>
       <p className="text-[#9CA3AF] text-sm">{label}</p>
 
-      {/* Without Nishon */}
+      {/* Without Performa */}
       <div className="text-center">
-        <p className={`text-sm font-semibold ${!nishonWins ? 'text-emerald-400' : 'text-[#6B7280]'}`}>
+        <p className={`text-sm font-semibold ${!performaWins ? 'text-emerald-400' : 'text-[#6B7280]'}`}>
           {typeof without === 'number' ? without.toLocaleString() : without}
           {unit && <span className="text-xs font-normal ml-0.5">{unit}</span>}
         </p>
       </div>
 
-      {/* With Nishon AI */}
+      {/* With Performa */}
       <div className="text-center">
-        <p className={`text-sm font-semibold ${nishonWins ? 'text-emerald-400' : 'text-[#6B7280]'}`}>
-          {typeof withNishon === 'number' ? withNishon.toLocaleString() : withNishon}
+        <p className={`text-sm font-semibold ${performaWins ? 'text-emerald-400' : 'text-[#6B7280]'}`}>
+          {typeof withPerforma === 'number' ? withPerforma.toLocaleString() : withPerforma}
           {unit && <span className="text-xs font-normal ml-0.5">{unit}</span>}
         </p>
-        {nishonWins && typeof without === 'number' && typeof withNishon === 'number' && withoutNum > 0 && (
+        {performaWins && typeof without === 'number' && typeof withPerforma === 'number' && withoutNum > 0 && (
           <p className="text-emerald-400 text-xs mt-0.5">
             +{Math.round(((withNum - withoutNum) / withoutNum) * 100)}%
           </p>
@@ -269,7 +269,7 @@ export default function RoiCalculatorPage() {
     const nRoas    = nRevenue / budget
     const nWasted  = Math.round(budget * NISHON_IMPROVEMENT.wasteReduction)
 
-    const withNishon: ScenarioResult = {
+    const withPerforma: ScenarioResult = {
       monthlyLeads: nLeads,
       monthlySales: nSales,
       monthlyRevenue: nRevenue,
@@ -283,7 +283,7 @@ export default function RoiCalculatorPage() {
 
     // ── NISHON AI COST (platform fee) ────────────────────────────────
     // 6% of ad spend + $29 base (Growth plan)
-    const nishonFee = Math.round(budget * 0.06) + 79
+    const performaFee = Math.round(budget * 0.06) + 79
 
     // ── DIFFERENCES ──────────────────────────────────────────────────
     const extraLeads   = nLeads - leads
@@ -292,19 +292,19 @@ export default function RoiCalculatorPage() {
     const savedTargetologist = industryData.targetologistCost
     const savedTime    = optHours // hours saved per month
     const totalSaved   = savedWaste + savedTargetologist
-    const netBenefit   = extraRevenue + totalSaved - nishonFee
+    const netBenefit   = extraRevenue + totalSaved - performaFee
 
     // Monthly and period totals
     const periodExtraRevenue = extraRevenue * months
     const periodNetBenefit   = netBenefit * months
-    const paybackDays = nishonFee > 0
-      ? Math.round((nishonFee / (extraRevenue / 30)))
+    const paybackDays = performaFee > 0
+      ? Math.round((performaFee / (extraRevenue / 30)))
       : 0
 
     return {
       without,
-      withNishon,
-      nishonFee,
+      withPerforma,
+      performaFee,
       extraLeads,
       extraRevenue,
       savedWaste,
@@ -330,7 +330,7 @@ export default function RoiCalculatorPage() {
           <Badge variant="purple">📊 Real hisob-kitob</Badge>
         </div>
         <p className="text-[#6B7280] text-sm">
-          Reklama byudjetingiz Nishon AI bilan va usiz qancha qaytishini ko'ring —
+          Reklama byudjetingiz Performa bilan va usiz qancha qaytishini ko'ring —
           real CIS bozori ma'lumotlariga asoslangan
         </p>
       </div>
@@ -440,7 +440,7 @@ export default function RoiCalculatorPage() {
       {/* KEY DIFFERENCES — Big numbers */}
       <div>
         <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide mb-3">
-          Nishon AI bilan {months} oyda qo'shimcha foyda
+          Performa bilan {months} oyda qo'shimcha foyda
         </p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <BigDiffCard
@@ -481,7 +481,7 @@ export default function RoiCalculatorPage() {
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
             <p className="text-[#6B7280] text-sm mb-1">
-              Oylik sof foyda (daromad + tejamkorlik − Nishon AI to'lovi)
+              Oylik sof foyda (daromad + tejamkorlik − Performa to'lovi)
             </p>
             <p className={`text-4xl font-black ${
               results.netBenefit > 0 ? 'text-emerald-400' : 'text-red-400'
@@ -501,7 +501,7 @@ export default function RoiCalculatorPage() {
             </div>
             <div className="flex items-center gap-2 text-[#6B7280]">
               <span className="text-red-400">−</span>
-              Nishon AI to'lovi: {formatCurrency(results.nishonFee)}/oy
+              Performa to'lovi: {formatCurrency(results.performaFee)}/oy
             </div>
           </div>
           <div className="text-center">
@@ -524,7 +524,7 @@ export default function RoiCalculatorPage() {
             ❌ Usiz (oddiy targetolog)
           </p>
           <p className="text-[#374151] text-xs font-medium text-center">
-            ✅ Nishon AI bilan
+            ✅ Performa bilan
           </p>
         </div>
 
@@ -532,62 +532,62 @@ export default function RoiCalculatorPage() {
         <CompareRow
           label="Oylik leadlar"
           without={results.without.monthlyLeads}
-          withNishon={results.withNishon.monthlyLeads}
+          withPerforma={results.withPerforma.monthlyLeads}
           unit=" ta"
         />
         <CompareRow
           label="Oylik sotuvlar"
           without={results.without.monthlySales}
-          withNishon={results.withNishon.monthlySales}
+          withPerforma={results.withPerforma.monthlySales}
           unit=" ta"
           highlight
         />
         <CompareRow
           label="Oylik daromad"
           without={formatCurrency(results.without.monthlyRevenue)}
-          withNishon={formatCurrency(results.withNishon.monthlyRevenue)}
+          withPerforma={formatCurrency(results.withPerforma.monthlyRevenue)}
         />
         <CompareRow
           label="ROAS"
           without={`${results.without.roas}x`}
-          withNishon={`${results.withNishon.roas}x`}
+          withPerforma={`${results.withPerforma.roas}x`}
           highlight
         />
         <CompareRow
           label="CPA (1 lead narxi)"
           without={formatCurrency(results.without.cpa)}
-          withNishon={formatCurrency(results.withNishon.cpa)}
+          withPerforma={formatCurrency(results.withPerforma.cpa)}
           higherIsBetter={false}
         />
         <CompareRow
           label="CTR"
           without={`${results.without.ctr}%`}
-          withNishon={`${results.withNishon.ctr}%`}
+          withPerforma={`${results.withPerforma.ctr}%`}
           highlight
         />
         <CompareRow
           label="Isrof qilinadigan byudjet"
           without={formatCurrency(results.without.wastedBudget)}
-          withNishon={formatCurrency(results.withNishon.wastedBudget)}
+          withPerforma={formatCurrency(results.withPerforma.wastedBudget)}
           higherIsBetter={false}
         />
         <CompareRow
           label="Optimizatsiya vaqti"
           without={`${results.without.optimizationTime} soat/oy`}
-          withNishon="0 soat/oy"
+          withPerforma="0 soat/oy"
           higherIsBetter={false}
           highlight
         />
         <CompareRow
           label="Targetolog xarajati"
           without={formatCurrency(results.without.targetologistCost)}
-          withNishon="$0 (AI bajaradi)"
+          withPerforma="$0 (AI bajaradi)"
           higherIsBetter={false}
         />
         <CompareRow
-          label="Nishon AI to'lovi"
+          label="Performa to'lovi"
           without="$0"
-          withNishon={formatCurrency(results.nishonFee)}
+          withPerforma={formatCurrency(results.performaFee)}
           higherIsBetter={false}
           highlight
         />
@@ -610,14 +610,14 @@ export default function RoiCalculatorPage() {
 
         <Card className="border-[#D1D5DB] bg-[#111827]/5">
           <p className="text-[#374151] text-xs uppercase tracking-wide mb-2">
-            {months} oyda Nishon AI bilan
+            {months} oyda Performa bilan
           </p>
           <p className="text-2xl font-bold text-emerald-400 mb-1">
-            {formatCurrency(results.withNishon.monthlyRevenue * months)}
+            {formatCurrency(results.withPerforma.monthlyRevenue * months)}
           </p>
           <p className="text-[#6B7280] text-xs">
-            {(results.withNishon.monthlyLeads * months).toLocaleString()} lead ·{' '}
-            {(results.withNishon.monthlySales * months).toLocaleString()} sotuv
+            {(results.withPerforma.monthlyLeads * months).toLocaleString()} lead ·{' '}
+            {(results.withPerforma.monthlySales * months).toLocaleString()} sotuv
           </p>
         </Card>
 
@@ -645,7 +645,7 @@ export default function RoiCalculatorPage() {
             <p className="text-[#6B7280] text-xs leading-relaxed">
               Bu hisob-kitob O'zbekiston va MDH bozorining real o'rtacha ko'rsatkichlariga
               asoslangan. Natijalar mahsulot sifati, kreativ materiallar va bozor sharoitiga
-              qarab farq qilishi mumkin. Nishon AI foydalanuvchilarining o'rtacha ROAS
+              qarab farq qilishi mumkin. Performa foydalanuvchilarining o'rtacha ROAS
               ko'rsatkichi <span className="text-[#111827]">3.2x</span> ni tashkil etadi.
             </p>
           </div>

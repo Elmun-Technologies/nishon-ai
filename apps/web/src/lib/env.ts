@@ -3,7 +3,7 @@ const apiBaseUrl =
 
 if (!apiBaseUrl && process.env.NODE_ENV !== "test") {
   console.warn(
-    "[Nishon AI] Missing NEXT_PUBLIC_API_BASE_URL (or NEXT_PUBLIC_API_URL). Falling back to relative API paths.",
+    "[Performa] Missing NEXT_PUBLIC_API_BASE_URL (or NEXT_PUBLIC_API_URL). Falling back to relative API paths.",
   );
 }
 

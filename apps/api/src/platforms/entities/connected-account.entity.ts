@@ -8,7 +8,7 @@ import {
   JoinColumn,
 } from "typeorm";
 import { Workspace } from "../../workspaces/entities/workspace.entity";
-import { Platform } from "@nishon/shared";
+import { Platform } from "@performa/shared";
 
 /**
  * Stores OAuth credentials for connected ad platform accounts.

@@ -2,9 +2,9 @@ import type { Metadata } from 'next'
 import LegalPageLayout from '@/components/layout/LegalPageLayout'
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy | Nishon AI',
+  title: 'Privacy Policy | Performa',
   description:
-    'Learn how Nishon AI collects, uses, and protects user data for advertising automation.',
+    'Learn how Performa collects, uses, and protects user data for advertising automation.',
 }
 
 export default function Page() {
@@ -14,7 +14,7 @@ export default function Page() {
         <header className="space-y-3">
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Privacy Policy</h1>
           <p className="text-[#9CA3AF]">
-            This Privacy Policy explains how Nishon AI collects, uses, shares, stores, and
+            This Privacy Policy explains how Performa collects, uses, shares, stores, and
             protects information when you use our autonomous advertising platform.
           </p>
           <p className="text-sm text-[#6B7280]">Last updated: March 22, 2026</p>
@@ -23,7 +23,7 @@ export default function Page() {
         <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
           <h2 className="text-xl font-semibold">Introduction</h2>
           <p className="text-[#374151]">
-            Nishon AI helps businesses manage, optimize, and scale campaigns across supported ad
+            Performa helps businesses manage, optimize, and scale campaigns across supported ad
             platforms. To provide these services, we process operational and user-provided data.
             This policy is written for users, partners, and platform reviewers who need clear
             visibility into our privacy practices.
@@ -33,9 +33,9 @@ export default function Page() {
         <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
           <h2 className="text-xl font-semibold">Who we are</h2>
           <p className="text-[#374151]">
-            Nishon AI is a software platform that provides AI-assisted and autonomous campaign
+            Performa is a software platform that provides AI-assisted and autonomous campaign
             management workflows. We act as a service provider for users who connect their
-            advertising accounts and workspace data to operate campaigns through Nishon AI.
+            advertising accounts and workspace data to operate campaigns through Performa.
           </p>
         </section>
 
@@ -79,7 +79,7 @@ export default function Page() {
             <li>To connect third-party ad accounts and synchronize campaign information.</li>
             <li>To provide campaign management, analytics, and AI-generated recommendations.</li>
             <li>To operate monitoring, fraud prevention, and platform abuse safeguards.</li>
-            <li>To maintain, troubleshoot, and improve the performance of Nishon AI services.</li>
+            <li>To maintain, troubleshoot, and improve the performance of Performa services.</li>
           </ul>
           <h3 className="text-base font-semibold text-[#111827]">Legal basis and legitimate purpose</h3>
           <ul className="list-disc space-y-2 pl-5 text-[#374151]">
@@ -94,12 +94,12 @@ export default function Page() {
           <h2 className="text-xl font-semibold">Third-party integrations and service providers</h2>
           <h3 className="text-base font-semibold text-[#111827]">Meta</h3>
           <p className="text-[#374151]">
-            When you connect Meta accounts, Nishon AI may access account and campaign data within
+            When you connect Meta accounts, Performa may access account and campaign data within
             the permissions you authorize.
           </p>
           <h3 className="text-base font-semibold text-[#111827]">Google</h3>
           <p className="text-[#374151]">
-            For connected Google advertising services, Nishon AI processes account and campaign
+            For connected Google advertising services, Performa processes account and campaign
             data as needed for reporting and optimization workflows.
           </p>
           <h3 className="text-base font-semibold text-[#111827]">TikTok</h3>
@@ -109,7 +109,7 @@ export default function Page() {
           </p>
           <h3 className="text-base font-semibold text-[#111827]">Infrastructure and analytics</h3>
           <p className="text-[#374151]">
-            Nishon AI relies on infrastructure and hosting providers to run the platform. These
+            Performa relies on infrastructure and hosting providers to run the platform. These
             providers process data under service agreements and operational controls.
           </p>
           <p className="text-[#374151]">
@@ -128,7 +128,7 @@ export default function Page() {
 
           <h2 className="text-xl font-semibold">Data security</h2>
           <p className="text-[#374151]">
-            Nishon AI uses administrative, technical, and organizational safeguards intended to
+            Performa uses administrative, technical, and organizational safeguards intended to
             protect data from unauthorized access, loss, or misuse. No internet-based system can
             guarantee absolute security, but we continuously improve our controls.
           </p>
@@ -150,7 +150,7 @@ export default function Page() {
 
           <h2 className="text-xl font-semibold">Children&apos;s privacy</h2>
           <p className="text-[#374151]">
-            Nishon AI is intended for business and professional users and is not directed to
+            Performa is intended for business and professional users and is not directed to
             children. We do not knowingly collect personal data from children.
           </p>
 
@@ -173,7 +173,7 @@ export default function Page() {
           </p>
           <p className="text-sm text-[#6B7280]">
             Disclaimer: This policy is provided for operational and compliance purposes and may be
-            updated as the Nishon AI platform evolves.
+            updated as the Performa platform evolves.
           </p>
         </section>
       </article>

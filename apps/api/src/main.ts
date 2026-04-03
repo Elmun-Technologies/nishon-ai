@@ -62,8 +62,8 @@ async function bootstrap() {
 
   // Swagger setup
   const config = new DocumentBuilder()
-    .setTitle("Nishon AI API")
-    .setDescription("API for Nishon AI autonomous advertising platform")
+    .setTitle("Performa API")
+    .setDescription("API for Performa autonomous advertising platform")
     .setVersion("1.0")
     .addBearerAuth()
     .build();

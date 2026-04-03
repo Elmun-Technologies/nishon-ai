@@ -1,4 +1,4 @@
--- Nishon AI Campaign Wizard Database Schema
+-- Performa Campaign Wizard Database Schema
 -- Production-ready schema with proper relationships and constraints
 
 -- Users table

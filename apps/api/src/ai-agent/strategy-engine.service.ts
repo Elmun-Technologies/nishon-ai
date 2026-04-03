@@ -4,10 +4,10 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Workspace } from "../workspaces/entities/workspace.entity";
 import {
-  NishonAiClient,
+  PerformaAiClient,
   buildStrategyPrompt,
   STRATEGY_SYSTEM_PROMPT,
-} from "@nishon/ai-sdk";
+} from "@performa/ai-sdk";
 
 export interface StrategyInput {
   businessName: string;
@@ -84,7 +84,7 @@ export interface StrategyResult {
 }
 
 /**
- * StrategyEngineService is the brain of Nishon AI.
+ * StrategyEngineService is the brain of Performa.
  *
  * It takes raw business data from onboarding and produces a complete,
  * actionable advertising strategy using GPT-4o. Think of it as having
@@ -97,7 +97,7 @@ export interface StrategyResult {
 @Injectable()
 export class StrategyEngineService {
   private readonly logger = new Logger(StrategyEngineService.name);
-  private readonly aiClient: NishonAiClient;
+  private readonly aiClient: PerformaAiClient;
 
   constructor(
     private readonly config: ConfigService,
@@ -114,7 +114,7 @@ export class StrategyEngineService {
       ? this.config.get<string>("ANTHROPIC_BASE_URL", "")
       : this.config.get<string>("OPENAI_BASE_URL", "");
     if (apiKey) {
-      this.aiClient = new NishonAiClient(apiKey, baseURL || undefined, provider);
+      this.aiClient = new PerformaAiClient(apiKey, baseURL || undefined, provider);
     } else {
       this.logger.warn("AI provider API key is not configured — AI strategy generation will be unavailable");
     }
