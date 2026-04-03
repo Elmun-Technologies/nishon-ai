@@ -89,6 +89,67 @@ function defaultForm(): { name: string; conditions: TriggerCondition[]; actions:
   }
 }
 
+// ─── Pre-built tactic templates ───────────────────────────────────────────────
+
+const TACTIC_TEMPLATES = [
+  {
+    icon: '🛑',
+    name: 'Stop Loss',
+    desc: 'Yomon ishlayotgan ad setlarni to\'xtatib byudjetni himoya qilish',
+    color: 'border-red-200 bg-red-50',
+    labelColor: 'text-red-700 bg-red-100',
+    form: {
+      name: 'Stop Loss — ROAS < 0.75x (7 kun)',
+      conditions: [
+        { metric: 'roas' as Metric, operator: 'lt' as Operator, value: 0.75, windowDays: 7, dimension: 'campaign' as const },
+      ],
+      actions: [{ type: 'pause_campaign' as ActionType }],
+    },
+  },
+  {
+    icon: '🏄',
+    name: 'Surf (Scale)',
+    desc: 'ROAS yuqori bo\'lganda byudjetni +20% oshirish',
+    color: 'border-blue-200 bg-blue-50',
+    labelColor: 'text-blue-700 bg-blue-100',
+    form: {
+      name: 'Surf — ROAS > 3x da +20% budget',
+      conditions: [
+        { metric: 'roas' as Metric, operator: 'gte' as Operator, value: 3.0, windowDays: 1, dimension: 'campaign' as const },
+      ],
+      actions: [{ type: 'increase_budget' as ActionType, value: 20 }],
+    },
+  },
+  {
+    icon: '📉',
+    name: 'Sunsetting',
+    desc: 'Uzoq vaqt zarar keltirayotgan kampaniyalarni asta-sekin o\'chirish',
+    color: 'border-orange-200 bg-orange-50',
+    labelColor: 'text-orange-700 bg-orange-100',
+    form: {
+      name: 'Sunsetting — 7 kunlik zarar (-30% budget)',
+      conditions: [
+        { metric: 'roas' as Metric, operator: 'lt' as Operator, value: 1.0, windowDays: 7, dimension: 'campaign' as const },
+      ],
+      actions: [{ type: 'decrease_budget' as ActionType, value: 30 }],
+    },
+  },
+  {
+    icon: '📈',
+    name: 'Scale Winners',
+    desc: 'CTR yuqori bo\'lganda byudjetni +15% oshirish',
+    color: 'border-emerald-200 bg-emerald-50',
+    labelColor: 'text-emerald-700 bg-emerald-100',
+    form: {
+      name: 'Scale — CTR > 2% da +15% budget',
+      conditions: [
+        { metric: 'ctr' as Metric, operator: 'gte' as Operator, value: 2.0, windowDays: 3, dimension: 'campaign' as const },
+      ],
+      actions: [{ type: 'increase_budget' as ActionType, value: 15 }],
+    },
+  },
+]
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function TriggerSetsPage() {
@@ -208,15 +269,45 @@ export default function TriggerSetsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-[#111827] flex items-center gap-2">
-            ⚡ Triggersetlar
+            ⚡ Automation Tactics
           </h1>
           <p className="text-[#6B7280] text-sm mt-0.5">
-            Avtomatik qoidalar — har 30 daqiqada tekshiriladi
+            Tayyor shablonlar yoki o'z qoidalaringizni yarating — har 30 daqiqada tekshiriladi
           </p>
         </div>
-        <Button onClick={() => { setShowCreate(true); setForm(defaultForm()) }}>
-          + Yangi triggerset
-        </Button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => window.location.href = '/automation-overview'}
+            className="text-xs px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium"
+          >
+            📊 Overview →
+          </button>
+          <Button onClick={() => { setShowCreate(true); setForm(defaultForm()) }}>
+            + Yangi triggerset
+          </Button>
+        </div>
+      </div>
+
+      {/* ── Pre-built tactic templates ── */}
+      <div>
+        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Tayyor taktikalar — 1 klik bilan qo'shing</p>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          {TACTIC_TEMPLATES.map(t => (
+            <div key={t.name} className={`border rounded-xl p-4 ${t.color}`}>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-xl">{t.icon}</span>
+                <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${t.labelColor}`}>{t.name}</span>
+              </div>
+              <p className="text-xs text-gray-600 leading-relaxed mb-3">{t.desc}</p>
+              <button
+                onClick={() => { setForm(t.form); setShowCreate(true) }}
+                className="w-full text-xs py-1.5 bg-white border border-gray-200 rounded-lg hover:border-indigo-300 hover:text-indigo-700 transition font-medium text-gray-700"
+              >
+                Shablon qo'llash →
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
 
       {error && <Alert variant="error">{error}</Alert>}
