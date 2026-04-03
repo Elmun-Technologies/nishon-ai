@@ -149,6 +149,39 @@ const ERFM_EXPLAINER = [
   'AI ushbu segmentlarni Meta pixel signaliga uzatib lookalike sifatini oshiradi.',
 ]
 
+const TARGET_NETWORKS = [
+  'Meta / Facebook',
+  'Google Ads',
+  'Yandex Direct',
+  'TikTok Ads',
+  'LinkedIn Ads',
+  'Snapchat Ads',
+  'X Ads',
+  'Pinterest Ads',
+  'DV360',
+  'va boshqa tarmoqlar',
+]
+
+const IMPLEMENTATION_CHECKLIST: Array<{ module: string; items: string[] }> = [
+  { module: 'Core', items: ['login/register', 'org/workspace/team', 'RBAC', 'billing', 'audit logs'] },
+  {
+    module: 'Integrations',
+    items: ['Meta Ads', 'Google Ads', 'Yandex Direct', 'TikTok Ads', 'LinkedIn Ads', 'Snapchat Ads', 'Pinterest Ads', 'X Ads', 'GA4', 'Shopify/CRM'],
+  },
+  {
+    module: 'Sync engine',
+    items: ['OAuth', 'token refresh', 'scheduled/incremental sync', 'backfill', 'webhooks', 'retry/error monitoring'],
+  },
+  {
+    module: 'Reporting + Metrics',
+    items: ['overview dashboard', 'drill-down reports', 'custom reports', 'exports', 'scheduled reports', 'ROAS/CPA/CTR/CPM/CPC/LTV/funnel metrics'],
+  },
+  {
+    module: 'Automation + AI',
+    items: ['rules', 'budget/bid changes', 'alerts', 'recommendations', 'anomaly detection', 'forecasting', 'AI analyst chat'],
+  },
+]
+
 export default function AudiencesPage() {
   const [activeStage, setActiveStage] = useState<FunnelStage>('acquisition')
   const [query, setQuery] = useState('')
@@ -383,6 +416,15 @@ export default function AudiencesPage() {
         </section>
 
         <section className="rounded-xl border border-[#2C285A] bg-[#0A0820] p-4">
+          <h3 className="text-base font-semibold mb-3">Target multi-network scope</h3>
+          <div className="flex flex-wrap gap-2 mb-4">
+            {TARGET_NETWORKS.map((network) => (
+              <span key={network} className="text-xs px-2.5 py-1 rounded-full bg-[#17143D] border border-[#2C285A] text-[#C7D2FE]">
+                {network}
+              </span>
+            ))}
+          </div>
+
           <h3 className="text-base font-semibold mb-3">Winning audiences playbook (to‘liq)</h3>
           <p className="text-sm text-[#C7CAD1] mb-3">
             Asosiy prinsip: 76 ta preset bor, lekin hammasini birdan ishga tushirmang. Restaurant menyusi kabi — eng kuchli kombinatsiyalarni bosqichma-bosqich test qiling.
@@ -432,6 +474,22 @@ export default function AudiencesPage() {
                 </ul>
               </div>
             ))}
+          </div>
+
+          <div className="mt-4 rounded-lg border border-[#2C285A] p-3">
+            <p className="text-sm font-medium mb-3">Platform implementation checklist (kerakli qismlar)</p>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+              {IMPLEMENTATION_CHECKLIST.map((group) => (
+                <div key={group.module} className="rounded-lg border border-[#2C285A] p-3">
+                  <p className="text-sm font-medium mb-2">{group.module}</p>
+                  <ul className="space-y-1 list-disc list-inside text-xs text-[#A1A1AA]">
+                    {group.items.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
       </div>
