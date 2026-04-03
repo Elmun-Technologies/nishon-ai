@@ -45,9 +45,23 @@ async function bootstrap() {
     .map((origin) => origin.trim())
     .filter(Boolean);
 
+  const wildcardOrigins = frontendOrigins
+    .filter((origin) => origin.startsWith("*."))
+    .map((origin) => origin.slice(1)); // ".vercel.app"
+  const exactOrigins = frontendOrigins.filter((origin) => !origin.startsWith("*."));
+
   // Enable CORS
   app.enableCors({
-    origin: frontendOrigins.length > 0 ? frontendOrigins : true,
+    origin: (origin, callback) => {
+      if (frontendOrigins.length === 0) return callback(null, true);
+      if (!origin) return callback(null, true);
+      if (exactOrigins.includes(origin)) return callback(null, true);
+
+      const matchesWildcard = wildcardOrigins.some((wildcard) => origin.endsWith(wildcard));
+      if (matchesWildcard) return callback(null, true);
+
+      return callback(new Error(`CORS blocked for origin: ${origin}`), false);
+    },
     credentials: true,
   });
 
