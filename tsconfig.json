@@ -17,10 +17,10 @@
         "sourceMap": true,
         "baseUrl": ".",
         "paths": {
-            "@nishon/shared": [
+            "@performa/shared": [
                 "packages/shared/src"
             ],
-            "@nishon/ai-sdk": [
+            "@performa/ai-sdk": [
                 "packages/ai-sdk/src"
             ]
         }

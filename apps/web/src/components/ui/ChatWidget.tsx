@@ -19,7 +19,7 @@ export function ChatWidget() {
   const { currentWorkspace } = useWorkspaceStore()
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: 'Salom! Men Nishon AI yordamchisiman. Kampaniyalaringiz, metrikalar yoki strategiya haqida savol bering.' },
+    { role: 'assistant', content: 'Salom! Men Performa yordamchisiman. Kampaniyalaringiz, metrikalar yoki strategiya haqida savol bering.' },
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -40,7 +40,7 @@ export function ChatWidget() {
     setLoading(true)
 
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('nishon_access_token') : null
+      const token = typeof window !== 'undefined' ? localStorage.getItem('performa_access_token') : null
       const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || ''
       const res = await fetch(`${apiBase}/ai-agent/chat`, {
         method: 'POST',
@@ -90,7 +90,7 @@ export function ChatWidget() {
           <div className="flex items-center gap-3 px-4 py-3 bg-[#111827] border-b border-[#1F2937]">
             <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white font-bold text-sm">N</div>
             <div>
-              <div className="text-white font-semibold text-sm">Nishon AI</div>
+              <div className="text-white font-semibold text-sm">Performa</div>
               <div className="text-gray-400 text-xs">Kampaniya yordamchisi</div>
             </div>
             <div className="ml-auto w-2 h-2 rounded-full bg-emerald-400"></div>

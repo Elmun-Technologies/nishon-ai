@@ -191,7 +191,7 @@ export default function PortfolioDashboardPage() {
         {error && <Alert variant="error" className="mb-4">{error}</Alert>}
         <div className="bg-white border border-[#E5E7EB] rounded-xl p-4 mb-8 flex items-center gap-3">
           <span className="text-[#6B7280] text-sm flex-1 truncate">
-            nishon.ai/portfolio/{existingProfile.slug}
+            performa.ai/portfolio/{existingProfile.slug}
           </span>
           <button
             onClick={() => router.push(`/portfolio/${existingProfile.slug}`)}

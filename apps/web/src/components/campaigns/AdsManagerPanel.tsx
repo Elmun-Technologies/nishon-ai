@@ -1362,7 +1362,7 @@ export function AdsManagerPanel() {
                     <tr>
                       <th className="p-2 text-left">Facebook Ads Manager</th>
                       <th className="p-2 text-left">
-                        Nishon Business Dashboard
+                        Performa Business Dashboard
                       </th>
                     </tr>
                   </thead>

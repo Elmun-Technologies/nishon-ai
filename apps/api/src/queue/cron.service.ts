@@ -60,7 +60,7 @@ export class CronService implements OnModuleInit {
 
   /**
    * Evaluate all enabled triggersets every 30 minutes.
-   * This is what makes Nishon AI autonomous — rules fire without human input.
+   * This is what makes Performa autonomous — rules fire without human input.
    */
   @Cron("*/30 * * * *")
   async runTriggersets(): Promise<void> {

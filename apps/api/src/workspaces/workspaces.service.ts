@@ -16,7 +16,7 @@ import {
   CreateWorkspaceDto,
   UpdateWorkspaceDto,
   UpdateAutopilotDto,
-} from "@nishon/shared";
+} from "@performa/shared";
 
 @Injectable()
 export class WorkspacesService {

@@ -9,7 +9,7 @@ import { Repository } from "typeorm";
 import { ConfigService } from "@nestjs/config";
 import * as bcrypt from "bcryptjs";
 import { User } from "../users/entities/user.entity";
-import { RegisterDto, LoginDto, AuthResponseDto } from "@nishon/shared";
+import { RegisterDto, LoginDto, AuthResponseDto } from "@performa/shared";
 
 @Injectable()
 export class AuthService {

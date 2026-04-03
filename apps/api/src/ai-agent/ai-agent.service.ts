@@ -14,7 +14,7 @@ import {
 import { DecisionLoopService } from "./decision-loop.service";
 import { AiDecision } from "../ai-decisions/entities/ai-decision.entity";
 import { ConfigService } from "@nestjs/config";
-import { NishonAiClient } from "@nishon/ai-sdk";
+import { PerformaAiClient } from "@performa/ai-sdk";
 
 /**
  * AiAgentService is the public facade for all AI capabilities.
@@ -29,7 +29,7 @@ import { NishonAiClient } from "@nishon/ai-sdk";
 @Injectable()
 export class AiAgentService {
   private readonly logger = new Logger(AiAgentService.name);
-  private readonly aiClient: NishonAiClient;
+  private readonly aiClient: PerformaAiClient;
 
   constructor(
     private readonly strategyEngine: StrategyEngineService,
@@ -47,7 +47,7 @@ export class AiAgentService {
     const baseURL = provider === "anthropic"
       ? this.config.get<string>("ANTHROPIC_BASE_URL", "")
       : this.config.get<string>("OPENAI_BASE_URL", "");
-    this.aiClient = new NishonAiClient(apiKey, baseURL || undefined, provider);
+    this.aiClient = new PerformaAiClient(apiKey, baseURL || undefined, provider);
   }
 
   async generateStrategy(workspaceId: string): Promise<StrategyResult> {
@@ -111,7 +111,7 @@ export class AiAgentService {
     message: string;
     history?: { role: "user" | "assistant"; content: string }[];
   }): Promise<{ reply: string }> {
-    const systemPrompt = `You are Nishon AI — a helpful advertising assistant for the Nishon AI platform.
+    const systemPrompt = `You are Performa — a helpful advertising assistant for the Performa platform.
 You help users understand their Meta ad campaign performance, troubleshoot errors, and optimize their strategy.
 You have knowledge about Meta Ads (Facebook/Instagram), campaign budgets, CTR, ROAS, CPM, CPC metrics.
 Answer in the same language the user writes in (Uzbek, Russian, or English).

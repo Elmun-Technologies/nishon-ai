@@ -3,28 +3,28 @@ version: '3.8'
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: nishon-ai-postgres
+    container_name: performa-ai-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: nishon_ai_db
-      POSTGRES_USER: nishon
-      POSTGRES_PASSWORD: nishon_secret
+      POSTGRES_DB: performa_ai_db
+      POSTGRES_USER: performa
+      POSTGRES_PASSWORD: performa_secret
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U nishon -d nishon_ai_db"]
+      test: ["CMD-SHELL", "pg_isready -U performa -d performa_ai_db"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 30s
     networks:
-      - nishon-ai-network
+      - performa-ai-network
 
   redis:
     image: redis:7-alpine
-    container_name: nishon-ai-redis
+    container_name: performa-ai-redis
     restart: unless-stopped
     ports:
       - "6379:6379"
@@ -37,18 +37,18 @@ services:
       retries: 3
       start_period: 30s
     networks:
-      - nishon-ai-network
+      - performa-ai-network
 
   api:
     build:
       context: ./apps/api
       dockerfile: Dockerfile
-    container_name: nishon-ai-api
+    container_name: performa-ai-api
     restart: unless-stopped
     ports:
       - "3001:3001"
     environment:
-      - DATABASE_URL=postgresql://nishon:nishon_secret@postgres:5432/nishon_ai_db
+      - DATABASE_URL=postgresql://performa:performa_secret@postgres:5432/performa_ai_db
       - REDIS_URL=redis://redis:6379
       - JWT_SECRET=${JWT_SECRET:?JWT_SECRET must be set in .env}
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:?JWT_REFRESH_SECRET must be set in .env}
@@ -74,13 +74,13 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - nishon-ai-network
+      - performa-ai-network
 
   web:
     build:
       context: ./apps/web
       dockerfile: Dockerfile
-    container_name: nishon-ai-web
+    container_name: performa-ai-web
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -90,12 +90,12 @@ services:
     depends_on:
       - api
     networks:
-      - nishon-ai-network
+      - performa-ai-network
 
 volumes:
   postgres_data:
   redis_data:
 
 networks:
-  nishon-ai-network:
+  performa-ai-network:
     driver: bridge

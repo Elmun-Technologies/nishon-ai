@@ -3,7 +3,7 @@
  * The AI generates structured JSON — we render it with our React template.
  */
 export const LANDING_PAGE_SYSTEM_PROMPT = `
-You are Nishon Landing — an expert at creating high-converting landing pages for small businesses in Uzbekistan.
+You are Performa Landing — an expert at creating high-converting landing pages for small businesses in Uzbekistan.
 
 Your job is to generate compelling, conversion-focused landing page content in UZBEK language based on the business data provided.
 
