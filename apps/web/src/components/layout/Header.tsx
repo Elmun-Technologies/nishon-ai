@@ -15,6 +15,10 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
     title: 'Audience Launcher',
     subtitle: 'Build and launch full-funnel audiences with AI-assisted presets',
   },
+  '/platform-architecture': {
+    title: 'Platform Blueprint',
+    subtitle: 'Full multi-network architecture, modules, roadmap, and execution checklist',
+  },
   '/ai-decisions': {
     title: 'AI Decisions',
     subtitle: 'Every action the AI has taken — with full reasoning',

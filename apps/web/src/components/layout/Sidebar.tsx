@@ -45,6 +45,16 @@ const NAV_ITEMS = [
     ),
   },
   {
+    href: '/platform-architecture',
+    label: 'Platform Blueprint',
+    icon: (
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path d="M3 5h18M3 12h18M3 19h18" />
+        <path d="M7 5v14M17 5v14" />
+      </svg>
+    ),
+  },
+  {
     href: '/reporting',
     label: 'Hisobot',
     icon: (
