@@ -192,11 +192,11 @@ export function useInjectSeoMetadata(metadata: SeoMetadata | null) {
     updateMetaTag('twitter:image', metadata.twitterImage)
 
     // Update canonical URL
-    let canonical = document.querySelector("link[rel='canonical']")
+    let canonical = document.querySelector("link[rel='canonical']") as HTMLLinkElement | null
     if (canonical) {
       canonical.setAttribute('href', metadata.canonicalUrl)
     } else {
-      canonical = document.createElement('link')
+      canonical = document.createElement('link') as HTMLLinkElement
       canonical.rel = 'canonical'
       canonical.href = metadata.canonicalUrl
       document.head.appendChild(canonical)

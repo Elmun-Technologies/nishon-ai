@@ -13,20 +13,22 @@ export function useMarketplaceFilters(initialFilters: FilterCriteria = {}) {
 
   // Load filters from URL on mount
   useEffect(() => {
-    const urlFilters: FilterCriteria = {}
+    const urlFilters: any = {}
 
     searchParams.forEach((value, key) => {
-      if (key === 'platforms' || key === 'niches' || key === 'certifications' || key === 'languages') {
-        urlFilters[key as keyof FilterCriteria] = searchParams.getAll(key) as string[]
+      if (key === 'platforms' || key === 'niches' || key === 'certifications' || key === 'languages' || key === 'countries') {
+        urlFilters[key] = searchParams.getAll(key)
       } else if (key === 'minRating' || key === 'minExperience' || key === 'minBudget' || key === 'maxBudget' || key === 'minROAS') {
-        urlFilters[key as keyof FilterCriteria] = parseFloat(value)
+        urlFilters[key] = parseFloat(value)
       } else {
-        urlFilters[key as keyof FilterCriteria] = value
+        urlFilters[key] = value
       }
     })
 
+    const filteredFilters: FilterCriteria = urlFilters
+
     if (Object.keys(urlFilters).length > 0) {
-      setFilters(urlFilters)
+      setFilters(filteredFilters)
     } else {
       // Try to load from localStorage
       const saved = localStorage.getItem(FILTER_STORAGE_KEY)
