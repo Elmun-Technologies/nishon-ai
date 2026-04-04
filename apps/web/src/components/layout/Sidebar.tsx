@@ -16,74 +16,50 @@ import {
   Sparkles,
   TrendingUp,
   ShoppingBag,
+  ChevronDown,
 } from 'lucide-react'
 
-const NAV_ITEMS = [
+// Organize items by category
+const CATEGORIES = [
   {
-    href: '/dashboard',
-    label: 'Dashboard',
-    icon: LayoutGrid,
-  },
-  {
-    href: '/launch',
-    label: 'Reklama Yoqish',
+    id: 'advertising',
+    label: 'Reklama',
     icon: Rocket,
+    items: [
+      { href: '/launch', label: 'Yoqish', icon: Rocket },
+      { href: '/campaigns', label: 'Kampaniyalar', icon: Zap },
+      { href: '/marketplace', label: 'Marketplace', icon: ShoppingBag },
+    ],
   },
   {
-    href: '/campaigns',
-    label: 'Kampaniyalar',
-    icon: Zap,
-  },
-  {
-    href: '/reporting',
-    label: 'Hisobot',
+    id: 'analytics',
+    label: 'Analytics & Reports',
     icon: BarChart3,
+    items: [
+      { href: '/reporting', label: 'Hisobot', icon: BarChart3 },
+      { href: '/ai-decisions', label: 'AI Qarorlar', icon: Brain, badge: true },
+    ],
   },
   {
-    href: '/ai-decisions',
-    label: 'AI Qarorlar',
-    icon: Brain,
-    badge: true,
-  },
-  {
-    href: '/budget',
-    label: 'Byudjet',
-    icon: Wallet,
-  },
-  {
-    href: '/auto-optimization',
-    label: 'Auto-Optimallashtirish',
+    id: 'optimization',
+    label: 'Optimization',
     icon: Settings2,
+    items: [
+      { href: '/budget', label: 'Byudjet', icon: Wallet },
+      { href: '/auto-optimization', label: 'Auto-Optimizatsiya', icon: Settings2 },
+      { href: '/roi-calculator', label: 'ROI Kalkulyator', icon: BarChart3 },
+    ],
   },
   {
-    href: '/competitors',
-    label: 'Raqobatchilar',
-    icon: Users,
-  },
-  {
-    href: '/creative-scorer',
-    label: 'Kreativ Baholash',
+    id: 'tools',
+    label: 'Tools & Resources',
     icon: Sparkles,
-  },
-  {
-    href: '/landing-page',
-    label: 'Landing Page',
-    icon: TrendingUp,
-  },
-  {
-    href: '/roi-calculator',
-    label: 'ROI Kalkulyator',
-    icon: BarChart3,
-  },
-  {
-    href: '/my-portfolio',
-    label: 'Portfolio',
-    icon: TrendingUp,
-  },
-  {
-    href: '/marketplace',
-    label: 'Marketplace',
-    icon: ShoppingBag,
+    items: [
+      { href: '/creative-scorer', label: 'Kreativ Baholash', icon: Sparkles },
+      { href: '/competitors', label: 'Raqobatchilar', icon: Users },
+      { href: '/landing-page', label: 'Landing Page', icon: TrendingUp },
+      { href: '/my-portfolio', label: 'Portfolio', icon: TrendingUp },
+    ],
   },
 ]
 
@@ -99,7 +75,19 @@ export default function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const { currentWorkspace, user, logout } = useWorkspaceStore()
-  const [isWorkspaceMenuOpen, setIsWorkspaceMenuOpen] = useState(true)
+  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({
+    advertising: true,
+    analytics: true,
+    optimization: true,
+    tools: true,
+  })
+
+  function toggleCategory(categoryId: string) {
+    setExpandedCategories((prev) => ({
+      ...prev,
+      [categoryId]: !prev[categoryId],
+    }))
+  }
 
   function handleLogout() {
     logout()
@@ -110,7 +98,6 @@ export default function Sidebar() {
     <aside className="w-64 bg-surface border-r border-border flex flex-col shrink-0">
       {/* Header */}
       <div className="px-6 py-5 border-b border-border">
-        {/* Logo */}
         <div className="flex items-center gap-3 mb-1">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center shrink-0">
             <span className="text-white font-bold text-sm">P</span>
@@ -124,112 +111,91 @@ export default function Sidebar() {
         )}
       </div>
 
-      {/* Main Navigation */}
-      <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
-        {/* Dashboard - Always visible */}
-        {NAV_ITEMS.slice(0, 1).map((item) => {
-          const Icon = item.icon
-          const isActive =
-            item.href === '/dashboard'
-              ? pathname === '/dashboard'
-              : pathname.startsWith(item.href)
+      {/* Main Navigation - No scroll */}
+      <nav className="flex-1 px-2 py-4 space-y-3 overflow-hidden">
+        {/* Dashboard */}
+        <Link
+          href="/dashboard"
+          className={`
+            flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm
+            transition-all duration-150 group
+            ${
+              pathname === '/dashboard'
+                ? 'bg-surface-secondary text-text-primary'
+                : 'text-text-secondary hover:text-text-primary hover:bg-surface-secondary'
+            }
+          `}
+        >
+          <LayoutGrid
+            size={18}
+            className={`shrink-0 transition-colors ${
+              pathname === '/dashboard' ? 'text-text-primary' : 'text-text-tertiary group-hover:text-text-secondary'
+            }`}
+            strokeWidth={1.5}
+          />
+          <span className="flex-1 font-medium text-body-sm">Dashboard</span>
+        </Link>
+
+        {/* Categories */}
+        {CATEGORIES.map((category) => {
+          const isExpanded = expandedCategories[category.id]
+          const Icon = category.icon
 
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`
-                flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm
-                transition-all duration-150 group
-                ${
-                  isActive
-                    ? 'bg-surface-secondary text-text-primary'
-                    : 'text-text-secondary hover:text-text-primary hover:bg-surface-secondary'
-                }
-              `}
-            >
-              <Icon
-                size={18}
-                className={`shrink-0 transition-colors ${
-                  isActive ? 'text-text-primary' : 'text-text-tertiary group-hover:text-text-secondary'
-                }`}
-                strokeWidth={1.5}
-              />
-              <span className="flex-1 truncate font-medium text-body-sm">{item.label}</span>
-              {item.badge && (
-                <div className="w-2 h-2 rounded-full bg-blue-500 shrink-0 animate-pulse" />
+            <div key={category.id} className="space-y-1">
+              <button
+                onClick={() => toggleCategory(category.id)}
+                className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm
+                  transition-all duration-150 text-text-secondary hover:text-text-primary"
+              >
+                <Icon size={16} strokeWidth={1.5} className="shrink-0" />
+                <span className="flex-1 text-left font-medium text-body-sm">{category.label}</span>
+                <ChevronDown
+                  size={16}
+                  className={`shrink-0 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
+                />
+              </button>
+
+              {/* Subcategory Items */}
+              {isExpanded && (
+                <div className="space-y-1 pl-2">
+                  {category.items.map((item) => {
+                    const ItemIcon = item.icon
+                    const isActive = pathname.startsWith(item.href)
+
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className={`
+                          flex items-center gap-3 px-3 py-2 rounded-lg text-sm
+                          transition-all duration-150 group
+                          ${
+                            isActive
+                              ? 'bg-surface-secondary text-text-primary'
+                              : 'text-text-secondary hover:text-text-primary hover:bg-surface-secondary'
+                          }
+                        `}
+                      >
+                        <ItemIcon
+                          size={16}
+                          className={`shrink-0 transition-colors ${
+                            isActive ? 'text-text-primary' : 'text-text-tertiary group-hover:text-text-secondary'
+                          }`}
+                          strokeWidth={1.5}
+                        />
+                        <span className="flex-1 truncate font-medium text-body-sm">{item.label}</span>
+                        {item.badge && (
+                          <div className="w-2 h-2 rounded-full bg-blue-500 shrink-0 animate-pulse" />
+                        )}
+                      </Link>
+                    )
+                  })}
+                </div>
               )}
-            </Link>
+            </div>
           )
         })}
-
-        {/* Collapsible Workspace Menu */}
-        <div className="space-y-1">
-          <button
-            onClick={() => setIsWorkspaceMenuOpen(!isWorkspaceMenuOpen)}
-            className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm
-              transition-all duration-150 group
-              bg-surface-secondary hover:bg-border text-text-primary font-medium"
-          >
-            <span className="flex-1 text-left text-body-sm">
-              {currentWorkspace?.name ?? 'Workspace'}
-            </span>
-            <svg
-              width="16"
-              height="16"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-              className={`text-text-secondary transition-transform duration-300 shrink-0 ${
-                isWorkspaceMenuOpen ? 'rotate-180' : ''
-              }`}
-            >
-              <path d="M6 9l6 6 6-6" />
-            </svg>
-          </button>
-
-          {/* Collapsible Items */}
-          {isWorkspaceMenuOpen && (
-            <div className="space-y-1 pl-2">
-              {NAV_ITEMS.slice(1).map((item) => {
-                const Icon = item.icon
-                const isActive = pathname.startsWith(item.href)
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`
-                      flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm
-                      transition-all duration-150 group
-                      ${
-                        isActive
-                          ? 'bg-surface-secondary text-text-primary'
-                          : 'text-text-secondary hover:text-text-primary hover:bg-surface-secondary'
-                      }
-                    `}
-                  >
-                    <Icon
-                      size={18}
-                      className={`shrink-0 transition-colors ${
-                        isActive
-                          ? 'text-text-primary'
-                          : 'text-text-tertiary group-hover:text-text-secondary'
-                      }`}
-                      strokeWidth={1.5}
-                    />
-                    <span className="flex-1 truncate font-medium text-body-sm">
-                      {item.label}
-                    </span>
-                    {item.badge && (
-                      <div className="w-2 h-2 rounded-full bg-blue-500 shrink-0 animate-pulse" />
-                    )}
-                  </Link>
-                )
-              })}
-            </div>
-          )}
-        </div>
       </nav>
 
       {/* Autopilot Status */}
