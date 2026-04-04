@@ -1,4 +1,5 @@
 'use client'
+import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useWorkspaceStore } from '@/stores/workspace.store'
@@ -158,6 +159,7 @@ export default function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const { currentWorkspace, user, logout } = useWorkspaceStore()
+  const [isWorkspaceMenuOpen, setIsWorkspaceMenuOpen] = useState(true)
 
   function handleLogout() {
     logout()
@@ -215,37 +217,50 @@ export default function Sidebar() {
           )
         })}
 
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 p-2.5 transition-colors">
-          <div className="flex items-center justify-between px-2 py-1.5 text-slate-900 dark:text-slate-50">
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 transition-colors">
+          <button
+            onClick={() => setIsWorkspaceMenuOpen(!isWorkspaceMenuOpen)}
+            className="w-full flex items-center justify-between px-2.5 py-1.5 text-slate-900 dark:text-slate-50 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors rounded-t-2xl"
+          >
             <p className="text-sm font-medium">{currentWorkspace?.name ?? 'PR Workspace'}</p>
-            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} className="text-slate-600 dark:text-slate-400">
+            <svg
+              width="16"
+              height="16"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+              className={`text-slate-600 dark:text-slate-400 transition-transform duration-300 ${isWorkspaceMenuOpen ? 'rotate-180' : ''}`}
+            >
               <path d="M6 9l6 6 6-6" />
             </svg>
-          </div>
-          <div className="space-y-1 mt-1">
-            {NAV_ITEMS.slice(1, 7).map((item) => {
-              const isActive = pathname.startsWith(item.href)
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`
-                    flex items-center gap-3 px-2.5 py-2.5 rounded-xl text-sm transition-all duration-150 group
-                    ${isActive
-                      ? 'bg-white dark:bg-slate-900 dark:bg-slate-700 text-slate-900 dark:text-slate-50 font-medium shadow-sm'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 hover:bg-white dark:bg-slate-900/90 dark:hover:bg-slate-700'
-                    }
-                  `}
-                >
-                  <span className={`shrink-0 ${isActive ? 'text-slate-900 dark:text-slate-50' : 'text-slate-500 dark:text-slate-600 group-hover:text-slate-700 dark:group-hover:text-slate-400'}`}>
-                    {item.icon}
-                  </span>
-                  <span className="flex-1 truncate">{item.label}</span>
-                  {item.badge && <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />}
-                </Link>
-              )
-            })}
-          </div>
+          </button>
+          {isWorkspaceMenuOpen && (
+            <div className="space-y-1 p-2.5 border-t border-slate-200 dark:border-slate-700">
+              {NAV_ITEMS.slice(1, 7).map((item) => {
+                const isActive = pathname.startsWith(item.href)
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`
+                      flex items-center gap-3 px-2.5 py-2.5 rounded-xl text-sm transition-all duration-150 group
+                      ${isActive
+                        ? 'bg-white dark:bg-slate-900 dark:bg-slate-700 text-slate-900 dark:text-slate-50 font-medium shadow-sm'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 hover:bg-white dark:bg-slate-900/90 dark:hover:bg-slate-700'
+                      }
+                    `}
+                  >
+                    <span className={`shrink-0 ${isActive ? 'text-slate-900 dark:text-slate-50' : 'text-slate-500 dark:text-slate-600 group-hover:text-slate-700 dark:group-hover:text-slate-400'}`}>
+                      {item.icon}
+                    </span>
+                    <span className="flex-1 truncate">{item.label}</span>
+                    {item.badge && <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />}
+                  </Link>
+                )
+              })}
+            </div>
+          )}
         </div>
 
         <div className="space-y-1">
