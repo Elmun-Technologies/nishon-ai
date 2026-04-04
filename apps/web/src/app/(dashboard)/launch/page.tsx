@@ -6,6 +6,7 @@ import { campaigns as campaignsApi } from '@/lib/api-client'
 import { Alert } from '@/components/ui/Alert'
 
 type Platform = 'meta' | 'google' | 'yandex'
+type LaunchMode = 'self' | 'ai' | 'expert'
 type MetaStep = 1 | 2 | 3 | 4 | 5
 type GoogleStep = 1 | 2 | 3 | 4 | 5
 type YandexStep = 1 | 2 | 3 | 4
@@ -20,8 +21,24 @@ export default function LaunchPage() {
   const router = useRouter()
   const { currentWorkspace } = useWorkspaceStore()
   const [platform, setPlatform] = useState<Platform | null>(null)
+  const [launchMode, setLaunchMode] = useState<LaunchMode>('self')
+  const [activeTab, setActiveTab] = useState<'drafts' | 'ai_drafts' | 'templates' | 'launches'>('drafts')
+  const [search, setSearch] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+
+  const handlePlatformPick = (nextPlatform: Platform) => {
+    if (launchMode === 'ai') {
+      router.push(`/create-agent?platform=${nextPlatform}`)
+      return
+    }
+    if (launchMode === 'expert') {
+      router.push(`/service?platform=${nextPlatform}`)
+      return
+    }
+    // Self-launch flow continues in the full wizard experience
+    router.push(`/wizard?platform=${nextPlatform}&launchMode=self`)
+  }
 
   // Meta form state
   const [metaStep, setMetaStep] = useState<MetaStep>(1)
@@ -129,17 +146,75 @@ export default function LaunchPage() {
 
   if (!platform) {
     return (
-      <div className="max-w-4xl mx-auto space-y-6 py-6">
-        <div>
-          <h1 className="text-2xl font-bold text-[#111827] mb-1">🚀 Reklama Yoqish</h1>
-          <p className="text-[#6B7280] text-sm">Platforma tanlang va qadamma-qadam reklama yoqing</p>
+      <div className="max-w-5xl mx-auto space-y-5 py-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-[#111827] mb-1">Campaigns</h1>
+            <p className="text-[#6B7280] text-sm">Create and launch campaigns at scale</p>
+          </div>
+          <button
+            onClick={() => setLaunchMode('self')}
+            className="px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold"
+          >
+            + New campaign
+          </button>
+        </div>
+
+        <div className="flex gap-6 border-b border-[#E5E7EB]">
+          {[
+            { id: 'drafts', label: 'Drafts' },
+            { id: 'ai_drafts', label: 'AI Drafts' },
+            { id: 'templates', label: 'Templates' },
+            { id: 'launches', label: 'Launches' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as typeof activeTab)}
+              className={`pb-3 text-sm font-medium border-b-2 ${
+                activeTab === tab.id ? 'border-[#111827] text-[#111827]' : 'border-transparent text-[#6B7280] hover:text-[#111827]'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search drafts..."
+          className="w-full md:w-[420px] border border-[#E5E7EB] rounded-xl px-4 py-2.5 text-sm"
+        />
+
+        <div className="rounded-2xl border border-[#E5E7EB] bg-white p-4">
+          <p className="text-xs text-[#6B7280] mb-3">Launch usuli</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {[
+              { id: 'self', title: "O'zim launch qilaman", desc: 'Wizard orqali qo‘lda sozlab ishga tushirish' },
+              { id: 'ai', title: "AI agent launch qilsin", desc: 'AI draft + avtomatik optimizatsiya oqimi' },
+              { id: 'expert', title: 'Marketplace mutaxassis', desc: 'Jonli ekspert natijalarini ko‘rib tanlash' },
+            ].map((mode) => (
+              <button
+                key={mode.id}
+                onClick={() => setLaunchMode(mode.id as LaunchMode)}
+                className={`text-left rounded-xl border p-3 transition-colors ${
+                  launchMode === mode.id
+                    ? 'border-[#111827] bg-[#F9FAFB]'
+                    : 'border-[#E5E7EB] hover:border-[#D1D5DB]'
+                }`}
+              >
+                <p className="text-sm font-semibold text-[#111827]">{mode.title}</p>
+                <p className="text-xs text-[#6B7280] mt-1">{mode.desc}</p>
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {PLATFORMS.map(p => (
             <button
               key={p.id}
-              onClick={() => setPlatform(p.id as Platform)}
+              onClick={() => handlePlatformPick(p.id as Platform)}
               className="group relative overflow-hidden rounded-2xl border-2 border-[#E5E7EB] bg-white p-6 text-left transition-all hover:border-[#D1D5DB] hover:shadow-lg"
             >
               <div className="absolute inset-0 bg-gradient-to-br opacity-0 transition-opacity group-hover:opacity-5" style={{
@@ -150,12 +225,23 @@ export default function LaunchPage() {
                 <p className="text-sm text-[#6B7280]">{p.desc}</p>
                 <div className="pt-3">
                   <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#374151]">
-                    Boshlash →
+                    {launchMode === 'self' ? 'Wizardni boshlash →' : launchMode === 'ai' ? 'AI agentga yuborish →' : 'Ekspertga yuborish →'}
                   </span>
                 </div>
               </div>
             </button>
           ))}
+        </div>
+
+        <div className="rounded-2xl border border-dashed border-[#E5E7EB] bg-[#FCFCFD] p-10 text-center">
+          <p className="text-xl font-bold text-[#111827] mb-2">No campaign drafts yet</p>
+          <p className="text-sm text-[#6B7280] mb-5">
+            Platforma tanlang va ishga tushirish usulini belgilang: self, AI agent yoki marketplace mutaxassis.
+          </p>
+          <div className="flex items-center justify-center gap-2 flex-wrap">
+            <button onClick={() => setLaunchMode('self')} className="px-4 py-2 rounded-xl bg-violet-600 text-white text-sm font-medium">+ Start a new campaign</button>
+            <button onClick={() => setLaunchMode('ai')} className="px-4 py-2 rounded-xl border border-[#E5E7EB] text-sm text-[#374151]">✧ Try AI Launch</button>
+          </div>
         </div>
       </div>
     )
