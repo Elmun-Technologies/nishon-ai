@@ -199,7 +199,7 @@ export default function LaunchPage() {
                 onClick={() => setLaunchMode(mode.id as LaunchMode)}
                 className={`text-left rounded-xl border p-3 transition-colors ${
                   launchMode === mode.id
-                    ? 'border-[#111827] bg-slate-50 dark:bg-slate-800'
+                    ? 'border-slate-900 dark:border-white bg-slate-50 dark:bg-slate-800'
                     : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:border-slate-600'
                 }`}
               >
@@ -289,7 +289,7 @@ export default function LaunchPage() {
                   onClick={() => setMetaData(d => ({ ...d, objective: opt.value }))}
                   className={`p-4 rounded-xl border-2 transition-all text-left ${
                     metaData.objective === opt.value
-                      ? 'border-[#111827] bg-slate-100 dark:bg-slate-800'
+                      ? 'border-slate-900 dark:border-white bg-slate-100 dark:bg-slate-800'
                       : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:border-slate-600'
                   }`}
                 >
@@ -469,7 +469,7 @@ export default function LaunchPage() {
                 { value: 'display', label: 'Displey', desc: 'Veb-saytlar va applarida' },
                 { value: 'smart', label: 'Smart', desc: 'AI avtomatik optimallashtirish' },
               ].map(opt => (
-                <button key={opt.value} onClick={() => setGoogleData(d => ({ ...d, campaignType: opt.value }))} className={`p-4 rounded-xl border-2 text-left transition-all ${googleData.campaignType === opt.value ? 'border-[#111827] bg-slate-100 dark:bg-slate-800' : 'border-slate-200 dark:border-slate-700'}`}>
+                <button key={opt.value} onClick={() => setGoogleData(d => ({ ...d, campaignType: opt.value }))} className={`p-4 rounded-xl border-2 text-left transition-all ${googleData.campaignType === opt.value ? 'border-slate-900 dark:border-white bg-slate-100 dark:bg-slate-800' : 'border-slate-200 dark:border-slate-700'}`}>
                   <div className="font-semibold text-slate-900 dark:text-slate-50">{opt.label}</div>
                   <div className="text-sm text-slate-500 dark:text-slate-400">{opt.desc}</div>
                 </button>
@@ -587,7 +587,7 @@ export default function LaunchPage() {
                 { value: 'search', label: 'Qidiruv', desc: 'Yandex qidiruv natijalarida' },
                 { value: 'smart', label: 'Smart bannerlar', desc: 'Avtomatik reklama joylarida' },
               ].map(opt => (
-                <button key={opt.value} onClick={() => setYandexData(d => ({ ...d, campaignType: opt.value }))} className={`p-4 rounded-xl border-2 text-left ${yandexData.campaignType === opt.value ? 'border-[#111827] bg-slate-100 dark:bg-slate-800' : 'border-slate-200 dark:border-slate-700'}`}>
+                <button key={opt.value} onClick={() => setYandexData(d => ({ ...d, campaignType: opt.value }))} className={`p-4 rounded-xl border-2 text-left ${yandexData.campaignType === opt.value ? 'border-slate-900 dark:border-white bg-slate-100 dark:bg-slate-800' : 'border-slate-200 dark:border-slate-700'}`}>
                   <div className="font-semibold">{opt.label}</div>
                   <div className="text-sm text-slate-500 dark:text-slate-400">{opt.desc}</div>
                 </button>
