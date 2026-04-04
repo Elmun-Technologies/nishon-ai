@@ -239,21 +239,21 @@ export function AdsManagerPanel() {
             Ads Manager 2.0
           </h2>
           <div className="flex flex-wrap items-center gap-2 justify-end">
-            <button className="px-4 py-2 rounded-lg border border-[#CBD5E1] text-sm bg-white">
+            <button className="px-4 py-2 rounded-lg border border-[#CBD5E1] text-sm bg-white dark:bg-slate-900">
               Filter Data
             </button>
             <button
               onClick={() => setShowSmartFilter(true)}
-              className="px-4 py-2 rounded-lg border border-[#CBD5E1] text-sm bg-white"
+              className="px-4 py-2 rounded-lg border border-[#CBD5E1] text-sm bg-white dark:bg-slate-900"
             >
               Smart Filter
             </button>
-            <button className="px-4 py-2 rounded-lg border border-[#CBD5E1] text-sm bg-white">
+            <button className="px-4 py-2 rounded-lg border border-[#CBD5E1] text-sm bg-white dark:bg-slate-900">
               Export PDF
             </button>
             <button
               onClick={() => setShowAutoReporting(true)}
-              className="px-4 py-2 rounded-lg border border-[#CBD5E1] text-sm bg-white"
+              className="px-4 py-2 rounded-lg border border-[#CBD5E1] text-sm bg-white dark:bg-slate-900"
             >
               Automated Reporting
             </button>
@@ -1554,11 +1554,11 @@ export function AdsManagerPanel() {
           </div>
           <input
             placeholder="Email"
-            className="w-full border border-[#D1D5DB] rounded-lg px-3 py-2 mb-2"
+            className="w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 mb-2"
           />
           <input
             placeholder="CC"
-            className="w-full border border-[#D1D5DB] rounded-lg px-3 py-2"
+            className="w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2"
           />
           <div className="mt-6 flex justify-end gap-2">
             <Button
@@ -1608,7 +1608,7 @@ export function AdsManagerPanel() {
           </div>
           <input
             placeholder="Select Country"
-            className="w-full border border-[#D1D5DB] rounded-lg px-3 py-2 mt-4"
+            className="w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 mt-4"
           />
           <div className="mt-6 flex justify-end gap-2">
             <Button
@@ -1763,7 +1763,7 @@ export function AdsManagerPanel() {
             </div>
             <div>
               <label className="text-sm text-[#64748B]">Link sharing</label>
-              <select className="mt-1 w-full border border-[#D1D5DB] rounded-lg px-3 py-2">
+              <select className="mt-1 w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2">
                 <option>Disabled link</option>
                 <option>Public link</option>
               </select>
@@ -1813,7 +1813,7 @@ function ModalShell({
 }) {
   return (
     <div className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center p-4">
-      <div className="w-full max-w-4xl bg-white rounded-2xl shadow-2xl border border-[#E2E8F0]">
+      <div className="w-full max-w-4xl bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-[#E2E8F0]">
         <div className="flex items-center justify-between px-6 py-4 border-b border-[#E2E8F0]">
           <h3 className="text-2xl text-[#0F172A] font-semibold">{title}</h3>
           <button
