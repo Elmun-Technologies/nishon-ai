@@ -142,10 +142,16 @@ export default function Sidebar() {
           const Icon = category.icon
 
           return (
-            <div key={category.id} className="space-y-1">
+            <div
+              key={category.id}
+              className={`rounded-2xl border transition-all duration-300 ${
+                isExpanded ? 'border-border bg-surface-secondary' : 'border-border bg-transparent'
+              }`}
+            >
+              {/* Category Header */}
               <button
                 onClick={() => toggleCategory(category.id)}
-                className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm
+                className="w-full flex items-center gap-2 px-3 py-2.5 text-sm
                   transition-all duration-150 text-text-secondary hover:text-text-primary"
               >
                 <Icon size={16} strokeWidth={1.5} className="shrink-0" />
@@ -156,9 +162,9 @@ export default function Sidebar() {
                 />
               </button>
 
-              {/* Subcategory Items */}
+              {/* Subcategory Items - Dropdown */}
               {isExpanded && (
-                <div className="space-y-1 pl-2">
+                <div className="space-y-1 px-2.5 pb-2.5 pt-0 border-t border-border">
                   {category.items.map((item) => {
                     const ItemIcon = item.icon
                     const isActive = pathname.startsWith(item.href)
@@ -168,12 +174,12 @@ export default function Sidebar() {
                         key={item.href}
                         href={item.href}
                         className={`
-                          flex items-center gap-3 px-3 py-2 rounded-lg text-sm
+                          flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm
                           transition-all duration-150 group
                           ${
                             isActive
-                              ? 'bg-surface-secondary text-text-primary'
-                              : 'text-text-secondary hover:text-text-primary hover:bg-surface-secondary'
+                              ? 'bg-surface text-text-primary'
+                              : 'text-text-secondary hover:text-text-primary hover:bg-surface'
                           }
                         `}
                       >
