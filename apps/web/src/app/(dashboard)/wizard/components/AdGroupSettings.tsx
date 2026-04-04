@@ -175,7 +175,7 @@ export function AdGroupSettings({
                 <option key={s.value} value={s.value}>{s.label}</option>
               ))}
             </Select>
-            <p className="text-xs text-[#6B7280] mt-1">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
               {SCENARIOS.find(s => s.value === formData.scenario)?.description}
             </p>
           </div>
@@ -229,7 +229,7 @@ export function AdGroupSettings({
                     {loc}
                     <button
                       onClick={() => removeGeoLocation(loc)}
-                      className="text-[#9CA3AF] hover:text-white ml-1"
+                      className="text-slate-400 dark:text-slate-500 hover:text-white ml-1"
                     >
                       ✕
                     </button>
@@ -239,7 +239,7 @@ export function AdGroupSettings({
             )}
 
             {geoLocations.length === 0 && (
-              <p className="text-xs text-[#6B7280]">Hech qaysi joy tanlanmagan</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Hech qaysi joy tanlanmagan</p>
             )}
           </div>
         )}
@@ -268,7 +268,7 @@ export function AdGroupSettings({
                   onFormDataChange('geoTargeting', { ...formData.geoTargeting, radiusKm: Number(e.target.value) })
                 }
               />
-              <p className="text-xs text-[#6B7280] mt-1">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                 Markazdan {formData.geoTargeting.radiusKm || 10} km radius
               </p>
             </div>
@@ -295,7 +295,7 @@ export function AdGroupSettings({
               />
               <div>
                 <Label htmlFor={id}>{label}</Label>
-                <p className="text-xs text-[#6B7280]">{desc}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{desc}</p>
               </div>
             </div>
           ))}
@@ -378,7 +378,7 @@ export function AdGroupSettings({
                     onFormDataChange('keywords', updated)
                   }}
                 />
-                <span className="text-xs text-[#9CA3AF]">Minus</span>
+                <span className="text-xs text-slate-400 dark:text-slate-500">Minus</span>
               </div>
               <button
                 onClick={() =>
@@ -430,7 +430,7 @@ export function AdGroupSettings({
                 onFormDataChange('interests', { ...formData.interests, custom: e.target.value })
               }
             />
-            <p className="text-xs text-[#6B7280] mt-1">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
               AI bu matnni platforma segmentlariga aylantiradi
             </p>
           </div>
@@ -438,7 +438,7 @@ export function AdGroupSettings({
           {/* Parsed interests chips */}
           {(parsedInterests.length > 0 || (formData.interests?.parsed ?? []).length > 0) && (
             <div>
-              <p className="text-xs text-[#9CA3AF] mb-2">Aniqlangan segmentlar:</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500 mb-2">Aniqlangan segmentlar:</p>
               <div className="flex flex-wrap gap-2">
                 {(parsedInterests.length > 0 ? parsedInterests : formData.interests?.parsed ?? []).map(
                   (seg: string) => (
@@ -477,7 +477,7 @@ export function AdGroupSettings({
                 />
                 <div>
                   <Label htmlFor={id}>{label}</Label>
-                  <p className="text-xs text-[#6B7280]">{desc}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">{desc}</p>
                 </div>
               </div>
             ))}
@@ -594,8 +594,8 @@ export function AdGroupSettings({
 
           <div>
             <h4 className="text-sm font-medium text-white mb-2">Targeting Logic</h4>
-            <div className="bg-[#F9FAFB] p-3 rounded-lg">
-              <p className="text-xs text-[#6B7280]">
+            <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 {activeSegments.length > 0
                   ? activeSegments.join(' OR ')
                   : 'Hech qaysi segment tanlanmagan'}
@@ -626,7 +626,7 @@ export function AdGroupSettings({
               {groupQuickLinks.map((link, i) => (
                 <div key={i} className="border border-[#374151] rounded-lg p-3 space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-xs text-[#9CA3AF]">Quick Link {i + 1}</span>
+                    <span className="text-xs text-slate-400 dark:text-slate-500">Quick Link {i + 1}</span>
                     {groupQuickLinks.length > 1 && (
                       <button onClick={() => removeGroupQuickLink(i)} className="text-xs text-[#EF4444]">
                         O'chirish
@@ -727,7 +727,7 @@ export function AdGroupSettings({
               value={formData.urlParams?.utmContent ?? ''}
               onChange={(e) => onFormDataChange('urlParams', { ...formData.urlParams, utmContent: e.target.value })}
             />
-            <p className="text-xs text-[#6B7280] mt-1">Dinamik: {'{ad_group_name}'}</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Dinamik: {'{ad_group_name}'}</p>
           </div>
           <div>
             <Label>Custom Parameters</Label>
@@ -750,13 +750,13 @@ export function AdGroupSettings({
             </Accordion.Trigger>
             <Accordion.Content>
               <div className="space-y-6 pt-4">
-                <p className="text-xs text-[#6B7280]">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
                   Bu sozlamalar kampaniya darajasidagi bid korreksiyalarini guruh uchun ustiga yozadi
                 </p>
 
                 {/* 1. Age/Gender */}
                 <div>
-                  <h4 className="text-xs font-medium text-[#9CA3AF] uppercase tracking-wider mb-3">1. Yosh va Jins</h4>
+                  <h4 className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">1. Yosh va Jins</h4>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <BidInput label="Erkak" value={groupBid.genderAge?.male ?? 1}
                       onChange={v => setGroupBid('genderAge', { ...groupBid.genderAge, male: v })} />
@@ -777,7 +777,7 @@ export function AdGroupSettings({
 
                 {/* 2. Devices */}
                 <div>
-                  <h4 className="text-xs font-medium text-[#9CA3AF] uppercase tracking-wider mb-3">2. Qurilmalar</h4>
+                  <h4 className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">2. Qurilmalar</h4>
                   <div className="grid grid-cols-3 gap-3">
                     <BidInput label="Mobil" value={groupBid.devices?.mobile ?? 1}
                       onChange={v => setGroupBid('devices', { ...groupBid.devices, mobile: v })} />
@@ -790,7 +790,7 @@ export function AdGroupSettings({
 
                 {/* 3. Audience */}
                 <div>
-                  <h4 className="text-xs font-medium text-[#9CA3AF] uppercase tracking-wider mb-3">3. Auditoriya</h4>
+                  <h4 className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">3. Auditoriya</h4>
                   <div className="grid grid-cols-3 gap-3">
                     <BidInput label="Retargeting" value={groupBid.audience?.retargeting ?? 1}
                       onChange={v => setGroupBid('audience', { ...groupBid.audience, retargeting: v })} />
@@ -803,7 +803,7 @@ export function AdGroupSettings({
 
                 {/* 4. Format */}
                 <div>
-                  <h4 className="text-xs font-medium text-[#9CA3AF] uppercase tracking-wider mb-3">4. Reklama Formati</h4>
+                  <h4 className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">4. Reklama Formati</h4>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <BidInput label="Image" value={groupBid.format?.image ?? 1}
                       onChange={v => setGroupBid('format', { ...groupBid.format, image: v })} />
@@ -818,7 +818,7 @@ export function AdGroupSettings({
 
                 {/* 5. Income */}
                 <div>
-                  <h4 className="text-xs font-medium text-[#9CA3AF] uppercase tracking-wider mb-3">5. Daromad darajasi</h4>
+                  <h4 className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">5. Daromad darajasi</h4>
                   <div className="grid grid-cols-3 gap-3">
                     <BidInput label="Past" value={groupBid.income?.low ?? 1}
                       onChange={v => setGroupBid('income', { ...groupBid.income, low: v })} />
@@ -831,7 +831,7 @@ export function AdGroupSettings({
 
                 {/* 6. Weather */}
                 <div>
-                  <h4 className="text-xs font-medium text-[#9CA3AF] uppercase tracking-wider mb-3">6. Ob-havo</h4>
+                  <h4 className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">6. Ob-havo</h4>
                   <div className="grid grid-cols-3 gap-3">
                     <BidInput label="Quyoshli" value={groupBid.weather?.sunny ?? 1}
                       onChange={v => setGroupBid('weather', { ...groupBid.weather, sunny: v })} />
@@ -844,7 +844,7 @@ export function AdGroupSettings({
 
                 {/* 7. KPI */}
                 <div>
-                  <h4 className="text-xs font-medium text-[#9CA3AF] uppercase tracking-wider mb-3">
+                  <h4 className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">
                     7. KPI Korreksiyasi
                     <span className="ml-2 text-[#6366F1] normal-case">(Target CPA/ROAS)</span>
                   </h4>

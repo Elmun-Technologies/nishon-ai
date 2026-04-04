@@ -99,10 +99,10 @@ export default function SimulationPage() {
 
       {/* ── Page header ── */}
       <div>
-        <h1 className="text-2xl font-bold text-[#111827] mb-1">
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50 mb-1">
           Simulation & Forecast
         </h1>
-        <p className="text-[#6B7280] text-sm">
+        <p className="text-slate-500 dark:text-slate-400 text-sm">
           Byudjetingizni o'zgartirsa qanday natijalar bo'lishini oldindan ko'ring
         </p>
       </div>
@@ -134,11 +134,11 @@ export default function SimulationPage() {
           {/* Budget slider */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <label className="text-[#111827] font-medium text-sm">
+              <label className="text-slate-900 dark:text-slate-50 font-medium text-sm">
                 Monthly budget
               </label>
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold text-[#374151]">
+                <span className="text-2xl font-bold text-slate-700 dark:text-slate-300">
                   {formatCurrency(budget)}
                 </span>
                 {budgetDelta !== 0 && (
@@ -159,7 +159,7 @@ export default function SimulationPage() {
               step={50}
               value={budget}
               onChange={(e) => setBudget(Number(e.target.value))}
-              className="w-full h-2 bg-[#F3F4F6] rounded-full appearance-none cursor-pointer
+              className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full appearance-none cursor-pointer
                 [&::-webkit-slider-thumb]:appearance-none
                 [&::-webkit-slider-thumb]:w-5
                 [&::-webkit-slider-thumb]:h-5
@@ -171,7 +171,7 @@ export default function SimulationPage() {
             />
 
             {/* Scale reference points */}
-            <div className="flex justify-between text-xs text-[#6B7280] mt-2">
+            <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 mt-2">
               <span>$50</span>
               <span>$500</span>
               <span>$1,000</span>
@@ -188,8 +188,8 @@ export default function SimulationPage() {
                   className={`
                     text-xs px-3 py-1.5 rounded-lg border transition-all duration-200
                     ${budget === preset
-                      ? 'border-[#111827] bg-[#F3F4F6] text-[#374151] font-medium'
-                      : 'border-[#E5E7EB] text-[#6B7280] hover:border-[#111827]/50 hover:text-[#111827]'
+                      ? 'border-[#111827] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium'
+                      : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-[#111827]/50 hover:text-slate-900 dark:text-slate-50'
                     }
                   `}
                 >
@@ -201,7 +201,7 @@ export default function SimulationPage() {
 
           {/* Scenario selector */}
           <div>
-            <label className="text-[#111827] font-medium text-sm block mb-3">
+            <label className="text-slate-900 dark:text-slate-50 font-medium text-sm block mb-3">
               Scenario
             </label>
             <div className="grid grid-cols-3 gap-3">
@@ -218,8 +218,8 @@ export default function SimulationPage() {
                     key: 'realistic',
                     label: '😊 Realistic',
                     desc: 'Based on industry averages for your market',
-                    color: 'border-[#E5E7EB] hover:border-[#D1D5DB]',
-                    active: 'border-[#111827] bg-[#F3F4F6]',
+                    color: 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:border-slate-600',
+                    active: 'border-[#111827] bg-slate-100 dark:bg-slate-800',
                   },
                   {
                     key: 'optimistic',
@@ -238,8 +238,8 @@ export default function SimulationPage() {
                     ${scenario === s.key ? s.active : s.color}
                   `}
                 >
-                  <p className="font-medium text-[#111827] text-sm mb-1">{s.label}</p>
-                  <p className="text-[#6B7280] text-xs leading-relaxed">{s.desc}</p>
+                  <p className="font-medium text-slate-900 dark:text-slate-50 text-sm mb-1">{s.label}</p>
+                  <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">{s.desc}</p>
                 </button>
               ))}
             </div>
@@ -251,7 +251,7 @@ export default function SimulationPage() {
       {projection && (
         <>
           <div>
-            <h2 className="text-[#111827] font-semibold mb-3 flex items-center gap-2">
+            <h2 className="text-slate-900 dark:text-slate-50 font-semibold mb-3 flex items-center gap-2">
               Projected Results
               <Badge
                 variant={
@@ -277,7 +277,7 @@ export default function SimulationPage() {
                   label: 'Est. Leads',
                   value: projection.leads,
                   sub: 'per month',
-                  color: 'text-[#111827]',
+                  color: 'text-slate-900 dark:text-slate-50',
                   icon: '🎯',
                 },
                 {
@@ -291,19 +291,19 @@ export default function SimulationPage() {
                   label: 'Est. CPA',
                   value: formatCurrency(projection.cpa),
                   sub: 'cost per acquisition',
-                  color: 'text-[#111827]',
+                  color: 'text-slate-900 dark:text-slate-50',
                   icon: '💰',
                 },
               ].map(({ label, value, sub, color, icon }) => (
                 <Card key={label}>
                   <div className="flex items-center gap-2 mb-3">
                     <span className="text-lg">{icon}</span>
-                    <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide">
+                    <p className="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wide">
                       {label}
                     </p>
                   </div>
                   <p className={`text-2xl font-bold ${color}`}>{value}</p>
-                  <p className="text-[#6B7280] text-xs mt-1">{sub}</p>
+                  <p className="text-slate-500 dark:text-slate-400 text-xs mt-1">{sub}</p>
                 </Card>
               ))}
             </div>
@@ -313,7 +313,7 @@ export default function SimulationPage() {
           <Card>
             <div className="flex items-center gap-2 mb-5">
               <span className="text-lg">📊</span>
-              <h2 className="font-semibold text-[#111827]">Platform Breakdown</h2>
+              <h2 className="font-semibold text-slate-900 dark:text-slate-50">Platform Breakdown</h2>
               <Badge variant="gray" size="sm">
                 {formatCurrency(budget)} total
               </Badge>
@@ -331,23 +331,23 @@ export default function SimulationPage() {
                             className="w-2.5 h-2.5 rounded-full"
                             style={{ backgroundColor: color }}
                           />
-                          <span className="text-[#111827] text-sm capitalize font-medium">
+                          <span className="text-slate-900 dark:text-slate-50 text-sm capitalize font-medium">
                             {platform}
                           </span>
-                          <span className="text-[#6B7280] text-xs">
+                          <span className="text-slate-500 dark:text-slate-400 text-xs">
                             {percentage}%
                           </span>
                         </div>
                         <div className="text-right">
-                          <span className="text-[#111827] text-sm font-medium">
+                          <span className="text-slate-900 dark:text-slate-50 text-sm font-medium">
                             {formatCurrency(spend)}
                           </span>
-                          <span className="text-[#6B7280] text-xs ml-2">
+                          <span className="text-slate-500 dark:text-slate-400 text-xs ml-2">
                             ~{estLeads} leads
                           </span>
                         </div>
                       </div>
-                      <div className="h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden">
+                      <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                         <div
                           className="h-full rounded-full transition-all duration-500"
                           style={{
@@ -368,10 +368,10 @@ export default function SimulationPage() {
             <div className="flex items-start gap-3 px-2">
               <span className="text-lg mt-0.5">💡</span>
               <div>
-                <p className="text-[#111827] text-sm font-medium mb-1">
+                <p className="text-slate-900 dark:text-slate-50 text-sm font-medium mb-1">
                   What this simulation tells you
                 </p>
-                <p className="text-[#6B7280] text-xs leading-relaxed">
+                <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">
                   These projections are based on your AI-generated strategy
                   and industry benchmarks for your market.
                   Actual results depend on creative quality, landing page

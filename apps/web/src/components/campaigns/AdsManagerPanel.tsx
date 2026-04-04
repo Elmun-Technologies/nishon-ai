@@ -239,21 +239,21 @@ export function AdsManagerPanel() {
             Ads Manager 2.0
           </h2>
           <div className="flex flex-wrap items-center gap-2 justify-end">
-            <button className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 text-sm bg-white dark:bg-slate-900">
+            <button className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 text-sm bg-white dark:bg-slate-900 dark:bg-slate-900">
               Filter Data
             </button>
             <button
               onClick={() => setShowSmartFilter(true)}
-              className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 text-sm bg-white dark:bg-slate-900"
+              className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 text-sm bg-white dark:bg-slate-900 dark:bg-slate-900"
             >
               Smart Filter
             </button>
-            <button className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 text-sm bg-white dark:bg-slate-900">
+            <button className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 text-sm bg-white dark:bg-slate-900 dark:bg-slate-900">
               Export PDF
             </button>
             <button
               onClick={() => setShowAutoReporting(true)}
-              className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 text-sm bg-white dark:bg-slate-900"
+              className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 text-sm bg-white dark:bg-slate-900 dark:bg-slate-900"
             >
               Automated Reporting
             </button>
@@ -1813,7 +1813,7 @@ function ModalShell({
 }) {
   return (
     <div className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center p-4">
-      <div className="w-full max-w-4xl bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700">
+      <div className="w-full max-w-4xl bg-white dark:bg-slate-900 dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700">
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-700">
           <h3 className="text-2xl text-slate-900 dark:text-slate-50 font-semibold">{title}</h3>
           <button

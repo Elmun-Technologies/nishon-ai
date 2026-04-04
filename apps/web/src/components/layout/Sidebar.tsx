@@ -199,8 +199,8 @@ export default function Sidebar() {
                 flex items-center gap-3 px-3 py-3 rounded-xl text-sm
                 transition-all duration-150 group
                 ${isActive
-                  ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-50 font-medium shadow-sm'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 hover:bg-white dark:hover:bg-slate-800'
+                  ? 'bg-white dark:bg-slate-900 dark:bg-slate-800 text-slate-900 dark:text-slate-50 font-medium shadow-sm'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 hover:bg-white dark:bg-slate-900 dark:hover:bg-slate-800'
                 }
               `}
             >
@@ -232,8 +232,8 @@ export default function Sidebar() {
                   className={`
                     flex items-center gap-3 px-2.5 py-2.5 rounded-xl text-sm transition-all duration-150 group
                     ${isActive
-                      ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-50 font-medium shadow-sm'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 hover:bg-white/90 dark:hover:bg-slate-700'
+                      ? 'bg-white dark:bg-slate-900 dark:bg-slate-700 text-slate-900 dark:text-slate-50 font-medium shadow-sm'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 hover:bg-white dark:bg-slate-900/90 dark:hover:bg-slate-700'
                     }
                   `}
                 >
@@ -258,8 +258,8 @@ export default function Sidebar() {
                 className={`
                   flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-150 group
                   ${isActive
-                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-50 font-medium shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 hover:bg-white dark:hover:bg-slate-700'
+                    ? 'bg-white dark:bg-slate-900 dark:bg-slate-700 text-slate-900 dark:text-slate-50 font-medium shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 hover:bg-white dark:bg-slate-900 dark:hover:bg-slate-700'
                   }
                 `}
               >
@@ -276,7 +276,7 @@ export default function Sidebar() {
       {/* Autopilot status */}
       {currentWorkspace && (
         <div className="px-3 pb-3">
-          <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 transition-colors">
+          <div className="bg-white dark:bg-slate-900 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 transition-colors">
             <div className="flex items-center gap-2">
               <div
                 className={`w-1.5 h-1.5 rounded-full shrink-0 ${
@@ -318,8 +318,8 @@ export default function Sidebar() {
                 flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm
                 transition-all duration-150 group
                 ${isActive
-                  ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-50 font-medium'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 hover:bg-white dark:hover:bg-slate-800'
+                  ? 'bg-white dark:bg-slate-900 dark:bg-slate-800 text-slate-900 dark:text-slate-50 font-medium'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 hover:bg-white dark:bg-slate-900 dark:hover:bg-slate-800'
                 }
               `}
             >

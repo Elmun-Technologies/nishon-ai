@@ -40,10 +40,10 @@ export function LearningMonitor({ workspaceId }: Props) {
   }))
 
   return (
-    <div className="bg-white border border-[#E5E7EB] rounded-2xl p-5">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-5">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-[#111827]">Learning Monitor</h3>
-        <span className="text-xs text-[#9CA3AF]">Kampaniyalar</span>
+        <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-50">Learning Monitor</h3>
+        <span className="text-xs text-slate-400 dark:text-slate-500">Kampaniyalar</span>
       </div>
 
       {loading ? (
@@ -63,7 +63,7 @@ export function LearningMonitor({ workspaceId }: Props) {
             />
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center mt-1">
-                <div className="text-lg font-bold text-[#111827]">{data?.total ?? 0}</div>
+                <div className="text-lg font-bold text-slate-900 dark:text-slate-50">{data?.total ?? 0}</div>
               </div>
             </div>
           </div>
@@ -74,9 +74,9 @@ export function LearningMonitor({ workspaceId }: Props) {
               <div key={l.key} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: l.color }} />
-                  <span className="text-xs text-[#6B7280]">{l.label}</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">{l.label}</span>
                 </div>
-                <span className="text-xs font-semibold text-[#111827]">{data?.[l.key] ?? 0}</span>
+                <span className="text-xs font-semibold text-slate-900 dark:text-slate-50">{data?.[l.key] ?? 0}</span>
               </div>
             ))}
           </div>

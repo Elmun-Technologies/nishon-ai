@@ -99,8 +99,8 @@ function PlatformCard({ platform, selected, onToggle }: PlatformCardProps) {
       className={`
         relative w-full text-left p-5 rounded-2xl border transition-all duration-200 cursor-pointer
         ${selected
-          ? 'border-opacity-60 bg-white'
-          : 'border-[#E5E7EB] bg-white hover:border-[#E5E7EB] hover:bg-white'
+          ? 'border-opacity-60 bg-white dark:bg-slate-900'
+          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-slate-200 dark:border-slate-700 hover:bg-white dark:bg-slate-900'
         }
       `}
       style={selected ? {
@@ -143,9 +143,9 @@ function PlatformCard({ platform, selected, onToggle }: PlatformCardProps) {
       {/* Platform info */}
       <div>
         <div className="flex items-center gap-2 mb-1">
-          <span className="text-sm font-semibold text-[#111827]">{platform.name}</span>
+          <span className="text-sm font-semibold text-slate-900 dark:text-slate-50">{platform.name}</span>
         </div>
-        <p className="text-xs text-[#6B7280] leading-relaxed">{platform.description}</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{platform.description}</p>
 
         {/* Status badge */}
         <div className="mt-3">
@@ -215,7 +215,7 @@ export function PlatformSelector({
 
       {/* Selection summary */}
       {selected.length > 0 && (
-        <div className="mt-4 p-3 rounded-xl bg-white border border-[#E5E7EB] flex items-center gap-3">
+        <div className="mt-4 p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center gap-3">
           <div className="flex -space-x-2">
             {selected.map((id) => {
               const p = platforms.find((pl) => pl.id === id)!
@@ -231,14 +231,14 @@ export function PlatformSelector({
               )
             })}
           </div>
-          <p className="text-xs text-[#9CA3AF]">
-            <span className="text-[#111827] font-medium">{selected.length}</span> ta platforma tanlandi
+          <p className="text-xs text-slate-400 dark:text-slate-500">
+            <span className="text-slate-900 dark:text-slate-50 font-medium">{selected.length}</span> ta platforma tanlandi
           </p>
         </div>
       )}
 
       {selected.length === 0 && (
-        <p className="mt-4 text-xs text-center text-[#6B7280]">
+        <p className="mt-4 text-xs text-center text-slate-500 dark:text-slate-400">
           Kamida {minSelect} ta platformani tanlang
         </p>
       )}

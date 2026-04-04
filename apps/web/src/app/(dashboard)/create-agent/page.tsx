@@ -125,8 +125,8 @@ export default function CreateAgentPage() {
 
       {/* Header */}
       <div>
-        <h1 className="text-xl font-bold text-[#111827]">AI Agent yaratish</h1>
-        <p className="text-[#6B7280] text-sm mt-1">
+        <h1 className="text-xl font-bold text-slate-900 dark:text-slate-50">AI Agent yaratish</h1>
+        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
           O'zingizning AI targetolog agentingizni konfigurlang va marketplace'ga chiqaring
         </p>
       </div>
@@ -136,11 +136,11 @@ export default function CreateAgentPage() {
         {[1, 2, 3].map(s => (
           <div key={s} className="flex items-center gap-2">
             <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-              step > s ? 'bg-emerald-500 text-white' : step === s ? 'bg-[#111827] text-white' : 'bg-[#E5E7EB] text-[#9CA3AF]'
+              step > s ? 'bg-emerald-500 text-white' : step === s ? 'bg-[#111827] text-white' : 'bg-[#E5E7EB] text-slate-400 dark:text-slate-500'
             }`}>
               {step > s ? '✓' : s}
             </div>
-            <span className={`text-xs ${step === s ? 'text-[#111827] font-medium' : 'text-[#9CA3AF]'}`}>
+            <span className={`text-xs ${step === s ? 'text-slate-900 dark:text-slate-50 font-medium' : 'text-slate-400 dark:text-slate-500'}`}>
               {s === 1 ? 'Asosiy ma\'lumot' : s === 2 ? 'AI konfiguratsiya' : 'Nashr'}
             </span>
             {s < 3 && <div className="w-8 h-px bg-[#E5E7EB]" />}
@@ -152,18 +152,18 @@ export default function CreateAgentPage() {
 
       {/* ── STEP 1: Basic Info ── */}
       {step === 1 && (
-        <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 space-y-5">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 space-y-5">
 
           {/* Avatar selector */}
           <div>
-            <label className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider block mb-3">Agent belgisi</label>
+            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-3">Agent belgisi</label>
             <div className="flex gap-2 flex-wrap mb-3">
               {AVATAR_OPTIONS.map(emoji => (
                 <button
                   key={emoji}
                   onClick={() => setForm(f => ({ ...f, avatar: emoji }))}
                   className={`w-10 h-10 rounded-xl text-xl flex items-center justify-center transition-all border-2 ${
-                    form.avatar === emoji ? 'border-[#111827] bg-[#F3F4F6]' : 'border-transparent hover:border-[#E5E7EB]'
+                    form.avatar === emoji ? 'border-[#111827] bg-slate-100 dark:bg-slate-800' : 'border-transparent hover:border-slate-200 dark:border-slate-700'
                   }`}
                 >
                   {emoji}
@@ -189,46 +189,46 @@ export default function CreateAgentPage() {
                 {form.avatar}
               </div>
               <div>
-                <p className="text-sm font-medium text-[#111827]">{form.displayName || 'Agent nomi'}</p>
-                <p className="text-xs text-[#6B7280]">{form.title || 'Sarlavha'}</p>
+                <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{form.displayName || 'Agent nomi'}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{form.title || 'Sarlavha'}</p>
               </div>
             </div>
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider block mb-2">Agent nomi *</label>
+            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-2">Agent nomi *</label>
             <input
               value={form.displayName}
               onChange={e => setForm(f => ({ ...f, displayName: e.target.value }))}
               placeholder="Masalan: Meta Pro AI, E-commerce Optimizer"
-              className="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-4 py-3 text-sm text-[#111827] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#111827]/50"
+              className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-sm text-slate-900 dark:text-slate-50 placeholder:text-slate-400 dark:text-slate-500 focus:outline-none focus:border-[#111827]/50"
             />
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider block mb-2">Sarlavha *</label>
+            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-2">Sarlavha *</label>
             <input
               value={form.title}
               onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
               placeholder="Masalan: Meta & Instagram uchun AI performance agent"
-              className="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-4 py-3 text-sm text-[#111827] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#111827]/50"
+              className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-sm text-slate-900 dark:text-slate-50 placeholder:text-slate-400 dark:text-slate-500 focus:outline-none focus:border-[#111827]/50"
             />
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider block mb-2">Tavsif</label>
+            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-2">Tavsif</label>
             <textarea
               value={form.bio}
               onChange={e => setForm(f => ({ ...f, bio: e.target.value }))}
               placeholder="Bu agent nima qiladi, qanday natijalarga erishadi..."
               rows={3}
-              className="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-4 py-3 text-sm text-[#111827] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#111827]/50 resize-none"
+              className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-sm text-slate-900 dark:text-slate-50 placeholder:text-slate-400 dark:text-slate-500 focus:outline-none focus:border-[#111827]/50 resize-none"
             />
           </div>
 
           {/* Platforms */}
           <div>
-            <label className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider block mb-2">Platformalar *</label>
+            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-2">Platformalar *</label>
             <div className="flex flex-wrap gap-2">
               {PLATFORM_OPTIONS.map(p => (
                 <button
@@ -237,7 +237,7 @@ export default function CreateAgentPage() {
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
                     form.platforms.includes(p)
                       ? 'bg-[#111827] text-white border-[#111827]'
-                      : 'bg-[#F9FAFB] text-[#6B7280] border-[#E5E7EB] hover:border-[#D1D5DB]'
+                      : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:border-slate-600'
                   }`}
                 >
                   {p}
@@ -248,13 +248,13 @@ export default function CreateAgentPage() {
 
           {/* Niches */}
           <div>
-            <label className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider block mb-2">Niche ixtisoslashuv</label>
+            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-2">Niche ixtisoslashuv</label>
             <div className="flex flex-wrap gap-1.5 mb-2">
               {NICHE_OPTIONS.filter(n => !form.niches.includes(n)).slice(0, 8).map(n => (
                 <button
                   key={n}
                   onClick={() => setForm(f => ({ ...f, niches: [...f.niches, n] }))}
-                  className="text-[10px] px-2.5 py-1 rounded-lg bg-[#F3F4F6] text-[#6B7280] hover:bg-[#E5E7EB] transition-all"
+                  className="text-[10px] px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
                 >
                   + {n}
                 </button>
@@ -266,7 +266,7 @@ export default function CreateAgentPage() {
                 onChange={e => setNicheInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && addNiche()}
                 placeholder="Boshqa niche qo'shish (Enter)"
-                className="flex-1 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-3 py-2 text-xs text-[#111827] placeholder:text-[#9CA3AF] focus:outline-none"
+                className="flex-1 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-900 dark:text-slate-50 placeholder:text-slate-400 dark:text-slate-500 focus:outline-none"
               />
             </div>
             {form.niches.length > 0 && (
@@ -283,7 +283,7 @@ export default function CreateAgentPage() {
 
           {/* Pricing */}
           <div>
-            <label className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider block mb-2">Narx modeli</label>
+            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-2">Narx modeli</label>
             <div className="grid grid-cols-3 gap-2 mb-3">
               {[
                 { id: 'commission', label: 'Komissiya' },
@@ -296,7 +296,7 @@ export default function CreateAgentPage() {
                   className={`py-2 rounded-lg text-xs font-medium border transition-all ${
                     form.pricingModel === opt.id
                       ? 'bg-[#111827] text-white border-[#111827]'
-                      : 'bg-[#F9FAFB] text-[#6B7280] border-[#E5E7EB]'
+                      : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700'
                   }`}
                 >
                   {opt.label}
@@ -306,15 +306,15 @@ export default function CreateAgentPage() {
             <div className="flex gap-3">
               {(form.pricingModel === 'fixed' || form.pricingModel === 'hybrid') && (
                 <div className="flex items-center gap-1.5">
-                  <span className="text-xs text-[#6B7280]">$</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">$</span>
                   <input
                     type="number"
                     value={form.monthlyRate}
                     onChange={e => setForm(f => ({ ...f, monthlyRate: e.target.value }))}
                     placeholder="49"
-                    className="w-24 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-3 py-2 text-xs text-[#111827] focus:outline-none"
+                    className="w-24 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-900 dark:text-slate-50 focus:outline-none"
                   />
-                  <span className="text-xs text-[#6B7280]">/oy</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">/oy</span>
                 </div>
               )}
               {(form.pricingModel === 'commission' || form.pricingModel === 'hybrid') && (
@@ -324,9 +324,9 @@ export default function CreateAgentPage() {
                     value={form.commissionRate}
                     onChange={e => setForm(f => ({ ...f, commissionRate: e.target.value }))}
                     placeholder="8"
-                    className="w-20 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-3 py-2 text-xs text-[#111827] focus:outline-none"
+                    className="w-20 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-900 dark:text-slate-50 focus:outline-none"
                   />
-                  <span className="text-xs text-[#6B7280]">% komissiya</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">% komissiya</span>
                 </div>
               )}
             </div>
@@ -346,15 +346,15 @@ export default function CreateAgentPage() {
 
       {/* ── STEP 2: AI Config ── */}
       {step === 2 && (
-        <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 space-y-5">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 space-y-5">
           <div>
-            <h2 className="text-lg font-bold text-[#111827] mb-1">AI Konfiguratsiya</h2>
-            <p className="text-sm text-[#6B7280]">Agent qanday ishlashini sozlang</p>
+            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-50 mb-1">AI Konfiguratsiya</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Agent qanday ishlashini sozlang</p>
           </div>
 
           {/* Autopilot mode */}
           <div>
-            <label className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider block mb-3">Ish rejimi</label>
+            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-3">Ish rejimi</label>
             <div className="space-y-2">
               {AUTOPILOT_OPTIONS.map(opt => (
                 <button
@@ -362,16 +362,16 @@ export default function CreateAgentPage() {
                   onClick={() => setForm(f => ({ ...f, autopilotMode: opt.id }))}
                   className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
                     form.autopilotMode === opt.id
-                      ? 'border-[#111827] bg-[#F9FAFB]'
-                      : 'border-[#E5E7EB] hover:border-[#D1D5DB] bg-white'
+                      ? 'border-[#111827] bg-slate-50 dark:bg-slate-800/50'
+                      : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900'
                   }`}
                 >
                   <div className="flex items-center gap-2 mb-1">
                     <span>{opt.badge}</span>
-                    <span className="font-semibold text-sm text-[#111827]">{opt.label}</span>
+                    <span className="font-semibold text-sm text-slate-900 dark:text-slate-50">{opt.label}</span>
                     {form.autopilotMode === opt.id && <span className="text-xs text-emerald-600 ml-auto">✓ Tanlangan</span>}
                   </div>
-                  <p className="text-xs text-[#6B7280]">{opt.desc}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">{opt.desc}</p>
                 </button>
               ))}
             </div>
@@ -379,22 +379,22 @@ export default function CreateAgentPage() {
 
           {/* Min budget */}
           <div>
-            <label className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider block mb-2">Minimal byudjet ($/oy)</label>
+            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-2">Minimal byudjet ($/oy)</label>
             <div className="flex items-center gap-2">
-              <span className="text-[#6B7280] text-sm">$</span>
+              <span className="text-slate-500 dark:text-slate-400 text-sm">$</span>
               <input
                 type="number"
                 value={form.minManagedBudget}
                 onChange={e => setForm(f => ({ ...f, minManagedBudget: e.target.value }))}
-                className="w-32 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-3 py-2 text-sm text-[#111827] focus:outline-none"
+                className="w-32 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-slate-50 focus:outline-none"
               />
-              <span className="text-xs text-[#6B7280]">Bu summadan past byudjetlarda agent ishlamaydi</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400">Bu summadan past byudjetlarda agent ishlamaydi</span>
             </div>
           </div>
 
           {/* Decision frequency */}
           <div>
-            <label className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider block mb-2">Qaror qabul qilish chastotasi</label>
+            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-2">Qaror qabul qilish chastotasi</label>
             <div className="grid grid-cols-4 gap-2">
               {[1, 2, 4, 6].map(h => (
                 <button
@@ -403,22 +403,22 @@ export default function CreateAgentPage() {
                   className={`py-2 rounded-lg text-xs font-medium border transition-all ${
                     form.decisionFrequencyHours === String(h)
                       ? 'bg-[#111827] text-white border-[#111827]'
-                      : 'bg-[#F9FAFB] text-[#6B7280] border-[#E5E7EB]'
+                      : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700'
                   }`}
                 >
                   {h}h
                 </button>
               ))}
             </div>
-            <p className="text-xs text-[#6B7280] mt-1.5">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5">
               Agent har {form.decisionFrequencyHours} soatda kampaniya ma'lumotlarini tahlil qiladi
             </p>
           </div>
 
           {/* Supported platforms (subset of form.platforms) */}
           <div>
-            <label className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider block mb-2">Qo'llab-quvvatlanadigan platformalar</label>
-            <p className="text-xs text-[#9CA3AF] mb-2">Standart bo'yicha — barcha tanlangan platformalar</p>
+            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-2">Qo'llab-quvvatlanadigan platformalar</label>
+            <p className="text-xs text-slate-400 dark:text-slate-500 mb-2">Standart bo'yicha — barcha tanlangan platformalar</p>
             <div className="flex flex-wrap gap-2">
               {form.platforms.map(p => (
                 <button
@@ -430,7 +430,7 @@ export default function CreateAgentPage() {
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
                     form.supportedPlatforms.includes(p) || form.supportedPlatforms.length === 0
                       ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                      : 'bg-[#F9FAFB] text-[#6B7280] border-[#E5E7EB]'
+                      : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700'
                   }`}
                 >
                   {p}
@@ -440,29 +440,29 @@ export default function CreateAgentPage() {
           </div>
 
           {/* Summary card */}
-          <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4">
-            <p className="text-xs font-semibold text-[#6B7280] mb-2">Agent xulosasi:</p>
+          <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
+            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2">Agent xulosasi:</p>
             <div className="flex items-center gap-3 mb-2">
               <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${form.avatarColor} flex items-center justify-center text-xl`}>
                 {form.avatar}
               </div>
               <div>
-                <p className="font-semibold text-sm text-[#111827]">{form.displayName}</p>
-                <p className="text-xs text-[#6B7280]">{form.title}</p>
+                <p className="font-semibold text-sm text-slate-900 dark:text-slate-50">{form.displayName}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{form.title}</p>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-2 text-xs text-[#6B7280]">
-              <span>Mode: <b className="text-[#111827]">{form.autopilotMode === 'FULL_AUTO' ? 'To\'liq avtomatik' : 'Yarim avtomatik'}</b></span>
-              <span>Minimal: <b className="text-[#111827]">${form.minManagedBudget}/oy</b></span>
-              <span>Qarorlar: <b className="text-[#111827]">har {form.decisionFrequencyHours}h</b></span>
-              <span>Narx: <b className="text-[#111827]">
+            <div className="grid grid-cols-2 gap-2 text-xs text-slate-500 dark:text-slate-400">
+              <span>Mode: <b className="text-slate-900 dark:text-slate-50">{form.autopilotMode === 'FULL_AUTO' ? 'To\'liq avtomatik' : 'Yarim avtomatik'}</b></span>
+              <span>Minimal: <b className="text-slate-900 dark:text-slate-50">${form.minManagedBudget}/oy</b></span>
+              <span>Qarorlar: <b className="text-slate-900 dark:text-slate-50">har {form.decisionFrequencyHours}h</b></span>
+              <span>Narx: <b className="text-slate-900 dark:text-slate-50">
                 {form.pricingModel === 'commission' ? `${form.commissionRate}% komissiya` : `$${form.monthlyRate}/oy`}
               </b></span>
             </div>
           </div>
 
           <div className="flex justify-between">
-            <button onClick={() => setStep(1)} className="text-[#9CA3AF] hover:text-[#111827] text-sm transition-colors">
+            <button onClick={() => setStep(1)} className="text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:text-slate-50 text-sm transition-colors">
               ← Orqaga
             </button>
             <button
@@ -478,20 +478,20 @@ export default function CreateAgentPage() {
 
       {/* ── STEP 3: Success ── */}
       {step === 3 && createdAgent && (
-        <div className="bg-white border border-[#E5E7EB] rounded-2xl p-8 text-center">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-8 text-center">
           <div className="text-5xl mb-4">🎉</div>
-          <h2 className="text-xl font-bold text-[#111827] mb-2">Agent yaratildi!</h2>
-          <p className="text-[#6B7280] text-sm mb-6">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50 mb-2">Agent yaratildi!</h2>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">
             Agentingiz tayyor. Nashr qilish uchun moderatsiyadan o'tishi kerak.
           </p>
 
-          <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4 mb-6 flex items-center gap-3">
+          <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4 mb-6 flex items-center gap-3">
             <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${form.avatarColor} flex items-center justify-center text-2xl`}>
               {form.avatar}
             </div>
             <div className="text-left flex-1">
-              <p className="font-semibold text-sm text-[#111827]">{createdAgent.displayName}</p>
-              <p className="text-xs text-[#6B7280]">{createdAgent.title}</p>
+              <p className="font-semibold text-sm text-slate-900 dark:text-slate-50">{createdAgent.displayName}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">{createdAgent.title}</p>
               <p className="text-xs text-amber-600 mt-0.5">⏳ Moderatsiya kutilmoqda</p>
             </div>
           </div>
@@ -506,7 +506,7 @@ export default function CreateAgentPage() {
             </button>
             <button
               onClick={() => router.push('/my-portfolio')}
-              className="bg-[#F9FAFB] hover:bg-[#F3F4F6] text-[#111827] px-6 py-3 rounded-xl border border-[#E5E7EB] transition-all"
+              className="bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-50 px-6 py-3 rounded-xl border border-slate-200 dark:border-slate-700 transition-all"
             >
               Keyinroq
             </button>

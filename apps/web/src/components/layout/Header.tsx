@@ -68,7 +68,7 @@ export default function Header() {
   }
 
   return (
-    <header className="h-14 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-6 flex items-center justify-between shrink-0 transition-colors">
+    <header className="h-14 bg-white dark:bg-slate-900 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-6 flex items-center justify-between shrink-0 transition-colors">
       <div>
         <h1 className="text-slate-900 dark:text-slate-50 font-semibold text-sm">{page.title}</h1>
         {page.subtitle && (

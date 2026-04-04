@@ -94,9 +94,9 @@ const START_ORDER = [
 export default function PlatformArchitecturePage() {
   return (
     <div className="space-y-6">
-      <section className="rounded-2xl border border-[#E5E7EB] bg-white p-6">
-        <h2 className="text-2xl font-semibold text-[#111827]">Performa Multi-Network Blueprint</h2>
-        <p className="text-sm text-[#6B7280] mt-2">
+      <section className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6">
+        <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50">Performa Multi-Network Blueprint</h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
           Bu bo‘limda Madgicx-like, lekin Performa’ga moslashtirilgan full platform architecture frontend ichiga kiritildi:
           modullar, roadmap, checklist va execution scope.
         </p>
@@ -104,9 +104,9 @@ export default function PlatformArchitecturePage() {
 
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {MODULES.map((module) => (
-          <div key={module.title} className="rounded-xl border border-[#E5E7EB] bg-white p-5">
-            <h3 className="text-base font-semibold text-[#111827]">{module.title}</h3>
-            <ul className="mt-3 space-y-2 list-disc list-inside text-sm text-[#4B5563]">
+          <div key={module.title} className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5">
+            <h3 className="text-base font-semibold text-slate-900 dark:text-slate-50">{module.title}</h3>
+            <ul className="mt-3 space-y-2 list-disc list-inside text-sm text-slate-600 dark:text-slate-400">
               {module.items.map((item) => (
                 <li key={item}>{item}</li>
               ))}
@@ -115,12 +115,12 @@ export default function PlatformArchitecturePage() {
         ))}
       </section>
 
-      <section className="rounded-xl border border-[#E5E7EB] bg-white p-5">
-        <h3 className="text-base font-semibold text-[#111827]">Roadmap</h3>
+      <section className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5">
+        <h3 className="text-base font-semibold text-slate-900 dark:text-slate-50">Roadmap</h3>
         <div className="mt-4 overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-[#6B7280] border-b border-[#E5E7EB]">
+              <tr className="text-left text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
                 <th className="pb-2">Phase</th>
                 <th className="pb-2">Deliverables</th>
                 <th className="pb-2">Timeline</th>
@@ -129,9 +129,9 @@ export default function PlatformArchitecturePage() {
             <tbody>
               {ROADMAP.map((row) => (
                 <tr key={row.phase} className="border-b border-[#F3F4F6] align-top">
-                  <td className="py-2 font-medium text-[#111827]">{row.phase}</td>
-                  <td className="py-2 text-[#4B5563]">{row.detail}</td>
-                  <td className="py-2 text-[#4B5563]">{row.timeline}</td>
+                  <td className="py-2 font-medium text-slate-900 dark:text-slate-50">{row.phase}</td>
+                  <td className="py-2 text-slate-600 dark:text-slate-400">{row.detail}</td>
+                  <td className="py-2 text-slate-600 dark:text-slate-400">{row.timeline}</td>
                 </tr>
               ))}
             </tbody>
@@ -139,13 +139,13 @@ export default function PlatformArchitecturePage() {
         </div>
       </section>
 
-      <section className="rounded-xl border border-[#E5E7EB] bg-white p-5">
-        <h3 className="text-base font-semibold text-[#111827]">Execution checklist</h3>
+      <section className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5">
+        <h3 className="text-base font-semibold text-slate-900 dark:text-slate-50">Execution checklist</h3>
         <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
           {CHECKLIST.map((block) => (
-            <div key={block.group} className="rounded-lg border border-[#E5E7EB] p-4">
-              <p className="font-medium text-[#111827]">{block.group}</p>
-              <ul className="mt-2 space-y-1 text-sm text-[#4B5563]">
+            <div key={block.group} className="rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+              <p className="font-medium text-slate-900 dark:text-slate-50">{block.group}</p>
+              <ul className="mt-2 space-y-1 text-sm text-slate-600 dark:text-slate-400">
                 {block.points.map((point) => (
                   <li key={point}>• {point}</li>
                 ))}
@@ -156,20 +156,20 @@ export default function PlatformArchitecturePage() {
       </section>
 
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="rounded-xl border border-[#E5E7EB] bg-white p-5">
-          <h3 className="text-base font-semibold text-[#111827]">User roles</h3>
-          <ul className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-[#4B5563]">
+        <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5">
+          <h3 className="text-base font-semibold text-slate-900 dark:text-slate-50">User roles</h3>
+          <ul className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-slate-600 dark:text-slate-400">
             {USER_ROLES.map((role) => (
-              <li key={role} className="rounded-md border border-[#E5E7EB] px-2.5 py-1.5">
+              <li key={role} className="rounded-md border border-slate-200 dark:border-slate-700 px-2.5 py-1.5">
                 {role}
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="rounded-xl border border-[#E5E7EB] bg-white p-5">
-          <h3 className="text-base font-semibold text-[#111827]">Service breakdown</h3>
-          <ul className="mt-3 space-y-1.5 text-sm text-[#4B5563]">
+        <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5">
+          <h3 className="text-base font-semibold text-slate-900 dark:text-slate-50">Service breakdown</h3>
+          <ul className="mt-3 space-y-1.5 text-sm text-slate-600 dark:text-slate-400">
             {SERVICES.map((service) => (
               <li key={service}>• {service}</li>
             ))}
@@ -177,9 +177,9 @@ export default function PlatformArchitecturePage() {
         </div>
       </section>
 
-      <section className="rounded-xl border border-[#E5E7EB] bg-white p-5">
-        <h3 className="text-base font-semibold text-[#111827]">Recommended start order</h3>
-        <ol className="mt-3 space-y-1.5 list-decimal list-inside text-sm text-[#4B5563]">
+      <section className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5">
+        <h3 className="text-base font-semibold text-slate-900 dark:text-slate-50">Recommended start order</h3>
+        <ol className="mt-3 space-y-1.5 list-decimal list-inside text-sm text-slate-600 dark:text-slate-400">
           {START_ORDER.map((item) => (
             <li key={item}>{item}</li>
           ))}

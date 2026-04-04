@@ -124,7 +124,7 @@ export default function CampaignsPage() {
           </Button>
           <button
             onClick={() => setShowCreatePanel(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 text-sm font-semibold transition-colors shadow-lg shadow-gray-200"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 dark:bg-white dark:bg-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 text-sm font-semibold transition-colors shadow-lg shadow-gray-200"
           >
             <span className="text-base leading-none">+</span>
             Kampaniya yaratish
@@ -138,7 +138,7 @@ export default function CampaignsPage() {
       <AdsManagerPanel />
 
       {/* ── Filter tabs ── */}
-      <div className="flex items-center gap-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-1 w-fit">
+      <div className="flex items-center gap-1 bg-white dark:bg-slate-900 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-1 w-fit">
         {(
           [
             { key: "all", label: "All" },
@@ -155,7 +155,7 @@ export default function CampaignsPage() {
               transition-all duration-200
               ${
                 filter === tab.key
-                  ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900"
+                  ? "bg-slate-900 dark:bg-white dark:bg-slate-900 text-white dark:text-slate-900"
                   : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50 hover:bg-slate-50 dark:bg-slate-800"
               }
             `}
@@ -166,7 +166,7 @@ export default function CampaignsPage() {
                 text-xs px-1.5 py-0.5 rounded-full
                 ${
                   filter === tab.key
-                    ? "bg-white dark:bg-slate-900/20 text-slate-900 dark:text-slate-50"
+                    ? "bg-white dark:bg-slate-900 dark:bg-slate-900/20 text-slate-900 dark:text-slate-50"
                     : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
                 }
               `}
@@ -209,7 +209,7 @@ export default function CampaignsPage() {
                 <Card
                   hoverable
                   onClick={() => setSelectedId(isSelected ? null : campaign.id)}
-                  className={`transition-all duration-200 ${isSelected ? "border-slate-900/40 dark:border-white/40 bg-white/5 dark:bg-white/5" : ""}`}
+                  className={`transition-all duration-200 ${isSelected ? "border-slate-900/40 dark:border-white/40 bg-white dark:bg-slate-900/5 dark:bg-white dark:bg-slate-900/5" : ""}`}
                   padding="none"
                 >
                   <div className="flex items-center gap-4 p-5">

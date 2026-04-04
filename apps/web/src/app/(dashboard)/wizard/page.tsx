@@ -621,8 +621,8 @@ export default function CampaignWizardPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#111827]">Create Campaign</h1>
-          <p className="text-[#6B7280] text-sm">Step {currentStep} of {totalSteps}</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50">Create Campaign</h1>
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Step {currentStep} of {totalSteps}</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="secondary" onClick={() => router.push('/campaigns')}>
@@ -635,12 +635,12 @@ export default function CampaignWizardPage() {
       </div>
 
       {/* Progress Bar */}
-      <div className="bg-white border border-[#E5E7EB] rounded-xl p-4">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-[#6B7280]">Progress</span>
-          <span className="text-sm text-[#111827]">{currentStep}/{totalSteps}</span>
+          <span className="text-sm text-slate-500 dark:text-slate-400">Progress</span>
+          <span className="text-sm text-slate-900 dark:text-slate-50">{currentStep}/{totalSteps}</span>
         </div>
-        <div className="w-full bg-[#F3F4F6] rounded-full h-2">
+        <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2">
           <div 
             className="bg-[#111827] h-2 rounded-full transition-all duration-300"
             style={{ width: `${(currentStep / totalSteps) * 100}%` }}
@@ -649,14 +649,14 @@ export default function CampaignWizardPage() {
       </div>
 
       {/* Live grading preview while user is working */}
-      <div className="bg-white border border-[#E5E7EB] rounded-xl p-4">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
         <div className="flex items-center justify-between flex-wrap gap-3 mb-3">
           <div>
-            <p className="text-sm font-semibold text-[#111827]">Live Grading Preview</p>
-            <p className="text-xs text-[#6B7280]">Sozlayotganingizda score real vaqtda yangilanadi</p>
+            <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">Live Grading Preview</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Sozlayotganingizda score real vaqtda yangilanadi</p>
           </div>
           <div className="text-right">
-            <p className="text-xs text-[#6B7280]">Overall</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Overall</p>
             <p className={`text-2xl font-black ${
               liveGrade.overall >= 75 ? 'text-emerald-500' : liveGrade.overall >= 50 ? 'text-amber-500' : 'text-rose-500'
             }`}>
@@ -671,11 +671,11 @@ export default function CampaignWizardPage() {
               { label: 'Targeting Score', value: liveGrade.targetingScore },
               { label: 'Estimated CTR', value: liveGrade.estimatedCtr, isText: true },
           ].map((m) => (
-            <div key={m.label} className="rounded-lg border border-[#E5E7EB] p-3">
-              <p className="text-[11px] text-[#6B7280]">{m.label}</p>
-              <p className="text-base font-bold text-[#111827]">{m.isText ? m.value : `${m.value}/100`}</p>
+            <div key={m.label} className="rounded-lg border border-slate-200 dark:border-slate-700 p-3">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">{m.label}</p>
+              <p className="text-base font-bold text-slate-900 dark:text-slate-50">{m.isText ? m.value : `${m.value}/100`}</p>
               {!m.isText && (
-                <div className="w-full h-1.5 rounded-full bg-[#F3F4F6] mt-2 overflow-hidden">
+                <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 mt-2 overflow-hidden">
                   <div
                     className={`h-full rounded-full ${Number(m.value) >= 70 ? 'bg-emerald-400' : Number(m.value) >= 50 ? 'bg-amber-400' : 'bg-rose-400'}`}
                     style={{ width: `${m.value}%` }}
@@ -685,8 +685,8 @@ export default function CampaignWizardPage() {
             </div>
           ))}
         </div>
-        <p className="text-xs text-[#6B7280] mt-3">
-          Readiness: <span className="font-semibold text-[#111827]">{liveGrade.readiness}</span> ·
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-3">
+          Readiness: <span className="font-semibold text-slate-900 dark:text-slate-50">{liveGrade.readiness}</span> ·
           {creativeDiagnostics.loading
             ? ' creative score AI tomonidan hisoblanmoqda...'
             : creativeDiagnostics.source === 'ai'
@@ -739,8 +739,8 @@ function Step1Platforms({ formData, setFormData }: { formData: CampaignFormData,
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-[#111827] mb-2">Select Platforms</h2>
-        <p className="text-[#6B7280]">Choose where you want to run your campaign</p>
+        <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-2">Select Platforms</h2>
+        <p className="text-slate-500 dark:text-slate-400">Choose where you want to run your campaign</p>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -759,22 +759,22 @@ function Step1Platforms({ formData, setFormData }: { formData: CampaignFormData,
               <PlatformIcon platform={platform.name} size="lg" />
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-semibold text-[#111827]">{platform.displayName}</h3>
+                  <h3 className="font-semibold text-slate-900 dark:text-slate-50">{platform.displayName}</h3>
                   {!platform.connected && (
                     <Badge variant="warning" size="sm">Not Connected</Badge>
                   )}
                 </div>
-                <p className="text-[#6B7280] text-sm">
+                <p className="text-slate-500 dark:text-slate-400 text-sm">
                   {platform.connected ? 'Ready to use' : 'Connect account to enable'}
                 </p>
               </div>
               <div className={`w-4 h-4 rounded border-2 ${
                 formData.platforms.includes(platform.id) 
                   ? 'bg-[#111827] border-[#111827]' 
-                  : 'border-[#E5E7EB] bg-[#F3F4F6]'
+                  : 'border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800'
               }`}>
                 {formData.platforms.includes(platform.id) && (
-                  <svg className="w-3 h-3 text-[#111827] mt-0.5 ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-3 h-3 text-slate-900 dark:text-slate-50 mt-0.5 ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                   </svg>
                 )}
@@ -786,7 +786,7 @@ function Step1Platforms({ formData, setFormData }: { formData: CampaignFormData,
 
       {formData.platforms.length === 0 && (
         <div className="text-center py-8">
-          <p className="text-[#6B7280]">Select at least one platform to continue</p>
+          <p className="text-slate-500 dark:text-slate-400">Select at least one platform to continue</p>
         </div>
       )}
     </div>
@@ -833,15 +833,15 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
     setFormData(prev => ({ ...prev, schedule: { ...prev.schedule, hours: next } }))
   }
 
-  const cls = "w-full px-3 py-2 bg-[#F3F4F6] border border-[#E5E7EB] rounded-lg text-[#111827] focus:outline-none focus:border-[#111827]"
-  const lbl = "block text-sm font-medium text-[#6B7280] mb-2"
+  const cls = "w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-50 focus:outline-none focus:border-[#111827]"
+  const lbl = "block text-sm font-medium text-slate-500 dark:text-slate-400 mb-2"
 
   const quickLinks: string[] = formData.extensions.quickLinks || []
   const clarifiers: string[] = formData.extensions.clarifiers || []
 
   return (
     <div className="space-y-8">
-      <h2 className="text-xl font-semibold text-[#111827]">Campaign Settings</h2>
+      <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50">Campaign Settings</h2>
 
       {/* ── Basic ── */}
       <div className="space-y-4">
@@ -912,7 +912,7 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
             <input type="checkbox" checked={formData.schedule.alwaysOn}
               onChange={(e) => setFormData(prev => ({ ...prev, schedule: { ...prev.schedule, alwaysOn: e.target.checked } }))}
               className="w-4 h-4 accent-[#7C3AED]" />
-            <span className="text-[#111827]">Show ad 24/7 (Always On)</span>
+            <span className="text-slate-900 dark:text-slate-50">Show ad 24/7 (Always On)</span>
           </label>
 
           {!formData.schedule.alwaysOn && (
@@ -923,7 +923,7 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
                   const all = HOURS_24.map(String)
                   const allSelected = all.every(h => selectedHours.includes(h))
                   setFormData(prev => ({ ...prev, schedule: { ...prev.schedule, hours: allSelected ? [] : all } }))
-                }} className="text-xs text-[#374151] hover:underline">
+                }} className="text-xs text-slate-700 dark:text-slate-300 hover:underline">
                   {HOURS_24.every(h => selectedHours.includes(String(h))) ? 'Deselect All' : 'Select All'}
                 </button>
               </div>
@@ -933,13 +933,13 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
                   const active = selectedHours.includes(key)
                   return (
                     <button key={h} type="button" onClick={() => toggleHour(key)}
-                      className={`py-1 rounded text-xs font-mono transition-colors ${active ? 'bg-[#111827] text-white' : 'bg-[#F3F4F6] text-[#9CA3AF] hover:bg-[#3A3A4A]'}`}>
+                      className={`py-1 rounded text-xs font-mono transition-colors ${active ? 'bg-[#111827] text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-[#3A3A4A]'}`}>
                       {String(h).padStart(2, '0')}
                     </button>
                   )
                 })}
               </div>
-              <p className="text-xs text-[#6B7280] mt-1">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                 {selectedHours.length === 0 ? 'No hours — ad will not run' : `${selectedHours.length}/24 hours selected`}
               </p>
             </div>
@@ -949,10 +949,10 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
 
       {/* ── Strategy & Bidding ── */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-[#111827]">Strategy & Bidding</h3>
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Strategy & Bidding</h3>
         {formData.platforms.length > 0 && (
-          <p className="text-xs text-[#6B7280]">
-            Showing strategies for <span className="text-[#374151] capitalize">{primaryPlatform}</span>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Showing strategies for <span className="text-slate-700 dark:text-slate-300 capitalize">{primaryPlatform}</span>
             {formData.platforms.length > 1 && ` (+${formData.platforms.length - 1} more)`}
           </p>
         )}
@@ -983,7 +983,7 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
             <option value="medium">Medium</option>
             <option value="high">High</option>
           </select>
-          <p className="text-xs text-[#6B7280] mt-1">Higher priority wins same-account auctions.</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Higher priority wins same-account auctions.</p>
         </div>
 
         {primaryPlatform === 'meta' && (
@@ -991,14 +991,14 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
             <input type="checkbox" checked={formData.strategy.advantagePlus}
               onChange={(e) => setFormData(prev => ({ ...prev, strategy: { ...prev.strategy, advantagePlus: e.target.checked } }))}
               className="w-4 h-4 accent-[#7C3AED]" />
-            <span className="text-[#111827]">Advantage+ Campaign Budget</span>
+            <span className="text-slate-900 dark:text-slate-50">Advantage+ Campaign Budget</span>
           </label>
         )}
       </div>
 
       {/* ── UTM Parameters ── */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-[#111827]">UTM Parameters</h3>
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50">UTM Parameters</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {(['source', 'medium', 'campaign', 'content', 'term'] as const).map(field => (
             <input key={field} type="text" placeholder={`utm_${field}`}
@@ -1007,12 +1007,12 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
               className={`${cls} placeholder-[#6B7280]`} />
           ))}
         </div>
-        <p className="text-xs text-[#6B7280]">Dynamic: {'{keyword}'}, {'{campaign_id}'}, {'{placement}'}</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400">Dynamic: {'{keyword}'}, {'{campaign_id}'}, {'{placement}'}</p>
       </div>
 
       {/* ── Ad Extensions ── */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-[#111827]">Ad Extensions</h3>
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Ad Extensions</h3>
 
         {/* Quick Links */}
         <div>
@@ -1023,7 +1023,7 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
                 else setFormData(prev => ({ ...prev, extensions: { ...prev.extensions, quickLinks: [''] } }))
               }}
               className="w-4 h-4 accent-[#7C3AED]" />
-            <span className="text-[#111827]">Quick Links (Sitelinks)</span>
+            <span className="text-slate-900 dark:text-slate-50">Quick Links (Sitelinks)</span>
           </label>
           {(formData.extensions.quickLinks?.length ?? 0) > 0 && (
             <div className="ml-7 space-y-2">
@@ -1050,7 +1050,7 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
                 else setFormData(prev => ({ ...prev, extensions: { ...prev.extensions, clarifiers: [''] } }))
               }}
               className="w-4 h-4 accent-[#7C3AED]" />
-            <span className="text-[#111827]">Clarifiers (Callouts)</span>
+            <span className="text-slate-900 dark:text-slate-50">Clarifiers (Callouts)</span>
           </label>
           {(formData.extensions.clarifiers?.length ?? 0) > 0 && (
             <div className="ml-7 space-y-2">
@@ -1075,7 +1075,7 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
               if (!e.target.checked) setFormData(prev => ({ ...prev, extensions: { ...prev.extensions, promoCode: '' } }))
             }}
             className="w-4 h-4 accent-[#7C3AED]" />
-          <span className="text-[#111827]">Promo Code</span>
+          <span className="text-slate-900 dark:text-slate-50">Promo Code</span>
         </label>
         {!!formData.extensions.promoCode && (
           <input type="text" placeholder="e.g. SAVE20" value={formData.extensions.promoCode}
@@ -1088,13 +1088,13 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
           <input type="checkbox" checked={!!formData.extensions.delivery}
             onChange={(e) => setFormData(prev => ({ ...prev, extensions: { ...prev.extensions, delivery: e.target.checked } }))}
             className="w-4 h-4 accent-[#7C3AED]" />
-          <span className="text-[#111827]">Delivery Extension</span>
+          <span className="text-slate-900 dark:text-slate-50">Delivery Extension</span>
         </label>
       </div>
 
       {/* ── AI Optimization ── */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-[#111827]">AI Optimization</h3>
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50">AI Optimization</h3>
         <div className="space-y-3">
           {([
             { key: 'autoReplaceCreatives' as const, label: 'Automatically replace underperforming creatives', desc: 'AI replaces low-performing ads with new variants' },
@@ -1107,8 +1107,8 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
                 onChange={(e) => setFormData(prev => ({ ...prev, aiOptimization: { ...prev.aiOptimization, [key]: e.target.checked } }))}
                 className="w-4 h-4 accent-[#7C3AED] mt-1" />
               <div>
-                <span className="text-[#111827]">{label}</span>
-                <p className="text-xs text-[#6B7280]">{desc}</p>
+                <span className="text-slate-900 dark:text-slate-50">{label}</span>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{desc}</p>
               </div>
             </label>
           ))}
@@ -1117,7 +1117,7 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
 
       {/* ── Minus Keywords ── */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-[#111827]">Minus Keywords (Campaign Level)</h3>
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Minus Keywords (Campaign Level)</h3>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className={lbl}>Match Type</label>
@@ -1138,15 +1138,15 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
 
       {/* ── Bid Adjustments (Campaign) ── */}
       <details className="group">
-        <summary className="cursor-pointer text-lg font-semibold text-[#111827] py-2 flex items-center gap-2">
+        <summary className="cursor-pointer text-lg font-semibold text-slate-900 dark:text-slate-50 py-2 flex items-center gap-2">
           <span>Bid Adjustments (Campaign Level)</span>
-          <span className="text-[#6B7280] text-sm group-open:hidden">▶</span>
-          <span className="text-[#6B7280] text-sm hidden group-open:inline">▼</span>
+          <span className="text-slate-500 dark:text-slate-400 text-sm group-open:hidden">▶</span>
+          <span className="text-slate-500 dark:text-slate-400 text-sm hidden group-open:inline">▼</span>
         </summary>
         <div className="space-y-6 mt-4">
           {/* Age/Gender */}
           <div>
-            <h4 className="text-sm font-medium text-[#9CA3AF] mb-3">Age & Gender</h4>
+            <h4 className="text-sm font-medium text-slate-400 dark:text-slate-500 mb-3">Age & Gender</h4>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {['male', 'female', 'age_18_24', 'age_25_44'].map(k => (
                 <div key={k}>
@@ -1161,7 +1161,7 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
           </div>
           {/* Devices */}
           <div>
-            <h4 className="text-sm font-medium text-[#9CA3AF] mb-3">Devices</h4>
+            <h4 className="text-sm font-medium text-slate-400 dark:text-slate-500 mb-3">Devices</h4>
             <div className="grid grid-cols-3 gap-3">
               {['mobile', 'desktop', 'tablet'].map(k => (
                 <div key={k}>
@@ -1176,7 +1176,7 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
           </div>
           {/* Audience */}
           <div>
-            <h4 className="text-sm font-medium text-[#9CA3AF] mb-3">Audience Segments</h4>
+            <h4 className="text-sm font-medium text-slate-400 dark:text-slate-500 mb-3">Audience Segments</h4>
             <div className="grid grid-cols-3 gap-3">
               {['retargeting', 'lookalike', 'custom'].map(k => (
                 <div key={k}>
@@ -1191,7 +1191,7 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
           </div>
           {/* Format */}
           <div>
-            <h4 className="text-sm font-medium text-[#9CA3AF] mb-3">Ad Format</h4>
+            <h4 className="text-sm font-medium text-slate-400 dark:text-slate-500 mb-3">Ad Format</h4>
             <div className="grid grid-cols-4 gap-3">
               {['image', 'video', 'carousel', 'collection'].map(k => (
                 <div key={k}>
@@ -1206,7 +1206,7 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
           </div>
           {/* Income */}
           <div>
-            <h4 className="text-sm font-medium text-[#9CA3AF] mb-3">Income Level</h4>
+            <h4 className="text-sm font-medium text-slate-400 dark:text-slate-500 mb-3">Income Level</h4>
             <div className="grid grid-cols-3 gap-3">
               {['low', 'medium', 'high'].map(k => (
                 <div key={k}>
@@ -1221,7 +1221,7 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
           </div>
           {/* Weather */}
           <div>
-            <h4 className="text-sm font-medium text-[#9CA3AF] mb-3">Weather</h4>
+            <h4 className="text-sm font-medium text-slate-400 dark:text-slate-500 mb-3">Weather</h4>
             <div className="grid grid-cols-3 gap-3">
               {['sunny', 'rainy', 'cold'].map(k => (
                 <div key={k}>
@@ -1236,8 +1236,8 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
           </div>
           {/* KPI — 7th type */}
           <div>
-            <h4 className="text-sm font-medium text-[#9CA3AF] mb-1">KPI Corrections</h4>
-            <p className="text-xs text-[#6B7280] mb-3">Adjust bids when campaign KPI deviates from target</p>
+            <h4 className="text-sm font-medium text-slate-400 dark:text-slate-500 mb-1">KPI Corrections</h4>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">Adjust bids when campaign KPI deviates from target</p>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {[
                 { k: 'cpa_above', l: 'CPA above target' },
@@ -1262,7 +1262,7 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
 
       {/* ── Placement Exclusions ── */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-[#111827]">Placement Exclusions</h3>
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Placement Exclusions</h3>
         <div>
           <label className={lbl}>Excluded Sites (one per line)</label>
           <textarea rows={3} placeholder="example.com&#10;bad-site.net"
@@ -1292,8 +1292,8 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
   const [kwInput, setKwInput] = useState('')
   const [kwMatch, setKwMatch] = useState<'broad'|'phrase'|'exact'>('broad')
 
-  const cls = "w-full px-3 py-2 bg-[#F3F4F6] border border-[#E5E7EB] rounded-lg text-[#111827] placeholder-[#6B7280] focus:outline-none focus:border-[#111827]"
-  const lbl = "block text-sm font-medium text-[#6B7280] mb-1"
+  const cls = "w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-50 placeholder-[#6B7280] focus:outline-none focus:border-[#111827]"
+  const lbl = "block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1"
 
   const addGeo = () => {
     const val = geoInput.trim()
@@ -1357,7 +1357,7 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
 
   return (
     <div className="space-y-8">
-      <h2 className="text-xl font-semibold text-[#111827]">Ad Group Settings</h2>
+      <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50">Ad Group Settings</h2>
 
       {/* ── Basic ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1380,18 +1380,18 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
 
       {/* ── Geo Targeting with chips ── */}
       <div>
-        <h3 className="text-lg font-semibold text-[#111827] mb-3">Geo Targeting</h3>
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-3">Geo Targeting</h3>
         <div className="flex gap-2 mb-3">
           <button
             type="button"
             onClick={() => setFormData(prev => ({ ...prev, geoTargeting: { ...prev.geoTargeting, mode: 'list' } }))}
-            className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${formData.geoTargeting.mode === 'list' ? 'bg-[#111827] text-white' : 'bg-[#F3F4F6] text-[#9CA3AF]'}`}>
+            className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${formData.geoTargeting.mode === 'list' ? 'bg-[#111827] text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500'}`}>
             List Mode
           </button>
           <button
             type="button"
             onClick={() => setFormData(prev => ({ ...prev, geoTargeting: { ...prev.geoTargeting, mode: 'map' } }))}
-            className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${formData.geoTargeting.mode === 'map' ? 'bg-[#111827] text-white' : 'bg-[#F3F4F6] text-[#9CA3AF]'}`}>
+            className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${formData.geoTargeting.mode === 'map' ? 'bg-[#111827] text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500'}`}>
             Map Mode (Radius)
           </button>
         </div>
@@ -1403,19 +1403,19 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
                 onKeyDown={e => e.key === 'Enter' && addGeo()}
                 className={`${cls} flex-1`} placeholder="City or region, press Enter" />
               <button type="button" onClick={addGeo}
-                className="px-4 py-2 bg-[#111827] hover:bg-[#1F2937] rounded-lg text-[#111827] text-sm font-medium">
+                className="px-4 py-2 bg-[#111827] hover:bg-[#1F2937] rounded-lg text-slate-900 dark:text-slate-50 text-sm font-medium">
                 Add
               </button>
             </div>
             <div className="flex flex-wrap gap-2">
               {formData.geoTargeting.locations.map((loc, i) => (
-                <span key={i} className="flex items-center gap-1 bg-[#E5E7EB] border border-[#111827]/40 text-[#374151] text-sm px-2 py-1 rounded-full">
+                <span key={i} className="flex items-center gap-1 bg-[#E5E7EB] border border-[#111827]/40 text-slate-700 dark:text-slate-300 text-sm px-2 py-1 rounded-full">
                   📍 {loc}
-                  <button type="button" onClick={() => removeGeo(i)} className="ml-1 hover:text-[#111827]">×</button>
+                  <button type="button" onClick={() => removeGeo(i)} className="ml-1 hover:text-slate-900 dark:text-slate-50">×</button>
                 </span>
               ))}
               {formData.geoTargeting.locations.length === 0 && (
-                <span className="text-[#6B7280] text-sm">No locations added yet</span>
+                <span className="text-slate-500 dark:text-slate-400 text-sm">No locations added yet</span>
               )}
             </div>
           </div>
@@ -1439,7 +1439,7 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
 
       {/* ── Auto Targeting ── */}
       <div>
-        <h3 className="text-lg font-semibold text-[#111827] mb-3">Auto Targeting (AI-based)</h3>
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-3">Auto Targeting (AI-based)</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           {([
             { key: 'queries', label: 'Direct queries', desc: 'Product-specific' },
@@ -1448,18 +1448,18 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
             { key: 'additionalQueries', label: 'Additional', desc: 'Related products' },
             { key: 'alternativeQueries', label: 'Alternative', desc: 'Substitutes' },
           ] as const).map(({ key, label, desc }) => (
-            <label key={key} className="flex items-start gap-3 cursor-pointer bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg p-3 hover:border-[#D1D5DB]">
+            <label key={key} className="flex items-start gap-3 cursor-pointer bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg p-3 hover:border-slate-300 dark:border-slate-600">
               <input type="checkbox" checked={formData.adGroup.autoTargeting[key] as boolean}
                 onChange={() => toggleAt(key)} className="w-4 h-4 accent-[#7C3AED] mt-0.5" />
               <div>
-                <div className="text-[#111827] text-sm font-medium">{label}</div>
-                <div className="text-[#6B7280] text-xs">{desc}</div>
+                <div className="text-slate-900 dark:text-slate-50 text-sm font-medium">{label}</div>
+                <div className="text-slate-500 dark:text-slate-400 text-xs">{desc}</div>
               </div>
             </label>
           ))}
         </div>
         <div className="mt-3">
-          <p className="text-[#6B7280] text-xs mb-2">Brand Reminders:</p>
+          <p className="text-slate-500 dark:text-slate-400 text-xs mb-2">Brand Reminders:</p>
           <div className="flex gap-4">
             {([
               { key: 'own', label: 'Own Brand' },
@@ -1470,7 +1470,7 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
                 <input type="checkbox" checked={formData.adGroup.autoTargeting.brandReminders[key]}
                   onChange={() => setFormData(prev => ({ ...prev, adGroup: { ...prev.adGroup, autoTargeting: { ...prev.adGroup.autoTargeting, brandReminders: { ...prev.adGroup.autoTargeting.brandReminders, [key]: !prev.adGroup.autoTargeting.brandReminders[key] } } } }))}
                   className="w-4 h-4 accent-[#7C3AED]" />
-                <span className="text-[#111827] text-sm">{label}</span>
+                <span className="text-slate-900 dark:text-slate-50 text-sm">{label}</span>
               </label>
             ))}
           </div>
@@ -1480,7 +1480,7 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
       {/* ── Keywords ── */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-semibold text-[#111827]">Keywords</h3>
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Keywords</h3>
           <Button variant="secondary" size="sm" onClick={onGenerateKeywords} disabled={aiLoading}>
             {aiLoading ? 'Generating…' : '✨ AI Generate'}
           </Button>
@@ -1490,19 +1490,19 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
             onKeyDown={e => e.key === 'Enter' && addKw()}
             className={`${cls} flex-1`} placeholder="Type keyword, press Enter" />
           <select value={kwMatch} onChange={e => setKwMatch(e.target.value as any)}
-            className="px-3 py-2 bg-[#F3F4F6] border border-[#E5E7EB] rounded-lg text-[#111827] text-sm">
+            className="px-3 py-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-50 text-sm">
             <option value="broad">Broad</option>
             <option value="phrase">Phrase</option>
             <option value="exact">Exact</option>
           </select>
           <button type="button" onClick={addKw}
-            className="px-4 py-2 bg-[#111827] hover:bg-[#1F2937] rounded-lg text-[#111827] text-sm">Add</button>
+            className="px-4 py-2 bg-[#111827] hover:bg-[#1F2937] rounded-lg text-slate-900 dark:text-slate-50 text-sm">Add</button>
         </div>
         <div className="space-y-1">
           {formData.adGroup.keywords.phrases.map((phrase, i) => (
-            <div key={i} className="flex items-center justify-between bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-3 py-2">
+            <div key={i} className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2">
               <div className="flex items-center gap-2">
-                <span className="text-[#111827] text-sm">{phrase}</span>
+                <span className="text-slate-900 dark:text-slate-50 text-sm">{phrase}</span>
                 <span className={`text-xs px-1.5 py-0.5 rounded ${
                   formData.adGroup.keywords.matchTypes[phrase] === 'exact' ? 'bg-purple-500/20 text-purple-300' :
                   formData.adGroup.keywords.matchTypes[phrase] === 'phrase' ? 'bg-blue-500/20 text-blue-300' :
@@ -1511,28 +1511,28 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
                   {formData.adGroup.keywords.matchTypes[phrase] || 'broad'}
                 </span>
               </div>
-              <button type="button" onClick={() => removeKw(phrase)} className="text-[#6B7280] hover:text-red-400 text-sm">×</button>
+              <button type="button" onClick={() => removeKw(phrase)} className="text-slate-500 dark:text-slate-400 hover:text-red-400 text-sm">×</button>
             </div>
           ))}
           {formData.adGroup.keywords.phrases.length === 0 && (
-            <p className="text-[#6B7280] text-sm text-center py-4">No keywords yet. Add manually or use AI Generate.</p>
+            <p className="text-slate-500 dark:text-slate-400 text-sm text-center py-4">No keywords yet. Add manually or use AI Generate.</p>
           )}
         </div>
       </div>
 
       {/* ── Interests with AI parse ── */}
       <div>
-        <h3 className="text-lg font-semibold text-[#111827] mb-3">Interests & Habits</h3>
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-3">Interests & Habits</h3>
         <textarea rows={3} placeholder="Describe your audience freely, e.g. 'sports fans aged 25-35 who shop online'"
           value={formData.adGroup.interests.join('\n')}
           onChange={e => setFormData(prev => ({ ...prev, adGroup: { ...prev.adGroup, interests: e.target.value.split('\n').filter(Boolean) } }))}
           className={`${cls} resize-none`} />
-        <p className="text-xs text-[#6B7280] mt-1">AI will parse this and map to platform-specific interest segments automatically.</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">AI will parse this and map to platform-specific interest segments automatically.</p>
       </div>
 
       {/* ── Audience Segments ── */}
       <div>
-        <h3 className="text-lg font-semibold text-[#111827] mb-3">Audience Segments & Retargeting</h3>
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-3">Audience Segments & Retargeting</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           {([
             { key: 'buyers', label: 'Buyers', desc: '≥1 purchase' },
@@ -1541,12 +1541,12 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
             { key: 'abandonedCart', label: 'Abandoned Cart', desc: 'Added but not bought' },
             { key: 'viewedNotBought', label: 'Viewed Not Bought', desc: 'Saw product, no purchase' },
           ] as const).map(({ key, label, desc }) => (
-            <label key={key} className="flex items-start gap-3 cursor-pointer bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg p-3 hover:border-[#D1D5DB]">
+            <label key={key} className="flex items-start gap-3 cursor-pointer bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg p-3 hover:border-slate-300 dark:border-slate-600">
               <input type="checkbox" checked={formData.adGroup.audiences[key] as boolean}
                 onChange={() => toggleAud(key)} className="w-4 h-4 accent-[#7C3AED] mt-0.5" />
               <div>
-                <div className="text-[#111827] text-sm font-medium">{label}</div>
-                <div className="text-[#6B7280] text-xs">{desc}</div>
+                <div className="text-slate-900 dark:text-slate-50 text-sm font-medium">{label}</div>
+                <div className="text-slate-500 dark:text-slate-400 text-xs">{desc}</div>
               </div>
             </label>
           ))}
@@ -1555,8 +1555,8 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
 
       {/* ── Group Extensions with content ── */}
       <div>
-        <h3 className="text-lg font-semibold text-[#111827] mb-3">Ad Group Extensions</h3>
-        <p className="text-xs text-[#6B7280] mb-3">These override campaign-level extensions for this ad group only.</p>
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-3">Ad Group Extensions</h3>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">These override campaign-level extensions for this ad group only.</p>
 
         {/* Quick Links */}
         <div className="mb-4">
@@ -1568,7 +1568,7 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
                 else setFormData(prev => ({ ...prev, adGroup: { ...prev.adGroup, extensions: { ...prev.adGroup.extensions, quickLinks: [''] } } }))
               }}
               className="w-4 h-4 accent-[#7C3AED]" />
-            <span className="text-[#111827]">Quick Links (override campaign)</span>
+            <span className="text-slate-900 dark:text-slate-50">Quick Links (override campaign)</span>
           </label>
           {(formData.adGroup.extensions.quickLinks?.length ?? 0) > 0 && (
             <div className="ml-7 space-y-2">
@@ -1596,7 +1596,7 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
                 else setFormData(prev => ({ ...prev, adGroup: { ...prev.adGroup, extensions: { ...prev.adGroup.extensions, clarifiers: [''] } } }))
               }}
               className="w-4 h-4 accent-[#7C3AED]" />
-            <span className="text-[#111827]">Clarifiers (override campaign)</span>
+            <span className="text-slate-900 dark:text-slate-50">Clarifiers (override campaign)</span>
           </label>
           {(formData.adGroup.extensions.clarifiers?.length ?? 0) > 0 && (
             <div className="ml-7 space-y-2">
@@ -1622,7 +1622,7 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
               if (!e.target.checked) setFormData(prev => ({ ...prev, adGroup: { ...prev.adGroup, extensions: { ...prev.adGroup.extensions, promoCode: '' } } }))
             }}
             className="w-4 h-4 accent-[#7C3AED]" />
-          <span className="text-[#111827]">Promo Code (override campaign)</span>
+          <span className="text-slate-900 dark:text-slate-50">Promo Code (override campaign)</span>
         </label>
         {!!formData.adGroup.extensions.promoCode && (
           <input type="text" placeholder="e.g. GROUP20"
@@ -1634,10 +1634,10 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
 
       {/* ── Group Bid Adjustments — 7 types ── */}
       <details className="group">
-        <summary className="cursor-pointer text-lg font-semibold text-[#111827] py-2 flex items-center gap-2">
+        <summary className="cursor-pointer text-lg font-semibold text-slate-900 dark:text-slate-50 py-2 flex items-center gap-2">
           Ad Group Bid Adjustments (override campaign)
-          <span className="text-[#6B7280] text-sm group-open:hidden">▶</span>
-          <span className="text-[#6B7280] text-sm hidden group-open:inline">▼</span>
+          <span className="text-slate-500 dark:text-slate-400 text-sm group-open:hidden">▶</span>
+          <span className="text-slate-500 dark:text-slate-400 text-sm hidden group-open:inline">▼</span>
         </summary>
         <div className="mt-3 space-y-4">
           {BID7.map(({ k, l }) => (
@@ -1660,13 +1660,13 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
 
       {/* ── URL Params ── */}
       <div>
-        <h3 className="text-lg font-semibold text-[#111827] mb-3">URL Parameters</h3>
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-3">URL Parameters</h3>
         <div>
           <label className={lbl}>UTM Content</label>
           <input type="text" value={formData.adGroup.urlParams.utmContent}
             onChange={e => setFormData(prev => ({ ...prev, adGroup: { ...prev.adGroup, urlParams: { utmContent: e.target.value } } }))}
             className={`${cls} placeholder-[#6B7280]`} placeholder="{ad_group_name}" />
-          <p className="text-xs text-[#6B7280] mt-1">Dynamic: {'{ad_group_name}'}, {'{keyword}'}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Dynamic: {'{ad_group_name}'}, {'{keyword}'}</p>
         </div>
       </div>
     </div>
@@ -1685,7 +1685,7 @@ function CharCounter({ value, max }: { value: string; max: number }) {
   const len = value.length
   const over = len > max
   return (
-    <span className={`text-xs ml-auto ${over ? 'text-red-400' : len > max * 0.8 ? 'text-yellow-400' : 'text-[#6B7280]'}`}>
+    <span className={`text-xs ml-auto ${over ? 'text-red-400' : len > max * 0.8 ? 'text-yellow-400' : 'text-slate-500 dark:text-slate-400'}`}>
       {len}/{max}
     </span>
   )
@@ -1701,8 +1701,8 @@ function Step4Creative({ formData, setFormData, onGenerateAdCopy, aiLoading }: {
   const primaryPlatform = formData.platforms[0] || 'meta'
   const limits = CHAR_LIMITS[primaryPlatform] || CHAR_LIMITS.meta
 
-  const cls = "w-full px-3 py-2 bg-[#F3F4F6] border border-[#E5E7EB] rounded-lg text-[#111827] placeholder-[#6B7280] focus:outline-none focus:border-[#111827]"
-  const lbl = "block text-sm font-medium text-[#6B7280] mb-1"
+  const cls = "w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-50 placeholder-[#6B7280] focus:outline-none focus:border-[#111827]"
+  const lbl = "block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1"
 
   const headlines: string[] = formData.creative.headlines.length >= 3
     ? formData.creative.headlines
@@ -1761,10 +1761,10 @@ function Step4Creative({ formData, setFormData, onGenerateAdCopy, aiLoading }: {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-[#111827]">Creative Assets</h2>
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50">Creative Assets</h2>
           {formData.platforms.length > 0 && (
-            <p className="text-xs text-[#6B7280] mt-1">
-              Char limits for <span className="text-[#374151] capitalize">{primaryPlatform}</span>:
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              Char limits for <span className="text-slate-700 dark:text-slate-300 capitalize">{primaryPlatform}</span>:
               headline {limits.headline}, description {limits.description}
             </p>
           )}
@@ -1790,7 +1790,7 @@ function Step4Creative({ formData, setFormData, onGenerateAdCopy, aiLoading }: {
 
       {/* Headlines */}
       <div className="space-y-3">
-        <h3 className="text-lg font-semibold text-[#111827]">Headlines</h3>
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Headlines</h3>
         {headlines.slice(0, 3).map((h, i) => (
           <div key={i}>
             <div className="flex items-center justify-between mb-1">
@@ -1807,7 +1807,7 @@ function Step4Creative({ formData, setFormData, onGenerateAdCopy, aiLoading }: {
 
       {/* Descriptions */}
       <div className="space-y-3">
-        <h3 className="text-lg font-semibold text-[#111827]">Descriptions</h3>
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Descriptions</h3>
         {descriptions.slice(0, 2).map((d, i) => (
           <div key={i}>
             <div className="flex items-center justify-between mb-1">
@@ -1824,13 +1824,13 @@ function Step4Creative({ formData, setFormData, onGenerateAdCopy, aiLoading }: {
 
       {/* Media Upload */}
       <div className="space-y-3">
-        <h3 className="text-lg font-semibold text-[#111827]">Media Assets</h3>
-        <p className="text-xs text-[#6B7280]">
-          Required aspect ratio for <span className="text-[#374151] capitalize">{primaryPlatform}</span>: {expectedRatio.label}
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Media Assets</h3>
+        <p className="text-xs text-slate-500 dark:text-slate-400">
+          Required aspect ratio for <span className="text-slate-700 dark:text-slate-300 capitalize">{primaryPlatform}</span>: {expectedRatio.label}
         </p>
 
         {/* Image upload */}
-        <div className="border-2 border-dashed border-[#E5E7EB] hover:border-[#D1D5DB] rounded-lg p-6 text-center transition-colors">
+        <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:border-slate-600 rounded-lg p-6 text-center transition-colors">
           <input type="file" multiple accept="image/*" className="hidden" id="image-upload"
             onChange={e => {
               const files = Array.from(e.target.files || [])
@@ -1838,19 +1838,19 @@ function Step4Creative({ formData, setFormData, onGenerateAdCopy, aiLoading }: {
             }} />
           <label htmlFor="image-upload" className="cursor-pointer block">
             <div className="text-3xl mb-2">🖼️</div>
-            <div className="text-[#111827] text-sm font-medium mb-1">Upload Images</div>
-            <div className="text-xs text-[#6B7280]">JPG, PNG · max 30 MB each</div>
+            <div className="text-slate-900 dark:text-slate-50 text-sm font-medium mb-1">Upload Images</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400">JPG, PNG · max 30 MB each</div>
           </label>
         </div>
 
         {/* Video upload */}
-        <div className="border-2 border-dashed border-[#E5E7EB] hover:border-[#D1D5DB] rounded-lg p-6 text-center transition-colors">
+        <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:border-slate-600 rounded-lg p-6 text-center transition-colors">
           <input type="file" accept="video/*" className="hidden" id="video-upload"
             onChange={handleVideoUpload} />
           <label htmlFor="video-upload" className="cursor-pointer block">
             <div className="text-3xl mb-2">🎬</div>
-            <div className="text-[#111827] text-sm font-medium mb-1">Upload Video</div>
-            <div className="text-xs text-[#6B7280]">MP4, MOV · {expectedRatio.label} required</div>
+            <div className="text-slate-900 dark:text-slate-50 text-sm font-medium mb-1">Upload Video</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400">MP4, MOV · {expectedRatio.label} required</div>
           </label>
         </div>
 
@@ -1864,10 +1864,10 @@ function Step4Creative({ formData, setFormData, onGenerateAdCopy, aiLoading }: {
         {formData.creative.images.length > 0 && (
           <div className="space-y-2">
             {formData.creative.images.map((file, i) => (
-              <div key={i} className="flex items-center justify-between bg-[#F3F4F6] rounded-lg px-3 py-2">
-                <span className="text-[#111827] text-sm truncate">{(file as File).name}</span>
+              <div key={i} className="flex items-center justify-between bg-slate-100 dark:bg-slate-800 rounded-lg px-3 py-2">
+                <span className="text-slate-900 dark:text-slate-50 text-sm truncate">{(file as File).name}</span>
                 <button type="button" onClick={() => setFormData(prev => ({ ...prev, creative: { ...prev.creative, images: prev.creative.images.filter((_, j) => j !== i) } }))}
-                  className="text-[#6B7280] hover:text-red-400 ml-2 shrink-0">×</button>
+                  className="text-slate-500 dark:text-slate-400 hover:text-red-400 ml-2 shrink-0">×</button>
               </div>
             ))}
           </div>
@@ -1885,17 +1885,17 @@ function Step4Creative({ formData, setFormData, onGenerateAdCopy, aiLoading }: {
       </div>
 
       {/* A/B Testing */}
-      <div className="bg-white border border-[#E5E7EB] rounded-xl p-4 space-y-4">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-4 space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-[#111827] font-semibold">A/B Testing</h3>
-            <p className="text-xs text-[#6B7280] mt-0.5">Test multiple creative variants automatically</p>
+            <h3 className="text-slate-900 dark:text-slate-50 font-semibold">A/B Testing</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Test multiple creative variants automatically</p>
           </div>
           <label className="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" checked={formData.creative.testing.enabled}
               onChange={e => setFormData(prev => ({ ...prev, creative: { ...prev.creative, testing: { ...prev.creative.testing, enabled: e.target.checked } } }))}
               className="w-4 h-4 accent-[#7C3AED]" />
-            <span className="text-[#111827] text-sm">Enable</span>
+            <span className="text-slate-900 dark:text-slate-50 text-sm">Enable</span>
           </label>
         </div>
         {formData.creative.testing.enabled && (
@@ -1904,10 +1904,10 @@ function Step4Creative({ formData, setFormData, onGenerateAdCopy, aiLoading }: {
             <input type="range" min={2} max={5} value={formData.creative.testing.variants}
               onChange={e => setFormData(prev => ({ ...prev, creative: { ...prev.creative, testing: { ...prev.creative.testing, variants: Number(e.target.value) } } }))}
               className="w-full accent-[#7C3AED]" />
-            <div className="flex justify-between text-xs text-[#6B7280] mt-1">
+            <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 mt-1">
               <span>2</span><span>3</span><span>4</span><span>5</span>
             </div>
-            <p className="text-xs text-[#6B7280] mt-2">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
               AI will create {formData.creative.testing.variants} variants and allocate budget to the best performer after 48h.
             </p>
           </div>
@@ -1919,11 +1919,11 @@ function Step4Creative({ formData, setFormData, onGenerateAdCopy, aiLoading }: {
 
 function MetaFeedPreview({ formData }: { formData: CampaignFormData }) {
   return (
-    <div className="bg-white rounded-xl overflow-hidden shadow-lg max-w-sm mx-auto">
+    <div className="bg-white dark:bg-slate-900 rounded-xl overflow-hidden shadow-lg max-w-sm mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3">
         <div className="flex items-center gap-2">
-          <div className="w-9 h-9 bg-[#111827] rounded-full flex items-center justify-center text-[#111827] font-bold text-sm">N</div>
+          <div className="w-9 h-9 bg-[#111827] rounded-full flex items-center justify-center text-slate-900 dark:text-slate-50 font-bold text-sm">N</div>
           <div>
             <div className="text-black text-sm font-semibold">{formData.name || 'Your Business'}</div>
             <div className="text-[#65676B] text-xs">Sponsored · 🌐</div>
@@ -1972,24 +1972,24 @@ function MetaStoriesPreview({ formData }: { formData: CampaignFormData }) {
       {/* Top bar */}
       <div className="absolute top-0 left-0 right-0 px-3 pt-3 z-10">
         <div className="flex gap-1 mb-2">
-          <div className="flex-1 h-0.5 bg-white rounded-full" />
-          <div className="flex-1 h-0.5 bg-white/40 rounded-full" />
-          <div className="flex-1 h-0.5 bg-white/40 rounded-full" />
+          <div className="flex-1 h-0.5 bg-white dark:bg-slate-900 rounded-full" />
+          <div className="flex-1 h-0.5 bg-white dark:bg-slate-900/40 rounded-full" />
+          <div className="flex-1 h-0.5 bg-white dark:bg-slate-900/40 rounded-full" />
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 bg-[#111827] rounded-full flex items-center justify-center text-[#111827] text-xs font-bold">N</div>
+          <div className="w-7 h-7 bg-[#111827] rounded-full flex items-center justify-center text-slate-900 dark:text-slate-50 text-xs font-bold">N</div>
           <div>
-            <div className="text-[#111827] text-xs font-semibold">{formData.name || 'Your Business'}</div>
-            <div className="text-[#111827]/70 text-xs">Sponsored</div>
+            <div className="text-slate-900 dark:text-slate-50 text-xs font-semibold">{formData.name || 'Your Business'}</div>
+            <div className="text-slate-900 dark:text-slate-50/70 text-xs">Sponsored</div>
           </div>
         </div>
       </div>
       {/* Bottom overlay */}
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-4 pt-8 pb-4 z-10">
-        <p className="text-[#111827] text-sm font-semibold mb-1">{formData.creative.headlines[0] || 'Your headline'}</p>
-        <p className="text-[#111827]/80 text-xs mb-3">{formData.creative.descriptions[0] || 'Tap to learn more'}</p>
+        <p className="text-slate-900 dark:text-slate-50 text-sm font-semibold mb-1">{formData.creative.headlines[0] || 'Your headline'}</p>
+        <p className="text-slate-900 dark:text-slate-50/80 text-xs mb-3">{formData.creative.descriptions[0] || 'Tap to learn more'}</p>
         {/* Swipe up CTA */}
-        <div className="flex flex-col items-center text-[#111827]/90 text-xs">
+        <div className="flex flex-col items-center text-slate-900 dark:text-slate-50/90 text-xs">
           <span className="text-lg">↑</span>
           <span>{formData.creative.cta || 'Learn More'}</span>
         </div>
@@ -2007,13 +2007,13 @@ function Step5Preview({ formData }: { formData: CampaignFormData }) {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-xl font-semibold text-[#111827]">Preview</h2>
-        <p className="text-[#6B7280] text-sm mt-1">See how your ad will look on each platform</p>
+        <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50">Preview</h2>
+        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">See how your ad will look on each platform</p>
       </div>
 
       {/* No platforms selected */}
       {formData.platforms.length === 0 && (
-        <div className="text-center py-12 text-[#6B7280]">
+        <div className="text-center py-12 text-slate-500 dark:text-slate-400">
           <div className="text-4xl mb-3">📱</div>
           <p>Select platforms in Step 1 to see previews</p>
         </div>
@@ -2025,7 +2025,7 @@ function Step5Preview({ formData }: { formData: CampaignFormData }) {
           <div key={platform}>
             <div className="flex items-center gap-3 mb-3">
               <PlatformIcon platform={platform} size="md" />
-              <h3 className="font-semibold text-[#111827] capitalize">{platform} Preview</h3>
+              <h3 className="font-semibold text-slate-900 dark:text-slate-50 capitalize">{platform} Preview</h3>
             </div>
 
             {/* Meta: Feed / Stories tabs */}
@@ -2034,7 +2034,7 @@ function Step5Preview({ formData }: { formData: CampaignFormData }) {
                 <div className="flex gap-2 mb-4">
                   {['feed', 'stories'].map(tab => (
                     <button key={tab} type="button" onClick={() => setTab(platform, tab)}
-                      className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${getTab(platform) === tab ? 'bg-[#111827] text-white' : 'bg-[#F3F4F6] text-[#6B7280] hover:text-[#111827]'}`}>
+                      className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${getTab(platform) === tab ? 'bg-[#111827] text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50'}`}>
                       {tab === 'feed' ? '📰 Feed' : '📲 Stories'}
                     </button>
                   ))}
@@ -2049,9 +2049,9 @@ function Step5Preview({ formData }: { formData: CampaignFormData }) {
 
             {/* Google Search Preview */}
             {platform === 'google' && (
-              <div className="bg-white rounded-xl p-5 shadow-lg max-w-lg mx-auto">
+              <div className="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-lg max-w-lg mx-auto">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="bg-[#1a73e8] text-[#111827] text-xs px-1.5 py-0.5 rounded font-medium">Ad</span>
+                  <span className="bg-[#1a73e8] text-slate-900 dark:text-slate-50 text-xs px-1.5 py-0.5 rounded font-medium">Ad</span>
                   <span className="text-[#202124] text-sm">www.yoursite.com</span>
                 </div>
                 <div className="text-[#1a0dab] text-xl font-medium hover:underline cursor-pointer mb-1">
@@ -2072,7 +2072,7 @@ function Step5Preview({ formData }: { formData: CampaignFormData }) {
 
             {/* Yandex Preview */}
             {platform === 'yandex' && (
-              <div className="bg-white rounded-xl p-5 shadow-lg max-w-lg mx-auto border border-[#e5e5e5]">
+              <div className="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-lg max-w-lg mx-auto border border-[#e5e5e5]">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="border border-[#FFCC00] text-[#888] text-xs px-1.5 py-0.5 rounded">Реклама</span>
                   <span className="text-[#888] text-sm">yoursite.com</span>
@@ -2091,14 +2091,14 @@ function Step5Preview({ formData }: { formData: CampaignFormData }) {
 
             {/* Telegram Preview */}
             {platform === 'telegram' && (
-              <div className="bg-[#F9FAFB] rounded-xl p-1 max-w-sm mx-auto shadow-lg">
-                <div className="bg-[#F9FAFB] rounded-lg overflow-hidden">
+              <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-1 max-w-sm mx-auto shadow-lg">
+                <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg overflow-hidden">
                   {/* Channel header */}
                   <div className="flex items-center gap-3 px-4 py-3 border-b border-[#0E1621]">
-                    <div className="w-10 h-10 bg-[#2CA5E0] rounded-full flex items-center justify-center text-[#111827] font-bold">N</div>
+                    <div className="w-10 h-10 bg-[#2CA5E0] rounded-full flex items-center justify-center text-slate-900 dark:text-slate-50 font-bold">N</div>
                     <div>
-                      <div className="text-[#111827] text-sm font-semibold">{formData.name || 'Your Channel'}</div>
-                      <div className="text-[#6B7280] text-xs">Sponsored</div>
+                      <div className="text-slate-900 dark:text-slate-50 text-sm font-semibold">{formData.name || 'Your Channel'}</div>
+                      <div className="text-slate-500 dark:text-slate-400 text-xs">Sponsored</div>
                     </div>
                   </div>
                   {/* Ad card */}
@@ -2107,9 +2107,9 @@ function Step5Preview({ formData }: { formData: CampaignFormData }) {
                       <span className="text-4xl">🖼️</span>
                     </div>
                     <div className="p-3">
-                      <div className="text-[#111827] font-semibold text-sm mb-1">{formData.creative.headlines[0] || 'Ad headline'}</div>
+                      <div className="text-slate-900 dark:text-slate-50 font-semibold text-sm mb-1">{formData.creative.headlines[0] || 'Ad headline'}</div>
                       <div className="text-[#8E9BA7] text-xs">{formData.creative.descriptions[0] || 'Ad description text'}</div>
-                      <button className="mt-3 w-full bg-[#2CA5E0] text-[#111827] rounded-lg py-2 text-sm font-medium">
+                      <button className="mt-3 w-full bg-[#2CA5E0] text-slate-900 dark:text-slate-50 rounded-lg py-2 text-sm font-medium">
                         {formData.creative.cta || 'Learn More'}
                       </button>
                     </div>
@@ -2122,8 +2122,8 @@ function Step5Preview({ formData }: { formData: CampaignFormData }) {
       </div>
 
       {/* Campaign Summary */}
-      <div className="bg-white border border-[#E5E7EB] rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-[#111827] mb-4">Campaign Summary</h3>
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-6">
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Campaign Summary</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { label: 'Platforms', value: formData.platforms.length > 0 ? formData.platforms.map(p => p.toUpperCase()).join(', ') : '—' },
@@ -2131,9 +2131,9 @@ function Step5Preview({ formData }: { formData: CampaignFormData }) {
             { label: 'Objective', value: formData.objective ? formData.objective.charAt(0).toUpperCase() + formData.objective.slice(1) : '—' },
             { label: 'Strategy', value: formData.strategy.type.replace(/_/g, ' ') },
           ].map(({ label, value }) => (
-            <div key={label} className="bg-[#F9FAFB] rounded-lg p-3">
-              <div className="text-[#6B7280] text-xs mb-1">{label}</div>
-              <div className="text-[#111827] font-semibold text-sm">{value}</div>
+            <div key={label} className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3">
+              <div className="text-slate-500 dark:text-slate-400 text-xs mb-1">{label}</div>
+              <div className="text-slate-900 dark:text-slate-50 font-semibold text-sm">{value}</div>
             </div>
           ))}
         </div>
@@ -2143,9 +2143,9 @@ function Step5Preview({ formData }: { formData: CampaignFormData }) {
             { label: 'Geo Targets', value: formData.geoTargeting.locations.length > 0 ? formData.geoTargeting.locations.join(', ') : 'All locations' },
             { label: 'A/B Variants', value: formData.creative.testing.enabled ? `${formData.creative.testing.variants} variants` : 'Disabled' },
           ].map(({ label, value }) => (
-            <div key={label} className="bg-[#F9FAFB] rounded-lg p-3">
-              <div className="text-[#6B7280] text-xs mb-1">{label}</div>
-              <div className="text-[#111827] text-sm">{value}</div>
+            <div key={label} className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3">
+              <div className="text-slate-500 dark:text-slate-400 text-xs mb-1">{label}</div>
+              <div className="text-slate-900 dark:text-slate-50 text-sm">{value}</div>
             </div>
           ))}
         </div>
@@ -2176,25 +2176,25 @@ function Step6Publish({ formData, onPublish, loading }: { formData: CampaignForm
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-xl font-semibold text-[#111827]">Ready to Publish</h2>
-        <p className="text-[#6B7280] text-sm mt-1">Review your campaign before going live</p>
+        <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50">Ready to Publish</h2>
+        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Review your campaign before going live</p>
       </div>
 
       {/* Checklist */}
-      <div className="bg-white border border-[#E5E7EB] rounded-xl p-5">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-5">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-[#111827]">Pre-launch checklist</h3>
+          <h3 className="font-semibold text-slate-900 dark:text-slate-50">Pre-launch checklist</h3>
           <span className={`text-sm font-medium ${allGood ? 'text-green-400' : 'text-yellow-400'}`}>
             {passCount}/{CHECKLIST.length} complete
           </span>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {CHECKLIST.map(item => (
-            <div key={item.key} className={`flex items-center gap-3 px-3 py-2 rounded-lg ${item.ok ? 'bg-green-500/10' : 'bg-[#F3F4F6]'}`}>
-              <span className={item.ok ? 'text-green-400' : 'text-[#6B7280]'}>
+            <div key={item.key} className={`flex items-center gap-3 px-3 py-2 rounded-lg ${item.ok ? 'bg-green-500/10' : 'bg-slate-100 dark:bg-slate-800'}`}>
+              <span className={item.ok ? 'text-green-400' : 'text-slate-500 dark:text-slate-400'}>
                 {item.ok ? '✓' : '○'}
               </span>
-              <span className={`text-sm ${item.ok ? 'text-[#111827]' : 'text-[#6B7280]'}`}>{item.label}</span>
+              <span className={`text-sm ${item.ok ? 'text-slate-900 dark:text-slate-50' : 'text-slate-500 dark:text-slate-400'}`}>{item.label}</span>
             </div>
           ))}
         </div>
@@ -2202,19 +2202,19 @@ function Step6Publish({ formData, onPublish, loading }: { formData: CampaignForm
 
       {/* Per-platform status cards */}
       <div>
-        <h3 className="font-semibold text-[#111827] mb-3">Platforms to publish</h3>
+        <h3 className="font-semibold text-slate-900 dark:text-slate-50 mb-3">Platforms to publish</h3>
         {formData.platforms.length === 0 ? (
-          <p className="text-[#6B7280] text-sm">No platforms selected. Go back to Step 1.</p>
+          <p className="text-slate-500 dark:text-slate-400 text-sm">No platforms selected. Go back to Step 1.</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {formData.platforms.map(platform => (
               <div key={platform}
-                className="flex items-center gap-4 bg-white border border-[#E5E7EB] rounded-xl px-4 py-4"
+                className="flex items-center gap-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-4"
                 style={{ borderLeftColor: PLATFORM_COLORS[platform] || '#7C3AED', borderLeftWidth: 3 }}>
                 <span className="text-2xl">{PLATFORM_ICONS[platform] || '📣'}</span>
                 <div className="flex-1 min-w-0">
-                  <div className="text-[#111827] font-semibold capitalize">{platform}</div>
-                  <div className="text-xs text-[#6B7280] mt-0.5">
+                  <div className="text-slate-900 dark:text-slate-50 font-semibold capitalize">{platform}</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                     {loading ? 'Submitting...' : 'Ready to publish'}
                   </div>
                 </div>
@@ -2237,18 +2237,18 @@ function Step6Publish({ formData, onPublish, loading }: { formData: CampaignForm
           { label: 'A/B Test', value: formData.creative.testing.enabled ? `${formData.creative.testing.variants} variants` : 'Off' },
           { label: 'Geo', value: formData.geoTargeting.locations.length > 0 ? `${formData.geoTargeting.locations.length} locations` : 'Global' },
         ].map(({ label, value }) => (
-          <div key={label} className="bg-white border border-[#E5E7EB] rounded-lg p-3">
-            <div className="text-[#6B7280] text-xs mb-1">{label}</div>
-            <div className="text-[#111827] text-sm font-medium truncate">{value}</div>
+          <div key={label} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg p-3">
+            <div className="text-slate-500 dark:text-slate-400 text-xs mb-1">{label}</div>
+            <div className="text-slate-900 dark:text-slate-50 text-sm font-medium truncate">{value}</div>
           </div>
         ))}
       </div>
 
       {/* Terms + Publish button */}
-      <div className="bg-white border border-[#E5E7EB] rounded-xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="text-[#6B7280] text-sm">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="text-slate-500 dark:text-slate-400 text-sm">
           By publishing you confirm this campaign complies with platform policies and our{' '}
-          <span className="text-[#374151] cursor-pointer hover:underline">terms of service</span>.
+          <span className="text-slate-700 dark:text-slate-300 cursor-pointer hover:underline">terms of service</span>.
         </div>
         <Button
           onClick={onPublish}

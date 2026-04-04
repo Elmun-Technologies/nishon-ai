@@ -51,8 +51,8 @@ export function Dashboard() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-[#111827]">Dashboard</h1>
-        <p className="text-[#6B7280] mt-1">Overview of your advertising performance</p>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-50">Dashboard</h1>
+        <p className="text-slate-500 dark:text-slate-400 mt-1">Overview of your advertising performance</p>
       </div>
 
       {/* Time Range Filter */}
@@ -72,28 +72,28 @@ export function Dashboard() {
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="p-6">
-          <p className="text-[#6B7280] text-sm font-medium">Total Spend</p>
-          <p className="text-4xl font-bold text-[#111827] mt-2">${stats.totalSpend.toLocaleString()}</p>
-          <p className="text-xs text-[#9CA3AF] mt-2">+12.5% vs last period</p>
+          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Total Spend</p>
+          <p className="text-4xl font-bold text-slate-900 dark:text-slate-50 mt-2">${stats.totalSpend.toLocaleString()}</p>
+          <p className="text-xs text-slate-400 dark:text-slate-500 mt-2">+12.5% vs last period</p>
         </Card>
 
         <Card className="p-6">
-          <p className="text-[#6B7280] text-sm font-medium">Conversions</p>
-          <p className="text-4xl font-bold text-[#111827] mt-2">{stats.totalConversions.toLocaleString()}</p>
-          <p className="text-xs text-[#9CA3AF] mt-2">+15.2% vs last period</p>
+          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Conversions</p>
+          <p className="text-4xl font-bold text-slate-900 dark:text-slate-50 mt-2">{stats.totalConversions.toLocaleString()}</p>
+          <p className="text-xs text-slate-400 dark:text-slate-500 mt-2">+15.2% vs last period</p>
         </Card>
 
         <Card className="p-6">
-          <p className="text-[#6B7280] text-sm font-medium">Avg ROAS</p>
-          <p className="text-4xl font-bold text-[#111827] mt-2">{stats.avgRoas.toFixed(2)}x</p>
-          <p className="text-xs text-[#9CA3AF] mt-2">-2.1% vs last period</p>
+          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Avg ROAS</p>
+          <p className="text-4xl font-bold text-slate-900 dark:text-slate-50 mt-2">{stats.avgRoas.toFixed(2)}x</p>
+          <p className="text-xs text-slate-400 dark:text-slate-500 mt-2">-2.1% vs last period</p>
         </Card>
       </div>
 
       {/* Performance Chart */}
       <Card className="p-6">
-        <h3 className="font-semibold text-[#111827] mb-6">7-Day Performance</h3>
-        <div className="h-[300px] bg-[#F9FAFB] rounded-lg p-4">
+        <h3 className="font-semibold text-slate-900 dark:text-slate-50 mb-6">7-Day Performance</h3>
+        <div className="h-[300px] bg-slate-50 dark:bg-slate-800/50 rounded-lg p-4">
           <LineChart data={PERFORMANCE_DATA} />
         </div>
       </Card>
@@ -101,7 +101,7 @@ export function Dashboard() {
       {/* Platform Filter and Campaign List */}
       <div className="space-y-4">
         <div>
-          <h3 className="font-semibold text-[#111827] mb-4">Campaigns</h3>
+          <h3 className="font-semibold text-slate-900 dark:text-slate-50 mb-4">Campaigns</h3>
           <div className="flex gap-2 mb-4">
             {['all', 'meta', 'google', 'yandex'].map(platform => (
               <Button
@@ -120,17 +120,17 @@ export function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredCampaigns.map(campaign => (
             <Card key={campaign.id} className="p-4">
-              <p className="font-medium text-[#111827] mb-3">{campaign.name}</p>
+              <p className="font-medium text-slate-900 dark:text-slate-50 mb-3">{campaign.name}</p>
               <div className="space-y-2 text-sm">
-                <div className="flex justify-between text-[#6B7280]">
+                <div className="flex justify-between text-slate-500 dark:text-slate-400">
                   <span>Spend:</span>
-                  <span className="font-semibold text-[#111827]">${campaign.spend.toLocaleString()}</span>
+                  <span className="font-semibold text-slate-900 dark:text-slate-50">${campaign.spend.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between text-[#6B7280]">
+                <div className="flex justify-between text-slate-500 dark:text-slate-400">
                   <span>Conversions:</span>
-                  <span className="font-semibold text-[#111827]">{campaign.conversions}</span>
+                  <span className="font-semibold text-slate-900 dark:text-slate-50">{campaign.conversions}</span>
                 </div>
-                <div className="flex justify-between text-[#6B7280]">
+                <div className="flex justify-between text-slate-500 dark:text-slate-400">
                   <span>ROAS:</span>
                   <span className="font-semibold text-green-600">{campaign.roas.toFixed(2)}x</span>
                 </div>

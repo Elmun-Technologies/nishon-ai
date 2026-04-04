@@ -186,7 +186,7 @@ export default function LaunchPage() {
           className="w-full md:w-[420px] border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm"
         />
 
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4">
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 dark:bg-slate-900 p-4">
           <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">Launch usuli</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {[
@@ -215,7 +215,7 @@ export default function LaunchPage() {
             <button
               key={p.id}
               onClick={() => handlePlatformPick(p.id as Platform)}
-              className="group relative overflow-hidden rounded-2xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 text-left transition-all hover:border-slate-300 dark:border-slate-600 hover:shadow-lg"
+              className="group relative overflow-hidden rounded-2xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 dark:bg-slate-900 p-6 text-left transition-all hover:border-slate-300 dark:border-slate-600 hover:shadow-lg"
             >
               <div className="absolute inset-0 bg-gradient-to-br opacity-0 transition-opacity group-hover:opacity-5" style={{
                 backgroundImage: `linear-gradient(to bottom right, var(--tw-gradient-stops))`,
@@ -233,7 +233,7 @@ export default function LaunchPage() {
           ))}
         </div>
 
-        <div className="rounded-2xl border border-dashed border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-10 text-center">
+        <div className="rounded-2xl border border-dashed border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 dark:bg-slate-900 p-10 text-center">
           <p className="text-xl font-bold text-slate-900 dark:text-slate-50 mb-2">No campaign drafts yet</p>
           <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">
             Platforma tanlang va ishga tushirish usulini belgilang: self, AI agent yoki marketplace mutaxassis.
@@ -267,12 +267,12 @@ export default function LaunchPage() {
 
         {/* Progress bar */}
         <div className="bg-slate-100 dark:bg-slate-800 rounded-full h-2">
-          <div className="bg-slate-900 dark:bg-white h-2 rounded-full transition-all" style={{ width: `${(metaStep / 5) * 100}%` }} />
+          <div className="bg-slate-900 dark:bg-white dark:bg-slate-900 h-2 rounded-full transition-all" style={{ width: `${(metaStep / 5) * 100}%` }} />
         </div>
 
         {/* Step 1: Objective */}
         {metaStep === 1 && (
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 space-y-5">
+          <div className="bg-white dark:bg-slate-900 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 space-y-5">
             <div>
               <h2 className="text-lg font-bold text-slate-900 dark:text-slate-50 mb-2">Maqsad tanlang</h2>
               <p className="text-slate-500 dark:text-slate-400 text-sm">Reklama orqali nima erishmoqchisiz?</p>
@@ -298,7 +298,7 @@ export default function LaunchPage() {
                 </button>
               ))}
             </div>
-            <button onClick={() => setMetaStep(2)} className="w-full bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 py-3 rounded-xl font-semibold">
+            <button onClick={() => setMetaStep(2)} className="w-full bg-slate-900 dark:bg-white dark:bg-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 py-3 rounded-xl font-semibold">
               Davom etish →
             </button>
           </div>
@@ -306,7 +306,7 @@ export default function LaunchPage() {
 
         {/* Step 2: Audience */}
         {metaStep === 2 && (
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 space-y-5">
+          <div className="bg-white dark:bg-slate-900 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 space-y-5">
             <div>
               <h2 className="text-lg font-bold text-slate-900 dark:text-slate-50 mb-2">Auditoriya</h2>
               <p className="text-slate-500 dark:text-slate-400 text-sm">Kim sizning reklama ko'radi?</p>
@@ -334,7 +334,7 @@ export default function LaunchPage() {
               <button onClick={() => setMetaStep(1)} className="flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-50 py-3 rounded-xl font-semibold">
                 ← Orqaga
               </button>
-              <button onClick={() => setMetaStep(3)} className="flex-1 bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 py-3 rounded-xl font-semibold">
+              <button onClick={() => setMetaStep(3)} className="flex-1 bg-slate-900 dark:bg-white dark:bg-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 py-3 rounded-xl font-semibold">
                 Davom etish →
               </button>
             </div>
@@ -343,7 +343,7 @@ export default function LaunchPage() {
 
         {/* Step 3: Budget */}
         {metaStep === 3 && (
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 space-y-5">
+          <div className="bg-white dark:bg-slate-900 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 space-y-5">
             <div>
               <h2 className="text-lg font-bold text-slate-900 dark:text-slate-50 mb-2">Byudjet</h2>
               <p className="text-slate-500 dark:text-slate-400 text-sm">Reklama uchun qancha pul sarflaysiz?</p>
@@ -367,7 +367,7 @@ export default function LaunchPage() {
               <button onClick={() => setMetaStep(2)} className="flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-50 py-3 rounded-xl font-semibold">
                 ← Orqaga
               </button>
-              <button onClick={() => setMetaStep(4)} className="flex-1 bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 py-3 rounded-xl font-semibold">
+              <button onClick={() => setMetaStep(4)} className="flex-1 bg-slate-900 dark:bg-white dark:bg-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 py-3 rounded-xl font-semibold">
                 Davom etish →
               </button>
             </div>
@@ -376,7 +376,7 @@ export default function LaunchPage() {
 
         {/* Step 4: Creative */}
         {metaStep === 4 && (
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 space-y-5">
+          <div className="bg-white dark:bg-slate-900 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 space-y-5">
             <div>
               <h2 className="text-lg font-bold text-slate-900 dark:text-slate-50 mb-2">Kreativ</h2>
               <p className="text-slate-500 dark:text-slate-400 text-sm">Reklama tasviri va matni</p>
@@ -404,7 +404,7 @@ export default function LaunchPage() {
               <button onClick={() => setMetaStep(3)} className="flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-50 py-3 rounded-xl font-semibold">
                 ← Orqaga
               </button>
-              <button onClick={() => setMetaStep(5)} className="flex-1 bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 py-3 rounded-xl font-semibold">
+              <button onClick={() => setMetaStep(5)} className="flex-1 bg-slate-900 dark:bg-white dark:bg-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 py-3 rounded-xl font-semibold">
                 Ko'rib chiqish →
               </button>
             </div>
@@ -413,7 +413,7 @@ export default function LaunchPage() {
 
         {/* Step 5: Review */}
         {metaStep === 5 && (
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 space-y-5">
+          <div className="bg-white dark:bg-slate-900 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 space-y-5">
             <div>
               <h2 className="text-lg font-bold text-slate-900 dark:text-slate-50 mb-2">Ko'rib chiqing</h2>
               <p className="text-slate-500 dark:text-slate-400 text-sm">Barcha ma'lumotlar to'g'rimi?</p>
@@ -457,11 +457,11 @@ export default function LaunchPage() {
         {error && <Alert variant="error">{error}</Alert>}
 
         <div className="bg-slate-100 dark:bg-slate-800 rounded-full h-2">
-          <div className="bg-slate-900 dark:bg-white h-2 rounded-full transition-all" style={{ width: `${(googleStep / 5) * 100}%` }} />
+          <div className="bg-slate-900 dark:bg-white dark:bg-slate-900 h-2 rounded-full transition-all" style={{ width: `${(googleStep / 5) * 100}%` }} />
         </div>
 
         {googleStep === 1 && (
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 space-y-5">
+          <div className="bg-white dark:bg-slate-900 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 space-y-5">
             <h2 className="text-lg font-bold text-slate-900 dark:text-slate-50">Kampaniya turi</h2>
             <div className="grid grid-cols-1 gap-3">
               {[
@@ -479,7 +479,7 @@ export default function LaunchPage() {
               <button onClick={() => setPlatform(null)} className="flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-50 py-3 rounded-xl font-semibold">
                 ← Orqaga
               </button>
-              <button onClick={() => setGoogleStep(2)} className="flex-1 bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 py-3 rounded-xl font-semibold">
+              <button onClick={() => setGoogleStep(2)} className="flex-1 bg-slate-900 dark:bg-white dark:bg-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 py-3 rounded-xl font-semibold">
                 Davom →
               </button>
             </div>
@@ -487,18 +487,18 @@ export default function LaunchPage() {
         )}
 
         {googleStep === 2 && (
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 space-y-5">
+          <div className="bg-white dark:bg-slate-900 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 space-y-5">
             <h2 className="text-lg font-bold text-slate-900 dark:text-slate-50">Kalit so'zlar</h2>
             <textarea value={googleData.keywords} onChange={e => setGoogleData(d => ({ ...d, keywords: e.target.value }))} placeholder="Har bir kalit so'zni yangi qatorga yozing..." rows={4} className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2" />
             <div className="flex gap-2">
               <button onClick={() => setGoogleStep(1)} className="flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-50 py-3 rounded-xl font-semibold">←</button>
-              <button onClick={() => setGoogleStep(3)} className="flex-1 bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 py-3 rounded-xl font-semibold">→</button>
+              <button onClick={() => setGoogleStep(3)} className="flex-1 bg-slate-900 dark:bg-white dark:bg-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 py-3 rounded-xl font-semibold">→</button>
             </div>
           </div>
         )}
 
         {googleStep === 3 && (
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 space-y-5">
+          <div className="bg-white dark:bg-slate-900 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 space-y-5">
             <h2 className="text-lg font-bold text-slate-900 dark:text-slate-50">Reklama matni</h2>
             <div className="space-y-3">
               <input type="text" value={googleData.headline1} onChange={e => setGoogleData(d => ({ ...d, headline1: e.target.value }))} placeholder="Sarlavha 1" className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2" />
@@ -509,13 +509,13 @@ export default function LaunchPage() {
             </div>
             <div className="flex gap-2">
               <button onClick={() => setGoogleStep(2)} className="flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-50 py-3 rounded-xl font-semibold">←</button>
-              <button onClick={() => setGoogleStep(4)} className="flex-1 bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 py-3 rounded-xl font-semibold">→</button>
+              <button onClick={() => setGoogleStep(4)} className="flex-1 bg-slate-900 dark:bg-white dark:bg-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 py-3 rounded-xl font-semibold">→</button>
             </div>
           </div>
         )}
 
         {googleStep === 4 && (
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 space-y-5">
+          <div className="bg-white dark:bg-slate-900 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 space-y-5">
             <h2 className="text-lg font-bold text-slate-900 dark:text-slate-50">Byudjet va taklif</h2>
             <div className="space-y-3">
               <div>
@@ -533,13 +533,13 @@ export default function LaunchPage() {
             </div>
             <div className="flex gap-2">
               <button onClick={() => setGoogleStep(3)} className="flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-50 py-3 rounded-xl font-semibold">←</button>
-              <button onClick={() => setGoogleStep(5)} className="flex-1 bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 py-3 rounded-xl font-semibold">Ko'rib chiqing →</button>
+              <button onClick={() => setGoogleStep(5)} className="flex-1 bg-slate-900 dark:bg-white dark:bg-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 py-3 rounded-xl font-semibold">Ko'rib chiqing →</button>
             </div>
           </div>
         )}
 
         {googleStep === 5 && (
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 space-y-5">
+          <div className="bg-white dark:bg-slate-900 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 space-y-5">
             <h2 className="text-lg font-bold text-slate-900 dark:text-slate-50">Ko'rib chiqing</h2>
             <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-4 space-y-2 text-sm">
               <div className="flex justify-between"><span className="text-slate-500 dark:text-slate-400">Turi:</span> <span className="font-semibold">{googleData.campaignType}</span></div>
@@ -576,11 +576,11 @@ export default function LaunchPage() {
         {error && <Alert variant="error">{error}</Alert>}
 
         <div className="bg-slate-100 dark:bg-slate-800 rounded-full h-2">
-          <div className="bg-slate-900 dark:bg-white h-2 rounded-full transition-all" style={{ width: `${(yandexStep / 4) * 100}%` }} />
+          <div className="bg-slate-900 dark:bg-white dark:bg-slate-900 h-2 rounded-full transition-all" style={{ width: `${(yandexStep / 4) * 100}%` }} />
         </div>
 
         {yandexStep === 1 && (
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 space-y-5">
+          <div className="bg-white dark:bg-slate-900 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 space-y-5">
             <h2 className="text-lg font-bold text-slate-900 dark:text-slate-50">Kampaniya turi</h2>
             <div className="space-y-3">
               {[
@@ -595,38 +595,38 @@ export default function LaunchPage() {
             </div>
             <div className="flex gap-2">
               <button onClick={() => setPlatform(null)} className="flex-1 bg-slate-100 dark:bg-slate-800 py-3 rounded-xl font-semibold">← Orqaga</button>
-              <button onClick={() => setYandexStep(2)} className="flex-1 bg-slate-900 dark:bg-white text-white dark:text-slate-900 py-3 rounded-xl font-semibold">Davom →</button>
+              <button onClick={() => setYandexStep(2)} className="flex-1 bg-slate-900 dark:bg-white dark:bg-slate-900 text-white dark:text-slate-900 py-3 rounded-xl font-semibold">Davom →</button>
             </div>
           </div>
         )}
 
         {yandexStep === 2 && (
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 space-y-5">
+          <div className="bg-white dark:bg-slate-900 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 space-y-5">
             <h2 className="text-lg font-bold text-slate-900 dark:text-slate-50">Kalit so'zlar</h2>
             <textarea value={yandexData.keywords} onChange={e => setYandexData(d => ({ ...d, keywords: e.target.value }))} placeholder="Kalit so'zlar..." rows={4} className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2" />
             <textarea value={yandexData.negativeKeywords} onChange={e => setYandexData(d => ({ ...d, negativeKeywords: e.target.value }))} placeholder="Salbiy kalit so'zlar (ixtiyoriy)..." rows={2} className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2" />
             <div className="flex gap-2">
               <button onClick={() => setYandexStep(1)} className="flex-1 bg-slate-100 dark:bg-slate-800 py-3 rounded-xl">←</button>
-              <button onClick={() => setYandexStep(3)} className="flex-1 bg-slate-900 dark:bg-white text-white dark:text-slate-900 py-3 rounded-xl">→</button>
+              <button onClick={() => setYandexStep(3)} className="flex-1 bg-slate-900 dark:bg-white dark:bg-slate-900 text-white dark:text-slate-900 py-3 rounded-xl">→</button>
             </div>
           </div>
         )}
 
         {yandexStep === 3 && (
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 space-y-5">
+          <div className="bg-white dark:bg-slate-900 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 space-y-5">
             <h2 className="text-lg font-bold text-slate-900 dark:text-slate-50">Reklama matni</h2>
             <input type="text" value={yandexData.headline} onChange={e => setYandexData(d => ({ ...d, headline: e.target.value }))} placeholder="Sarlavha" className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2" />
             <textarea value={yandexData.description} onChange={e => setYandexData(d => ({ ...d, description: e.target.value }))} placeholder="Tavsif" rows={3} className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2" />
             <input type="text" value={yandexData.url} onChange={e => setYandexData(d => ({ ...d, url: e.target.value }))} placeholder="Sayt manzili" className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2" />
             <div className="flex gap-2">
               <button onClick={() => setYandexStep(2)} className="flex-1 bg-slate-100 dark:bg-slate-800 py-3 rounded-xl">←</button>
-              <button onClick={() => setYandexStep(4)} className="flex-1 bg-slate-900 dark:bg-white text-white dark:text-slate-900 py-3 rounded-xl">Ko'rib chiqing →</button>
+              <button onClick={() => setYandexStep(4)} className="flex-1 bg-slate-900 dark:bg-white dark:bg-slate-900 text-white dark:text-slate-900 py-3 rounded-xl">Ko'rib chiqing →</button>
             </div>
           </div>
         )}
 
         {yandexStep === 4 && (
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 space-y-5">
+          <div className="bg-white dark:bg-slate-900 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 space-y-5">
             <h2 className="text-lg font-bold text-slate-900 dark:text-slate-50">Byudjet va strategiya</h2>
             <div className="space-y-3">
               <div>

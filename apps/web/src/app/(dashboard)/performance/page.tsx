@@ -66,8 +66,8 @@ export default function PerformancePage() {
   return (
     <div className="space-y-5 max-w-6xl">
       <div>
-        <h1 className="text-2xl font-bold text-[#111827]">Performance</h1>
-        <p className="text-[#6B7280] text-sm">Monitor and analyze your campaign performance</p>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50">Performance</h1>
+        <p className="text-slate-500 dark:text-slate-400 text-sm">Monitor and analyze your campaign performance</p>
       </div>
 
       <Card>
@@ -76,7 +76,7 @@ export default function PerformancePage() {
             <button
               key={d}
               onClick={() => setDays(d)}
-              className={`px-3 py-1.5 rounded-lg text-xs border ${days === d ? 'bg-[#111827] text-white border-[#111827]' : 'border-[#E5E7EB] text-[#6B7280]'}`}
+              className={`px-3 py-1.5 rounded-lg text-xs border ${days === d ? 'bg-[#111827] text-white border-[#111827]' : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400'}`}
             >
               Last {d} days
             </button>
@@ -85,7 +85,7 @@ export default function PerformancePage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search..."
-            className="ml-auto border border-[#E5E7EB] rounded-lg px-3 py-1.5 text-sm min-w-56"
+            className="ml-auto border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-sm min-w-56"
           />
         </div>
       </Card>
@@ -94,11 +94,11 @@ export default function PerformancePage() {
 
       <Card padding="none">
         {loading ? (
-          <div className="p-8 text-sm text-[#6B7280]">Loading...</div>
+          <div className="p-8 text-sm text-slate-500 dark:text-slate-400">Loading...</div>
         ) : filtered.length === 0 ? (
           <div className="p-12 text-center space-y-3">
-            <p className="text-2xl font-bold text-[#111827]">Start tracking your performance</p>
-            <p className="text-sm text-[#6B7280]">Launch your first campaign to see real-time metrics here.</p>
+            <p className="text-2xl font-bold text-slate-900 dark:text-slate-50">Start tracking your performance</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Launch your first campaign to see real-time metrics here.</p>
             <div className="flex items-center justify-center gap-2">
               <Button onClick={() => (window.location.href = '/launch')}>Launch with AI</Button>
               <Button variant="secondary" onClick={() => (window.location.href = '/wizard')}>Create manually</Button>
@@ -108,17 +108,17 @@ export default function PerformancePage() {
           <div className="overflow-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-[#E5E7EB]">
+                <tr className="border-b border-slate-200 dark:border-slate-700">
                   {['Name', 'Account', 'Status', 'Spend', 'Clicks', 'CTR', 'CPC'].map((h) => (
-                    <th key={h} className="text-left px-4 py-3 text-xs text-[#6B7280] uppercase">{h}</th>
+                    <th key={h} className="text-left px-4 py-3 text-xs text-slate-500 dark:text-slate-400 uppercase">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {filtered.map((c) => (
                   <tr key={c.id} className="border-b border-[#F3F4F6]">
-                    <td className="px-4 py-3 text-sm text-[#111827]">{c.name}</td>
-                    <td className="px-4 py-3 text-sm text-[#6B7280]">{c.accountName}</td>
+                    <td className="px-4 py-3 text-sm text-slate-900 dark:text-slate-50">{c.name}</td>
+                    <td className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">{c.accountName}</td>
                     <td className="px-4 py-3 text-sm">{c.status}</td>
                     <td className="px-4 py-3 text-sm">{formatCurrency(c.metrics.spend)}</td>
                     <td className="px-4 py-3 text-sm">{formatNumber(c.metrics.clicks)}</td>

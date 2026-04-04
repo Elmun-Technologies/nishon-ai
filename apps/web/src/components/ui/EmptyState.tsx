@@ -31,7 +31,7 @@ const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
       <div
         ref={ref}
         className={cn(
-          'bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-8 text-center',
+          'bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-8 text-center',
           className
         )}
         {...props}
@@ -39,8 +39,8 @@ const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
         <div className="space-y-4">
           <div className="text-4xl">{icon}</div>
           <div className="space-y-2">
-            <h3 className="text-[#111827] text-lg font-semibold">{title}</h3>
-            <p className="text-[#6B7280] text-sm leading-relaxed">{description}</p>
+            <h3 className="text-slate-900 dark:text-slate-50 text-lg font-semibold">{title}</h3>
+            <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{description}</p>
           </div>
           {action && (
             <div className="pt-4">

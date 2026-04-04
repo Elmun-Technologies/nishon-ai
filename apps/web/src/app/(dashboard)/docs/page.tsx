@@ -116,14 +116,14 @@ export default function DocsPage() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-5">
-      <div className="bg-white border border-[#E5E7EB] rounded-2xl p-4">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-4">
         <div className="flex items-center gap-3 mb-3">
-          <h1 className="text-2xl font-bold text-[#111827]">📚 Documentation</h1>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50">📚 Documentation</h1>
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search..."
-            className="ml-auto border border-[#E5E7EB] rounded-xl px-3 py-2 text-sm min-w-64"
+            className="ml-auto border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm min-w-64"
           />
         </div>
         <div className="flex gap-4 flex-wrap border-b border-[#F3F4F6] pb-2">
@@ -132,7 +132,7 @@ export default function DocsPage() {
               key={t.id}
               onClick={() => setTab(t.id)}
               className={`text-sm font-medium pb-1 border-b-2 ${
-                tab === t.id ? 'text-[#4F46E5] border-[#4F46E5]' : 'text-[#6B7280] border-transparent'
+                tab === t.id ? 'text-[#4F46E5] border-[#4F46E5]' : 'text-slate-500 dark:text-slate-400 border-transparent'
               }`}
             >
               {t.label}
@@ -142,8 +142,8 @@ export default function DocsPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr_220px] gap-4">
-        <div className="bg-white border border-[#E5E7EB] rounded-xl p-4 h-fit">
-          <p className="text-sm font-semibold text-[#111827] mb-2">Bo‘limlar</p>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-4 h-fit">
+          <p className="text-sm font-semibold text-slate-900 dark:text-slate-50 mb-2">Bo‘limlar</p>
           <div className="space-y-1">
             {current.sections.map((s) => (
               <a key={s.id} href={`#${s.id}`} className="block text-sm text-[#4F46E5] hover:underline">
@@ -153,19 +153,19 @@ export default function DocsPage() {
           </div>
         </div>
 
-        <div className="bg-white border border-[#E5E7EB] rounded-xl p-6 space-y-6">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-6 space-y-6">
           <div>
             <p className="text-sm text-[#4F46E5] font-semibold mb-1">{TOP_TABS.find((t) => t.id === tab)?.label}</p>
-            <h2 className="text-4xl font-bold text-[#111827]">{current.heading}</h2>
-            <p className="text-[#4B5563] mt-3">{current.intro}</p>
+            <h2 className="text-4xl font-bold text-slate-900 dark:text-slate-50">{current.heading}</h2>
+            <p className="text-slate-600 dark:text-slate-400 mt-3">{current.intro}</p>
           </div>
 
           {filteredSections.map((section) => (
-            <section id={section.id} key={section.id} className="border border-[#E5E7EB] rounded-xl p-4">
-              <h3 className="text-2xl font-semibold text-[#111827] mb-2">{section.title}</h3>
-              <p className="text-[#4B5563]">{section.body}</p>
+            <section id={section.id} key={section.id} className="border border-slate-200 dark:border-slate-700 rounded-xl p-4">
+              <h3 className="text-2xl font-semibold text-slate-900 dark:text-slate-50 mb-2">{section.title}</h3>
+              <p className="text-slate-600 dark:text-slate-400">{section.body}</p>
               {section.steps && (
-                <ol className="mt-3 space-y-1 list-decimal list-inside text-sm text-[#374151]">
+                <ol className="mt-3 space-y-1 list-decimal list-inside text-sm text-slate-700 dark:text-slate-300">
                   {section.steps.map((step) => <li key={step}>{step}</li>)}
                 </ol>
               )}
@@ -173,11 +173,11 @@ export default function DocsPage() {
           ))}
         </div>
 
-        <div className="bg-white border border-[#E5E7EB] rounded-xl p-4 h-fit">
-          <p className="text-sm font-semibold text-[#111827] mb-2">On this page</p>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-4 h-fit">
+          <p className="text-sm font-semibold text-slate-900 dark:text-slate-50 mb-2">On this page</p>
           <div className="space-y-1">
             {filteredSections.map((s) => (
-              <a key={s.id} href={`#${s.id}`} className="block text-sm text-[#6B7280] hover:text-[#111827]">
+              <a key={s.id} href={`#${s.id}`} className="block text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50">
                 {s.title}
               </a>
             ))}

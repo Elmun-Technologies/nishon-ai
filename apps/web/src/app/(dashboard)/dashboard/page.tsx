@@ -92,7 +92,7 @@ export default function DashboardPage() {
   if (!ws) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="max-w-md w-full text-center p-10 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl">
+        <div className="max-w-md w-full text-center p-10 bg-white dark:bg-slate-900 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl">
           <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-violet-600 rounded-2xl flex items-center justify-center mx-auto mb-5 text-3xl shadow-lg shadow-blue-500/30">
             🚀
           </div>
@@ -174,7 +174,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {currentWorkspace && <LearningMonitor workspaceId={currentWorkspace.id} />}
         {forecast && forecast.daily?.length > 0 && (
-          <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/60 rounded-xl p-6 hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-lg transition-all duration-300">
+          <div className="lg:col-span-2 bg-white dark:bg-slate-900 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/60 rounded-xl p-6 hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-lg transition-all duration-300">
             <div className="flex items-start justify-between mb-4">
               <div>
                 <h2 className="text-base font-semibold text-slate-900 dark:text-slate-50 flex items-center gap-2">
@@ -202,7 +202,7 @@ export default function DashboardPage() {
 
       {/* Top Ads */}
       {topAds.length > 0 && (
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/60 rounded-xl p-6 hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-lg transition-all duration-300">
+        <div className="bg-white dark:bg-slate-900 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/60 rounded-xl p-6 hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-lg transition-all duration-300">
           <div className="flex items-center justify-between mb-5">
             <div>
               <h2 className="text-base font-semibold text-slate-900 dark:text-slate-50">🏆 Eng yaxshi kampaniyalar</h2>
@@ -214,7 +214,7 @@ export default function DashboardPage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
             {topAds.map((ad, idx) => (
-              <div key={ad.campaignId} className="group bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl p-4 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-white dark:hover:bg-slate-800 hover:shadow-md transition-all duration-200">
+              <div key={ad.campaignId} className="group bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl p-4 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-white dark:bg-slate-900 dark:hover:bg-slate-800 hover:shadow-md transition-all duration-200">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-200 dark:bg-slate-700 px-2 py-0.5 rounded-md">#{idx + 1}</span>
                   <span className={`text-xs px-2 py-0.5 rounded-md font-medium ${ad.status === 'ACTIVE' ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-700 text-slate-500'}`}>
@@ -244,7 +244,7 @@ export default function DashboardPage() {
 
       {/* AI Strategy + Autopilot */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/60 rounded-xl p-6 hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-lg transition-all duration-300">
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/60 rounded-xl p-6 hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-lg transition-all duration-300">
           <div className="flex items-start justify-between mb-5">
             <div>
               <div className="flex items-center gap-2.5 mb-1">
@@ -292,7 +292,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Autopilot */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/60 rounded-xl p-6 hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-lg transition-all duration-300">
+        <div className="bg-white dark:bg-slate-900 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/60 rounded-xl p-6 hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-lg transition-all duration-300">
           <div className="flex items-center gap-2.5 mb-5">
             <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center text-sm">⚡</div>
             <h2 className="font-semibold text-slate-900 dark:text-slate-50">Autopilot</h2>
@@ -347,7 +347,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/60 rounded-xl px-6 py-4 flex items-center justify-between hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-200">
+      <div className="bg-white dark:bg-slate-900 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/60 rounded-xl px-6 py-4 flex items-center justify-between hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-200">
         <p className="text-slate-500 dark:text-slate-400 text-sm font-medium shrink-0">Tezkor amallar</p>
         <div className="flex items-center gap-2 flex-wrap justify-end">
           {[

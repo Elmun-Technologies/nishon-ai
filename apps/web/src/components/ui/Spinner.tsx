@@ -15,7 +15,7 @@ export function Spinner({ size = 'md', className }: SpinnerProps) {
   return (
     <div
       className={cn(
-        'rounded-full border-[#E5E7EB] border-t-[#7C3AED] animate-spin',
+        'rounded-full border-slate-200 dark:border-slate-700 border-t-[#7C3AED] animate-spin',
         sizes[size],
         className
       )}
@@ -28,7 +28,7 @@ export function PageSpinner() {
     <div className="flex items-center justify-center flex-1 min-h-64">
       <div className="flex flex-col items-center gap-3">
         <Spinner size="lg" />
-        <p className="text-[#6B7280] text-sm">Loading...</p>
+        <p className="text-slate-500 dark:text-slate-400 text-sm">Loading...</p>
       </div>
     </div>
   )

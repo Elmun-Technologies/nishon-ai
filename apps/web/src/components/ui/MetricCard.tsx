@@ -25,7 +25,7 @@ const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
       <div
         ref={ref}
         className={cn(
-          'group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/60',
+          'group relative bg-white dark:bg-slate-900 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/60',
           'rounded-xl p-5 flex flex-col justify-between',
           'hover:border-slate-300 dark:hover:border-slate-600',
           'hover:shadow-lg dark:hover:shadow-slate-900/50',

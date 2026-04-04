@@ -40,7 +40,7 @@ export function Tabs({ tabs, activeTab, onChange, value, onValueChange, children
 
   // Simple usage
   return (
-    <div className={cn('flex items-center gap-1 bg-white border border-[#E5E7EB] rounded-xl p-1 w-fit', className)}>
+    <div className={cn('flex items-center gap-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-1 w-fit', className)}>
       {(tabs ?? []).map((tab) => (
         <button
           key={tab.key}
@@ -50,7 +50,7 @@ export function Tabs({ tabs, activeTab, onChange, value, onValueChange, children
             'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200',
             (activeTab ?? value) === tab.key
               ? 'bg-[#111827] text-white'
-              : 'text-[#6B7280] hover:text-[#111827] hover:bg-[#F9FAFB]'
+              : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50 hover:bg-slate-50 dark:bg-slate-800/50'
           )}
         >
           {tab.icon}
@@ -66,7 +66,7 @@ export function Tabs({ tabs, activeTab, onChange, value, onValueChange, children
 export interface TabsListProps { children: React.ReactNode; className?: string }
 export function TabsList({ children, className }: TabsListProps) {
   return (
-    <div className={cn('flex items-center gap-1 bg-white border border-[#E5E7EB] rounded-xl p-1 w-fit', className)}>
+    <div className={cn('flex items-center gap-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-1 w-fit', className)}>
       {children}
     </div>
   )
@@ -81,7 +81,7 @@ export function TabsTrigger({ value, children, className }: TabsTriggerProps) {
       onClick={() => ctx.onChange(value)}
       className={cn(
         'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200',
-        ctx.value === value ? 'bg-[#111827] text-white' : 'text-[#6B7280] hover:text-[#111827] hover:bg-[#F9FAFB]'
+        ctx.value === value ? 'bg-[#111827] text-white' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50 hover:bg-slate-50 dark:bg-slate-800/50'
       )}
     >
       {children}

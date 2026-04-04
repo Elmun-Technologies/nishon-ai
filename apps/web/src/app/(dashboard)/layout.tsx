@@ -26,11 +26,11 @@ export default function DashboardLayout({
   }, [accessToken, router])
 
   return (
-    <div className="flex h-screen bg-white dark:bg-slate-950 overflow-hidden transition-colors">
+    <div className="flex h-screen bg-white dark:bg-slate-900 dark:bg-slate-950 overflow-hidden transition-colors">
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-auto p-6 bg-white dark:bg-slate-950 text-slate-950 dark:text-slate-50">
+        <main className="flex-1 overflow-y-auto p-6 bg-white dark:bg-slate-900 dark:bg-slate-950 text-slate-950 dark:text-slate-50">
           {children}
         </main>
       </div>

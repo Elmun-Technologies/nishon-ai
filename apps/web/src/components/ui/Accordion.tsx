@@ -14,22 +14,22 @@ interface AccordionItemSimpleProps {
 export function AccordionItem({ title, children, defaultOpen = false, className }: AccordionItemSimpleProps) {
   const [open, setOpen] = React.useState(defaultOpen)
   return (
-    <div className={cn('border border-[#E5E7EB] rounded-lg overflow-hidden', className)}>
+    <div className={cn('border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden', className)}>
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-[#111827] hover:bg-[#F9FAFB] transition-colors"
+        className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-50 hover:bg-slate-50 dark:bg-slate-800/50 transition-colors"
       >
         {title}
         <svg
           width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
-          className={cn('text-[#6B7280] transition-transform duration-200', open && 'rotate-180')}
+          className={cn('text-slate-500 dark:text-slate-400 transition-transform duration-200', open && 'rotate-180')}
         >
           <path d="M19 9l-7 7-7-7" />
         </svg>
       </button>
       {open && (
-        <div className="px-4 pb-4 pt-1 border-t border-[#E5E7EB]">
+        <div className="px-4 pb-4 pt-1 border-t border-slate-200 dark:border-slate-700">
           {children}
         </div>
       )}
@@ -90,7 +90,7 @@ function Item({ value = '', children, className }: CompoundItemProps) {
   const { openItems } = React.useContext(AccordionContext)
   return (
     <ItemContext.Provider value={{ value, isOpen: openItems.has(value) }}>
-      <div className={cn('border border-[#E5E7EB] rounded-lg overflow-hidden', className)}>
+      <div className={cn('border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden', className)}>
         {children}
       </div>
     </ItemContext.Provider>
@@ -105,14 +105,14 @@ function Trigger({ children, className }: CompoundTriggerProps) {
       type="button"
       onClick={() => toggle(value)}
       className={cn(
-        'w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-[#111827] hover:bg-[#F9FAFB] transition-colors',
+        'w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-50 hover:bg-slate-50 dark:bg-slate-800/50 transition-colors',
         className
       )}
     >
       {children}
       <svg
         width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
-        className={cn('text-[#6B7280] transition-transform duration-200 shrink-0', isOpen && 'rotate-180')}
+        className={cn('text-slate-500 dark:text-slate-400 transition-transform duration-200 shrink-0', isOpen && 'rotate-180')}
       >
         <path d="M19 9l-7 7-7-7" />
       </svg>
@@ -124,7 +124,7 @@ function Content({ children, className }: CompoundContentProps) {
   const { isOpen } = React.useContext(ItemContext)
   if (!isOpen) return null
   return (
-    <div className={cn('px-4 pb-4 pt-1 border-t border-[#E5E7EB]', className)}>
+    <div className={cn('px-4 pb-4 pt-1 border-t border-slate-200 dark:border-slate-700', className)}>
       {children}
     </div>
   )
