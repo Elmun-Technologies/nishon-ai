@@ -429,6 +429,42 @@ export class VerifyPerformanceDto {
   fraudRiskLevel?: number;
 }
 
+// 10. SyncStatusDto
+export class SyncStatusDto {
+  @IsNotEmpty()
+  @IsUUID()
+  specialistId: string;
+
+  @IsNotEmpty()
+  @IsString()
+  specialistName: string;
+
+  @IsNotEmpty()
+  @IsEnum(PlatformType)
+  platform: PlatformType;
+
+  @IsNotEmpty()
+  @IsEnum(['pending', 'in_progress', 'completed', 'failed'])
+  status: 'pending' | 'in_progress' | 'completed' | 'failed';
+
+  @IsOptional()
+  @Type(() => Date)
+  lastSyncAt?: Date;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  recordsCount?: number;
+
+  @IsOptional()
+  @IsString()
+  errorMessage?: string;
+
+  @IsOptional()
+  @Type(() => Date)
+  nextScheduledSync?: Date;
+}
+
 // ==================== RESPONSE DTOs ====================
 
 // Language DTO
