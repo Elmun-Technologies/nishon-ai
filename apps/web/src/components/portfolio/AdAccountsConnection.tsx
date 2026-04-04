@@ -1,266 +1,280 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { AlertCircle, Check, Plus, Trash2, RefreshCw } from 'lucide-react';
+import { AlertCircle, Check, ArrowRight, RotateCcw } from 'lucide-react';
+
+type PlatformType = 'meta' | 'google' | 'yandex';
+type StepType = 'select' | 'connect' | 'success';
 
 interface ConnectedAccount {
-  id: string;
-  platform: 'meta' | 'google' | 'yandex';
+  platform: PlatformType;
   accountName: string;
   accountId: string;
-  status: 'connected' | 'disconnected' | 'pending' | 'error';
+  status: 'connected' | 'pending' | 'error';
   lastSync?: Date;
-  metricsCount?: number;
-  errorMessage?: string;
 }
 
 interface AdAccountsConnectionProps {
-  onAccountConnected?: (account: ConnectedAccount) => void;
-  onAccountDisconnected?: (accountId: string) => void;
-  onSync?: (accountId: string) => Promise<void>;
+  onComplete?: () => void;
 }
 
-const platformConfig = {
+const platformInfo = {
   meta: {
-    name: 'Meta Ads',
-    color: 'bg-blue-600',
+    name: 'Meta (Facebook/Instagram)',
     icon: '🔵',
     description: 'Facebook va Instagram reklama hisoblarini ulash',
+    details: 'Facebookda, Instagramda, Messenger va Audience Network da kampaniyalar yuborish',
+    color: 'blue',
+    requiredScopes: ['ads_management', 'analytics'],
   },
   google: {
     name: 'Google Ads',
-    color: 'bg-blue-500',
     icon: '🔍',
     description: 'Google Ads reklama kampaniyalarini ulash',
+    details: 'Qidiruv, Display va Smart kampaniyalarni boshqarish',
+    color: 'blue',
+    requiredScopes: ['googleads'],
   },
   yandex: {
     name: 'Yandex Direct',
-    color: 'bg-red-600',
-    icon: '🔴',
-    description: 'Yandex Direct reklama hisoblarini ulash',
+    icon: '🟡',
+    description: 'Yandex reklama hisoblarini ulash',
+    details: 'Yandex-da qidiruv va reklama kampaniyalarini boshqarish',
+    color: 'amber',
+    requiredScopes: ['yandex_direct'],
   },
 };
 
-const statusConfig = {
-  connected: { label: 'Ulangan', color: 'bg-green-100 text-green-800' },
-  disconnected: { label: 'Ulanmagan', color: 'bg-gray-100 text-gray-800' },
-  pending: { label: 'Kutilmoqda', color: 'bg-yellow-100 text-yellow-800' },
-  error: { label: 'Xato', color: 'bg-red-100 text-red-800' },
-};
-
-export const AdAccountsConnection: React.FC<AdAccountsConnectionProps> = ({
-  onAccountConnected,
-  onAccountDisconnected,
-  onSync,
-}) => {
-  const [accounts, setAccounts] = useState<ConnectedAccount[]>([]);
+export const AdAccountsConnection: React.FC<AdAccountsConnectionProps> = ({ onComplete }) => {
+  const [step, setStep] = useState<StepType>('select');
+  const [selectedPlatform, setSelectedPlatform] = useState<PlatformType | null>(null);
+  const [connectedAccounts, setConnectedAccounts] = useState<ConnectedAccount[]>([]);
   const [loading, setLoading] = useState(false);
-  const [syncing, setSyncing] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadConnectedAccounts();
-  }, []);
+  const handleSelectPlatform = (platform: PlatformType) => {
+    setSelectedPlatform(platform);
+    setError(null);
+    setStep('connect');
+  };
 
-  const loadConnectedAccounts = async () => {
+  const handleConnect = async (platform: PlatformType) => {
     setLoading(true);
+    setError(null);
     try {
-      // TODO: Fetch from API
-      // const response = await fetch('/api/connected-accounts');
-      // const data = await response.json();
-      // setAccounts(data);
-      setAccounts([]);
-    } finally {
+      // Redirect to OAuth
+      const redirectUrl = `/api/auth/${platform}/callback?return=/portfolio`;
+      window.location.href = `/api/auth/${platform}?redirect=${encodeURIComponent(redirectUrl)}`;
+    } catch (err) {
+      setError('Ulanishda xato yuz berdi. Qayta urinib ko\'ring.');
       setLoading(false);
     }
   };
 
-  const handleConnect = (platform: 'meta' | 'google' | 'yandex') => {
-    // TODO: Implement OAuth flow
-    window.location.href = `/api/auth/${platform}/connect?redirect=/portfolio`;
+  const handleBackToSelect = () => {
+    setStep('select');
+    setSelectedPlatform(null);
+    setError(null);
   };
 
-  const handleDisconnect = async (accountId: string) => {
-    if (window.confirm('Bu hisobni unashtirmoqchisiz?')) {
-      try {
-        // TODO: Call disconnect API
-        setAccounts(accounts.filter((acc) => acc.id !== accountId));
-        onAccountDisconnected?.(accountId);
-      } catch (error) {
-        console.error('Failed to disconnect account:', error);
-      }
-    }
-  };
-
-  const handleSync = async (accountId: string) => {
-    setSyncing(accountId);
-    try {
-      await onSync?.(accountId);
-      loadConnectedAccounts();
-    } finally {
-      setSyncing(null);
-    }
-  };
-
-  const connectedPlatforms = new Set(accounts.map((acc) => acc.platform));
+  const connectedPlatforms = connectedAccounts.map((acc) => acc.platform);
   const availablePlatforms = (['meta', 'google', 'yandex'] as const).filter(
-    (p) => !connectedPlatforms.has(p),
+    (p) => !connectedPlatforms.includes(p),
   );
 
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">Reklama Hisoblarini Ulash</h2>
-        <p className="mt-2 text-gray-600">
-          Meta, Google va Yandex reklama hisoblarini ulang va real vaqtda ma'lumotlarni kuzating
-        </p>
-      </div>
+  // ── STEP 1: PLATFORM SELECTION ──
+  if (step === 'select') {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">Qaysi platform uchun hisobni ulaysiz?</h3>
+          <p className="text-gray-600 text-sm">
+            Reklama hisobingizni Performa platformasiga ulang va real vaqtda ma'lumotlarni kuzating
+          </p>
+        </div>
 
-      {/* Connected Accounts */}
-      {accounts.length > 0 && (
-        <Card className="p-6">
-          <h3 className="mb-4 text-lg font-semibold text-gray-900">Ulangan Hisoblar</h3>
-          <div className="space-y-4">
-            {accounts.map((account) => (
-              <div
-                key={account.id}
-                className="flex items-center justify-between rounded-lg border border-gray-200 p-4 hover:bg-gray-50"
-              >
-                <div className="flex items-center gap-4">
-                  <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${platformConfig[account.platform].color}`}>
-                    <span className="text-xl">{platformConfig[account.platform].icon}</span>
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="font-semibold text-gray-900">
-                        {platformConfig[account.platform].name}
-                      </p>
-                      <Badge
-                        variant="outline"
-                        className={`text-xs ${statusConfig[account.status].color}`}
-                      >
-                        {statusConfig[account.status].label}
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-gray-600">{account.accountName}</p>
-                    {account.lastSync && (
-                      <p className="text-xs text-gray-500 mt-1">
-                        Oxirgi sinkronizasyon: {new Date(account.lastSync).toLocaleString('uz-UZ')}
-                      </p>
-                    )}
-                    {account.errorMessage && (
-                      <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
-                        <AlertCircle size={14} /> {account.errorMessage}
-                      </p>
-                    )}
-                  </div>
+        {/* Already Connected Accounts */}
+        {connectedAccounts.length > 0 && (
+          <Card className="border-green-200 bg-green-50 p-4">
+            <h4 className="font-semibold text-green-900 mb-3 flex items-center gap-2">
+              <Check size={18} /> Ulangan hisoblar ({connectedAccounts.length}/3)
+            </h4>
+            <div className="space-y-2">
+              {connectedAccounts.map((acc) => (
+                <div key={acc.platform} className="flex items-center justify-between p-3 bg-white rounded-lg border border-green-200">
+                  <span className="text-sm">
+                    {platformInfo[acc.platform].icon} {platformInfo[acc.platform].name}
+                  </span>
+                  <Badge className="bg-green-600">{acc.accountName}</Badge>
                 </div>
+              ))}
+            </div>
+          </Card>
+        )}
 
-                <div className="flex items-center gap-2">
-                  {account.metricsCount !== undefined && (
-                    <div className="text-right">
-                      <p className="text-sm font-semibold text-gray-900">{account.metricsCount}</p>
-                      <p className="text-xs text-gray-600">kampaniya</p>
+        {/* Platform Selection Grid */}
+        <div className="grid gap-4 md:grid-cols-3">
+          {(['meta', 'google', 'yandex'] as const).map((platform) => {
+            const isConnected = connectedPlatforms.includes(platform);
+            const info = platformInfo[platform];
+
+            return (
+              <button
+                key={platform}
+                onClick={() => !isConnected && handleSelectPlatform(platform)}
+                disabled={isConnected}
+                className={`text-left transition-all ${
+                  isConnected
+                    ? 'opacity-50 cursor-not-allowed'
+                    : 'hover:shadow-lg hover:border-blue-300 cursor-pointer'
+                }`}
+              >
+                <Card
+                  className={`p-6 h-full flex flex-col gap-4 ${
+                    isConnected ? 'border-green-200 bg-green-50' : 'border-gray-200 hover:bg-gray-50'
+                  }`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className={`flex h-12 w-12 items-center justify-center rounded-lg bg-${info.color}-100`}>
+                      <span className="text-2xl">{info.icon}</span>
+                    </div>
+                    {isConnected && <Check size={20} className="text-green-600" />}
+                  </div>
+
+                  <div>
+                    <h4 className="font-bold text-gray-900 text-lg">{info.name}</h4>
+                    <p className="text-sm text-gray-600 mt-1">{info.description}</p>
+                    <p className="text-xs text-gray-500 mt-2">{info.details}</p>
+                  </div>
+
+                  {!isConnected && (
+                    <div className="flex items-center gap-2 text-blue-600 font-semibold text-sm mt-auto pt-4 border-t border-gray-200">
+                      Tanlash <ArrowRight size={16} />
                     </div>
                   )}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleSync(account.id)}
-                    disabled={syncing === account.id}
-                    title="Sinkronizasyon"
-                  >
-                    <RefreshCw size={16} className={syncing === account.id ? 'animate-spin' : ''} />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDisconnect(account.id)}
-                    className="text-red-600 hover:bg-red-50"
-                    title="Unashtirish"
-                  >
-                    <Trash2 size={16} />
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-      )}
+                  {isConnected && (
+                    <div className="text-green-600 font-semibold text-sm mt-auto pt-4 border-t border-green-200">
+                      ✓ Ulangan
+                    </div>
+                  )}
+                </Card>
+              </button>
+            );
+          })}
+        </div>
 
-      {/* Connection Status Summary */}
-      <div className="grid gap-4 md:grid-cols-3">
-        {(['meta', 'google', 'yandex'] as const).map((platform) => {
-          const account = accounts.find((acc) => acc.platform === platform);
-          const isConnected = account && account.status === 'connected';
-
-          return (
-            <Card
-              key={platform}
-              className={`p-6 transition-all ${
-                isConnected ? 'border-green-200 bg-green-50' : 'border-gray-200'
-              }`}
-            >
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${platformConfig[platform].color}`}>
-                    <span className="text-lg">{platformConfig[platform].icon}</span>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">{platformConfig[platform].name}</h3>
-                    <p className="text-xs text-gray-600 mt-1">{platformConfig[platform].description}</p>
-                  </div>
-                </div>
-                {isConnected && <Check size={20} className="text-green-600" />}
-              </div>
-
-              {isConnected ? (
-                <div className="mt-4 flex gap-2">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => handleSync(account.id)}
-                    disabled={syncing === account.id}
-                    className="w-full"
-                  >
-                    <RefreshCw size={14} />
-                    Yangilash
-                  </Button>
-                </div>
-              ) : (
-                <Button
-                  onClick={() => handleConnect(platform)}
-                  disabled={loading}
-                  className="mt-4 w-full"
-                >
-                  <Plus size={16} />
-                  Ulash
-                </Button>
-              )}
-            </Card>
-          );
-        })}
+        {availablePlatforms.length === 0 && (
+          <Card className="border-green-200 bg-green-50 p-6 text-center">
+            <div className="flex justify-center mb-3">
+              <Check size={32} className="text-green-600" />
+            </div>
+            <h4 className="font-bold text-green-900 mb-2">Barcha hisoblar ulangan!</h4>
+            <p className="text-green-700 text-sm mb-4">
+              Siz Meta, Google va Yandex reklama hisoblarini ulagan bo'lsangiz, davom etishingiz mumkin.
+            </p>
+            <Button onClick={onComplete} className="w-full">
+              Davom etish →
+            </Button>
+          </Card>
+        )}
       </div>
+    );
+  }
 
-      {/* Integration Info */}
-      <Card className="border-blue-200 bg-blue-50 p-6">
-        <div className="flex gap-4">
-          <AlertCircle className="h-5 w-5 flex-shrink-0 text-blue-600 mt-0.5" />
+  // ── STEP 2: CONNECTION FLOW ──
+  if (step === 'connect' && selectedPlatform) {
+    const info = platformInfo[selectedPlatform];
+
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleBackToSelect}
+            className="mb-4 text-gray-600 hover:text-gray-900"
+          >
+            ← Orqaga
+          </Button>
+          <h3 className="text-2xl font-bold text-gray-900 mb-2">
+            {info.icon} {info.name} ni ulash
+          </h3>
+          <p className="text-gray-600">{info.description}</p>
+        </div>
+
+        {/* Connection Card */}
+        <Card className="p-8 text-center space-y-6">
+          <div className="flex justify-center">
+            <div className={`flex h-20 w-20 items-center justify-center rounded-2xl bg-${info.color}-100`}>
+              <span className="text-4xl">{info.icon}</span>
+            </div>
+          </div>
+
           <div>
-            <h4 className="font-semibold text-blue-900">Ma'lumot</h4>
-            <p className="mt-2 text-sm text-blue-800">
-              Ulangan hisoblaringizdan real vaqtda ma'lumotlar olinadi va Dashboard'da ko'rsatiladi.
-              Har kuni avtomatik ravishda sinkronizasyon bo'ladi. Xavfsizlik uchun API kalitlar shifrlangan
-              holda saqlanadi.
+            <h4 className="text-xl font-bold text-gray-900 mb-2">Tayyor?</h4>
+            <p className="text-gray-600 text-sm">
+              Quyidagi tugmani bosing va {info.name} hisobingizga kirish ruxsatini bering.
+              <br />
+              Ruxsat berilgandan so'ng avtomatik ravishda qaytasiz.
             </p>
           </div>
-        </div>
-      </Card>
-    </div>
-  );
+
+          {error && (
+            <div className="flex gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <AlertCircle size={20} className="text-red-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-red-900 text-sm">{error}</p>
+              </div>
+            </div>
+          )}
+
+          <Button
+            onClick={() => handleConnect(selectedPlatform)}
+            disabled={loading}
+            size="lg"
+            className="w-full"
+          >
+            {loading ? (
+              <>
+                <span className="animate-spin inline-block mr-2">⏳</span>
+                Yuborilmoqda...
+              </>
+            ) : (
+              <>
+                {info.icon} {info.name} ga ulanish
+              </>
+            )}
+          </Button>
+
+          <p className="text-xs text-gray-500">
+            🔒 Sizning ma'lumotlaringiz xavfsiz. Biz faqat reklama hisoblarini boshqarish uchun kirish kerak.
+          </p>
+        </Card>
+
+        {/* Info Card */}
+        <Card className="border-blue-200 bg-blue-50 p-6">
+          <div className="flex gap-4">
+            <div className="text-2xl">ℹ️</div>
+            <div>
+              <h4 className="font-semibold text-blue-900 mb-2">Nima bo'ladi?</h4>
+              <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
+                <li>Sizning {info.name} hisobiga xavfli ulanish o'rnatiladi</li>
+                <li>Reklama ma'lumotlari avtomatik ravishda sinxronizasiya bo'ladi</li>
+                <li>Portfolio'da real vaqtda natijalar ko'rsatiladi</li>
+                <li>Biz sizning reklama budjetini boshqarmayiz - faqat ko'rish uchun kiramiz</li>
+              </ul>
+            </div>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
+  return null;
 };
 
 export default AdAccountsConnection;
