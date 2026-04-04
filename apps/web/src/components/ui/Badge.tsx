@@ -23,9 +23,9 @@ const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
     ref
   ) => {
     const variants = {
-      default: 'bg-gray-100 border border-gray-200 text-gray-600',
-      secondary: 'bg-gray-100 border border-gray-200 text-gray-600',
-      gray: 'bg-gray-100 border border-gray-200 text-gray-600',
+      default: 'bg-surface-secondary border border-border text-text-secondary',
+      secondary: 'bg-surface-secondary border border-border text-text-secondary',
+      gray: 'bg-surface-secondary border border-border text-text-secondary',
       purple: 'bg-violet-50 border border-violet-200 text-violet-700',
       success: 'bg-emerald-50 border border-emerald-200 text-emerald-700',
       warning: 'bg-amber-50 border border-amber-200 text-amber-700',
@@ -34,7 +34,7 @@ const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
       danger: 'bg-red-50 border border-red-200 text-red-700',
     }
     const sizes = {
-      sm: 'px-1.5 py-0.5 text-[10px]',
+      sm: 'px-2 py-0.5 text-xs',
       md: 'px-2.5 py-1 text-xs',
     }
 
@@ -42,7 +42,7 @@ const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
       <div
         ref={ref}
         className={cn(
-          'inline-flex items-center gap-1.5 rounded-full font-medium border',
+          'inline-flex items-center gap-1.5 rounded-full font-medium border transition-colors duration-200',
           variants[variant],
           sizes[size],
           dot && 'pr-2',
@@ -53,12 +53,12 @@ const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
         {dot && (
           <span
             className={cn(
-              'w-1.5 h-1.5 rounded-full',
+              'w-1.5 h-1.5 rounded-full shrink-0',
               variant === 'purple' && 'bg-violet-500',
               variant === 'success' && 'bg-emerald-500',
               variant === 'warning' && 'bg-amber-500',
               variant === 'error' && 'bg-red-500',
-              (variant === 'default' || variant === 'gray') && 'bg-gray-400'
+              (variant === 'default' || variant === 'gray' || variant === 'secondary') && 'bg-gray-400'
             )}
           />
         )}
