@@ -7,11 +7,12 @@ import { Badge } from '@/components/ui/Badge'
 import { Progress } from '@/components/ui/Progress'
 import { LineChart, BarChart, PieChart } from '@/components/ui/Charts'
 import { useCampaigns } from '@/hooks/useCampaigns'
+import { Info } from 'lucide-react'
 
-const PLATFORM_COLORS: Record<string, { bg: string; accent: string; icon: string }> = {
-  meta:   { bg: 'from-blue-500/10 to-blue-600/10', accent: 'text-blue-500', icon: '📘' },
-  google: { bg: 'from-red-500/10 to-blue-500/10', accent: 'text-red-500', icon: '🔍' },
-  yandex: { bg: 'from-yellow-500/10 to-orange-500/10', accent: 'text-yellow-600', icon: '🟡' },
+const PLATFORM_COLORS: Record<string, { bg: string; accent: string; border: string; icon: string; glow: string }> = {
+  meta:   { bg: 'from-blue-500/5 via-slate-800 to-blue-600/5', accent: 'text-blue-400', border: 'border-blue-500/30 hover:border-blue-400/60', icon: '📘', glow: 'hover:shadow-lg hover:shadow-blue-500/20' },
+  google: { bg: 'from-red-500/5 via-slate-800 to-blue-500/5', accent: 'text-red-400', border: 'border-red-500/30 hover:border-red-400/60', icon: '🔍', glow: 'hover:shadow-lg hover:shadow-red-500/20' },
+  yandex: { bg: 'from-amber-500/5 via-slate-800 to-orange-500/5', accent: 'text-amber-400', border: 'border-amber-500/30 hover:border-amber-400/60', icon: '🟡', glow: 'hover:shadow-lg hover:shadow-amber-500/20' },
 }
 
 export function Dashboard() {
@@ -48,9 +49,9 @@ export function Dashboard() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-[#111827]">Dashboard</h2>
+      <div className="space-y-8">
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-slate-200 to-slate-100 bg-clip-text text-transparent">Dashboard</h2>
           <div className="flex gap-2">
             {['7d', '30d', '90d'].map(range => (
               <Button key={range} variant="secondary" size="sm">
@@ -59,14 +60,12 @@ export function Dashboard() {
             ))}
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map(i => (
-            <Card key={i} padding="lg">
-              <div className="animate-pulse">
-                <div className="h-4 bg-[#3A3A4A] rounded w-1/2 mb-2"></div>
-                <div className="h-8 bg-[#3A3A4A] rounded w-3/4"></div>
-              </div>
-            </Card>
+            <div key={i} className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6 animate-pulse">
+              <div className="h-4 bg-slate-700 rounded w-1/2 mb-3"></div>
+              <div className="h-10 bg-slate-700 rounded w-3/4"></div>
+            </div>
           ))}
         </div>
       </div>
@@ -76,69 +75,66 @@ export function Dashboard() {
   if (error) {
     return (
       <div className="space-y-6">
-        <h2 className="text-xl font-semibold text-[#111827]">Dashboard</h2>
-        <Card padding="lg">
-          <p className="text-red-400">Error loading dashboard data: {error}</p>
+        <h2 className="text-3xl font-bold bg-gradient-to-r from-slate-200 to-slate-100 bg-clip-text text-transparent">Dashboard</h2>
+        <div className="border border-red-500/50 bg-red-500/10 rounded-xl p-6">
+          <p className="text-red-300">Error loading dashboard data: {error}</p>
           <Button onClick={() => window.location.reload()} className="mt-4">
             Retry
           </Button>
-        </Card>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-[#111827]">Dashboard</h2>
+      <div className="flex items-center justify-between mb-2">
+        <div>
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-slate-200 to-slate-100 bg-clip-text text-transparent mb-1">Dashboard</h2>
+          <p className="text-sm text-slate-400">Track your advertising performance in real-time</p>
+        </div>
         <div className="flex gap-2">
           {['7d', '30d', '90d'].map(range => (
-            <Button
+            <button
               key={range}
-              variant={timeRange === range ? "primary" : "secondary"}
-              size="sm"
               onClick={() => setTimeRange(range)}
+              className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
+                timeRange === range
+                  ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg shadow-cyan-500/30'
+                  : 'bg-slate-800/50 border border-slate-700 text-slate-300 hover:border-slate-600 hover:bg-slate-800'
+              }`}
             >
               {range}
-            </Button>
+            </button>
           ))}
         </div>
       </div>
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card padding="lg">
-          <div className="space-y-2">
-            <p className="text-sm text-[#6B7280]">Total Spend</p>
-            <p className="text-2xl font-bold text-[#111827]">${totalSpend.toLocaleString()}</p>
-            <Badge variant="success">+12.5% vs last period</Badge>
+        {[
+          { label: 'Total Spend', value: `$${totalSpend.toLocaleString()}`, change: '+12.5%', color: 'from-cyan-500/20 to-blue-500/20', accentColor: 'text-cyan-400', icon: '💰' },
+          { label: 'Total Clicks', value: totalClicks.toLocaleString(), change: '+8.2%', color: 'from-purple-500/20 to-pink-500/20', accentColor: 'text-purple-400', icon: '🎯' },
+          { label: 'Conversions', value: totalConversions.toLocaleString(), change: '+15.7%', color: 'from-emerald-500/20 to-teal-500/20', accentColor: 'text-emerald-400', icon: '✨' },
+          { label: 'Average ROAS', value: `${avgROAS.toFixed(2)}x`, change: '+3.1%', color: 'from-orange-500/20 to-red-500/20', accentColor: 'text-orange-400', icon: '📈' },
+        ].map((metric, i) => (
+          <div
+            key={i}
+            className={`group bg-gradient-to-br ${metric.color} border border-slate-700/50 rounded-xl p-6 transition-all duration-300 hover:border-slate-600/80 hover:shadow-xl hover:shadow-slate-700/30 cursor-pointer`}
+          >
+            <div className="flex items-start justify-between mb-3">
+              <span className="text-3xl">{metric.icon}</span>
+              <Info className="w-4 h-4 text-slate-500 group-hover:text-slate-400 transition-colors" />
+            </div>
+            <p className="text-slate-400 text-sm font-medium mb-2">{metric.label}</p>
+            <p className={`text-3xl font-bold ${metric.accentColor} mb-3`}>{metric.value}</p>
+            <div className="flex items-center gap-1">
+              <span className="text-emerald-400 text-sm">↗</span>
+              <span className="text-emerald-400 text-sm font-semibold">{metric.change} vs last period</span>
+            </div>
           </div>
-        </Card>
-
-        <Card padding="lg">
-          <div className="space-y-2">
-            <p className="text-sm text-[#6B7280]">Total Clicks</p>
-            <p className="text-2xl font-bold text-[#111827]">{totalClicks.toLocaleString()}</p>
-            <Badge variant="success">+8.2% vs last period</Badge>
-          </div>
-        </Card>
-
-        <Card padding="lg">
-          <div className="space-y-2">
-            <p className="text-sm text-[#6B7280]">Conversions</p>
-            <p className="text-2xl font-bold text-[#111827]">{totalConversions.toLocaleString()}</p>
-            <Badge variant="success">+15.7% vs last period</Badge>
-          </div>
-        </Card>
-
-        <Card padding="lg">
-          <div className="space-y-2">
-            <p className="text-sm text-[#6B7280]">Average ROAS</p>
-            <p className="text-2xl font-bold text-[#111827]">{avgROAS.toFixed(2)}x</p>
-            <Badge variant="warning">+3.1% vs last period</Badge>
-          </div>
-        </Card>
+        ))}
       </div>
 
       {/* Per-Platform Tracking */}
@@ -147,73 +143,96 @@ export function Dashboard() {
           const stats = platformStats[platform]
           if (!stats) return null
           return (
-            <Card key={platform} padding="lg" className={`bg-gradient-to-br ${colors.bg} border-l-4`} style={{ borderLeftColor: colors.accent }}>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-2xl">{colors.icon}</span>
-                  <span className="text-xs font-semibold text-[#6B7280] uppercase">{stats.campaigns} kampaniya</span>
+            <div
+              key={platform}
+              className={`group bg-gradient-to-br ${colors.bg} border ${colors.border} rounded-xl p-6 transition-all duration-300 ${colors.glow}`}
+            >
+              <div className="space-y-4">
+                <div className="flex items-start justify-between">
+                  <span className="text-4xl">{colors.icon}</span>
+                  <span className={`text-xs font-bold ${colors.accent} uppercase tracking-wider`}>{stats.campaigns} campaigns</span>
                 </div>
-                <div>
-                  <p className="text-[#6B7280] text-xs">Sarflandi</p>
-                  <p className="text-lg font-bold text-[#111827]">${stats.spend.toLocaleString()}</p>
+
+                <div className="space-y-1">
+                  <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">Total Spend</p>
+                  <p className={`text-2xl font-bold ${colors.accent}`}>${stats.spend.toLocaleString()}</p>
                 </div>
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  <div>
-                    <p className="text-[#6B7280]">Kliklar</p>
-                    <p className="font-semibold text-[#111827]">{stats.clicks.toLocaleString()}</p>
+
+                <div className="grid grid-cols-2 gap-4 pt-2">
+                  <div className="space-y-1">
+                    <p className="text-slate-500 text-xs font-medium">Clicks</p>
+                    <p className="text-lg font-semibold text-slate-100">{stats.clicks.toLocaleString()}</p>
                   </div>
-                  <div>
-                    <p className="text-[#6B7280]">Konversiya</p>
-                    <p className="font-semibold text-[#111827]">{stats.conversions.toLocaleString()}</p>
+                  <div className="space-y-1">
+                    <p className="text-slate-500 text-xs font-medium">Conversions</p>
+                    <p className="text-lg font-semibold text-slate-100">{stats.conversions.toLocaleString()}</p>
                   </div>
                 </div>
+
+                <div className="h-1 bg-gradient-to-r from-slate-700 to-transparent rounded-full mt-3 group-hover:from-slate-600 transition-colors"></div>
               </div>
-            </Card>
+            </div>
           )
         })}
       </div>
 
       {/* Performance Chart */}
-      <Card padding="lg">
-        <h3 className="text-lg font-semibold text-[#111827] mb-4">Performance Over Time</h3>
+      <div className="border border-slate-700/50 bg-gradient-to-br from-slate-800/30 to-slate-900/30 rounded-xl p-6 hover:border-slate-600/80 transition-all duration-300 hover:shadow-xl hover:shadow-slate-700/20">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h3 className="text-xl font-bold text-slate-100">Performance Over Time</h3>
+            <p className="text-sm text-slate-400 mt-1">Track your spending, clicks, and conversions</p>
+          </div>
+          <span className="text-2xl">📊</span>
+        </div>
         <LineChart
           data={performanceData}
           xKey="date"
           yKeys={['spend', 'clicks', 'conversions']}
-          colors={['#7C3AED', '#4285F4', '#FFCC00']}
+          colors={['#06B6D4', '#8B5CF6', '#10B981']}
         />
-      </Card>
+      </div>
 
       {/* Recent Campaigns */}
-      <Card padding="lg">
-        <h3 className="text-lg font-semibold text-[#111827] mb-4">Recent Campaigns</h3>
+      <div className="border border-slate-700/50 bg-gradient-to-br from-slate-800/30 to-slate-900/30 rounded-xl p-6 hover:border-slate-600/80 transition-all duration-300 hover:shadow-xl hover:shadow-slate-700/20">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h3 className="text-xl font-bold text-slate-100">Recent Campaigns</h3>
+            <p className="text-sm text-slate-400 mt-1">Your top performing campaigns</p>
+          </div>
+          <span className="text-2xl">🎯</span>
+        </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[#E5E7EB]">
-                <th className="text-left text-[#6B7280] pb-3 font-semibold">Campaign</th>
-                <th className="text-left text-[#6B7280] pb-3 font-semibold">Platform</th>
-                <th className="text-left text-[#6B7280] pb-3 font-semibold">Spend</th>
-                <th className="text-left text-[#6B7280] pb-3 font-semibold">Clicks</th>
-                <th className="text-left text-[#6B7280] pb-3 font-semibold">Conv</th>
-                <th className="text-left text-[#6B7280] pb-3 font-semibold">ROAS</th>
+              <tr className="border-b border-slate-700/50">
+                <th className="text-left text-slate-400 pb-4 font-semibold uppercase text-xs tracking-wider">Campaign</th>
+                <th className="text-left text-slate-400 pb-4 font-semibold uppercase text-xs tracking-wider">Platform</th>
+                <th className="text-left text-slate-400 pb-4 font-semibold uppercase text-xs tracking-wider">Spend</th>
+                <th className="text-left text-slate-400 pb-4 font-semibold uppercase text-xs tracking-wider">Clicks</th>
+                <th className="text-left text-slate-400 pb-4 font-semibold uppercase text-xs tracking-wider">Conversions</th>
+                <th className="text-left text-slate-400 pb-4 font-semibold uppercase text-xs tracking-wider">ROAS</th>
               </tr>
             </thead>
             <tbody>
               {campaigns?.slice(0, 5).map(campaign => (
-                <tr key={campaign.id} className="border-b border-[#E5E7EB] hover:bg-[#F9FAFB]">
-                  <td className="py-3 text-[#111827] font-medium">{campaign.name}</td>
-                  <td className="py-3"><Badge variant="secondary" size="sm">{campaign.platform.toUpperCase()}</Badge></td>
-                  <td className="py-3 text-[#111827]">${(campaign.totalSpend || 0).toLocaleString()}</td>
-                  <td className="py-3 text-[#111827]">{(campaign.totalClicks || 0).toLocaleString()}</td>
-                  <td className="py-3 text-[#111827]">{(campaign.totalConversions || 0).toLocaleString()}</td>
-                  <td className="py-3 text-[#111827] font-semibold">{((campaign.totalConversions || 0) / (campaign.totalSpend || 1)).toFixed(2)}x</td>
+                <tr key={campaign.id} className="border-b border-slate-700/30 hover:bg-slate-800/50 transition-colors duration-200">
+                  <td className="py-4 text-slate-200 font-medium">{campaign.name}</td>
+                  <td className="py-4">
+                    <span className="inline-block px-3 py-1 rounded-lg bg-slate-700/50 text-slate-300 text-xs font-semibold uppercase tracking-wider">
+                      {campaign.platform.toUpperCase()}
+                    </span>
+                  </td>
+                  <td className="py-4 text-slate-200">${(campaign.totalSpend || 0).toLocaleString()}</td>
+                  <td className="py-4 text-slate-200">{(campaign.totalClicks || 0).toLocaleString()}</td>
+                  <td className="py-4 text-slate-200">{(campaign.totalConversions || 0).toLocaleString()}</td>
+                  <td className="py-4 text-emerald-400 font-bold">{((campaign.totalConversions || 0) / (campaign.totalSpend || 1)).toFixed(2)}x</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-      </Card>
+      </div>
     </div>
   )
 }
