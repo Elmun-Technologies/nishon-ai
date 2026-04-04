@@ -48,12 +48,12 @@ const STATUS_STYLE: Record<string, string> = {
   ACTIVE:   'text-emerald-400 bg-emerald-400/10',
   PAUSED:   'text-amber-400 bg-amber-400/10',
   DELETED:  'text-red-400 bg-red-400/10',
-  ARCHIVED: 'text-[#6B7280] bg-[#F3F4F6]',
+  ARCHIVED: 'text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800',
 }
 
 function MetricCell({ value, className = '' }: { value: string; className?: string }) {
   return (
-    <td className={`px-3 py-2.5 text-right text-sm font-medium text-[#111827] tabular-nums ${className}`}>
+    <td className={`px-3 py-2.5 text-right text-sm font-medium text-slate-900 dark:text-slate-50 tabular-nums ${className}`}>
       {value}
     </td>
   )
@@ -182,7 +182,7 @@ export default function ReportingPage() {
   if (!currentWorkspace) {
     return (
       <div className="flex items-center justify-center h-full">
-        <p className="text-[#6B7280]">Workspace tanlanmagan</p>
+        <p className="text-slate-500 dark:text-slate-400">Workspace tanlanmagan</p>
       </div>
     )
   }
@@ -193,17 +193,17 @@ export default function ReportingPage() {
       {/* ── Header ── */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-xl font-bold text-[#111827] flex items-center gap-2">
+          <h1 className="text-xl font-bold text-slate-900 dark:text-slate-50 flex items-center gap-2">
             📊 Hisobot
           </h1>
-          <p className="text-[#6B7280] text-sm mt-0.5">
+          <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">
             Meta Ads — Account → Kampaniya darajasida ko'rsatkichlar
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           {/* Date range selector */}
-          <div className="flex items-center gap-1 bg-white border border-[#E5E7EB] rounded-xl p-1">
+          <div className="flex items-center gap-1 bg-white border border-slate-200 dark:border-slate-700 rounded-xl p-1">
             {DAY_OPTIONS.map((d) => (
               <button
                 key={d}
@@ -212,7 +212,7 @@ export default function ReportingPage() {
                   px-3 py-1.5 rounded-lg text-xs font-medium transition-colors
                   ${days === d
                     ? 'bg-[#111827] text-white'
-                    : 'text-[#6B7280] hover:text-[#111827]'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50'
                   }
                 `}
               >
@@ -242,9 +242,9 @@ export default function ReportingPage() {
             { label: 'Jami Kliklar', value: formatNumber(totals.clicks) },
             { label: 'Jami Ko\'rinishlar', value: formatNumber(totals.impressions) },
           ].map((item) => (
-            <div key={item.label} className="bg-white border border-[#E5E7EB] rounded-xl p-4">
-              <p className="text-[#6B7280] text-xs mb-1">{item.label}</p>
-              <p className="text-[#111827] text-lg font-bold">{item.value}</p>
+            <div key={item.label} className="bg-white border border-slate-200 dark:border-slate-700 rounded-xl p-4">
+              <p className="text-slate-500 dark:text-slate-400 text-xs mb-1">{item.label}</p>
+              <p className="text-slate-900 dark:text-slate-50 text-lg font-bold">{item.value}</p>
             </div>
           ))}
         </div>
@@ -253,9 +253,9 @@ export default function ReportingPage() {
       {/* ── Custom Metrics Panel ── */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-[#111827] flex items-center gap-2">
+          <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-50 flex items-center gap-2">
             📌 Mening Ko'rsatkichlarim
-            <span className="text-xs text-[#9CA3AF] font-normal">— keraklisini tanlang</span>
+            <span className="text-xs text-slate-400 dark:text-slate-500 font-normal">— keraklisini tanlang</span>
           </h2>
           <div className="flex gap-1 flex-wrap justify-end">
             {AVAILABLE_METRICS.map((m) => (
@@ -266,8 +266,8 @@ export default function ReportingPage() {
                 )}
                 className={`text-xs px-2.5 py-1 rounded-full border transition-all ${
                   activeMetrics.includes(m.id)
-                    ? 'bg-[#111827] text-white border-[#111827]'
-                    : 'bg-white text-[#6B7280] border-[#E5E7EB] hover:border-[#D1D5DB]'
+                    ? 'bg-[#111827] text-white border-slate-900 dark:border-slate-100'
+                    : 'bg-white text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:border-slate-600'
                 }`}
               >
                 {m.icon} {m.label}
@@ -279,15 +279,15 @@ export default function ReportingPage() {
         {activeMetrics.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {AVAILABLE_METRICS.filter((m) => activeMetrics.includes(m.id)).map((m) => (
-              <div key={m.id} className="bg-white border border-[#E5E7EB] rounded-xl p-4 relative group">
+              <div key={m.id} className="bg-white border border-slate-200 dark:border-slate-700 rounded-xl p-4 relative group">
                 <button
                   onClick={() => setActiveMetrics((prev) => prev.filter((x) => x !== m.id))}
-                  className="absolute top-2 right-2 text-[#D1D5DB] hover:text-[#9CA3AF] opacity-0 group-hover:opacity-100 transition-opacity text-xs leading-none"
+                  className="absolute top-2 right-2 text-[#D1D5DB] hover:text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity text-xs leading-none"
                 >
                   ×
                 </button>
-                <p className="text-[#6B7280] text-xs mb-1">{m.icon} {m.label}</p>
-                <p className="text-[#111827] text-xl font-bold">{m.value}</p>
+                <p className="text-slate-500 dark:text-slate-400 text-xs mb-1">{m.icon} {m.label}</p>
+                <p className="text-slate-900 dark:text-slate-50 text-xl font-bold">{m.value}</p>
                 <p className={`text-xs mt-0.5 ${m.positive ? 'text-emerald-500' : 'text-red-400'}`}>
                   {m.trend} vs oldingi davr
                 </p>
@@ -295,33 +295,33 @@ export default function ReportingPage() {
             ))}
           </div>
         ) : (
-          <div className="border border-dashed border-[#E5E7EB] rounded-xl p-6 text-center">
-            <p className="text-[#9CA3AF] text-sm">Yuqoridan ko'rsatkichlarni tanlang</p>
+          <div className="border border-dashed border-slate-200 dark:border-slate-700 rounded-xl p-6 text-center">
+            <p className="text-slate-400 dark:text-slate-500 text-sm">Yuqoridan ko'rsatkichlarni tanlang</p>
           </div>
         )}
       </div>
 
       {/* ── Budget Simulation ── */}
-      <div className="bg-white border border-[#E5E7EB] rounded-xl overflow-hidden">
+      <div className="bg-white border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
         <button
           onClick={() => setShowSimulation(!showSimulation)}
-          className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-[#F9FAFB] transition-colors"
+          className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-slate-50 dark:bg-slate-900 transition-colors"
         >
           <div className="flex items-center gap-2">
             <span>🔮</span>
-            <span className="text-[#111827] font-medium text-sm">Byudjet Simulyatsiyasi</span>
-            <span className="text-xs text-[#9CA3AF]">— byudjet o'zgartirsa nima bo'ladi?</span>
+            <span className="text-slate-900 dark:text-slate-50 font-medium text-sm">Byudjet Simulyatsiyasi</span>
+            <span className="text-xs text-slate-400 dark:text-slate-500">— byudjet o'zgartirsa nima bo'ladi?</span>
           </div>
-          <span className={`text-[#6B7280] text-sm transition-transform duration-200 ${showSimulation ? 'rotate-180' : ''}`}>▾</span>
+          <span className={`text-slate-500 dark:text-slate-400 text-sm transition-transform duration-200 ${showSimulation ? 'rotate-180' : ''}`}>▾</span>
         </button>
 
         {showSimulation && (
-          <div className="px-5 pb-5 border-t border-[#E5E7EB]">
+          <div className="px-5 pb-5 border-t border-slate-200 dark:border-slate-700">
             <div className="pt-4 space-y-4">
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm text-[#374151] font-medium">Oylik byudjet</label>
-                  <span className="text-[#111827] font-bold text-lg">${simBudget.toLocaleString()}</span>
+                  <label className="text-sm text-slate-700 dark:text-slate-300 font-medium">Oylik byudjet</label>
+                  <span className="text-slate-900 dark:text-slate-50 font-bold text-lg">${simBudget.toLocaleString()}</span>
                 </div>
                 <input
                   type="range"
@@ -332,25 +332,25 @@ export default function ReportingPage() {
                   onChange={(e) => setSimBudget(parseInt(e.target.value))}
                   className="w-full accent-[#111827]"
                 />
-                <div className="flex justify-between text-xs text-[#9CA3AF] mt-1">
+                <div className="flex justify-between text-xs text-slate-400 dark:text-slate-500 mt-1">
                   <span>$500</span><span>$10,000</span>
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-3">
                 {[
                   { label: 'Pessimistik', mult: 0.65, color: 'text-red-500', bg: 'bg-red-50 border-red-100' },
-                  { label: 'Realistik',   mult: 1.0,  color: 'text-[#374151]', bg: 'bg-[#F9FAFB] border-[#E5E7EB]' },
+                  { label: 'Realistik',   mult: 1.0,  color: 'text-slate-700 dark:text-slate-300', bg: 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700' },
                   { label: 'Optimistik',  mult: 1.35, color: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-100' },
                 ].map((s) => (
                   <div key={s.label} className={`border rounded-xl p-3 ${s.bg}`}>
-                    <p className="text-[#6B7280] text-xs mb-2">{s.label}</p>
+                    <p className="text-slate-500 dark:text-slate-400 text-xs mb-2">{s.label}</p>
                     <p className={`text-lg font-bold ${s.color}`}>{Math.round(simBudget / 18.5 * s.mult)} lid</p>
-                    <p className="text-[#9CA3AF] text-xs">ROAS: {(2.4 * s.mult).toFixed(1)}x</p>
-                    <p className="text-[#9CA3AF] text-xs">CPA: ${(18.5 / s.mult).toFixed(0)}</p>
+                    <p className="text-slate-400 dark:text-slate-500 text-xs">ROAS: {(2.4 * s.mult).toFixed(1)}x</p>
+                    <p className="text-slate-400 dark:text-slate-500 text-xs">CPA: ${(18.5 / s.mult).toFixed(0)}</p>
                   </div>
                 ))}
               </div>
-              <p className="text-[#9CA3AF] text-xs">* Hisoblash joriy kampaniyalar ko'rsatkichlariga asoslangan</p>
+              <p className="text-slate-400 dark:text-slate-500 text-xs">* Hisoblash joriy kampaniyalar ko'rsatkichlariga asoslangan</p>
             </div>
           </div>
         )}
@@ -367,8 +367,8 @@ export default function ReportingPage() {
         ) : !data || data.accounts.length === 0 ? (
           <div className="text-center py-16 px-6">
             <span className="text-4xl block mb-3">📊</span>
-            <p className="text-[#111827] font-semibold mb-1">Ma'lumot yo'q</p>
-            <p className="text-[#6B7280] text-sm">
+            <p className="text-slate-900 dark:text-slate-50 font-semibold mb-1">Ma'lumot yo'q</p>
+            <p className="text-slate-500 dark:text-slate-400 text-sm">
               Meta Ads ulanmagan yoki bu davr uchun ma'lumot mavjud emas.
             </p>
             <Button
@@ -385,26 +385,26 @@ export default function ReportingPage() {
             <table className="w-full">
               {/* Table header */}
               <thead>
-                <tr className="border-b border-[#E5E7EB]">
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B7280] uppercase tracking-wide w-full">
+                <tr className="border-b border-slate-200 dark:border-slate-700">
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide w-full">
                     Kanal / Kampaniya
                   </th>
-                  <th className="px-3 py-3 text-right text-xs font-semibold text-[#6B7280] uppercase tracking-wide whitespace-nowrap">
+                  <th className="px-3 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide whitespace-nowrap">
                     Status
                   </th>
-                  <th className="px-3 py-3 text-right text-xs font-semibold text-[#6B7280] uppercase tracking-wide whitespace-nowrap">
+                  <th className="px-3 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide whitespace-nowrap">
                     Xarajat
                   </th>
-                  <th className="px-3 py-3 text-right text-xs font-semibold text-[#6B7280] uppercase tracking-wide whitespace-nowrap">
+                  <th className="px-3 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide whitespace-nowrap">
                     Kliklar
                   </th>
-                  <th className="px-3 py-3 text-right text-xs font-semibold text-[#6B7280] uppercase tracking-wide whitespace-nowrap">
+                  <th className="px-3 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide whitespace-nowrap">
                     Ko'rinish
                   </th>
-                  <th className="px-3 py-3 text-right text-xs font-semibold text-[#6B7280] uppercase tracking-wide whitespace-nowrap">
+                  <th className="px-3 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide whitespace-nowrap">
                     CTR
                   </th>
-                  <th className="px-3 py-3 text-right text-xs font-semibold text-[#6B7280] uppercase tracking-wide whitespace-nowrap">
+                  <th className="px-3 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide whitespace-nowrap">
                     CPC
                   </th>
                 </tr>
@@ -418,7 +418,7 @@ export default function ReportingPage() {
                       {/* ── Account row ── */}
                       <tr
                         key={account.id}
-                        className="bg-[#F9FAFB] hover:bg-white cursor-pointer transition-colors"
+                        className="bg-slate-50 dark:bg-slate-900 hover:bg-white cursor-pointer transition-colors"
                         onClick={() => toggleExpand(account.id)}
                       >
                         <td className="px-4 py-3">
@@ -427,24 +427,24 @@ export default function ReportingPage() {
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="#1877F2">
                               <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                             </svg>
-                            <span className="text-[#111827] font-semibold text-sm">{account.name}</span>
-                            <span className="text-[#6B7280] text-xs">{account.id}</span>
-                            <span className="text-[#6B7280] text-xs ml-1">
+                            <span className="text-slate-900 dark:text-slate-50 font-semibold text-sm">{account.name}</span>
+                            <span className="text-slate-500 dark:text-slate-400 text-xs">{account.id}</span>
+                            <span className="text-slate-500 dark:text-slate-400 text-xs ml-1">
                               {account.campaigns.length} kampaniya
                             </span>
                             {/* Expand chevron */}
-                            <span className={`text-[#6B7280] ml-auto transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`}>
+                            <span className={`text-slate-500 dark:text-slate-400 ml-auto transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`}>
                               ›
                             </span>
                           </div>
                         </td>
                         <td className="px-3 py-3 text-right">
-                          <span className="text-xs text-[#6B7280]">—</span>
+                          <span className="text-xs text-slate-500 dark:text-slate-400">—</span>
                         </td>
                         <MetricCell value={formatCurrency(account.metrics.spend)} />
                         <MetricCell value={formatNumber(account.metrics.clicks)} />
                         <MetricCell value={formatNumber(account.metrics.impressions)} />
-                        <MetricCell value={`${account.metrics.ctr.toFixed(2)}%`} className="text-[#374151]" />
+                        <MetricCell value={`${account.metrics.ctr.toFixed(2)}%`} className="text-slate-700 dark:text-slate-300" />
                         <MetricCell value={formatCurrency(account.metrics.cpc)} />
                       </tr>
 
@@ -452,18 +452,18 @@ export default function ReportingPage() {
                       {isOpen && account.campaigns.map((campaign) => (
                         <tr
                           key={campaign.id}
-                          className="bg-white hover:bg-[#F9FAFB] transition-colors"
+                          className="bg-white hover:bg-slate-50 dark:bg-slate-900 transition-colors"
                         >
                           <td className="px-4 py-2.5">
                             <div className="flex items-center gap-2 pl-6">
                               {/* Indent line */}
-                              <span className="w-px h-4 bg-[#F3F4F6] shrink-0" />
-                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="text-[#6B7280] shrink-0">
+                              <span className="w-px h-4 bg-slate-100 dark:bg-slate-800 shrink-0" />
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="text-slate-500 dark:text-slate-400 shrink-0">
                                 <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                               </svg>
-                              <span className="text-[#374151] text-sm">{campaign.name}</span>
+                              <span className="text-slate-700 dark:text-slate-300 text-sm">{campaign.name}</span>
                               {campaign.objective && (
-                                <span className="text-[10px] text-[#6B7280] bg-[#F9FAFB] border border-[#E5E7EB] px-1.5 py-0.5 rounded">
+                                <span className="text-[10px] text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 px-1.5 py-0.5 rounded">
                                   {campaign.objective.replace('OUTCOME_', '')}
                                 </span>
                               )}
@@ -471,7 +471,7 @@ export default function ReportingPage() {
                             {/* Tags row */}
                             <div className="pl-14 flex items-center gap-1.5 flex-wrap mt-1">
                               {(campaignTags[campaign.id] ?? campaign.tags ?? []).map((tag) => (
-                                <span key={tag} className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-[#E5E7EB] text-[#374151] border border-[#D1D5DB]">
+                                <span key={tag} className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-[#E5E7EB] text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600">
                                   {tag}
                                   <button onClick={() => removeTag(campaign.id, tag)} className="hover:text-red-400 leading-none">×</button>
                                 </span>
@@ -487,12 +487,12 @@ export default function ReportingPage() {
                                   }}
                                   onBlur={() => setEditingTagId(null)}
                                   placeholder="teg nomi..."
-                                  className="text-[10px] px-2 py-0.5 rounded-full bg-white border border-[#111827] text-[#111827] placeholder-[#9CA3AF] outline-none w-24"
+                                  className="text-[10px] px-2 py-0.5 rounded-full bg-white border border-slate-900 dark:border-slate-100 text-slate-900 dark:text-slate-50 placeholder-[#9CA3AF] outline-none w-24"
                                 />
                               ) : (
                                 <button
                                   onClick={() => { setEditingTagId(campaign.id); setTagInput('') }}
-                                  className="text-[10px] text-[#6B7280] hover:text-[#374151] border border-dashed border-[#E5E7EB] hover:border-[#111827] px-2 py-0.5 rounded-full transition-colors"
+                                  className="text-[10px] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300 border border-dashed border-slate-200 dark:border-slate-700 hover:border-slate-900 dark:border-slate-100 px-2 py-0.5 rounded-full transition-colors"
                                 >
                                   + teg
                                 </button>
@@ -500,7 +500,7 @@ export default function ReportingPage() {
                             </div>
                           </td>
                           <td className="px-3 py-2.5 text-right">
-                            <span className={`text-[10px] px-2 py-0.5 rounded font-medium ${STATUS_STYLE[campaign.status] ?? 'text-[#6B7280] bg-[#F3F4F6]'}`}>
+                            <span className={`text-[10px] px-2 py-0.5 rounded font-medium ${STATUS_STYLE[campaign.status] ?? 'text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800'}`}>
                               {campaign.status}
                             </span>
                           </td>
@@ -511,8 +511,8 @@ export default function ReportingPage() {
                             value={`${campaign.metrics.ctr.toFixed(2)}%`}
                             className={
                               campaign.metrics.ctr >= 2 ? 'text-emerald-400' :
-                              campaign.metrics.ctr >= 1 ? 'text-[#111827]' :
-                              campaign.metrics.ctr > 0  ? 'text-amber-400' : 'text-[#6B7280]'
+                              campaign.metrics.ctr >= 1 ? 'text-slate-900 dark:text-slate-50' :
+                              campaign.metrics.ctr > 0  ? 'text-amber-400' : 'text-slate-500 dark:text-slate-400'
                             }
                           />
                           <MetricCell value={campaign.metrics.cpc > 0 ? formatCurrency(campaign.metrics.cpc) : '—'} />

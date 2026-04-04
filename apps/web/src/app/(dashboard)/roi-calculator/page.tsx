@@ -156,14 +156,14 @@ function CompareRow({
   const performaWins = higherIsBetter ? withNum > withoutNum : withNum < withoutNum
 
   return (
-    <div className={`grid grid-cols-3 gap-4 px-5 py-3.5 border-b border-[#E5E7EB] last:border-0 ${
+    <div className={`grid grid-cols-3 gap-4 px-5 py-3.5 border-b border-slate-200 dark:border-slate-700 last:border-0 ${
       highlight ? 'bg-[#111827]/5' : ''
     }`}>
-      <p className="text-[#9CA3AF] text-sm">{label}</p>
+      <p className="text-slate-400 dark:text-slate-500 text-sm">{label}</p>
 
       {/* Without Performa */}
       <div className="text-center">
-        <p className={`text-sm font-semibold ${!performaWins ? 'text-emerald-400' : 'text-[#6B7280]'}`}>
+        <p className={`text-sm font-semibold ${!performaWins ? 'text-emerald-400' : 'text-slate-500 dark:text-slate-400'}`}>
           {typeof without === 'number' ? without.toLocaleString() : without}
           {unit && <span className="text-xs font-normal ml-0.5">{unit}</span>}
         </p>
@@ -171,7 +171,7 @@ function CompareRow({
 
       {/* With Performa */}
       <div className="text-center">
-        <p className={`text-sm font-semibold ${performaWins ? 'text-emerald-400' : 'text-[#6B7280]'}`}>
+        <p className={`text-sm font-semibold ${performaWins ? 'text-emerald-400' : 'text-slate-500 dark:text-slate-400'}`}>
           {typeof withPerforma === 'number' ? withPerforma.toLocaleString() : withPerforma}
           {unit && <span className="text-xs font-normal ml-0.5">{unit}</span>}
         </p>
@@ -202,7 +202,7 @@ function BigDiffCard({
 }) {
   const colors = {
     emerald: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
-    purple: 'text-[#374151] bg-[#F3F4F6] border-[#D1D5DB]',
+    purple: 'text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-600',
     amber: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
     blue: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
   }
@@ -326,10 +326,10 @@ export default function RoiCalculatorPage() {
       {/* Header */}
       <div>
         <div className="flex items-center gap-3 mb-1">
-          <h1 className="text-2xl font-bold text-[#111827]">ROI Kalkulyator</h1>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50">ROI Kalkulyator</h1>
           <Badge variant="purple">📊 Real hisob-kitob</Badge>
         </div>
-        <p className="text-[#6B7280] text-sm">
+        <p className="text-slate-500 dark:text-slate-400 text-sm">
           Reklama byudjetingiz Performa bilan va usiz qancha qaytishini ko'ring —
           real CIS bozori ma'lumotlariga asoslangan
         </p>
@@ -341,11 +341,11 @@ export default function RoiCalculatorPage() {
 
           {/* Budget */}
           <div>
-            <label className="block text-sm font-medium text-[#9CA3AF] mb-3">
+            <label className="block text-sm font-medium text-slate-400 dark:text-slate-500 mb-3">
               Oylik reklama byudjeti
             </label>
-            <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-3 mb-2">
-              <p className="text-2xl font-bold text-[#374151] text-center">
+            <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-3 mb-2">
+              <p className="text-2xl font-bold text-slate-700 dark:text-slate-300 text-center">
                 {formatCurrency(budget)}
               </p>
             </div>
@@ -356,7 +356,7 @@ export default function RoiCalculatorPage() {
               onChange={(e) => setBudget(Number(e.target.value))}
               className="w-full accent-[#7C3AED]"
             />
-            <div className="flex justify-between text-xs text-[#6B7280] mt-1">
+            <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 mt-1">
               <span>$50</span>
               <span>$5,000</span>
             </div>
@@ -364,16 +364,16 @@ export default function RoiCalculatorPage() {
 
           {/* Industry */}
           <div>
-            <label className="block text-sm font-medium text-[#9CA3AF] mb-3">
+            <label className="block text-sm font-medium text-slate-400 dark:text-slate-500 mb-3">
               Soha
             </label>
             <select
               value={industry}
               onChange={(e) => setIndustry(e.target.value)}
-              className="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl px-4 py-3 text-[#111827] text-sm focus:outline-none focus:border-[#111827] transition-all"
+              className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-slate-50 text-sm focus:outline-none focus:border-slate-900 dark:border-slate-100 transition-all"
             >
               {Object.entries(INDUSTRY_DATA).map(([key, val]) => (
-                <option key={key} value={key} className="bg-[#F9FAFB]">
+                <option key={key} value={key} className="bg-slate-50 dark:bg-slate-900">
                   {val.label}
                 </option>
               ))}
@@ -382,7 +382,7 @@ export default function RoiCalculatorPage() {
 
           {/* Period */}
           <div>
-            <label className="block text-sm font-medium text-[#9CA3AF] mb-3">
+            <label className="block text-sm font-medium text-slate-400 dark:text-slate-500 mb-3">
               Hisoblash davri
             </label>
             <div className="grid grid-cols-3 gap-1.5">
@@ -392,8 +392,8 @@ export default function RoiCalculatorPage() {
                   onClick={() => setMonths(m)}
                   className={`py-2.5 rounded-lg border text-sm font-medium transition-all ${
                     months === m
-                      ? 'border-[#111827] bg-[#F3F4F6] text-[#374151]'
-                      : 'border-[#E5E7EB] text-[#6B7280] hover:border-[#D1D5DB]'
+                      ? 'border-slate-900 dark:border-slate-100 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                      : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:border-slate-600'
                   }`}
                 >
                   {m}oy
@@ -404,7 +404,7 @@ export default function RoiCalculatorPage() {
 
           {/* Platform */}
           <div>
-            <label className="block text-sm font-medium text-[#9CA3AF] mb-3">
+            <label className="block text-sm font-medium text-slate-400 dark:text-slate-500 mb-3">
               Asosiy platform
             </label>
             <div className="space-y-1.5">
@@ -418,12 +418,12 @@ export default function RoiCalculatorPage() {
                   onClick={() => setPlatform(p.value)}
                   className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg border text-xs transition-all ${
                     platform === p.value
-                      ? 'border-[#111827] bg-[#F3F4F6] text-[#111827]'
-                      : 'border-[#E5E7EB] text-[#6B7280] hover:border-[#D1D5DB]'
+                      ? 'border-slate-900 dark:border-slate-100 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-50'
+                      : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:border-slate-600'
                   }`}
                 >
                   <span className={`w-3 h-3 rounded-full border shrink-0 flex items-center justify-center ${
-                    platform === p.value ? 'border-[#111827]' : 'border-[#4B5563]'
+                    platform === p.value ? 'border-slate-900 dark:border-slate-100' : 'border-[#4B5563]'
                   }`}>
                     {platform === p.value && (
                       <span className="w-1.5 h-1.5 rounded-full bg-[#111827] block" />
@@ -439,7 +439,7 @@ export default function RoiCalculatorPage() {
 
       {/* KEY DIFFERENCES — Big numbers */}
       <div>
-        <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide mb-3">
+        <p className="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wide mb-3">
           Performa bilan {months} oyda qo'shimcha foyda
         </p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -480,33 +480,33 @@ export default function RoiCalculatorPage() {
       }`}>
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
-            <p className="text-[#6B7280] text-sm mb-1">
+            <p className="text-slate-500 dark:text-slate-400 text-sm mb-1">
               Oylik sof foyda (daromad + tejamkorlik − Performa to'lovi)
             </p>
             <p className={`text-4xl font-black ${
               results.netBenefit > 0 ? 'text-emerald-400' : 'text-red-400'
             }`}>
               {results.netBenefit > 0 ? '+' : ''}{formatCurrency(results.netBenefit)}
-              <span className="text-lg font-normal text-[#6B7280] ml-2">/oy</span>
+              <span className="text-lg font-normal text-slate-500 dark:text-slate-400 ml-2">/oy</span>
             </p>
           </div>
           <div className="space-y-1 text-sm">
-            <div className="flex items-center gap-2 text-[#6B7280]">
+            <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
               <span className="text-emerald-400">+</span>
               Qo'shimcha daromad: {formatCurrency(results.extraRevenue)}/oy
             </div>
-            <div className="flex items-center gap-2 text-[#6B7280]">
+            <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
               <span className="text-emerald-400">+</span>
               Tejab qolgan: {formatCurrency(results.totalSaved)}/oy
             </div>
-            <div className="flex items-center gap-2 text-[#6B7280]">
+            <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
               <span className="text-red-400">−</span>
               Performa to'lovi: {formatCurrency(results.performaFee)}/oy
             </div>
           </div>
           <div className="text-center">
-            <p className="text-[#6B7280] text-xs mb-1">To'lovni qoplash muddati</p>
-            <p className="text-[#111827] text-2xl font-bold">
+            <p className="text-slate-500 dark:text-slate-400 text-xs mb-1">To'lovni qoplash muddati</p>
+            <p className="text-slate-900 dark:text-slate-50 text-2xl font-bold">
               {results.paybackDays} kun
             </p>
           </div>
@@ -516,14 +516,14 @@ export default function RoiCalculatorPage() {
       {/* Detailed comparison table */}
       <Card padding="none">
         {/* Table header */}
-        <div className="grid grid-cols-3 gap-4 px-5 py-3 bg-[#F9FAFB] border-b border-[#E5E7EB] rounded-t-xl">
-          <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide">
+        <div className="grid grid-cols-3 gap-4 px-5 py-3 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 rounded-t-xl">
+          <p className="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wide">
             Ko'rsatkich
           </p>
-          <p className="text-[#9CA3AF] text-xs font-medium text-center">
+          <p className="text-slate-400 dark:text-slate-500 text-xs font-medium text-center">
             ❌ Usiz (oddiy targetolog)
           </p>
-          <p className="text-[#374151] text-xs font-medium text-center">
+          <p className="text-slate-700 dark:text-slate-300 text-xs font-medium text-center">
             ✅ Performa bilan
           </p>
         </div>
@@ -596,33 +596,33 @@ export default function RoiCalculatorPage() {
       {/* Period summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
-          <p className="text-[#6B7280] text-xs uppercase tracking-wide mb-2">
+          <p className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wide mb-2">
             {months} oyda usiz
           </p>
-          <p className="text-2xl font-bold text-[#111827] mb-1">
+          <p className="text-2xl font-bold text-slate-900 dark:text-slate-50 mb-1">
             {formatCurrency(results.without.monthlyRevenue * months)}
           </p>
-          <p className="text-[#6B7280] text-xs">
+          <p className="text-slate-500 dark:text-slate-400 text-xs">
             {(results.without.monthlyLeads * months).toLocaleString()} lead ·{' '}
             {(results.without.monthlySales * months).toLocaleString()} sotuv
           </p>
         </Card>
 
-        <Card className="border-[#D1D5DB] bg-[#111827]/5">
-          <p className="text-[#374151] text-xs uppercase tracking-wide mb-2">
+        <Card className="border-slate-300 dark:border-slate-600 bg-[#111827]/5">
+          <p className="text-slate-700 dark:text-slate-300 text-xs uppercase tracking-wide mb-2">
             {months} oyda Performa bilan
           </p>
           <p className="text-2xl font-bold text-emerald-400 mb-1">
             {formatCurrency(results.withPerforma.monthlyRevenue * months)}
           </p>
-          <p className="text-[#6B7280] text-xs">
+          <p className="text-slate-500 dark:text-slate-400 text-xs">
             {(results.withPerforma.monthlyLeads * months).toLocaleString()} lead ·{' '}
             {(results.withPerforma.monthlySales * months).toLocaleString()} sotuv
           </p>
         </Card>
 
         <Card>
-          <p className="text-[#6B7280] text-xs uppercase tracking-wide mb-2">
+          <p className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wide mb-2">
             {months} oyda sof foyda
           </p>
           <p className={`text-2xl font-bold mb-1 ${
@@ -631,7 +631,7 @@ export default function RoiCalculatorPage() {
             {results.periodNetBenefit > 0 ? '+' : ''}
             {formatCurrency(results.periodNetBenefit)}
           </p>
-          <p className="text-[#6B7280] text-xs">
+          <p className="text-slate-500 dark:text-slate-400 text-xs">
             To'lov {results.paybackDays} kunda qaytadi
           </p>
         </Card>
@@ -642,11 +642,11 @@ export default function RoiCalculatorPage() {
         <div className="flex items-start gap-3 px-2">
           <span className="text-lg mt-0.5 shrink-0">ℹ️</span>
           <div className="flex-1">
-            <p className="text-[#6B7280] text-xs leading-relaxed">
+            <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">
               Bu hisob-kitob O'zbekiston va MDH bozorining real o'rtacha ko'rsatkichlariga
               asoslangan. Natijalar mahsulot sifati, kreativ materiallar va bozor sharoitiga
               qarab farq qilishi mumkin. Performa foydalanuvchilarining o'rtacha ROAS
-              ko'rsatkichi <span className="text-[#111827]">3.2x</span> ni tashkil etadi.
+              ko'rsatkichi <span className="text-slate-900 dark:text-slate-50">3.2x</span> ni tashkil etadi.
             </p>
           </div>
           <Button
