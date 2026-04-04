@@ -38,6 +38,21 @@ const NAV_ITEMS = [
     icon: BarChart3,
   },
   {
+    href: '/performance',
+    label: 'Performance',
+    icon: BarChart3,
+  },
+  {
+    href: '/top-ads',
+    label: 'Top Ads',
+    icon: TrendingUp,
+  },
+  {
+    href: '/docs',
+    label: "Yo'riqnoma",
+    icon: Sparkles,
+  },
+  {
     href: '/ai-decisions',
     label: 'AI Qarorlar',
     icon: Brain,
