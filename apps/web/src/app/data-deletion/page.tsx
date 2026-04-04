@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import LegalPageLayout from '@/components/layout/LegalPageLayout'
 
 export const metadata: Metadata = {
-  title: 'Data Deletion Instructions | Nishon AI',
-  description: 'How to request account and data deletion from Nishon AI.',
+  title: 'Data Deletion Instructions | Performa',
+  description: 'How to request account and data deletion from Performa.',
 }
 
 export default function Page() {
@@ -13,7 +13,7 @@ export default function Page() {
         <header className="space-y-3">
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Data Deletion Instructions</h1>
           <p className="text-[#9CA3AF]">
-            This page explains how Nishon AI users can request deletion of account and platform
+            This page explains how Performa users can request deletion of account and platform
             data associated with their workspace.
           </p>
           <p className="text-sm text-[#6B7280]">Last updated: March 22, 2026</p>
@@ -22,7 +22,7 @@ export default function Page() {
         <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
           <h2 className="text-xl font-semibold">Overview</h2>
           <p className="text-[#374151]">
-            Nishon AI supports user-initiated deletion requests for account and connected
+            Performa supports user-initiated deletion requests for account and connected
             workspace data. Deletion requests are processed in a controlled workflow to protect
             account security and prevent unauthorized removals.
           </p>
@@ -40,7 +40,7 @@ export default function Page() {
           </p>
           <p className="text-[#374151]">
             Include your account email, workspace name (if applicable), and a clear statement that
-            you request deletion of your Nishon AI data.
+            you request deletion of your Performa data.
           </p>
         </section>
 
@@ -56,9 +56,9 @@ export default function Page() {
         <section className="space-y-4 rounded-xl border border-[#E5E7EB] bg-white p-6">
           <h2 className="text-xl font-semibold">What data will be deleted</h2>
           <ul className="list-disc space-y-2 pl-5 text-[#374151]">
-            <li>User account profile and authentication-related records in Nishon AI.</li>
+            <li>User account profile and authentication-related records in Performa.</li>
             <li>Workspace configuration and associated campaign operation history.</li>
-            <li>Connected OAuth tokens and third-party integration credentials stored by Nishon AI.</li>
+            <li>Connected OAuth tokens and third-party integration credentials stored by Performa.</li>
             <li>Stored analytics and AI decision/recommendation records tied to your account.</li>
           </ul>
 
@@ -80,7 +80,7 @@ export default function Page() {
         <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
           <h2 className="text-xl font-semibold">Third-party connected platform implications</h2>
           <p className="text-[#374151]">
-            Deleting data in Nishon AI does not automatically delete data held by third-party
+            Deleting data in Performa does not automatically delete data held by third-party
             platforms (such as Meta, Google, or TikTok). You may need to separately remove
             applications, revoke tokens, or submit deletion requests directly with those providers.
           </p>
@@ -89,7 +89,7 @@ export default function Page() {
         <section className="space-y-4 rounded-xl border border-[#E5E7EB] bg-white p-6">
           <h2 className="text-xl font-semibold">Confirmation process</h2>
           <p className="text-[#374151]">
-            Once the request is completed, Nishon AI sends confirmation to the request email,
+            Once the request is completed, Performa sends confirmation to the request email,
             including status details (completed, partially retained for legal reasons, or requiring
             additional information).
           </p>
@@ -102,7 +102,7 @@ export default function Page() {
           </p>
           <p className="text-sm text-[#6B7280]">
             Disclaimer: These instructions are provided for operational and compliance purposes and
-            may be updated as the Nishon AI platform evolves.
+            may be updated as the Performa platform evolves.
           </p>
         </section>
       </article>

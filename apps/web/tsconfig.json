@@ -21,8 +21,8 @@
     "baseUrl": "src",
     "paths": {
       "@/*": ["./*"],
-      "@nishon/shared": ["../../packages/shared/src"],
-      "@nishon/shared/*": ["../../packages/shared/src/*"]
+      "@performa/shared": ["../../packages/shared/src"],
+      "@performa/shared/*": ["../../packages/shared/src/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

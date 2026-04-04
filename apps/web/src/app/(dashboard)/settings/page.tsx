@@ -238,6 +238,7 @@ export default function SettingsPage() {
   const [telegramSaved, setTelegramSaved] = useState(false)
 
   const [metaConnected, setMetaConnected] = useState<boolean | null>(null)
+  const [metaConnecting, setMetaConnecting] = useState(false)
 
   // ── Optimization policy state ──────────────────────────────────────────────
   const [policy, setPolicy] = useState({
@@ -325,7 +326,7 @@ export default function SettingsPage() {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/workspaces/${currentWorkspace.id}`, {
         method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('nishon_access_token') ?? ''}`,
+          Authorization: `Bearer ${localStorage.getItem('performa_access_token') ?? ''}`,
         },
       })
       if (res.ok || res.status === 204) {
@@ -335,6 +336,12 @@ export default function SettingsPage() {
     } catch (err: any) {
       setSaveError(err?.message ?? 'Failed to delete workspace')
     }
+  }
+
+  function handleMetaConnect() {
+    if (!currentWorkspace?.id || metaConnecting) return
+    setMetaConnecting(true)
+    connectMeta(currentWorkspace.id)
   }
 
   return (
@@ -568,11 +575,11 @@ export default function SettingsPage() {
                       <div className="flex items-center gap-2 shrink-0">
                         <button
                           type="button"
-                          onClick={() => currentWorkspace?.id && connectMeta(currentWorkspace.id)}
-                          disabled={!currentWorkspace?.id}
+                          onClick={handleMetaConnect}
+                          disabled={!currentWorkspace?.id || metaConnecting}
                           className="text-xs px-3 py-1.5 rounded-lg border border-[#D1D5DB] text-[#374151] hover:bg-[#F3F4F6] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                         >
-                          Connect
+                          {metaConnecting ? 'Connecting…' : 'Connect'}
                         </button>
                         <Link
                           href={integration.href}
@@ -763,7 +770,7 @@ export default function SettingsPage() {
 
               <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg p-4 mb-4 text-xs text-[#9CA3AF] space-y-1.5">
                 <p className="font-medium text-[#E5E7EB]">Qanday ulash:</p>
-                <p>1. Telegramda <span className="text-[#374151] font-mono">@NishonAIBot</span> ga yozing</p>
+                <p>1. Telegramda <span className="text-[#374151] font-mono">@PerformaAIBot</span> ga yozing</p>
                 <p>2. <span className="font-mono text-[#111827]">/start</span> buyrug'ini yuboring</p>
                 <p>3. Bot sizga Chat ID ni ko'rsatadi — uni quyida kiriting</p>
               </div>

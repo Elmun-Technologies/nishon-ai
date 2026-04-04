@@ -17,7 +17,7 @@ export default function DashboardLayout({
     // If no token in store or localStorage, redirect to login
     const token =
       accessToken || (typeof window !== 'undefined'
-        ? localStorage.getItem('nishon_access_token')
+        ? localStorage.getItem('performa_access_token')
         : null)
 
     if (!token) {

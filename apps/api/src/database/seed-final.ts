@@ -65,7 +65,7 @@ async function seed() {
 
   // Check if demo user already exists
   const existing = await userRepo.findOne({
-    where: { email: "demo@nishon.ai" },
+    where: { email: "demo@performa.ai" },
   });
   if (existing) {
     console.log("✅ Demo user already exists — skipping seed");
@@ -77,7 +77,7 @@ async function seed() {
   const hashedPassword = await bcrypt.hash("demo1234", 12);
   const user = await userRepo.save(
     userRepo.create({
-      email: "demo@nishon.ai",
+      email: "demo@performa.ai",
       password: hashedPassword,
       name: "Demo User",
       plan: UserPlan.PRO,
@@ -255,7 +255,7 @@ async function seed() {
 
   console.log("");
   console.log("🎉 Seed complete! Demo credentials:");
-  console.log("   Email:    demo@nishon.ai");
+  console.log("   Email:    demo@performa.ai");
   console.log("   Password: demo1234");
   console.log("");
 

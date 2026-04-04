@@ -1,4 +1,4 @@
-export { NishonAiClient } from './openai-client'
+export { PerformaAiClient } from './openai-client'
 export type { CompleteOptions, CompleteResult, AiProvider } from './openai-client'
 export {
   getModelByTask,

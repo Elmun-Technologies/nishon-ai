@@ -14,7 +14,7 @@ import { Response } from "express";
 import { MetaOAuthService } from "./meta-oauth.service";
 import { ConnectedAccount } from "../platforms/entities/connected-account.entity";
 import { Workspace } from "../workspaces/entities/workspace.entity";
-import { Platform } from "@nishon/shared";
+import { Platform } from "@performa/shared";
 import { encrypt } from "../common/crypto.util";
 
 /**

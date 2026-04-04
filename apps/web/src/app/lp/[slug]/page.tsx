@@ -337,7 +337,7 @@ export default function LandingPagePublic() {
 
         {/* Powered by footer */}
         <div className="py-3 text-center text-xs text-gray-400 bg-gray-50">
-          Nishon AI bilan yaratilgan
+          Performa bilan yaratilgan
         </div>
       </div>
 

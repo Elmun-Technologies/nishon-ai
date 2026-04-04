@@ -13,7 +13,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const token =
       accessToken ||
-      (typeof window !== 'undefined' ? localStorage.getItem('nishon_access_token') : null)
+      (typeof window !== 'undefined' ? localStorage.getItem('performa_access_token') : null)
 
     if (!token) {
       router.push('/login')

@@ -37,7 +37,7 @@ async function apiRequest<T>(
   }
 
   if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('nishon_access_token')
+    const token = localStorage.getItem('performa_access_token')
     if (token) headers.Authorization = `Bearer ${token}`
   }
 
@@ -49,7 +49,7 @@ async function apiRequest<T>(
   })
 
   if (res.status === 401 && retry && typeof window !== 'undefined') {
-    const refreshToken = localStorage.getItem('nishon_refresh_token')
+    const refreshToken = localStorage.getItem('performa_refresh_token')
     if (refreshToken) {
       try {
         const refreshRes = await fetch(toUrl('/auth/refresh'), {
@@ -63,12 +63,12 @@ async function apiRequest<T>(
 
         const refreshJson = await refreshRes.json()
         const newToken = refreshJson.accessToken
-        if (newToken) localStorage.setItem('nishon_access_token', newToken)
+        if (newToken) localStorage.setItem('performa_access_token', newToken)
 
         return apiRequest<T>(method, pathOrUrl, body, false)
       } catch {
-        localStorage.removeItem('nishon_access_token')
-        localStorage.removeItem('nishon_refresh_token')
+        localStorage.removeItem('performa_access_token')
+        localStorage.removeItem('performa_refresh_token')
         window.location.href = '/login'
       }
     } else {

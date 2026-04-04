@@ -43,7 +43,7 @@ export default function LoginPage() {
       const res = await auth.login(form)
       const { accessToken, refreshToken, user } = res.data
 
-      localStorage.setItem('nishon_refresh_token', refreshToken)
+      localStorage.setItem('performa_refresh_token', refreshToken)
       setAccessToken(accessToken)
       setUser(user)
 
@@ -78,7 +78,7 @@ export default function LoginPage() {
       <div className="hidden lg:flex lg:w-1/2 bg-white border-r border-[#E5E7EB] flex-col justify-between p-12">
         <div>
           <h1 className="text-2xl font-bold text-[#111827]">
-            Nishon <span className="text-[#374151]">AI</span>
+            Performa <span className="text-[#374151]">AI</span>
           </h1>
         </div>
 
@@ -93,7 +93,7 @@ export default function LoginPage() {
               <span className="text-[#374151]">o'zi ishlaydi.</span>
             </h2>
             <p className="text-[#6B7280] text-lg leading-relaxed">
-              Nishon AI Meta, Google va TikTok kampaniyalaringizni
+              Performa Meta, Google va TikTok kampaniyalaringizni
               mustaqil boshqaradi — har 2 soatda optimallashtiradi, har kuni hisobot beradi.
             </p>
           </div>
@@ -113,7 +113,7 @@ export default function LoginPage() {
 
           <div className="bg-[#F9FAFB] rounded-xl p-5 border border-[#E5E7EB]">
             <p className="text-[#374151] text-sm leading-relaxed mb-3">
-              "Nishon AI targetologimizni almashtirdi va birinchi oyda ROAS 2.8x oshdi.
+              "Performa targetologimizni almashtirdi va birinchi oyda ROAS 2.8x oshdi.
               Endi kampaniya boshqarishga 0 soat sarflaymiz."
             </p>
             <div className="flex items-center gap-3">
@@ -128,7 +128,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <p className="text-[#6B7280] text-xs">© 2025 Nishon AI. All rights reserved.</p>
+        <p className="text-[#6B7280] text-xs">© 2025 Performa. All rights reserved.</p>
       </div>
 
       {/* Right panel — form */}
@@ -138,7 +138,7 @@ export default function LoginPage() {
           {/* Mobile logo */}
           <div className="lg:hidden text-center mb-8">
             <h1 className="text-2xl font-bold text-[#111827]">
-              Nishon <span className="text-[#374151]">AI</span>
+              Performa <span className="text-[#374151]">AI</span>
             </h1>
           </div>
 

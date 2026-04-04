@@ -54,21 +54,26 @@ export type SyncResult = {
  * workspaceId is required: the backend encodes it in OAuth state so the
  * callback knows which workspace to save the token to.
  */
-export function connectMeta(workspaceId: string): void {
+export function buildMetaConnectUrl(workspaceId: string, redirectTo?: string): string | null {
   if (!workspaceId) {
-    console.error('[Nishon AI] connectMeta: workspaceId is required')
-    return
+    console.error('[Performa] connectMeta: workspaceId is required')
+    return null
   }
 
   const backendUrl = env.apiBaseUrl.replace(/\/$/, '')
-  const redirectTo =
-    typeof window !== 'undefined' ? `${window.location.origin}/settings/meta` : undefined
-
   const url = new URL(`${backendUrl}/meta/connect`)
   url.searchParams.set('workspaceId', workspaceId)
   if (redirectTo) url.searchParams.set('redirectTo', redirectTo)
 
-  window.location.href = url.toString()
+  return url.toString()
+}
+
+export function connectMeta(workspaceId: string): void {
+  const redirectTo =
+    typeof window !== 'undefined' ? `${window.location.origin}/settings/meta` : undefined
+  const url = buildMetaConnectUrl(workspaceId, redirectTo)
+  if (!url || typeof window === 'undefined') return
+  window.location.href = url
 }
 
 // ─── API calls (authenticated via JWT in api-client) ─────────────────────────

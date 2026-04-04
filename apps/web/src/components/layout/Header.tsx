@@ -9,7 +9,15 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   },
   '/campaigns': {
     title: 'Campaigns',
-    subtitle: 'All campaigns managed by Nishon AI',
+    subtitle: 'All campaigns managed by Performa',
+  },
+  '/audiences': {
+    title: 'Audience Launcher',
+    subtitle: 'Build and launch full-funnel audiences with AI-assisted presets',
+  },
+  '/platform-architecture': {
+    title: 'Platform Blueprint',
+    subtitle: 'Full multi-network architecture, modules, roadmap, and execution checklist',
   },
   '/ai-decisions': {
     title: 'AI Decisions',
@@ -33,7 +41,7 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   },
   '/roi-calculator': {
     title: 'ROI Kalkulyator',
-    subtitle: 'Nishon AI bilan reklama foydasini hisoblash',
+    subtitle: 'Performa bilan reklama foydasini hisoblash',
   },
   '/settings': {
     title: 'Settings',
@@ -44,7 +52,7 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
 export default function Header() {
   const pathname = usePathname()
   const { currentWorkspace } = useWorkspaceStore()
-  const page = PAGE_TITLES[pathname] ?? { title: 'Nishon AI', subtitle: '' }
+  const page = PAGE_TITLES[pathname] ?? { title: 'Performa', subtitle: '' }
 
   return (
     <header className="h-14 bg-white border-b border-[#E5E7EB] px-6 flex items-center justify-between shrink-0">

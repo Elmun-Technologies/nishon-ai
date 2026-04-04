@@ -35,6 +35,26 @@ const NAV_ITEMS = [
     ),
   },
   {
+    href: '/audiences',
+    label: 'Audience Launcher',
+    icon: (
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <circle cx="11" cy="11" r="7" />
+        <path d="M20 20l-3-3" />
+      </svg>
+    ),
+  },
+  {
+    href: '/platform-architecture',
+    label: 'Platform Blueprint',
+    icon: (
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path d="M3 5h18M3 12h18M3 19h18" />
+        <path d="M7 5v14M17 5v14" />
+      </svg>
+    ),
+  },
+  {
     href: '/reporting',
     label: 'Hisobot',
     icon: (
@@ -145,31 +165,27 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="w-64 bg-white border-r border-[#E5E7EB] flex flex-col shrink-0">
+    <aside className="w-72 bg-[#F3F4F6] border-r border-[#E5E7EB] flex flex-col shrink-0">
 
       {/* Logo + workspace selector */}
-      <div className="px-4 py-4 border-b border-[#E5E7EB]">
-        <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-[#111827] flex items-center justify-center shrink-0">
-            <span className="text-white font-bold text-xs">N</span>
+      <div className="px-5 pt-6 pb-4">
+        <div className="flex items-center gap-3">
+          <div className="grid grid-cols-2 gap-1 shrink-0">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#22C55E]" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#3B82F6]" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#EC4899]" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[#111827] font-semibold text-sm leading-tight truncate">
-              {currentWorkspace?.name ?? 'Nishon AI'}
-            </p>
-            {currentWorkspace && (
-              <p className="text-[#9CA3AF] text-xs truncate">Workspace</p>
-            )}
+            <p className="text-[#111827] font-semibold text-2xl leading-tight truncate">Performa</p>
+            <p className="text-[#6B7280] text-xs truncate">{currentWorkspace?.name ?? 'Workspace'}</p>
           </div>
-          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} className="text-[#9CA3AF] shrink-0">
-            <path d="M19 9l-7 7-7-7"/>
-          </svg>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-2 py-3 space-y-0.5 overflow-y-auto">
-        {NAV_ITEMS.map((item) => {
+      <nav className="flex-1 px-3 py-1 space-y-4 overflow-y-auto">
+        {NAV_ITEMS.slice(0, 1).map((item) => {
           const isActive =
             item.href === '/dashboard'
               ? pathname === '/dashboard'
@@ -180,11 +196,11 @@ export default function Sidebar() {
               key={item.href}
               href={item.href}
               className={`
-                flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm
+                flex items-center gap-3 px-3 py-3 rounded-xl text-sm
                 transition-all duration-150 group
                 ${isActive
-                  ? 'bg-[#F3F4F6] text-[#111827] font-medium'
-                  : 'text-[#6B7280] hover:text-[#111827] hover:bg-[#F9FAFB]'
+                  ? 'bg-white text-[#111827] font-medium shadow-sm'
+                  : 'text-[#374151] hover:text-[#111827] hover:bg-white'
                 }
               `}
             >
@@ -198,12 +214,69 @@ export default function Sidebar() {
             </Link>
           )
         })}
+
+        <div className="rounded-2xl border border-[#E5E7EB] bg-[#EDEFF2] p-2.5">
+          <div className="flex items-center justify-between px-2 py-1.5 text-[#111827]">
+            <p className="text-sm font-medium">{currentWorkspace?.name ?? 'PR Workspace'}</p>
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} className="text-[#374151]">
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </div>
+          <div className="space-y-1 mt-1">
+            {NAV_ITEMS.slice(1, 7).map((item) => {
+              const isActive = pathname.startsWith(item.href)
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`
+                    flex items-center gap-3 px-2.5 py-2.5 rounded-xl text-sm transition-all duration-150 group
+                    ${isActive
+                      ? 'bg-white text-[#111827] font-medium shadow-sm'
+                      : 'text-[#4B5563] hover:text-[#111827] hover:bg-white/90'
+                    }
+                  `}
+                >
+                  <span className={`shrink-0 ${isActive ? 'text-[#111827]' : 'text-[#6B7280] group-hover:text-[#374151]'}`}>
+                    {item.icon}
+                  </span>
+                  <span className="flex-1 truncate">{item.label}</span>
+                  {item.badge && <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />}
+                </Link>
+              )
+            })}
+          </div>
+        </div>
+
+        <div className="space-y-1">
+          {NAV_ITEMS.slice(7).map((item) => {
+            const isActive = pathname.startsWith(item.href)
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`
+                  flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-150 group
+                  ${isActive
+                    ? 'bg-white text-[#111827] font-medium shadow-sm'
+                    : 'text-[#4B5563] hover:text-[#111827] hover:bg-white'
+                  }
+                `}
+              >
+                <span className={`shrink-0 ${isActive ? 'text-[#111827]' : 'text-[#6B7280] group-hover:text-[#374151]'}`}>
+                  {item.icon}
+                </span>
+                <span className="flex-1 truncate">{item.label}</span>
+              </Link>
+            )
+          })}
+        </div>
       </nav>
 
       {/* Autopilot status */}
       {currentWorkspace && (
-        <div className="px-2 pb-2">
-          <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-3 py-2.5">
+        <div className="px-3 pb-3">
+          <div className="bg-white border border-[#E5E7EB] rounded-xl px-3 py-2.5">
             <div className="flex items-center gap-2">
               <div
                 className={`w-1.5 h-1.5 rounded-full shrink-0 ${
@@ -234,7 +307,7 @@ export default function Sidebar() {
       )}
 
       {/* Bottom nav */}
-      <div className="px-2 border-t border-[#E5E7EB] py-2">
+      <div className="px-3 border-t border-[#E5E7EB] py-2">
         {BOTTOM_NAV.map((item) => {
           const isActive = pathname.startsWith(item.href)
           return (
@@ -245,8 +318,8 @@ export default function Sidebar() {
                 flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm
                 transition-all duration-150 group
                 ${isActive
-                  ? 'bg-[#F3F4F6] text-[#111827] font-medium'
-                  : 'text-[#6B7280] hover:text-[#111827] hover:bg-[#F9FAFB]'
+                  ? 'bg-white text-[#111827] font-medium'
+                  : 'text-[#6B7280] hover:text-[#111827] hover:bg-white'
                 }
               `}
             >
@@ -260,7 +333,7 @@ export default function Sidebar() {
       </div>
 
       {/* User info + logout */}
-      <div className="px-3 py-3 border-t border-[#E5E7EB]">
+      <div className="px-4 py-4 border-t border-[#E5E7EB] bg-[#F3F4F6]">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-full bg-[#F3F4F6] border border-[#E5E7EB] flex items-center justify-center shrink-0">
             <span className="text-[#374151] text-xs font-semibold">

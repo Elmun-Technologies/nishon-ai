@@ -621,7 +621,7 @@ export default function OnboardingPage() {
         {/* Logo */}
         <div className="text-center mb-5">
           <h1 className="text-xl font-bold text-[#111827]">
-            Nishon <span className="text-[#374151]">AI</span>
+            Performa <span className="text-[#374151]">AI</span>
           </h1>
         </div>
 
@@ -1295,7 +1295,7 @@ export default function OnboardingPage() {
                   Strategiya tayyorlanmoqda...
                 </h3>
                 <p className="text-[#6B7280] text-sm mb-6 max-w-xs mx-auto">
-                  Nishon AI sizning ma'lumotlaringizni tahlil qilib,
+                  Performa sizning ma'lumotlaringizni tahlil qilib,
                   shaxsiy reklama strategiyasini yaratmoqda.
                 </p>
                 <div className="max-w-xs mx-auto space-y-2.5 text-left">

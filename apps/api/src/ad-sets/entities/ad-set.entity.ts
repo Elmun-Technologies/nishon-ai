@@ -10,7 +10,7 @@ import {
 } from "typeorm";
 import { Campaign } from "../../campaigns/entities/campaign.entity";
 import { Ad } from "../../ads/entities/ad.entity";
-import { CampaignStatus } from "@nishon/shared";
+import { CampaignStatus } from "@performa/shared";
 
 /**
  * An AdSet (called "Ad Group" in Google) sits between a Campaign and individual Ads.

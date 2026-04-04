@@ -287,7 +287,7 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
             ← Katalog
           </button>
           <span className="text-lg font-extrabold">
-            Nishon <span className="text-[#374151]">AI</span>
+            Performa <span className="text-[#374151]">AI</span>
           </span>
           <button
             onClick={() => router.push('/login')}
