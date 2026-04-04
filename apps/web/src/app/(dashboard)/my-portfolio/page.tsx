@@ -40,7 +40,7 @@ function SetupStep({ step, active, done }: { step: typeof STEPS[0]; active: bool
 
 export default function PortfolioDashboardPage() {
   const router = useRouter()
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false) // Start with false to show content immediately
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -65,6 +65,9 @@ export default function PortfolioDashboardPage() {
 
   // Load existing profile on mount
   useEffect(() => {
+    // Set timeout to ensure page loads even if API is slow
+    const timeout = setTimeout(() => setLoading(false), 2000)
+
     agents.mine()
       .then(res => {
         const list = res.data as any[]
@@ -87,9 +90,14 @@ export default function PortfolioDashboardPage() {
           }
           setCompletedSteps([1, 2])
         }
+        setLoading(false)
+        clearTimeout(timeout)
       })
-      .catch(() => { /* no profile yet */ })
-      .finally(() => setLoading(false))
+      .catch(() => {
+        /* no profile yet */
+        setLoading(false)
+        clearTimeout(timeout)
+      })
   }, [])
 
   const completeStep = (step: number) => {
