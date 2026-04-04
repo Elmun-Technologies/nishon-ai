@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
@@ -144,6 +144,62 @@ interface CampaignFormData {
   }
 }
 
+interface LiveGrade {
+  overall: number
+  creativeScore: number
+  setupScore: number
+  targetingScore: number
+  readiness: 'Low' | 'Medium' | 'High'
+  estimatedCtr: string
+}
+
+interface LiveCreativeDiagnostics {
+  score: number | null
+  estimatedCtr: string | null
+  loading: boolean
+  source: 'ai' | 'fallback'
+}
+
+function clamp(value: number, min = 0, max = 100) {
+  return Math.max(min, Math.min(max, value))
+}
+
+function calculateLiveGrade(
+  formData: CampaignFormData,
+  creativeDiagnostics: LiveCreativeDiagnostics,
+): LiveGrade {
+  const creativeSignals = [
+    formData.creative.headlines.length > 0 ? 20 : 0,
+    formData.creative.descriptions.length > 0 ? 20 : 0,
+    formData.creative.primaryText.trim() ? 20 : 0,
+    formData.creative.images.length > 0 ? 25 : 0,
+    formData.creative.cta ? 15 : 0,
+  ]
+  const fallbackCreativeScore = clamp(creativeSignals.reduce((a, b) => a + b, 0))
+  const creativeScore = creativeDiagnostics.score ?? fallbackCreativeScore
+
+  const setupScore = clamp(
+    (formData.platforms.length > 0 ? 25 : 0) +
+    (formData.name.trim() ? 20 : 0) +
+    (formData.objective ? 15 : 0) +
+    (formData.budget.amount > 0 ? 20 : 0) +
+    (formData.adGroup.name.trim() ? 20 : 0),
+  )
+
+  const targetingScore = clamp(
+    (formData.geoTargeting.locations.length > 0 ? 35 : 10) +
+    (formData.adGroup.interests.length > 0 ? 25 : 10) +
+    ((formData.adGroup.keywords.phrases.length > 0 || formData.adGroup.audiences.custom.length > 0) ? 25 : 10) +
+    (formData.adGroup.negativeKeywords.length > 0 ? 15 : 5),
+  )
+
+  const overall = Math.round(creativeScore * 0.45 + setupScore * 0.3 + targetingScore * 0.25)
+  const readiness: LiveGrade['readiness'] = overall >= 75 ? 'High' : overall >= 50 ? 'Medium' : 'Low'
+  const estimatedCtr = creativeDiagnostics.estimatedCtr ?? `${(0.8 + (overall / 100) * 2.4).toFixed(2)}%`
+
+  return { overall, creativeScore, setupScore, targetingScore, readiness, estimatedCtr }
+}
+
 // Mock data
 const PLATFORMS: Platform[] = [
   {
@@ -195,6 +251,12 @@ export default function CampaignWizardPage() {
   const [currentStep, setCurrentStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [aiLoading, setAiLoading] = useState(false)
+  const [creativeDiagnostics, setCreativeDiagnostics] = useState<LiveCreativeDiagnostics>({
+    score: null,
+    estimatedCtr: null,
+    loading: false,
+    source: 'fallback',
+  })
   const [formData, setFormData] = useState<CampaignFormData>({
     platforms: [],
     name: '',
@@ -483,6 +545,77 @@ export default function CampaignWizardPage() {
     }
   }
 
+  useEffect(() => {
+    const image = formData.creative.images[0]
+    if (!image) {
+      setCreativeDiagnostics({
+        score: null,
+        estimatedCtr: null,
+        loading: false,
+        source: 'fallback',
+      })
+      return
+    }
+
+    let cancelled = false
+    const timer = window.setTimeout(async () => {
+      try {
+        setCreativeDiagnostics((prev) => ({ ...prev, loading: true }))
+        const reader = new FileReader()
+        const base64 = await new Promise<string>((resolve, reject) => {
+          reader.onload = () => {
+            const result = String(reader.result || '')
+            const payload = result.includes(',') ? result.split(',')[1] : result
+            resolve(payload)
+          }
+          reader.onerror = () => reject(new Error('Image read failed'))
+          reader.readAsDataURL(image)
+        })
+
+        const response = await aiAgent.scoreCreative({
+          imageBase64: base64,
+          mimeType: image.type || 'image/png',
+          platform: formData.platforms[0] || 'meta',
+          creativeType: 'image',
+          goal: formData.objective,
+          workspaceContext: {
+            name: formData.name || 'Campaign',
+            targetAudience: formData.adGroup.interests.join(', ') || 'General',
+          },
+        } as any)
+        const data = (response as any).data ?? response
+        if (cancelled) return
+        setCreativeDiagnostics({
+          score: typeof data?.overallScore === 'number' ? clamp(data.overallScore) : null,
+          estimatedCtr: typeof data?.estimatedCtr === 'string' ? data.estimatedCtr : null,
+          loading: false,
+          source: 'ai',
+        })
+      } catch {
+        if (cancelled) return
+        setCreativeDiagnostics({
+          score: null,
+          estimatedCtr: null,
+          loading: false,
+          source: 'fallback',
+        })
+      }
+    }, 700)
+
+    return () => {
+      cancelled = true
+      window.clearTimeout(timer)
+    }
+  }, [
+    formData.creative.images,
+    formData.objective,
+    formData.platforms,
+    formData.name,
+    formData.adGroup.interests,
+  ])
+
+  const liveGrade = calculateLiveGrade(formData, creativeDiagnostics)
+
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       {/* Header */}
@@ -513,6 +646,53 @@ export default function CampaignWizardPage() {
             style={{ width: `${(currentStep / totalSteps) * 100}%` }}
           />
         </div>
+      </div>
+
+      {/* Live grading preview while user is working */}
+      <div className="bg-white border border-[#E5E7EB] rounded-xl p-4">
+        <div className="flex items-center justify-between flex-wrap gap-3 mb-3">
+          <div>
+            <p className="text-sm font-semibold text-[#111827]">Live Grading Preview</p>
+            <p className="text-xs text-[#6B7280]">Sozlayotganingizda score real vaqtda yangilanadi</p>
+          </div>
+          <div className="text-right">
+            <p className="text-xs text-[#6B7280]">Overall</p>
+            <p className={`text-2xl font-black ${
+              liveGrade.overall >= 75 ? 'text-emerald-500' : liveGrade.overall >= 50 ? 'text-amber-500' : 'text-rose-500'
+            }`}>
+              {liveGrade.overall}/100
+            </p>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {[
+              { label: 'Creative Score', value: liveGrade.creativeScore },
+              { label: 'Setup Score', value: liveGrade.setupScore },
+              { label: 'Targeting Score', value: liveGrade.targetingScore },
+              { label: 'Estimated CTR', value: liveGrade.estimatedCtr, isText: true },
+          ].map((m) => (
+            <div key={m.label} className="rounded-lg border border-[#E5E7EB] p-3">
+              <p className="text-[11px] text-[#6B7280]">{m.label}</p>
+              <p className="text-base font-bold text-[#111827]">{m.isText ? m.value : `${m.value}/100`}</p>
+              {!m.isText && (
+                <div className="w-full h-1.5 rounded-full bg-[#F3F4F6] mt-2 overflow-hidden">
+                  <div
+                    className={`h-full rounded-full ${Number(m.value) >= 70 ? 'bg-emerald-400' : Number(m.value) >= 50 ? 'bg-amber-400' : 'bg-rose-400'}`}
+                    style={{ width: `${m.value}%` }}
+                  />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        <p className="text-xs text-[#6B7280] mt-3">
+          Readiness: <span className="font-semibold text-[#111827]">{liveGrade.readiness}</span> ·
+          {creativeDiagnostics.loading
+            ? ' creative score AI tomonidan hisoblanmoqda...'
+            : creativeDiagnostics.source === 'ai'
+              ? ' creative score real AI diagnostic natijasiga asoslangan.'
+              : ' creative image yo‘q yoki AI unavailable bo‘lsa fallback preview ishlatiladi.'}
+        </p>
       </div>
 
       {/* Step Content */}

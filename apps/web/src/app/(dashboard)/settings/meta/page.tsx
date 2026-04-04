@@ -59,6 +59,73 @@ function Metric({ label, value }: { label: string; value: string }) {
   )
 }
 
+interface AccountRecommendation {
+  title: string
+  detail: string
+}
+
+function buildAccountRecommendations(account: MetaDashboardAccount): AccountRecommendation[] {
+  const totalCampaigns = account.campaigns.length
+  const activeCampaigns = account.campaigns.filter((c) => c.status === 'ACTIVE').length
+  const spend = account.campaigns.reduce((s, c) => s + c.metrics.spend, 0)
+  const clicks = account.campaigns.reduce((s, c) => s + c.metrics.clicks, 0)
+  const impressions = account.campaigns.reduce((s, c) => s + c.metrics.impressions, 0)
+  const ctr = impressions > 0 ? (clicks / impressions) * 100 : 0
+  const cpc = clicks > 0 ? spend / clicks : 0
+
+  const tips: AccountRecommendation[] = []
+
+  if (totalCampaigns === 0) {
+    tips.push({
+      title: 'Kampaniya yo‘q',
+      detail: 'Account ulangan, lekin kampaniya topilmadi. Sync qilgandan keyin structure va objective tekshiring.',
+    })
+    return tips
+  }
+
+  if (activeCampaigns === 0) {
+    tips.push({
+      title: 'Barcha kampaniya pause holatda',
+      detail: 'Kamida 1 ta test kampaniyani ACTIVE qiling, aks holda accountdan signal kelmaydi.',
+    })
+  } else if (activeCampaigns < Math.ceil(totalCampaigns * 0.4)) {
+    tips.push({
+      title: 'Faol kampaniyalar kam',
+      detail: `Hozir ${activeCampaigns}/${totalCampaigns} faol. Strukturani soddalashtirib, winning adsetlarni aktiv qiling.`,
+    })
+  }
+
+  if (ctr < 1) {
+    tips.push({
+      title: 'CTR past',
+      detail: `CTR ${ctr.toFixed(2)}%. Creative angle, hook va CTA ni A/B test orqali yangilang.`,
+    })
+  }
+
+  if (cpc > 1.5) {
+    tips.push({
+      title: 'CPC yuqori',
+      detail: `O‘rtacha CPC $${cpc.toFixed(2)}. Audience overlap va placementlarni tozalang.`,
+    })
+  }
+
+  if (spend > 0 && clicks === 0) {
+    tips.push({
+      title: 'Spend bor, klik yo‘q',
+      detail: 'Byudjet sarflanmoqda, lekin trafik yo‘q. Tracking va targetingni darhol tekshiring.',
+    })
+  }
+
+  if (tips.length === 0) {
+    tips.push({
+      title: 'Account sog‘lom',
+      detail: 'Asosiy metrikalar yaxshi. Winning kampaniyalarni bosqichma-bosqich scale qiling.',
+    })
+  }
+
+  return tips
+}
+
 function CampaignRow({ campaign }: { campaign: MetaDashboardCampaign }) {
   const [open, setOpen] = useState(false)
   const { spend, clicks, impressions, ctr, cpc } = campaign.metrics
@@ -112,17 +179,34 @@ function CampaignRow({ campaign }: { campaign: MetaDashboardCampaign }) {
   )
 }
 
-function AccountCard({ account }: { account: MetaDashboardAccount }) {
+function AccountCard({
+  account,
+  selected,
+  onSelectToggle,
+}: {
+  account: MetaDashboardAccount
+  selected: boolean
+  onSelectToggle: () => void
+}) {
   const totalSpend = account.campaigns.reduce((s, c) => s + c.metrics.spend, 0)
   const totalImpressions = account.campaigns.reduce((s, c) => s + c.metrics.impressions, 0)
   const totalClicks = account.campaigns.reduce((s, c) => s + c.metrics.clicks, 0)
+  const recommendations = buildAccountRecommendations(account)
 
   return (
     <div className="rounded-xl border border-[#E5E7EB] bg-white overflow-hidden">
       {/* Account header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-[#E5E7EB]">
         <div>
-          <p className="text-sm font-semibold text-[#111827]">{account.name}</p>
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={selected}
+              onChange={onSelectToggle}
+              className="rounded border-[#D1D5DB]"
+            />
+            <p className="text-sm font-semibold text-[#111827]">{account.name}</p>
+          </div>
           <p className="text-xs text-[#6B7280] mt-0.5">
             {account.id} · {account.currency ?? '—'} · {account.timezone ?? '—'}
           </p>
@@ -150,6 +234,16 @@ function AccountCard({ account }: { account: MetaDashboardAccount }) {
 
       {/* Campaigns */}
       <div className="p-4 space-y-2">
+        <div className="rounded-lg border border-[#E5E7EB] bg-[#F9FAFB] p-3">
+          <p className="text-xs font-semibold text-[#374151] mb-1.5">Account recommendations</p>
+          <ul className="space-y-1">
+            {recommendations.map((tip) => (
+              <li key={tip.title} className="text-xs text-[#6B7280]">
+                <span className="font-medium text-[#374151]">{tip.title}:</span> {tip.detail}
+              </li>
+            ))}
+          </ul>
+        </div>
         {account.campaigns.length === 0 ? (
           <p className="text-sm text-[#6B7280] text-center py-4">No campaigns found.</p>
         ) : (
@@ -178,10 +272,15 @@ export default function MetaSettingsPage() {
   const [justConnected, setJustConnected] = useState(false)
   const [lastSyncedAt, setLastSyncedAt] = useState<Date | null>(null)
   const [connecting, setConnecting] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
+  const [query, setQuery] = useState('')
+  const [selectedAccounts, setSelectedAccounts] = useState<Set<string>>(new Set())
+  const [showOnlySelected, setShowOnlySelected] = useState(false)
 
-  const loadDashboard = useCallback(async () => {
+  const loadDashboard = useCallback(async (background = false) => {
     if (!workspaceId) return
     setError(null)
+    if (background) setRefreshing(true)
 
     try {
       const data = await fetchMetaDashboard(workspaceId)
@@ -196,6 +295,8 @@ export default function MetaSettingsPage() {
         setError(err?.message ?? 'Failed to load Meta data')
         setPageState('error')
       }
+    } finally {
+      if (background) setRefreshing(false)
     }
   }, [workspaceId])
 
@@ -213,8 +314,16 @@ export default function MetaSettingsPage() {
       window.history.replaceState({}, '', window.location.pathname)
     }
 
-    void loadDashboard()
+    void loadDashboard(false)
   }, [workspaceId, loadDashboard])
+
+  useEffect(() => {
+    if (pageState !== 'connected') return
+    const timer = window.setInterval(() => {
+      void loadDashboard(true)
+    }, 60000)
+    return () => window.clearInterval(timer)
+  }, [pageState, loadDashboard])
 
   // After connecting: auto-trigger sync to pull initial data
   useEffect(() => {
@@ -237,7 +346,7 @@ export default function MetaSettingsPage() {
           ? `Synced ${result.accountsSynced} account${result.accountsSynced !== 1 ? 's' : ''}, ${result.campaignsSynced} campaign${result.campaignsSynced !== 1 ? 's' : ''}`
           : `Partial sync: ${result.errors.length} error${result.errors.length !== 1 ? 's' : ''}`,
       )
-      await loadDashboard()
+      await loadDashboard(true)
     } catch (err: any) {
       setSyncResult(`Sync failed: ${err?.message ?? 'Unknown error'}`)
     } finally {
@@ -357,6 +466,9 @@ export default function MetaSettingsPage() {
 
   // ── Connected ──────────────────────────────────────────────────────────────
   const accounts = dashboard?.accounts ?? []
+  const filteredAccounts = accounts
+    .filter((a) => a.name.toLowerCase().includes(query.toLowerCase()) || a.id.toLowerCase().includes(query.toLowerCase()))
+    .filter((a) => (showOnlySelected ? selectedAccounts.has(a.id) : true))
   const totalAccounts = accounts.length
   const totalCampaigns = accounts.reduce((s, a) => s + a.campaigns.length, 0)
   const totalSpend = accounts.reduce(
@@ -408,6 +520,7 @@ export default function MetaSettingsPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          {refreshing && <span className="text-xs text-[#6B7280]">Refreshing…</span>}
           {syncResult && (
             <span className={`text-xs ${syncResult.includes('failed') || syncResult.includes('error') ? 'text-red-400' : 'text-emerald-400'}`}>
               {syncResult}
@@ -415,8 +528,16 @@ export default function MetaSettingsPage() {
           )}
           <button
             type="button"
+            onClick={() => void loadDashboard(true)}
+            disabled={refreshing || syncing}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E5E7EB] text-sm text-[#374151] hover:bg-[#F9FAFB] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {refreshing ? 'Refreshing…' : 'Reload'}
+          </button>
+          <button
+            type="button"
             onClick={() => void handleSync()}
-            disabled={syncing}
+            disabled={syncing || refreshing}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E5E7EB] text-sm text-[#374151] hover:bg-[#F9FAFB] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <svg
@@ -465,11 +586,57 @@ export default function MetaSettingsPage() {
         </div>
       ) : (
         <div className="space-y-4">
+          <div className="rounded-xl border border-[#E5E7EB] bg-white p-3 flex items-center gap-2 flex-wrap">
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search ad account..."
+              className="px-3 py-2 rounded-lg border border-[#E5E7EB] text-sm text-[#111827] flex-1 min-w-56"
+            />
+            <button
+              type="button"
+              onClick={() => {
+                if (selectedAccounts.size === filteredAccounts.length) {
+                  setSelectedAccounts(new Set())
+                } else {
+                  setSelectedAccounts(new Set(filteredAccounts.map((a) => a.id)))
+                }
+              }}
+              className="text-xs px-3 py-2 rounded-lg border border-[#E5E7EB] text-[#374151] hover:bg-[#F9FAFB]"
+            >
+              {selectedAccounts.size === filteredAccounts.length ? 'Clear selection' : 'Select visible'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowOnlySelected((v) => !v)}
+              className={`text-xs px-3 py-2 rounded-lg border ${
+                showOnlySelected ? 'border-[#111827] bg-[#111827] text-white' : 'border-[#E5E7EB] text-[#374151] hover:bg-[#F9FAFB]'
+              }`}
+            >
+              {showOnlySelected ? 'Showing selected' : 'Show selected only'}
+            </button>
+            <span className="text-xs text-[#6B7280]">
+              Selected: {selectedAccounts.size}
+            </span>
+          </div>
+
           <h2 className="text-sm font-semibold text-[#9CA3AF] uppercase tracking-wider px-1">
-            Ad Accounts ({totalAccounts})
+            Ad Accounts ({filteredAccounts.length}/{totalAccounts})
           </h2>
-          {accounts.map((account) => (
-            <AccountCard key={account.id} account={account} />
+          {filteredAccounts.map((account) => (
+            <AccountCard
+              key={account.id}
+              account={account}
+              selected={selectedAccounts.has(account.id)}
+              onSelectToggle={() =>
+                setSelectedAccounts((prev) => {
+                  const next = new Set(prev)
+                  if (next.has(account.id)) next.delete(account.id)
+                  else next.add(account.id)
+                  return next
+                })
+              }
+            />
           ))}
         </div>
       )}

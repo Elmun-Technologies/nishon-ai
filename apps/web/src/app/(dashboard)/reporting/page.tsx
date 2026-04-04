@@ -42,6 +42,20 @@ interface ReportData {
   accounts: ReportAccount[]
 }
 
+interface AccountGradeBreakdown {
+  wastedSpend: number
+  qualityScore: number
+  impressionShare: number
+  accountActivity: number
+}
+
+interface AccountGradeResult {
+  overall: number
+  level: 'Foundational' | 'Intermediate' | 'Advanced' | 'Elite'
+  breakdown: AccountGradeBreakdown
+  recommendations: string[]
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const STATUS_STYLE: Record<string, string> = {
@@ -81,6 +95,64 @@ const AVAILABLE_METRICS = [
   { id: 'leads',       label: 'Lidlar',          icon: '🙋', value: '84',       trend: '+12',    positive: true  },
   { id: 'conv_rate',   label: 'Konversiya %',    icon: '✅', value: '4.8%',     trend: '+0.6%',  positive: true  },
 ]
+
+const GRADE_LEVELS = [
+  { min: 85, label: 'Elite', color: 'text-emerald-500', badge: 'bg-emerald-50 border-emerald-200 text-emerald-700' },
+  { min: 70, label: 'Advanced', color: 'text-lime-500', badge: 'bg-lime-50 border-lime-200 text-lime-700' },
+  { min: 50, label: 'Intermediate', color: 'text-amber-500', badge: 'bg-amber-50 border-amber-200 text-amber-700' },
+  { min: 0, label: 'Foundational', color: 'text-rose-500', badge: 'bg-rose-50 border-rose-200 text-rose-700' },
+] as const
+
+function clamp(value: number, min = 0, max = 100) {
+  return Math.max(min, Math.min(max, value))
+}
+
+function computeAccountGrade(account: ReportAccount): AccountGradeResult {
+  const totalCampaigns = account.campaigns.length
+  const activeCampaigns = account.campaigns.filter((c) => c.status === 'ACTIVE').length
+  const activeRatio = totalCampaigns > 0 ? activeCampaigns / totalCampaigns : 0
+
+  const ctrScore = clamp(account.metrics.ctr * 25)
+  const cpcScore = clamp(100 - account.metrics.cpc * 12)
+  const wastedSpend = clamp((ctrScore * 0.55) + (cpcScore * 0.45))
+
+  const qualityScore = clamp((ctrScore * 0.7) + (activeRatio * 100 * 0.3))
+
+  const impressionVolumeScore = clamp(Math.log10(account.metrics.impressions + 1) * 20)
+  const impressionShare = clamp((account.metrics.ctr * 20 * 0.6) + (impressionVolumeScore * 0.4))
+
+  const activityFromCount = clamp(totalCampaigns * 14)
+  const activityFromClicks = clamp(Math.log10(account.metrics.clicks + 1) * 35)
+  const accountActivity = clamp((activeRatio * 100 * 0.45) + (activityFromCount * 0.3) + (activityFromClicks * 0.25))
+
+  const overall = Math.round(
+    wastedSpend * 0.2 +
+    qualityScore * 0.35 +
+    impressionShare * 0.2 +
+    accountActivity * 0.25,
+  )
+
+  const level = GRADE_LEVELS.find((g) => overall >= g.min)?.label ?? 'Foundational'
+  const recommendations: string[] = []
+
+  if (qualityScore < 55) recommendations.push('CTR ni oshirish uchun ad copy va creative A/B testlarni ko‘paytiring.')
+  if (wastedSpend < 55) recommendations.push('Past CTR yoki yuqori CPC kampaniyalarda negative audience/placement tozalash qiling.')
+  if (impressionShare < 55) recommendations.push('Byudjet va bid strategiyasini ko‘rib chiqing, yetarli impression olishga fokus qiling.')
+  if (accountActivity < 55) recommendations.push('Haftalik optimizatsiya routine kiriting: pause, scale, audience refresh.')
+  if (recommendations.length === 0) recommendations.push('Akkount holati yaxshi: eng kuchli kampaniyalarni scale qilishni davom ettiring.')
+
+  return {
+    overall,
+    level,
+    breakdown: {
+      wastedSpend: Math.round(wastedSpend),
+      qualityScore: Math.round(qualityScore),
+      impressionShare: Math.round(impressionShare),
+      accountActivity: Math.round(accountActivity),
+    },
+    recommendations,
+  }
+}
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
@@ -177,6 +249,10 @@ export default function ReportingPage() {
       impressions: acc.impressions + a.metrics.impressions,
     }),
     { spend: 0, clicks: 0, impressions: 0 },
+  )
+
+  const accountGrades = new Map(
+    (data?.accounts ?? []).map((account) => [account.id, computeAccountGrade(account)]),
   )
 
   if (!currentWorkspace) {
@@ -413,6 +489,8 @@ export default function ReportingPage() {
               <tbody className="divide-y divide-[#1C1C27]">
                 {data.accounts.map((account) => {
                   const isOpen = expanded.has(account.id)
+                  const grade = accountGrades.get(account.id)!
+                  const levelStyle = GRADE_LEVELS.find((g) => g.label === grade.level) ?? GRADE_LEVELS[3]
                   return (
                     <>
                       {/* ── Account row ── */}
@@ -432,6 +510,9 @@ export default function ReportingPage() {
                             <span className="text-[#6B7280] text-xs ml-1">
                               {account.campaigns.length} kampaniya
                             </span>
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full border ml-2 ${levelStyle.badge}`}>
+                              {grade.overall}/100 • {grade.level}
+                            </span>
                             {/* Expand chevron */}
                             <span className={`text-[#6B7280] ml-auto transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`}>
                               ›
@@ -447,6 +528,57 @@ export default function ReportingPage() {
                         <MetricCell value={`${account.metrics.ctr.toFixed(2)}%`} className="text-[#374151]" />
                         <MetricCell value={formatCurrency(account.metrics.cpc)} />
                       </tr>
+
+                      {/* ── Account grading detail ── */}
+                      {isOpen && (
+                        <tr className="bg-[#FCFCFD]">
+                          <td colSpan={7} className="px-4 py-3 border-b border-[#F3F4F6]">
+                            <div className="rounded-xl border border-[#E5E7EB] bg-white p-4">
+                              <div className="flex items-center justify-between gap-3 flex-wrap mb-3">
+                                <div>
+                                  <p className="text-xs text-[#6B7280] uppercase tracking-wide">Account Grading</p>
+                                  <p className="text-sm text-[#111827] font-semibold">Har bir account bo‘yicha 4 ta asosiy signal</p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span className={`text-xs px-2 py-1 rounded-full border ${levelStyle.badge}`}>{grade.level}</span>
+                                  <span className={`text-xl font-black ${levelStyle.color}`}>{grade.overall}</span>
+                                </div>
+                              </div>
+
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+                                {[
+                                  { key: 'Wasted Spend', value: grade.breakdown.wastedSpend },
+                                  { key: 'Quality Score', value: grade.breakdown.qualityScore },
+                                  { key: 'Impression Share', value: grade.breakdown.impressionShare },
+                                  { key: 'Account Activity', value: grade.breakdown.accountActivity },
+                                ].map((item) => (
+                                  <div key={item.key} className="rounded-lg border border-[#E5E7EB] p-2.5">
+                                    <p className="text-[11px] text-[#6B7280]">{item.key}</p>
+                                    <p className="text-base font-bold text-[#111827]">{item.value}/100</p>
+                                    <div className="w-full h-1.5 rounded-full bg-[#F3F4F6] mt-2 overflow-hidden">
+                                      <div
+                                        className={`h-full rounded-full ${
+                                          item.value >= 70 ? 'bg-emerald-400' : item.value >= 50 ? 'bg-amber-400' : 'bg-rose-400'
+                                        }`}
+                                        style={{ width: `${item.value}%` }}
+                                      />
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+
+                              <div className="rounded-lg bg-[#F9FAFB] border border-[#F3F4F6] p-3">
+                                <p className="text-xs font-semibold text-[#374151] mb-1">Tavsiya:</p>
+                                <ul className="space-y-1">
+                                  {grade.recommendations.map((tip) => (
+                                    <li key={tip} className="text-xs text-[#6B7280]">• {tip}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
 
                       {/* ── Campaign rows (expandable) ── */}
                       {isOpen && account.campaigns.map((campaign) => (
