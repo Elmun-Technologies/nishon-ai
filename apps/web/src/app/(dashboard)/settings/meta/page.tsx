@@ -46,7 +46,7 @@ function ActionBadge({ action }: { action: string }) {
 function StatusDot({ status }: { status: string }) {
   const active = status === 'ACTIVE'
   return (
-    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${active ? 'bg-emerald-400' : 'bg-[#4B5563]'}`} />
+    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${active ? 'bg-emerald-400' : 'bg-slate-600'}`} />
   )
 }
 
@@ -449,7 +449,7 @@ export default function MetaSettingsPage() {
           <button
             type="button"
             onClick={handleConnect}
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#111827] hover:bg-[#1F2937] text-white text-sm font-medium transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium transition-colors"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="text-slate-900 dark:text-slate-50">
               <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
@@ -576,7 +576,7 @@ export default function MetaSettingsPage() {
             type="button"
             onClick={() => void handleSync()}
             disabled={syncing}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#111827] hover:bg-[#1F2937] text-white text-sm font-medium disabled:opacity-50 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium disabled:opacity-50 transition-colors"
           >
             <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} className={syncing ? 'animate-spin' : ''}>
               <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
@@ -610,7 +610,7 @@ export default function MetaSettingsPage() {
               type="button"
               onClick={() => setShowOnlySelected((v) => !v)}
               className={`text-xs px-3 py-2 rounded-lg border ${
-                showOnlySelected ? 'border-[#111827] bg-[#111827] text-white' : 'border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:bg-slate-800/50'
+                showOnlySelected ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:bg-slate-800/50'
               }`}
             >
               {showOnlySelected ? 'Showing selected' : 'Show selected only'}

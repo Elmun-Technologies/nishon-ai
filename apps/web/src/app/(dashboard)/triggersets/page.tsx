@@ -388,7 +388,7 @@ export default function TriggerSetsPage() {
                     onClick={() => handleToggle(ts)}
                     className={`
                       relative mt-0.5 inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors duration-200
-                      ${ts.enabled ? 'bg-[#111827]' : 'bg-slate-100 dark:bg-slate-800'}
+                      ${ts.enabled ? 'bg-slate-900' : 'bg-slate-100 dark:bg-slate-800'}
                     `}
                   >
                     <span

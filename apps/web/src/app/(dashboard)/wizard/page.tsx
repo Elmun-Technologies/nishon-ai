@@ -642,7 +642,7 @@ export default function CampaignWizardPage() {
         </div>
         <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2">
           <div 
-            className="bg-[#111827] h-2 rounded-full transition-all duration-300"
+            className="bg-slate-900 h-2 rounded-full transition-all duration-300"
             style={{ width: `${(currentStep / totalSteps) * 100}%` }}
           />
         </div>
@@ -751,7 +751,7 @@ function Step1Platforms({ formData, setFormData }: { formData: CampaignFormData,
             onClick={() => togglePlatform(platform.id)}
             className={`cursor-pointer transition-all ${
               formData.platforms.includes(platform.id) 
-                ? 'border-[#111827]/40 bg-[#111827]/5' 
+                ? 'border-slate-900/40 bg-slate-900/5' 
                 : ''
             }`}
           >
@@ -770,7 +770,7 @@ function Step1Platforms({ formData, setFormData }: { formData: CampaignFormData,
               </div>
               <div className={`w-4 h-4 rounded border-2 ${
                 formData.platforms.includes(platform.id) 
-                  ? 'bg-[#111827] border-[#111827]' 
+                  ? 'bg-slate-900 border-slate-900' 
                   : 'border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800'
               }`}>
                 {formData.platforms.includes(platform.id) && (
@@ -833,7 +833,7 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
     setFormData(prev => ({ ...prev, schedule: { ...prev.schedule, hours: next } }))
   }
 
-  const cls = "w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-50 focus:outline-none focus:border-[#111827]"
+  const cls = "w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-50 focus:outline-none focus:border-slate-900"
   const lbl = "block text-sm font-medium text-slate-500 dark:text-slate-400 mb-2"
 
   const quickLinks: string[] = formData.extensions.quickLinks || []
@@ -850,7 +850,7 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
             <label className={lbl}>Campaign Name</label>
             <input type="text" value={formData.name}
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              className={`${cls} placeholder-[#6B7280]`} placeholder="Enter campaign name" />
+              className={`${cls} placeholder-slate-500`} placeholder="Enter campaign name" />
           </div>
           <div>
             <label className={lbl}>Objective</label>
@@ -911,7 +911,7 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
           <label className="flex items-center gap-3 cursor-pointer">
             <input type="checkbox" checked={formData.schedule.alwaysOn}
               onChange={(e) => setFormData(prev => ({ ...prev, schedule: { ...prev.schedule, alwaysOn: e.target.checked } }))}
-              className="w-4 h-4 accent-[#7C3AED]" />
+              className="w-4 h-4 accent-violet-600" />
             <span className="text-slate-900 dark:text-slate-50">Show ad 24/7 (Always On)</span>
           </label>
 
@@ -933,7 +933,7 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
                   const active = selectedHours.includes(key)
                   return (
                     <button key={h} type="button" onClick={() => toggleHour(key)}
-                      className={`py-1 rounded text-xs font-mono transition-colors ${active ? 'bg-[#111827] text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-[#3A3A4A]'}`}>
+                      className={`py-1 rounded text-xs font-mono transition-colors ${active ? 'bg-slate-900 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-[#3A3A4A]'}`}>
                       {String(h).padStart(2, '0')}
                     </button>
                   )
@@ -969,7 +969,7 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
             <label className={lbl}>Bid Cap (optional)</label>
             <input type="number" value={formData.strategy.bidCap || ''}
               onChange={(e) => setFormData(prev => ({ ...prev, strategy: { ...prev.strategy, bidCap: Number(e.target.value) } }))}
-              placeholder="No cap" className={`${cls} placeholder-[#6B7280]`} />
+              placeholder="No cap" className={`${cls} placeholder-slate-500`} />
           </div>
         </div>
 
@@ -990,7 +990,7 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
           <label className="flex items-center gap-3 cursor-pointer">
             <input type="checkbox" checked={formData.strategy.advantagePlus}
               onChange={(e) => setFormData(prev => ({ ...prev, strategy: { ...prev.strategy, advantagePlus: e.target.checked } }))}
-              className="w-4 h-4 accent-[#7C3AED]" />
+              className="w-4 h-4 accent-violet-600" />
             <span className="text-slate-900 dark:text-slate-50">Advantage+ Campaign Budget</span>
           </label>
         )}
@@ -1004,7 +1004,7 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
             <input key={field} type="text" placeholder={`utm_${field}`}
               value={formData.utm[field]}
               onChange={(e) => setFormData(prev => ({ ...prev, utm: { ...prev.utm, [field]: e.target.value } }))}
-              className={`${cls} placeholder-[#6B7280]`} />
+              className={`${cls} placeholder-slate-500`} />
           ))}
         </div>
         <p className="text-xs text-slate-500 dark:text-slate-400">Dynamic: {'{keyword}'}, {'{campaign_id}'}, {'{placement}'}</p>
@@ -1022,7 +1022,7 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
                 if (!e.target.checked) setFormData(prev => ({ ...prev, extensions: { ...prev.extensions, quickLinks: [] } }))
                 else setFormData(prev => ({ ...prev, extensions: { ...prev.extensions, quickLinks: [''] } }))
               }}
-              className="w-4 h-4 accent-[#7C3AED]" />
+              className="w-4 h-4 accent-violet-600" />
             <span className="text-slate-900 dark:text-slate-50">Quick Links (Sitelinks)</span>
           </label>
           {(formData.extensions.quickLinks?.length ?? 0) > 0 && (
@@ -1035,7 +1035,7 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
                     next[idx] = e.target.value
                     setFormData(prev => ({ ...prev, extensions: { ...prev.extensions, quickLinks: next } }))
                   }}
-                  className={`${cls} placeholder-[#6B7280]`} />
+                  className={`${cls} placeholder-slate-500`} />
               ))}
             </div>
           )}
@@ -1049,7 +1049,7 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
                 if (!e.target.checked) setFormData(prev => ({ ...prev, extensions: { ...prev.extensions, clarifiers: [] } }))
                 else setFormData(prev => ({ ...prev, extensions: { ...prev.extensions, clarifiers: [''] } }))
               }}
-              className="w-4 h-4 accent-[#7C3AED]" />
+              className="w-4 h-4 accent-violet-600" />
             <span className="text-slate-900 dark:text-slate-50">Clarifiers (Callouts)</span>
           </label>
           {(formData.extensions.clarifiers?.length ?? 0) > 0 && (
@@ -1062,7 +1062,7 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
                     next[idx] = e.target.value
                     setFormData(prev => ({ ...prev, extensions: { ...prev.extensions, clarifiers: next } }))
                   }}
-                  className={`${cls} placeholder-[#6B7280]`} />
+                  className={`${cls} placeholder-slate-500`} />
               ))}
             </div>
           )}
@@ -1074,20 +1074,20 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
             onChange={(e) => {
               if (!e.target.checked) setFormData(prev => ({ ...prev, extensions: { ...prev.extensions, promoCode: '' } }))
             }}
-            className="w-4 h-4 accent-[#7C3AED]" />
+            className="w-4 h-4 accent-violet-600" />
           <span className="text-slate-900 dark:text-slate-50">Promo Code</span>
         </label>
         {!!formData.extensions.promoCode && (
           <input type="text" placeholder="e.g. SAVE20" value={formData.extensions.promoCode}
             onChange={(e) => setFormData(prev => ({ ...prev, extensions: { ...prev.extensions, promoCode: e.target.value } }))}
-            className={`${cls} placeholder-[#6B7280] ml-7`} />
+            className={`${cls} placeholder-slate-500 ml-7`} />
         )}
 
         {/* Delivery */}
         <label className="flex items-center gap-3 cursor-pointer">
           <input type="checkbox" checked={!!formData.extensions.delivery}
             onChange={(e) => setFormData(prev => ({ ...prev, extensions: { ...prev.extensions, delivery: e.target.checked } }))}
-            className="w-4 h-4 accent-[#7C3AED]" />
+            className="w-4 h-4 accent-violet-600" />
           <span className="text-slate-900 dark:text-slate-50">Delivery Extension</span>
         </label>
       </div>
@@ -1105,7 +1105,7 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
             <label key={key} className="flex items-start gap-3 cursor-pointer">
               <input type="checkbox" checked={formData.aiOptimization[key]}
                 onChange={(e) => setFormData(prev => ({ ...prev, aiOptimization: { ...prev.aiOptimization, [key]: e.target.checked } }))}
-                className="w-4 h-4 accent-[#7C3AED] mt-1" />
+                className="w-4 h-4 accent-violet-600 mt-1" />
               <div>
                 <span className="text-slate-900 dark:text-slate-50">{label}</span>
                 <p className="text-xs text-slate-500 dark:text-slate-400">{desc}</p>
@@ -1292,7 +1292,7 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
   const [kwInput, setKwInput] = useState('')
   const [kwMatch, setKwMatch] = useState<'broad'|'phrase'|'exact'>('broad')
 
-  const cls = "w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-50 placeholder-[#6B7280] focus:outline-none focus:border-[#111827]"
+  const cls = "w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-50 placeholder-slate-500 focus:outline-none focus:border-slate-900"
   const lbl = "block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1"
 
   const addGeo = () => {
@@ -1365,7 +1365,7 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
           <label className={lbl}>Ad Group Name</label>
           <input type="text" value={formData.adGroup.name}
             onChange={e => setFormData(prev => ({ ...prev, adGroup: { ...prev.adGroup, name: e.target.value } }))}
-            className={`${cls} placeholder-[#6B7280]`} placeholder="e.g. Search — Shoes — Broad" />
+            className={`${cls} placeholder-slate-500`} placeholder="e.g. Search — Shoes — Broad" />
         </div>
         <div>
           <label className={lbl}>Scenario</label>
@@ -1385,13 +1385,13 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
           <button
             type="button"
             onClick={() => setFormData(prev => ({ ...prev, geoTargeting: { ...prev.geoTargeting, mode: 'list' } }))}
-            className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${formData.geoTargeting.mode === 'list' ? 'bg-[#111827] text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500'}`}>
+            className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${formData.geoTargeting.mode === 'list' ? 'bg-slate-900 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500'}`}>
             List Mode
           </button>
           <button
             type="button"
             onClick={() => setFormData(prev => ({ ...prev, geoTargeting: { ...prev.geoTargeting, mode: 'map' } }))}
-            className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${formData.geoTargeting.mode === 'map' ? 'bg-[#111827] text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500'}`}>
+            className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${formData.geoTargeting.mode === 'map' ? 'bg-slate-900 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500'}`}>
             Map Mode (Radius)
           </button>
         </div>
@@ -1403,13 +1403,13 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
                 onKeyDown={e => e.key === 'Enter' && addGeo()}
                 className={`${cls} flex-1`} placeholder="City or region, press Enter" />
               <button type="button" onClick={addGeo}
-                className="px-4 py-2 bg-[#111827] hover:bg-[#1F2937] rounded-lg text-slate-900 dark:text-slate-50 text-sm font-medium">
+                className="px-4 py-2 bg-slate-900 hover:bg-slate-800 rounded-lg text-slate-900 dark:text-slate-50 text-sm font-medium">
                 Add
               </button>
             </div>
             <div className="flex flex-wrap gap-2">
               {formData.geoTargeting.locations.map((loc, i) => (
-                <span key={i} className="flex items-center gap-1 bg-[#E5E7EB] border border-[#111827]/40 text-slate-700 dark:text-slate-300 text-sm px-2 py-1 rounded-full">
+                <span key={i} className="flex items-center gap-1 bg-slate-200 border border-slate-900/40 text-slate-700 dark:text-slate-300 text-sm px-2 py-1 rounded-full">
                   📍 {loc}
                   <button type="button" onClick={() => removeGeo(i)} className="ml-1 hover:text-slate-900 dark:text-slate-50">×</button>
                 </span>
@@ -1425,7 +1425,7 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
               <label className={lbl}>City</label>
               <input type="text" value={formData.geoTargeting.city || ''}
                 onChange={e => setFormData(prev => ({ ...prev, geoTargeting: { ...prev.geoTargeting, city: e.target.value } }))}
-                className={`${cls} placeholder-[#6B7280]`} placeholder="Tashkent" />
+                className={`${cls} placeholder-slate-500`} placeholder="Tashkent" />
             </div>
             <div>
               <label className={lbl}>Radius (km)</label>
@@ -1450,7 +1450,7 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
           ] as const).map(({ key, label, desc }) => (
             <label key={key} className="flex items-start gap-3 cursor-pointer bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg p-3 hover:border-slate-300 dark:border-slate-600">
               <input type="checkbox" checked={formData.adGroup.autoTargeting[key] as boolean}
-                onChange={() => toggleAt(key)} className="w-4 h-4 accent-[#7C3AED] mt-0.5" />
+                onChange={() => toggleAt(key)} className="w-4 h-4 accent-violet-600 mt-0.5" />
               <div>
                 <div className="text-slate-900 dark:text-slate-50 text-sm font-medium">{label}</div>
                 <div className="text-slate-500 dark:text-slate-400 text-xs">{desc}</div>
@@ -1469,7 +1469,7 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
               <label key={key} className="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" checked={formData.adGroup.autoTargeting.brandReminders[key]}
                   onChange={() => setFormData(prev => ({ ...prev, adGroup: { ...prev.adGroup, autoTargeting: { ...prev.adGroup.autoTargeting, brandReminders: { ...prev.adGroup.autoTargeting.brandReminders, [key]: !prev.adGroup.autoTargeting.brandReminders[key] } } } }))}
-                  className="w-4 h-4 accent-[#7C3AED]" />
+                  className="w-4 h-4 accent-violet-600" />
                 <span className="text-slate-900 dark:text-slate-50 text-sm">{label}</span>
               </label>
             ))}
@@ -1496,7 +1496,7 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
             <option value="exact">Exact</option>
           </select>
           <button type="button" onClick={addKw}
-            className="px-4 py-2 bg-[#111827] hover:bg-[#1F2937] rounded-lg text-slate-900 dark:text-slate-50 text-sm">Add</button>
+            className="px-4 py-2 bg-slate-900 hover:bg-slate-800 rounded-lg text-slate-900 dark:text-slate-50 text-sm">Add</button>
         </div>
         <div className="space-y-1">
           {formData.adGroup.keywords.phrases.map((phrase, i) => (
@@ -1543,7 +1543,7 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
           ] as const).map(({ key, label, desc }) => (
             <label key={key} className="flex items-start gap-3 cursor-pointer bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg p-3 hover:border-slate-300 dark:border-slate-600">
               <input type="checkbox" checked={formData.adGroup.audiences[key] as boolean}
-                onChange={() => toggleAud(key)} className="w-4 h-4 accent-[#7C3AED] mt-0.5" />
+                onChange={() => toggleAud(key)} className="w-4 h-4 accent-violet-600 mt-0.5" />
               <div>
                 <div className="text-slate-900 dark:text-slate-50 text-sm font-medium">{label}</div>
                 <div className="text-slate-500 dark:text-slate-400 text-xs">{desc}</div>
@@ -1567,7 +1567,7 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
                 if (!e.target.checked) setFormData(prev => ({ ...prev, adGroup: { ...prev.adGroup, extensions: { ...prev.adGroup.extensions, quickLinks: [] } } }))
                 else setFormData(prev => ({ ...prev, adGroup: { ...prev.adGroup, extensions: { ...prev.adGroup.extensions, quickLinks: [''] } } }))
               }}
-              className="w-4 h-4 accent-[#7C3AED]" />
+              className="w-4 h-4 accent-violet-600" />
             <span className="text-slate-900 dark:text-slate-50">Quick Links (override campaign)</span>
           </label>
           {(formData.adGroup.extensions.quickLinks?.length ?? 0) > 0 && (
@@ -1580,7 +1580,7 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
                     const next = [...groupExtQl]; next[idx] = e.target.value
                     setFormData(prev => ({ ...prev, adGroup: { ...prev.adGroup, extensions: { ...prev.adGroup.extensions, quickLinks: next } } }))
                   }}
-                  className={`${cls} placeholder-[#6B7280]`} />
+                  className={`${cls} placeholder-slate-500`} />
               ))}
             </div>
           )}
@@ -1595,7 +1595,7 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
                 if (!e.target.checked) setFormData(prev => ({ ...prev, adGroup: { ...prev.adGroup, extensions: { ...prev.adGroup.extensions, clarifiers: [] } } }))
                 else setFormData(prev => ({ ...prev, adGroup: { ...prev.adGroup, extensions: { ...prev.adGroup.extensions, clarifiers: [''] } } }))
               }}
-              className="w-4 h-4 accent-[#7C3AED]" />
+              className="w-4 h-4 accent-violet-600" />
             <span className="text-slate-900 dark:text-slate-50">Clarifiers (override campaign)</span>
           </label>
           {(formData.adGroup.extensions.clarifiers?.length ?? 0) > 0 && (
@@ -1608,7 +1608,7 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
                     const next = [...groupExtCl]; next[idx] = e.target.value
                     setFormData(prev => ({ ...prev, adGroup: { ...prev.adGroup, extensions: { ...prev.adGroup.extensions, clarifiers: next } } }))
                   }}
-                  className={`${cls} placeholder-[#6B7280]`} />
+                  className={`${cls} placeholder-slate-500`} />
               ))}
             </div>
           )}
@@ -1621,14 +1621,14 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
             onChange={e => {
               if (!e.target.checked) setFormData(prev => ({ ...prev, adGroup: { ...prev.adGroup, extensions: { ...prev.adGroup.extensions, promoCode: '' } } }))
             }}
-            className="w-4 h-4 accent-[#7C3AED]" />
+            className="w-4 h-4 accent-violet-600" />
           <span className="text-slate-900 dark:text-slate-50">Promo Code (override campaign)</span>
         </label>
         {!!formData.adGroup.extensions.promoCode && (
           <input type="text" placeholder="e.g. GROUP20"
             value={formData.adGroup.extensions.promoCode}
             onChange={e => setFormData(prev => ({ ...prev, adGroup: { ...prev.adGroup, extensions: { ...prev.adGroup.extensions, promoCode: e.target.value } } }))}
-            className={`${cls} placeholder-[#6B7280] ml-7`} />
+            className={`${cls} placeholder-slate-500 ml-7`} />
         )}
       </div>
 
@@ -1665,7 +1665,7 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
           <label className={lbl}>UTM Content</label>
           <input type="text" value={formData.adGroup.urlParams.utmContent}
             onChange={e => setFormData(prev => ({ ...prev, adGroup: { ...prev.adGroup, urlParams: { utmContent: e.target.value } } }))}
-            className={`${cls} placeholder-[#6B7280]`} placeholder="{ad_group_name}" />
+            className={`${cls} placeholder-slate-500`} placeholder="{ad_group_name}" />
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Dynamic: {'{ad_group_name}'}, {'{keyword}'}</p>
         </div>
       </div>
@@ -1701,7 +1701,7 @@ function Step4Creative({ formData, setFormData, onGenerateAdCopy, aiLoading }: {
   const primaryPlatform = formData.platforms[0] || 'meta'
   const limits = CHAR_LIMITS[primaryPlatform] || CHAR_LIMITS.meta
 
-  const cls = "w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-50 placeholder-[#6B7280] focus:outline-none focus:border-[#111827]"
+  const cls = "w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-50 placeholder-slate-500 focus:outline-none focus:border-slate-900"
   const lbl = "block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1"
 
   const headlines: string[] = formData.creative.headlines.length >= 3
@@ -1894,7 +1894,7 @@ function Step4Creative({ formData, setFormData, onGenerateAdCopy, aiLoading }: {
           <label className="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" checked={formData.creative.testing.enabled}
               onChange={e => setFormData(prev => ({ ...prev, creative: { ...prev.creative, testing: { ...prev.creative.testing, enabled: e.target.checked } } }))}
-              className="w-4 h-4 accent-[#7C3AED]" />
+              className="w-4 h-4 accent-violet-600" />
             <span className="text-slate-900 dark:text-slate-50 text-sm">Enable</span>
           </label>
         </div>
@@ -1903,7 +1903,7 @@ function Step4Creative({ formData, setFormData, onGenerateAdCopy, aiLoading }: {
             <label className={lbl}>Number of variants: {formData.creative.testing.variants}</label>
             <input type="range" min={2} max={5} value={formData.creative.testing.variants}
               onChange={e => setFormData(prev => ({ ...prev, creative: { ...prev.creative, testing: { ...prev.creative.testing, variants: Number(e.target.value) } } }))}
-              className="w-full accent-[#7C3AED]" />
+              className="w-full accent-violet-600" />
             <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 mt-1">
               <span>2</span><span>3</span><span>4</span><span>5</span>
             </div>
@@ -1923,7 +1923,7 @@ function MetaFeedPreview({ formData }: { formData: CampaignFormData }) {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3">
         <div className="flex items-center gap-2">
-          <div className="w-9 h-9 bg-[#111827] rounded-full flex items-center justify-center text-slate-900 dark:text-slate-50 font-bold text-sm">N</div>
+          <div className="w-9 h-9 bg-slate-900 rounded-full flex items-center justify-center text-slate-900 dark:text-slate-50 font-bold text-sm">N</div>
           <div>
             <div className="text-black text-sm font-semibold">{formData.name || 'Your Business'}</div>
             <div className="text-[#65676B] text-xs">Sponsored · 🌐</div>
@@ -1936,7 +1936,7 @@ function MetaFeedPreview({ formData }: { formData: CampaignFormData }) {
         <p className="text-black text-sm">{formData.creative.primaryText || 'Your primary text goes here...'}</p>
       </div>
       {/* Image placeholder */}
-      <div className="bg-gradient-to-br from-[#7C3AED]/30 to-[#1877F2]/20 h-64 flex items-center justify-center">
+      <div className="bg-gradient-to-br from-violet-600/30 to-[#1877F2]/20 h-64 flex items-center justify-center">
         <span className="text-4xl">🖼️</span>
       </div>
       {/* Link card */}
@@ -1966,7 +1966,7 @@ function MetaStoriesPreview({ formData }: { formData: CampaignFormData }) {
   return (
     <div className="relative bg-black rounded-2xl overflow-hidden max-w-[240px] mx-auto" style={{ aspectRatio: '9/16' }}>
       {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#7C3AED]/50 to-[#1877F2]/30 flex items-center justify-center">
+      <div className="absolute inset-0 bg-gradient-to-br from-violet-600/50 to-[#1877F2]/30 flex items-center justify-center">
         <span className="text-6xl">🖼️</span>
       </div>
       {/* Top bar */}
@@ -1977,7 +1977,7 @@ function MetaStoriesPreview({ formData }: { formData: CampaignFormData }) {
           <div className="flex-1 h-0.5 bg-white dark:bg-slate-900/40 rounded-full" />
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 bg-[#111827] rounded-full flex items-center justify-center text-slate-900 dark:text-slate-50 text-xs font-bold">N</div>
+          <div className="w-7 h-7 bg-slate-900 rounded-full flex items-center justify-center text-slate-900 dark:text-slate-50 text-xs font-bold">N</div>
           <div>
             <div className="text-slate-900 dark:text-slate-50 text-xs font-semibold">{formData.name || 'Your Business'}</div>
             <div className="text-slate-900 dark:text-slate-50/70 text-xs">Sponsored</div>
@@ -2034,7 +2034,7 @@ function Step5Preview({ formData }: { formData: CampaignFormData }) {
                 <div className="flex gap-2 mb-4">
                   {['feed', 'stories'].map(tab => (
                     <button key={tab} type="button" onClick={() => setTab(platform, tab)}
-                      className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${getTab(platform) === tab ? 'bg-[#111827] text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50'}`}>
+                      className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${getTab(platform) === tab ? 'bg-slate-900 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50'}`}>
                       {tab === 'feed' ? '📰 Feed' : '📲 Stories'}
                     </button>
                   ))}
@@ -2103,7 +2103,7 @@ function Step5Preview({ formData }: { formData: CampaignFormData }) {
                   </div>
                   {/* Ad card */}
                   <div className="mx-3 my-3 bg-[#202B36] rounded-xl overflow-hidden">
-                    <div className="h-40 bg-gradient-to-br from-[#2CA5E0]/30 to-[#7C3AED]/20 flex items-center justify-center">
+                    <div className="h-40 bg-gradient-to-br from-[#2CA5E0]/30 to-violet-600/20 flex items-center justify-center">
                       <span className="text-4xl">🖼️</span>
                     </div>
                     <div className="p-3">

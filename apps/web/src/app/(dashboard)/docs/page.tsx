@@ -126,7 +126,7 @@ export default function DocsPage() {
             className="ml-auto border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm min-w-64"
           />
         </div>
-        <div className="flex gap-4 flex-wrap border-b border-[#F3F4F6] pb-2">
+        <div className="flex gap-4 flex-wrap border-b border-slate-100 pb-2">
           {TOP_TABS.map((t) => (
             <button
               key={t.id}

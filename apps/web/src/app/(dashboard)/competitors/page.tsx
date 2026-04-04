@@ -489,7 +489,7 @@ export default function CompetitorsPage() {
               value={form.name}
               onChange={(e) => update('name', e.target.value)}
               placeholder="Masalan: Texnomart, MediaPark, ..."
-              className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-slate-50 placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-[#111827] transition-all"
+              className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-slate-50 placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-slate-900 transition-all"
             />
           </div>
 
@@ -510,7 +510,7 @@ export default function CompetitorsPage() {
                   value={form.instagram}
                   onChange={(e) => update('instagram', e.target.value)}
                   placeholder="@texnomart_uz"
-                  className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-4 py-3 text-slate-900 dark:text-slate-50 placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-[#111827] transition-all"
+                  className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-4 py-3 text-slate-900 dark:text-slate-50 placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-slate-900 transition-all"
                 />
               </div>
             </div>
@@ -529,7 +529,7 @@ export default function CompetitorsPage() {
                   value={form.website}
                   onChange={(e) => update('website', e.target.value)}
                   placeholder="https://texnomart.uz"
-                  className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-4 py-3 text-slate-900 dark:text-slate-50 placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-[#111827] transition-all"
+                  className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-4 py-3 text-slate-900 dark:text-slate-50 placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-slate-900 transition-all"
                 />
               </div>
             </div>
@@ -691,7 +691,7 @@ export default function CompetitorsPage() {
                   px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200
                   ${
                     activeTab === tab.key
-                      ? 'bg-[#111827] text-white'
+                      ? 'bg-slate-900 text-white'
                       : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50 hover:bg-slate-50 dark:bg-slate-800/50'
                   }
                 `}
@@ -821,7 +821,7 @@ export default function CompetitorsPage() {
                 <div className="space-y-2">
                   {result.annualStrategy.keyActions.map((action, i) => (
                     <div key={i} className="flex items-start gap-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl px-4 py-3">
-                      <div className="w-6 h-6 rounded-lg bg-[#E5E7EB] flex items-center justify-center shrink-0">
+                      <div className="w-6 h-6 rounded-lg bg-slate-200 flex items-center justify-center shrink-0">
                         <span className="text-slate-700 dark:text-slate-300 text-xs font-bold">{i + 1}</span>
                       </div>
                       <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed">{action}</p>

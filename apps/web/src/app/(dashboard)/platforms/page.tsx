@@ -57,7 +57,7 @@ export default function PlatformsPage() {
             className={`
               px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200
               ${canProceed
-                ? 'bg-[#111827] hover:bg-[#1F2937] text-white shadow-lg shadow-gray-200'
+                ? 'bg-slate-900 hover:bg-slate-800 text-white shadow-lg shadow-gray-200'
                 : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 cursor-not-allowed'
               }
             `}

@@ -56,7 +56,7 @@ function Field({
   multiline?: boolean
   placeholder?: string
 }) {
-  const cls = 'w-full border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-900 dark:text-slate-50 bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-[#111827]/20 resize-none'
+  const cls = 'w-full border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-900 dark:text-slate-50 bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/20 resize-none'
   return (
     <div>
       <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{label}</label>
@@ -334,7 +334,7 @@ export default function LandingPageEditor() {
       <button
         onClick={handleGenerate}
         disabled={generating}
-        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed border-slate-300 dark:border-slate-600 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50 hover:border-[#111827] transition-all"
+        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed border-slate-300 dark:border-slate-600 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50 hover:border-slate-900 transition-all"
       >
         {generating ? <><Spinner size="sm" /> Qayta yaratilmoqda...</> : '🔄 AI bilan qayta yaratish'}
       </button>
@@ -411,7 +411,7 @@ export default function LandingPageEditor() {
                   onClick={() => updateContent('colorScheme', opt.key)}
                   className={`flex flex-col items-center gap-1.5 p-2 rounded-xl border-2 transition-all ${
                     page.content?.colorScheme === opt.key
-                      ? 'border-[#111827]'
+                      ? 'border-slate-900'
                       : 'border-transparent hover:border-slate-200 dark:border-slate-700'
                   }`}
                 >

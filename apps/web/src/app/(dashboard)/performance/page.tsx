@@ -76,7 +76,7 @@ export default function PerformancePage() {
             <button
               key={d}
               onClick={() => setDays(d)}
-              className={`px-3 py-1.5 rounded-lg text-xs border ${days === d ? 'bg-[#111827] text-white border-[#111827]' : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400'}`}
+              className={`px-3 py-1.5 rounded-lg text-xs border ${days === d ? 'bg-slate-900 text-white border-slate-900' : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400'}`}
             >
               Last {d} days
             </button>
@@ -116,7 +116,7 @@ export default function PerformancePage() {
               </thead>
               <tbody>
                 {filtered.map((c) => (
-                  <tr key={c.id} className="border-b border-[#F3F4F6]">
+                  <tr key={c.id} className="border-b border-slate-100">
                     <td className="px-4 py-3 text-sm text-slate-900 dark:text-slate-50">{c.name}</td>
                     <td className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">{c.accountName}</td>
                     <td className="px-4 py-3 text-sm">{c.status}</td>

@@ -341,7 +341,7 @@ export default function AutoOptimizationPage() {
             desc: "AI tahlil va tavsiyalaridan foydalanib, barcha qarorlarni o'zingiz qabul qilasiz. To'liq nazorat.",
             badge: null,
             badgeColor: '',
-            borderActive: 'border-[#374151] bg-slate-50 dark:bg-slate-800/50',
+            borderActive: 'border-slate-700 bg-slate-50 dark:bg-slate-800/50',
           },
         ].map((opt) => (
           <button
@@ -375,7 +375,7 @@ export default function AutoOptimizationPage() {
               onClick={() => handleTabChange(t)}
               className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
                 tab === t
-                  ? 'bg-[#111827] text-white'
+                  ? 'bg-slate-900 text-white'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50'
               }`}
             >
@@ -464,7 +464,7 @@ export default function AutoOptimizationPage() {
                   onClick={() => setMode('recommend')}
                   className={`text-left p-4 rounded-xl border transition-all ${
                     mode === 'recommend'
-                      ? 'border-[#111827] bg-slate-100 dark:bg-slate-800'
+                      ? 'border-slate-900 bg-slate-100 dark:bg-slate-800'
                       : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:border-slate-600'
                   }`}
                 >

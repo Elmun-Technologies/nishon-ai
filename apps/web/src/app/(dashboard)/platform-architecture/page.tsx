@@ -128,7 +128,7 @@ export default function PlatformArchitecturePage() {
             </thead>
             <tbody>
               {ROADMAP.map((row) => (
-                <tr key={row.phase} className="border-b border-[#F3F4F6] align-top">
+                <tr key={row.phase} className="border-b border-slate-100 align-top">
                   <td className="py-2 font-medium text-slate-900 dark:text-slate-50">{row.phase}</td>
                   <td className="py-2 text-slate-600 dark:text-slate-400">{row.detail}</td>
                   <td className="py-2 text-slate-600 dark:text-slate-400">{row.timeline}</td>

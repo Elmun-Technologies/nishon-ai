@@ -85,7 +85,7 @@ export function ConversionMetrics({
     return (
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6">
         <div className="flex items-center justify-center h-40">
-          <div className="w-8 h-8 border-2 border-[#111827] border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
         </div>
       </div>
     )

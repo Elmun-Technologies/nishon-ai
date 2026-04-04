@@ -71,7 +71,7 @@ export function PlatformSelection({ selectedPlatforms, onPlatformToggle }: Platf
             onClick={() => onPlatformToggle(platform.id)}
             className={`cursor-pointer transition-all ${
               selectedPlatforms.includes(platform.id) 
-                ? 'border-[#111827]/40 bg-[#111827]/5' 
+                ? 'border-slate-900/40 bg-slate-900/5' 
                 : ''
             }`}
           >
@@ -90,7 +90,7 @@ export function PlatformSelection({ selectedPlatforms, onPlatformToggle }: Platf
               </div>
               <div className={`w-4 h-4 rounded border-2 ${
                 selectedPlatforms.includes(platform.id) 
-                  ? 'bg-[#111827] border-[#111827]' 
+                  ? 'bg-slate-900 border-slate-900' 
                   : 'border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800'
               }`}>
                 {selectedPlatforms.includes(platform.id) && (

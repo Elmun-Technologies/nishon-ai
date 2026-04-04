@@ -134,7 +134,7 @@ function AgentCardItem({
       </div>
 
       {/* Price + Hire */}
-      <div className="flex items-center justify-between pt-3 border-t border-[#F3F4F6]">
+      <div className="flex items-center justify-between pt-3 border-t border-slate-100">
         <div>
           <p className="text-[10px] text-slate-400 dark:text-slate-500">Narxi</p>
           <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">{priceLabel}</p>
@@ -301,7 +301,7 @@ export default function ServiceSelectionPage() {
             onClick={card.onClick || undefined}
             className={`text-left p-4 rounded-2xl border-2 transition-all ${
               card.active
-                ? 'border-[#111827] bg-slate-50 dark:bg-slate-800/50'
+                ? 'border-slate-900 bg-slate-50 dark:bg-slate-800/50'
                 : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900'
             }`}
           >
@@ -338,7 +338,7 @@ export default function ServiceSelectionPage() {
                 onClick={() => setTab(t.key as any)}
                 className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
                   tab === t.key
-                    ? 'bg-[#111827] text-white'
+                    ? 'bg-slate-900 text-white'
                     : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300'
                 }`}
               >

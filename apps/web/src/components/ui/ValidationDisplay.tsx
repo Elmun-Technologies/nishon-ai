@@ -59,7 +59,7 @@ export function ValidationDisplay({ results, onFix }: ValidationDisplayProps) {
         <div className="flex justify-end pt-4 border-t border-slate-200 dark:border-slate-700">
           <button
             onClick={onFix}
-            className="px-4 py-2 bg-[#111827] text-white rounded-lg hover:bg-[#111827]/90 transition-colors"
+            className="px-4 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-900/90 transition-colors"
           >
             Fix Issues
           </button>

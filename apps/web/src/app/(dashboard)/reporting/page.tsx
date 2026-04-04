@@ -287,7 +287,7 @@ export default function ReportingPage() {
                 className={`
                   px-3 py-1.5 rounded-lg text-xs font-medium transition-colors
                   ${days === d
-                    ? 'bg-[#111827] text-white'
+                    ? 'bg-slate-900 text-white'
                     : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50'
                   }
                 `}
@@ -342,7 +342,7 @@ export default function ReportingPage() {
                 )}
                 className={`text-xs px-2.5 py-1 rounded-full border transition-all ${
                   activeMetrics.includes(m.id)
-                    ? 'bg-[#111827] text-white border-[#111827]'
+                    ? 'bg-slate-900 text-white border-slate-900'
                     : 'bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:border-slate-600'
                 }`}
               >
@@ -358,7 +358,7 @@ export default function ReportingPage() {
               <div key={m.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-4 relative group">
                 <button
                   onClick={() => setActiveMetrics((prev) => prev.filter((x) => x !== m.id))}
-                  className="absolute top-2 right-2 text-[#D1D5DB] hover:text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity text-xs leading-none"
+                  className="absolute top-2 right-2 text-slate-300 hover:text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity text-xs leading-none"
                 >
                   ×
                 </button>
@@ -406,7 +406,7 @@ export default function ReportingPage() {
                   step={100}
                   value={simBudget}
                   onChange={(e) => setSimBudget(parseInt(e.target.value))}
-                  className="w-full accent-[#111827]"
+                  className="w-full accent-slate-900"
                 />
                 <div className="flex justify-between text-xs text-slate-400 dark:text-slate-500 mt-1">
                   <span>$500</span><span>$10,000</span>
@@ -532,7 +532,7 @@ export default function ReportingPage() {
                       {/* ── Account grading detail ── */}
                       {isOpen && (
                         <tr className="bg-slate-50 dark:bg-slate-800/50">
-                          <td colSpan={7} className="px-4 py-3 border-b border-[#F3F4F6]">
+                          <td colSpan={7} className="px-4 py-3 border-b border-slate-100">
                             <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4">
                               <div className="flex items-center justify-between gap-3 flex-wrap mb-3">
                                 <div>
@@ -567,7 +567,7 @@ export default function ReportingPage() {
                                 ))}
                               </div>
 
-                              <div className="rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-[#F3F4F6] p-3">
+                              <div className="rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-100 p-3">
                                 <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Tavsiya:</p>
                                 <ul className="space-y-1">
                                   {grade.recommendations.map((tip) => (
@@ -603,7 +603,7 @@ export default function ReportingPage() {
                             {/* Tags row */}
                             <div className="pl-14 flex items-center gap-1.5 flex-wrap mt-1">
                               {(campaignTags[campaign.id] ?? campaign.tags ?? []).map((tag) => (
-                                <span key={tag} className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-[#E5E7EB] text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600">
+                                <span key={tag} className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600">
                                   {tag}
                                   <button onClick={() => removeTag(campaign.id, tag)} className="hover:text-red-400 leading-none">×</button>
                                 </span>
@@ -619,12 +619,12 @@ export default function ReportingPage() {
                                   }}
                                   onBlur={() => setEditingTagId(null)}
                                   placeholder="teg nomi..."
-                                  className="text-[10px] px-2 py-0.5 rounded-full bg-white dark:bg-slate-900 border border-[#111827] text-slate-900 dark:text-slate-50 placeholder-[#9CA3AF] outline-none w-24"
+                                  className="text-[10px] px-2 py-0.5 rounded-full bg-white dark:bg-slate-900 border border-slate-900 text-slate-900 dark:text-slate-50 placeholder-slate-400 outline-none w-24"
                                 />
                               ) : (
                                 <button
                                   onClick={() => { setEditingTagId(campaign.id); setTagInput('') }}
-                                  className="text-[10px] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300 border border-dashed border-slate-200 dark:border-slate-700 hover:border-[#111827] px-2 py-0.5 rounded-full transition-colors"
+                                  className="text-[10px] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300 border border-dashed border-slate-200 dark:border-slate-700 hover:border-slate-900 px-2 py-0.5 rounded-full transition-colors"
                                 >
                                   + teg
                                 </button>

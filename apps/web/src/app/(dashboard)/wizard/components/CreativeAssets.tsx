@@ -308,7 +308,7 @@ export function CreativeAssets({
               <input
                 type="file"
                 accept="image/*"
-                className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-50 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#111827] file:text-slate-900 dark:text-slate-50 hover:file:bg-[#6B2FB8]"
+                className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-50 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-slate-900 file:text-slate-900 dark:text-slate-50 hover:file:bg-[#6B2FB8]"
                 onChange={(e) => {
                   const file = e.target.files?.[0]
                   if (file) {
@@ -449,7 +449,7 @@ export function CreativeAssets({
               <p className="text-sm text-slate-500 dark:text-slate-400">125 characters</p>
               <div className="w-full bg-[#3A3A4A] rounded-full h-2 mt-2">
                 <div 
-                  className="bg-[#111827] h-2 rounded-full" 
+                  className="bg-slate-900 h-2 rounded-full" 
                   style={{ width: `${(formData.creatives.headlines[0]?.length || 0) / 125 * 100}%` }}
                 ></div>
               </div>

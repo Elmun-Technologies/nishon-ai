@@ -48,7 +48,7 @@ export function LearningMonitor({ workspaceId }: Props) {
 
       {loading ? (
         <div className="flex items-center justify-center h-32">
-          <div className="w-8 h-8 border-2 border-[#111827] border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
         </div>
       ) : (
         <div className="flex items-center gap-6">

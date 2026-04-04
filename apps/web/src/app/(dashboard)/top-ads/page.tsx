@@ -81,7 +81,7 @@ export default function TopAdsPage() {
               </thead>
               <tbody>
                 {filtered.map((r) => (
-                  <tr key={r.campaignId} className="border-b border-[#F3F4F6]">
+                  <tr key={r.campaignId} className="border-b border-slate-100">
                     <td className="px-4 py-3 text-sm text-slate-900 dark:text-slate-50">{r.name}</td>
                     <td className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">{r.status}</td>
                     <td className="px-4 py-3 text-sm">{formatCurrency(r.spend)}</td>

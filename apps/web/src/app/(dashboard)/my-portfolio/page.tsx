@@ -30,7 +30,7 @@ const PLATFORM_OPTIONS = ['meta', 'google', 'yandex', 'telegram', 'tiktok', 'you
 function SetupStep({ step, active, done }: { step: typeof STEPS[0]; active: boolean; done: boolean }) {
   return (
     <div className={`flex items-center gap-3 p-3 rounded-xl transition-all ${active ? 'bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-600' : done ? 'opacity-60' : 'opacity-40'}`}>
-      <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm ${done ? 'bg-emerald-100 text-emerald-600' : active ? 'bg-[#E5E7EB] text-slate-700 dark:text-slate-300' : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400'}`}>
+      <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm ${done ? 'bg-emerald-100 text-emerald-600' : active ? 'bg-slate-200 text-slate-700 dark:text-slate-300' : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400'}`}>
         {done ? '✓' : step.icon}
       </div>
       <span className={`text-sm ${active ? 'text-slate-900 dark:text-slate-50 font-medium' : 'text-slate-400 dark:text-slate-500'}`}>{step.label}</span>
@@ -213,7 +213,7 @@ export default function PortfolioDashboardPage() {
         <div className="flex gap-3 justify-center">
           <button
             onClick={() => router.push('/portfolio')}
-            className="bg-[#111827] hover:bg-[#1F2937] text-white px-6 py-3 rounded-xl font-semibold transition-all"
+            className="bg-slate-900 hover:bg-slate-800 text-white px-6 py-3 rounded-xl font-semibold transition-all"
           >
             Katalogga o'tish
           </button>
@@ -285,7 +285,7 @@ export default function PortfolioDashboardPage() {
               </div>
               <div className="w-full bg-slate-50 dark:bg-slate-800/50 rounded-full h-1.5">
                 <div
-                  className="bg-[#111827] h-1.5 rounded-full transition-all"
+                  className="bg-slate-900 h-1.5 rounded-full transition-all"
                   style={{ width: `${(completedSteps.length / STEPS.length) * 100}%` }}
                 />
               </div>
@@ -324,7 +324,7 @@ export default function PortfolioDashboardPage() {
                     value={profile.displayName}
                     onChange={e => setProfile(p => ({ ...p, displayName: e.target.value }))}
                     placeholder="Ism Familiya"
-                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-900 dark:text-slate-50 text-sm placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-[#111827]/50"
+                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-900 dark:text-slate-50 text-sm placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-slate-900/50"
                   />
                 </div>
 
@@ -334,7 +334,7 @@ export default function PortfolioDashboardPage() {
                     value={profile.title}
                     onChange={e => setProfile(p => ({ ...p, title: e.target.value }))}
                     placeholder="Masalan: Senior Meta & Google Ads Specialist"
-                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-900 dark:text-slate-50 text-sm placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-[#111827]/50"
+                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-900 dark:text-slate-50 text-sm placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-slate-900/50"
                   />
                 </div>
 
@@ -345,7 +345,7 @@ export default function PortfolioDashboardPage() {
                     onChange={e => setProfile(p => ({ ...p, bio: e.target.value }))}
                     placeholder="Tajribangiz, ixtisosligingiz va natijalari haqida..."
                     rows={4}
-                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-900 dark:text-slate-50 text-sm placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-[#111827]/50 resize-none"
+                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-900 dark:text-slate-50 text-sm placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-slate-900/50 resize-none"
                   />
                 </div>
 
@@ -355,7 +355,7 @@ export default function PortfolioDashboardPage() {
                     value={profile.location}
                     onChange={e => setProfile(p => ({ ...p, location: e.target.value }))}
                     placeholder="Toshkent, O'zbekiston"
-                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-900 dark:text-slate-50 text-sm placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-[#111827]/50"
+                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-900 dark:text-slate-50 text-sm placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-slate-900/50"
                   />
                 </div>
 
@@ -373,7 +373,7 @@ export default function PortfolioDashboardPage() {
                         onClick={() => setProfile(p => ({ ...p, pricingModel: opt.id as any }))}
                         className={`py-2 rounded-lg text-xs font-medium border transition-all ${
                           profile.pricingModel === opt.id
-                            ? 'bg-[#111827] text-white border-[#111827]'
+                            ? 'bg-slate-900 text-white border-slate-900'
                             : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:border-slate-600'
                         }`}
                       >
@@ -390,7 +390,7 @@ export default function PortfolioDashboardPage() {
                         value={profile.monthlyRate}
                         onChange={e => setProfile(p => ({ ...p, monthlyRate: e.target.value }))}
                         placeholder="500"
-                        className="w-32 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-50 text-sm placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-[#111827]/50"
+                        className="w-32 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-50 text-sm placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-slate-900/50"
                       />
                       <span className="text-slate-500 dark:text-slate-400 text-sm">/oy</span>
                     </div>
@@ -402,7 +402,7 @@ export default function PortfolioDashboardPage() {
                         value={profile.commissionRate}
                         onChange={e => setProfile(p => ({ ...p, commissionRate: e.target.value }))}
                         placeholder="15"
-                        className="w-24 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-50 text-sm placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-[#111827]/50"
+                        className="w-24 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-50 text-sm placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-slate-900/50"
                       />
                       <span className="text-slate-500 dark:text-slate-400 text-sm">% komissiya</span>
                     </div>
@@ -419,7 +419,7 @@ export default function PortfolioDashboardPage() {
                         onClick={() => togglePlatform(p)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
                           profile.platforms.includes(p)
-                            ? 'bg-[#111827] text-white border-[#111827]'
+                            ? 'bg-slate-900 text-white border-slate-900'
                             : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:border-slate-600'
                         }`}
                       >
@@ -438,7 +438,7 @@ export default function PortfolioDashboardPage() {
                       onChange={e => setNicheInput(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && addNiche()}
                       placeholder="E-commerce, Fashion... (Enter)"
-                      className="flex-1 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-50 text-sm placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-[#111827]/50"
+                      className="flex-1 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-50 text-sm placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-slate-900/50"
                     />
                     <button
                       onClick={addNiche}
@@ -478,7 +478,7 @@ export default function PortfolioDashboardPage() {
                 <button
                   onClick={() => completeStep(1)}
                   disabled={!profile.title || !profile.bio || !profile.displayName}
-                  className="bg-[#111827] hover:bg-[#1F2937] disabled:opacity-40 text-white px-6 py-3 rounded-xl font-semibold transition-all"
+                  className="bg-slate-900 hover:bg-slate-800 disabled:opacity-40 text-white px-6 py-3 rounded-xl font-semibold transition-all"
                 >
                   Davom etish →
                 </button>
@@ -503,7 +503,7 @@ export default function PortfolioDashboardPage() {
                     key={opt.id}
                     className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-all ${
                       visibility.includes(opt.id)
-                        ? 'bg-[#111827]/5 border-slate-300 dark:border-slate-600'
+                        ? 'bg-slate-900/5 border-slate-300 dark:border-slate-600'
                         : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:border-slate-600'
                     }`}
                   >
@@ -511,7 +511,7 @@ export default function PortfolioDashboardPage() {
                     <div
                       onClick={() => toggleVisibility(opt.id)}
                       className={`w-11 h-6 rounded-full transition-colors flex items-center px-0.5 cursor-pointer ${
-                        visibility.includes(opt.id) ? 'bg-[#111827]' : 'bg-[#E5E7EB]'
+                        visibility.includes(opt.id) ? 'bg-slate-900' : 'bg-slate-200'
                       }`}
                     >
                       <div className={`w-5 h-5 bg-white dark:bg-slate-900 rounded-full transition-transform shadow ${visibility.includes(opt.id) ? 'translate-x-5' : 'translate-x-0'}`} />
@@ -526,7 +526,7 @@ export default function PortfolioDashboardPage() {
                 </button>
                 <button
                   onClick={() => completeStep(2)}
-                  className="bg-[#111827] hover:bg-[#1F2937] text-white px-6 py-3 rounded-xl font-semibold transition-all"
+                  className="bg-slate-900 hover:bg-slate-800 text-white px-6 py-3 rounded-xl font-semibold transition-all"
                 >
                   Davom etish →
                 </button>
@@ -596,7 +596,7 @@ export default function PortfolioDashboardPage() {
                 <button
                   onClick={handlePublish}
                   disabled={saving || !profile.title || !profile.bio}
-                  className="bg-[#111827] hover:bg-[#1F2937] disabled:opacity-40 text-white px-8 py-3 rounded-xl font-bold transition-all flex items-center gap-2"
+                  className="bg-slate-900 hover:bg-slate-800 disabled:opacity-40 text-white px-8 py-3 rounded-xl font-bold transition-all flex items-center gap-2"
                 >
                   {saving ? <><Spinner size="sm" /> Saqlanmoqda...</> : '🚀 Nashr qilish'}
                 </button>

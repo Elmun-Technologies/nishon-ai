@@ -168,7 +168,7 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
             className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               metaView === view
                 ? 'bg-[#6366F1] text-slate-900 dark:text-slate-50'
-                : 'bg-[#1F2937] text-slate-400 dark:text-slate-500 hover:bg-[#374151]'
+                : 'bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-slate-700'
             }`}
           >
             {view === 'feed' ? '📰 Feed' : '📱 Stories'}
@@ -264,7 +264,7 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
             {/* Desktop Stories (wider) */}
             <div>
               <p className="text-xs text-slate-400 dark:text-slate-500 text-center mb-2">Desktop</p>
-              <div className="w-56 h-80 rounded-2xl overflow-hidden shadow-2xl relative bg-gradient-to-br from-[#A855F7] to-[#EC4899]">
+              <div className="w-56 h-80 rounded-2xl overflow-hidden shadow-2xl relative bg-gradient-to-br from-[#A855F7] to-pink-500">
                 <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
                 <div className="absolute top-3 left-2 right-2 flex gap-1">
                   <div className="flex-1 h-0.5 bg-white dark:bg-slate-900 rounded-full" />

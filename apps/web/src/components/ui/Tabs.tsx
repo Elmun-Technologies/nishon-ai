@@ -49,7 +49,7 @@ export function Tabs({ tabs, activeTab, onChange, value, onValueChange, children
           className={cn(
             'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200',
             (activeTab ?? value) === tab.key
-              ? 'bg-[#111827] text-white'
+              ? 'bg-slate-900 text-white'
               : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50 hover:bg-slate-50 dark:bg-slate-800/50'
           )}
         >
@@ -81,7 +81,7 @@ export function TabsTrigger({ value, children, className }: TabsTriggerProps) {
       onClick={() => ctx.onChange(value)}
       className={cn(
         'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200',
-        ctx.value === value ? 'bg-[#111827] text-white' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50 hover:bg-slate-50 dark:bg-slate-800/50'
+        ctx.value === value ? 'bg-slate-900 text-white' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50 hover:bg-slate-50 dark:bg-slate-800/50'
       )}
     >
       {children}

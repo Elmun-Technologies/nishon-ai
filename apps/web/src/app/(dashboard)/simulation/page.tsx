@@ -164,7 +164,7 @@ export default function SimulationPage() {
                 [&::-webkit-slider-thumb]:w-5
                 [&::-webkit-slider-thumb]:h-5
                 [&::-webkit-slider-thumb]:rounded-full
-                [&::-webkit-slider-thumb]:bg-[#111827]
+                [&::-webkit-slider-thumb]:bg-slate-900
                 [&::-webkit-slider-thumb]:cursor-pointer
                 [&::-webkit-slider-thumb]:border-2
                 [&::-webkit-slider-thumb]:border-white/20"
@@ -188,8 +188,8 @@ export default function SimulationPage() {
                   className={`
                     text-xs px-3 py-1.5 rounded-lg border transition-all duration-200
                     ${budget === preset
-                      ? 'border-[#111827] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium'
-                      : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-[#111827]/50 hover:text-slate-900 dark:text-slate-50'
+                      ? 'border-slate-900 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium'
+                      : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-900/50 hover:text-slate-900 dark:text-slate-50'
                     }
                   `}
                 >
@@ -219,7 +219,7 @@ export default function SimulationPage() {
                     label: '😊 Realistic',
                     desc: 'Based on industry averages for your market',
                     color: 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:border-slate-600',
-                    active: 'border-[#111827] bg-slate-100 dark:bg-slate-800',
+                    active: 'border-slate-900 bg-slate-100 dark:bg-slate-800',
                   },
                   {
                     key: 'optimistic',

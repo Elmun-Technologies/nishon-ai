@@ -69,7 +69,7 @@ export function MetaAdsAdapter({ platform, onConnect, onDisconnect, isConnected,
       {connectionStatus === 'connecting' && (
         <div className="space-y-2 mb-4">
           <Progress value={50} />
-          <p className="text-sm text-[#6B7280]">Connecting to Meta Ads API...</p>
+          <p className="text-sm text-slate-500">Connecting to Meta Ads API...</p>
         </div>
       )}
 
@@ -82,7 +82,7 @@ export function MetaAdsAdapter({ platform, onConnect, onDisconnect, isConnected,
       <div className="space-y-4">
         <div>
           <h4 className="text-md font-medium text-white mb-2">Features</h4>
-          <ul className="text-sm text-[#6B7280] space-y-1">
+          <ul className="text-sm text-slate-500 space-y-1">
             <li>✓ Campaign creation and management</li>
             <li>✓ Ad Set targeting and optimization</li>
             <li>✓ Creative asset management</li>
@@ -167,7 +167,7 @@ export function GoogleAdsAdapter({ platform, onConnect, onDisconnect, isConnecte
       {connectionStatus === 'connecting' && (
         <div className="space-y-2 mb-4">
           <Progress value={60} />
-          <p className="text-sm text-[#6B7280]">Connecting to Google Ads API...</p>
+          <p className="text-sm text-slate-500">Connecting to Google Ads API...</p>
         </div>
       )}
 
@@ -180,7 +180,7 @@ export function GoogleAdsAdapter({ platform, onConnect, onDisconnect, isConnecte
       <div className="space-y-4">
         <div>
           <h4 className="text-md font-medium text-white mb-2">Features</h4>
-          <ul className="text-sm text-[#6B7280] space-y-1">
+          <ul className="text-sm text-slate-500 space-y-1">
             <li>✓ Search campaigns with RSA</li>
             <li>✓ Display and video campaigns</li>
             <li>✓ Performance Max campaigns</li>
@@ -265,7 +265,7 @@ export function YandexDirectAdapter({ platform, onConnect, onDisconnect, isConne
       {connectionStatus === 'connecting' && (
         <div className="space-y-2 mb-4">
           <Progress value={40} />
-          <p className="text-sm text-[#6B7280]">Connecting to Yandex Direct API...</p>
+          <p className="text-sm text-slate-500">Connecting to Yandex Direct API...</p>
         </div>
       )}
 
@@ -278,7 +278,7 @@ export function YandexDirectAdapter({ platform, onConnect, onDisconnect, isConne
       <div className="space-y-4">
         <div>
           <h4 className="text-md font-medium text-white mb-2">Features</h4>
-          <ul className="text-sm text-[#6B7280] space-y-1">
+          <ul className="text-sm text-slate-500 space-y-1">
             <li>✓ Text and banner ads</li>
             <li>✓ Smart bidding strategies</li>
             <li>✓ Audience targeting</li>
@@ -363,7 +363,7 @@ export function TelegramAdsAdapter({ platform, onConnect, onDisconnect, isConnec
       {connectionStatus === 'connecting' && (
         <div className="space-y-2 mb-4">
           <Progress value={30} />
-          <p className="text-sm text-[#6B7280]">Connecting to Telegram Ads...</p>
+          <p className="text-sm text-slate-500">Connecting to Telegram Ads...</p>
         </div>
       )}
 
@@ -376,7 +376,7 @@ export function TelegramAdsAdapter({ platform, onConnect, onDisconnect, isConnec
       <div className="space-y-4">
         <div>
           <h4 className="text-md font-medium text-white mb-2">Features</h4>
-          <ul className="text-sm text-[#6B7280] space-y-1">
+          <ul className="text-sm text-slate-500 space-y-1">
             <li>⚠️ Manual campaign creation (MVP)</li>
             <li>⚠️ Limited API integration</li>
             <li>⚠️ Future: Full API support</li>
@@ -475,7 +475,7 @@ export function PlatformConnectionManager() {
           {Object.entries(connections).map(([platform, connected]) => (
             <div key={platform} className="text-center">
               <div className={`text-2xl mb-2 ${
-                connected ? 'text-green-400' : 'text-[#6B7280]'
+                connected ? 'text-green-400' : 'text-slate-500'
               }`}>
                 {platform === 'meta' && '📘'}
                 {platform === 'google' && '🔍'}
@@ -484,7 +484,7 @@ export function PlatformConnectionManager() {
               </div>
               <div className="text-white font-medium capitalize">{platform}</div>
               <div className={`text-sm ${
-                connected ? 'text-green-400' : 'text-[#6B7280]'
+                connected ? 'text-green-400' : 'text-slate-500'
               }`}>
                 {connected ? 'Connected' : 'Not Connected'}
               </div>

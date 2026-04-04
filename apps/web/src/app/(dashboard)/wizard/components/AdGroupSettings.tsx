@@ -224,7 +224,7 @@ export function AdGroupSettings({
                 {geoLocations.map(loc => (
                   <span
                     key={loc}
-                    className="flex items-center gap-1 bg-[#1F2937] text-white text-sm px-3 py-1 rounded-full"
+                    className="flex items-center gap-1 bg-slate-800 text-white text-sm px-3 py-1 rounded-full"
                   >
                     {loc}
                     <button
@@ -384,7 +384,7 @@ export function AdGroupSettings({
                 onClick={() =>
                   onFormDataChange('keywords', formData.keywords.filter((_: any, i: number) => i !== index))
                 }
-                className="text-[#EF4444] hover:text-red-400 text-sm"
+                className="text-red-500 hover:text-red-400 text-sm"
               >
                 ✕
               </button>
@@ -559,7 +559,7 @@ export function AdGroupSettings({
                             const updated = formData.customRule.conditions.filter((_: any, j: number) => j !== i)
                             onFormDataChange('customRule', { ...formData.customRule, conditions: updated })
                           }}
-                          className="text-[#EF4444] hover:text-red-400 text-sm"
+                          className="text-red-500 hover:text-red-400 text-sm"
                         >
                           ✕
                         </button>
@@ -624,11 +624,11 @@ export function AdGroupSettings({
           {activeGroupExtensions.includes('quickLinks') && (
             <div className="ml-6 space-y-3">
               {groupQuickLinks.map((link, i) => (
-                <div key={i} className="border border-[#374151] rounded-lg p-3 space-y-2">
+                <div key={i} className="border border-slate-700 rounded-lg p-3 space-y-2">
                   <div className="flex justify-between">
                     <span className="text-xs text-slate-400 dark:text-slate-500">Quick Link {i + 1}</span>
                     {groupQuickLinks.length > 1 && (
-                      <button onClick={() => removeGroupQuickLink(i)} className="text-xs text-[#EF4444]">
+                      <button onClick={() => removeGroupQuickLink(i)} className="text-xs text-red-500">
                         O'chirish
                       </button>
                     )}
@@ -680,7 +680,7 @@ export function AdGroupSettings({
                     onChange={(e) => updateGroupClarifier(i, e.target.value)}
                   />
                   {groupClarifiers.length > 1 && (
-                    <button onClick={() => removeGroupClarifier(i)} className="text-[#EF4444] px-2">✕</button>
+                    <button onClick={() => removeGroupClarifier(i)} className="text-red-500 px-2">✕</button>
                   )}
                 </div>
               ))}

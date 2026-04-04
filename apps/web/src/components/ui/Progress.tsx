@@ -16,7 +16,7 @@ export function Progress({ value, max = 100, className, barClassName, label }: P
       {label && <p className="text-xs text-slate-500 dark:text-slate-400">{label}</p>}
       <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
         <div
-          className={cn('h-full bg-[#111827] rounded-full transition-all duration-300', barClassName)}
+          className={cn('h-full bg-slate-900 rounded-full transition-all duration-300', barClassName)}
           style={{ width: `${pct}%` }}
         />
       </div>

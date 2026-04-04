@@ -206,15 +206,15 @@ export default function AudiencesPage() {
   }
 
   return (
-    <div className="min-h-full rounded-2xl border border-[#1E1B4B] bg-[#08071A] text-[#E5E7EB] overflow-hidden">
+    <div className="min-h-full rounded-2xl border border-[#1E1B4B] bg-[#08071A] text-slate-200 overflow-hidden">
       <div className="border-b border-[#1F1B4D] px-5 py-4 flex items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-semibold">Audience Launcher</h2>
-          <p className="text-xs text-[#9CA3AF] mt-1">
+          <p className="text-xs text-slate-400 mt-1">
             Performa full-funnel targeting strategy — Madgicx workflow adapted for our platform.
           </p>
         </div>
-        <button className="px-4 py-2 rounded-lg bg-[#8B80F9] text-[#111827] text-sm font-semibold disabled:opacity-40" disabled={selected.length === 0}>
+        <button className="px-4 py-2 rounded-lg bg-[#8B80F9] text-slate-900 text-sm font-semibold disabled:opacity-40" disabled={selected.length === 0}>
           Next
         </button>
       </div>
@@ -260,7 +260,7 @@ export default function AudiencesPage() {
                 >
                   <div className="flex items-start justify-between gap-2">
                     <p className="font-medium text-sm">{audience.name}</p>
-                    <span className={`w-4 h-4 rounded border ${active ? 'bg-[#8B80F9] border-[#8B80F9]' : 'border-[#6B7280]'}`} />
+                    <span className={`w-4 h-4 rounded border ${active ? 'bg-[#8B80F9] border-[#8B80F9]' : 'border-slate-500'}`} />
                   </div>
                   <p className="text-xs text-[#A1A1AA] mt-2">{audience.description}</p>
                   <div className="flex flex-wrap gap-1.5 mt-3">
@@ -280,7 +280,7 @@ export default function AudiencesPage() {
         <section className="rounded-xl border border-[#2C285A] bg-[#0A0820]">
           <div className="px-4 py-3 border-b border-[#1F1B4D] flex items-center justify-between">
             <p className="font-medium">Campaign Set Up</p>
-            <span className="text-xs text-[#9CA3AF]">Step 1 of 4</span>
+            <span className="text-xs text-slate-400">Step 1 of 4</span>
           </div>
           <div className="p-4 space-y-4">
             <div className="inline-flex rounded-lg border border-[#2C285A] overflow-hidden">
@@ -325,13 +325,13 @@ export default function AudiencesPage() {
         <section className="rounded-xl border border-[#2C285A] bg-[#0A0820] p-4 space-y-4">
           <div className="flex items-center justify-between">
             <p className="font-medium">Select the Ad Creatives</p>
-            <button className="px-3 py-1.5 rounded-lg bg-[#8B80F9] text-[#111827] text-xs font-semibold">Save Changes</button>
+            <button className="px-3 py-1.5 rounded-lg bg-[#8B80F9] text-slate-900 text-xs font-semibold">Save Changes</button>
           </div>
           <div className="rounded-lg border border-[#2C285A] p-3">
-            <p className="text-xs text-[#9CA3AF] mb-2">Your selected audiences</p>
+            <p className="text-xs text-slate-400 mb-2">Your selected audiences</p>
             <div className="flex flex-wrap gap-2">
               {selected.length === 0 ? (
-                <span className="text-xs text-[#6B7280]">No audience selected yet.</span>
+                <span className="text-xs text-slate-500">No audience selected yet.</span>
               ) : (
                 selected.map((id) => {
                   const item = AUDIENCES.find((a) => a.id === id)
@@ -348,8 +348,8 @@ export default function AudiencesPage() {
             {[1, 2, 3, 4].map((n) => (
               <div key={n} className="rounded-lg border border-[#2C285A] bg-[#0D0B22] p-2">
                 <div className="aspect-[4/5] rounded bg-[#16133B] mb-2" />
-                <p className="text-xs text-[#D1D5DB]">Creative #{n}</p>
-                <p className="text-[11px] text-[#9CA3AF] mt-1">ROAS, CTR, thumb-stop va spend metrikalari bo‘yicha saralash.</p>
+                <p className="text-xs text-slate-300">Creative #{n}</p>
+                <p className="text-[11px] text-slate-400 mt-1">ROAS, CTR, thumb-stop va spend metrikalari bo‘yicha saralash.</p>
               </div>
             ))}
           </div>
@@ -358,7 +358,7 @@ export default function AudiencesPage() {
         <section className="rounded-xl border border-[#2C285A] bg-[#0A0820] p-4 space-y-4">
           <div className="flex items-center justify-between">
             <p className="font-medium">Set Up the Audiences</p>
-            <button className="px-3 py-1.5 rounded-lg bg-[#8B80F9] text-[#111827] text-xs font-semibold">Save Changes</button>
+            <button className="px-3 py-1.5 rounded-lg bg-[#8B80F9] text-slate-900 text-xs font-semibold">Save Changes</button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div className="rounded-lg border border-[#2C285A] p-3 space-y-3">
@@ -369,7 +369,7 @@ export default function AudiencesPage() {
                 <option>Kazakhstan</option>
                 <option>Custom selection</option>
               </select>
-              <p className="text-xs text-[#9CA3AF]">Language, geo va exclusionlarni alohida saqlash mumkin.</p>
+              <p className="text-xs text-slate-400">Language, geo va exclusionlarni alohida saqlash mumkin.</p>
             </div>
             <div className="rounded-lg border border-[#2C285A] p-3 space-y-3">
               <p className="text-sm font-medium">Recency</p>
@@ -379,12 +379,12 @@ export default function AudiencesPage() {
                 <option>3-30 days</option>
                 <option>30-180 days</option>
               </select>
-              <p className="text-xs text-[#9CA3AF]">0-3 kun “hot window”, 3-30 kun esa pastroq frequency bilan.</p>
+              <p className="text-xs text-slate-400">0-3 kun “hot window”, 3-30 kun esa pastroq frequency bilan.</p>
             </div>
             <div className="rounded-lg border border-[#2C285A] p-3 space-y-3">
               <p className="text-sm font-medium">Lookalike percentage</p>
               <input type="range" min={1} max={20} defaultValue={5} className="w-full" />
-              <p className="text-xs text-[#9CA3AF]">Tavsiya: 0-5% dan boshlang, keyin scale qiling.</p>
+              <p className="text-xs text-slate-400">Tavsiya: 0-5% dan boshlang, keyin scale qiling.</p>
             </div>
             <div className="rounded-lg border border-[#2C285A] p-3 space-y-3">
               <p className="text-sm font-medium">Conversion + Budget</p>
@@ -401,15 +401,15 @@ export default function AudiencesPage() {
         <section className="rounded-xl border border-[#2C285A] bg-[#0A0820] p-4 space-y-4">
           <div className="flex items-center justify-between">
             <p className="font-medium">Summary & Launch</p>
-            <button className="px-4 py-2 rounded-lg bg-[#8B80F9] text-[#111827] text-sm font-semibold">Launch</button>
+            <button className="px-4 py-2 rounded-lg bg-[#8B80F9] text-slate-900 text-sm font-semibold">Launch</button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
             <div className="rounded-lg border border-[#2C285A] p-3">
-              <p className="text-[#9CA3AF] text-xs mb-1">When to launch</p>
+              <p className="text-slate-400 text-xs mb-1">When to launch</p>
               <p>Launch now yoki schedule (midnight / custom time).</p>
             </div>
             <div className="rounded-lg border border-[#2C285A] p-3">
-              <p className="text-[#9CA3AF] text-xs mb-1">Naming structure</p>
+              <p className="text-slate-400 text-xs mb-1">Naming structure</p>
               <p>Account label + Audience + Placement + Age + Gender + Location.</p>
             </div>
           </div>

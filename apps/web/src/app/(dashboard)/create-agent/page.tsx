@@ -136,14 +136,14 @@ export default function CreateAgentPage() {
         {[1, 2, 3].map(s => (
           <div key={s} className="flex items-center gap-2">
             <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-              step > s ? 'bg-emerald-500 text-white' : step === s ? 'bg-[#111827] text-white' : 'bg-[#E5E7EB] text-slate-400 dark:text-slate-500'
+              step > s ? 'bg-emerald-500 text-white' : step === s ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-400 dark:text-slate-500'
             }`}>
               {step > s ? '✓' : s}
             </div>
             <span className={`text-xs ${step === s ? 'text-slate-900 dark:text-slate-50 font-medium' : 'text-slate-400 dark:text-slate-500'}`}>
               {s === 1 ? 'Asosiy ma\'lumot' : s === 2 ? 'AI konfiguratsiya' : 'Nashr'}
             </span>
-            {s < 3 && <div className="w-8 h-px bg-[#E5E7EB]" />}
+            {s < 3 && <div className="w-8 h-px bg-slate-200" />}
           </div>
         ))}
       </div>
@@ -163,7 +163,7 @@ export default function CreateAgentPage() {
                   key={emoji}
                   onClick={() => setForm(f => ({ ...f, avatar: emoji }))}
                   className={`w-10 h-10 rounded-xl text-xl flex items-center justify-center transition-all border-2 ${
-                    form.avatar === emoji ? 'border-[#111827] bg-slate-100 dark:bg-slate-800' : 'border-transparent hover:border-slate-200 dark:border-slate-700'
+                    form.avatar === emoji ? 'border-slate-900 bg-slate-100 dark:bg-slate-800' : 'border-transparent hover:border-slate-200 dark:border-slate-700'
                   }`}
                 >
                   {emoji}
@@ -176,7 +176,7 @@ export default function CreateAgentPage() {
                   key={c.value}
                   onClick={() => setForm(f => ({ ...f, avatarColor: c.value }))}
                   className={`w-7 h-7 rounded-full bg-gradient-to-br ${c.value} border-2 transition-all ${
-                    form.avatarColor === c.value ? 'border-[#111827] scale-110' : 'border-transparent'
+                    form.avatarColor === c.value ? 'border-slate-900 scale-110' : 'border-transparent'
                   }`}
                   title={c.label}
                 />
@@ -201,7 +201,7 @@ export default function CreateAgentPage() {
               value={form.displayName}
               onChange={e => setForm(f => ({ ...f, displayName: e.target.value }))}
               placeholder="Masalan: Meta Pro AI, E-commerce Optimizer"
-              className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-sm text-slate-900 dark:text-slate-50 placeholder:text-slate-400 dark:text-slate-500 focus:outline-none focus:border-[#111827]/50"
+              className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-sm text-slate-900 dark:text-slate-50 placeholder:text-slate-400 dark:text-slate-500 focus:outline-none focus:border-slate-900/50"
             />
           </div>
 
@@ -211,7 +211,7 @@ export default function CreateAgentPage() {
               value={form.title}
               onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
               placeholder="Masalan: Meta & Instagram uchun AI performance agent"
-              className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-sm text-slate-900 dark:text-slate-50 placeholder:text-slate-400 dark:text-slate-500 focus:outline-none focus:border-[#111827]/50"
+              className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-sm text-slate-900 dark:text-slate-50 placeholder:text-slate-400 dark:text-slate-500 focus:outline-none focus:border-slate-900/50"
             />
           </div>
 
@@ -222,7 +222,7 @@ export default function CreateAgentPage() {
               onChange={e => setForm(f => ({ ...f, bio: e.target.value }))}
               placeholder="Bu agent nima qiladi, qanday natijalarga erishadi..."
               rows={3}
-              className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-sm text-slate-900 dark:text-slate-50 placeholder:text-slate-400 dark:text-slate-500 focus:outline-none focus:border-[#111827]/50 resize-none"
+              className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-sm text-slate-900 dark:text-slate-50 placeholder:text-slate-400 dark:text-slate-500 focus:outline-none focus:border-slate-900/50 resize-none"
             />
           </div>
 
@@ -236,7 +236,7 @@ export default function CreateAgentPage() {
                   onClick={() => setForm(f => ({ ...f, platforms: toggleItem(f.platforms, p) }))}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
                     form.platforms.includes(p)
-                      ? 'bg-[#111827] text-white border-[#111827]'
+                      ? 'bg-slate-900 text-white border-slate-900'
                       : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:border-slate-600'
                   }`}
                 >
@@ -272,7 +272,7 @@ export default function CreateAgentPage() {
             {form.niches.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
                 {form.niches.map(n => (
-                  <span key={n} className="flex items-center gap-1 bg-[#111827] text-white text-xs px-2.5 py-1 rounded-lg">
+                  <span key={n} className="flex items-center gap-1 bg-slate-900 text-white text-xs px-2.5 py-1 rounded-lg">
                     {n}
                     <button onClick={() => setForm(f => ({ ...f, niches: f.niches.filter(x => x !== n) }))} className="opacity-60 hover:opacity-100">✕</button>
                   </span>
@@ -295,7 +295,7 @@ export default function CreateAgentPage() {
                   onClick={() => setForm(f => ({ ...f, pricingModel: opt.id as any }))}
                   className={`py-2 rounded-lg text-xs font-medium border transition-all ${
                     form.pricingModel === opt.id
-                      ? 'bg-[#111827] text-white border-[#111827]'
+                      ? 'bg-slate-900 text-white border-slate-900'
                       : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700'
                   }`}
                 >
@@ -336,7 +336,7 @@ export default function CreateAgentPage() {
             <button
               onClick={() => setStep(2)}
               disabled={!form.displayName || !form.title || form.platforms.length === 0}
-              className="bg-[#111827] hover:bg-[#1F2937] disabled:opacity-40 text-white px-6 py-3 rounded-xl font-semibold transition-all"
+              className="bg-slate-900 hover:bg-slate-800 disabled:opacity-40 text-white px-6 py-3 rounded-xl font-semibold transition-all"
             >
               Davom etish →
             </button>
@@ -362,7 +362,7 @@ export default function CreateAgentPage() {
                   onClick={() => setForm(f => ({ ...f, autopilotMode: opt.id }))}
                   className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
                     form.autopilotMode === opt.id
-                      ? 'border-[#111827] bg-slate-50 dark:bg-slate-800/50'
+                      ? 'border-slate-900 bg-slate-50 dark:bg-slate-800/50'
                       : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900'
                   }`}
                 >
@@ -402,7 +402,7 @@ export default function CreateAgentPage() {
                   onClick={() => setForm(f => ({ ...f, decisionFrequencyHours: String(h) }))}
                   className={`py-2 rounded-lg text-xs font-medium border transition-all ${
                     form.decisionFrequencyHours === String(h)
-                      ? 'bg-[#111827] text-white border-[#111827]'
+                      ? 'bg-slate-900 text-white border-slate-900'
                       : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700'
                   }`}
                 >
@@ -468,7 +468,7 @@ export default function CreateAgentPage() {
             <button
               onClick={handleCreate}
               disabled={saving}
-              className="bg-[#111827] hover:bg-[#1F2937] disabled:opacity-40 text-white px-6 py-3 rounded-xl font-semibold transition-all flex items-center gap-2"
+              className="bg-slate-900 hover:bg-slate-800 disabled:opacity-40 text-white px-6 py-3 rounded-xl font-semibold transition-all flex items-center gap-2"
             >
               {saving ? <><Spinner size="sm" /> Yaratilmoqda...</> : 'Agent yaratish →'}
             </button>
@@ -500,7 +500,7 @@ export default function CreateAgentPage() {
             <button
               onClick={handlePublish}
               disabled={saving}
-              className="bg-[#111827] hover:bg-[#1F2937] disabled:opacity-40 text-white px-6 py-3 rounded-xl font-semibold transition-all flex items-center gap-2"
+              className="bg-slate-900 hover:bg-slate-800 disabled:opacity-40 text-white px-6 py-3 rounded-xl font-semibold transition-all flex items-center gap-2"
             >
               {saving ? <><Spinner size="sm" /> ...</> : '🚀 Marketplace\'ga chiqarish'}
             </button>

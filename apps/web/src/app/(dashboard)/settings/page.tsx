@@ -83,7 +83,7 @@ const AUTOPILOT_MODES = [
     label: 'Manual',
     description: 'AI only gives insights and suggestions. All changes are made by you.',
     badge: null,
-    dotColor: 'bg-[#4B5563]',
+    dotColor: 'bg-slate-600',
   },
 ]
 
@@ -451,7 +451,7 @@ export default function SettingsPage() {
                         w-full flex items-start gap-4 p-4 rounded-xl border text-left
                         transition-all duration-150
                         ${autopilotMode === mode.value
-                          ? 'border-[#111827]/40 bg-[#111827]/5'
+                          ? 'border-slate-900/40 bg-slate-900/5'
                           : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:bg-slate-800/50'
                         }
                       `}
@@ -459,10 +459,10 @@ export default function SettingsPage() {
                       {/* Radio circle */}
                       <div className={`
                         mt-0.5 w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center
-                        ${autopilotMode === mode.value ? 'border-[#111827]' : 'border-[#4B5563]'}
+                        ${autopilotMode === mode.value ? 'border-slate-900' : 'border-slate-600'}
                       `}>
                         {autopilotMode === mode.value && (
-                          <div className="w-2 h-2 rounded-full bg-[#111827]" />
+                          <div className="w-2 h-2 rounded-full bg-slate-900" />
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -491,7 +491,7 @@ export default function SettingsPage() {
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Your personal account details.</p>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-[#E5E7EB] border border-slate-300 dark:border-slate-600 flex items-center justify-center shrink-0">
+                  <div className="w-12 h-12 rounded-full bg-slate-200 border border-slate-300 dark:border-slate-600 flex items-center justify-center shrink-0">
                     <span className="text-slate-700 dark:text-slate-300 text-lg font-bold">
                       {user?.name?.charAt(0)?.toUpperCase() ?? 'U'}
                     </span>
@@ -615,7 +615,7 @@ export default function SettingsPage() {
                           </div>
                           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{integration.description}</p>
                         </div>
-                        <button disabled className="text-xs px-3 py-1.5 rounded-lg bg-[#E5E7EB] text-slate-500 dark:text-slate-400 cursor-not-allowed shrink-0">
+                        <button disabled className="text-xs px-3 py-1.5 rounded-lg bg-slate-200 text-slate-500 dark:text-slate-400 cursor-not-allowed shrink-0">
                           Ulash
                         </button>
                       </div>
@@ -636,7 +636,7 @@ export default function SettingsPage() {
                           <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{integration.name}</p>
                           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{integration.description}</p>
                         </div>
-                        <button disabled className="text-xs px-3 py-1.5 rounded-lg bg-[#E5E7EB] text-slate-500 dark:text-slate-400 cursor-not-allowed shrink-0">
+                        <button disabled className="text-xs px-3 py-1.5 rounded-lg bg-slate-200 text-slate-500 dark:text-slate-400 cursor-not-allowed shrink-0">
                           Ulash
                         </button>
                       </div>
@@ -657,7 +657,7 @@ export default function SettingsPage() {
                           <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{integration.name}</p>
                           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{integration.description}</p>
                         </div>
-                        <button disabled className="text-xs px-3 py-1.5 rounded-lg bg-[#E5E7EB] text-slate-500 dark:text-slate-400 cursor-not-allowed shrink-0">
+                        <button disabled className="text-xs px-3 py-1.5 rounded-lg bg-slate-200 text-slate-500 dark:text-slate-400 cursor-not-allowed shrink-0">
                           Ulash
                         </button>
                       </div>
@@ -678,7 +678,7 @@ export default function SettingsPage() {
                           <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{integration.name}</p>
                           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{integration.description}</p>
                         </div>
-                        <button disabled className="text-xs px-3 py-1.5 rounded-lg bg-[#E5E7EB] text-slate-500 dark:text-slate-400 cursor-not-allowed shrink-0">
+                        <button disabled className="text-xs px-3 py-1.5 rounded-lg bg-slate-200 text-slate-500 dark:text-slate-400 cursor-not-allowed shrink-0">
                           Ulash
                         </button>
                       </div>
@@ -734,7 +734,7 @@ export default function SettingsPage() {
                       onClick={() => item.onChange((v: boolean) => !v)}
                       className={`
                         relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 shrink-0 ml-6
-                        ${item.value ? 'bg-[#111827]' : 'bg-slate-100 dark:bg-slate-800'}
+                        ${item.value ? 'bg-slate-900' : 'bg-slate-100 dark:bg-slate-800'}
                       `}
                     >
                       <span
@@ -761,7 +761,7 @@ export default function SettingsPage() {
               <div className="mb-4">
                 <h2 className="text-base font-semibold text-slate-900 dark:text-slate-50 flex items-center gap-2">
                   <span>Telegram Kunlik Hisobot</span>
-                  <span className="text-xs bg-[#E5E7EB] text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-full font-normal">Tavsiya etiladi</span>
+                  <span className="text-xs bg-slate-200 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-full font-normal">Tavsiya etiladi</span>
                 </h2>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Har kuni soat 09:00 da kampaniya natijalari Telegramga yuboriladi. Bot orqali Chat ID oling.
@@ -769,7 +769,7 @@ export default function SettingsPage() {
               </div>
 
               <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg p-4 mb-4 text-xs text-slate-400 dark:text-slate-500 space-y-1.5">
-                <p className="font-medium text-[#E5E7EB]">Qanday ulash:</p>
+                <p className="font-medium text-slate-200">Qanday ulash:</p>
                 <p>1. Telegramda <span className="text-slate-700 dark:text-slate-300 font-mono">@PerformaAIBot</span> ga yozing</p>
                 <p>2. <span className="font-mono text-slate-900 dark:text-slate-50">/start</span> buyrug'ini yuboring</p>
                 <p>3. Bot sizga Chat ID ni ko'rsatadi — uni quyida kiriting</p>
@@ -822,7 +822,7 @@ export default function SettingsPage() {
                 </div>
 
                 {policyLoading ? (
-                  <div className="py-8 flex justify-center"><div className="w-5 h-5 border-2 border-[#111827] border-t-transparent rounded-full animate-spin" /></div>
+                  <div className="py-8 flex justify-center"><div className="w-5 h-5 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" /></div>
                 ) : (
                   <div className="space-y-0 divide-y divide-[#2A2A3A]">
                     {[
@@ -869,7 +869,7 @@ export default function SettingsPage() {
                           type="button"
                           onClick={() => setPolicy((p) => ({ ...p, [item.key]: !p[item.key] }))}
                           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 shrink-0 ${
-                            policy[item.key] ? 'bg-[#111827]' : 'bg-slate-100 dark:bg-slate-800'
+                            policy[item.key] ? 'bg-slate-900' : 'bg-slate-100 dark:bg-slate-800'
                           }`}
                         >
                           <span className={`inline-block h-4 w-4 transform rounded-full bg-white dark:bg-slate-900 shadow transition-transform duration-200 ${
@@ -893,7 +893,7 @@ export default function SettingsPage() {
                           className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full appearance-none cursor-pointer
                             [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4
                             [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full
-                            [&::-webkit-slider-thumb]:bg-[#111827] [&::-webkit-slider-thumb]:cursor-pointer"
+                            [&::-webkit-slider-thumb]:bg-slate-900 [&::-webkit-slider-thumb]:cursor-pointer"
                         />
                         <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 mt-1">
                           <span>5%</span><span>25%</span><span>50%</span>

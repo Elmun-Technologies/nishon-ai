@@ -99,22 +99,22 @@ export function Marketplace() {
   })
 
   return (
-    <div className="min-h-screen bg-[#0F172A]">
+    <div className="min-h-screen bg-slate-950">
       {/* Header */}
-      <div className="border-b border-[#1E293B] bg-[#0F172A] sticky top-0 z-40">
+      <div className="border-b border-slate-800 bg-slate-950 sticky top-0 z-40">
         <div className="p-6 max-w-full">
           <h1 className="text-3xl font-bold text-white mb-4">Marketplace</h1>
 
           {/* Search Bar */}
           <div className="flex gap-3 mb-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-3 w-5 h-5 text-[#64748B]" />
+              <Search className="absolute left-3 top-3 w-5 h-5 text-slate-500" />
               <input
                 type="text"
                 placeholder="Search specialists..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-[#1E293B] border border-[#334155] rounded-lg text-white placeholder-[#64748B] focus:outline-none focus:border-blue-500"
+                className="w-full pl-10 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
               />
             </div>
           </div>
@@ -123,12 +123,12 @@ export function Marketplace() {
 
       <div className="flex min-h-[calc(100vh-180px)]">
         {/* Sidebar Filters */}
-        <div className="w-72 border-r border-[#1E293B] bg-[#0F172A] p-6 overflow-y-auto">
+        <div className="w-72 border-r border-slate-800 bg-slate-950 p-6 overflow-y-auto">
           <h3 className="text-white font-bold text-lg mb-6">Filter By</h3>
 
           {/* Rating Filter */}
           <div className="mb-6">
-            <p className="text-[#94A3B8] text-xs font-bold uppercase tracking-wider mb-3">Rating</p>
+            <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-3">Rating</p>
             <div className="space-y-2">
               {[
                 { label: 'All', value: 0 },
@@ -145,7 +145,7 @@ export function Marketplace() {
                     onChange={() => setFilters(prev => ({ ...prev, minRating: r.value }))}
                     className="rounded-full"
                   />
-                  <span className="text-sm text-[#E2E8F0] group-hover:text-white">{r.label}</span>
+                  <span className="text-sm text-slate-200 group-hover:text-white">{r.label}</span>
                 </label>
               ))}
             </div>
@@ -153,7 +153,7 @@ export function Marketplace() {
 
           {/* Platform Filter */}
           <div className="mb-6">
-            <p className="text-[#94A3B8] text-xs font-bold uppercase tracking-wider mb-3">Platforms</p>
+            <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-3">Platforms</p>
             <div className="space-y-2">
               {['meta', 'google', 'yandex'].map(platform => (
                 <label key={platform} className="flex items-center gap-3 cursor-pointer group">
@@ -170,7 +170,7 @@ export function Marketplace() {
                     }}
                     className="rounded"
                   />
-                  <span className="text-sm text-[#E2E8F0] group-hover:text-white capitalize">
+                  <span className="text-sm text-slate-200 group-hover:text-white capitalize">
                     {platform === 'meta' && '📘'} {platform === 'google' && '🔍'} {platform === 'yandex' && '🟡'} {platform}
                   </span>
                 </label>
@@ -180,12 +180,12 @@ export function Marketplace() {
 
           {/* ROAS Filter */}
           <div className="mb-6">
-            <p className="text-[#94A3B8] text-xs font-bold uppercase tracking-wider mb-3">Min ROAS</p>
+            <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-3">Min ROAS</p>
             <div className="space-y-2">
               {['2.0x+', '2.5x+', '3.0x+', '3.5x+'].map(roas => (
                 <label key={roas} className="flex items-center gap-3 cursor-pointer group">
                   <input type="radio" name="roas" className="rounded-full" defaultChecked={roas === '2.5x+'} />
-                  <span className="text-sm text-[#E2E8F0] group-hover:text-white">{roas}</span>
+                  <span className="text-sm text-slate-200 group-hover:text-white">{roas}</span>
                 </label>
               ))}
             </div>
@@ -193,12 +193,12 @@ export function Marketplace() {
 
           {/* Experience Filter */}
           <div className="mb-6">
-            <p className="text-[#94A3B8] text-xs font-bold uppercase tracking-wider mb-3">Experience</p>
+            <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-3">Experience</p>
             <div className="space-y-2">
               {['All', '3+ years', '5+ years', '10+ years'].map(exp => (
                 <label key={exp} className="flex items-center gap-3 cursor-pointer group">
                   <input type="radio" name="exp" className="rounded-full" defaultChecked={exp === 'All'} />
-                  <span className="text-sm text-[#E2E8F0] group-hover:text-white">{exp}</span>
+                  <span className="text-sm text-slate-200 group-hover:text-white">{exp}</span>
                 </label>
               ))}
             </div>
@@ -206,7 +206,7 @@ export function Marketplace() {
 
           {/* Verified Filter */}
           <div className="mb-6">
-            <p className="text-[#94A3B8] text-xs font-bold uppercase tracking-wider mb-3">Status</p>
+            <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-3">Status</p>
             <label className="flex items-center gap-3 cursor-pointer group">
               <input
                 type="checkbox"
@@ -214,18 +214,18 @@ export function Marketplace() {
                 onChange={() => setFilters(prev => ({ ...prev, verified: !prev.verified }))}
                 className="rounded"
               />
-              <span className="text-sm text-[#E2E8F0] group-hover:text-white">Is Verified</span>
+              <span className="text-sm text-slate-200 group-hover:text-white">Is Verified</span>
             </label>
           </div>
 
           {/* Average Monthly Spend */}
           <div>
-            <p className="text-[#94A3B8] text-xs font-bold uppercase tracking-wider mb-3">Avg Spend</p>
+            <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-3">Avg Spend</p>
             <div className="space-y-2">
               {['<$5k', '$5k-$10k', '$10k-$20k', '$20k+'].map(spend => (
                 <label key={spend} className="flex items-center gap-3 cursor-pointer group">
                   <input type="checkbox" className="rounded" />
-                  <span className="text-sm text-[#E2E8F0] group-hover:text-white">{spend}</span>
+                  <span className="text-sm text-slate-200 group-hover:text-white">{spend}</span>
                 </label>
               ))}
             </div>
@@ -241,7 +241,7 @@ export function Marketplace() {
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {TRENDING_SPECIALISTS.map((spec, idx) => (
-                <Card key={idx} className="p-4 bg-[#1E293B] border-[#334155] hover:border-green-500 transition-all">
+                <Card key={idx} className="p-4 bg-slate-800 border-slate-700 hover:border-green-500 transition-all">
                   <div className="flex items-center justify-between">
                     <p className="text-white font-semibold text-sm">{spec.name}</p>
                     <span className={spec.trending === 'up' ? 'text-green-400 font-bold' : 'text-red-400 font-bold'}>
@@ -267,7 +267,7 @@ export function Marketplace() {
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                     sortBy === sort.key
                       ? 'bg-blue-600 text-white'
-                      : 'bg-[#1E293B] text-[#94A3B8] hover:bg-[#334155]'
+                      : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
                   }`}
                 >
                   {sort.label}
@@ -282,7 +282,7 @@ export function Marketplace() {
                 className={`p-2 rounded transition-all ${
                   viewMode === 'grid'
                     ? 'bg-blue-600 text-white'
-                    : 'bg-[#1E293B] text-[#94A3B8] hover:bg-[#334155]'
+                    : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
                 }`}
                 title="Grid view"
               >
@@ -293,7 +293,7 @@ export function Marketplace() {
                 className={`p-2 rounded transition-all ${
                   viewMode === 'table'
                     ? 'bg-blue-600 text-white'
-                    : 'bg-[#1E293B] text-[#94A3B8] hover:bg-[#334155]'
+                    : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
                 }`}
                 title="Table view"
               >
@@ -306,7 +306,7 @@ export function Marketplace() {
           {viewMode === 'grid' && (
             <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
               {filteredSpecialists.map(specialist => (
-                <div key={specialist.id} className="bg-[#1E293B] border border-[#334155] rounded-xl p-6 hover:border-blue-500 transition-all group">
+                <div key={specialist.id} className="bg-slate-800 border border-slate-700 rounded-xl p-6 hover:border-blue-500 transition-all group">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-xl">
@@ -314,27 +314,27 @@ export function Marketplace() {
                       </div>
                       <div>
                         <h3 className="text-white font-semibold">{specialist.name}</h3>
-                        <p className="text-[#94A3B8] text-sm">{specialist.title}</p>
+                        <p className="text-slate-400 text-sm">{specialist.title}</p>
                       </div>
                     </div>
                     {specialist.verified && <Badge className="bg-green-500/20 text-green-400 text-xs">✓</Badge>}
                   </div>
 
                   <div className="grid grid-cols-4 gap-2 mb-4">
-                    <div className="bg-[#0F172A] rounded p-2 text-center">
-                      <p className="text-[#64748B] text-xs">Rating</p>
+                    <div className="bg-slate-950 rounded p-2 text-center">
+                      <p className="text-slate-500 text-xs">Rating</p>
                       <p className="text-white font-bold">{specialist.rating}</p>
                     </div>
-                    <div className="bg-[#0F172A] rounded p-2 text-center">
-                      <p className="text-[#64748B] text-xs">ROAS</p>
+                    <div className="bg-slate-950 rounded p-2 text-center">
+                      <p className="text-slate-500 text-xs">ROAS</p>
                       <p className="text-green-400 font-bold">{specialist.roas}x</p>
                     </div>
-                    <div className="bg-[#0F172A] rounded p-2 text-center">
-                      <p className="text-[#64748B] text-xs">Success</p>
+                    <div className="bg-slate-950 rounded p-2 text-center">
+                      <p className="text-slate-500 text-xs">Success</p>
                       <p className="text-white font-bold">{specialist.successRate}%</p>
                     </div>
-                    <div className="bg-[#0F172A] rounded p-2 text-center">
-                      <p className="text-[#64748B] text-xs">Reviews</p>
+                    <div className="bg-slate-950 rounded p-2 text-center">
+                      <p className="text-slate-500 text-xs">Reviews</p>
                       <p className="text-white font-bold text-sm">{specialist.reviews}</p>
                     </div>
                   </div>
@@ -347,12 +347,12 @@ export function Marketplace() {
 
                   <div className="flex flex-wrap gap-2 mb-4">
                     {specialist.platforms.map(p => (
-                      <Badge key={p} className="bg-[#334155] text-[#E2E8F0] text-xs uppercase">{p}</Badge>
+                      <Badge key={p} className="bg-slate-700 text-slate-200 text-xs uppercase">{p}</Badge>
                     ))}
                   </div>
 
-                  <div className="flex justify-between pt-4 border-t border-[#334155]">
-                    <span className="text-[#94A3B8] text-sm">Avg. {specialist.avgSpend}</span>
+                  <div className="flex justify-between pt-4 border-t border-slate-700">
+                    <span className="text-slate-400 text-sm">Avg. {specialist.avgSpend}</span>
                     <button className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-all">
                       View →
                     </button>
@@ -364,36 +364,36 @@ export function Marketplace() {
 
           {/* Table View */}
           {viewMode === 'table' && (
-            <Card className="p-6 bg-[#1E293B] border-[#334155]">
+            <Card className="p-6 bg-slate-800 border-slate-700">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-[#334155]">
-                      <th className="text-left py-3 px-4 text-[#94A3B8] font-bold">Specialist</th>
-                      <th className="text-right py-3 px-4 text-[#94A3B8] font-bold">Rating</th>
-                      <th className="text-right py-3 px-4 text-[#94A3B8] font-bold">ROAS</th>
-                      <th className="text-right py-3 px-4 text-[#94A3B8] font-bold">Success Rate</th>
-                      <th className="text-right py-3 px-4 text-[#94A3B8] font-bold">Reviews</th>
-                      <th className="text-right py-3 px-4 text-[#94A3B8] font-bold">Avg Spend</th>
-                      <th className="text-center py-3 px-4 text-[#94A3B8] font-bold">Action</th>
+                    <tr className="border-b border-slate-700">
+                      <th className="text-left py-3 px-4 text-slate-400 font-bold">Specialist</th>
+                      <th className="text-right py-3 px-4 text-slate-400 font-bold">Rating</th>
+                      <th className="text-right py-3 px-4 text-slate-400 font-bold">ROAS</th>
+                      <th className="text-right py-3 px-4 text-slate-400 font-bold">Success Rate</th>
+                      <th className="text-right py-3 px-4 text-slate-400 font-bold">Reviews</th>
+                      <th className="text-right py-3 px-4 text-slate-400 font-bold">Avg Spend</th>
+                      <th className="text-center py-3 px-4 text-slate-400 font-bold">Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredSpecialists.map(specialist => (
-                      <tr key={specialist.id} className="border-b border-[#334155] hover:bg-[#0F172A] transition-all">
+                      <tr key={specialist.id} className="border-b border-slate-700 hover:bg-slate-950 transition-all">
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-2">
                             <span className="text-xl">{specialist.avatar}</span>
                             <div>
                               <p className="text-white font-medium">{specialist.name}</p>
-                              <p className="text-[#64748B] text-xs">{specialist.title}</p>
+                              <p className="text-slate-500 text-xs">{specialist.title}</p>
                             </div>
                           </div>
                         </td>
                         <td className="py-3 px-4 text-right text-white font-semibold">{specialist.rating}</td>
                         <td className="py-3 px-4 text-right text-green-400 font-bold">{specialist.roas}x</td>
                         <td className="py-3 px-4 text-right text-white">{specialist.successRate}%</td>
-                        <td className="py-3 px-4 text-right text-[#94A3B8]">{specialist.reviews}</td>
+                        <td className="py-3 px-4 text-right text-slate-400">{specialist.reviews}</td>
                         <td className="py-3 px-4 text-right text-white">{specialist.avgSpend}</td>
                         <td className="py-3 px-4 text-center">
                           <button className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-all">
@@ -411,7 +411,7 @@ export function Marketplace() {
           {/* No Results */}
           {filteredSpecialists.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-[#94A3B8] text-lg">No specialists found matching your criteria</p>
+              <p className="text-slate-400 text-lg">No specialists found matching your criteria</p>
             </div>
           )}
         </div>
