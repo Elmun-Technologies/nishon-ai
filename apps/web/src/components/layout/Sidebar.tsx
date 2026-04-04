@@ -14,6 +14,7 @@ import {
   Users,
   Sparkles,
   TrendingUp,
+  ShoppingBag,
 } from 'lucide-react'
 
 const NAV_ITEMS = [
@@ -92,6 +93,11 @@ const NAV_ITEMS = [
     href: '/my-portfolio',
     label: 'Portfolio',
     icon: TrendingUp,
+  },
+  {
+    href: '/marketplace',
+    label: 'Marketplace',
+    icon: ShoppingBag,
   },
 ]
 
