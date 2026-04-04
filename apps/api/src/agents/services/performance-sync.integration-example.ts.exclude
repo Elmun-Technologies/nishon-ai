@@ -10,7 +10,7 @@
 // EXAMPLE 1: Controller Integration
 // ============================================================================
 
-import { Controller, Post, Get, Param, Body, Query, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Get, Param, Body, Query, UseGuards, Req, NotFoundException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { PerformanceSyncService } from './performance-sync.service';
 import { AgentsService } from '../agents.service';

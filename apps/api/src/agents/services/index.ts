@@ -18,6 +18,3 @@ export {
   AdminFraudAction,
   FraudRiskAnalysis,
 } from './fraud-detection-admin.service';
-
-// Export example patterns for documentation
-export * from './fraud-detection.examples';

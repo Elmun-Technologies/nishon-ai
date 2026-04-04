@@ -445,10 +445,10 @@ export class PerformanceSyncService {
 
     // Calculate weighted averages
     const avgRoas =
-      totalSpend > 0 ? parseFloat(((totalRevenue / totalSpend) * 100) / 100) : 0;
+      totalSpend > 0 ? parseFloat((((totalRevenue / totalSpend) * 100) / 100).toString()) : 0;
     const avgCpa =
       totalConversions > 0
-        ? parseFloat((totalSpend / totalConversions) / 100)
+        ? parseFloat(((totalSpend / totalConversions) / 100).toString())
         : 0;
     const avgCtr =
       allMetrics.length > 0

@@ -1,65 +1,70 @@
-# MarketplaceSearchService - Implementation Guide
+# SEO Optimization System - Implementation Guide
 
 ## Quick Start
 
-### 1. Service is Already Registered
+### 1. Services are Ready to Register
 
-The `MarketplaceSearchService` is automatically registered in the `AgentsModule` and ready to use.
+Three core services handle all SEO functionality:
+- `MarketplaceSeoService` - Metadata generation
+- `SitemapService` - Sitemap generation
+- `RobotsService` - robots.txt generation
 
-### 2. Inject into Your Service or Controller
+### 2. Register Services in AgentsModule
 
 ```typescript
-import { Injectable } from '@nestjs/common';
-import { MarketplaceSearchService } from './services/marketplace-search.service';
+import { Module } from '@nestjs/common'
+import { MarketplaceSeoService } from './services/marketplace-seo.service'
+import { SitemapService } from './services/sitemap.service'
+import { RobotsService } from './services/robots.service'
 
-@Injectable()
-export class YourService {
-  constructor(private readonly marketplaceSearch: MarketplaceSearchService) {}
-
-  async findSpecialists() {
-    return this.marketplaceSearch.searchSpecialists({
-      query: 'facebook ads',
-      platforms: ['meta'],
-      page: 1,
-      pageSize: 20,
-    });
-  }
-}
+@Module({
+  providers: [MarketplaceSeoService, SitemapService, RobotsService],
+  exports: [MarketplaceSeoService, SitemapService, RobotsService],
+})
+export class AgentsModule {}
 ```
 
 ### 3. Create REST Endpoints
 
 ```typescript
-import { Controller, Get, Query, Param } from '@nestjs/common';
-import { MarketplaceSearchService, MarketplaceFilters } from './services/marketplace-search.service';
+import { Controller, Post, Get, Logger } from '@nestjs/common'
+import { MarketplaceSeoService } from '../services/marketplace-seo.service'
+import { SitemapService } from '../services/sitemap.service'
+import { RobotsService } from '../services/robots.service'
 
-@Controller('api/marketplace')
-export class MarketplaceController {
-  constructor(private readonly search: MarketplaceSearchService) {}
+@Controller('api/seo')
+export class SeoController {
+  private readonly logger = new Logger(SeoController.name)
 
-  @Get('search')
-  async searchSpecialists(@Query() filters: MarketplaceFilters) {
-    return this.search.searchSpecialists(filters);
+  constructor(
+    private readonly seo: MarketplaceSeoService,
+    private readonly sitemap: SitemapService,
+    private readonly robots: RobotsService,
+  ) {}
+
+  @Post('generate-sitemaps')
+  async generateSitemaps() {
+    await this.sitemap.generateAllSitemaps()
+    return { success: true }
   }
 
-  @Get('filters')
-  async getAvailableFilters(@Query() filters: MarketplaceFilters) {
-    return this.search.getAvailableFilters(filters);
+  @Post('generate-robots')
+  async generateRobots() {
+    await this.robots.generateRobotsTxt()
+    return { success: true }
   }
 
-  @Get('specialists/:slug')
-  async getDetail(@Param('slug') slug: string) {
-    return this.search.getSpecialistDetail(slug);
-  }
-
-  @Get('specialists/:slug/performance')
-  async getPerformance(@Param('slug') slug: string) {
-    return this.search.getSpecialistPerformance(slug, 'year');
+  @Get('stats')
+  async getStats() {
+    return {
+      sitemaps: await this.sitemap.getSitemapStats(),
+      robots: await this.robots.getRobotsStats(),
+    }
   }
 }
 ```
 
-## Feature Examples
+## Setup Features
 
 ### Example 1: Search E-commerce Specialists
 

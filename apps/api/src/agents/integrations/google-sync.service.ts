@@ -13,9 +13,8 @@ import { firstValueFrom } from "rxjs";
 
 import { AgentProfile } from "../entities/agent-profile.entity";
 import { AgentPlatformMetrics } from "../entities/agent-platform-metrics.entity";
-import { ConnectedAccount } from "../../platforms/entities/connected-account.entity";
+import { ServiceEngagement } from "../entities/service-engagement.entity";
 import { Workspace } from "../../workspaces/entities/workspace.entity";
-import { MetaAdsService } from "../../meta/meta-ads.service";
 import { Platform } from "@performa/shared";
 import { decrypt } from "../../common/crypto.util";
 
@@ -51,10 +50,10 @@ export interface MetricsPullConfig {
 }
 
 /**
- * MetaPerformanceRow is the normalized performance metric pulled from Meta Ads Insights.
- * Maps daily campaign insights to a standard format for storage in agent_platform_metrics.
+ * GooglePerformanceRow is the normalized performance metric pulled from Google Ads API.
+ * Maps daily campaign metrics to a standard format for storage in agent_platform_metrics.
  */
-interface MetaPerformanceRow {
+interface GooglePerformanceRow {
   campaignId: string;
   campaignName: string;
   date: Date;
@@ -65,20 +64,19 @@ interface MetaPerformanceRow {
   conversionValue: number;
   // Computed
   ctr: number; // clicks / impressions
-  cpa: number; // spend / conversions (null if conversions=0)
+  cpa: number | null; // spend / conversions (null if conversions=0)
   roas: number; // conversionValue / spend (null if spend=0)
 }
 
 /**
- * MetaAccountWithMetrics represents a Meta ad account with its associated campaigns
- * and their performance metrics.
+ * GoogleAccountWithMetrics represents a Google Ads customer with its associated
+ * campaigns and their performance metrics.
  */
-interface MetaAccountWithMetrics {
-  accountId: string;
-  accountName: string;
+interface GoogleAccountWithMetrics {
+  customerId: string;
+  customerName: string;
   currency: string;
-  timezone: string;
-  performanceRows: MetaPerformanceRow[];
+  performanceRows: GooglePerformanceRow[];
 }
 
 /**
@@ -91,10 +89,10 @@ export interface FraudValidationResult {
 }
 
 /**
- * MetaPerformanceSyncService enhances the marketplace by syncing real Meta Ads campaign
- * performance data directly into specialist profiles. This enables:
+ * GooglePerformanceSyncService enhances the marketplace by syncing real Google Ads
+ * campaign performance data directly into specialist profiles. This enables:
  *
- * 1. **Data Collection**: Pulls daily/monthly campaign metrics from Meta Ads Insights API
+ * 1. **Data Collection**: Pulls daily/monthly campaign metrics from Google Ads API v15
  * 2. **Validation**: Checks metrics for fraud using configurable rules
  * 3. **Storage**: Persists normalized metrics to agent_platform_metrics
  * 4. **Profile Update**: Recalculates specialist cached stats and performance history
@@ -102,27 +100,36 @@ export interface FraudValidationResult {
  *
  * Design principles:
  * - Workspace isolation: All operations respect workspace boundaries
- * - Rate limiting: Staggered API requests, exponential backoff on 429
+ * - Rate limiting: Staggered API requests (10 req/10 sec limit)
  * - Idempotency: Upserts ensure repeated syncs are safe
  * - Partial success: Per-account errors don't abort the entire specialist sync
  * - Audit trail: All syncs logged with timestamps and result metrics
  *
  * Error handling:
- * - 190 (token expired): Attempt refresh, then notify admin
- * - 17/613 (rate limit): Exponential backoff + queue for retry
+ * - Token expired: Attempt refresh, then notify admin
+ * - Rate limit: Queue for retry with exponential backoff
  * - Missing campaigns: Log warning, continue with other accounts
  * - Fraud detection: Flag suspicious metrics, include in fraud_risk_score
  */
 @Injectable()
-export class MetaPerformanceSyncService {
-  private readonly logger = new Logger(MetaPerformanceSyncService.name);
+export class GooglePerformanceSyncService {
+  private readonly logger = new Logger(GooglePerformanceSyncService.name);
   private readonly encryptionKey: string | null;
+  private readonly googleAdsApiVersion = "v15";
+  private readonly googleAdsApiBase = "https://googleads.googleapis.com";
 
-  // Rate limit state: track last request time per account
-  private readonly rateLimitState = new Map<string, { lastRequestMs: number; backoffMultiplier: number }>();
+  // Rate limit state: Google Ads API allows 10 requests per 10 seconds
+  // Track request timestamps to enforce this limit
+  private readonly rateLimitState = new Map<
+    string,
+    {
+      lastRequestMs: number;
+      requestTimestamps: number[];
+      backoffMultiplier: number;
+    }
+  >();
 
   constructor(
-    private readonly metaApi: MetaAdsService,
     private readonly http: HttpService,
     private readonly dataSource: DataSource,
     private readonly config: ConfigService,
@@ -130,8 +137,8 @@ export class MetaPerformanceSyncService {
     private readonly agentProfileRepo: Repository<AgentProfile>,
     @InjectRepository(AgentPlatformMetrics)
     private readonly metricsRepo: Repository<AgentPlatformMetrics>,
-    @InjectRepository(ConnectedAccount)
-    private readonly connectedAccountRepo: Repository<ConnectedAccount>,
+    @InjectRepository(ServiceEngagement)
+    private readonly serviceEngagementRepo: Repository<ServiceEngagement>,
     @InjectRepository(Workspace)
     private readonly workspaceRepo: Repository<Workspace>,
   ) {
@@ -143,9 +150,9 @@ export class MetaPerformanceSyncService {
    * Main entry point: sync performance metrics for a specialist into the marketplace.
    *
    * Execution flow:
-   * 1. Validate specialist exists and owns connected Meta accounts
-   * 2. Get access token from most recent connected Meta account
-   * 3. Fetch all campaigns and their insights from Meta API
+   * 1. Validate specialist exists and owns connected Google Ads accounts
+   * 2. Get access token from most recent ServiceEngagement
+   * 3. Fetch all campaigns and their metrics from Google Ads API
    * 4. Validate metrics with fraud detection rules
    * 5. Upsert metrics to agent_platform_metrics table
    * 6. Recalculate cached stats and monthly performance
@@ -156,7 +163,7 @@ export class MetaPerformanceSyncService {
    * @param config Pull configuration (lookback period, force refresh, etc.)
    * @returns Detailed result including metrics counts, errors, and fraud score
    * @throws NotFoundException if specialist not found
-   * @throws BadRequestException if no Meta accounts connected
+   * @throws BadRequestException if no Google Ads accounts connected
    */
   async syncSpecialistMetrics(
     agentProfileId: string,
@@ -213,12 +220,20 @@ export class MetaPerformanceSyncService {
       const accessToken = await this.resolveAccessToken(workspaceId);
       if (!accessToken) {
         throw new BadRequestException(
-          `No active Meta integration found for workspace ${workspaceId}. ` +
-            "Please connect a Meta ad account first.",
+          `No active Google Ads integration found for workspace ${workspaceId}. ` +
+            "Please connect a Google Ads account first.",
         );
       }
 
-      // ──── Step 3: Calculate date range ────────────────────────────────────
+      // ──── Step 3: Get customer ID from ServiceEngagement ──────────────────────
+      const customerIds = await this.getConnectedCustomerIds(workspaceId);
+      if (customerIds.length === 0) {
+        throw new BadRequestException(
+          "No Google Ads customer accounts configured for this workspace.",
+        );
+      }
+
+      // ──── Step 4: Calculate date range ────────────────────────────────────
       const endDate = new Date();
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - pullConfig.dayLookback);
@@ -233,21 +248,21 @@ export class MetaPerformanceSyncService {
         dayLookback: pullConfig.dayLookback,
       });
 
-      // ──── Step 4: Fetch ad accounts and campaign metrics ────────────────────
+      // ──── Step 5: Fetch customer accounts and campaign metrics ──────────────
       const accountsWithMetrics = await this.fetchAccountMetrics(
-        workspaceId,
+        customerIds,
         accessToken,
         startDate,
         endDate,
       );
 
       if (accountsWithMetrics.length === 0) {
-        result.warnings.push("No campaigns found in connected Meta accounts");
+        result.warnings.push("No campaigns found in connected Google Ads accounts");
         result.success = true;
         return result;
       }
 
-      // ──── Step 5: Validate metrics (fraud detection) ───────────────────────
+      // ──── Step 6: Validate metrics (fraud detection) ───────────────────────
       const validatedMetrics = await this.validateMetricsWithFraudDetection(
         accountsWithMetrics,
         specialist,
@@ -259,7 +274,7 @@ export class MetaPerformanceSyncService {
         result.warnings.push(...validatedMetrics.errors);
       }
 
-      // ──── Step 6: Persist to database (with transaction) ──────────────────
+      // ──── Step 7: Persist to database (with transaction) ──────────────────
       if (!pullConfig.dryRun) {
         const persistResult = await this.persistMetrics(
           agentProfileId,
@@ -277,7 +292,7 @@ export class MetaPerformanceSyncService {
         );
       }
 
-      // ──── Step 7: Update specialist profile ────────────────────────────────
+      // ──── Step 8: Update specialist profile ────────────────────────────────
       if (!pullConfig.dryRun) {
         await this.updateSpecialistProfile(
           agentProfileId,
@@ -313,60 +328,52 @@ export class MetaPerformanceSyncService {
   }
 
   /**
-   * Fetches all ad accounts and their campaign insights from Meta API.
-   * Handles pagination, rate limiting, and per-account error recovery.
+   * Fetches all customer accounts and their campaign metrics from Google Ads API.
+   * Handles rate limiting and per-account error recovery.
    */
   private async fetchAccountMetrics(
-    workspaceId: string,
+    customerIds: string[],
     accessToken: string,
     startDate: Date,
     endDate: Date,
-  ): Promise<MetaAccountWithMetrics[]> {
-    const accounts = await this.metaApi.getAdAccounts(accessToken);
-    const results: MetaAccountWithMetrics[] = [];
+  ): Promise<GoogleAccountWithMetrics[]> {
+    const results: GoogleAccountWithMetrics[] = [];
 
-    for (const account of accounts) {
+    for (const customerId of customerIds) {
       try {
-        // Rate limit: stagger requests
-        await this.applyRateLimit(account.id);
+        // Rate limit: enforce Google Ads API limit
+        await this.applyRateLimit(customerId);
 
-        const campaigns = await this.metaApi.getCampaigns(account.id, accessToken);
+        const campaigns = await this.getCampaigns(customerId, accessToken);
 
         if (campaigns.length === 0) {
           this.logger.debug({
-            message: "No campaigns found for account",
-            accountId: account.id,
-            accountName: account.name,
+            message: "No campaigns found for customer",
+            customerId,
           });
           continue;
         }
 
-        // Fetch insights for all campaigns in this account
-        const allInsights = await this.getAccountInsights(
-          account.id,
+        // Fetch metrics for all campaigns in this customer
+        const performanceRows = await this.getCampaignMetrics(
+          customerId,
           accessToken,
           startDate,
           endDate,
         );
 
-        // Map insights to MetaPerformanceRow format
-        const performanceRows = this.mapInsightsToMetrics(
-          allInsights,
-          campaigns,
-        );
-
-        results.push({
-          accountId: account.id,
-          accountName: account.name,
-          currency: account.currency ?? "USD",
-          timezone: account.timezone_name ?? "UTC",
-          performanceRows,
-        });
+        if (performanceRows.length > 0) {
+          results.push({
+            customerId,
+            customerName: `Customer ${customerId}`,
+            currency: "USD", // TODO: fetch from customer settings
+            performanceRows,
+          });
+        }
       } catch (err: any) {
         this.logger.error({
-          message: "Failed to fetch metrics for account",
-          accountId: account.id,
-          accountName: account.name,
+          message: "Failed to fetch metrics for customer",
+          customerId,
           error: err?.message,
         });
         // Continue with other accounts
@@ -377,91 +384,136 @@ export class MetaPerformanceSyncService {
   }
 
   /**
-   * Fetches insights (daily metrics) for an ad account across all campaigns.
-   * Uses Meta's account-level insights endpoint for efficiency.
+   * Fetches all campaigns for a Google Ads customer.
+   * Uses Google Ads API v15 customer.gaql search.
    */
-  private async getAccountInsights(
-    accountId: string,
-    accessToken: string,
-    startDate: Date,
-    endDate: Date,
-  ): Promise<any[]> {
-    const formatDate = (d: Date) => d.toISOString().split("T")[0];
-
+  private async getCampaigns(customerId: string, accessToken: string): Promise<any[]> {
     try {
-      // Account-level insights include all campaigns in the account
-      const insights = await this.metaApi.getInsights(
-        accountId,
-        accessToken,
-        {
-          dateStart: formatDate(startDate),
-          dateEnd: formatDate(endDate),
-          timeIncrement: "1", // Daily
-          fields: "campaign_id,campaign_name,date_start,spend,impressions,clicks,conversions,conversion_value,ctr,cpc",
-        },
+      const query = `
+        SELECT campaign.id, campaign.name, campaign.status
+        FROM campaign
+        WHERE campaign.status != REMOVED
+        ORDER BY campaign.id
+      `;
+
+      const response = await firstValueFrom(
+        this.http.post(
+          `${this.googleAdsApiBase}/${this.googleAdsApiVersion}/customers/${customerId}/googleAds:search`,
+          { query },
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              "Content-Type": "application/json",
+              "developer-token": this.config.get<string>("GOOGLE_ADS_DEVELOPER_TOKEN", ""),
+            },
+          },
+        ),
       );
 
-      return insights || [];
+      return (
+        response.data.results?.map((result: any) => ({
+          id: result.campaign.id,
+          name: result.campaign.name,
+          status: result.campaign.status,
+        })) || []
+      );
     } catch (err: any) {
       this.logger.warn({
-        message: "Failed to fetch account insights",
-        accountId,
-        error: err?.message,
+        message: "Failed to fetch campaigns",
+        customerId,
+        error: err?.response?.data?.error?.message || err?.message,
       });
       return [];
     }
   }
 
   /**
-   * Maps raw Meta Insights API response to normalized MetaPerformanceRow format.
-   * Calculates derived metrics (CTR, CPA, ROAS).
+   * Fetches daily performance metrics for all campaigns in a customer.
+   * Aggregates impressions, clicks, spend, and conversions.
    */
-  private mapInsightsToMetrics(
-    insights: any[],
-    campaigns: any[],
-  ): MetaPerformanceRow[] {
-    const campaignMap = new Map(campaigns.map((c) => [c.id, c]));
-    const rows: MetaPerformanceRow[] = [];
+  private async getCampaignMetrics(
+    customerId: string,
+    accessToken: string,
+    startDate: Date,
+    endDate: Date,
+  ): Promise<GooglePerformanceRow[]> {
+    try {
+      const formatDate = (d: Date) => d.toISOString().split("T")[0];
 
-    for (const insight of insights) {
-      const campaignId = insight.campaign_id;
-      const campaign = campaignMap.get(campaignId);
+      const query = `
+        SELECT
+          campaign.id,
+          campaign.name,
+          segments.date,
+          metrics.impressions,
+          metrics.clicks,
+          metrics.cost_micros,
+          metrics.conversions,
+          metrics.conversion_value
+        FROM campaign
+        WHERE
+          campaign.status != REMOVED
+          AND segments.date >= '${formatDate(startDate)}'
+          AND segments.date <= '${formatDate(endDate)}'
+        ORDER BY segments.date DESC, campaign.id
+      `;
 
-      if (!campaign) {
-        this.logger.debug({
-          message: "Campaign not found in lookup",
-          campaignId,
+      const response = await firstValueFrom(
+        this.http.post(
+          `${this.googleAdsApiBase}/${this.googleAdsApiVersion}/customers/${customerId}/googleAds:search`,
+          { query },
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              "Content-Type": "application/json",
+              "developer-token": this.config.get<string>("GOOGLE_ADS_DEVELOPER_TOKEN", ""),
+            },
+          },
+        ),
+      );
+
+      const rows: GooglePerformanceRow[] = [];
+
+      for (const result of response.data.results || []) {
+        const metrics = result.metrics;
+        const campaign = result.campaign;
+
+        // Google Ads API returns cost in micros (millionths)
+        const spend = (metrics.cost_micros || 0) / 1000000;
+        const impressions = parseInt(metrics.impressions || "0", 10);
+        const clicks = parseInt(metrics.clicks || "0", 10);
+        const conversions = parseFloat(metrics.conversions || "0");
+        const conversionValue = parseFloat(metrics.conversion_value || "0");
+
+        // Calculate derived metrics
+        const ctr = impressions > 0 ? (clicks / impressions) * 100 : 0;
+        const cpa = conversions > 0 ? spend / conversions : null;
+        const roas = spend > 0 ? conversionValue / spend : null;
+
+        rows.push({
+          campaignId: campaign.id,
+          campaignName: campaign.name,
+          date: new Date(result.segments.date),
+          spend,
+          impressions,
+          clicks,
+          conversions,
+          conversionValue,
+          ctr,
+          cpa,
+          roas,
         });
-        continue;
       }
 
-      const spend = parseFloat(insight.spend || "0");
-      const impressions = parseInt(insight.impressions || "0", 10);
-      const clicks = parseInt(insight.clicks || "0", 10);
-      const conversions = parseFloat(insight.conversions || "0");
-      const conversionValue = parseFloat(insight.conversion_value || "0");
-
-      // Calculate derived metrics
-      const ctr = impressions > 0 ? (clicks / impressions) * 100 : 0;
-      const cpa = conversions > 0 ? spend / conversions : null;
-      const roas = spend > 0 ? conversionValue / spend : null;
-
-      rows.push({
-        campaignId,
-        campaignName: campaign.name,
-        date: new Date(insight.date_start),
-        spend,
-        impressions,
-        clicks,
-        conversions,
-        conversionValue,
-        ctr,
-        cpa,
-        roas,
+      return rows;
+    } catch (err: any) {
+      this.logger.warn({
+        message: "Failed to fetch campaign metrics",
+        customerId,
+        error: err?.response?.data?.error?.message || err?.message,
       });
+      return [];
     }
-
-    return rows;
   }
 
   /**
@@ -473,14 +525,14 @@ export class MetaPerformanceSyncService {
    * - Sudden spikes or anomalies
    */
   private async validateMetricsWithFraudDetection(
-    accountsWithMetrics: MetaAccountWithMetrics[],
+    accountsWithMetrics: GoogleAccountWithMetrics[],
     specialist: AgentProfile,
   ): Promise<{
-    rows: MetaPerformanceRow[];
+    rows: GooglePerformanceRow[];
     fraudRiskScore: number;
     errors: string[];
   }> {
-    const allRows: MetaPerformanceRow[] = accountsWithMetrics.flatMap(
+    const allRows: GooglePerformanceRow[] = accountsWithMetrics.flatMap(
       (acc) => acc.performanceRows,
     );
 
@@ -551,13 +603,13 @@ export class MetaPerformanceSyncService {
    */
   private async persistMetrics(
     agentProfileId: string,
-    rows: MetaPerformanceRow[],
+    rows: GooglePerformanceRow[],
     forceRefresh: boolean,
     startDate: Date,
     endDate: Date,
   ): Promise<{ inserted: number; updated: number }> {
     // Group by month for aggregation
-    const byMonth = new Map<string, MetaPerformanceRow[]>();
+    const byMonth = new Map<string, GooglePerformanceRow[]>();
 
     for (const row of rows) {
       // Create first-day-of-month date for aggregationPeriod
@@ -593,7 +645,7 @@ export class MetaPerformanceSyncService {
 
       aggregatedMetrics.push({
         agentProfileId,
-        platform: "meta",
+        platform: "google",
         aggregationPeriod,
         totalSpend,
         campaignsCount: new Set(monthRows.map((r) => r.campaignId)).size,
@@ -617,7 +669,7 @@ export class MetaPerformanceSyncService {
         if (forceRefresh) {
           await em.delete(AgentPlatformMetrics, {
             agentProfileId,
-            platform: "meta",
+            platform: "google",
             aggregationPeriod: metric.aggregationPeriod,
           });
         }
@@ -637,11 +689,11 @@ export class MetaPerformanceSyncService {
           const existing = await em.findOne(AgentPlatformMetrics, {
             where: {
               agentProfileId,
-              platform: "meta",
+              platform: "google",
               aggregationPeriod: metric.aggregationPeriod,
             },
           });
-          if (existing && existing.syncedAt > new Date(Date.now() - 1000)) {
+          if (existing && existing.updatedAt > new Date(Date.now() - 1000)) {
             updated++;
           } else {
             inserted++;
@@ -655,6 +707,7 @@ export class MetaPerformanceSyncService {
     this.logger.log({
       message: "Metrics persisted",
       agentProfileId,
+      platform: "google",
       metricsCount: aggregatedMetrics.length,
       inserted,
       updated,
@@ -674,18 +727,17 @@ export class MetaPerformanceSyncService {
     fraudRiskScore: number,
     metricsUpdated: boolean,
   ): Promise<void> {
-    // Fetch all metrics for this specialist
+    // Fetch all metrics for this specialist (all platforms)
     const metrics = await this.metricsRepo.find({
       where: {
         agentProfileId,
-        platform: "meta",
       },
       order: {
         aggregationPeriod: "DESC",
       },
     });
 
-    // Calculate aggregated stats
+    // Calculate aggregated stats (across all platforms)
     let totalSpend = 0;
     let totalRevenue = 0;
     let roasSum = 0;
@@ -782,67 +834,81 @@ export class MetaPerformanceSyncService {
   }
 
   /**
-   * Rate limiting helper: enforces minimum delay between API requests per account
-   * to avoid hitting Meta's rate limits. Uses exponential backoff on 429 responses.
+   * Rate limiting helper: enforces Google Ads API limit of 10 requests per 10 seconds.
+   * Uses exponential backoff if limit is hit.
    */
-  private async applyRateLimit(accountId: string): Promise<void> {
+  private async applyRateLimit(customerId: string): Promise<void> {
     const now = Date.now();
-    const state = this.rateLimitState.get(accountId);
+    const state = this.rateLimitState.get(customerId);
 
     if (state) {
-      const elapsed = now - state.lastRequestMs;
-      const minDelay = 100 * state.backoffMultiplier; // Start at 100ms, exponential backoff
+      // Remove timestamps older than 10 seconds
+      state.requestTimestamps = state.requestTimestamps.filter((ts) => now - ts < 10000);
 
-      if (elapsed < minDelay) {
-        await new Promise((resolve) => setTimeout(resolve, minDelay - elapsed));
+      // If we have 10 requests in the last 10 seconds, wait
+      if (state.requestTimestamps.length >= 10) {
+        const oldestTimestamp = state.requestTimestamps[0];
+        const waitTime = 10000 - (now - oldestTimestamp) + 100; // +100ms buffer
+
+        if (waitTime > 0) {
+          this.logger.warn({
+            message: "Rate limit approached, applying backoff",
+            customerId,
+            requestsInWindow: state.requestTimestamps.length,
+            waitMs: waitTime,
+          });
+
+          await new Promise((resolve) => setTimeout(resolve, waitTime));
+        }
       }
 
-      // Reset backoff after successful request
+      state.requestTimestamps.push(Date.now());
       state.lastRequestMs = Date.now();
     } else {
-      this.rateLimitState.set(accountId, {
+      this.rateLimitState.set(customerId, {
         lastRequestMs: now,
+        requestTimestamps: [now],
         backoffMultiplier: 1,
       });
     }
   }
 
   /**
-   * Handles rate limit (429) responses from Meta API.
-   * Increases backoff multiplier for future requests to this account.
+   * Handles rate limit responses from Google Ads API.
+   * Increases backoff multiplier for future requests to this customer.
    */
-  private handleRateLimit(accountId: string): void {
-    const state = this.rateLimitState.get(accountId);
+  private handleRateLimit(customerId: string): void {
+    const state = this.rateLimitState.get(customerId);
     if (state) {
       state.backoffMultiplier = Math.min(state.backoffMultiplier * 2, 10); // Cap at 10x
       this.logger.warn({
         message: "Rate limit hit, increasing backoff",
-        accountId,
+        customerId,
         backoffMultiplier: state.backoffMultiplier,
       });
     }
   }
 
   /**
-   * Resolves Meta access token for a workspace.
-   * Looks up most recent active ConnectedAccount and decrypts token if needed.
+   * Resolves Google Ads access token for a workspace.
+   * Looks up most recent active ServiceEngagement and decrypts token if needed.
    * Attempts token refresh if token has expired.
    */
   private async resolveAccessToken(workspaceId: string): Promise<string | null> {
-    const account = await this.connectedAccountRepo.findOne({
+    const engagement = await this.serviceEngagementRepo.findOne({
       where: {
         workspaceId,
-        platform: Platform.META,
+        platformType: "google_ads",
         isActive: true,
       },
       order: { createdAt: "DESC" },
     });
 
-    if (!account) {
+    if (!engagement || !engagement.accessToken) {
       return null;
     }
 
-    let token = account.accessToken;
+    let token = engagement.accessToken;
 
     // Decrypt if needed
     if (this.encryptionKey && token.includes(":")) {
@@ -859,14 +925,18 @@ export class MetaPerformanceSyncService {
     }
 
     // Check if token is expired and attempt refresh
-    if (account.tokenExpiresAt && account.tokenExpiresAt < new Date()) {
-      if (account.refreshToken) {
+    if (engagement.tokenExpiresAt && engagement.tokenExpiresAt < new Date()) {
+      if (engagement.refreshToken) {
         try {
-          const newToken = await this.refreshAccessToken(account.refreshToken);
+          const newToken = await this.refreshAccessToken(
+            engagement.refreshToken,
+            engagement.clientId,
+            engagement.clientSecret,
+          );
           token = newToken;
-          account.accessToken = newToken;
-          account.tokenExpiresAt = new Date(Date.now() + 5184000000); // 60 days
-          await this.connectedAccountRepo.save(account);
+          engagement.accessToken = newToken;
+          engagement.tokenExpiresAt = new Date(Date.now() + 3600000); // 1 hour from now
+          await this.serviceEngagementRepo.save(engagement);
 
           this.logger.log({
             message: "Token refreshed successfully",
@@ -894,28 +964,54 @@ export class MetaPerformanceSyncService {
 
   /**
    * Attempts to refresh an expired access token using the refresh token.
-   * Calls Meta's token refresh endpoint.
+   * Calls Google OAuth token endpoint.
    */
-  private async refreshAccessToken(refreshToken: string): Promise<string> {
-    const clientId = this.config.get<string>("META_APP_ID", "");
-    const clientSecret = this.config.get<string>("META_APP_SECRET", "");
-
+  private async refreshAccessToken(
+    refreshToken: string,
+    clientId: string,
+    clientSecret: string,
+  ): Promise<string> {
     const decryptedRefresh = this.encryptionKey
       ? decrypt(refreshToken, this.encryptionKey)
       : refreshToken;
 
     const response = await firstValueFrom(
-      this.http.get("https://graph.facebook.com/v20.0/oauth/access_token", {
-        params: {
+      this.http.post(
+        "https://oauth2.googleapis.com/token",
+        {
           grant_type: "refresh_token",
           client_id: clientId,
           client_secret: clientSecret,
           refresh_token: decryptedRefresh,
         },
-      }),
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        },
+      ),
     );
 
     return response.data.access_token;
+  }
+
+  /**
+   * Gets list of Google Ads customer IDs connected to a workspace.
+   * Fetches from ServiceEngagement records.
+   */
+  private async getConnectedCustomerIds(workspaceId: string): Promise<string[]> {
+    const engagements = await this.serviceEngagementRepo.find({
+      where: {
+        workspaceId,
+        platformType: "google_ads",
+        isActive: true,
+      },
+    });
+
+    return engagements
+      .map((e) => e.externalAccountId)
+      .filter((id): id is string => !!id)
+      .map((id) => id.replace(/[^0-9]/g, "")); // Remove hyphens from customer ID
   }
 
   /**
@@ -930,6 +1026,7 @@ export class MetaPerformanceSyncService {
     this.logger.log({
       message: "Starting bulk performance sync for workspace",
       workspaceId,
+      platform: "google",
     });
 
     const specialists = await this.agentProfileRepo.find({
@@ -974,6 +1071,7 @@ export class MetaPerformanceSyncService {
     this.logger.log({
       message: "Bulk performance sync completed",
       workspaceId,
+      platform: "google",
       totalSpecialists: specialists.length,
       successCount,
       failureCount: specialists.length - successCount,

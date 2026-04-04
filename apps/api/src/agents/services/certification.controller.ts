@@ -198,9 +198,9 @@ export class CertificationController {
    */
   @Get('admin/pending')
   async getPendingCertifications(
+    @Request() req: any,
     @Query('limit') limit?: string,
     @Query('offset') offset?: string,
-    @Request() req: any,
   ): Promise<{ items: AgentCertificationDetailDTO[]; total: number }> {
     // TODO: Add @UseGuards(AdminGuard)
     // if (!req.user?.isAdmin) {
