@@ -933,7 +933,7 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
                   const active = selectedHours.includes(key)
                   return (
                     <button key={h} type="button" onClick={() => toggleHour(key)}
-                      className={`py-1 rounded text-xs font-mono transition-colors ${active ? 'bg-slate-900 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-[#3A3A4A]'}`}>
+                      className={`py-1 rounded text-xs font-mono transition-colors ${active ? 'bg-slate-900 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-slate-700 dark:bg-slate-700'}`}>
                       {String(h).padStart(2, '0')}
                     </button>
                   )

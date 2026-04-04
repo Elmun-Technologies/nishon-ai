@@ -12,14 +12,14 @@ export default function Page() {
       <article className="space-y-8">
         <header className="space-y-3">
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Data Deletion Instructions</h1>
-          <p className="text-[#9CA3AF]">
+          <p className="text-slate-400 dark:text-slate-500">
             This page explains how Performa users can request deletion of account and platform
             data associated with their workspace.
           </p>
           <p className="text-sm text-slate-500 dark:text-slate-400">Last updated: March 22, 2026</p>
         </header>
 
-        <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
+        <section className="space-y-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
           <h2 className="text-xl font-semibold">Overview</h2>
           <p className="text-slate-700 dark:text-slate-300">
             Performa supports user-initiated deletion requests for account and connected
@@ -28,7 +28,7 @@ export default function Page() {
           </p>
         </section>
 
-        <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
+        <section className="space-y-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
           <h2 className="text-xl font-semibold">How to request deletion</h2>
           <p className="text-slate-700 dark:text-slate-300">
             Send a request from your registered account email address to:
@@ -44,7 +44,7 @@ export default function Page() {
           </p>
         </section>
 
-        <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
+        <section className="space-y-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
           <h2 className="text-xl font-semibold">Identity verification process</h2>
           <p className="text-slate-700 dark:text-slate-300">
             Before processing deletion, we may verify account ownership through the registered
@@ -53,7 +53,7 @@ export default function Page() {
           </p>
         </section>
 
-        <section className="space-y-4 rounded-xl border border-[#E5E7EB] bg-white p-6">
+        <section className="space-y-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
           <h2 className="text-xl font-semibold">What data will be deleted</h2>
           <ul className="list-disc space-y-2 pl-5 text-slate-700 dark:text-slate-300">
             <li>User account profile and authentication-related records in Performa.</li>
@@ -70,14 +70,14 @@ export default function Page() {
           </p>
         </section>
 
-        <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
+        <section className="space-y-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
           <h2 className="text-xl font-semibold">Processing timeline</h2>
           <p className="text-slate-700 dark:text-slate-300">
             After identity verification, we process deletion requests within 3-5 business days.
           </p>
         </section>
 
-        <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
+        <section className="space-y-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
           <h2 className="text-xl font-semibold">Third-party connected platform implications</h2>
           <p className="text-slate-700 dark:text-slate-300">
             Deleting data in Performa does not automatically delete data held by third-party
@@ -86,7 +86,7 @@ export default function Page() {
           </p>
         </section>
 
-        <section className="space-y-4 rounded-xl border border-[#E5E7EB] bg-white p-6">
+        <section className="space-y-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
           <h2 className="text-xl font-semibold">Confirmation process</h2>
           <p className="text-slate-700 dark:text-slate-300">
             Once the request is completed, Performa sends confirmation to the request email,

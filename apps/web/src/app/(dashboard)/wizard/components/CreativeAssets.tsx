@@ -447,7 +447,7 @@ export function CreativeAssets({
             <div>
               <Label>Meta Headline Limit</Label>
               <p className="text-sm text-slate-500 dark:text-slate-400">125 characters</p>
-              <div className="w-full bg-[#3A3A4A] rounded-full h-2 mt-2">
+              <div className="w-full bg-slate-700 dark:bg-slate-700 rounded-full h-2 mt-2">
                 <div 
                   className="bg-slate-900 h-2 rounded-full" 
                   style={{ width: `${(formData.creatives.headlines[0]?.length || 0) / 125 * 100}%` }}
@@ -458,7 +458,7 @@ export function CreativeAssets({
             <div>
               <Label>Google Headline Limit</Label>
               <p className="text-sm text-slate-500 dark:text-slate-400">30 characters</p>
-              <div className="w-full bg-[#3A3A4A] rounded-full h-2 mt-2">
+              <div className="w-full bg-slate-700 dark:bg-slate-700 rounded-full h-2 mt-2">
                 <div 
                   className="bg-[#4285F4] h-2 rounded-full" 
                   style={{ width: `${(formData.creatives.headlines[0]?.length || 0) / 30 * 100}%` }}
@@ -469,7 +469,7 @@ export function CreativeAssets({
             <div>
               <Label>Yandex Headline Limit</Label>
               <p className="text-sm text-slate-500 dark:text-slate-400">56 characters</p>
-              <div className="w-full bg-[#3A3A4A] rounded-full h-2 mt-2">
+              <div className="w-full bg-slate-700 dark:bg-slate-700 rounded-full h-2 mt-2">
                 <div 
                   className="bg-[#FFCC00] h-2 rounded-full" 
                   style={{ width: `${(formData.creatives.headlines[0]?.length || 0) / 56 * 100}%` }}
@@ -480,7 +480,7 @@ export function CreativeAssets({
             <div>
               <Label>Meta Primary Text Limit</Label>
               <p className="text-sm text-slate-500 dark:text-slate-400">125 characters</p>
-              <div className="w-full bg-[#3A3A4A] rounded-full h-2 mt-2">
+              <div className="w-full bg-slate-700 dark:bg-slate-700 rounded-full h-2 mt-2">
                 <div 
                   className="bg-[#1877F2] h-2 rounded-full" 
                   style={{ width: `${(formData.creatives.primaryText?.length || 0) / 125 * 100}%` }}

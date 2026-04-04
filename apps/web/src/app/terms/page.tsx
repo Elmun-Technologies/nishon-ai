@@ -12,13 +12,13 @@ export default function Page() {
       <article className="space-y-8">
         <header className="space-y-3">
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Terms of Service</h1>
-          <p className="text-[#9CA3AF]">
+          <p className="text-slate-400 dark:text-slate-500">
             These Terms of Service govern your access to and use of Performa.
           </p>
           <p className="text-sm text-slate-500 dark:text-slate-400">Last updated: March 22, 2026</p>
         </header>
 
-        <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
+        <section className="space-y-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
           <h2 className="text-xl font-semibold">Acceptance of terms</h2>
           <p className="text-slate-700 dark:text-slate-300">
             By creating an account, connecting third-party ad platforms, or using Performa, you
@@ -26,7 +26,7 @@ export default function Page() {
           </p>
         </section>
 
-        <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
+        <section className="space-y-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
           <h2 className="text-xl font-semibold">Description of the platform</h2>
           <p className="text-slate-700 dark:text-slate-300">
             Performa is an autonomous advertising platform that supports campaign operations,
@@ -34,7 +34,7 @@ export default function Page() {
           </p>
         </section>
 
-        <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
+        <section className="space-y-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
           <h2 className="text-xl font-semibold">Eligibility</h2>
           <p className="text-slate-700 dark:text-slate-300">
             You represent that you are legally authorized to enter into these Terms and to act on
@@ -42,7 +42,7 @@ export default function Page() {
           </p>
         </section>
 
-        <section className="space-y-4 rounded-xl border border-[#E5E7EB] bg-white p-6">
+        <section className="space-y-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
           <h2 className="text-xl font-semibold">Account registration and responsibility</h2>
           <ul className="list-disc space-y-2 pl-5 text-slate-700 dark:text-slate-300">
             <li>You must provide accurate and current registration information.</li>
@@ -51,7 +51,7 @@ export default function Page() {
           </ul>
         </section>
 
-        <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
+        <section className="space-y-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
           <h2 className="text-xl font-semibold">Connected third-party accounts</h2>
           <p className="text-slate-700 dark:text-slate-300">
             Performa relies on integrations with services such as Meta, Google, and TikTok.
@@ -59,7 +59,7 @@ export default function Page() {
           </p>
         </section>
 
-        <section className="space-y-4 rounded-xl border border-[#E5E7EB] bg-white p-6">
+        <section className="space-y-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
           <h2 className="text-xl font-semibold">Acceptable use</h2>
           <p className="text-slate-700 dark:text-slate-300">
             You agree to use Performa only for lawful advertising and campaign operations.
@@ -73,7 +73,7 @@ export default function Page() {
           </ul>
         </section>
 
-        <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
+        <section className="space-y-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
           <h2 className="text-xl font-semibold">AI-generated recommendation disclaimer</h2>
           <p className="text-slate-700 dark:text-slate-300">
             Performa may provide recommendations or automated actions based on campaign data.
@@ -82,7 +82,7 @@ export default function Page() {
           </p>
         </section>
 
-        <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
+        <section className="space-y-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
           <h2 className="text-xl font-semibold">Platform availability and downtime</h2>
           <p className="text-slate-700 dark:text-slate-300">
             We aim for reliable service but do not guarantee uninterrupted availability. Scheduled
@@ -90,7 +90,7 @@ export default function Page() {
           </p>
         </section>
 
-        <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
+        <section className="space-y-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
           <h2 className="text-xl font-semibold">Fees and billing</h2>
           <p className="text-slate-700 dark:text-slate-300">
             If paid plans or billing are introduced, pricing and payment terms will be presented
@@ -99,7 +99,7 @@ export default function Page() {
           </p>
         </section>
 
-        <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
+        <section className="space-y-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
           <h2 className="text-xl font-semibold">Intellectual property</h2>
           <p className="text-slate-700 dark:text-slate-300">
             Performa platform software, branding, and related materials are owned by or licensed
@@ -107,7 +107,7 @@ export default function Page() {
           </p>
         </section>
 
-        <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
+        <section className="space-y-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
           <h2 className="text-xl font-semibold">Suspension and termination</h2>
           <p className="text-slate-700 dark:text-slate-300">
             We may suspend or terminate access where there is suspected abuse, legal risk,
@@ -115,7 +115,7 @@ export default function Page() {
           </p>
         </section>
 
-        <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
+        <section className="space-y-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
           <h2 className="text-xl font-semibold">Disclaimer of warranties</h2>
           <p className="text-slate-700 dark:text-slate-300">
             Performa is provided on an "as is" and "as available" basis to the maximum extent
@@ -124,7 +124,7 @@ export default function Page() {
           </p>
         </section>
 
-        <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
+        <section className="space-y-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
           <h2 className="text-xl font-semibold">Limitation of liability</h2>
           <p className="text-slate-700 dark:text-slate-300">
             To the maximum extent permitted by law, Performa is not liable for indirect,
@@ -133,7 +133,7 @@ export default function Page() {
           </p>
         </section>
 
-        <section className="space-y-4 rounded-xl border border-[#E5E7EB] bg-white p-6">
+        <section className="space-y-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
           <h2 className="text-xl font-semibold">Indemnification</h2>
           <p className="text-slate-700 dark:text-slate-300">
             You agree to indemnify and hold Performa harmless from claims, liabilities, damages,

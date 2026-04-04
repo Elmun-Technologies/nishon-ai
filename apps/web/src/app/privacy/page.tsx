@@ -13,14 +13,14 @@ export default function Page() {
       <article className="space-y-8">
         <header className="space-y-3">
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Privacy Policy</h1>
-          <p className="text-[#9CA3AF]">
+          <p className="text-slate-400 dark:text-slate-500">
             This Privacy Policy explains how Performa collects, uses, shares, stores, and
             protects information when you use our autonomous advertising platform.
           </p>
           <p className="text-sm text-slate-500 dark:text-slate-400">Last updated: March 22, 2026</p>
         </header>
 
-        <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
+        <section className="space-y-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
           <h2 className="text-xl font-semibold">Introduction</h2>
           <p className="text-slate-700 dark:text-slate-300">
             Performa helps businesses manage, optimize, and scale campaigns across supported ad
@@ -30,7 +30,7 @@ export default function Page() {
           </p>
         </section>
 
-        <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
+        <section className="space-y-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
           <h2 className="text-xl font-semibold">Who we are</h2>
           <p className="text-slate-700 dark:text-slate-300">
             Performa is a software platform that provides AI-assisted and autonomous campaign
@@ -39,7 +39,7 @@ export default function Page() {
           </p>
         </section>
 
-        <section className="space-y-4 rounded-xl border border-[#E5E7EB] bg-white p-6">
+        <section className="space-y-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
           <h2 className="text-xl font-semibold">What information we collect</h2>
           <h3 className="text-base font-semibold text-slate-900 dark:text-slate-50">Account information</h3>
           <ul className="list-disc space-y-2 pl-5 text-slate-700 dark:text-slate-300">
@@ -72,7 +72,7 @@ export default function Page() {
           </ul>
         </section>
 
-        <section className="space-y-4 rounded-xl border border-[#E5E7EB] bg-white p-6">
+        <section className="space-y-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
           <h2 className="text-xl font-semibold">How we use data</h2>
           <ul className="list-disc space-y-2 pl-5 text-slate-700 dark:text-slate-300">
             <li>To authenticate users and secure accounts and workspaces.</li>
@@ -90,7 +90,7 @@ export default function Page() {
           </ul>
         </section>
 
-        <section className="space-y-4 rounded-xl border border-[#E5E7EB] bg-white p-6">
+        <section className="space-y-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
           <h2 className="text-xl font-semibold">Third-party integrations and service providers</h2>
           <h3 className="text-base font-semibold text-slate-900 dark:text-slate-50">Meta</h3>
           <p className="text-slate-700 dark:text-slate-300">
@@ -118,7 +118,7 @@ export default function Page() {
           </p>
         </section>
 
-        <section className="space-y-4 rounded-xl border border-[#E5E7EB] bg-white p-6">
+        <section className="space-y-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
           <h2 className="text-xl font-semibold">Data retention</h2>
           <p className="text-slate-700 dark:text-slate-300">
             We retain information for as long as needed to provide services, maintain records,
@@ -161,7 +161,7 @@ export default function Page() {
           </p>
         </section>
 
-        <section className="space-y-4 rounded-xl border border-[#E5E7EB] bg-white p-6">
+        <section className="space-y-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
           <h2 className="text-xl font-semibold">Contact</h2>
           <p className="text-slate-700 dark:text-slate-300">
             For privacy questions, access requests, or data-protection concerns, contact:

@@ -314,14 +314,14 @@ function OptionCard({
         text-left p-4 rounded-xl border transition-all duration-200 w-full
         ${selected
           ? 'border-[#111827] bg-[#F3F4F6] ring-1 ring-[#111827]/30'
-          : 'border-[#E5E7EB] hover:border-[#D1D5DB] hover:bg-slate-50 dark:bg-slate-800/50'
+          : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:bg-slate-800/50'
         }
       `}
     >
       {icon && <span className="text-xl mb-2 block">{icon}</span>}
       <p
         className={`font-medium text-sm ${
-          selected ? 'text-slate-900 dark:text-slate-50' : 'text-[#9CA3AF]'
+          selected ? 'text-slate-900 dark:text-slate-50' : 'text-slate-400 dark:text-slate-500'
         }`}
       >
         {label}
@@ -360,8 +360,8 @@ function TagSelector({
                 isSelected
                   ? 'border-[#111827] bg-[#F3F4F6] text-slate-700 dark:text-slate-300 font-medium'
                   : isDisabled
-                    ? 'border-[#E5E7EB] text-[#3A3A4A] cursor-not-allowed'
-                    : 'border-[#E5E7EB] text-slate-500 dark:text-slate-400 hover:border-[#D1D5DB] hover:text-slate-900 dark:text-slate-50'
+                    ? 'border-slate-200 dark:border-slate-700 text-[#3A3A4A] cursor-not-allowed'
+                    : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:border-slate-600 hover:text-slate-900 dark:text-slate-50'
               }
             `}
           >
@@ -646,11 +646,11 @@ export default function OnboardingPage() {
         </div>
 
         {/* Card */}
-        <div className="bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden">
+        <div className="bg-white border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden">
           {/* Header */}
-          <div className="px-7 pt-7 pb-5 border-b border-[#E5E7EB]">
+          <div className="px-7 pt-7 pb-5 border-b border-slate-200 dark:border-slate-700">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#F3F4F6] border border-[#D1D5DB] flex items-center justify-center text-xl">
+              <div className="w-10 h-10 rounded-xl bg-[#F3F4F6] border border-slate-300 dark:border-slate-600 flex items-center justify-center text-xl">
                 {STEPS[step - 1]?.icon}
               </div>
               <div>
@@ -667,7 +667,7 @@ export default function OnboardingPage() {
               <>
                 {/* Business name */}
                 <div>
-                  <label className="block text-sm font-medium text-[#9CA3AF] mb-2">
+                  <label className="block text-sm font-medium text-slate-400 dark:text-slate-500 mb-2">
                     Biznes / brend nomi
                   </label>
                   <input
@@ -675,13 +675,13 @@ export default function OnboardingPage() {
                     value={form.businessName}
                     onChange={(e) => update('businessName', e.target.value)}
                     placeholder="Masalan: TechShop Uzbekistan"
-                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-[#E5E7EB] rounded-xl px-4 py-3 text-slate-900 dark:text-slate-50 placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-[#111827] focus:ring-1 focus:ring-[#111827]/20 transition-all"
+                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-slate-50 placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-[#111827] focus:ring-1 focus:ring-[#111827]/20 transition-all"
                   />
                 </div>
 
                 {/* Industry grid */}
                 <div>
-                  <label className="block text-sm font-medium text-[#9CA3AF] mb-3">
+                  <label className="block text-sm font-medium text-slate-400 dark:text-slate-500 mb-3">
                     Soha
                   </label>
                   <div className="grid grid-cols-3 gap-2">
@@ -699,7 +699,7 @@ export default function OnboardingPage() {
 
                 {/* Business age */}
                 <div>
-                  <label className="block text-sm font-medium text-[#9CA3AF] mb-3">
+                  <label className="block text-sm font-medium text-slate-400 dark:text-slate-500 mb-3">
                     Biznes yoshi
                   </label>
                   <div className="grid grid-cols-4 gap-2">
@@ -721,7 +721,7 @@ export default function OnboardingPage() {
 
                 {/* Target locations */}
                 <div>
-                  <label className="block text-sm font-medium text-[#9CA3AF] mb-3">
+                  <label className="block text-sm font-medium text-slate-400 dark:text-slate-500 mb-3">
                     Maqsadli hudud{' '}
                     <span className="text-slate-500 dark:text-slate-400 font-normal">
                       (bir nechta tanlash mumkin)
@@ -740,7 +740,7 @@ export default function OnboardingPage() {
                             ${
                               selected
                                 ? 'border-[#111827] bg-[#F3F4F6] text-slate-900 dark:text-slate-50 font-medium'
-                                : 'border-[#E5E7EB] text-[#9CA3AF] hover:border-[#D1D5DB]'
+                                : 'border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:border-slate-300 dark:border-slate-600'
                             }
                           `}
                         >
@@ -762,7 +762,7 @@ export default function OnboardingPage() {
 
                 {/* Monthly revenue */}
                 <div>
-                  <label className="block text-sm font-medium text-[#9CA3AF] mb-3">
+                  <label className="block text-sm font-medium text-slate-400 dark:text-slate-500 mb-3">
                     Hozirgi oylik daromad
                   </label>
                   <div className="space-y-2">
@@ -776,7 +776,7 @@ export default function OnboardingPage() {
                           ${
                             form.monthlyRevenue === r.value
                               ? 'border-[#111827] bg-[#F3F4F6] text-slate-900 dark:text-slate-50'
-                              : 'border-[#E5E7EB] text-[#9CA3AF] hover:border-[#D1D5DB]'
+                              : 'border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:border-slate-300 dark:border-slate-600'
                           }
                         `}
                       >
@@ -804,7 +804,7 @@ export default function OnboardingPage() {
               <>
                 {/* Product category */}
                 <div>
-                  <label className="block text-sm font-medium text-[#9CA3AF] mb-3">
+                  <label className="block text-sm font-medium text-slate-400 dark:text-slate-500 mb-3">
                     Mahsulot / Xizmat turi
                   </label>
                   <div className="grid grid-cols-3 gap-3">
@@ -822,10 +822,10 @@ export default function OnboardingPage() {
 
                 {/* Price range */}
                 <div>
-                  <label className="block text-sm font-medium text-[#9CA3AF] mb-3">
+                  <label className="block text-sm font-medium text-slate-400 dark:text-slate-500 mb-3">
                     Narx diapazoni
                   </label>
-                  <div className="bg-slate-50 dark:bg-slate-800/50 border border-[#E5E7EB] rounded-xl p-4">
+                  <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
                     <div className="flex items-center justify-between mb-4">
                       <div className="text-center">
                         <p className="text-slate-500 dark:text-slate-400 text-xs mb-1">Minimal</p>
@@ -882,7 +882,7 @@ export default function OnboardingPage() {
 
                 {/* Product strengths */}
                 <div>
-                  <label className="block text-sm font-medium text-[#9CA3AF] mb-1">
+                  <label className="block text-sm font-medium text-slate-400 dark:text-slate-500 mb-1">
                     Asosiy ustunliklar
                     <span className="text-slate-500 dark:text-slate-400 font-normal ml-2">(bir nechta tanlang)</span>
                   </label>
@@ -898,7 +898,7 @@ export default function OnboardingPage() {
 
                 {/* Delivery type */}
                 <div>
-                  <label className="block text-sm font-medium text-[#9CA3AF] mb-3">
+                  <label className="block text-sm font-medium text-slate-400 dark:text-slate-500 mb-3">
                     Yetkazib berish usuli
                   </label>
                   <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -920,7 +920,7 @@ export default function OnboardingPage() {
               <>
                 {/* Age groups */}
                 <div>
-                  <label className="block text-sm font-medium text-[#9CA3AF] mb-3">
+                  <label className="block text-sm font-medium text-slate-400 dark:text-slate-500 mb-3">
                     Maqsadli yosh guruhlar
                     <span className="text-slate-500 dark:text-slate-400 font-normal ml-2">(bir nechta tanlang)</span>
                   </label>
@@ -937,7 +937,7 @@ export default function OnboardingPage() {
                             ${
                               sel
                                 ? 'border-[#111827] bg-[#F3F4F6] text-slate-700 dark:text-slate-300'
-                                : 'border-[#E5E7EB] text-slate-500 dark:text-slate-400 hover:border-[#D1D5DB]'
+                                : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:border-slate-600'
                             }
                           `}
                         >
@@ -950,7 +950,7 @@ export default function OnboardingPage() {
 
                 {/* Gender */}
                 <div>
-                  <label className="block text-sm font-medium text-[#9CA3AF] mb-3">
+                  <label className="block text-sm font-medium text-slate-400 dark:text-slate-500 mb-3">
                     Jins
                   </label>
                   <div className="grid grid-cols-3 gap-2">
@@ -980,7 +980,7 @@ export default function OnboardingPage() {
 
                 {/* Audience income */}
                 <div>
-                  <label className="block text-sm font-medium text-[#9CA3AF] mb-3">
+                  <label className="block text-sm font-medium text-slate-400 dark:text-slate-500 mb-3">
                     Auditoriya daromad darajasi
                   </label>
                   <div className="grid grid-cols-2 gap-2">
@@ -1002,7 +1002,7 @@ export default function OnboardingPage() {
 
                 {/* Interests */}
                 <div>
-                  <label className="block text-sm font-medium text-[#9CA3AF] mb-1">
+                  <label className="block text-sm font-medium text-slate-400 dark:text-slate-500 mb-1">
                     Qiziqishlar
                     <span className="text-slate-500 dark:text-slate-400 font-normal ml-2">(kamida 2 ta)</span>
                   </label>
@@ -1018,7 +1018,7 @@ export default function OnboardingPage() {
 
                 {/* Preferred platforms */}
                 <div>
-                  <label className="block text-sm font-medium text-[#9CA3AF] mb-3">
+                  <label className="block text-sm font-medium text-slate-400 dark:text-slate-500 mb-3">
                     Auditoriyangiz qaysi platformada ko'p?
                   </label>
                   <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -1032,7 +1032,7 @@ export default function OnboardingPage() {
                           ${
                             form.platforms.includes(p.value)
                               ? 'border-[#111827] bg-[#F3F4F6] text-slate-900 dark:text-slate-50 font-medium'
-                              : 'border-[#E5E7EB] text-[#9CA3AF] hover:border-[#D1D5DB]'
+                              : 'border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:border-slate-300 dark:border-slate-600'
                           }
                         `}
                       >
@@ -1050,7 +1050,7 @@ export default function OnboardingPage() {
               <>
                 {/* Primary goal */}
                 <div>
-                  <label className="block text-sm font-medium text-[#9CA3AF] mb-3">
+                  <label className="block text-sm font-medium text-slate-400 dark:text-slate-500 mb-3">
                     Asosiy reklama maqsadi
                   </label>
                   <div className="grid grid-cols-1 gap-2">
@@ -1069,7 +1069,7 @@ export default function OnboardingPage() {
 
                 {/* Secondary goals */}
                 <div>
-                  <label className="block text-sm font-medium text-[#9CA3AF] mb-1">
+                  <label className="block text-sm font-medium text-slate-400 dark:text-slate-500 mb-1">
                     Qo'shimcha maqsadlar
                     <span className="text-slate-500 dark:text-slate-400 font-normal ml-2">(ixtiyoriy)</span>
                   </label>
@@ -1083,7 +1083,7 @@ export default function OnboardingPage() {
 
                 {/* KPI priority */}
                 <div>
-                  <label className="block text-sm font-medium text-[#9CA3AF] mb-3">
+                  <label className="block text-sm font-medium text-slate-400 dark:text-slate-500 mb-3">
                     Eng muhim KPI (asosiy ko'rsatkich)
                   </label>
                   <div className="space-y-2">
@@ -1097,7 +1097,7 @@ export default function OnboardingPage() {
                           ${
                             form.kpiPriority === kpi.value
                               ? 'border-[#111827] bg-[#F3F4F6] text-slate-900 dark:text-slate-50'
-                              : 'border-[#E5E7EB] text-[#9CA3AF] hover:border-[#D1D5DB]'
+                              : 'border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:border-slate-300 dark:border-slate-600'
                           }
                         `}
                       >
@@ -1120,7 +1120,7 @@ export default function OnboardingPage() {
 
                 {/* Previous experience */}
                 <div>
-                  <label className="block text-sm font-medium text-[#9CA3AF] mb-3">
+                  <label className="block text-sm font-medium text-slate-400 dark:text-slate-500 mb-3">
                     Avvalgi reklama tajribangiz
                   </label>
                   <div className="grid grid-cols-2 gap-2">
@@ -1142,10 +1142,10 @@ export default function OnboardingPage() {
 
                 {/* Budget */}
                 <div>
-                  <label className="block text-sm font-medium text-[#9CA3AF] mb-3">
+                  <label className="block text-sm font-medium text-slate-400 dark:text-slate-500 mb-3">
                     Oylik reklama byudjeti
                   </label>
-                  <div className="bg-slate-50 dark:bg-slate-800/50 border border-[#E5E7EB] rounded-xl p-4 mb-3">
+                  <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4 mb-3">
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-slate-500 dark:text-slate-400 text-sm">Byudjet</span>
                       <span className="text-2xl font-bold text-slate-700 dark:text-slate-300">
@@ -1178,7 +1178,7 @@ export default function OnboardingPage() {
                           ${
                             form.monthlyBudget === p
                               ? 'border-[#111827] bg-[#F3F4F6] text-slate-700 dark:text-slate-300'
-                              : 'border-[#E5E7EB] text-slate-500 dark:text-slate-400 hover:border-[#D1D5DB]'
+                              : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:border-slate-600'
                           }
                         `}
                       >
@@ -1195,7 +1195,7 @@ export default function OnboardingPage() {
               <>
                 {/* Has competitors */}
                 <div>
-                  <label className="block text-sm font-medium text-[#9CA3AF] mb-3">
+                  <label className="block text-sm font-medium text-slate-400 dark:text-slate-500 mb-3">
                     Sizning bozoringizda raqobatchilar bormi?
                   </label>
                   <div className="grid grid-cols-2 gap-3">
@@ -1217,7 +1217,7 @@ export default function OnboardingPage() {
                 {/* Competitor names */}
                 {form.hasCompetitors && (
                   <div>
-                    <label className="block text-sm font-medium text-[#9CA3AF] mb-2">
+                    <label className="block text-sm font-medium text-slate-400 dark:text-slate-500 mb-2">
                       Asosiy raqobatchilar
                       <span className="text-slate-500 dark:text-slate-400 font-normal ml-2">
                         (ixtiyoriy, vergul bilan)
@@ -1228,7 +1228,7 @@ export default function OnboardingPage() {
                       value={form.competitorNames}
                       onChange={(e) => update('competitorNames', e.target.value)}
                       placeholder="Masalan: Texnomart, Mediapark, Eldorado"
-                      className="w-full bg-slate-50 dark:bg-slate-800/50 border border-[#E5E7EB] rounded-xl px-4 py-3 text-slate-900 dark:text-slate-50 placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-[#111827] transition-all"
+                      className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-slate-50 placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-[#111827] transition-all"
                     />
                     <p className="text-slate-500 dark:text-slate-400 text-xs mt-2">
                       💡 AI ularning reklamalarini tahlil qilib, sizga ustunlik topadi
@@ -1238,7 +1238,7 @@ export default function OnboardingPage() {
 
                 {/* Unique advantages */}
                 <div>
-                  <label className="block text-sm font-medium text-[#9CA3AF] mb-1">
+                  <label className="block text-sm font-medium text-slate-400 dark:text-slate-500 mb-1">
                     Sizning asosiy ustunliklaringiz
                   </label>
                   <p className="text-slate-500 dark:text-slate-400 text-xs mb-3">
@@ -1253,7 +1253,7 @@ export default function OnboardingPage() {
 
                 {/* Market position */}
                 <div>
-                  <label className="block text-sm font-medium text-[#9CA3AF] mb-3">
+                  <label className="block text-sm font-medium text-slate-400 dark:text-slate-500 mb-3">
                     Bozordagi o'rningiz
                   </label>
                   <div className="grid grid-cols-2 gap-3">
@@ -1288,7 +1288,7 @@ export default function OnboardingPage() {
             {/* ══ STEP 6: AI Analysis ══ */}
             {step === 6 && (
               <div className="py-6 text-center">
-                <div className="w-20 h-20 rounded-2xl bg-[#F3F4F6] border border-[#D1D5DB] flex items-center justify-center mx-auto mb-5">
+                <div className="w-20 h-20 rounded-2xl bg-[#F3F4F6] border border-slate-300 dark:border-slate-600 flex items-center justify-center mx-auto mb-5">
                   <Spinner size="lg" />
                 </div>
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-2">
@@ -1357,11 +1357,11 @@ export default function OnboardingPage() {
                 </div>
 
                 {/* Strategy summary */}
-                <div className="bg-slate-50 dark:bg-slate-800/50 border border-[#E5E7EB] rounded-xl p-4">
+                <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
                   <p className="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wide mb-2">
                     AI Strategiya xulosasi
                   </p>
-                  <p className="text-[#9CA3AF] text-sm leading-relaxed">
+                  <p className="text-slate-400 dark:text-slate-500 text-sm leading-relaxed">
                     {strategy.summary}
                   </p>
                 </div>
@@ -1374,7 +1374,7 @@ export default function OnboardingPage() {
                     { icon: '💰', label: 'Est. CPA', value: strategy.monthlyForecast?.estimatedCpa ? `$${Number(strategy.monthlyForecast.estimatedCpa).toFixed(0)}` : '—', color: 'text-slate-900 dark:text-slate-50' },
                     { icon: '📊', label: 'Ishonch darajasi', value: strategy.monthlyForecast?.confidence ?? '—', color: 'text-slate-700 dark:text-slate-300' },
                   ].map(({ icon, label, value, color }) => (
-                    <div key={label} className="bg-white border border-[#E5E7EB] rounded-xl p-3">
+                    <div key={label} className="bg-white border border-slate-200 dark:border-slate-700 rounded-xl p-3">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-sm">{icon}</span>
                         <p className="text-slate-500 dark:text-slate-400 text-xs">{label}</p>
@@ -1386,11 +1386,11 @@ export default function OnboardingPage() {
 
                 {/* ══ BUDGET DISTRIBUTION ══ */}
                 {strategy.channelBreakdown && strategy.channelBreakdown.length > 0 && (
-                  <div className="border-t border-[#E5E7EB] pt-5">
+                  <div className="border-t border-slate-200 dark:border-slate-700 pt-5">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-xl">💰</span>
                       <h3 className="font-semibold text-slate-900 dark:text-slate-50">Byudjet taqsimoti</h3>
-                      <span className="bg-[#F3F4F6] text-slate-700 dark:text-slate-300 text-xs px-2 py-0.5 rounded-full border border-[#D1D5DB]">
+                      <span className="bg-[#F3F4F6] text-slate-700 dark:text-slate-300 text-xs px-2 py-0.5 rounded-full border border-slate-300 dark:border-slate-600">
                         ${form.monthlyBudget.toLocaleString()}/oy
                       </span>
                     </div>
@@ -1408,7 +1408,7 @@ export default function OnboardingPage() {
                               isPrimary
                                 ? 'bg-[#F0FDF4] border-emerald-200'
                                 : isSecondary
-                                  ? 'bg-slate-50 dark:bg-slate-800/50 border-[#E5E7EB]'
+                                  ? 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700'
                                   : 'bg-white border-[#F3F4F6]'
                             }`}
                           >
@@ -1458,7 +1458,7 @@ export default function OnboardingPage() {
                                 {ch.tactics.slice(0, 3).map((t: string, ti: number) => (
                                   <span
                                     key={ti}
-                                    className="text-[10px] px-2 py-0.5 rounded-full bg-white border border-[#E5E7EB] text-slate-500 dark:text-slate-400"
+                                    className="text-[10px] px-2 py-0.5 rounded-full bg-white border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400"
                                   >
                                     {t}
                                   </span>
@@ -1466,7 +1466,7 @@ export default function OnboardingPage() {
                               </div>
                             )}
                             {ch.expectedResult && (
-                              <p className="text-[10px] text-[#9CA3AF] mt-1.5">
+                              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1.5">
                                 📈 {ch.expectedResult}
                               </p>
                             )}
@@ -1478,18 +1478,18 @@ export default function OnboardingPage() {
                 )}
 
                 {/* SCRIPTS SECTION */}
-                <div className="border-t border-[#E5E7EB] pt-5">
+                <div className="border-t border-slate-200 dark:border-slate-700 pt-5">
                   <div className="flex items-center gap-2 mb-4">
                     <span className="text-xl">📝</span>
                     <h3 className="font-semibold text-slate-900 dark:text-slate-50">Tayyor Reklama Skriptlari</h3>
-                    <span className="bg-[#F3F4F6] text-slate-700 dark:text-slate-300 text-xs px-2 py-0.5 rounded-full border border-[#D1D5DB]">
+                    <span className="bg-[#F3F4F6] text-slate-700 dark:text-slate-300 text-xs px-2 py-0.5 rounded-full border border-slate-300 dark:border-slate-600">
                       AI tomonidan yozilgan
                     </span>
                   </div>
 
                   {/* Script loading */}
                   {scriptLoading && (
-                    <div className="bg-slate-50 dark:bg-slate-800/50 border border-[#E5E7EB] rounded-xl p-6 text-center">
+                    <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-6 text-center">
                       <div className="flex items-center justify-center gap-3 mb-3">
                         <div className="w-5 h-5 border-2 border-[#111827] border-t-transparent rounded-full animate-spin" />
                         <p className="text-slate-900 dark:text-slate-50 text-sm font-medium">Skriptlar yozilmoqda...</p>
@@ -1500,7 +1500,7 @@ export default function OnboardingPage() {
                       </p>
                       <div className="flex flex-wrap gap-2 justify-center mt-3">
                         {form.platforms.map((p) => (
-                          <span key={p} className="text-xs text-slate-500 dark:text-slate-400 bg-white px-2 py-1 rounded-lg border border-[#E5E7EB]">
+                          <span key={p} className="text-xs text-slate-500 dark:text-slate-400 bg-white px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-700">
                             {p === 'meta' ? '📘 Meta' : p === 'google' ? '🔍 Google' :
                              p === 'tiktok' ? '🎵 TikTok' : p === 'youtube' ? '▶️ YouTube' :
                              p === 'telegram' ? '✈️ Telegram' : p} ✍️
@@ -1536,7 +1536,7 @@ export default function OnboardingPage() {
                               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
                                 activeScriptTab === platform
                                   ? 'bg-[#111827] text-white'
-                                  : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 border border-[#E5E7EB] hover:text-slate-900 dark:text-slate-50'
+                                  : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:text-slate-900 dark:text-slate-50'
                               }`}
                             >
                               {labels[platform] || platform}
@@ -1551,12 +1551,12 @@ export default function OnboardingPage() {
 
                           {/* Video scripts */}
                           <div>
-                            <p className="text-[#9CA3AF] text-xs font-medium uppercase tracking-wide mb-3">
+                            <p className="text-slate-400 dark:text-slate-500 text-xs font-medium uppercase tracking-wide mb-3">
                               🎬 Video Skriptlar (3 ta variant — Reels / Stories)
                             </p>
                             <div className="space-y-3">
                               {scripts.platforms.meta.videoScripts.map((vs) => (
-                                <div key={vs.scriptNumber} className="bg-slate-50 dark:bg-slate-800/50 border border-[#E5E7EB] rounded-xl p-4">
+                                <div key={vs.scriptNumber} className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
                                   <div className="flex items-center justify-between mb-3">
                                     <span className="text-slate-700 dark:text-slate-300 text-xs font-semibold">
                                       Script #{vs.scriptNumber}
@@ -1599,19 +1599,19 @@ export default function OnboardingPage() {
 
                           {/* Banner copies */}
                           <div>
-                            <p className="text-[#9CA3AF] text-xs font-medium uppercase tracking-wide mb-3">
+                            <p className="text-slate-400 dark:text-slate-500 text-xs font-medium uppercase tracking-wide mb-3">
                               🖼 Banner Ad Copy (7 ta variant)
                             </p>
                             <div className="space-y-2">
                               {scripts.platforms.meta.bannerCopies.map((bc) => (
-                                <div key={bc.variant} className="bg-slate-50 dark:bg-slate-800/50 border border-[#E5E7EB] rounded-xl p-3">
+                                <div key={bc.variant} className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3">
                                   <div className="flex items-start justify-between gap-3">
                                     <div className="flex-1 space-y-1">
                                       <p className="text-slate-900 dark:text-slate-50 text-sm font-semibold">{bc.headline}</p>
-                                      <p className="text-[#9CA3AF] text-xs">{bc.primaryText}</p>
+                                      <p className="text-slate-400 dark:text-slate-500 text-xs">{bc.primaryText}</p>
                                       <p className="text-slate-500 dark:text-slate-400 text-xs">{bc.description}</p>
                                     </div>
-                                    <span className="bg-[#F3F4F6] text-slate-700 dark:text-slate-300 text-xs px-2 py-1 rounded-lg border border-[#D1D5DB] shrink-0 whitespace-nowrap">
+                                    <span className="bg-[#F3F4F6] text-slate-700 dark:text-slate-300 text-xs px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-600 shrink-0 whitespace-nowrap">
                                       {bc.ctaButton}
                                     </span>
                                   </div>
@@ -1626,12 +1626,12 @@ export default function OnboardingPage() {
                       {activeScriptTab === 'google' && scripts.platforms.google && (
                         <div className="space-y-4">
                           <div>
-                            <p className="text-[#9CA3AF] text-xs font-medium uppercase tracking-wide mb-3">
+                            <p className="text-slate-400 dark:text-slate-500 text-xs font-medium uppercase tracking-wide mb-3">
                               📰 Responsive Search Ad — Headlines (15 ta)
                             </p>
                             <div className="grid grid-cols-1 gap-2">
                               {scripts.platforms.google.headlines.map((h, i) => (
-                                <div key={i} className="flex items-center gap-3 bg-slate-50 dark:bg-slate-800/50 border border-[#E5E7EB] rounded-lg px-3 py-2">
+                                <div key={i} className="flex items-center gap-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2">
                                   <span className="text-slate-500 dark:text-slate-400 text-xs w-5 shrink-0">{i + 1}.</span>
                                   <p className="text-slate-900 dark:text-slate-50 text-sm">{h}</p>
                                   <span className="text-slate-500 dark:text-slate-400 text-xs ml-auto shrink-0">
@@ -1642,12 +1642,12 @@ export default function OnboardingPage() {
                             </div>
                           </div>
                           <div>
-                            <p className="text-[#9CA3AF] text-xs font-medium uppercase tracking-wide mb-3">
+                            <p className="text-slate-400 dark:text-slate-500 text-xs font-medium uppercase tracking-wide mb-3">
                               📝 Descriptions (4 ta)
                             </p>
                             <div className="space-y-2">
                               {scripts.platforms.google.descriptions.map((d, i) => (
-                                <div key={i} className="bg-slate-50 dark:bg-slate-800/50 border border-[#E5E7EB] rounded-lg px-3 py-2.5">
+                                <div key={i} className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2.5">
                                   <div className="flex items-start justify-between gap-2">
                                     <p className="text-slate-700 dark:text-slate-300 text-sm">{d}</p>
                                     <span className="text-slate-500 dark:text-slate-400 text-xs shrink-0">{d.length}/90</span>
@@ -1662,11 +1662,11 @@ export default function OnboardingPage() {
                       {/* TIKTOK SCRIPTS */}
                       {activeScriptTab === 'tiktok' && scripts.platforms.tiktok && (
                         <div className="space-y-3">
-                          <p className="text-[#9CA3AF] text-xs font-medium uppercase tracking-wide mb-3">
+                          <p className="text-slate-400 dark:text-slate-500 text-xs font-medium uppercase tracking-wide mb-3">
                             🎵 TikTok UGC Skriptlar (3 ta variant)
                           </p>
                           {scripts.platforms.tiktok.scripts.map((ts) => (
-                            <div key={ts.scriptNumber} className="bg-slate-50 dark:bg-slate-800/50 border border-[#E5E7EB] rounded-xl p-4">
+                            <div key={ts.scriptNumber} className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
                               <div className="flex items-center gap-2 mb-3">
                                 <span className="text-slate-700 dark:text-slate-300 text-xs font-semibold">Script #{ts.scriptNumber}</span>
                                 <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 px-2 py-0.5 rounded">{ts.style}</span>
@@ -1710,10 +1710,10 @@ export default function OnboardingPage() {
                       {/* YOUTUBE */}
                       {activeScriptTab === 'youtube' && scripts.platforms.youtube && (
                         <div className="space-y-3">
-                          <p className="text-[#9CA3AF] text-xs font-medium uppercase tracking-wide mb-3">
+                          <p className="text-slate-400 dark:text-slate-500 text-xs font-medium uppercase tracking-wide mb-3">
                             ▶️ YouTube Skippable Ad Script
                           </p>
-                          <div className="bg-slate-50 dark:bg-slate-800/50 border border-[#E5E7EB] rounded-xl p-4 space-y-3">
+                          <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4 space-y-3">
                             <div>
                               <span className="text-red-400 text-xs font-medium block mb-1">🎣 Hook (0–5 soniya) — Skip qilishdan oldin</span>
                               <p className="text-slate-900 dark:text-slate-50 text-sm bg-red-500/5 border border-red-500/10 rounded-lg px-3 py-2">
@@ -1739,11 +1739,11 @@ export default function OnboardingPage() {
                       {/* TELEGRAM */}
                       {activeScriptTab === 'telegram' && scripts.platforms.telegram && (
                         <div className="space-y-3">
-                          <p className="text-[#9CA3AF] text-xs font-medium uppercase tracking-wide mb-3">
+                          <p className="text-slate-400 dark:text-slate-500 text-xs font-medium uppercase tracking-wide mb-3">
                             ✈️ Telegram Post Ads (3 ta variant)
                           </p>
                           {scripts.platforms.telegram.posts.map((post, i) => (
-                            <div key={i} className="bg-slate-50 dark:bg-slate-800/50 border border-[#E5E7EB] rounded-xl p-4">
+                            <div key={i} className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
                               <span className="text-slate-700 dark:text-slate-300 text-xs font-medium block mb-2">Post #{i + 1}</span>
                               <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed whitespace-pre-line">
                                 {post}
@@ -1787,7 +1787,7 @@ export default function OnboardingPage() {
 
           {/* Footer buttons */}
           {step !== 6 && (
-            <div className="px-7 py-5 border-t border-[#E5E7EB] flex gap-3">
+            <div className="px-7 py-5 border-t border-slate-200 dark:border-slate-700 flex gap-3">
               {step > 1 && step < 7 && (
                 <Button
                   variant="secondary"
@@ -1810,7 +1810,7 @@ export default function OnboardingPage() {
                   </Button>
                   <button
                     onClick={() => router.push('/dashboard')}
-                    className="text-xs text-[#9CA3AF] text-center py-1 hover:text-slate-500 dark:text-slate-400 transition-colors"
+                    className="text-xs text-slate-400 dark:text-slate-500 text-center py-1 hover:text-slate-500 dark:text-slate-400 transition-colors"
                   >
                     Keyinroq — Dashboardga o'tish
                   </button>

@@ -130,7 +130,7 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        <div className="bg-white border border-[#E5E7EB] rounded-xl p-6">
+        <div className="bg-white border border-slate-200 dark:border-slate-700 rounded-xl p-6">
           <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-6">
             Hisob yaratish
           </h2>

@@ -226,9 +226,9 @@ export default function AudiencesPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search for audience..."
-              className="w-full md:max-w-sm rounded-lg border border-[#2C285A] bg-[#0D0B22] px-3 py-2 text-sm outline-none focus:border-[#8B80F9]"
+              className="w-full md:max-w-sm rounded-lg border border-slate-700 dark:border-slate-600 bg-slate-950 dark:bg-slate-900 px-3 py-2 text-sm outline-none focus:border-[#8B80F9]"
             />
-            <span className="text-xs px-2 py-1 rounded-full bg-[#151236] border border-[#2C285A]">{selected.length} selected</span>
+            <span className="text-xs px-2 py-1 rounded-full bg-[#151236] border border-slate-700 dark:border-slate-600">{selected.length} selected</span>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-2">
@@ -239,7 +239,7 @@ export default function AudiencesPage() {
                 className={`text-left px-3 py-2 rounded-lg text-sm border ${
                   stage.id === activeStage
                     ? 'bg-[#221B5A] border-[#8B80F9] text-white'
-                    : 'bg-[#0D0B22] border-[#2C285A] text-[#A1A1AA]'
+                    : 'bg-slate-950 dark:bg-slate-900 border-slate-700 dark:border-slate-600 text-[#A1A1AA]'
                 }`}
               >
                 {stage.label}
@@ -255,7 +255,7 @@ export default function AudiencesPage() {
                   key={audience.id}
                   onClick={() => toggleAudience(audience.id)}
                   className={`text-left rounded-xl border p-4 transition ${
-                    active ? 'border-[#8B80F9] bg-[#14113A]' : 'border-[#2C285A] bg-[#0A0820] hover:border-[#4C478F]'
+                    active ? 'border-[#8B80F9] bg-[#14113A]' : 'border-slate-700 dark:border-slate-600 bg-slate-950 dark:bg-slate-900 hover:border-[#4C478F]'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
@@ -277,22 +277,22 @@ export default function AudiencesPage() {
           </div>
         </section>
 
-        <section className="rounded-xl border border-[#2C285A] bg-[#0A0820]">
+        <section className="rounded-xl border border-slate-700 dark:border-slate-600 bg-slate-950 dark:bg-slate-900">
           <div className="px-4 py-3 border-b border-[#1F1B4D] flex items-center justify-between">
             <p className="font-medium">Campaign Set Up</p>
             <span className="text-xs text-slate-400">Step 1 of 4</span>
           </div>
           <div className="p-4 space-y-4">
-            <div className="inline-flex rounded-lg border border-[#2C285A] overflow-hidden">
+            <div className="inline-flex rounded-lg border border-slate-700 dark:border-slate-600 overflow-hidden">
               <button
                 onClick={() => setSplitByFunnel(true)}
-                className={`px-3 py-2 text-xs ${splitByFunnel ? 'bg-[#221B5A] text-white' : 'bg-[#0D0B22] text-[#A1A1AA]'}`}
+                className={`px-3 py-2 text-xs ${splitByFunnel ? 'bg-[#221B5A] text-white' : 'bg-slate-950 dark:bg-slate-900 text-[#A1A1AA]'}`}
               >
                 Split campaigns per funnel stage
               </button>
               <button
                 onClick={() => setSplitByFunnel(false)}
-                className={`px-3 py-2 text-xs ${!splitByFunnel ? 'bg-[#221B5A] text-white' : 'bg-[#0D0B22] text-[#A1A1AA]'}`}
+                className={`px-3 py-2 text-xs ${!splitByFunnel ? 'bg-[#221B5A] text-white' : 'bg-slate-950 dark:bg-slate-900 text-[#A1A1AA]'}`}
               >
                 Launch all ad sets to one campaign
               </button>
@@ -300,11 +300,11 @@ export default function AudiencesPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
               <input
-                className="md:col-span-2 rounded-lg border border-[#2C285A] bg-[#0D0B22] px-3 py-2 text-sm"
+                className="md:col-span-2 rounded-lg border border-slate-700 dark:border-slate-600 bg-slate-950 dark:bg-slate-900 px-3 py-2 text-sm"
                 defaultValue="Performa - Acquisition Prospecting - Master Campaign"
               />
               <select
-                className="rounded-lg border border-[#2C285A] bg-[#0D0B22] px-3 py-2 text-sm"
+                className="rounded-lg border border-slate-700 dark:border-slate-600 bg-slate-950 dark:bg-slate-900 px-3 py-2 text-sm"
                 value={objective}
                 onChange={(e) => setObjective(e.target.value)}
               >
@@ -314,20 +314,20 @@ export default function AudiencesPage() {
                 <option>Engagement</option>
                 <option>Awareness</option>
               </select>
-              <div className="inline-flex rounded-lg border border-[#2C285A] overflow-hidden h-fit">
-                <button onClick={() => setBudgetType('CBO')} className={`px-3 py-2 text-xs ${budgetType === 'CBO' ? 'bg-[#221B5A] text-white' : 'bg-[#0D0B22] text-[#A1A1AA]'}`}>CBO</button>
-                <button onClick={() => setBudgetType('ABO')} className={`px-3 py-2 text-xs ${budgetType === 'ABO' ? 'bg-[#221B5A] text-white' : 'bg-[#0D0B22] text-[#A1A1AA]'}`}>ABO</button>
+              <div className="inline-flex rounded-lg border border-slate-700 dark:border-slate-600 overflow-hidden h-fit">
+                <button onClick={() => setBudgetType('CBO')} className={`px-3 py-2 text-xs ${budgetType === 'CBO' ? 'bg-[#221B5A] text-white' : 'bg-slate-950 dark:bg-slate-900 text-[#A1A1AA]'}`}>CBO</button>
+                <button onClick={() => setBudgetType('ABO')} className={`px-3 py-2 text-xs ${budgetType === 'ABO' ? 'bg-[#221B5A] text-white' : 'bg-slate-950 dark:bg-slate-900 text-[#A1A1AA]'}`}>ABO</button>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="rounded-xl border border-[#2C285A] bg-[#0A0820] p-4 space-y-4">
+        <section className="rounded-xl border border-slate-700 dark:border-slate-600 bg-slate-950 dark:bg-slate-900 p-4 space-y-4">
           <div className="flex items-center justify-between">
             <p className="font-medium">Select the Ad Creatives</p>
             <button className="px-3 py-1.5 rounded-lg bg-[#8B80F9] text-slate-900 text-xs font-semibold">Save Changes</button>
           </div>
-          <div className="rounded-lg border border-[#2C285A] p-3">
+          <div className="rounded-lg border border-slate-700 dark:border-slate-600 p-3">
             <p className="text-xs text-slate-400 mb-2">Your selected audiences</p>
             <div className="flex flex-wrap gap-2">
               {selected.length === 0 ? (
@@ -336,7 +336,7 @@ export default function AudiencesPage() {
                 selected.map((id) => {
                   const item = AUDIENCES.find((a) => a.id === id)
                   return (
-                    <span key={id} className="text-xs px-2 py-1 rounded bg-[#17143D] border border-[#2C285A]">
+                    <span key={id} className="text-xs px-2 py-1 rounded bg-[#17143D] border border-slate-700 dark:border-slate-600">
                       {item?.name}
                     </span>
                   )
@@ -346,7 +346,7 @@ export default function AudiencesPage() {
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
             {[1, 2, 3, 4].map((n) => (
-              <div key={n} className="rounded-lg border border-[#2C285A] bg-[#0D0B22] p-2">
+              <div key={n} className="rounded-lg border border-slate-700 dark:border-slate-600 bg-slate-950 dark:bg-slate-900 p-2">
                 <div className="aspect-[4/5] rounded bg-[#16133B] mb-2" />
                 <p className="text-xs text-slate-300">Creative #{n}</p>
                 <p className="text-[11px] text-slate-400 mt-1">ROAS, CTR, thumb-stop va spend metrikalari bo‘yicha saralash.</p>
@@ -355,15 +355,15 @@ export default function AudiencesPage() {
           </div>
         </section>
 
-        <section className="rounded-xl border border-[#2C285A] bg-[#0A0820] p-4 space-y-4">
+        <section className="rounded-xl border border-slate-700 dark:border-slate-600 bg-slate-950 dark:bg-slate-900 p-4 space-y-4">
           <div className="flex items-center justify-between">
             <p className="font-medium">Set Up the Audiences</p>
             <button className="px-3 py-1.5 rounded-lg bg-[#8B80F9] text-slate-900 text-xs font-semibold">Save Changes</button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div className="rounded-lg border border-[#2C285A] p-3 space-y-3">
+            <div className="rounded-lg border border-slate-700 dark:border-slate-600 p-3 space-y-3">
               <p className="text-sm font-medium">Choose Locations</p>
-              <select className="w-full rounded-lg border border-[#2C285A] bg-[#0D0B22] px-3 py-2 text-sm">
+              <select className="w-full rounded-lg border border-slate-700 dark:border-slate-600 bg-slate-950 dark:bg-slate-900 px-3 py-2 text-sm">
                 <option>Worldwide</option>
                 <option>Uzbekistan</option>
                 <option>Kazakhstan</option>
@@ -371,9 +371,9 @@ export default function AudiencesPage() {
               </select>
               <p className="text-xs text-slate-400">Language, geo va exclusionlarni alohida saqlash mumkin.</p>
             </div>
-            <div className="rounded-lg border border-[#2C285A] p-3 space-y-3">
+            <div className="rounded-lg border border-slate-700 dark:border-slate-600 p-3 space-y-3">
               <p className="text-sm font-medium">Recency</p>
-              <select className="w-full rounded-lg border border-[#2C285A] bg-[#0D0B22] px-3 py-2 text-sm">
+              <select className="w-full rounded-lg border border-slate-700 dark:border-slate-600 bg-slate-950 dark:bg-slate-900 px-3 py-2 text-sm">
                 <option>0-180 days</option>
                 <option>0-3 days</option>
                 <option>3-30 days</option>
@@ -381,45 +381,45 @@ export default function AudiencesPage() {
               </select>
               <p className="text-xs text-slate-400">0-3 kun “hot window”, 3-30 kun esa pastroq frequency bilan.</p>
             </div>
-            <div className="rounded-lg border border-[#2C285A] p-3 space-y-3">
+            <div className="rounded-lg border border-slate-700 dark:border-slate-600 p-3 space-y-3">
               <p className="text-sm font-medium">Lookalike percentage</p>
               <input type="range" min={1} max={20} defaultValue={5} className="w-full" />
               <p className="text-xs text-slate-400">Tavsiya: 0-5% dan boshlang, keyin scale qiling.</p>
             </div>
-            <div className="rounded-lg border border-[#2C285A] p-3 space-y-3">
+            <div className="rounded-lg border border-slate-700 dark:border-slate-600 p-3 space-y-3">
               <p className="text-sm font-medium">Conversion + Budget</p>
-              <select className="w-full rounded-lg border border-[#2C285A] bg-[#0D0B22] px-3 py-2 text-sm">
+              <select className="w-full rounded-lg border border-slate-700 dark:border-slate-600 bg-slate-950 dark:bg-slate-900 px-3 py-2 text-sm">
                 <option>Purchase</option>
                 <option>Add to Cart</option>
                 <option>Lead</option>
               </select>
-              <input className="w-full rounded-lg border border-[#2C285A] bg-[#0D0B22] px-3 py-2 text-sm" defaultValue="USD 10 / day" />
+              <input className="w-full rounded-lg border border-slate-700 dark:border-slate-600 bg-slate-950 dark:bg-slate-900 px-3 py-2 text-sm" defaultValue="USD 10 / day" />
             </div>
           </div>
         </section>
 
-        <section className="rounded-xl border border-[#2C285A] bg-[#0A0820] p-4 space-y-4">
+        <section className="rounded-xl border border-slate-700 dark:border-slate-600 bg-slate-950 dark:bg-slate-900 p-4 space-y-4">
           <div className="flex items-center justify-between">
             <p className="font-medium">Summary & Launch</p>
             <button className="px-4 py-2 rounded-lg bg-[#8B80F9] text-slate-900 text-sm font-semibold">Launch</button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-            <div className="rounded-lg border border-[#2C285A] p-3">
+            <div className="rounded-lg border border-slate-700 dark:border-slate-600 p-3">
               <p className="text-slate-400 text-xs mb-1">When to launch</p>
               <p>Launch now yoki schedule (midnight / custom time).</p>
             </div>
-            <div className="rounded-lg border border-[#2C285A] p-3">
+            <div className="rounded-lg border border-slate-700 dark:border-slate-600 p-3">
               <p className="text-slate-400 text-xs mb-1">Naming structure</p>
               <p>Account label + Audience + Placement + Age + Gender + Location.</p>
             </div>
           </div>
         </section>
 
-        <section className="rounded-xl border border-[#2C285A] bg-[#0A0820] p-4">
+        <section className="rounded-xl border border-slate-700 dark:border-slate-600 bg-slate-950 dark:bg-slate-900 p-4">
           <h3 className="text-base font-semibold mb-3">Target multi-network scope</h3>
           <div className="flex flex-wrap gap-2 mb-4">
             {TARGET_NETWORKS.map((network) => (
-              <span key={network} className="text-xs px-2.5 py-1 rounded-full bg-[#17143D] border border-[#2C285A] text-[#C7D2FE]">
+              <span key={network} className="text-xs px-2.5 py-1 rounded-full bg-[#17143D] border border-slate-700 dark:border-slate-600 text-[#C7D2FE]">
                 {network}
               </span>
             ))}
@@ -432,7 +432,7 @@ export default function AudiencesPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             {Object.entries(PREBUILT_LIBRARY).map(([title, items]) => (
-              <div key={title} className="rounded-lg border border-[#2C285A] p-3">
+              <div key={title} className="rounded-lg border border-slate-700 dark:border-slate-600 p-3">
                 <p className="font-medium text-sm mb-2">{title}</p>
                 <ul className="space-y-1.5 list-disc list-inside text-xs text-[#A1A1AA]">
                   {items.map((item) => (
@@ -443,7 +443,7 @@ export default function AudiencesPage() {
             ))}
           </div>
 
-          <div className="mt-4 rounded-lg border border-[#2C285A] p-3">
+          <div className="mt-4 rounded-lg border border-slate-700 dark:border-slate-600 p-3">
             <p className="text-sm font-medium mb-2">Madgicx vs Ads Manager (nima uchun bu section kerak)</p>
             <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-[#A1A1AA]">
               <li>• Performa’da preset audiences va exclusionlar oldindan beriladi.</li>
@@ -453,7 +453,7 @@ export default function AudiencesPage() {
             </ul>
           </div>
 
-          <div className="mt-4 rounded-lg border border-[#2C285A] p-3">
+          <div className="mt-4 rounded-lg border border-slate-700 dark:border-slate-600 p-3">
             <p className="text-sm font-medium mb-2">eRFM model (detal)</p>
             <ul className="space-y-1.5 list-disc list-inside text-xs text-[#A1A1AA]">
               {ERFM_EXPLAINER.map((item) => (
@@ -464,7 +464,7 @@ export default function AudiencesPage() {
 
           <div className="mt-4 space-y-3">
             {FULL_FUNNEL_RECOMMENDATIONS.map((section) => (
-              <div key={section.title} className="rounded-lg border border-[#2C285A] p-3">
+              <div key={section.title} className="rounded-lg border border-slate-700 dark:border-slate-600 p-3">
                 <p className="text-sm font-medium">{section.title}</p>
                 {section.intro && <p className="text-xs text-[#C7CAD1] mt-1">{section.intro}</p>}
                 <ul className="mt-2 space-y-1.5 list-disc list-inside text-xs text-[#A1A1AA]">
@@ -476,11 +476,11 @@ export default function AudiencesPage() {
             ))}
           </div>
 
-          <div className="mt-4 rounded-lg border border-[#2C285A] p-3">
+          <div className="mt-4 rounded-lg border border-slate-700 dark:border-slate-600 p-3">
             <p className="text-sm font-medium mb-3">Platform implementation checklist (kerakli qismlar)</p>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
               {IMPLEMENTATION_CHECKLIST.map((group) => (
-                <div key={group.module} className="rounded-lg border border-[#2C285A] p-3">
+                <div key={group.module} className="rounded-lg border border-slate-700 dark:border-slate-600 p-3">
                   <p className="text-sm font-medium mb-2">{group.module}</p>
                   <ul className="space-y-1 list-disc list-inside text-xs text-[#A1A1AA]">
                     {group.items.map((item) => (

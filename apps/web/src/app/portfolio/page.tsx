@@ -92,7 +92,7 @@ function VerifiedBadge() {
 
 function ProBadge() {
   return (
-    <span className="inline-flex items-center gap-1 bg-[#111827]/15 border border-[#D1D5DB] text-slate-700 dark:text-slate-300 text-[10px] font-bold px-2 py-0.5 rounded-full">
+    <span className="inline-flex items-center gap-1 bg-[#111827]/15 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 text-[10px] font-bold px-2 py-0.5 rounded-full">
       ⭐ PRO
     </span>
   )
@@ -135,7 +135,7 @@ function RoasTrend({ data }: { data: { month: string; roas: number }[] }) {
 function TargetologistCard({ t }: { t: PortfolioTargetologist }) {
   return (
     <Link href={`/portfolio/${t.slug}`} className="block group">
-      <div className="bg-white border border-[#E5E7EB] group-hover:border-[#D1D5DB] rounded-2xl p-6 transition-all duration-300 group-hover:shadow-[0_0_30px_rgba(124,58,237,0.1)]">
+      <div className="bg-white border border-slate-200 dark:border-slate-700 group-hover:border-slate-300 dark:border-slate-600 rounded-2xl p-6 transition-all duration-300 group-hover:shadow-[0_0_30px_rgba(124,58,237,0.1)]">
 
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
@@ -197,8 +197,8 @@ function TargetologistCard({ t }: { t: PortfolioTargetologist }) {
               key={p.id}
               className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded-full border ${
                 p.verified
-                  ? 'bg-slate-50 dark:bg-slate-800/50 border-[#E5E7EB] text-slate-900 dark:text-slate-50'
-                  : 'bg-slate-50 dark:bg-slate-800/50 border-[#E5E7EB] text-slate-500 dark:text-slate-400'
+                  ? 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-50'
+                  : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400'
               }`}
             >
               {p.icon} {p.name}
@@ -210,7 +210,7 @@ function TargetologistCard({ t }: { t: PortfolioTargetologist }) {
         {/* Niches */}
         <div className="flex flex-wrap gap-1.5 mb-5">
           {t.niches.slice(0, 3).map(n => (
-            <span key={n} className="text-[10px] bg-slate-50 dark:bg-slate-800/50 text-[#9CA3AF] px-2 py-0.5 rounded-md border border-[#E5E7EB]">
+            <span key={n} className="text-[10px] bg-slate-50 dark:bg-slate-800/50 text-slate-400 dark:text-slate-500 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">
               {n}
             </span>
           ))}
@@ -220,7 +220,7 @@ function TargetologistCard({ t }: { t: PortfolioTargetologist }) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-4 border-t border-[#E5E7EB]">
+        <div className="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-700">
           <div>
             <span className="text-slate-500 dark:text-slate-400 text-xs">Narxi: </span>
             <span className="text-slate-900 dark:text-slate-50 font-semibold text-sm">${t.price.from}</span>
@@ -307,7 +307,7 @@ export default function PortfolioPage() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-slate-50">
 
       {/* ── NAV ── */}
-      <nav className="sticky top-0 z-50 border-b border-[#E5E7EB] bg-slate-50 dark:bg-slate-800/50/90 backdrop-blur-lg">
+      <nav className="sticky top-0 z-50 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50/90 backdrop-blur-lg">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <button onClick={() => router.push('/')} className="text-xl font-extrabold">
             Performa <span className="text-slate-700 dark:text-slate-300">AI</span>
@@ -315,7 +315,7 @@ export default function PortfolioPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.push('/portfolio/setup')}
-              className="text-sm text-[#9CA3AF] hover:text-slate-900 dark:text-slate-50 transition-colors px-4 py-2 border border-[#E5E7EB] rounded-lg"
+              className="text-sm text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:text-slate-50 transition-colors px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg"
             >
               Targetolog bo'lish →
             </button>
@@ -330,22 +330,22 @@ export default function PortfolioPage() {
       </nav>
 
       {/* ── HERO ── */}
-      <div className="relative py-16 px-6 text-center border-b border-[#E5E7EB] overflow-hidden">
+      <div className="relative py-16 px-6 text-center border-b border-slate-200 dark:border-slate-700 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-[#7C3AED]/5 to-transparent pointer-events-none" />
         <div className="relative max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 bg-[#F3F4F6] border border-[#D1D5DB] rounded-full px-4 py-1.5 mb-5">
+          <div className="inline-flex items-center gap-2 bg-[#F3F4F6] border border-slate-300 dark:border-slate-600 rounded-full px-4 py-1.5 mb-5">
             <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
             <span className="text-slate-700 dark:text-slate-300 text-xs font-bold uppercase tracking-widest">Live Portfolio Tracking</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-slate-50 mb-4">
             Tasdiqlangan targetologlar
           </h1>
-          <p className="text-[#9CA3AF] text-lg max-w-xl mx-auto mb-8">
+          <p className="text-slate-400 dark:text-slate-500 text-lg max-w-xl mx-auto mb-8">
             Haqiqiy kampaniya natijalari bilan. Real-time statistika. myfxbook uslubida — lekin reklama uchun.
           </p>
 
           {/* aggregate stats */}
-          <div className="inline-grid grid-cols-4 gap-px bg-[#F3F4F6] rounded-2xl overflow-hidden border border-[#E5E7EB]">
+          <div className="inline-grid grid-cols-4 gap-px bg-[#F3F4F6] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700">
             {[
               { v: totals.targetologists, l: 'Targetolog' },
               { v: formatSpend(totals.spendManaged), l: 'Boshqarilgan' },
@@ -369,12 +369,12 @@ export default function PortfolioPage() {
 
             {/* Search */}
             <div>
-              <label className="text-[#9CA3AF] text-xs font-semibold uppercase tracking-wider block mb-2">Qidirish</label>
+              <label className="text-slate-400 dark:text-slate-500 text-xs font-semibold uppercase tracking-wider block mb-2">Qidirish</label>
               <input
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Ism yoki niche..."
-                className="w-full bg-white border border-[#E5E7EB] rounded-lg px-3 py-2.5 text-sm text-slate-900 dark:text-slate-50 placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-[#111827]/50"
+                className="w-full bg-white border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2.5 text-sm text-slate-900 dark:text-slate-50 placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-[#111827]/50"
               />
             </div>
 
@@ -391,7 +391,7 @@ export default function PortfolioPage() {
 
             {/* Platforms */}
             <div>
-              <label className="text-[#9CA3AF] text-xs font-semibold uppercase tracking-wider block mb-3">Platformalar</label>
+              <label className="text-slate-400 dark:text-slate-500 text-xs font-semibold uppercase tracking-wider block mb-3">Platformalar</label>
               <div className="space-y-2">
                 {ALL_PLATFORMS.map(p => (
                   <button
@@ -400,7 +400,7 @@ export default function PortfolioPage() {
                     className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all ${
                       selectedPlatforms.includes(p.id)
                         ? 'bg-[#111827]/15 border border-[#111827]/40 text-slate-900 dark:text-slate-50'
-                        : 'bg-white border border-[#E5E7EB] text-[#9CA3AF] hover:border-[#E5E7EB]'
+                        : 'bg-white border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:border-slate-200 dark:border-slate-700'
                     }`}
                   >
                     <span>{p.icon}</span>
@@ -413,7 +413,7 @@ export default function PortfolioPage() {
 
             {/* Min ROAS */}
             <div>
-              <label className="text-[#9CA3AF] text-xs font-semibold uppercase tracking-wider block mb-2">
+              <label className="text-slate-400 dark:text-slate-500 text-xs font-semibold uppercase tracking-wider block mb-2">
                 Min ROAS: <span className="text-slate-900 dark:text-slate-50">{minROAS > 0 ? `${minROAS}x` : 'Hammasi'}</span>
               </label>
               <input
@@ -429,7 +429,7 @@ export default function PortfolioPage() {
 
             {/* Niches */}
             <div>
-              <label className="text-[#9CA3AF] text-xs font-semibold uppercase tracking-wider block mb-3">Niche</label>
+              <label className="text-slate-400 dark:text-slate-500 text-xs font-semibold uppercase tracking-wider block mb-3">Niche</label>
               <div className="flex flex-wrap gap-1.5">
                 {ALL_NICHES.map(n => (
                   <button
@@ -438,7 +438,7 @@ export default function PortfolioPage() {
                     className={`text-xs px-2.5 py-1 rounded-full border transition-all ${
                       selectedNiches.includes(n)
                         ? 'bg-[#E5E7EB] border-[#111827]/50 text-slate-900 dark:text-slate-50'
-                        : 'bg-white border-[#E5E7EB] text-[#9CA3AF] hover:border-[#E5E7EB]'
+                        : 'bg-white border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:border-slate-200 dark:border-slate-700'
                     }`}
                   >
                     {n}
@@ -474,7 +474,7 @@ export default function PortfolioPage() {
                   className={`px-4 py-2 text-sm font-medium rounded-xl transition-all ${
                     agentTypeFilter === t.key
                       ? 'bg-[#111827] text-white'
-                      : 'bg-white border border-[#E5E7EB] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50'
+                      : 'bg-white border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50'
                   }`}
                 >
                   {t.label}
@@ -484,7 +484,7 @@ export default function PortfolioPage() {
 
             {/* Sort + count */}
             <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
-              <p className="text-[#9CA3AF] text-sm">
+              <p className="text-slate-400 dark:text-slate-500 text-sm">
                 <span className="text-slate-900 dark:text-slate-50 font-semibold">{filtered.length}</span>{' '}
                 {agentTypeFilter === 'ai' ? 'AI agent' : agentTypeFilter === 'human' ? 'targetolog' : 'natija'} topildi
               </p>
@@ -493,7 +493,7 @@ export default function PortfolioPage() {
                 <select
                   value={sortBy}
                   onChange={e => setSortBy(e.target.value)}
-                  className="bg-white border border-[#E5E7EB] text-slate-900 dark:text-slate-50 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-[#111827]/50"
+                  className="bg-white border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-50 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-[#111827]/50"
                 >
                   {SORT_OPTIONS.map(o => (
                     <option key={o.value} value={o.value}>{o.label}</option>
@@ -505,7 +505,7 @@ export default function PortfolioPage() {
             {filtered.length === 0 ? (
               <div className="text-center py-24">
                 <div className="text-5xl mb-4">🔍</div>
-                <p className="text-[#9CA3AF]">Hech qanday targetolog topilmadi</p>
+                <p className="text-slate-400 dark:text-slate-500">Hech qanday targetolog topilmadi</p>
                 <button
                   onClick={() => { setSelectedPlatforms([]); setSelectedNiches([]); setVerifiedOnly(false); setMinROAS(0); setSearch('') }}
                   className="mt-4 text-slate-700 dark:text-slate-300 hover:text-slate-700 dark:text-slate-300 text-sm"
@@ -525,10 +525,10 @@ export default function PortfolioPage() {
       </div>
 
       {/* ── CTA for targetologists ── */}
-      <div className="border-t border-[#E5E7EB] py-16 px-6 text-center">
+      <div className="border-t border-slate-200 dark:border-slate-700 py-16 px-6 text-center">
         <div className="max-w-2xl mx-auto">
           <h2 className="text-3xl font-extrabold text-slate-900 dark:text-slate-50 mb-4">Targetolmisiz?</h2>
-          <p className="text-[#9CA3AF] mb-8">
+          <p className="text-slate-400 dark:text-slate-500 mb-8">
             Performa ga qo'shiling — natijalaringizni real-time da ko'rsating va ko'proq mijoz toping.
           </p>
           <button

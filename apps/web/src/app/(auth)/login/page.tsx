@@ -75,7 +75,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-800/50 flex">
 
       {/* Left panel */}
-      <div className="hidden lg:flex lg:w-1/2 bg-white border-r border-[#E5E7EB] flex-col justify-between p-12">
+      <div className="hidden lg:flex lg:w-1/2 bg-white border-r border-slate-200 dark:border-slate-700 flex-col justify-between p-12">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50">
             Performa <span className="text-slate-700 dark:text-slate-300">AI</span>
@@ -84,7 +84,7 @@ export default function LoginPage() {
 
         <div>
           <div className="mb-8">
-            <div className="inline-flex items-center gap-2 bg-[#F3F4F6] border border-[#D1D5DB] rounded-full px-4 py-2 mb-6">
+            <div className="inline-flex items-center gap-2 bg-[#F3F4F6] border border-slate-300 dark:border-slate-600 rounded-full px-4 py-2 mb-6">
               <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span className="text-slate-700 dark:text-slate-300 text-sm font-medium">AI Agent Active</span>
             </div>
@@ -104,20 +104,20 @@ export default function LoginPage() {
               { value: '−40%', label: "Past CPA" },
               { value: '24/7', label: "AI monitoring" },
             ].map((stat) => (
-              <div key={stat.label} className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 border border-[#E5E7EB]">
+              <div key={stat.label} className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
                 <p className="text-2xl font-bold text-slate-700 dark:text-slate-300">{stat.value}</p>
                 <p className="text-slate-500 dark:text-slate-400 text-xs mt-1">{stat.label}</p>
               </div>
             ))}
           </div>
 
-          <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-5 border border-[#E5E7EB]">
+          <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-5 border border-slate-200 dark:border-slate-700">
             <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed mb-3">
               "Performa targetologimizni almashtirdi va birinchi oyda ROAS 2.8x oshdi.
               Endi kampaniya boshqarishga 0 soat sarflaymiz."
             </p>
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-[#E5E7EB] border border-[#D1D5DB] flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-[#E5E7EB] border border-slate-300 dark:border-slate-600 flex items-center justify-center">
                 <span className="text-xs font-bold text-slate-700 dark:text-slate-300">JT</span>
               </div>
               <div>
@@ -142,7 +142,7 @@ export default function LoginPage() {
             </h1>
           </div>
 
-          <div className="bg-white border border-[#E5E7EB] rounded-xl p-6">
+          <div className="bg-white border border-slate-200 dark:border-slate-700 rounded-xl p-6">
             <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-6">Xush kelibsiz</h2>
 
             {/* Social login buttons */}
