@@ -80,9 +80,9 @@ function apiAgentToPortfolio(a: any, reviews: any[]): PortfolioTargetologist {
 function StatCard({ label, value, sub, accent }: { label: string; value: string | number; sub?: string; accent?: boolean }) {
   return (
     <div className="bg-white border border-[#E5E7EB] rounded-xl p-4">
-      <div className="text-[#6B7280] text-xs mb-1">{label}</div>
-      <div className={`text-2xl font-extrabold ${accent ? 'text-[#374151]' : 'text-[#111827]'}`}>{value}</div>
-      {sub && <div className="text-[#6B7280] text-xs mt-0.5">{sub}</div>}
+      <div className="text-slate-500 dark:text-slate-400 text-xs mb-1">{label}</div>
+      <div className={`text-2xl font-extrabold ${accent ? 'text-slate-700 dark:text-slate-300' : 'text-slate-900 dark:text-slate-50'}`}>{value}</div>
+      {sub && <div className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">{sub}</div>}
     </div>
   )
 }
@@ -103,15 +103,15 @@ function RoasChart({ data }: { data: { month: string; roas: number; spend: numbe
       {data.map(d => (
         <div key={d.month} className="flex items-center gap-3">
           <span className="text-[#9CA3AF] text-xs w-8 flex-shrink-0">{d.month}</span>
-          <div className="flex-1 bg-[#F9FAFB] rounded-full h-6 overflow-hidden">
+          <div className="flex-1 bg-slate-50 dark:bg-slate-800/50 rounded-full h-6 overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-[#7C3AED] to-[#A855F7] rounded-full flex items-center justify-end pr-2 transition-all duration-500"
               style={{ width: `${(d.roas / maxRoas) * 100}%` }}
             >
-              <span className="text-[#111827] text-[10px] font-bold">{d.roas}x</span>
+              <span className="text-slate-900 dark:text-slate-50 text-[10px] font-bold">{d.roas}x</span>
             </div>
           </div>
-          <span className="text-[#6B7280] text-xs w-16 text-right flex-shrink-0">{formatSpend(d.spend)}</span>
+          <span className="text-slate-500 dark:text-slate-400 text-xs w-16 text-right flex-shrink-0">{formatSpend(d.spend)}</span>
         </div>
       ))}
     </div>
@@ -150,7 +150,7 @@ function PlatformSplit({ data }: { data: { platform: string; percent: number; co
           <div key={d.platform} className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: d.color }} />
             <span className="text-[#9CA3AF] text-xs">{d.platform}</span>
-            <span className="text-[#111827] text-xs font-bold ml-auto pl-4">{d.percent}%</span>
+            <span className="text-slate-900 dark:text-slate-50 text-xs font-bold ml-auto pl-4">{d.percent}%</span>
           </div>
         ))}
       </div>
@@ -163,24 +163,24 @@ function CampaignRow({ c }: { c: PortfolioTargetologist['recentCampaigns'][0] })
   const PLATFORM_ICONS: Record<string, string> = { meta: '📘', google: '🔍', yandex: '🟡', telegram: '✈️' }
   const statusColors: Record<string, string> = {
     active: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-    completed: 'bg-[#F9FAFB] text-[#9CA3AF] border-[#E5E7EB]',
+    completed: 'bg-slate-50 dark:bg-slate-800/50 text-[#9CA3AF] border-[#E5E7EB]',
     paused: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
   }
   const statusLabels: Record<string, string> = { active: '🟢 Faol', completed: '✓ Tugadi', paused: '⏸ Pauza' }
   return (
-    <div className="flex items-center gap-4 py-3.5 border-b border-[#E5E7EB] last:border-0 hover:bg-[#F9FAFB]/40 rounded-lg px-2 transition-colors">
+    <div className="flex items-center gap-4 py-3.5 border-b border-[#E5E7EB] last:border-0 hover:bg-slate-50 dark:bg-slate-800/50/40 rounded-lg px-2 transition-colors">
       <span className="text-xl flex-shrink-0">{PLATFORM_ICONS[c.platform] ?? '📊'}</span>
       <div className="flex-1 min-w-0">
-        <div className="text-[#111827] text-sm font-medium truncate">{c.niche}</div>
-        <div className="text-[#6B7280] text-xs">{c.duration}</div>
+        <div className="text-slate-900 dark:text-slate-50 text-sm font-medium truncate">{c.niche}</div>
+        <div className="text-slate-500 dark:text-slate-400 text-xs">{c.duration}</div>
       </div>
       <div className="text-right">
-        <div className="text-[#111827] text-sm font-bold">{c.roas}x ROAS</div>
-        <div className="text-[#6B7280] text-xs">${c.spend.toLocaleString()} sarflandi</div>
+        <div className="text-slate-900 dark:text-slate-50 text-sm font-bold">{c.roas}x ROAS</div>
+        <div className="text-slate-500 dark:text-slate-400 text-xs">${c.spend.toLocaleString()} sarflandi</div>
       </div>
       <div className="text-right hidden sm:block">
-        <div className="text-[#111827] text-sm">${c.cpa}</div>
-        <div className="text-[#6B7280] text-xs">CPA</div>
+        <div className="text-slate-900 dark:text-slate-50 text-sm">${c.cpa}</div>
+        <div className="text-slate-500 dark:text-slate-400 text-xs">CPA</div>
       </div>
       <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border flex-shrink-0 ${statusColors[c.status]}`}>
         {statusLabels[c.status]}
@@ -203,16 +203,16 @@ function ReviewCard({ r }: { r: PortfolioTargetologist['reviews'][0] }) {
           </span>
         )}
       </div>
-      <p className="text-[#374151] text-sm leading-relaxed italic mb-4">"{r.text}"</p>
+      <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed italic mb-4">"{r.text}"</p>
       <div className="flex items-center gap-2">
-        <div className="w-8 h-8 rounded-lg bg-[#F3F4F6] flex items-center justify-center text-xs font-bold text-[#111827]">
+        <div className="w-8 h-8 rounded-lg bg-[#F3F4F6] flex items-center justify-center text-xs font-bold text-slate-900 dark:text-slate-50">
           {r.author.charAt(0)}
         </div>
         <div>
-          <div className="text-[#111827] text-sm font-semibold">{r.author}</div>
-          <div className="text-[#6B7280] text-xs">{r.company}</div>
+          <div className="text-slate-900 dark:text-slate-50 text-sm font-semibold">{r.author}</div>
+          <div className="text-slate-500 dark:text-slate-400 text-xs">{r.company}</div>
         </div>
-        <span className="ml-auto text-[#6B7280] text-xs">{r.date}</span>
+        <span className="ml-auto text-slate-500 dark:text-slate-400 text-xs">{r.date}</span>
       </div>
     </div>
   )
@@ -254,7 +254,7 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-[#111827] border-t-transparent rounded-full animate-spin" />
       </div>
     )
@@ -264,10 +264,10 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
 
   if (!t) {
     return (
-      <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center text-center px-6">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center text-center px-6">
         <div>
           <div className="text-6xl mb-4">👤</div>
-          <h2 className="text-2xl font-bold text-[#111827] mb-2">Targetolog topilmadi</h2>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-50 mb-2">Targetolog topilmadi</h2>
           <p className="text-[#9CA3AF] mb-6">Bu profil mavjud emas yoki o'chirilgan</p>
           <button onClick={() => router.push('/portfolio')} className="bg-[#111827] text-white px-6 py-3 rounded-lg font-semibold">
             Katalogga qaytish
@@ -278,16 +278,16 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
   }
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB] text-[#111827]">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-slate-50">
 
       {/* ── NAV ── */}
-      <nav className="sticky top-0 z-50 border-b border-[#E5E7EB] bg-[#F9FAFB]/90 backdrop-blur-lg">
+      <nav className="sticky top-0 z-50 border-b border-[#E5E7EB] bg-slate-50 dark:bg-slate-800/50/90 backdrop-blur-lg">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <button onClick={() => router.push('/portfolio')} className="flex items-center gap-2 text-[#9CA3AF] hover:text-[#111827] transition-colors text-sm">
+          <button onClick={() => router.push('/portfolio')} className="flex items-center gap-2 text-[#9CA3AF] hover:text-slate-900 dark:text-slate-50 transition-colors text-sm">
             ← Katalog
           </button>
           <span className="text-lg font-extrabold">
-            Performa <span className="text-[#374151]">AI</span>
+            Performa <span className="text-slate-700 dark:text-slate-300">AI</span>
           </span>
           <button
             onClick={() => router.push('/login')}
@@ -305,22 +305,22 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
           <div className="flex flex-col md:flex-row gap-6 items-start">
 
             {/* Avatar */}
-            <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${t.avatarColor} flex items-center justify-center text-2xl font-black text-[#111827] shadow-xl flex-shrink-0`}>
+            <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${t.avatarColor} flex items-center justify-center text-2xl font-black text-slate-900 dark:text-slate-50 shadow-xl flex-shrink-0`}>
               {t.avatar}
             </div>
 
             {/* Info */}
             <div className="flex-1">
               <div className="flex flex-wrap items-center gap-2 mb-1">
-                <h1 className="text-2xl font-extrabold text-[#111827]">{t.name}</h1>
+                <h1 className="text-2xl font-extrabold text-slate-900 dark:text-slate-50">{t.name}</h1>
                 {t.verified && <VerifiedBadge />}
                 {t.proMember && (
-                  <span className="bg-[#111827]/15 border border-[#D1D5DB] text-[#374151] text-xs font-bold px-2.5 py-1 rounded-full">⭐ PRO</span>
+                  <span className="bg-[#111827]/15 border border-[#D1D5DB] text-slate-700 dark:text-slate-300 text-xs font-bold px-2.5 py-1 rounded-full">⭐ PRO</span>
                 )}
               </div>
               <p className="text-[#9CA3AF] text-sm mb-1">{t.title}</p>
-              <p className="text-[#6B7280] text-xs mb-4">📍 {t.location} &nbsp;·&nbsp; A'zo bo'lgan: {t.joinedAt} &nbsp;·&nbsp; ⚡ {t.responseTime}</p>
-              <p className="text-[#374151] text-sm leading-relaxed max-w-2xl">{t.bio}</p>
+              <p className="text-slate-500 dark:text-slate-400 text-xs mb-4">📍 {t.location} &nbsp;·&nbsp; A'zo bo'lgan: {t.joinedAt} &nbsp;·&nbsp; ⚡ {t.responseTime}</p>
+              <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed max-w-2xl">{t.bio}</p>
 
               {/* platform tags */}
               <div className="flex flex-wrap gap-2 mt-4">
@@ -329,29 +329,29 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
                     key={p.id}
                     className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border ${
                       p.verified
-                        ? 'bg-[#F9FAFB] border-[#E5E7EB] text-[#111827]'
-                        : 'bg-[#F9FAFB] border-[#E5E7EB] text-[#6B7280]'
+                        ? 'bg-slate-50 dark:bg-slate-800/50 border-[#E5E7EB] text-slate-900 dark:text-slate-50'
+                        : 'bg-slate-50 dark:bg-slate-800/50 border-[#E5E7EB] text-slate-500 dark:text-slate-400'
                     }`}
                   >
                     {p.icon} {p.name}
                     {p.verified && <span className="text-emerald-400 font-bold">✓</span>}
-                    <span className="text-[#6B7280]">({p.accountsConnected})</span>
+                    <span className="text-slate-500 dark:text-slate-400">({p.accountsConnected})</span>
                   </span>
                 ))}
               </div>
             </div>
 
             {/* CTA card */}
-            <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-5 w-full md:w-56 flex-shrink-0">
+            <div className="bg-slate-50 dark:bg-slate-800/50 border border-[#E5E7EB] rounded-xl p-5 w-full md:w-56 flex-shrink-0">
               <div className="flex items-center gap-1 mb-3">
                 <span className="text-yellow-400 text-sm">★</span>
-                <span className="text-[#111827] font-bold">{t.rating}</span>
-                <span className="text-[#6B7280] text-xs">({t.reviewCount} sharh)</span>
+                <span className="text-slate-900 dark:text-slate-50 font-bold">{t.rating}</span>
+                <span className="text-slate-500 dark:text-slate-400 text-xs">({t.reviewCount} sharh)</span>
               </div>
-              <div className="text-[#6B7280] text-xs mb-1">Narxi:</div>
-              <div className="text-[#111827] font-extrabold text-xl mb-4">
+              <div className="text-slate-500 dark:text-slate-400 text-xs mb-1">Narxi:</div>
+              <div className="text-slate-900 dark:text-slate-50 font-extrabold text-xl mb-4">
                 ${t.price.from}
-                <span className="text-[#6B7280] text-sm font-normal">/{t.price.unit}</span>
+                <span className="text-slate-500 dark:text-slate-400 text-sm font-normal">/{t.price.unit}</span>
               </div>
               <button
                 onClick={() => setContactOpen(true)}
@@ -361,7 +361,7 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
               </button>
               <button
                 onClick={() => router.push('/login')}
-                className="w-full bg-[#F9FAFB] hover:bg-[#F3F4F6] text-[#9CA3AF] text-sm py-2.5 rounded-xl border border-[#E5E7EB] transition-all"
+                className="w-full bg-slate-50 dark:bg-slate-800/50 hover:bg-[#F3F4F6] text-[#9CA3AF] text-sm py-2.5 rounded-xl border border-[#E5E7EB] transition-all"
               >
                 Xizmat buyurtma
               </button>
@@ -373,23 +373,23 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3 mb-8">
           <div className="col-span-2 bg-gradient-to-br from-white to-[#F9FAFB] border border-[#D1D5DB] rounded-xl p-4">
             <div className="text-[#9CA3AF] text-xs mb-1">O'rtacha ROAS</div>
-            <div className="text-3xl font-extrabold text-[#374151]">{t.stats.avgROAS}x</div>
+            <div className="text-3xl font-extrabold text-slate-700 dark:text-slate-300">{t.stats.avgROAS}x</div>
             <div className="text-xs text-emerald-400 mt-1">En yaxshi: {t.stats.bestROAS}x</div>
           </div>
           <div className="col-span-2 bg-white border border-[#E5E7EB] rounded-xl p-4">
             <div className="text-[#9CA3AF] text-xs mb-1">O'rtacha CPA</div>
-            <div className="text-3xl font-extrabold text-[#111827]">${t.stats.avgCPA}</div>
-            <div className="text-xs text-[#6B7280] mt-1">O'rtacha CTR: {t.stats.avgCTR}%</div>
+            <div className="text-3xl font-extrabold text-slate-900 dark:text-slate-50">${t.stats.avgCPA}</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">O'rtacha CTR: {t.stats.avgCTR}%</div>
           </div>
           <div className="col-span-2 bg-white border border-[#E5E7EB] rounded-xl p-4">
             <div className="text-[#9CA3AF] text-xs mb-1">Jami boshqarilgan</div>
-            <div className="text-3xl font-extrabold text-[#111827]">{formatSpend(t.stats.totalSpendManaged)}</div>
-            <div className="text-xs text-[#6B7280] mt-1">Faol: {t.stats.activeCampaigns} kampaniya</div>
+            <div className="text-3xl font-extrabold text-slate-900 dark:text-slate-50">{formatSpend(t.stats.totalSpendManaged)}</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">Faol: {t.stats.activeCampaigns} kampaniya</div>
           </div>
           <div className="col-span-2 bg-white border border-[#E5E7EB] rounded-xl p-4">
             <div className="text-[#9CA3AF] text-xs mb-1">Muvaffaqiyat darajasi</div>
             <div className="text-3xl font-extrabold text-emerald-400">{t.stats.successRate}%</div>
-            <div className="text-xs text-[#6B7280] mt-1">Jami: {t.stats.totalCampaigns} ta kampaniya</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">Jami: {t.stats.totalCampaigns} ta kampaniya</div>
           </div>
         </div>
 
@@ -397,7 +397,7 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
         <div className="flex items-center gap-2 mb-6">
           <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
           <span className="text-emerald-400 text-xs font-bold uppercase tracking-widest">Live tracking — real vaqtda yangilanadi</span>
-          <span className="text-[#6B7280] text-xs ml-2">Oxirgi yangilanish: 5 daqiqa oldin</span>
+          <span className="text-slate-500 dark:text-slate-400 text-xs ml-2">Oxirgi yangilanish: 5 daqiqa oldin</span>
         </div>
 
         {/* ── TABS ── */}
@@ -409,7 +409,7 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
               className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
                 tab === t2
                   ? 'bg-[#111827] text-white shadow'
-                  : 'text-[#9CA3AF] hover:text-[#111827]'
+                  : 'text-[#9CA3AF] hover:text-slate-900 dark:text-slate-50'
               }`}
             >
               {t2 === 'overview' ? '📊 Ko\'rinish' : t2 === 'campaigns' ? '🎯 Kampaniyalar' : '⭐ Sharhlar'}
@@ -424,22 +424,22 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
             {/* ROAS chart */}
             <div className="lg:col-span-2 bg-white border border-[#E5E7EB] rounded-2xl p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-[#111827] font-bold">ROAS dinamikasi (6 oy)</h3>
-                <span className="text-xs text-[#6B7280] bg-[#F9FAFB] px-3 py-1 rounded-lg border border-[#E5E7EB]">Oylik</span>
+                <h3 className="text-slate-900 dark:text-slate-50 font-bold">ROAS dinamikasi (6 oy)</h3>
+                <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 px-3 py-1 rounded-lg border border-[#E5E7EB]">Oylik</span>
               </div>
               <RoasChart data={t.monthlyPerformance} />
             </div>
 
             {/* Platform split */}
             <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6">
-              <h3 className="text-[#111827] font-bold mb-6">Platform taqsimoti</h3>
+              <h3 className="text-slate-900 dark:text-slate-50 font-bold mb-6">Platform taqsimoti</h3>
               <PlatformSplit data={t.platformSplit} />
 
               <div className="mt-6 pt-5 border-t border-[#E5E7EB]">
                 <h4 className="text-[#9CA3AF] text-xs font-semibold uppercase tracking-wider mb-3">Niche ixtisoslashuv</h4>
                 <div className="flex flex-wrap gap-2">
                   {t.niches.map(n => (
-                    <span key={n} className="text-xs bg-[#F9FAFB] border border-[#E5E7EB] text-[#374151] px-2.5 py-1 rounded-lg">
+                    <span key={n} className="text-xs bg-slate-50 dark:bg-slate-800/50 border border-[#E5E7EB] text-slate-700 dark:text-slate-300 px-2.5 py-1 rounded-lg">
                       {n}
                     </span>
                   ))}
@@ -461,8 +461,8 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
         {tab === 'campaigns' && (
           <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-[#111827] font-bold">So'nggi kampaniyalar</h3>
-              <span className="text-xs text-[#6B7280] bg-[#F9FAFB] border border-[#E5E7EB] px-3 py-1 rounded-lg">
+              <h3 className="text-slate-900 dark:text-slate-50 font-bold">So'nggi kampaniyalar</h3>
+              <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border border-[#E5E7EB] px-3 py-1 rounded-lg">
                 Mijoz maxfiyligi uchun anonimlashtrilgan
               </span>
             </div>
@@ -474,23 +474,23 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
 
             {/* aggregate row */}
             <div className="mt-6 pt-4 border-t border-[#E5E7EB] grid grid-cols-3 gap-4">
-              <div className="bg-[#F9FAFB] rounded-xl p-3 text-center">
-                <div className="text-[#111827] font-bold text-lg">
+              <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 text-center">
+                <div className="text-slate-900 dark:text-slate-50 font-bold text-lg">
                   {(t.recentCampaigns.reduce((s, c) => s + c.roas, 0) / t.recentCampaigns.length).toFixed(1)}x
                 </div>
-                <div className="text-[#6B7280] text-xs">O'rtacha ROAS</div>
+                <div className="text-slate-500 dark:text-slate-400 text-xs">O'rtacha ROAS</div>
               </div>
-              <div className="bg-[#F9FAFB] rounded-xl p-3 text-center">
-                <div className="text-[#111827] font-bold text-lg">
+              <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 text-center">
+                <div className="text-slate-900 dark:text-slate-50 font-bold text-lg">
                   {formatSpend(t.recentCampaigns.reduce((s, c) => s + c.spend, 0))}
                 </div>
-                <div className="text-[#6B7280] text-xs">Jami sarflangan</div>
+                <div className="text-slate-500 dark:text-slate-400 text-xs">Jami sarflangan</div>
               </div>
-              <div className="bg-[#F9FAFB] rounded-xl p-3 text-center">
+              <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 text-center">
                 <div className="text-emerald-400 font-bold text-lg">
                   {t.recentCampaigns.filter(c => c.status === 'active').length} ta
                 </div>
-                <div className="text-[#6B7280] text-xs">Hozir faol</div>
+                <div className="text-slate-500 dark:text-slate-400 text-xs">Hozir faol</div>
               </div>
             </div>
           </div>
@@ -501,13 +501,13 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
           <div>
             <div className="flex items-center gap-6 bg-white border border-[#E5E7EB] rounded-2xl p-6 mb-6">
               <div className="text-center">
-                <div className="text-5xl font-extrabold text-[#111827]">{t.rating}</div>
+                <div className="text-5xl font-extrabold text-slate-900 dark:text-slate-50">{t.rating}</div>
                 <div className="flex gap-0.5 justify-center my-1">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <span key={i} className={i < Math.floor(t.rating) ? 'text-yellow-400' : 'text-[#2A2A3A]'}>★</span>
                   ))}
                 </div>
-                <div className="text-[#6B7280] text-xs">{t.reviewCount} sharh</div>
+                <div className="text-slate-500 dark:text-slate-400 text-xs">{t.reviewCount} sharh</div>
               </div>
               <div className="flex-1">
                 {[5, 4, 3, 2, 1].map(star => {
@@ -515,12 +515,12 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
                   const pct = t.reviews.length ? (count / t.reviews.length) * 100 : 0
                   return (
                     <div key={star} className="flex items-center gap-2 mb-1">
-                      <span className="text-[#6B7280] text-xs w-4">{star}</span>
+                      <span className="text-slate-500 dark:text-slate-400 text-xs w-4">{star}</span>
                       <span className="text-yellow-400 text-xs">★</span>
-                      <div className="flex-1 bg-[#F9FAFB] rounded-full h-2">
+                      <div className="flex-1 bg-slate-50 dark:bg-slate-800/50 rounded-full h-2">
                         <div className="h-2 bg-yellow-400 rounded-full" style={{ width: `${pct}%` }} />
                       </div>
-                      <span className="text-[#6B7280] text-xs w-4 text-right">{count}</span>
+                      <span className="text-slate-500 dark:text-slate-400 text-xs w-4 text-right">{count}</span>
                     </div>
                   )
                 })}
@@ -540,8 +540,8 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-6">
           <div className="bg-white border border-[#E5E7EB] rounded-2xl p-8 w-full max-w-md">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-[#111827] font-bold text-xl">{t.name} bilan bog'lanish</h3>
-              <button onClick={() => setContactOpen(false)} className="text-[#6B7280] hover:text-[#111827] text-xl">✕</button>
+              <h3 className="text-slate-900 dark:text-slate-50 font-bold text-xl">{t.name} bilan bog'lanish</h3>
+              <button onClick={() => setContactOpen(false)} className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50 text-xl">✕</button>
             </div>
             <p className="text-[#9CA3AF] text-sm mb-6">
               Xabar yuborish uchun platformaga kiring yoki ro'yxatdan o'ting.
@@ -555,7 +555,7 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
               </button>
               <button
                 onClick={() => router.push('/register')}
-                className="w-full bg-[#F9FAFB] hover:bg-[#F3F4F6] text-[#111827] py-3 rounded-xl border border-[#E5E7EB] transition-all"
+                className="w-full bg-slate-50 dark:bg-slate-800/50 hover:bg-[#F3F4F6] text-slate-900 dark:text-slate-50 py-3 rounded-xl border border-[#E5E7EB] transition-all"
               >
                 Ro'yxatdan o'tish — bepul
               </button>

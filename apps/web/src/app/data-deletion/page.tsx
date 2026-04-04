@@ -16,12 +16,12 @@ export default function Page() {
             This page explains how Performa users can request deletion of account and platform
             data associated with their workspace.
           </p>
-          <p className="text-sm text-[#6B7280]">Last updated: March 22, 2026</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Last updated: March 22, 2026</p>
         </header>
 
         <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
           <h2 className="text-xl font-semibold">Overview</h2>
-          <p className="text-[#374151]">
+          <p className="text-slate-700 dark:text-slate-300">
             Performa supports user-initiated deletion requests for account and connected
             workspace data. Deletion requests are processed in a controlled workflow to protect
             account security and prevent unauthorized removals.
@@ -30,15 +30,15 @@ export default function Page() {
 
         <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
           <h2 className="text-xl font-semibold">How to request deletion</h2>
-          <p className="text-[#374151]">
+          <p className="text-slate-700 dark:text-slate-300">
             Send a request from your registered account email address to:
           </p>
-          <p className="text-[#374151]">
-            <a className="text-[#374151] hover:text-[#C4B5FD]" href="mailto:elmuntechnologies@gmail.com">
+          <p className="text-slate-700 dark:text-slate-300">
+            <a className="text-slate-700 dark:text-slate-300 hover:text-[#C4B5FD]" href="mailto:elmuntechnologies@gmail.com">
               elmuntechnologies@gmail.com
             </a>
           </p>
-          <p className="text-[#374151]">
+          <p className="text-slate-700 dark:text-slate-300">
             Include your account email, workspace name (if applicable), and a clear statement that
             you request deletion of your Performa data.
           </p>
@@ -46,7 +46,7 @@ export default function Page() {
 
         <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
           <h2 className="text-xl font-semibold">Identity verification process</h2>
-          <p className="text-[#374151]">
+          <p className="text-slate-700 dark:text-slate-300">
             Before processing deletion, we may verify account ownership through the registered
             email and related account metadata. Additional confirmation may be required if the
             request appears incomplete or inconsistent.
@@ -55,7 +55,7 @@ export default function Page() {
 
         <section className="space-y-4 rounded-xl border border-[#E5E7EB] bg-white p-6">
           <h2 className="text-xl font-semibold">What data will be deleted</h2>
-          <ul className="list-disc space-y-2 pl-5 text-[#374151]">
+          <ul className="list-disc space-y-2 pl-5 text-slate-700 dark:text-slate-300">
             <li>User account profile and authentication-related records in Performa.</li>
             <li>Workspace configuration and associated campaign operation history.</li>
             <li>Connected OAuth tokens and third-party integration credentials stored by Performa.</li>
@@ -63,7 +63,7 @@ export default function Page() {
           </ul>
 
           <h2 className="text-xl font-semibold">Data that may be retained</h2>
-          <p className="text-[#374151]">
+          <p className="text-slate-700 dark:text-slate-300">
             Certain records may be retained where required by applicable law, security, fraud
             prevention, dispute resolution, or audit obligations. Retained data is minimized and
             handled under applicable controls.
@@ -72,14 +72,14 @@ export default function Page() {
 
         <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
           <h2 className="text-xl font-semibold">Processing timeline</h2>
-          <p className="text-[#374151]">
+          <p className="text-slate-700 dark:text-slate-300">
             After identity verification, we process deletion requests within 3-5 business days.
           </p>
         </section>
 
         <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
           <h2 className="text-xl font-semibold">Third-party connected platform implications</h2>
-          <p className="text-[#374151]">
+          <p className="text-slate-700 dark:text-slate-300">
             Deleting data in Performa does not automatically delete data held by third-party
             platforms (such as Meta, Google, or TikTok). You may need to separately remove
             applications, revoke tokens, or submit deletion requests directly with those providers.
@@ -88,19 +88,19 @@ export default function Page() {
 
         <section className="space-y-4 rounded-xl border border-[#E5E7EB] bg-white p-6">
           <h2 className="text-xl font-semibold">Confirmation process</h2>
-          <p className="text-[#374151]">
+          <p className="text-slate-700 dark:text-slate-300">
             Once the request is completed, Performa sends confirmation to the request email,
             including status details (completed, partially retained for legal reasons, or requiring
             additional information).
           </p>
 
           <h2 className="text-xl font-semibold">Contact email</h2>
-          <p className="text-[#374151]">
-            <a className="text-[#374151] hover:text-[#C4B5FD]" href="mailto:elmuntechnologies@gmail.com">
+          <p className="text-slate-700 dark:text-slate-300">
+            <a className="text-slate-700 dark:text-slate-300 hover:text-[#C4B5FD]" href="mailto:elmuntechnologies@gmail.com">
               elmuntechnologies@gmail.com
             </a>
           </p>
-          <p className="text-sm text-[#6B7280]">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             Disclaimer: These instructions are provided for operational and compliance purposes and
             may be updated as the Performa platform evolves.
           </p>

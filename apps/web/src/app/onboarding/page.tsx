@@ -314,19 +314,19 @@ function OptionCard({
         text-left p-4 rounded-xl border transition-all duration-200 w-full
         ${selected
           ? 'border-[#111827] bg-[#F3F4F6] ring-1 ring-[#111827]/30'
-          : 'border-[#E5E7EB] hover:border-[#D1D5DB] hover:bg-[#F9FAFB]'
+          : 'border-[#E5E7EB] hover:border-[#D1D5DB] hover:bg-slate-50 dark:bg-slate-800/50'
         }
       `}
     >
       {icon && <span className="text-xl mb-2 block">{icon}</span>}
       <p
         className={`font-medium text-sm ${
-          selected ? 'text-[#111827]' : 'text-[#9CA3AF]'
+          selected ? 'text-slate-900 dark:text-slate-50' : 'text-[#9CA3AF]'
         }`}
       >
         {label}
       </p>
-      {desc && <p className="text-[#6B7280] text-xs mt-1">{desc}</p>}
+      {desc && <p className="text-slate-500 dark:text-slate-400 text-xs mt-1">{desc}</p>}
     </button>
   )
 }
@@ -358,10 +358,10 @@ function TagSelector({
               text-sm px-3 py-1.5 rounded-lg border transition-all duration-200
               ${
                 isSelected
-                  ? 'border-[#111827] bg-[#F3F4F6] text-[#374151] font-medium'
+                  ? 'border-[#111827] bg-[#F3F4F6] text-slate-700 dark:text-slate-300 font-medium'
                   : isDisabled
                     ? 'border-[#E5E7EB] text-[#3A3A4A] cursor-not-allowed'
-                    : 'border-[#E5E7EB] text-[#6B7280] hover:border-[#D1D5DB] hover:text-[#111827]'
+                    : 'border-[#E5E7EB] text-slate-500 dark:text-slate-400 hover:border-[#D1D5DB] hover:text-slate-900 dark:text-slate-50'
               }
             `}
           >
@@ -616,12 +616,12 @@ export default function OnboardingPage() {
   // ─── RENDER ───────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
         {/* Logo */}
         <div className="text-center mb-5">
-          <h1 className="text-xl font-bold text-[#111827]">
-            Performa <span className="text-[#374151]">AI</span>
+          <h1 className="text-xl font-bold text-slate-900 dark:text-slate-50">
+            Performa <span className="text-slate-700 dark:text-slate-300">AI</span>
           </h1>
         </div>
 
@@ -638,10 +638,10 @@ export default function OnboardingPage() {
             ))}
           </div>
           <div className="flex justify-between text-xs">
-            <span className="text-[#374151] font-medium">
+            <span className="text-slate-700 dark:text-slate-300 font-medium">
               {step <= 5 ? `${step}/5 qadam` : step === 6 ? 'Tahlil...' : 'Tayyor!'}
             </span>
-            <span className="text-[#6B7280]">{STEPS[step - 1]?.title}</span>
+            <span className="text-slate-500 dark:text-slate-400">{STEPS[step - 1]?.title}</span>
           </div>
         </div>
 
@@ -654,8 +654,8 @@ export default function OnboardingPage() {
                 {STEPS[step - 1]?.icon}
               </div>
               <div>
-                <h2 className="text-xl font-bold text-[#111827]">{STEPS[step - 1]?.title}</h2>
-                <p className="text-[#6B7280] text-sm">{STEPS[step - 1]?.subtitle}</p>
+                <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">{STEPS[step - 1]?.title}</h2>
+                <p className="text-slate-500 dark:text-slate-400 text-sm">{STEPS[step - 1]?.subtitle}</p>
               </div>
             </div>
           </div>
@@ -675,7 +675,7 @@ export default function OnboardingPage() {
                     value={form.businessName}
                     onChange={(e) => update('businessName', e.target.value)}
                     placeholder="Masalan: TechShop Uzbekistan"
-                    className="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl px-4 py-3 text-[#111827] placeholder:text-[#6B7280] focus:outline-none focus:border-[#111827] focus:ring-1 focus:ring-[#111827]/20 transition-all"
+                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-[#E5E7EB] rounded-xl px-4 py-3 text-slate-900 dark:text-slate-50 placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-[#111827] focus:ring-1 focus:ring-[#111827]/20 transition-all"
                   />
                 </div>
 
@@ -723,7 +723,7 @@ export default function OnboardingPage() {
                 <div>
                   <label className="block text-sm font-medium text-[#9CA3AF] mb-3">
                     Maqsadli hudud{' '}
-                    <span className="text-[#6B7280] font-normal">
+                    <span className="text-slate-500 dark:text-slate-400 font-normal">
                       (bir nechta tanlash mumkin)
                     </span>
                   </label>
@@ -739,7 +739,7 @@ export default function OnboardingPage() {
                             flex items-center gap-2.5 px-4 py-2.5 rounded-xl border text-sm transition-all
                             ${
                               selected
-                                ? 'border-[#111827] bg-[#F3F4F6] text-[#111827] font-medium'
+                                ? 'border-[#111827] bg-[#F3F4F6] text-slate-900 dark:text-slate-50 font-medium'
                                 : 'border-[#E5E7EB] text-[#9CA3AF] hover:border-[#D1D5DB]'
                             }
                           `}
@@ -751,7 +751,7 @@ export default function OnboardingPage() {
                                 : 'border-[#4B5563]'
                             }`}
                           >
-                            {selected && <span className="text-[#111827] text-xs">✓</span>}
+                            {selected && <span className="text-slate-900 dark:text-slate-50 text-xs">✓</span>}
                           </span>
                           {loc.label}
                         </button>
@@ -775,7 +775,7 @@ export default function OnboardingPage() {
                           w-full flex items-center gap-3 px-4 py-3 rounded-xl border text-sm transition-all text-left
                           ${
                             form.monthlyRevenue === r.value
-                              ? 'border-[#111827] bg-[#F3F4F6] text-[#111827]'
+                              ? 'border-[#111827] bg-[#F3F4F6] text-slate-900 dark:text-slate-50'
                               : 'border-[#E5E7EB] text-[#9CA3AF] hover:border-[#D1D5DB]'
                           }
                         `}
@@ -825,21 +825,21 @@ export default function OnboardingPage() {
                   <label className="block text-sm font-medium text-[#9CA3AF] mb-3">
                     Narx diapazoni
                   </label>
-                  <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4">
+                  <div className="bg-slate-50 dark:bg-slate-800/50 border border-[#E5E7EB] rounded-xl p-4">
                     <div className="flex items-center justify-between mb-4">
                       <div className="text-center">
-                        <p className="text-[#6B7280] text-xs mb-1">Minimal</p>
-                        <p className="text-[#111827] font-bold text-lg">${form.priceRange.min}</p>
+                        <p className="text-slate-500 dark:text-slate-400 text-xs mb-1">Minimal</p>
+                        <p className="text-slate-900 dark:text-slate-50 font-bold text-lg">${form.priceRange.min}</p>
                       </div>
-                      <div className="text-[#6B7280] text-sm">—</div>
+                      <div className="text-slate-500 dark:text-slate-400 text-sm">—</div>
                       <div className="text-center">
-                        <p className="text-[#6B7280] text-xs mb-1">Maksimal</p>
-                        <p className="text-[#374151] font-bold text-lg">${form.priceRange.max}</p>
+                        <p className="text-slate-500 dark:text-slate-400 text-xs mb-1">Maksimal</p>
+                        <p className="text-slate-700 dark:text-slate-300 font-bold text-lg">${form.priceRange.max}</p>
                       </div>
                     </div>
                     <div className="space-y-3">
                       <div>
-                        <label className="text-xs text-[#6B7280] block mb-1">
+                        <label className="text-xs text-slate-500 dark:text-slate-400 block mb-1">
                           Minimal narx: ${form.priceRange.min}
                         </label>
                         <input
@@ -858,7 +858,7 @@ export default function OnboardingPage() {
                         />
                       </div>
                       <div>
-                        <label className="text-xs text-[#6B7280] block mb-1">
+                        <label className="text-xs text-slate-500 dark:text-slate-400 block mb-1">
                           Maksimal narx: ${form.priceRange.max}
                         </label>
                         <input
@@ -884,9 +884,9 @@ export default function OnboardingPage() {
                 <div>
                   <label className="block text-sm font-medium text-[#9CA3AF] mb-1">
                     Asosiy ustunliklar
-                    <span className="text-[#6B7280] font-normal ml-2">(bir nechta tanlang)</span>
+                    <span className="text-slate-500 dark:text-slate-400 font-normal ml-2">(bir nechta tanlang)</span>
                   </label>
-                  <p className="text-[#6B7280] text-xs mb-3">
+                  <p className="text-slate-500 dark:text-slate-400 text-xs mb-3">
                     Reklama matni ana shu ustunliklarga asoslanadi
                   </p>
                   <TagSelector
@@ -922,7 +922,7 @@ export default function OnboardingPage() {
                 <div>
                   <label className="block text-sm font-medium text-[#9CA3AF] mb-3">
                     Maqsadli yosh guruhlar
-                    <span className="text-[#6B7280] font-normal ml-2">(bir nechta tanlang)</span>
+                    <span className="text-slate-500 dark:text-slate-400 font-normal ml-2">(bir nechta tanlang)</span>
                   </label>
                   <div className="flex gap-2 flex-wrap">
                     {AGE_GROUPS.map((ag) => {
@@ -936,8 +936,8 @@ export default function OnboardingPage() {
                             px-5 py-2.5 rounded-xl border font-medium text-sm transition-all
                             ${
                               sel
-                                ? 'border-[#111827] bg-[#F3F4F6] text-[#374151]'
-                                : 'border-[#E5E7EB] text-[#6B7280] hover:border-[#D1D5DB]'
+                                ? 'border-[#111827] bg-[#F3F4F6] text-slate-700 dark:text-slate-300'
+                                : 'border-[#E5E7EB] text-slate-500 dark:text-slate-400 hover:border-[#D1D5DB]'
                             }
                           `}
                         >
@@ -1004,9 +1004,9 @@ export default function OnboardingPage() {
                 <div>
                   <label className="block text-sm font-medium text-[#9CA3AF] mb-1">
                     Qiziqishlar
-                    <span className="text-[#6B7280] font-normal ml-2">(kamida 2 ta)</span>
+                    <span className="text-slate-500 dark:text-slate-400 font-normal ml-2">(kamida 2 ta)</span>
                   </label>
-                  <p className="text-[#6B7280] text-xs mb-3">
+                  <p className="text-slate-500 dark:text-slate-400 text-xs mb-3">
                     Meta va TikTok mana shu qiziqishlar bo'yicha targetlaydi
                   </p>
                   <TagSelector
@@ -1031,7 +1031,7 @@ export default function OnboardingPage() {
                           flex items-center gap-2.5 px-4 py-3 rounded-xl border text-sm transition-all
                           ${
                             form.platforms.includes(p.value)
-                              ? 'border-[#111827] bg-[#F3F4F6] text-[#111827] font-medium'
+                              ? 'border-[#111827] bg-[#F3F4F6] text-slate-900 dark:text-slate-50 font-medium'
                               : 'border-[#E5E7EB] text-[#9CA3AF] hover:border-[#D1D5DB]'
                           }
                         `}
@@ -1071,7 +1071,7 @@ export default function OnboardingPage() {
                 <div>
                   <label className="block text-sm font-medium text-[#9CA3AF] mb-1">
                     Qo'shimcha maqsadlar
-                    <span className="text-[#6B7280] font-normal ml-2">(ixtiyoriy)</span>
+                    <span className="text-slate-500 dark:text-slate-400 font-normal ml-2">(ixtiyoriy)</span>
                   </label>
                   <TagSelector
                     options={SECONDARY_GOALS}
@@ -1096,7 +1096,7 @@ export default function OnboardingPage() {
                           w-full flex items-center gap-3 px-4 py-3 rounded-xl border text-sm transition-all text-left
                           ${
                             form.kpiPriority === kpi.value
-                              ? 'border-[#111827] bg-[#F3F4F6] text-[#111827]'
+                              ? 'border-[#111827] bg-[#F3F4F6] text-slate-900 dark:text-slate-50'
                               : 'border-[#E5E7EB] text-[#9CA3AF] hover:border-[#D1D5DB]'
                           }
                         `}
@@ -1145,12 +1145,12 @@ export default function OnboardingPage() {
                   <label className="block text-sm font-medium text-[#9CA3AF] mb-3">
                     Oylik reklama byudjeti
                   </label>
-                  <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4 mb-3">
+                  <div className="bg-slate-50 dark:bg-slate-800/50 border border-[#E5E7EB] rounded-xl p-4 mb-3">
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-[#6B7280] text-sm">Byudjet</span>
-                      <span className="text-2xl font-bold text-[#374151]">
+                      <span className="text-slate-500 dark:text-slate-400 text-sm">Byudjet</span>
+                      <span className="text-2xl font-bold text-slate-700 dark:text-slate-300">
                         ${form.monthlyBudget.toLocaleString()}
-                        <span className="text-sm font-normal text-[#6B7280]">/oy</span>
+                        <span className="text-sm font-normal text-slate-500 dark:text-slate-400">/oy</span>
                       </span>
                     </div>
                     <input
@@ -1162,7 +1162,7 @@ export default function OnboardingPage() {
                       onChange={(e) => update('monthlyBudget', Number(e.target.value))}
                       className="w-full accent-[#7C3AED]"
                     />
-                    <div className="flex justify-between text-xs text-[#6B7280] mt-1">
+                    <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 mt-1">
                       <span>$50</span>
                       <span>$10,000</span>
                     </div>
@@ -1177,8 +1177,8 @@ export default function OnboardingPage() {
                           text-xs px-3 py-1.5 rounded-lg border transition-all
                           ${
                             form.monthlyBudget === p
-                              ? 'border-[#111827] bg-[#F3F4F6] text-[#374151]'
-                              : 'border-[#E5E7EB] text-[#6B7280] hover:border-[#D1D5DB]'
+                              ? 'border-[#111827] bg-[#F3F4F6] text-slate-700 dark:text-slate-300'
+                              : 'border-[#E5E7EB] text-slate-500 dark:text-slate-400 hover:border-[#D1D5DB]'
                           }
                         `}
                       >
@@ -1219,7 +1219,7 @@ export default function OnboardingPage() {
                   <div>
                     <label className="block text-sm font-medium text-[#9CA3AF] mb-2">
                       Asosiy raqobatchilar
-                      <span className="text-[#6B7280] font-normal ml-2">
+                      <span className="text-slate-500 dark:text-slate-400 font-normal ml-2">
                         (ixtiyoriy, vergul bilan)
                       </span>
                     </label>
@@ -1228,9 +1228,9 @@ export default function OnboardingPage() {
                       value={form.competitorNames}
                       onChange={(e) => update('competitorNames', e.target.value)}
                       placeholder="Masalan: Texnomart, Mediapark, Eldorado"
-                      className="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl px-4 py-3 text-[#111827] placeholder:text-[#6B7280] focus:outline-none focus:border-[#111827] transition-all"
+                      className="w-full bg-slate-50 dark:bg-slate-800/50 border border-[#E5E7EB] rounded-xl px-4 py-3 text-slate-900 dark:text-slate-50 placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-[#111827] transition-all"
                     />
-                    <p className="text-[#6B7280] text-xs mt-2">
+                    <p className="text-slate-500 dark:text-slate-400 text-xs mt-2">
                       💡 AI ularning reklamalarini tahlil qilib, sizga ustunlik topadi
                     </p>
                   </div>
@@ -1241,7 +1241,7 @@ export default function OnboardingPage() {
                   <label className="block text-sm font-medium text-[#9CA3AF] mb-1">
                     Sizning asosiy ustunliklaringiz
                   </label>
-                  <p className="text-[#6B7280] text-xs mb-3">
+                  <p className="text-slate-500 dark:text-slate-400 text-xs mb-3">
                     Reklama xabari ana shu ustunliklarga quriladi
                   </p>
                   <TagSelector
@@ -1270,14 +1270,14 @@ export default function OnboardingPage() {
 
                 {/* Summary preview */}
                 <div className="bg-[#111827]/5 border border-[#111827]/15 rounded-xl p-4">
-                  <p className="text-[#374151] text-xs font-medium mb-2">
+                  <p className="text-slate-700 dark:text-slate-300 text-xs font-medium mb-2">
                     📋 Ma'lumotlar xulosasi (AI ga yuboriladigan):
                   </p>
-                  <div className="space-y-1 text-xs text-[#6B7280]">
-                    <p>🏢 <span className="text-[#111827]">{form.businessName}</span> — {form.industry}</p>
+                  <div className="space-y-1 text-xs text-slate-500 dark:text-slate-400">
+                    <p>🏢 <span className="text-slate-900 dark:text-slate-50">{form.businessName}</span> — {form.industry}</p>
                     <p>📍 {form.targetLocation.join(', ')}</p>
-                    <p>💰 Byudjet: <span className="text-[#111827]">${form.monthlyBudget}/oy</span></p>
-                    <p>🎯 Maqsad: <span className="text-[#111827]">{form.primaryGoal}</span></p>
+                    <p>💰 Byudjet: <span className="text-slate-900 dark:text-slate-50">${form.monthlyBudget}/oy</span></p>
+                    <p>🎯 Maqsad: <span className="text-slate-900 dark:text-slate-50">{form.primaryGoal}</span></p>
                     <p>👥 Yosh: {form.ageGroups.join(', ')}</p>
                     <p>📢 Platformalar: {form.platforms.join(', ')}</p>
                   </div>
@@ -1291,10 +1291,10 @@ export default function OnboardingPage() {
                 <div className="w-20 h-20 rounded-2xl bg-[#F3F4F6] border border-[#D1D5DB] flex items-center justify-center mx-auto mb-5">
                   <Spinner size="lg" />
                 </div>
-                <h3 className="text-lg font-semibold text-[#111827] mb-2">
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-2">
                   Strategiya tayyorlanmoqda...
                 </h3>
-                <p className="text-[#6B7280] text-sm mb-6 max-w-xs mx-auto">
+                <p className="text-slate-500 dark:text-slate-400 text-sm mb-6 max-w-xs mx-auto">
                   Performa sizning ma'lumotlaringizni tahlil qilib,
                   shaxsiy reklama strategiyasini yaratmoqda.
                 </p>
@@ -1330,7 +1330,7 @@ export default function OnboardingPage() {
                           <span className="w-2 h-2 rounded-full bg-[#111827] animate-pulse block" />
                         ) : null}
                       </div>
-                      <p className={`text-sm ${i <= analysisStep ? 'text-[#111827]' : 'text-[#6B7280]'}`}>
+                      <p className={`text-sm ${i <= analysisStep ? 'text-slate-900 dark:text-slate-50' : 'text-slate-500 dark:text-slate-400'}`}>
                         {msg}
                       </p>
                     </div>
@@ -1350,15 +1350,15 @@ export default function OnboardingPage() {
                     <p className="text-emerald-400 font-semibold text-sm">
                       Strategiya va skriptlar tayyor!
                     </p>
-                    <p className="text-[#6B7280] text-xs mt-0.5">
+                    <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">
                       AI agentingiz faollashtirildi — reklama uchun hamma narsa tayyor
                     </p>
                   </div>
                 </div>
 
                 {/* Strategy summary */}
-                <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4">
-                  <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide mb-2">
+                <div className="bg-slate-50 dark:bg-slate-800/50 border border-[#E5E7EB] rounded-xl p-4">
+                  <p className="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wide mb-2">
                     AI Strategiya xulosasi
                   </p>
                   <p className="text-[#9CA3AF] text-sm leading-relaxed">
@@ -1369,15 +1369,15 @@ export default function OnboardingPage() {
                 {/* KPI grid */}
                 <div className="grid grid-cols-2 gap-3">
                   {[
-                    { icon: '🎯', label: 'Est. Oylik Leadlar', value: strategy.monthlyForecast?.estimatedLeads ?? '—', color: 'text-[#111827]' },
+                    { icon: '🎯', label: 'Est. Oylik Leadlar', value: strategy.monthlyForecast?.estimatedLeads ?? '—', color: 'text-slate-900 dark:text-slate-50' },
                     { icon: '📈', label: 'Est. ROAS', value: strategy.monthlyForecast?.estimatedRoas ? `${Number(strategy.monthlyForecast.estimatedRoas).toFixed(1)}x` : '—', color: 'text-emerald-400' },
-                    { icon: '💰', label: 'Est. CPA', value: strategy.monthlyForecast?.estimatedCpa ? `$${Number(strategy.monthlyForecast.estimatedCpa).toFixed(0)}` : '—', color: 'text-[#111827]' },
-                    { icon: '📊', label: 'Ishonch darajasi', value: strategy.monthlyForecast?.confidence ?? '—', color: 'text-[#374151]' },
+                    { icon: '💰', label: 'Est. CPA', value: strategy.monthlyForecast?.estimatedCpa ? `$${Number(strategy.monthlyForecast.estimatedCpa).toFixed(0)}` : '—', color: 'text-slate-900 dark:text-slate-50' },
+                    { icon: '📊', label: 'Ishonch darajasi', value: strategy.monthlyForecast?.confidence ?? '—', color: 'text-slate-700 dark:text-slate-300' },
                   ].map(({ icon, label, value, color }) => (
                     <div key={label} className="bg-white border border-[#E5E7EB] rounded-xl p-3">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-sm">{icon}</span>
-                        <p className="text-[#6B7280] text-xs">{label}</p>
+                        <p className="text-slate-500 dark:text-slate-400 text-xs">{label}</p>
                       </div>
                       <p className={`text-lg font-bold ${color}`}>{value}</p>
                     </div>
@@ -1389,12 +1389,12 @@ export default function OnboardingPage() {
                   <div className="border-t border-[#E5E7EB] pt-5">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-xl">💰</span>
-                      <h3 className="font-semibold text-[#111827]">Byudjet taqsimoti</h3>
-                      <span className="bg-[#F3F4F6] text-[#374151] text-xs px-2 py-0.5 rounded-full border border-[#D1D5DB]">
+                      <h3 className="font-semibold text-slate-900 dark:text-slate-50">Byudjet taqsimoti</h3>
+                      <span className="bg-[#F3F4F6] text-slate-700 dark:text-slate-300 text-xs px-2 py-0.5 rounded-full border border-[#D1D5DB]">
                         ${form.monthlyBudget.toLocaleString()}/oy
                       </span>
                     </div>
-                    <p className="text-[#6B7280] text-xs mb-4">
+                    <p className="text-slate-500 dark:text-slate-400 text-xs mb-4">
                       AI sizning biznesingiz va auditoriyangizdan kelib chiqib byudjetni quyidagicha taqsimlashni tavsiya qiladi
                     </p>
                     <div className="space-y-3">
@@ -1408,7 +1408,7 @@ export default function OnboardingPage() {
                               isPrimary
                                 ? 'bg-[#F0FDF4] border-emerald-200'
                                 : isSecondary
-                                  ? 'bg-[#F9FAFB] border-[#E5E7EB]'
+                                  ? 'bg-slate-50 dark:bg-slate-800/50 border-[#E5E7EB]'
                                   : 'bg-white border-[#F3F4F6]'
                             }`}
                           >
@@ -1416,7 +1416,7 @@ export default function OnboardingPage() {
                             <div className="flex items-center justify-between mb-2">
                               <div className="flex items-center gap-2">
                                 <span className="text-lg">{ch.emoji || '📊'}</span>
-                                <span className="font-semibold text-[#111827] text-sm">
+                                <span className="font-semibold text-slate-900 dark:text-slate-50 text-sm">
                                   {ch.channelName}
                                 </span>
                                 {isPrimary && (
@@ -1426,10 +1426,10 @@ export default function OnboardingPage() {
                                 )}
                               </div>
                               <div className="text-right">
-                                <span className="text-[#111827] font-bold text-sm">
+                                <span className="text-slate-900 dark:text-slate-50 font-bold text-sm">
                                   ${(ch.monthlyAmount || Math.round(form.monthlyBudget * ch.percentage / 100)).toLocaleString()}
                                 </span>
-                                <span className="text-[#6B7280] text-xs ml-1">/ oy</span>
+                                <span className="text-slate-500 dark:text-slate-400 text-xs ml-1">/ oy</span>
                               </div>
                             </div>
 
@@ -1444,10 +1444,10 @@ export default function OnboardingPage() {
                             </div>
 
                             <div className="flex items-center justify-between mb-2">
-                              <p className="text-[#6B7280] text-xs leading-relaxed flex-1 pr-4">
+                              <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed flex-1 pr-4">
                                 {ch.rationale}
                               </p>
-                              <span className={`text-xs font-semibold shrink-0 ${isPrimary ? 'text-emerald-600' : 'text-[#374151]'}`}>
+                              <span className={`text-xs font-semibold shrink-0 ${isPrimary ? 'text-emerald-600' : 'text-slate-700 dark:text-slate-300'}`}>
                                 {ch.percentage}%
                               </span>
                             </div>
@@ -1458,7 +1458,7 @@ export default function OnboardingPage() {
                                 {ch.tactics.slice(0, 3).map((t: string, ti: number) => (
                                   <span
                                     key={ti}
-                                    className="text-[10px] px-2 py-0.5 rounded-full bg-white border border-[#E5E7EB] text-[#6B7280]"
+                                    className="text-[10px] px-2 py-0.5 rounded-full bg-white border border-[#E5E7EB] text-slate-500 dark:text-slate-400"
                                   >
                                     {t}
                                   </span>
@@ -1481,26 +1481,26 @@ export default function OnboardingPage() {
                 <div className="border-t border-[#E5E7EB] pt-5">
                   <div className="flex items-center gap-2 mb-4">
                     <span className="text-xl">📝</span>
-                    <h3 className="font-semibold text-[#111827]">Tayyor Reklama Skriptlari</h3>
-                    <span className="bg-[#F3F4F6] text-[#374151] text-xs px-2 py-0.5 rounded-full border border-[#D1D5DB]">
+                    <h3 className="font-semibold text-slate-900 dark:text-slate-50">Tayyor Reklama Skriptlari</h3>
+                    <span className="bg-[#F3F4F6] text-slate-700 dark:text-slate-300 text-xs px-2 py-0.5 rounded-full border border-[#D1D5DB]">
                       AI tomonidan yozilgan
                     </span>
                   </div>
 
                   {/* Script loading */}
                   {scriptLoading && (
-                    <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-6 text-center">
+                    <div className="bg-slate-50 dark:bg-slate-800/50 border border-[#E5E7EB] rounded-xl p-6 text-center">
                       <div className="flex items-center justify-center gap-3 mb-3">
                         <div className="w-5 h-5 border-2 border-[#111827] border-t-transparent rounded-full animate-spin" />
-                        <p className="text-[#111827] text-sm font-medium">Skriptlar yozilmoqda...</p>
+                        <p className="text-slate-900 dark:text-slate-50 text-sm font-medium">Skriptlar yozilmoqda...</p>
                       </div>
-                      <p className="text-[#6B7280] text-xs">
+                      <p className="text-slate-500 dark:text-slate-400 text-xs">
                         AI strategiya asosida har bir platform uchun skript tayyorlamoqda.
                         Bu 15–20 soniya davom etadi.
                       </p>
                       <div className="flex flex-wrap gap-2 justify-center mt-3">
                         {form.platforms.map((p) => (
-                          <span key={p} className="text-xs text-[#6B7280] bg-white px-2 py-1 rounded-lg border border-[#E5E7EB]">
+                          <span key={p} className="text-xs text-slate-500 dark:text-slate-400 bg-white px-2 py-1 rounded-lg border border-[#E5E7EB]">
                             {p === 'meta' ? '📘 Meta' : p === 'google' ? '🔍 Google' :
                              p === 'tiktok' ? '🎵 TikTok' : p === 'youtube' ? '▶️ YouTube' :
                              p === 'telegram' ? '✈️ Telegram' : p} ✍️
@@ -1536,7 +1536,7 @@ export default function OnboardingPage() {
                               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
                                 activeScriptTab === platform
                                   ? 'bg-[#111827] text-white'
-                                  : 'bg-[#F9FAFB] text-[#6B7280] border border-[#E5E7EB] hover:text-[#111827]'
+                                  : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 border border-[#E5E7EB] hover:text-slate-900 dark:text-slate-50'
                               }`}
                             >
                               {labels[platform] || platform}
@@ -1556,14 +1556,14 @@ export default function OnboardingPage() {
                             </p>
                             <div className="space-y-3">
                               {scripts.platforms.meta.videoScripts.map((vs) => (
-                                <div key={vs.scriptNumber} className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4">
+                                <div key={vs.scriptNumber} className="bg-slate-50 dark:bg-slate-800/50 border border-[#E5E7EB] rounded-xl p-4">
                                   <div className="flex items-center justify-between mb-3">
-                                    <span className="text-[#374151] text-xs font-semibold">
+                                    <span className="text-slate-700 dark:text-slate-300 text-xs font-semibold">
                                       Script #{vs.scriptNumber}
                                     </span>
                                     <div className="flex gap-2">
-                                      <span className="text-xs text-[#6B7280] bg-[#F9FAFB] px-2 py-0.5 rounded">{vs.duration}</span>
-                                      <span className="text-xs text-[#6B7280] bg-[#F9FAFB] px-2 py-0.5 rounded">{vs.format}</span>
+                                      <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 px-2 py-0.5 rounded">{vs.duration}</span>
+                                      <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 px-2 py-0.5 rounded">{vs.format}</span>
                                     </div>
                                   </div>
                                   <div className="space-y-2.5">
@@ -1571,7 +1571,7 @@ export default function OnboardingPage() {
                                       <span className="text-red-400 text-xs font-medium block mb-1">
                                         🎣 Hook (0–3 soniya) — Diqqatni tortish
                                       </span>
-                                      <p className="text-[#111827] text-sm bg-red-500/5 border border-red-500/10 rounded-lg px-3 py-2">
+                                      <p className="text-slate-900 dark:text-slate-50 text-sm bg-red-500/5 border border-red-500/10 rounded-lg px-3 py-2">
                                         {vs.hook}
                                       </p>
                                     </div>
@@ -1579,7 +1579,7 @@ export default function OnboardingPage() {
                                       <span className="text-amber-400 text-xs font-medium block mb-1">
                                         📢 Asosiy xabar (4–25 soniya)
                                       </span>
-                                      <p className="text-[#374151] text-sm bg-[#F9FAFB] rounded-lg px-3 py-2 leading-relaxed">
+                                      <p className="text-slate-700 dark:text-slate-300 text-sm bg-slate-50 dark:bg-slate-800/50 rounded-lg px-3 py-2 leading-relaxed">
                                         {vs.body}
                                       </p>
                                     </div>
@@ -1587,7 +1587,7 @@ export default function OnboardingPage() {
                                       <span className="text-emerald-400 text-xs font-medium block mb-1">
                                         ✅ CTA (oxirgi 5 soniya)
                                       </span>
-                                      <p className="text-[#111827] text-sm bg-emerald-500/5 border border-emerald-500/10 rounded-lg px-3 py-2">
+                                      <p className="text-slate-900 dark:text-slate-50 text-sm bg-emerald-500/5 border border-emerald-500/10 rounded-lg px-3 py-2">
                                         {vs.cta}
                                       </p>
                                     </div>
@@ -1604,14 +1604,14 @@ export default function OnboardingPage() {
                             </p>
                             <div className="space-y-2">
                               {scripts.platforms.meta.bannerCopies.map((bc) => (
-                                <div key={bc.variant} className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-3">
+                                <div key={bc.variant} className="bg-slate-50 dark:bg-slate-800/50 border border-[#E5E7EB] rounded-xl p-3">
                                   <div className="flex items-start justify-between gap-3">
                                     <div className="flex-1 space-y-1">
-                                      <p className="text-[#111827] text-sm font-semibold">{bc.headline}</p>
+                                      <p className="text-slate-900 dark:text-slate-50 text-sm font-semibold">{bc.headline}</p>
                                       <p className="text-[#9CA3AF] text-xs">{bc.primaryText}</p>
-                                      <p className="text-[#6B7280] text-xs">{bc.description}</p>
+                                      <p className="text-slate-500 dark:text-slate-400 text-xs">{bc.description}</p>
                                     </div>
-                                    <span className="bg-[#F3F4F6] text-[#374151] text-xs px-2 py-1 rounded-lg border border-[#D1D5DB] shrink-0 whitespace-nowrap">
+                                    <span className="bg-[#F3F4F6] text-slate-700 dark:text-slate-300 text-xs px-2 py-1 rounded-lg border border-[#D1D5DB] shrink-0 whitespace-nowrap">
                                       {bc.ctaButton}
                                     </span>
                                   </div>
@@ -1631,10 +1631,10 @@ export default function OnboardingPage() {
                             </p>
                             <div className="grid grid-cols-1 gap-2">
                               {scripts.platforms.google.headlines.map((h, i) => (
-                                <div key={i} className="flex items-center gap-3 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-3 py-2">
-                                  <span className="text-[#6B7280] text-xs w-5 shrink-0">{i + 1}.</span>
-                                  <p className="text-[#111827] text-sm">{h}</p>
-                                  <span className="text-[#6B7280] text-xs ml-auto shrink-0">
+                                <div key={i} className="flex items-center gap-3 bg-slate-50 dark:bg-slate-800/50 border border-[#E5E7EB] rounded-lg px-3 py-2">
+                                  <span className="text-slate-500 dark:text-slate-400 text-xs w-5 shrink-0">{i + 1}.</span>
+                                  <p className="text-slate-900 dark:text-slate-50 text-sm">{h}</p>
+                                  <span className="text-slate-500 dark:text-slate-400 text-xs ml-auto shrink-0">
                                     {h.length}/30
                                   </span>
                                 </div>
@@ -1647,10 +1647,10 @@ export default function OnboardingPage() {
                             </p>
                             <div className="space-y-2">
                               {scripts.platforms.google.descriptions.map((d, i) => (
-                                <div key={i} className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-3 py-2.5">
+                                <div key={i} className="bg-slate-50 dark:bg-slate-800/50 border border-[#E5E7EB] rounded-lg px-3 py-2.5">
                                   <div className="flex items-start justify-between gap-2">
-                                    <p className="text-[#374151] text-sm">{d}</p>
-                                    <span className="text-[#6B7280] text-xs shrink-0">{d.length}/90</span>
+                                    <p className="text-slate-700 dark:text-slate-300 text-sm">{d}</p>
+                                    <span className="text-slate-500 dark:text-slate-400 text-xs shrink-0">{d.length}/90</span>
                                   </div>
                                 </div>
                               ))}
@@ -1666,36 +1666,36 @@ export default function OnboardingPage() {
                             🎵 TikTok UGC Skriptlar (3 ta variant)
                           </p>
                           {scripts.platforms.tiktok.scripts.map((ts) => (
-                            <div key={ts.scriptNumber} className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4">
+                            <div key={ts.scriptNumber} className="bg-slate-50 dark:bg-slate-800/50 border border-[#E5E7EB] rounded-xl p-4">
                               <div className="flex items-center gap-2 mb-3">
-                                <span className="text-[#374151] text-xs font-semibold">Script #{ts.scriptNumber}</span>
-                                <span className="text-xs text-[#6B7280] bg-[#F9FAFB] px-2 py-0.5 rounded">{ts.style}</span>
+                                <span className="text-slate-700 dark:text-slate-300 text-xs font-semibold">Script #{ts.scriptNumber}</span>
+                                <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 px-2 py-0.5 rounded">{ts.style}</span>
                               </div>
                               <div className="space-y-2.5">
                                 <div>
                                   <span className="text-red-400 text-xs font-medium block mb-1">
                                     🎣 Hook (0–3 soniya) — ENG MUHIM!
                                   </span>
-                                  <p className="text-[#111827] text-sm bg-red-500/5 border border-red-500/10 rounded-lg px-3 py-2">
+                                  <p className="text-slate-900 dark:text-slate-50 text-sm bg-red-500/5 border border-red-500/10 rounded-lg px-3 py-2">
                                     {ts.hook}
                                   </p>
                                 </div>
                                 <div>
                                   <span className="text-amber-400 text-xs font-medium block mb-1">Body (4–30 soniya)</span>
-                                  <p className="text-[#374151] text-sm bg-[#F9FAFB] rounded-lg px-3 py-2 leading-relaxed">
+                                  <p className="text-slate-700 dark:text-slate-300 text-sm bg-slate-50 dark:bg-slate-800/50 rounded-lg px-3 py-2 leading-relaxed">
                                     {ts.body}
                                   </p>
                                 </div>
                                 <div>
                                   <span className="text-emerald-400 text-xs font-medium block mb-1">CTA (oxirgi 3 soniya)</span>
-                                  <p className="text-[#111827] text-sm bg-emerald-500/5 border border-emerald-500/10 rounded-lg px-3 py-2">
+                                  <p className="text-slate-900 dark:text-slate-50 text-sm bg-emerald-500/5 border border-emerald-500/10 rounded-lg px-3 py-2">
                                     {ts.cta}
                                   </p>
                                 </div>
                                 {ts.hashtags.length > 0 && (
                                   <div className="flex flex-wrap gap-1.5 pt-1">
                                     {ts.hashtags.map((tag) => (
-                                      <span key={tag} className="text-xs text-[#374151] bg-[#111827]/5 px-2 py-0.5 rounded">
+                                      <span key={tag} className="text-xs text-slate-700 dark:text-slate-300 bg-[#111827]/5 px-2 py-0.5 rounded">
                                         {tag}
                                       </span>
                                     ))}
@@ -1713,22 +1713,22 @@ export default function OnboardingPage() {
                           <p className="text-[#9CA3AF] text-xs font-medium uppercase tracking-wide mb-3">
                             ▶️ YouTube Skippable Ad Script
                           </p>
-                          <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4 space-y-3">
+                          <div className="bg-slate-50 dark:bg-slate-800/50 border border-[#E5E7EB] rounded-xl p-4 space-y-3">
                             <div>
                               <span className="text-red-400 text-xs font-medium block mb-1">🎣 Hook (0–5 soniya) — Skip qilishdan oldin</span>
-                              <p className="text-[#111827] text-sm bg-red-500/5 border border-red-500/10 rounded-lg px-3 py-2">
+                              <p className="text-slate-900 dark:text-slate-50 text-sm bg-red-500/5 border border-red-500/10 rounded-lg px-3 py-2">
                                 {scripts.platforms.youtube.hook}
                               </p>
                             </div>
                             <div>
                               <span className="text-amber-400 text-xs font-medium block mb-1">Body (6–30 soniya)</span>
-                              <p className="text-[#374151] text-sm bg-[#F9FAFB] rounded-lg px-3 py-2 leading-relaxed">
+                              <p className="text-slate-700 dark:text-slate-300 text-sm bg-slate-50 dark:bg-slate-800/50 rounded-lg px-3 py-2 leading-relaxed">
                                 {scripts.platforms.youtube.body}
                               </p>
                             </div>
                             <div>
                               <span className="text-emerald-400 text-xs font-medium block mb-1">CTA (oxirgi 5 soniya)</span>
-                              <p className="text-[#111827] text-sm bg-emerald-500/5 border border-emerald-500/10 rounded-lg px-3 py-2">
+                              <p className="text-slate-900 dark:text-slate-50 text-sm bg-emerald-500/5 border border-emerald-500/10 rounded-lg px-3 py-2">
                                 {scripts.platforms.youtube.cta}
                               </p>
                             </div>
@@ -1743,9 +1743,9 @@ export default function OnboardingPage() {
                             ✈️ Telegram Post Ads (3 ta variant)
                           </p>
                           {scripts.platforms.telegram.posts.map((post, i) => (
-                            <div key={i} className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4">
-                              <span className="text-[#374151] text-xs font-medium block mb-2">Post #{i + 1}</span>
-                              <p className="text-[#374151] text-sm leading-relaxed whitespace-pre-line">
+                            <div key={i} className="bg-slate-50 dark:bg-slate-800/50 border border-[#E5E7EB] rounded-xl p-4">
+                              <span className="text-slate-700 dark:text-slate-300 text-xs font-medium block mb-2">Post #{i + 1}</span>
+                              <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed whitespace-pre-line">
                                 {post}
                               </p>
                             </div>
@@ -1756,11 +1756,11 @@ export default function OnboardingPage() {
                       {/* General tips */}
                       {scripts.generalTips && scripts.generalTips.length > 0 && (
                         <div className="bg-[#111827]/5 border border-[#111827]/15 rounded-xl p-4">
-                          <p className="text-[#374151] text-xs font-medium mb-2">💡 Kreativ tavsiyalar</p>
+                          <p className="text-slate-700 dark:text-slate-300 text-xs font-medium mb-2">💡 Kreativ tavsiyalar</p>
                           <ul className="space-y-1">
                             {scripts.generalTips.map((tip, i) => (
-                              <li key={i} className="text-[#6B7280] text-xs flex gap-2">
-                                <span className="text-[#374151]">•</span> {tip}
+                              <li key={i} className="text-slate-500 dark:text-slate-400 text-xs flex gap-2">
+                                <span className="text-slate-700 dark:text-slate-300">•</span> {tip}
                               </li>
                             ))}
                           </ul>
@@ -1777,7 +1777,7 @@ export default function OnboardingPage() {
               <div className="space-y-2">
                 <Alert variant="error">{error}</Alert>
                 {createdWorkspaceId && (
-                  <p className="text-xs text-[#6B7280] text-center">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 text-center">
                     Workspace yaratildi. Dashboard'ga o'tib keyinroq strategiya yaratishingiz mumkin.
                   </p>
                 )}
@@ -1810,7 +1810,7 @@ export default function OnboardingPage() {
                   </Button>
                   <button
                     onClick={() => router.push('/dashboard')}
-                    className="text-xs text-[#9CA3AF] text-center py-1 hover:text-[#6B7280] transition-colors"
+                    className="text-xs text-[#9CA3AF] text-center py-1 hover:text-slate-500 dark:text-slate-400 transition-colors"
                   >
                     Keyinroq — Dashboardga o'tish
                   </button>

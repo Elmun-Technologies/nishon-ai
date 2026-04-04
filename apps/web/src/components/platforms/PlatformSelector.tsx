@@ -222,7 +222,7 @@ export function PlatformSelector({
               return (
                 <div
                   key={id}
-                  className="w-7 h-7 rounded-lg flex items-center justify-center border-2 border-[#0F0F15]"
+                  className="w-7 h-7 rounded-lg flex items-center justify-center border-2 border-slate-950 dark:border-slate-700"
                   style={{ backgroundColor: p.color + '20' }}
                   title={p.name}
                 >
