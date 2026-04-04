@@ -1,4 +1,5 @@
 'use client'
+import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useWorkspaceStore } from '@/stores/workspace.store'
@@ -98,6 +99,7 @@ export default function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const { currentWorkspace, user, logout } = useWorkspaceStore()
+  const [isWorkspaceMenuOpen, setIsWorkspaceMenuOpen] = useState(true)
 
   function handleLogout() {
     logout()
@@ -124,7 +126,8 @@ export default function Sidebar() {
 
       {/* Main Navigation */}
       <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
-        {NAV_ITEMS.map((item) => {
+        {/* Dashboard - Always visible */}
+        {NAV_ITEMS.slice(0, 1).map((item) => {
           const Icon = item.icon
           const isActive =
             item.href === '/dashboard'
@@ -159,6 +162,74 @@ export default function Sidebar() {
             </Link>
           )
         })}
+
+        {/* Collapsible Workspace Menu */}
+        <div className="space-y-1">
+          <button
+            onClick={() => setIsWorkspaceMenuOpen(!isWorkspaceMenuOpen)}
+            className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm
+              transition-all duration-150 group
+              bg-surface-secondary hover:bg-border text-text-primary font-medium"
+          >
+            <span className="flex-1 text-left text-body-sm">
+              {currentWorkspace?.name ?? 'Workspace'}
+            </span>
+            <svg
+              width="16"
+              height="16"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+              className={`text-text-secondary transition-transform duration-300 shrink-0 ${
+                isWorkspaceMenuOpen ? 'rotate-180' : ''
+              }`}
+            >
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </button>
+
+          {/* Collapsible Items */}
+          {isWorkspaceMenuOpen && (
+            <div className="space-y-1 pl-2">
+              {NAV_ITEMS.slice(1).map((item) => {
+                const Icon = item.icon
+                const isActive = pathname.startsWith(item.href)
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`
+                      flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm
+                      transition-all duration-150 group
+                      ${
+                        isActive
+                          ? 'bg-surface-secondary text-text-primary'
+                          : 'text-text-secondary hover:text-text-primary hover:bg-surface-secondary'
+                      }
+                    `}
+                  >
+                    <Icon
+                      size={18}
+                      className={`shrink-0 transition-colors ${
+                        isActive
+                          ? 'text-text-primary'
+                          : 'text-text-tertiary group-hover:text-text-secondary'
+                      }`}
+                      strokeWidth={1.5}
+                    />
+                    <span className="flex-1 truncate font-medium text-body-sm">
+                      {item.label}
+                    </span>
+                    {item.badge && (
+                      <div className="w-2 h-2 rounded-full bg-blue-500 shrink-0 animate-pulse" />
+                    )}
+                  </Link>
+                )
+              })}
+            </div>
+          )}
+        </div>
       </nav>
 
       {/* Autopilot Status */}
