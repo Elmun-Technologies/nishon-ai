@@ -254,4 +254,7 @@ export class AgentProfile {
 
   @OneToMany("AgentPerformanceSyncLog", "agentProfile", { cascade: true })
   syncLogs: any[];
+
+  @OneToMany("FraudDetectionAudit", "agentProfile", { cascade: true })
+  fraudAudits: any[];
 }

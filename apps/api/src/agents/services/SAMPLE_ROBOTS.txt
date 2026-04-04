@@ -1,0 +1,79 @@
+# Performa Marketplace robots.txt
+# Generated: 2026-04-04
+# For more information, visit https://www.robotstxt.org/
+
+User-agent: *
+Disallow: /admin
+Disallow: /auth
+Disallow: /api
+Disallow: /admin-panel
+Disallow: /_next
+Disallow: /.well-known
+Allow: /marketplace
+Allow: /marketplace/specialists
+Crawl-delay: 1
+
+User-agent: Googlebot
+Disallow: /admin
+Disallow: /auth
+Disallow: /api
+Disallow: /admin-panel
+Disallow: /_next
+Allow: /marketplace
+Allow: /marketplace/specialists
+Allow: /*.json
+Crawl-delay: 1
+Request-rate: 1/1
+
+User-agent: Googlebot-Image
+Disallow: /admin
+Disallow: /auth
+Disallow: /api
+Allow: /marketplace
+Allow: /images
+Allow: /og
+
+User-agent: Bingbot
+Disallow: /admin
+Disallow: /auth
+Disallow: /api
+Disallow: /admin-panel
+Allow: /marketplace
+Allow: /marketplace/specialists
+Crawl-delay: 1
+
+User-agent: Yandexbot
+Disallow: /admin
+Disallow: /auth
+Disallow: /api
+Disallow: /admin-panel
+Allow: /marketplace
+Allow: /marketplace/specialists
+Crawl-delay: 1
+
+User-agent: DuckDuckGoBot
+Disallow: /admin
+Disallow: /auth
+Disallow: /api
+Allow: /marketplace
+
+User-agent: ia_archiver
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /admin
+Disallow: /auth
+Disallow: /api
+Allow: /marketplace
+
+User-agent: AhrefsBot
+Disallow:
+Allow: /
+
+User-agent: SemrushBot
+Disallow:
+Allow: /
+
+# Sitemap location
+Sitemap: https://performa.ai/sitemaps/sitemap.xml
+Sitemap: https://performa.ai/sitemaps/sitemap-index.xml
