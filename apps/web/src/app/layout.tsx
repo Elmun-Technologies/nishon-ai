@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { Providers } from '@/components/providers/ThemeProvider'
 
 // Use system font stack — no network dependency
 const inter = { className: 'font-sans' }
@@ -15,9 +16,9 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className="font-sans bg-[#F9FAFB] text-[#111827] antialiased">
-        {children}
+    <html lang="en" suppressHydrationWarning>
+      <body className="font-sans bg-white dark:bg-slate-950 text-slate-950 dark:text-slate-50 antialiased transition-colors">
+        <Providers>{children}</Providers>
       </body>
     </html>
   )

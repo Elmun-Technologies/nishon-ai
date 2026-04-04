@@ -2,102 +2,142 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useWorkspaceStore } from '@/stores/workspace.store'
-import {
-  LayoutGrid,
-  Rocket,
-  Zap,
-  BarChart3,
-  Brain,
-  Wallet,
-  Settings2,
-  LogOut,
-  Users,
-  Sparkles,
-  TrendingUp,
-  ShoppingBag,
-} from 'lucide-react'
 
 const NAV_ITEMS = [
   {
     href: '/dashboard',
     label: 'Dashboard',
-    icon: LayoutGrid,
+    icon: (
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+        <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+        <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+        <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+      </svg>
+    ),
   },
   {
     href: '/launch',
     label: 'Reklama Yoqish',
-    icon: Rocket,
+    icon: (
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.82m5.84-2.56a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.815m2.565-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/>
+      </svg>
+    ),
   },
   {
     href: '/campaigns',
     label: 'Kampaniyalar',
-    icon: Zap,
+    icon: (
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
+      </svg>
+    ),
+  },
+  {
+    href: '/audiences',
+    label: 'Audience Launcher',
+    icon: (
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <circle cx="11" cy="11" r="7" />
+        <path d="M20 20l-3-3" />
+      </svg>
+    ),
+  },
+  {
+    href: '/platform-architecture',
+    label: 'Platform Blueprint',
+    icon: (
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path d="M3 5h18M3 12h18M3 19h18" />
+        <path d="M7 5v14M17 5v14" />
+      </svg>
+    ),
   },
   {
     href: '/reporting',
     label: 'Hisobot',
-    icon: BarChart3,
-  },
-  {
-    href: '/performance',
-    label: 'Performance',
-    icon: BarChart3,
-  },
-  {
-    href: '/top-ads',
-    label: 'Top Ads',
-    icon: TrendingUp,
-  },
-  {
-    href: '/docs',
-    label: "Yo'riqnoma",
-    icon: Sparkles,
+    icon: (
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+      </svg>
+    ),
   },
   {
     href: '/ai-decisions',
     label: 'AI Qarorlar',
-    icon: Brain,
+    icon: (
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+      </svg>
+    ),
     badge: true,
   },
   {
     href: '/budget',
     label: 'Byudjet',
-    icon: Wallet,
+    icon: (
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+    ),
   },
   {
     href: '/auto-optimization',
     label: 'Auto-Optimallashtirish',
-    icon: Settings2,
+    icon: (
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+      </svg>
+    ),
   },
   {
     href: '/competitors',
     label: 'Raqobatchilar',
-    icon: Users,
+    icon: (
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path d="M8 21h8" />
+        <path d="M12 17v4" />
+        <path d="M4 7l8-4 8 4-8 4-8-4Z" />
+        <path d="M4 7v10l8 4 8-4V7" />
+      </svg>
+    ),
   },
   {
     href: '/creative-scorer',
     label: 'Kreativ Baholash',
-    icon: Sparkles,
+    icon: (
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+      </svg>
+    ),
   },
   {
     href: '/landing-page',
     label: 'Landing Page',
-    icon: TrendingUp,
+    icon: (
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+      </svg>
+    ),
   },
   {
     href: '/roi-calculator',
     label: 'ROI Kalkulyator',
-    icon: BarChart3,
+    icon: (
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+      </svg>
+    ),
   },
   {
     href: '/my-portfolio',
     label: 'Portfolio',
-    icon: TrendingUp,
-  },
-  {
-    href: '/marketplace',
-    label: 'Marketplace',
-    icon: ShoppingBag,
+    icon: (
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M16 8v8m-4-5v5m-4-2v2M3 20h18M3 4h18M3 12h18" />
+      </svg>
+    ),
   },
 ]
 
@@ -105,7 +145,12 @@ const BOTTOM_NAV = [
   {
     href: '/settings',
     label: 'Sozlamalar',
-    icon: Settings2,
+    icon: (
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+        <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+      </svg>
+    ),
   },
 ]
 
@@ -120,27 +165,27 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="w-64 bg-surface border-r border-border flex flex-col shrink-0">
-      {/* Header */}
-      <div className="px-6 py-5 border-b border-border">
-        {/* Logo */}
-        <div className="flex items-center gap-3 mb-1">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center shrink-0">
-            <span className="text-white font-bold text-sm">P</span>
+    <aside className="w-72 bg-slate-50 dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col shrink-0 transition-colors">
+
+      {/* Logo + workspace selector */}
+      <div className="px-5 pt-6 pb-4">
+        <div className="flex items-center gap-3">
+          <div className="grid grid-cols-2 gap-1 shrink-0">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+            <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+            <span className="w-2.5 h-2.5 rounded-full bg-pink-500" />
           </div>
-          <h1 className="heading-lg flex-1">Performa</h1>
+          <div className="flex-1 min-w-0">
+            <p className="text-slate-900 dark:text-slate-50 font-semibold text-2xl leading-tight truncate">Performa</p>
+            <p className="text-slate-600 dark:text-slate-400 text-xs truncate">{currentWorkspace?.name ?? 'Workspace'}</p>
+          </div>
         </div>
-        {currentWorkspace && (
-          <p className="text-label text-text-tertiary">
-            {currentWorkspace.name}
-          </p>
-        )}
       </div>
 
-      {/* Main Navigation */}
-      <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
-        {NAV_ITEMS.map((item) => {
-          const Icon = item.icon
+      {/* Navigation */}
+      <nav className="flex-1 px-3 py-1 space-y-4 overflow-y-auto">
+        {NAV_ITEMS.slice(0, 1).map((item) => {
           const isActive =
             item.href === '/dashboard'
               ? pathname === '/dashboard'
@@ -151,114 +196,162 @@ export default function Sidebar() {
               key={item.href}
               href={item.href}
               className={`
-                flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm
+                flex items-center gap-3 px-3 py-3 rounded-xl text-sm
                 transition-all duration-150 group
-                ${
-                  isActive
-                    ? 'bg-surface-secondary text-text-primary'
-                    : 'text-text-secondary hover:text-text-primary hover:bg-surface-secondary'
+                ${isActive
+                  ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-50 font-medium shadow-sm'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 hover:bg-white dark:hover:bg-slate-800'
                 }
               `}
             >
-              <Icon
-                size={18}
-                className={`shrink-0 transition-colors ${
-                  isActive ? 'text-text-primary' : 'text-text-tertiary group-hover:text-text-secondary'
-                }`}
-                strokeWidth={1.5}
-              />
-              <span className="flex-1 truncate font-medium text-body-sm">{item.label}</span>
+              <span className={`shrink-0 ${isActive ? 'text-slate-900 dark:text-slate-50' : 'text-slate-400 dark:text-slate-600 group-hover:text-slate-600 dark:group-hover:text-slate-400'}`}>
+                {item.icon}
+              </span>
+              <span className="flex-1 truncate">{item.label}</span>
               {item.badge && (
-                <div className="w-2 h-2 rounded-full bg-blue-500 shrink-0 animate-pulse" />
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
               )}
             </Link>
           )
         })}
+
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 p-2.5 transition-colors">
+          <div className="flex items-center justify-between px-2 py-1.5 text-slate-900 dark:text-slate-50">
+            <p className="text-sm font-medium">{currentWorkspace?.name ?? 'PR Workspace'}</p>
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} className="text-slate-600 dark:text-slate-400">
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </div>
+          <div className="space-y-1 mt-1">
+            {NAV_ITEMS.slice(1, 7).map((item) => {
+              const isActive = pathname.startsWith(item.href)
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`
+                    flex items-center gap-3 px-2.5 py-2.5 rounded-xl text-sm transition-all duration-150 group
+                    ${isActive
+                      ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-50 font-medium shadow-sm'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 hover:bg-white/90 dark:hover:bg-slate-700'
+                    }
+                  `}
+                >
+                  <span className={`shrink-0 ${isActive ? 'text-slate-900 dark:text-slate-50' : 'text-slate-500 dark:text-slate-600 group-hover:text-slate-700 dark:group-hover:text-slate-400'}`}>
+                    {item.icon}
+                  </span>
+                  <span className="flex-1 truncate">{item.label}</span>
+                  {item.badge && <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />}
+                </Link>
+              )
+            })}
+          </div>
+        </div>
+
+        <div className="space-y-1">
+          {NAV_ITEMS.slice(7).map((item) => {
+            const isActive = pathname.startsWith(item.href)
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`
+                  flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-150 group
+                  ${isActive
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-50 font-medium shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 hover:bg-white dark:hover:bg-slate-700'
+                  }
+                `}
+              >
+                <span className={`shrink-0 ${isActive ? 'text-slate-900 dark:text-slate-50' : 'text-slate-500 dark:text-slate-600 group-hover:text-slate-700 dark:group-hover:text-slate-400'}`}>
+                  {item.icon}
+                </span>
+                <span className="flex-1 truncate">{item.label}</span>
+              </Link>
+            )
+          })}
+        </div>
       </nav>
 
-      {/* Autopilot Status */}
+      {/* Autopilot status */}
       {currentWorkspace && (
-        <div className="px-2 pb-4">
-          <div className="bg-surface-secondary border border-border rounded-lg px-3 py-3">
-            <div className="flex items-center gap-2 mb-2">
+        <div className="px-3 pb-3">
+          <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 transition-colors">
+            <div className="flex items-center gap-2">
               <div
-                className={`w-2 h-2 rounded-full shrink-0 ${
+                className={`w-1.5 h-1.5 rounded-full shrink-0 ${
                   currentWorkspace.autopilotMode === 'full_auto'
                     ? 'bg-emerald-500 animate-pulse'
                     : currentWorkspace.autopilotMode === 'assisted'
-                      ? 'bg-amber-500'
-                      : 'bg-gray-400'
+                    ? 'bg-amber-500'
+                    : 'bg-slate-400'
                 }`}
               />
-              <p className="text-label text-text-primary font-medium">
+              <p className="text-slate-700 dark:text-slate-300 text-xs font-medium">
                 {currentWorkspace.autopilotMode === 'full_auto'
                   ? 'To\'liq Avto'
                   : currentWorkspace.autopilotMode === 'assisted'
-                    ? 'Yordamlashish'
-                    : 'Qo\'lda boshqarish'}
+                  ? 'Yordamlashish'
+                  : 'Qo\'lda boshqarish'}
               </p>
             </div>
-            <p className="text-caption text-text-tertiary leading-relaxed">
+            <p className="text-slate-600 dark:text-slate-400 text-xs mt-0.5 leading-relaxed">
               {currentWorkspace.autopilotMode === 'full_auto'
                 ? 'AI kampaniyalarni mustaqil boshqarmoqda'
                 : currentWorkspace.autopilotMode === 'assisted'
-                  ? 'AI tavsiya beradi, siz tasdiqlaysiz'
-                  : 'AI faqat maslahat beradi'}
+                ? 'AI tavsiya beradi, siz tasdiqlaysiz'
+                : 'AI faqat maslahat beradi'}
             </p>
           </div>
         </div>
       )}
 
-      {/* Bottom Navigation */}
-      <div className="px-2 border-t border-border py-3">
+      {/* Bottom nav */}
+      <div className="px-3 border-t border-slate-200 dark:border-slate-700 py-2 transition-colors">
         {BOTTOM_NAV.map((item) => {
-          const Icon = item.icon
           const isActive = pathname.startsWith(item.href)
           return (
             <Link
               key={item.href}
               href={item.href}
               className={`
-                flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm
+                flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm
                 transition-all duration-150 group
-                ${
-                  isActive
-                    ? 'bg-surface-secondary text-text-primary'
-                    : 'text-text-secondary hover:text-text-primary hover:bg-surface-secondary'
+                ${isActive
+                  ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-50 font-medium'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 hover:bg-white dark:hover:bg-slate-800'
                 }
               `}
             >
-              <Icon
-                size={18}
-                className={`shrink-0 transition-colors ${
-                  isActive ? 'text-text-primary' : 'text-text-tertiary group-hover:text-text-secondary'
-                }`}
-                strokeWidth={1.5}
-              />
-              <span className="flex-1 font-medium text-body-sm">{item.label}</span>
+              <span className={`shrink-0 ${isActive ? 'text-slate-900 dark:text-slate-50' : 'text-slate-400 dark:text-slate-600 group-hover:text-slate-600 dark:group-hover:text-slate-400'}`}>
+                {item.icon}
+              </span>
+              <span>{item.label}</span>
             </Link>
           )
         })}
       </div>
 
-      {/* User Section */}
-      <div className="px-3 py-4 border-t border-border">
+      {/* User info + logout */}
+      <div className="px-4 py-4 border-t border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 transition-colors">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-full bg-surface-secondary border border-border flex items-center justify-center shrink-0">
-            <span className="text-label font-semibold text-text-primary">
+          <div className="w-7 h-7 rounded-full bg-slate-200 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 flex items-center justify-center shrink-0">
+            <span className="text-slate-700 dark:text-slate-300 text-xs font-semibold">
               {user?.name?.charAt(0)?.toUpperCase() ?? 'U'}
             </span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-caption font-medium text-text-primary truncate">{user?.name}</p>
-            <p className="text-caption text-text-tertiary truncate">{user?.email}</p>
+            <p className="text-slate-900 dark:text-slate-50 text-xs font-medium truncate">{user?.name}</p>
+            <p className="text-slate-600 dark:text-slate-400 text-xs truncate">{user?.email}</p>
           </div>
           <button
             onClick={handleLogout}
             title="Sign out"
-            className="text-text-tertiary hover:text-text-secondary transition-colors p-1.5 rounded-lg hover:bg-surface-secondary"
+            className="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors p-1 rounded"
           >
-            <LogOut size={16} strokeWidth={1.5} />
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+            </svg>
           </button>
         </div>
       </div>

@@ -2,6 +2,7 @@ import type { Config } from 'tailwindcss'
 
 const config: Config = {
   content: ['./src/**/*.{ts,tsx}'],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -52,6 +53,18 @@ const config: Config = {
         '1': '1px',
         '1.5': '1.5px',
         '2': '2px',
+      },
+      backgroundColor: {
+        light: {
+          primary: '#ffffff',
+          secondary: '#F9FAFB',
+          tertiary: '#F3F4F6',
+        },
+        dark: {
+          primary: '#0F172A',
+          secondary: '#1E293B',
+          tertiary: '#334155',
+        },
       },
     },
   },
