@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-import { Marketplace } from './components/Marketplace';
-
-export default function MarketplacePage() {
-  return <Marketplace />;
-=======
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -127,5 +121,4 @@ export default function MarketplacePage() {
       </Card>
     </div>
   );
->>>>>>> origin/claude/review-production-release-vj1ts
 }
