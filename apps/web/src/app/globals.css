@@ -4,11 +4,41 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Basis Grotesque Pro font import - using system fallback until custom font is set up */
+/* Basis Grotesque Pro font - add font files to public/fonts directory */
+/* Font files to add: */
+/* - BasisGrotesquePro-Regular.woff2 (weight: 400) */
+/* - BasisGrotesquePro-Medium.woff2 (weight: 500) */
+/* - BasisGrotesquePro-SemiBold.woff2 (weight: 600) */
+/* - BasisGrotesquePro-Bold.woff2 (weight: 700) */
+
 @font-face {
   font-family: 'Basis Grotesque Pro';
-  src: local('Basis Grotesque Pro'), local('BasisGrotesquePro');
+  src: url('/fonts/BasisGrotesquePro-Regular.woff2') format('woff2');
   font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Basis Grotesque Pro';
+  src: url('/fonts/BasisGrotesquePro-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Basis Grotesque Pro';
+  src: url('/fonts/BasisGrotesquePro-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Basis Grotesque Pro';
+  src: url('/fonts/BasisGrotesquePro-Bold.woff2') format('woff2');
+  font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
