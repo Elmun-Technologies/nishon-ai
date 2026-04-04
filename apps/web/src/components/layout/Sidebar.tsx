@@ -165,20 +165,20 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="w-72 bg-[#F3F4F6] border-r border-[#E5E7EB] flex flex-col shrink-0">
+    <aside className="w-72 bg-slate-50 dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col shrink-0 transition-colors">
 
       {/* Logo + workspace selector */}
       <div className="px-5 pt-6 pb-4">
         <div className="flex items-center gap-3">
           <div className="grid grid-cols-2 gap-1 shrink-0">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#22C55E]" />
-            <span className="w-2.5 h-2.5 rounded-full bg-[#3B82F6]" />
-            <span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]" />
-            <span className="w-2.5 h-2.5 rounded-full bg-[#EC4899]" />
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+            <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+            <span className="w-2.5 h-2.5 rounded-full bg-pink-500" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[#111827] font-semibold text-2xl leading-tight truncate">Performa</p>
-            <p className="text-[#6B7280] text-xs truncate">{currentWorkspace?.name ?? 'Workspace'}</p>
+            <p className="text-slate-900 dark:text-slate-50 font-semibold text-2xl leading-tight truncate">Performa</p>
+            <p className="text-slate-600 dark:text-slate-400 text-xs truncate">{currentWorkspace?.name ?? 'Workspace'}</p>
           </div>
         </div>
       </div>
@@ -199,12 +199,12 @@ export default function Sidebar() {
                 flex items-center gap-3 px-3 py-3 rounded-xl text-sm
                 transition-all duration-150 group
                 ${isActive
-                  ? 'bg-white text-[#111827] font-medium shadow-sm'
-                  : 'text-[#374151] hover:text-[#111827] hover:bg-white'
+                  ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-50 font-medium shadow-sm'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 hover:bg-white dark:hover:bg-slate-800'
                 }
               `}
             >
-              <span className={`shrink-0 ${isActive ? 'text-[#111827]' : 'text-[#9CA3AF] group-hover:text-[#6B7280]'}`}>
+              <span className={`shrink-0 ${isActive ? 'text-slate-900 dark:text-slate-50' : 'text-slate-400 dark:text-slate-600 group-hover:text-slate-600 dark:group-hover:text-slate-400'}`}>
                 {item.icon}
               </span>
               <span className="flex-1 truncate">{item.label}</span>
@@ -215,10 +215,10 @@ export default function Sidebar() {
           )
         })}
 
-        <div className="rounded-2xl border border-[#E5E7EB] bg-[#EDEFF2] p-2.5">
-          <div className="flex items-center justify-between px-2 py-1.5 text-[#111827]">
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 p-2.5 transition-colors">
+          <div className="flex items-center justify-between px-2 py-1.5 text-slate-900 dark:text-slate-50">
             <p className="text-sm font-medium">{currentWorkspace?.name ?? 'PR Workspace'}</p>
-            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} className="text-[#374151]">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} className="text-slate-600 dark:text-slate-400">
               <path d="M6 9l6 6 6-6" />
             </svg>
           </div>
@@ -232,12 +232,12 @@ export default function Sidebar() {
                   className={`
                     flex items-center gap-3 px-2.5 py-2.5 rounded-xl text-sm transition-all duration-150 group
                     ${isActive
-                      ? 'bg-white text-[#111827] font-medium shadow-sm'
-                      : 'text-[#4B5563] hover:text-[#111827] hover:bg-white/90'
+                      ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-50 font-medium shadow-sm'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 hover:bg-white/90 dark:hover:bg-slate-700'
                     }
                   `}
                 >
-                  <span className={`shrink-0 ${isActive ? 'text-[#111827]' : 'text-[#6B7280] group-hover:text-[#374151]'}`}>
+                  <span className={`shrink-0 ${isActive ? 'text-slate-900 dark:text-slate-50' : 'text-slate-500 dark:text-slate-600 group-hover:text-slate-700 dark:group-hover:text-slate-400'}`}>
                     {item.icon}
                   </span>
                   <span className="flex-1 truncate">{item.label}</span>
@@ -258,12 +258,12 @@ export default function Sidebar() {
                 className={`
                   flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-150 group
                   ${isActive
-                    ? 'bg-white text-[#111827] font-medium shadow-sm'
-                    : 'text-[#4B5563] hover:text-[#111827] hover:bg-white'
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-50 font-medium shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 hover:bg-white dark:hover:bg-slate-700'
                   }
                 `}
               >
-                <span className={`shrink-0 ${isActive ? 'text-[#111827]' : 'text-[#6B7280] group-hover:text-[#374151]'}`}>
+                <span className={`shrink-0 ${isActive ? 'text-slate-900 dark:text-slate-50' : 'text-slate-500 dark:text-slate-600 group-hover:text-slate-700 dark:group-hover:text-slate-400'}`}>
                   {item.icon}
                 </span>
                 <span className="flex-1 truncate">{item.label}</span>
@@ -276,7 +276,7 @@ export default function Sidebar() {
       {/* Autopilot status */}
       {currentWorkspace && (
         <div className="px-3 pb-3">
-          <div className="bg-white border border-[#E5E7EB] rounded-xl px-3 py-2.5">
+          <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 transition-colors">
             <div className="flex items-center gap-2">
               <div
                 className={`w-1.5 h-1.5 rounded-full shrink-0 ${
@@ -284,10 +284,10 @@ export default function Sidebar() {
                     ? 'bg-emerald-500 animate-pulse'
                     : currentWorkspace.autopilotMode === 'assisted'
                     ? 'bg-amber-500'
-                    : 'bg-gray-400'
+                    : 'bg-slate-400'
                 }`}
               />
-              <p className="text-[#374151] text-xs font-medium">
+              <p className="text-slate-700 dark:text-slate-300 text-xs font-medium">
                 {currentWorkspace.autopilotMode === 'full_auto'
                   ? 'To\'liq Avto'
                   : currentWorkspace.autopilotMode === 'assisted'
@@ -295,7 +295,7 @@ export default function Sidebar() {
                   : 'Qo\'lda boshqarish'}
               </p>
             </div>
-            <p className="text-[#9CA3AF] text-xs mt-0.5 leading-relaxed">
+            <p className="text-slate-600 dark:text-slate-400 text-xs mt-0.5 leading-relaxed">
               {currentWorkspace.autopilotMode === 'full_auto'
                 ? 'AI kampaniyalarni mustaqil boshqarmoqda'
                 : currentWorkspace.autopilotMode === 'assisted'
@@ -307,7 +307,7 @@ export default function Sidebar() {
       )}
 
       {/* Bottom nav */}
-      <div className="px-3 border-t border-[#E5E7EB] py-2">
+      <div className="px-3 border-t border-slate-200 dark:border-slate-700 py-2 transition-colors">
         {BOTTOM_NAV.map((item) => {
           const isActive = pathname.startsWith(item.href)
           return (
@@ -318,12 +318,12 @@ export default function Sidebar() {
                 flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm
                 transition-all duration-150 group
                 ${isActive
-                  ? 'bg-white text-[#111827] font-medium'
-                  : 'text-[#6B7280] hover:text-[#111827] hover:bg-white'
+                  ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-50 font-medium'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 hover:bg-white dark:hover:bg-slate-800'
                 }
               `}
             >
-              <span className={`shrink-0 ${isActive ? 'text-[#111827]' : 'text-[#9CA3AF] group-hover:text-[#6B7280]'}`}>
+              <span className={`shrink-0 ${isActive ? 'text-slate-900 dark:text-slate-50' : 'text-slate-400 dark:text-slate-600 group-hover:text-slate-600 dark:group-hover:text-slate-400'}`}>
                 {item.icon}
               </span>
               <span>{item.label}</span>
@@ -333,21 +333,21 @@ export default function Sidebar() {
       </div>
 
       {/* User info + logout */}
-      <div className="px-4 py-4 border-t border-[#E5E7EB] bg-[#F3F4F6]">
+      <div className="px-4 py-4 border-t border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 transition-colors">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-full bg-[#F3F4F6] border border-[#E5E7EB] flex items-center justify-center shrink-0">
-            <span className="text-[#374151] text-xs font-semibold">
+          <div className="w-7 h-7 rounded-full bg-slate-200 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 flex items-center justify-center shrink-0">
+            <span className="text-slate-700 dark:text-slate-300 text-xs font-semibold">
               {user?.name?.charAt(0)?.toUpperCase() ?? 'U'}
             </span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[#111827] text-xs font-medium truncate">{user?.name}</p>
-            <p className="text-[#9CA3AF] text-xs truncate">{user?.email}</p>
+            <p className="text-slate-900 dark:text-slate-50 text-xs font-medium truncate">{user?.name}</p>
+            <p className="text-slate-600 dark:text-slate-400 text-xs truncate">{user?.email}</p>
           </div>
           <button
             onClick={handleLogout}
             title="Sign out"
-            className="text-[#9CA3AF] hover:text-[#6B7280] transition-colors p-1 rounded"
+            className="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors p-1 rounded"
           >
             <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>

@@ -1,6 +1,9 @@
 'use client'
 import { usePathname } from 'next/navigation'
 import { useWorkspaceStore } from '@/stores/workspace.store'
+import { useTheme } from 'next-themes'
+import { Moon, Sun } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   '/dashboard': {
@@ -52,28 +55,38 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
 export default function Header() {
   const pathname = usePathname()
   const { currentWorkspace } = useWorkspaceStore()
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
   const page = PAGE_TITLES[pathname] ?? { title: 'Performa', subtitle: '' }
 
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark')
+  }
+
   return (
-    <header className="h-14 bg-white border-b border-[#E5E7EB] px-6 flex items-center justify-between shrink-0">
+    <header className="h-14 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-6 flex items-center justify-between shrink-0 transition-colors">
       <div>
-        <h1 className="text-[#111827] font-semibold text-sm">{page.title}</h1>
+        <h1 className="text-slate-900 dark:text-slate-50 font-semibold text-sm">{page.title}</h1>
         {page.subtitle && (
-          <p className="text-[#9CA3AF] text-xs mt-0.5">{page.subtitle}</p>
+          <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">{page.subtitle}</p>
         )}
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-4">
         {/* Autopilot mode badge */}
         {currentWorkspace && (
           <div
             className={`
-              flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium
+              flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium transition-colors
               ${currentWorkspace.autopilotMode === 'full_auto'
-                ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                ? 'bg-emerald-50 dark:bg-emerald-950 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300'
                 : currentWorkspace.autopilotMode === 'assisted'
-                ? 'bg-amber-50 border-amber-200 text-amber-700'
-                : 'bg-gray-100 border-gray-200 text-gray-600'
+                ? 'bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300'
+                : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
               }
             `}
           >
@@ -83,7 +96,7 @@ export default function Header() {
                   ? 'bg-emerald-500 animate-pulse'
                   : currentWorkspace.autopilotMode === 'assisted'
                   ? 'bg-amber-500'
-                  : 'bg-gray-400'
+                  : 'bg-slate-400'
               }`}
             />
             {currentWorkspace.autopilotMode === 'full_auto'
@@ -92,6 +105,21 @@ export default function Header() {
               ? 'Assisted'
               : 'Manual'}
           </div>
+        )}
+
+        {/* Theme toggle */}
+        {mounted && (
+          <button
+            onClick={toggleTheme}
+            className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-600 dark:text-slate-400"
+            aria-label="Toggle theme"
+          >
+            {theme === 'dark' ? (
+              <Sun className="w-4 h-4" />
+            ) : (
+              <Moon className="w-4 h-4" />
+            )}
+          </button>
         )}
       </div>
     </header>
