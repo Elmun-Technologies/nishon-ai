@@ -209,7 +209,7 @@ export default function CampaignsPage() {
                 <Card
                   hoverable
                   onClick={() => setSelectedId(isSelected ? null : campaign.id)}
-                  className={`transition-all duration-200 ${isSelected ? "border-[#111827]/40 bg-slate-900dark:bg-white/5 dark:bg-whitedark:bg-white/5" : ""}`}
+                  className={`transition-all duration-200 ${isSelected ? "border-slate-900/40 dark:border-white/40 bg-white/5 dark:bg-white/5" : ""}`}
                   padding="none"
                 >
                   <div className="flex items-center gap-4 p-5">
