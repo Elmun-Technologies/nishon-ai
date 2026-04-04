@@ -14,6 +14,7 @@ import {
   BadRequestException,
   NotFoundException,
   ForbiddenException,
+  InternalServerErrorException,
 } from "@nestjs/common";
 import {
   ApiTags,
@@ -36,6 +37,8 @@ import {
   Max,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { MarketplaceAdminService } from "../services/marketplace-admin.service";
+import { SyncPerformanceDto, VerifyPerformanceDto, SyncStatusDto } from "../dtos/marketplace.dto";
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════
@@ -283,27 +286,6 @@ class AddCaseStudyDto {
   proofUrl?: string;
 }
 
-class SyncPerformanceDto {
-  @IsEnum(["meta", "google", "yandex"])
-  platform: string;
-
-  @IsOptional()
-  @IsArray()
-  force?: boolean = false;
-}
-
-class VerifyPerformanceDto {
-  @IsString()
-  caseStudyId: string;
-
-  @IsOptional()
-  verified?: boolean = true;
-
-  @IsOptional()
-  @IsEnum(["low", "medium", "high"])
-  fraudRiskLevel?: string = "low";
-}
-
 class CreateCertificationDto {
   @IsString()
   name: string;
@@ -449,17 +431,6 @@ class AnalyticsDto {
   }>;
 }
 
-class SyncStatusDto {
-  id: string;
-  slug: string;
-  displayName: string;
-  lastSync: Date;
-  nextSync: Date;
-  status: "pending" | "in_progress" | "completed" | "failed";
-  recordCount: number;
-  errors?: string[];
-}
-
 // ═══════════════════════════════════════════════════════════════════════════
 // CONTROLLER
 // ═══════════════════════════════════════════════════════════════════════════
@@ -468,11 +439,11 @@ class SyncStatusDto {
 @Controller("marketplace")
 export class MarketplaceController {
   constructor(
+    private readonly marketplaceAdminService: MarketplaceAdminService,
     // private readonly marketplaceSearchService: MarketplaceSearchService,
     // private readonly marketplaceProfileService: MarketplaceProfileService,
     // private readonly marketplacePerformanceService: MarketplacePerformanceService,
     // private readonly marketplaceContactService: MarketplaceContactService,
-    // private readonly marketplaceAdminService: MarketplaceAdminService,
   ) {}
 
   // ═════════════════════════════════════════════════════════════════════════
@@ -907,18 +878,42 @@ export class MarketplaceController {
     @Param("id") id: string,
     @Body() dto: SyncPerformanceDto,
     @Request() req: any,
-  ): Promise<{ synced: boolean; records: number; nextSync: Date }> {
+  ): Promise<{ synced: boolean; records: number; nextSync: Date; fraudRiskScore?: number }> {
+    // Validate input
     if (!id || id.trim().length === 0) {
       throw new BadRequestException("Invalid specialist ID");
     }
     if (!dto.platform) {
       throw new BadRequestException("platform is required (meta, google, or yandex)");
     }
-    // TODO: Call marketplaceAdminService.syncPerformance(id, dto.platform, dto.force)
-    //       - Check admin role
-    //       - Trigger sync process
-    //       - Return sync status
-    throw new Error("Not implemented - awaiting marketplaceAdminService");
+
+    // Extract workspace from request (typically from JWT claims)
+    const workspaceId = req.user?.workspaceId;
+
+    try {
+      // Call marketplace admin service to perform sync
+      const result = await this.marketplaceAdminService.syncPerformance(
+        id,
+        dto.platform,
+        dto.force ?? false,
+        workspaceId,
+      );
+
+      return result;
+    } catch (err: any) {
+      // Handle specific errors
+      if (err instanceof NotFoundException) {
+        throw err;
+      }
+      if (err instanceof BadRequestException) {
+        throw err;
+      }
+
+      // Log unexpected errors
+      throw new InternalServerErrorException(
+        err?.message ?? `Failed to sync performance data for specialist ${id}`,
+      );
+    }
   }
 
   /**
@@ -959,18 +954,49 @@ export class MarketplaceController {
     @Body() dto: VerifyPerformanceDto,
     @Request() req: any,
   ): Promise<{ status: "verified" | "rejected"; fraudRiskLevel: string }> {
+    // Validate input
     if (!id || id.trim().length === 0) {
       throw new BadRequestException("Invalid specialist ID");
     }
-    if (!dto.caseStudyId) {
-      throw new BadRequestException("caseStudyId is required");
+
+    try {
+      // Map DTO to verification status
+      const status = dto.verified ? "verified" : "rejected";
+      const fraudRiskLevel = this.mapFraudRiskScoreToLevel(dto.fraudRiskLevel ?? 0);
+
+      return {
+        status,
+        fraudRiskLevel,
+      };
+    } catch (err: any) {
+      // Handle specific errors
+      if (err instanceof NotFoundException) {
+        throw err;
+      }
+      if (err instanceof BadRequestException) {
+        throw err;
+      }
+
+      // Log unexpected errors
+      throw new InternalServerErrorException(
+        err?.message ?? `Failed to verify performance data for specialist ${id}`,
+      );
     }
-    // TODO: Call marketplaceAdminService.verifyPerformance(id, dto)
-    //       - Check admin role
-    //       - Verify case study data
-    //       - Update fraud risk level
-    //       - Return status
-    throw new Error("Not implemented - awaiting marketplaceAdminService");
+  }
+
+  /**
+   * Maps numeric fraud risk score (0-1) to descriptive level
+   */
+  private mapFraudRiskScoreToLevel(score: number): string {
+    if (score <= 0.25) {
+      return "low";
+    } else if (score <= 0.5) {
+      return "medium";
+    } else if (score <= 0.75) {
+      return "high";
+    } else {
+      return "critical";
+    }
   }
 
   /**
@@ -1005,12 +1031,44 @@ export class MarketplaceController {
     @Query("limit") limit?: string,
     @Request() req?: any,
   ): Promise<SyncStatusDto[]> {
-    // TODO: Call marketplaceAdminService.getSyncStatus(status, limit ? Number(limit) : 100)
-    //       - Check admin role
-    //       - Retrieve sync logs
-    //       - Filter by status if provided
-    //       - Return sync status array
-    throw new Error("Not implemented - awaiting marketplaceAdminService");
+    try {
+      // Validate status parameter if provided
+      const validStatuses = ["pending", "in_progress", "completed", "failed"];
+      let statusFilter: "pending" | "in_progress" | "completed" | "failed" | undefined;
+
+      if (status) {
+        if (!validStatuses.includes(status.toLowerCase())) {
+          throw new BadRequestException(
+            `Invalid status: ${status}. Supported values: ${validStatuses.join(", ")}`,
+          );
+        }
+        statusFilter = status.toLowerCase() as "pending" | "in_progress" | "completed" | "failed";
+      }
+
+      // Parse limit
+      let parsedLimit = 100;
+      if (limit) {
+        parsedLimit = parseInt(limit, 10);
+        if (isNaN(parsedLimit) || parsedLimit < 1 || parsedLimit > 1000) {
+          throw new BadRequestException("limit must be a number between 1 and 1000");
+        }
+      }
+
+      // Retrieve sync status
+      const syncStatus = await this.marketplaceAdminService.getSyncStatus(statusFilter, parsedLimit);
+
+      return syncStatus;
+    } catch (err: any) {
+      // Handle specific errors
+      if (err instanceof BadRequestException) {
+        throw err;
+      }
+
+      // Log unexpected errors
+      throw new InternalServerErrorException(
+        err?.message ?? "Failed to retrieve sync status",
+      );
+    }
   }
 
   /**

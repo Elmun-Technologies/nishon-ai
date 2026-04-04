@@ -157,18 +157,12 @@ export class MarketplaceAdminService {
       // ──── Step 5: Log the sync ──────────────────────────────────────────────
       const syncLog = this.syncLogRepo.create({
         agentProfileId,
-        platform: normalizedPlatform,
+        syncType: normalizedPlatform as 'meta' | 'google' | 'yandex' | 'manual',
         status: syncResult.success ? "completed" : "failed",
-        recordsCount: syncResult.metricsInserted + syncResult.metricsUpdated,
+        recordsSynced: syncResult.metricsInserted + syncResult.metricsUpdated,
         errorMessage: syncResult.errors.length > 0 ? syncResult.errors[0] : null,
-        syncedAt: new Date(),
-        metadata: {
-          metricsInserted: syncResult.metricsInserted,
-          metricsUpdated: syncResult.metricsUpdated,
-          campaignsSynced: syncResult.campaignsSynced,
-          fraudRiskScore: syncResult.fraudRiskScore,
-          duration: Date.now() - startTime,
-        },
+        startedAt: new Date(),
+        completedAt: new Date(),
       });
 
       await this.syncLogRepo.save(syncLog);
@@ -178,7 +172,7 @@ export class MarketplaceAdminService {
         agentProfileId,
         platform: normalizedPlatform,
         success: syncResult.success,
-        recordsCount: syncLog.recordsCount,
+        recordsSynced: syncLog.recordsSynced,
         durationMs: Date.now() - startTime,
       });
 
@@ -188,7 +182,7 @@ export class MarketplaceAdminService {
 
       return {
         synced: syncResult.success,
-        records: syncLog.recordsCount,
+        records: syncLog.recordsSynced,
         nextSync,
         fraudRiskScore: syncResult.fraudRiskScore,
       };
@@ -199,15 +193,12 @@ export class MarketplaceAdminService {
       // Log the sync failure
       const syncLog = this.syncLogRepo.create({
         agentProfileId,
-        platform: normalizedPlatform,
+        syncType: normalizedPlatform as 'meta' | 'google' | 'yandex' | 'manual',
         status: "failed",
-        recordsCount: 0,
+        recordsSynced: 0,
         errorMessage,
-        syncedAt: new Date(),
-        metadata: {
-          error: errorMessage,
-          duration: Date.now() - startTime,
-        },
+        startedAt: new Date(),
+        completedAt: new Date(),
       });
 
       await this.syncLogRepo.save(syncLog);
@@ -323,12 +314,12 @@ export class MarketplaceAdminService {
     const results: SyncStatusDto[] = logs.map((log) => ({
       specialistId: log.agentProfileId,
       specialistName: log.agentProfile?.displayName ?? "Unknown",
-      platform: log.platform as any,
+      platform: log.syncType as any,
       status: log.status as any,
-      lastSyncAt: log.syncedAt,
-      recordsCount: log.recordsCount ?? 0,
+      lastSyncAt: log.startedAt ?? log.createdAt,
+      recordsCount: log.recordsSynced ?? 0,
       errorMessage: log.errorMessage ?? undefined,
-      nextScheduledSync: this.calculateNextSyncDate(log.syncedAt),
+      nextScheduledSync: this.calculateNextSyncDate(log.startedAt ?? log.createdAt),
     }));
 
     this.logger.log({

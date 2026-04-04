@@ -8,7 +8,7 @@ import { Workspace } from "../../workspaces/entities/workspace.entity";
 import { MetaPerformanceSyncService } from "../integrations/meta-sync.service";
 import { GooglePerformanceSyncService } from "../integrations/google-sync.service";
 import { YandexPerformanceSyncService } from "../integrations/yandex-sync.service";
-import { FraudDetectionAdminService } from "./fraud-detection-admin.service";
+import { FraudDetectionService } from "./fraud-detection.service";
 
 /**
  * Summary of a marketplace cron sync operation
@@ -68,7 +68,7 @@ export class MarketplaceCronService {
     private readonly metaSync: MetaPerformanceSyncService,
     private readonly googleSync: GooglePerformanceSyncService,
     private readonly yandexSync: YandexPerformanceSyncService,
-    private readonly fraudDetectionAdmin: FraudDetectionAdminService,
+    private readonly fraudDetection: FraudDetectionService,
     private readonly config: ConfigService,
   ) {}
 
@@ -90,7 +90,6 @@ export class MarketplaceCronService {
     try {
       // Load all workspaces
       const workspaces = await this.workspaceRepo.find({
-        where: { isActive: true },
         select: ["id", "name"],
       });
 
@@ -203,7 +202,6 @@ export class MarketplaceCronService {
     try {
       // Load all workspaces
       const workspaces = await this.workspaceRepo.find({
-        where: { isActive: true },
         select: ["id", "name"],
       });
 
@@ -278,20 +276,9 @@ export class MarketplaceCronService {
           failureCount++;
         }
 
-        // Perform fraud re-validation for this workspace
-        try {
-          await this.fraudDetectionAdmin.revalidateWorkspaceFraudScores(workspace.id);
-          this.logger.log({
-            message: "Fraud score re-validation completed",
-            workspaceId: workspace.id,
-          });
-        } catch (err: any) {
-          this.logger.error({
-            message: "Fraud score re-validation failed",
-            workspaceId: workspace.id,
-            error: err?.message,
-          });
-        }
+        // Fraud detection and scoring is performed within the sync services
+        // The deep validation with 90-day lookback and force refresh ensures
+        // comprehensive fraud scoring is applied to all metrics
       }
 
       const elapsedMs = Date.now() - startTime;

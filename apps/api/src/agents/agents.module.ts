@@ -21,6 +21,7 @@ import { MarketplaceSearchService } from "./services/marketplace-search.service"
 import { FraudDetectionService } from "./services/fraud-detection.service";
 import { FraudDetectionAdminService } from "./services/fraud-detection-admin.service";
 import { MarketplaceAdminService } from "./services/marketplace-admin.service";
+import { MarketplaceCronService } from "./services/marketplace-cron.service";
 import { MetaPerformanceSyncService } from "./integrations/meta-sync.service";
 import { GooglePerformanceSyncService } from "./integrations/google-sync.service";
 import { YandexPerformanceSyncService } from "./integrations/yandex-sync.service";
@@ -61,6 +62,7 @@ import { ConnectedAccount } from "../platforms/entities/connected-account.entity
     MetaPerformanceSyncService,
     GooglePerformanceSyncService,
     YandexPerformanceSyncService,
+    MarketplaceCronService,
   ],
   exports: [
     AgentsService,
@@ -73,6 +75,7 @@ import { ConnectedAccount } from "../platforms/entities/connected-account.entity
     MetaPerformanceSyncService,
     GooglePerformanceSyncService,
     YandexPerformanceSyncService,
+    MarketplaceCronService,
   ],
 })
 export class AgentsModule {}
