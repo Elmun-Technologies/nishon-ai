@@ -325,10 +325,10 @@ export default function CreativeScorerPage() {
                 relative rounded-xl border-2 border-dashed transition-all duration-200
                 min-h-[240px] flex items-center justify-center
                 ${isDragging
-                  ? 'border-slate-900 bg-slate-100 dark:bg-slate-800 cursor-copy'
+                  ? 'border-slate-900 dark:border-slate-100 bg-slate-100 dark:bg-slate-800 cursor-copy'
                   : file
                   ? 'border-slate-200 dark:border-slate-700 cursor-default'
-                  : 'border-slate-200 dark:border-slate-700 hover:border-slate-900/50 hover:bg-slate-50 dark:bg-slate-800/50/50 cursor-pointer'
+                  : 'border-slate-200 dark:border-slate-700 hover:border-slate-900 dark:border-slate-100/50 hover:bg-slate-50 dark:bg-slate-900/50 cursor-pointer'
                 }
               `}
             >
@@ -408,16 +408,16 @@ export default function CreativeScorerPage() {
                       className={`
                         flex items-center gap-2.5 px-3 py-2.5 rounded-xl border text-sm transition-all text-left
                         ${platform === p.value
-                          ? 'border-slate-900 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-50'
+                          ? 'border-slate-900 dark:border-slate-100 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-50'
                           : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:border-slate-600'
                         }
                       `}
                     >
                       <span className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
-                        platform === p.value ? 'border-slate-900' : 'border-slate-600'
+                        platform === p.value ? 'border-slate-900 dark:border-slate-100' : 'border-slate-600 dark:border-slate-500'
                       }`}>
                         {platform === p.value && (
-                          <span className="w-2 h-2 rounded-full bg-slate-900 block" />
+                          <span className="w-2 h-2 rounded-full bg-slate-900 dark:bg-slate-100 block" />
                         )}
                       </span>
                       {p.label}
@@ -439,7 +439,7 @@ export default function CreativeScorerPage() {
                       className={`
                         px-3 py-2 rounded-lg border text-xs font-medium transition-all
                         ${creativeType === ct.value
-                          ? 'border-slate-900 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                          ? 'border-slate-900 dark:border-slate-100 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
                           : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:border-slate-600'
                         }
                       `}
@@ -460,7 +460,7 @@ export default function CreativeScorerPage() {
                   value={goal}
                   onChange={(e) => setGoal(e.target.value)}
                   placeholder="Masalan: telefon sotish, kurs ro'yxatdan o'tkazish..."
-                  className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-slate-50 placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-slate-900 transition-all text-sm"
+                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-slate-50 placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-slate-900 dark:border-slate-100 transition-all text-sm"
                 />
               </div>
 
@@ -589,7 +589,7 @@ export default function CreativeScorerPage() {
                               {score}%
                             </span>
                           </div>
-                          <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                          <div className="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                             <div
                               className="h-full rounded-full transition-all duration-700"
                               style={{
@@ -610,7 +610,7 @@ export default function CreativeScorerPage() {
                 <div className="px-5 py-3 border-b border-slate-200 dark:border-slate-700">
                   <p className="text-slate-900 dark:text-slate-50 font-semibold text-sm">10 Parametr Tahlili</p>
                 </div>
-                <div className="divide-y divide-slate-100">
+                <div className="divide-y divide-slate-200 dark:divide-slate-700">
                   {result.parameters.map((param, i) => (
                     <div key={i} className="px-5 py-3">
                       <div className="flex items-start gap-3">

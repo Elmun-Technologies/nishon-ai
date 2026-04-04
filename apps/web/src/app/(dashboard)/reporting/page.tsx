@@ -42,20 +42,6 @@ interface ReportData {
   accounts: ReportAccount[]
 }
 
-interface AccountGradeBreakdown {
-  wastedSpend: number
-  qualityScore: number
-  impressionShare: number
-  accountActivity: number
-}
-
-interface AccountGradeResult {
-  overall: number
-  level: 'Foundational' | 'Intermediate' | 'Advanced' | 'Elite'
-  breakdown: AccountGradeBreakdown
-  recommendations: string[]
-}
-
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const STATUS_STYLE: Record<string, string> = {
@@ -95,64 +81,6 @@ const AVAILABLE_METRICS = [
   { id: 'leads',       label: 'Lidlar',          icon: '🙋', value: '84',       trend: '+12',    positive: true  },
   { id: 'conv_rate',   label: 'Konversiya %',    icon: '✅', value: '4.8%',     trend: '+0.6%',  positive: true  },
 ]
-
-const GRADE_LEVELS = [
-  { min: 85, label: 'Elite', color: 'text-emerald-500', badge: 'bg-emerald-50 border-emerald-200 text-emerald-700' },
-  { min: 70, label: 'Advanced', color: 'text-lime-500', badge: 'bg-lime-50 border-lime-200 text-lime-700' },
-  { min: 50, label: 'Intermediate', color: 'text-amber-500', badge: 'bg-amber-50 border-amber-200 text-amber-700' },
-  { min: 0, label: 'Foundational', color: 'text-rose-500', badge: 'bg-rose-50 border-rose-200 text-rose-700' },
-] as const
-
-function clamp(value: number, min = 0, max = 100) {
-  return Math.max(min, Math.min(max, value))
-}
-
-function computeAccountGrade(account: ReportAccount): AccountGradeResult {
-  const totalCampaigns = account.campaigns.length
-  const activeCampaigns = account.campaigns.filter((c) => c.status === 'ACTIVE').length
-  const activeRatio = totalCampaigns > 0 ? activeCampaigns / totalCampaigns : 0
-
-  const ctrScore = clamp(account.metrics.ctr * 25)
-  const cpcScore = clamp(100 - account.metrics.cpc * 12)
-  const wastedSpend = clamp((ctrScore * 0.55) + (cpcScore * 0.45))
-
-  const qualityScore = clamp((ctrScore * 0.7) + (activeRatio * 100 * 0.3))
-
-  const impressionVolumeScore = clamp(Math.log10(account.metrics.impressions + 1) * 20)
-  const impressionShare = clamp((account.metrics.ctr * 20 * 0.6) + (impressionVolumeScore * 0.4))
-
-  const activityFromCount = clamp(totalCampaigns * 14)
-  const activityFromClicks = clamp(Math.log10(account.metrics.clicks + 1) * 35)
-  const accountActivity = clamp((activeRatio * 100 * 0.45) + (activityFromCount * 0.3) + (activityFromClicks * 0.25))
-
-  const overall = Math.round(
-    wastedSpend * 0.2 +
-    qualityScore * 0.35 +
-    impressionShare * 0.2 +
-    accountActivity * 0.25,
-  )
-
-  const level = GRADE_LEVELS.find((g) => overall >= g.min)?.label ?? 'Foundational'
-  const recommendations: string[] = []
-
-  if (qualityScore < 55) recommendations.push('CTR ni oshirish uchun ad copy va creative A/B testlarni ko‘paytiring.')
-  if (wastedSpend < 55) recommendations.push('Past CTR yoki yuqori CPC kampaniyalarda negative audience/placement tozalash qiling.')
-  if (impressionShare < 55) recommendations.push('Byudjet va bid strategiyasini ko‘rib chiqing, yetarli impression olishga fokus qiling.')
-  if (accountActivity < 55) recommendations.push('Haftalik optimizatsiya routine kiriting: pause, scale, audience refresh.')
-  if (recommendations.length === 0) recommendations.push('Akkount holati yaxshi: eng kuchli kampaniyalarni scale qilishni davom ettiring.')
-
-  return {
-    overall,
-    level,
-    breakdown: {
-      wastedSpend: Math.round(wastedSpend),
-      qualityScore: Math.round(qualityScore),
-      impressionShare: Math.round(impressionShare),
-      accountActivity: Math.round(accountActivity),
-    },
-    recommendations,
-  }
-}
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
@@ -251,10 +179,6 @@ export default function ReportingPage() {
     { spend: 0, clicks: 0, impressions: 0 },
   )
 
-  const accountGrades = new Map(
-    (data?.accounts ?? []).map((account) => [account.id, computeAccountGrade(account)]),
-  )
-
   if (!currentWorkspace) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -279,7 +203,7 @@ export default function ReportingPage() {
 
         <div className="flex items-center gap-2">
           {/* Date range selector */}
-          <div className="flex items-center gap-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-1">
+          <div className="flex items-center gap-1 bg-white border border-slate-200 dark:border-slate-700 rounded-xl p-1">
             {DAY_OPTIONS.map((d) => (
               <button
                 key={d}
@@ -287,7 +211,7 @@ export default function ReportingPage() {
                 className={`
                   px-3 py-1.5 rounded-lg text-xs font-medium transition-colors
                   ${days === d
-                    ? 'bg-slate-900 text-white'
+                    ? 'bg-[#111827] text-white'
                     : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50'
                   }
                 `}
@@ -318,7 +242,7 @@ export default function ReportingPage() {
             { label: 'Jami Kliklar', value: formatNumber(totals.clicks) },
             { label: 'Jami Ko\'rinishlar', value: formatNumber(totals.impressions) },
           ].map((item) => (
-            <div key={item.label} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
+            <div key={item.label} className="bg-white border border-slate-200 dark:border-slate-700 rounded-xl p-4">
               <p className="text-slate-500 dark:text-slate-400 text-xs mb-1">{item.label}</p>
               <p className="text-slate-900 dark:text-slate-50 text-lg font-bold">{item.value}</p>
             </div>
@@ -342,8 +266,8 @@ export default function ReportingPage() {
                 )}
                 className={`text-xs px-2.5 py-1 rounded-full border transition-all ${
                   activeMetrics.includes(m.id)
-                    ? 'bg-slate-900 text-white border-slate-900'
-                    : 'bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:border-slate-600'
+                    ? 'bg-[#111827] text-white border-slate-900 dark:border-slate-100'
+                    : 'bg-white text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:border-slate-600'
                 }`}
               >
                 {m.icon} {m.label}
@@ -355,10 +279,10 @@ export default function ReportingPage() {
         {activeMetrics.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {AVAILABLE_METRICS.filter((m) => activeMetrics.includes(m.id)).map((m) => (
-              <div key={m.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-4 relative group">
+              <div key={m.id} className="bg-white border border-slate-200 dark:border-slate-700 rounded-xl p-4 relative group">
                 <button
                   onClick={() => setActiveMetrics((prev) => prev.filter((x) => x !== m.id))}
-                  className="absolute top-2 right-2 text-slate-300 hover:text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity text-xs leading-none"
+                  className="absolute top-2 right-2 text-[#D1D5DB] hover:text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity text-xs leading-none"
                 >
                   ×
                 </button>
@@ -378,10 +302,10 @@ export default function ReportingPage() {
       </div>
 
       {/* ── Budget Simulation ── */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
+      <div className="bg-white border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
         <button
           onClick={() => setShowSimulation(!showSimulation)}
-          className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-slate-50 dark:bg-slate-800/50 transition-colors"
+          className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-slate-50 dark:bg-slate-900 transition-colors"
         >
           <div className="flex items-center gap-2">
             <span>🔮</span>
@@ -406,7 +330,7 @@ export default function ReportingPage() {
                   step={100}
                   value={simBudget}
                   onChange={(e) => setSimBudget(parseInt(e.target.value))}
-                  className="w-full accent-slate-900"
+                  className="w-full accent-[#111827]"
                 />
                 <div className="flex justify-between text-xs text-slate-400 dark:text-slate-500 mt-1">
                   <span>$500</span><span>$10,000</span>
@@ -415,7 +339,7 @@ export default function ReportingPage() {
               <div className="grid grid-cols-3 gap-3">
                 {[
                   { label: 'Pessimistik', mult: 0.65, color: 'text-red-500', bg: 'bg-red-50 border-red-100' },
-                  { label: 'Realistik',   mult: 1.0,  color: 'text-slate-700 dark:text-slate-300', bg: 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700' },
+                  { label: 'Realistik',   mult: 1.0,  color: 'text-slate-700 dark:text-slate-300', bg: 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700' },
                   { label: 'Optimistik',  mult: 1.35, color: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-100' },
                 ].map((s) => (
                   <div key={s.label} className={`border rounded-xl p-3 ${s.bg}`}>
@@ -437,7 +361,7 @@ export default function ReportingPage() {
         {loading ? (
           <div className="space-y-px">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-12 bg-white dark:bg-slate-900 animate-pulse" style={{ opacity: 1 - i * 0.15 }} />
+              <div key={i} className="h-12 bg-white animate-pulse" style={{ opacity: 1 - i * 0.15 }} />
             ))}
           </div>
         ) : !data || data.accounts.length === 0 ? (
@@ -489,14 +413,12 @@ export default function ReportingPage() {
               <tbody className="divide-y divide-[#1C1C27]">
                 {data.accounts.map((account) => {
                   const isOpen = expanded.has(account.id)
-                  const grade = accountGrades.get(account.id)!
-                  const levelStyle = GRADE_LEVELS.find((g) => g.label === grade.level) ?? GRADE_LEVELS[3]
                   return (
                     <>
                       {/* ── Account row ── */}
                       <tr
                         key={account.id}
-                        className="bg-slate-50 dark:bg-slate-800/50 hover:bg-white dark:bg-slate-900 cursor-pointer transition-colors"
+                        className="bg-slate-50 dark:bg-slate-900 hover:bg-white cursor-pointer transition-colors"
                         onClick={() => toggleExpand(account.id)}
                       >
                         <td className="px-4 py-3">
@@ -509,9 +431,6 @@ export default function ReportingPage() {
                             <span className="text-slate-500 dark:text-slate-400 text-xs">{account.id}</span>
                             <span className="text-slate-500 dark:text-slate-400 text-xs ml-1">
                               {account.campaigns.length} kampaniya
-                            </span>
-                            <span className={`text-[10px] px-2 py-0.5 rounded-full border ml-2 ${levelStyle.badge}`}>
-                              {grade.overall}/100 • {grade.level}
                             </span>
                             {/* Expand chevron */}
                             <span className={`text-slate-500 dark:text-slate-400 ml-auto transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`}>
@@ -529,62 +448,11 @@ export default function ReportingPage() {
                         <MetricCell value={formatCurrency(account.metrics.cpc)} />
                       </tr>
 
-                      {/* ── Account grading detail ── */}
-                      {isOpen && (
-                        <tr className="bg-slate-50 dark:bg-slate-800/50">
-                          <td colSpan={7} className="px-4 py-3 border-b border-slate-100">
-                            <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4">
-                              <div className="flex items-center justify-between gap-3 flex-wrap mb-3">
-                                <div>
-                                  <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide">Account Grading</p>
-                                  <p className="text-sm text-slate-900 dark:text-slate-50 font-semibold">Har bir account bo‘yicha 4 ta asosiy signal</p>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <span className={`text-xs px-2 py-1 rounded-full border ${levelStyle.badge}`}>{grade.level}</span>
-                                  <span className={`text-xl font-black ${levelStyle.color}`}>{grade.overall}</span>
-                                </div>
-                              </div>
-
-                              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
-                                {[
-                                  { key: 'Wasted Spend', value: grade.breakdown.wastedSpend },
-                                  { key: 'Quality Score', value: grade.breakdown.qualityScore },
-                                  { key: 'Impression Share', value: grade.breakdown.impressionShare },
-                                  { key: 'Account Activity', value: grade.breakdown.accountActivity },
-                                ].map((item) => (
-                                  <div key={item.key} className="rounded-lg border border-slate-200 dark:border-slate-700 p-2.5">
-                                    <p className="text-[11px] text-slate-500 dark:text-slate-400">{item.key}</p>
-                                    <p className="text-base font-bold text-slate-900 dark:text-slate-50">{item.value}/100</p>
-                                    <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 mt-2 overflow-hidden">
-                                      <div
-                                        className={`h-full rounded-full ${
-                                          item.value >= 70 ? 'bg-emerald-400' : item.value >= 50 ? 'bg-amber-400' : 'bg-rose-400'
-                                        }`}
-                                        style={{ width: `${item.value}%` }}
-                                      />
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-
-                              <div className="rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-100 p-3">
-                                <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Tavsiya:</p>
-                                <ul className="space-y-1">
-                                  {grade.recommendations.map((tip) => (
-                                    <li key={tip} className="text-xs text-slate-500 dark:text-slate-400">• {tip}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-
                       {/* ── Campaign rows (expandable) ── */}
                       {isOpen && account.campaigns.map((campaign) => (
                         <tr
                           key={campaign.id}
-                          className="bg-white dark:bg-slate-900 hover:bg-slate-50 dark:bg-slate-800/50 transition-colors"
+                          className="bg-white hover:bg-slate-50 dark:bg-slate-900 transition-colors"
                         >
                           <td className="px-4 py-2.5">
                             <div className="flex items-center gap-2 pl-6">
@@ -595,7 +463,7 @@ export default function ReportingPage() {
                               </svg>
                               <span className="text-slate-700 dark:text-slate-300 text-sm">{campaign.name}</span>
                               {campaign.objective && (
-                                <span className="text-[10px] text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 px-1.5 py-0.5 rounded">
+                                <span className="text-[10px] text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 px-1.5 py-0.5 rounded">
                                   {campaign.objective.replace('OUTCOME_', '')}
                                 </span>
                               )}
@@ -603,7 +471,7 @@ export default function ReportingPage() {
                             {/* Tags row */}
                             <div className="pl-14 flex items-center gap-1.5 flex-wrap mt-1">
                               {(campaignTags[campaign.id] ?? campaign.tags ?? []).map((tag) => (
-                                <span key={tag} className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600">
+                                <span key={tag} className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-[#E5E7EB] text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600">
                                   {tag}
                                   <button onClick={() => removeTag(campaign.id, tag)} className="hover:text-red-400 leading-none">×</button>
                                 </span>
@@ -619,12 +487,12 @@ export default function ReportingPage() {
                                   }}
                                   onBlur={() => setEditingTagId(null)}
                                   placeholder="teg nomi..."
-                                  className="text-[10px] px-2 py-0.5 rounded-full bg-white dark:bg-slate-900 border border-slate-900 text-slate-900 dark:text-slate-50 placeholder-slate-400 outline-none w-24"
+                                  className="text-[10px] px-2 py-0.5 rounded-full bg-white border border-slate-900 dark:border-slate-100 text-slate-900 dark:text-slate-50 placeholder-[#9CA3AF] outline-none w-24"
                                 />
                               ) : (
                                 <button
                                   onClick={() => { setEditingTagId(campaign.id); setTagInput('') }}
-                                  className="text-[10px] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300 border border-dashed border-slate-200 dark:border-slate-700 hover:border-slate-900 px-2 py-0.5 rounded-full transition-colors"
+                                  className="text-[10px] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300 border border-dashed border-slate-200 dark:border-slate-700 hover:border-slate-900 dark:border-slate-100 px-2 py-0.5 rounded-full transition-colors"
                                 >
                                   + teg
                                 </button>

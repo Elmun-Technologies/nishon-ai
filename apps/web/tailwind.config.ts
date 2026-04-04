@@ -5,6 +5,9 @@ const config: Config = {
   darkMode: 'class',
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Basis Grotesque Pro', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Helvetica Neue', 'sans-serif'],
+      },
       colors: {
         // Primary brand color
         primary: '#111827',

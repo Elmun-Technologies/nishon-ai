@@ -103,7 +103,7 @@ function RoasChart({ data }: { data: { month: string; roas: number; spend: numbe
       {data.map(d => (
         <div key={d.month} className="flex items-center gap-3">
           <span className="text-slate-400 dark:text-slate-500 text-xs w-8 flex-shrink-0">{d.month}</span>
-          <div className="flex-1 bg-slate-50 dark:bg-slate-800/50 rounded-full h-6 overflow-hidden">
+          <div className="flex-1 bg-slate-50 dark:bg-slate-900 rounded-full h-6 overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-[#7C3AED] to-[#A855F7] rounded-full flex items-center justify-end pr-2 transition-all duration-500"
               style={{ width: `${(d.roas / maxRoas) * 100}%` }}
@@ -163,12 +163,12 @@ function CampaignRow({ c }: { c: PortfolioTargetologist['recentCampaigns'][0] })
   const PLATFORM_ICONS: Record<string, string> = { meta: '📘', google: '🔍', yandex: '🟡', telegram: '✈️' }
   const statusColors: Record<string, string> = {
     active: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-    completed: 'bg-slate-50 dark:bg-slate-800/50 text-slate-400 dark:text-slate-500 border-slate-200 dark:border-slate-700',
+    completed: 'bg-slate-50 dark:bg-slate-900 text-slate-400 dark:text-slate-500 border-slate-200 dark:border-slate-700',
     paused: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
   }
   const statusLabels: Record<string, string> = { active: '🟢 Faol', completed: '✓ Tugadi', paused: '⏸ Pauza' }
   return (
-    <div className="flex items-center gap-4 py-3.5 border-b border-slate-200 dark:border-slate-700 last:border-0 hover:bg-slate-50 dark:bg-slate-800/50/40 rounded-lg px-2 transition-colors">
+    <div className="flex items-center gap-4 py-3.5 border-b border-slate-200 dark:border-slate-700 last:border-0 hover:bg-slate-50 dark:bg-slate-900/40 rounded-lg px-2 transition-colors">
       <span className="text-xl flex-shrink-0">{PLATFORM_ICONS[c.platform] ?? '📊'}</span>
       <div className="flex-1 min-w-0">
         <div className="text-slate-900 dark:text-slate-50 text-sm font-medium truncate">{c.niche}</div>
@@ -205,7 +205,7 @@ function ReviewCard({ r }: { r: PortfolioTargetologist['reviews'][0] }) {
       </div>
       <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed italic mb-4">"{r.text}"</p>
       <div className="flex items-center gap-2">
-        <div className="w-8 h-8 rounded-lg bg-[#F3F4F6] flex items-center justify-center text-xs font-bold text-slate-900 dark:text-slate-50">
+        <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-bold text-slate-900 dark:text-slate-50">
           {r.author.charAt(0)}
         </div>
         <div>
@@ -254,8 +254,8 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#111827] border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-slate-900 dark:border-slate-100 border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -264,7 +264,7 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
 
   if (!t) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center text-center px-6">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center text-center px-6">
         <div>
           <div className="text-6xl mb-4">👤</div>
           <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-50 mb-2">Targetolog topilmadi</h2>
@@ -278,10 +278,10 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-50">
 
       {/* ── NAV ── */}
-      <nav className="sticky top-0 z-50 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50/90 backdrop-blur-lg">
+      <nav className="sticky top-0 z-50 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/90 backdrop-blur-lg">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <button onClick={() => router.push('/portfolio')} className="flex items-center gap-2 text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:text-slate-50 transition-colors text-sm">
             ← Katalog
@@ -329,8 +329,8 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
                     key={p.id}
                     className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border ${
                       p.verified
-                        ? 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-50'
-                        : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400'
+                        ? 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-50'
+                        : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400'
                     }`}
                   >
                     {p.icon} {p.name}
@@ -342,7 +342,7 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
             </div>
 
             {/* CTA card */}
-            <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-5 w-full md:w-56 flex-shrink-0">
+            <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-5 w-full md:w-56 flex-shrink-0">
               <div className="flex items-center gap-1 mb-3">
                 <span className="text-yellow-400 text-sm">★</span>
                 <span className="text-slate-900 dark:text-slate-50 font-bold">{t.rating}</span>
@@ -361,7 +361,7 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
               </button>
               <button
                 onClick={() => router.push('/login')}
-                className="w-full bg-slate-50 dark:bg-slate-800/50 hover:bg-[#F3F4F6] text-slate-400 dark:text-slate-500 text-sm py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 transition-all"
+                className="w-full bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 text-sm py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 transition-all"
               >
                 Xizmat buyurtma
               </button>
@@ -425,7 +425,7 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
             <div className="lg:col-span-2 bg-white border border-slate-200 dark:border-slate-700 rounded-2xl p-6">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-slate-900 dark:text-slate-50 font-bold">ROAS dinamikasi (6 oy)</h3>
-                <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-700">Oylik</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900 px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-700">Oylik</span>
               </div>
               <RoasChart data={t.monthlyPerformance} />
             </div>
@@ -439,7 +439,7 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
                 <h4 className="text-slate-400 dark:text-slate-500 text-xs font-semibold uppercase tracking-wider mb-3">Niche ixtisoslashuv</h4>
                 <div className="flex flex-wrap gap-2">
                   {t.niches.map(n => (
-                    <span key={n} className="text-xs bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 px-2.5 py-1 rounded-lg">
+                    <span key={n} className="text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 px-2.5 py-1 rounded-lg">
                       {n}
                     </span>
                   ))}
@@ -462,7 +462,7 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
           <div className="bg-white border border-slate-200 dark:border-slate-700 rounded-2xl p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-slate-900 dark:text-slate-50 font-bold">So'nggi kampaniyalar</h3>
-              <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 px-3 py-1 rounded-lg">
+              <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 px-3 py-1 rounded-lg">
                 Mijoz maxfiyligi uchun anonimlashtrilgan
               </span>
             </div>
@@ -474,19 +474,19 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
 
             {/* aggregate row */}
             <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700 grid grid-cols-3 gap-4">
-              <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 text-center">
+              <div className="bg-slate-50 dark:bg-slate-900 rounded-xl p-3 text-center">
                 <div className="text-slate-900 dark:text-slate-50 font-bold text-lg">
                   {(t.recentCampaigns.reduce((s, c) => s + c.roas, 0) / t.recentCampaigns.length).toFixed(1)}x
                 </div>
                 <div className="text-slate-500 dark:text-slate-400 text-xs">O'rtacha ROAS</div>
               </div>
-              <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 text-center">
+              <div className="bg-slate-50 dark:bg-slate-900 rounded-xl p-3 text-center">
                 <div className="text-slate-900 dark:text-slate-50 font-bold text-lg">
                   {formatSpend(t.recentCampaigns.reduce((s, c) => s + c.spend, 0))}
                 </div>
                 <div className="text-slate-500 dark:text-slate-400 text-xs">Jami sarflangan</div>
               </div>
-              <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 text-center">
+              <div className="bg-slate-50 dark:bg-slate-900 rounded-xl p-3 text-center">
                 <div className="text-emerald-400 font-bold text-lg">
                   {t.recentCampaigns.filter(c => c.status === 'active').length} ta
                 </div>
@@ -517,7 +517,7 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
                     <div key={star} className="flex items-center gap-2 mb-1">
                       <span className="text-slate-500 dark:text-slate-400 text-xs w-4">{star}</span>
                       <span className="text-yellow-400 text-xs">★</span>
-                      <div className="flex-1 bg-slate-50 dark:bg-slate-800/50 rounded-full h-2">
+                      <div className="flex-1 bg-slate-50 dark:bg-slate-900 rounded-full h-2">
                         <div className="h-2 bg-yellow-400 rounded-full" style={{ width: `${pct}%` }} />
                       </div>
                       <span className="text-slate-500 dark:text-slate-400 text-xs w-4 text-right">{count}</span>
@@ -555,7 +555,7 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
               </button>
               <button
                 onClick={() => router.push('/register')}
-                className="w-full bg-slate-50 dark:bg-slate-800/50 hover:bg-[#F3F4F6] text-slate-900 dark:text-slate-50 py-3 rounded-xl border border-slate-200 dark:border-slate-700 transition-all"
+                className="w-full bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-50 py-3 rounded-xl border border-slate-200 dark:border-slate-700 transition-all"
               >
                 Ro'yxatdan o'tish — bepul
               </button>

@@ -72,7 +72,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-800/50 flex">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex">
 
       {/* Left panel */}
       <div className="hidden lg:flex lg:w-1/2 bg-white border-r border-slate-200 dark:border-slate-700 flex-col justify-between p-12">
@@ -84,7 +84,7 @@ export default function LoginPage() {
 
         <div>
           <div className="mb-8">
-            <div className="inline-flex items-center gap-2 bg-[#F3F4F6] border border-slate-300 dark:border-slate-600 rounded-full px-4 py-2 mb-6">
+            <div className="inline-flex items-center gap-2 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full px-4 py-2 mb-6">
               <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span className="text-slate-700 dark:text-slate-300 text-sm font-medium">AI Agent Active</span>
             </div>
@@ -104,14 +104,14 @@ export default function LoginPage() {
               { value: '−40%', label: "Past CPA" },
               { value: '24/7', label: "AI monitoring" },
             ].map((stat) => (
-              <div key={stat.label} className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
+              <div key={stat.label} className="bg-slate-50 dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
                 <p className="text-2xl font-bold text-slate-700 dark:text-slate-300">{stat.value}</p>
                 <p className="text-slate-500 dark:text-slate-400 text-xs mt-1">{stat.label}</p>
               </div>
             ))}
           </div>
 
-          <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-5 border border-slate-200 dark:border-slate-700">
+          <div className="bg-slate-50 dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-700">
             <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed mb-3">
               "Performa targetologimizni almashtirdi va birinchi oyda ROAS 2.8x oshdi.
               Endi kampaniya boshqarishga 0 soat sarflaymiz."
@@ -166,9 +166,9 @@ export default function LoginPage() {
             </div>
 
             <div className="flex items-center gap-3 mb-4">
-              <div className="flex-1 h-px bg-[#F3F4F6]" />
+              <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800" />
               <span className="text-slate-500 dark:text-slate-400 text-xs">yoki email bilan</span>
-              <div className="flex-1 h-px bg-[#F3F4F6]" />
+              <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800" />
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">

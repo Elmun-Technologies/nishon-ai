@@ -117,7 +117,7 @@ export default function RegisterPage() {
   const passwordStrength = getPasswordStrength(form.password)
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center p-6">
       <div className="w-full max-w-md">
 
         {/* Logo */}
@@ -156,9 +156,9 @@ export default function RegisterPage() {
           </div>
 
           <div className="flex items-center gap-3 mb-4">
-            <div className="flex-1 h-px bg-[#F3F4F6]" />
+            <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800" />
             <span className="text-slate-500 dark:text-slate-400 text-xs">yoki email bilan</span>
-            <div className="flex-1 h-px bg-[#F3F4F6]" />
+            <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800" />
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -204,7 +204,7 @@ export default function RegisterPage() {
                         className={`h-1 flex-1 rounded-full transition-all duration-300 ${
                           level <= passwordStrength.level
                             ? passwordStrength.color
-                            : 'bg-[#F3F4F6]'
+                            : 'bg-slate-100 dark:bg-slate-800'
                         }`}
                       />
                     ))}

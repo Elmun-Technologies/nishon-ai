@@ -174,7 +174,7 @@ function TargetologistCard({ t }: { t: PortfolioTargetologist }) {
             { label: 'Kampaniya', value: t.stats.totalCampaigns },
             { label: 'Muvaffaqiyat', value: `${t.stats.successRate}%` },
           ].map(m => (
-            <div key={m.label} className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-2 text-center">
+            <div key={m.label} className="bg-slate-50 dark:bg-slate-900 rounded-lg p-2 text-center">
               <div className={`text-sm font-bold ${m.highlight ? 'text-slate-700 dark:text-slate-300' : 'text-slate-900 dark:text-slate-50'}`}>{m.value}</div>
               <div className="text-slate-500 dark:text-slate-400 text-[10px] mt-0.5">{m.label}</div>
             </div>
@@ -197,8 +197,8 @@ function TargetologistCard({ t }: { t: PortfolioTargetologist }) {
               key={p.id}
               className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded-full border ${
                 p.verified
-                  ? 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-50'
-                  : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400'
+                  ? 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-50'
+                  : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400'
               }`}
             >
               {p.icon} {p.name}
@@ -210,7 +210,7 @@ function TargetologistCard({ t }: { t: PortfolioTargetologist }) {
         {/* Niches */}
         <div className="flex flex-wrap gap-1.5 mb-5">
           {t.niches.slice(0, 3).map(n => (
-            <span key={n} className="text-[10px] bg-slate-50 dark:bg-slate-800/50 text-slate-400 dark:text-slate-500 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">
+            <span key={n} className="text-[10px] bg-slate-50 dark:bg-slate-900 text-slate-400 dark:text-slate-500 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">
               {n}
             </span>
           ))}
@@ -304,10 +304,10 @@ export default function PortfolioPage() {
   }), [allAgents])
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-50">
 
       {/* ── NAV ── */}
-      <nav className="sticky top-0 z-50 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50/90 backdrop-blur-lg">
+      <nav className="sticky top-0 z-50 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/90 backdrop-blur-lg">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <button onClick={() => router.push('/')} className="text-xl font-extrabold">
             Performa <span className="text-slate-700 dark:text-slate-300">AI</span>
@@ -333,7 +333,7 @@ export default function PortfolioPage() {
       <div className="relative py-16 px-6 text-center border-b border-slate-200 dark:border-slate-700 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-[#7C3AED]/5 to-transparent pointer-events-none" />
         <div className="relative max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 bg-[#F3F4F6] border border-slate-300 dark:border-slate-600 rounded-full px-4 py-1.5 mb-5">
+          <div className="inline-flex items-center gap-2 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full px-4 py-1.5 mb-5">
             <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
             <span className="text-slate-700 dark:text-slate-300 text-xs font-bold uppercase tracking-widest">Live Portfolio Tracking</span>
           </div>
@@ -345,7 +345,7 @@ export default function PortfolioPage() {
           </p>
 
           {/* aggregate stats */}
-          <div className="inline-grid grid-cols-4 gap-px bg-[#F3F4F6] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700">
+          <div className="inline-grid grid-cols-4 gap-px bg-slate-100 dark:bg-slate-800 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700">
             {[
               { v: totals.targetologists, l: 'Targetolog' },
               { v: formatSpend(totals.spendManaged), l: 'Boshqarilgan' },
@@ -374,7 +374,7 @@ export default function PortfolioPage() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Ism yoki niche..."
-                className="w-full bg-white border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2.5 text-sm text-slate-900 dark:text-slate-50 placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-[#111827]/50"
+                className="w-full bg-white border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2.5 text-sm text-slate-900 dark:text-slate-50 placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-slate-900 dark:border-slate-100/50"
               />
             </div>
 
@@ -382,7 +382,7 @@ export default function PortfolioPage() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setVerifiedOnly(!verifiedOnly)}
-                className={`w-10 h-5 rounded-full transition-colors ${verifiedOnly ? 'bg-[#111827]' : 'bg-[#F3F4F6]'}`}
+                className={`w-10 h-5 rounded-full transition-colors ${verifiedOnly ? 'bg-[#111827]' : 'bg-slate-100 dark:bg-slate-800'}`}
               >
                 <div className={`w-4 h-4 rounded-full bg-white mx-0.5 transition-transform ${verifiedOnly ? 'translate-x-5' : 'translate-x-0'}`} />
               </button>
@@ -399,7 +399,7 @@ export default function PortfolioPage() {
                     onClick={() => togglePlatform(p.id)}
                     className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all ${
                       selectedPlatforms.includes(p.id)
-                        ? 'bg-[#111827]/15 border border-[#111827]/40 text-slate-900 dark:text-slate-50'
+                        ? 'bg-[#111827]/15 border border-slate-900 dark:border-slate-100/40 text-slate-900 dark:text-slate-50'
                         : 'bg-white border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:border-slate-200 dark:border-slate-700'
                     }`}
                   >
@@ -437,7 +437,7 @@ export default function PortfolioPage() {
                     onClick={() => toggleNiche(n)}
                     className={`text-xs px-2.5 py-1 rounded-full border transition-all ${
                       selectedNiches.includes(n)
-                        ? 'bg-[#E5E7EB] border-[#111827]/50 text-slate-900 dark:text-slate-50'
+                        ? 'bg-[#E5E7EB] border-slate-900 dark:border-slate-100/50 text-slate-900 dark:text-slate-50'
                         : 'bg-white border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:border-slate-200 dark:border-slate-700'
                     }`}
                   >
@@ -493,7 +493,7 @@ export default function PortfolioPage() {
                 <select
                   value={sortBy}
                   onChange={e => setSortBy(e.target.value)}
-                  className="bg-white border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-50 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-[#111827]/50"
+                  className="bg-white border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-50 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-slate-900 dark:border-slate-100/50"
                 >
                   {SORT_OPTIONS.map(o => (
                     <option key={o.value} value={o.value}>{o.label}</option>
