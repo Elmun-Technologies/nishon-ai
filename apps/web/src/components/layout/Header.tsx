@@ -47,11 +47,11 @@ export default function Header() {
   const page = PAGE_TITLES[pathname] ?? { title: 'Performa', subtitle: '' }
 
   return (
-    <header className="h-14 bg-white border-b border-[#E5E7EB] px-6 flex items-center justify-between shrink-0">
+    <header className="h-14 bg-surface border-b border-border px-6 flex items-center justify-between shrink-0">
       <div>
-        <h1 className="text-[#111827] font-semibold text-sm">{page.title}</h1>
+        <h1 className="heading text-text-primary">{page.title}</h1>
         {page.subtitle && (
-          <p className="text-[#9CA3AF] text-xs mt-0.5">{page.subtitle}</p>
+          <p className="text-caption text-text-tertiary mt-0.5">{page.subtitle}</p>
         )}
       </div>
 
@@ -60,12 +60,14 @@ export default function Header() {
         {currentWorkspace && (
           <div
             className={`
-              flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium
-              ${currentWorkspace.autopilotMode === 'full_auto'
-                ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
-                : currentWorkspace.autopilotMode === 'assisted'
-                ? 'bg-amber-50 border-amber-200 text-amber-700'
-                : 'bg-gray-100 border-gray-200 text-gray-600'
+              flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-medium
+              transition-colors duration-200
+              ${
+                currentWorkspace.autopilotMode === 'full_auto'
+                  ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                  : currentWorkspace.autopilotMode === 'assisted'
+                    ? 'bg-amber-50 border-amber-200 text-amber-700'
+                    : 'bg-surface-secondary border-border text-text-secondary'
               }
             `}
           >
@@ -74,15 +76,15 @@ export default function Header() {
                 currentWorkspace.autopilotMode === 'full_auto'
                   ? 'bg-emerald-500 animate-pulse'
                   : currentWorkspace.autopilotMode === 'assisted'
-                  ? 'bg-amber-500'
-                  : 'bg-gray-400'
+                    ? 'bg-amber-500'
+                    : 'bg-gray-400'
               }`}
             />
             {currentWorkspace.autopilotMode === 'full_auto'
               ? 'Full Auto'
               : currentWorkspace.autopilotMode === 'assisted'
-              ? 'Assisted'
-              : 'Manual'}
+                ? 'Assisted'
+                : 'Manual'}
           </div>
         )}
       </div>

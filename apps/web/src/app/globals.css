@@ -21,8 +21,8 @@
   }
 
   body {
-    color: #111827;
-    background: #F9FAFB;
+    @apply text-text-primary bg-surface-alt;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
   }
 
   /* Force all inputs/textareas to light theme regardless of OS dark mode */
@@ -31,57 +31,101 @@
   select {
     color-scheme: light;
     background-color: white;
-    color: #111827;
+    @apply text-text-primary;
   }
 
   input::placeholder,
   textarea::placeholder {
-    color: #9CA3AF;
+    @apply text-text-tertiary;
   }
 
+  /* Scrollbar styling */
   ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: #F9FAFB; }
-  ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
+  ::-webkit-scrollbar-track { @apply bg-surface-alt; }
+  ::-webkit-scrollbar-thumb { @apply bg-gray-300 rounded; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-gray-400; }
+
+  /* Focus visible ring for accessibility */
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary ring-offset-1;
+  }
 }
 
 @layer components {
+  /* Buttons */
   .btn-primary {
-    @apply bg-[#111827] hover:bg-[#1F2937] text-white px-4 py-2 rounded-lg
-           font-medium transition-all duration-200 disabled:opacity-50
+    @apply bg-primary hover:bg-gray-900 text-white px-4 py-2.5 rounded-lg
+           font-medium transition-colors duration-200 disabled:opacity-50
            disabled:cursor-not-allowed active:scale-95 text-sm;
   }
 
   .btn-secondary {
-    @apply bg-white hover:bg-[#F9FAFB] text-[#111827] px-4 py-2 rounded-lg
-           font-medium transition-all duration-200 border border-[#E5E7EB]
+    @apply bg-surface hover:bg-surface-secondary text-text-primary px-4 py-2.5 rounded-lg
+           font-medium transition-colors duration-200 border border-border
            active:scale-95 text-sm;
   }
 
-  .card {
-    @apply bg-white border border-[#E5E7EB] rounded-xl p-6;
+  .btn-ghost {
+    @apply bg-transparent hover:bg-surface-secondary text-text-primary px-4 py-2.5 rounded-lg
+           font-medium transition-colors duration-200 text-sm;
   }
 
+  /* Cards */
+  .card {
+    @apply bg-surface border border-border rounded-xl p-6 transition-all duration-200;
+  }
+
+  .card-hover {
+    @apply card hover:shadow-md hover:border-gray-300;
+  }
+
+  /* Inputs */
   .input {
-    @apply bg-white border border-[#E5E7EB] rounded-lg px-4 py-3 w-full
-           text-[#111827] placeholder-[#9CA3AF] focus:outline-none
-           focus:border-[#111827] focus:ring-1 focus:ring-[#111827]/10
-           transition-colors duration-200 text-sm;
+    @apply bg-surface border border-border rounded-lg px-4 py-2.5 w-full
+           text-text-primary placeholder-text-tertiary focus:outline-none
+           focus:border-primary focus:ring-2 focus:ring-primary/10
+           transition-colors duration-200 text-body-sm;
   }
 
   .label {
-    @apply block text-sm font-medium text-[#374151] mb-2;
+    @apply block text-label font-medium text-text-secondary mb-2;
   }
 
+  /* Badges */
   .badge-active {
-    @apply bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs px-2 py-1 rounded-full font-medium;
+    @apply bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs px-2.5 py-1 rounded-full font-medium;
   }
 
   .badge-paused {
-    @apply bg-amber-50 text-amber-700 border border-amber-200 text-xs px-2 py-1 rounded-full font-medium;
+    @apply bg-amber-50 text-amber-700 border border-amber-200 text-xs px-2.5 py-1 rounded-full font-medium;
   }
 
   .badge-draft {
-    @apply bg-gray-100 text-gray-600 border border-gray-200 text-xs px-2 py-1 rounded-full font-medium;
+    @apply bg-surface-secondary text-text-secondary border border-border text-xs px-2.5 py-1 rounded-full font-medium;
+  }
+
+  /* Typography */
+  .heading-xl {
+    @apply text-heading-xl font-semibold text-text-primary;
+  }
+
+  .heading-lg {
+    @apply text-heading-lg font-semibold text-text-primary;
+  }
+
+  .heading {
+    @apply text-heading font-semibold text-text-primary;
+  }
+
+  .body-text {
+    @apply text-body text-text-primary;
+  }
+
+  .body-secondary {
+    @apply text-body text-text-secondary;
+  }
+
+  .body-tertiary {
+    @apply text-body text-text-tertiary;
   }
 }
