@@ -86,7 +86,6 @@ export function generateMetadata(metadata: SeoMetadata): Metadata {
     title: metadata.title,
     description: metadata.description,
     keywords: metadata.keywords,
-    canonical: metadata.canonicalUrl,
     alternates: {
       canonical: metadata.canonicalUrl,
     },

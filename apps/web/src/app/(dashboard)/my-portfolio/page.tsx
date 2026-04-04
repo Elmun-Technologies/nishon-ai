@@ -7,7 +7,6 @@ import { Spinner } from '@/components/ui/Spinner'
 import { Alert } from '@/components/ui/Alert'
 import { AdAccountsConnection } from '@/components/portfolio/AdAccountsConnection'
 
-  { id: 0, label: 'Reklama hisoblarini ulash', icon: '🔗' },
 const STEPS = [
   { id: 0, label: 'Reklama hisoblarini ulash', icon: '🔗' },
   { id: 1, label: 'Profil to\'ldirish', icon: '👤' },
@@ -293,21 +292,9 @@ export default function PortfolioDashboardPage() {
           {/* ── STEP 0: Connect Ad Accounts ── */}
           {activeStep === 0 && (
             <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6">
-              <AdAccountsConnection 
-                onAccountConnected={() => completeStep(0)}
-                onSync={async (accountId) => {
-                  // Trigger sync
-                  console.log('Syncing account:', accountId)
-                }}
+              <AdAccountsConnection
+                onComplete={() => completeStep(0)}
               />
-              <div className="mt-8 flex justify-end">
-                <button
-                  onClick={() => completeStep(0)}
-                  className="bg-[#111827] hover:bg-[#1F2937] text-white px-6 py-3 rounded-xl font-semibold transition-all"
-                >
-                  Davom etish →
-                </button>
-              </div>
             </div>
           )}
 
