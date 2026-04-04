@@ -37,7 +37,7 @@ export interface CompleteResult {
 export type AiProvider = 'openai' | 'anthropic'
 
 /**
- * NishonAI client powered by Agent Router.
+ * PerformaAI client powered by Agent Router.
  *
  * All AI calls in the platform go through this single client so model
  * selection, retries, token limits, and observability are centralised.
@@ -48,7 +48,7 @@ export type AiProvider = 'openai' | 'anthropic'
  *     agentName: 'StrategyEngine',
  *   })
  */
-export class NishonAiClient {
+export class PerformaAiClient {
   private readonly openai?: OpenAI
   private readonly provider: AiProvider
   private readonly apiKey: string
@@ -215,7 +215,7 @@ export class NishonAiClient {
     options: CompleteOptions,
     unwrapContent = false,
   ): Promise<CompleteResult> {
-    const label = options.agentName ?? 'NishonAI'
+    const label = options.agentName ?? 'PerformaAI'
     const task  = options.taskType  ?? 'unknown'
     let lastError: Error | null = null
 
@@ -227,7 +227,7 @@ export class NishonAiClient {
 
         // Structured observability log — one line per successful AI call
         console.log(
-          `[NishonAI] agent=${label} task=${task} model=${raw.model}` +
+          `[PerformaAI] agent=${label} task=${task} model=${raw.model}` +
           ` tokens=${raw.tokensUsed} duration=${durationMs}ms`,
         )
 
@@ -250,13 +250,13 @@ export class NishonAiClient {
             ? 'AI provider is temporarily unavailable (network block). Please try again in a few minutes.'
             : rawDetail
           const msg = `Agent Router error [${label}/${task}] status=${error?.status ?? 'unknown'} attempt=${attempt}: ${detail}`
-          console.error(`[NishonAI] ${msg} duration=${durationMs}ms`)
+          console.error(`[PerformaAI] ${msg} duration=${durationMs}ms`)
           throw new Error(msg)
         }
 
         const waitMs = Math.pow(2, attempt - 1) * 1000
         console.warn(
-          `[NishonAI] agent=${label} task=${task} attempt=${attempt} failed —` +
+          `[PerformaAI] agent=${label} task=${task} attempt=${attempt} failed —` +
           ` retrying in ${waitMs}ms (status=${error?.status})`,
         )
         await this.sleep(waitMs)

@@ -6,7 +6,7 @@ export default function LegalPageLayout({ children }: { children: React.ReactNod
       <header className="border-b border-[#E5E7EB] bg-[#F9FAFB]/90 backdrop-blur">
         <div className="mx-auto flex h-16 w-full max-w-5xl items-center justify-between px-4 sm:px-6">
           <Link href="/" className="text-lg font-bold tracking-tight">
-            Nishon <span className="text-[#374151]">AI</span>
+            Performa <span className="text-[#374151]">AI</span>
           </Link>
           <nav className="hidden items-center gap-5 text-sm text-[#9CA3AF] sm:flex">
             <Link href="/privacy" className="transition-colors hover:text-[#111827]">Privacy</Link>
@@ -20,7 +20,7 @@ export default function LegalPageLayout({ children }: { children: React.ReactNod
 
       <footer className="border-t border-[#E5E7EB]">
         <div className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-4 py-8 text-sm text-[#9CA3AF] sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <p>© {new Date().getFullYear()} Nishon AI</p>
+          <p>© {new Date().getFullYear()} Performa</p>
           <div className="flex flex-wrap gap-4">
             <Link href="/privacy" className="transition-colors hover:text-[#111827]">Privacy Policy</Link>
             <Link href="/terms" className="transition-colors hover:text-[#111827]">Terms of Service</Link>

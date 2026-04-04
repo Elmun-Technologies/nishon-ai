@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import LegalPageLayout from '@/components/layout/LegalPageLayout'
 
 export const metadata: Metadata = {
-  title: 'Terms of Service | Nishon AI',
-  description: 'Read the terms and conditions for using Nishon AI services.',
+  title: 'Terms of Service | Performa',
+  description: 'Read the terms and conditions for using Performa services.',
 }
 
 export default function Page() {
@@ -13,7 +13,7 @@ export default function Page() {
         <header className="space-y-3">
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Terms of Service</h1>
           <p className="text-[#9CA3AF]">
-            These Terms of Service govern your access to and use of Nishon AI.
+            These Terms of Service govern your access to and use of Performa.
           </p>
           <p className="text-sm text-[#6B7280]">Last updated: March 22, 2026</p>
         </header>
@@ -21,7 +21,7 @@ export default function Page() {
         <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
           <h2 className="text-xl font-semibold">Acceptance of terms</h2>
           <p className="text-[#374151]">
-            By creating an account, connecting third-party ad platforms, or using Nishon AI, you
+            By creating an account, connecting third-party ad platforms, or using Performa, you
             agree to these Terms and any related policies referenced within the platform.
           </p>
         </section>
@@ -29,7 +29,7 @@ export default function Page() {
         <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
           <h2 className="text-xl font-semibold">Description of the platform</h2>
           <p className="text-[#374151]">
-            Nishon AI is an autonomous advertising platform that supports campaign operations,
+            Performa is an autonomous advertising platform that supports campaign operations,
             analytics, and AI-assisted decision-making for connected ad accounts.
           </p>
         </section>
@@ -38,7 +38,7 @@ export default function Page() {
           <h2 className="text-xl font-semibold">Eligibility</h2>
           <p className="text-[#374151]">
             You represent that you are legally authorized to enter into these Terms and to act on
-            behalf of any business account you connect to Nishon AI.
+            behalf of any business account you connect to Performa.
           </p>
         </section>
 
@@ -54,7 +54,7 @@ export default function Page() {
         <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
           <h2 className="text-xl font-semibold">Connected third-party accounts</h2>
           <p className="text-[#374151]">
-            Nishon AI relies on integrations with services such as Meta, Google, and TikTok.
+            Performa relies on integrations with services such as Meta, Google, and TikTok.
             Your use of those services remains subject to their own terms and policies.
           </p>
         </section>
@@ -62,13 +62,13 @@ export default function Page() {
         <section className="space-y-4 rounded-xl border border-[#E5E7EB] bg-white p-6">
           <h2 className="text-xl font-semibold">Acceptable use</h2>
           <p className="text-[#374151]">
-            You agree to use Nishon AI only for lawful advertising and campaign operations.
+            You agree to use Performa only for lawful advertising and campaign operations.
           </p>
           <h3 className="text-base font-semibold text-[#111827]">Prohibited activities</h3>
           <ul className="list-disc space-y-2 pl-5 text-[#374151]">
             <li>Operating fraudulent, deceptive, abusive, or unlawful campaigns.</li>
             <li>Attempting to bypass platform security, limits, or access controls.</li>
-            <li>Using Nishon AI in a manner that violates third-party platform rules.</li>
+            <li>Using Performa in a manner that violates third-party platform rules.</li>
             <li>Interfering with service stability, availability, or other users.</li>
           </ul>
         </section>
@@ -76,7 +76,7 @@ export default function Page() {
         <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
           <h2 className="text-xl font-semibold">AI-generated recommendation disclaimer</h2>
           <p className="text-[#374151]">
-            Nishon AI may provide recommendations or automated actions based on campaign data.
+            Performa may provide recommendations or automated actions based on campaign data.
             These outputs are informational or operational aids and do not constitute guaranteed
             business, financial, or legal outcomes.
           </p>
@@ -102,8 +102,8 @@ export default function Page() {
         <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
           <h2 className="text-xl font-semibold">Intellectual property</h2>
           <p className="text-[#374151]">
-            Nishon AI platform software, branding, and related materials are owned by or licensed
-            to Nishon AI. These Terms do not transfer ownership rights to users.
+            Performa platform software, branding, and related materials are owned by or licensed
+            to Performa. These Terms do not transfer ownership rights to users.
           </p>
         </section>
 
@@ -118,7 +118,7 @@ export default function Page() {
         <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
           <h2 className="text-xl font-semibold">Disclaimer of warranties</h2>
           <p className="text-[#374151]">
-            Nishon AI is provided on an "as is" and "as available" basis to the maximum extent
+            Performa is provided on an "as is" and "as available" basis to the maximum extent
             permitted by law, without warranties of merchantability, fitness for a particular
             purpose, non-infringement, or guaranteed performance outcomes.
           </p>
@@ -127,7 +127,7 @@ export default function Page() {
         <section className="space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-6">
           <h2 className="text-xl font-semibold">Limitation of liability</h2>
           <p className="text-[#374151]">
-            To the maximum extent permitted by law, Nishon AI is not liable for indirect,
+            To the maximum extent permitted by law, Performa is not liable for indirect,
             incidental, special, consequential, or punitive damages, including loss of profits,
             data, business opportunities, or goodwill.
           </p>
@@ -136,7 +136,7 @@ export default function Page() {
         <section className="space-y-4 rounded-xl border border-[#E5E7EB] bg-white p-6">
           <h2 className="text-xl font-semibold">Indemnification</h2>
           <p className="text-[#374151]">
-            You agree to indemnify and hold Nishon AI harmless from claims, liabilities, damages,
+            You agree to indemnify and hold Performa harmless from claims, liabilities, damages,
             and costs arising from your misuse of the platform, violation of law, or breach of
             these Terms.
           </p>
@@ -144,14 +144,14 @@ export default function Page() {
           <h2 className="text-xl font-semibold">Governing law and jurisdiction</h2>
           <p className="text-[#374151]">
             Unless otherwise required by applicable law, these Terms are governed by applicable
-            laws in a competent jurisdiction determined by Nishon AI operational setup. A final
+            laws in a competent jurisdiction determined by Performa operational setup. A final
             governing law clause may be updated as legal structuring is finalized.
           </p>
 
           <h2 className="text-xl font-semibold">Changes to terms</h2>
           <p className="text-[#374151]">
             We may update these Terms from time to time. Updated terms become effective when
-            posted, and continued use of Nishon AI constitutes acceptance of the revised terms.
+            posted, and continued use of Performa constitutes acceptance of the revised terms.
           </p>
 
           <h2 className="text-xl font-semibold">Contact information</h2>
@@ -165,7 +165,7 @@ export default function Page() {
           </p>
           <p className="text-sm text-[#6B7280]">
             Disclaimer: These Terms are provided for operational and compliance purposes and may be
-            updated as the Nishon AI platform evolves.
+            updated as the Performa platform evolves.
           </p>
         </section>
       </article>

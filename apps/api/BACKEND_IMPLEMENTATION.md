@@ -1,8 +1,8 @@
-# 🚀 Nishon AI Campaign Wizard - Backend Implementation
+# 🚀 Performa Campaign Wizard - Backend Implementation
 
 ## 📋 Overview
 
-This document provides a comprehensive overview of the backend implementation for the Nishon AI Campaign Wizard, including database schema, API structure, DTOs, services, and controllers.
+This document provides a comprehensive overview of the backend implementation for the Performa Campaign Wizard, including database schema, API structure, DTOs, services, and controllers.
 
 ## 🗄️ Database Schema
 
@@ -340,4 +340,4 @@ interface ICampaignAdapter {
 - **Caching Strategy**: Multi-level caching
 - **Load Balancing**: Traffic distribution
 
-This backend implementation provides a solid foundation for the Nishon AI Campaign Wizard, with production-ready features, comprehensive testing, and scalable architecture.
+This backend implementation provides a solid foundation for the Performa Campaign Wizard, with production-ready features, comprehensive testing, and scalable architecture.

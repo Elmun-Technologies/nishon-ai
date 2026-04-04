@@ -5,9 +5,9 @@ const bcrypt = require('bcryptjs')
 const pool = new Pool({
   host: process.env.DB_HOST || process.env.DATABASE_HOST || 'postgres',
   port: process.env.DB_PORT || 5432,
-  database: process.env.DB_NAME || 'nishon_ai_db',
-  user: process.env.DB_USER || 'nishon',
-  password: process.env.DB_PASSWORD || 'nishon_secret',
+  database: process.env.DB_NAME || 'performa_ai_db',
+  user: process.env.DB_USER || 'performa',
+  password: process.env.DB_PASSWORD || 'performa_secret',
 })
 
 async function seed() {
@@ -17,7 +17,7 @@ async function seed() {
     // Check if demo user already exists
     const existing = await pool.query(
       'SELECT id FROM users WHERE email = $1',
-      ['demo@nishon.ai']
+      ['demo@performa.ai']
     )
 
     if (existing.rows.length > 0) {
@@ -29,10 +29,10 @@ async function seed() {
     const hashedPassword = await bcrypt.hash('demo1234', 12)
     const userResult = await pool.query(
       'INSERT INTO users (email, password, name, plan, is_email_verified, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, NOW(), NOW()) RETURNING id',
-      ['demo@nishon.ai', hashedPassword, 'Demo User', 'PRO', true]
+      ['demo@performa.ai', hashedPassword, 'Demo User', 'PRO', true]
     )
     const userId = userResult.rows[0].id
-    console.log('✅ Demo user created:', 'demo@nishon.ai')
+    console.log('✅ Demo user created:', 'demo@performa.ai')
 
     // Create demo workspace
     const workspaceResult = await pool.query(
@@ -224,7 +224,7 @@ async function seed() {
 
     console.log('')
     console.log('🎉 Seed complete! Demo credentials:')
-    console.log('   Email:    demo@nishon.ai')
+    console.log('   Email:    demo@performa.ai')
     console.log('   Password: demo1234')
     console.log('')
 

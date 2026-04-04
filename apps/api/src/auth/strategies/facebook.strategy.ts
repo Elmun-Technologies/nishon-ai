@@ -29,7 +29,7 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
     const email =
       profile.emails?.[0]?.value ??
       // Facebook sometimes omits email — use a stable fallback
-      `fb_${profile.id}@nishon.ai`;
+      `fb_${profile.id}@performa.ai`;
 
     const name    = profile.displayName ?? 'Facebook User';
     const picture = profile.photos?.[0]?.value ?? undefined;

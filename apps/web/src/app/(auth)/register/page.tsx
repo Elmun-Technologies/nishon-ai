@@ -93,7 +93,7 @@ export default function RegisterPage() {
         password: form.password,
       })
       const { accessToken, refreshToken, user } = res.data
-      localStorage.setItem('nishon_refresh_token', refreshToken)
+      localStorage.setItem('performa_refresh_token', refreshToken)
       setAccessToken(accessToken)
       setUser(user)
       router.push('/onboarding')
@@ -123,7 +123,7 @@ export default function RegisterPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-[#111827]">
-            Nishon <span className="text-[#374151]">AI</span>
+            Performa <span className="text-[#374151]">AI</span>
           </h1>
           <p className="text-[#6B7280] text-sm mt-1">
             AI bilan reklama boshqarishni boshlang

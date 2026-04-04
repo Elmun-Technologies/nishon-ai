@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Targetolog Portfolio — Nishon AI',
+  title: 'Targetolog Portfolio — Performa',
   description: 'O\'zbekistondagi eng yaxshi targetologlarning tasdiqlangan natijalari. Real-time kampaniya statistikasi.',
 }
 

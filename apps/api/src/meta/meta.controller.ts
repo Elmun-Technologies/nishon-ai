@@ -49,7 +49,7 @@ const RANGE_TO_DATE_PRESET: Record<string, string> = {
  * All Meta Ads endpoints live under /meta.
  *
  * Auth strategy:
- * - JWT guard protects all routes (user must be logged in to Nishon).
+ * - JWT guard protects all routes (user must be logged in to Performa).
  * - Data endpoints (dashboard, sync) validate workspace OWNERSHIP against the JWT
  *   user to prevent cross-tenant data access — ForbiddenException if mismatch.
  * - Passthrough endpoints (ad-accounts, campaigns, insights) use a Meta token
@@ -148,7 +148,7 @@ export class MetaController {
       type: "object",
       required: ["workspaceId"],
       properties: {
-        workspaceId: { type: "string", description: "Nishon workspace UUID" },
+        workspaceId: { type: "string", description: "Performa workspace UUID" },
         accessToken: {
           type: "string",
           description: "Optional Meta access token override.",
@@ -188,7 +188,7 @@ export class MetaController {
       "aggregated metrics and an AI health/action recommendation per campaign. " +
       "Only data for the requesting user's workspace is returned.",
   })
-  @ApiQuery({ name: "workspaceId", description: "Nishon workspace UUID" })
+  @ApiQuery({ name: "workspaceId", description: "Performa workspace UUID" })
   @ApiResponse({
     status: 200,
     description: "Dashboard data — scoped to the requesting workspace only",
@@ -314,7 +314,7 @@ export class MetaController {
 
   @Get("top-ads")
   @ApiOperation({ summary: "Get top performing campaigns by CTR for a workspace" })
-  @ApiQuery({ name: "workspaceId", description: "Nishon workspace UUID" })
+  @ApiQuery({ name: "workspaceId", description: "Performa workspace UUID" })
   @ApiQuery({ name: "limit", required: false, description: "Number of results (default 5)" })
   async topAds(
     @Query("workspaceId") workspaceId: string | undefined,
@@ -490,7 +490,7 @@ export class MetaController {
       }
     }
 
-    return { csv: lines.join("\n"), filename: `nishon-report-${new Date().toISOString().slice(0, 10)}.csv` };
+    return { csv: lines.join("\n"), filename: `performa-report-${new Date().toISOString().slice(0, 10)}.csv` };
   }
 
   // ─── Spend forecast ────────────────────────────────────────────────────────

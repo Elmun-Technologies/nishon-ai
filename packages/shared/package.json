@@ -1,7 +1,7 @@
 {
-  "name": "@nishon/shared",
+  "name": "@performa/shared",
   "version": "0.0.1",
-  "description": "Shared types, DTOs, and utilities for Nishon AI",
+  "description": "Shared types, DTOs, and utilities for Performa",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

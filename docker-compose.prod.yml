@@ -3,26 +3,26 @@ version: '3.8'
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: nishon-ai-postgres-prod
+    container_name: performa-ai-postgres-prod
     restart: always
     environment:
-      POSTGRES_DB: nishon_ai_db
-      POSTGRES_USER: nishon
+      POSTGRES_DB: performa_ai_db
+      POSTGRES_USER: performa
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U nishon -d nishon_ai_db"]
+      test: ["CMD-SHELL", "pg_isready -U performa -d performa_ai_db"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 30s
     networks:
-      - nishon-ai-network
+      - performa-ai-network
 
   redis:
     image: redis:7-alpine
-    container_name: nishon-ai-redis-prod
+    container_name: performa-ai-redis-prod
     restart: always
     volumes:
       - redis_data:/data
@@ -33,16 +33,16 @@ services:
       retries: 3
       start_period: 30s
     networks:
-      - nishon-ai-network
+      - performa-ai-network
 
   api:
     build:
       context: ./apps/api
       dockerfile: Dockerfile
-    container_name: nishon-ai-api-prod
+    container_name: performa-ai-api-prod
     restart: always
     environment:
-      - DATABASE_URL=postgresql://nishon:${POSTGRES_PASSWORD}@postgres:5432/nishon_ai_db
+      - DATABASE_URL=postgresql://performa:${POSTGRES_PASSWORD}@postgres:5432/performa_ai_db
       - REDIS_URL=redis://redis:6379
       - JWT_SECRET=${JWT_SECRET}
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
@@ -68,13 +68,13 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - nishon-ai-network
+      - performa-ai-network
 
   web:
     build:
       context: ./apps/web
       dockerfile: Dockerfile
-    container_name: nishon-ai-web-prod
+    container_name: performa-ai-web-prod
     restart: always
     environment:
       - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
@@ -82,11 +82,11 @@ services:
     depends_on:
       - api
     networks:
-      - nishon-ai-network
+      - performa-ai-network
 
   nginx:
     image: nginx:alpine
-    container_name: nishon-ai-nginx-prod
+    container_name: performa-ai-nginx-prod
     restart: always
     ports:
       - "80:80"
@@ -98,12 +98,12 @@ services:
       - api
       - web
     networks:
-      - nishon-ai-network
+      - performa-ai-network
 
 volumes:
   postgres_data:
   redis_data:
 
 networks:
-  nishon-ai-network:
+  performa-ai-network:
     driver: bridge

@@ -177,6 +177,7 @@ export default function MetaSettingsPage() {
   const [syncResult, setSyncResult] = useState<string | null>(null)
   const [justConnected, setJustConnected] = useState(false)
   const [lastSyncedAt, setLastSyncedAt] = useState<Date | null>(null)
+  const [connecting, setConnecting] = useState(false)
 
   const loadDashboard = useCallback(async () => {
     if (!workspaceId) return
@@ -245,7 +246,8 @@ export default function MetaSettingsPage() {
   }
 
   function handleConnect() {
-    if (!workspaceId) return
+    if (!workspaceId || connecting) return
+    setConnecting(true)
     connectMeta(workspaceId)
   }
 
@@ -483,9 +485,10 @@ export default function MetaSettingsPage() {
         <button
           type="button"
           onClick={handleConnect}
+          disabled={connecting}
           className="text-xs px-3 py-1.5 rounded-lg border border-[#E5E7EB] text-[#9CA3AF] hover:text-[#111827] hover:bg-[#F9FAFB] transition-colors shrink-0"
         >
-          Reconnect
+          {connecting ? 'Redirecting…' : 'Reconnect'}
         </button>
       </div>
     </div>

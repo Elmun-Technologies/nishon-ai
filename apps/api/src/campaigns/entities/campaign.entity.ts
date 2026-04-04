@@ -12,8 +12,8 @@ import {
 import { Workspace } from "../../workspaces/entities/workspace.entity";
 import { AdSet } from "../../ad-sets/entities/ad-set.entity";
 import { AiDecision } from "../../ai-decisions/entities/ai-decision.entity";
-import { Platform, CampaignStatus, CampaignObjective, BudgetType, CampaignCurrency } from "@nishon/shared";
-import type { CampaignSchedule } from "@nishon/shared";
+import { Platform, CampaignStatus, CampaignObjective, BudgetType, CampaignCurrency } from "@performa/shared";
+import type { CampaignSchedule } from "@performa/shared";
 
 /**
  * A Campaign is the top-level advertising unit on any platform.

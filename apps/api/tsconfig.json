@@ -18,8 +18,8 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@nishon/shared": ["../../packages/shared/src"],
-      "@nishon/ai-sdk": ["../../packages/ai-sdk/src"]
+      "@performa/shared": ["../../packages/shared/src"],
+      "@performa/ai-sdk": ["../../packages/ai-sdk/src"]
     }
   }
 }

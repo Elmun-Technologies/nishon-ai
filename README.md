@@ -1,10 +1,10 @@
-# Nishon AI
+# Performa
 
 An autonomous AI-powered advertising platform that manages digital ad campaigns better than a human media buyer (targetolog). Built for SMB businesses in the CIS/Central Asia market, with global expansion plans.
 
 ## Project Description
 
-Nishon AI is an AI agent that autonomously manages digital advertising campaigns across multiple platforms (Meta, Google, TikTok, YouTube, Telegram). The platform uses advanced AI to:
+Performa is an AI agent that autonomously manages digital advertising campaigns across multiple platforms (Meta, Google, TikTok, YouTube, Telegram). The platform uses advanced AI to:
 
 - Generate data-driven advertising strategies
 - Optimize campaign performance in real-time
@@ -23,7 +23,7 @@ Nishon AI is an AI agent that autonomously manages digital advertising campaigns
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd nishon-ai
+cd performa-ai
 ```
 
 2. Copy environment configuration:
@@ -53,7 +53,7 @@ By default, the applications will be available at values from environment variab
 ## Project Structure
 
 ```
-nishon-ai/
+performa-ai/
 ├── apps/
 │   ├── api/           # NestJS backend API
 │   └── web/           # Next.js frontend
@@ -66,7 +66,7 @@ nishon-ai/
 
 ## Available Scripts
 
-Root package (`nishon-ai/`) ichidan:
+Root package (`performa-ai/`) ichidan:
 
 - `pnpm dev` - Turbo orqali barcha ilovalarni dev rejimida ishga tushirish
 - `pnpm build` - Barcha paketlar uchun production build
