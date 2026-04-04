@@ -15,6 +15,7 @@ import { AgentProfile } from "../entities/agent-profile.entity";
 import { AgentPlatformMetrics } from "../entities/agent-platform-metrics.entity";
 import { ServiceEngagement } from "../entities/service-engagement.entity";
 import { Workspace } from "../../workspaces/entities/workspace.entity";
+import { ConnectedAccount } from "../../platforms/entities/connected-account.entity";
 import { Platform } from "@performa/shared";
 import { decrypt } from "../../common/crypto.util";
 
@@ -141,6 +142,8 @@ export class GooglePerformanceSyncService {
     private readonly serviceEngagementRepo: Repository<ServiceEngagement>,
     @InjectRepository(Workspace)
     private readonly workspaceRepo: Repository<Workspace>,
+    @InjectRepository(ConnectedAccount)
+    private readonly connectedAccountRepo: Repository<ConnectedAccount>,
   ) {
     const key = this.config.get<string>("ENCRYPTION_KEY", "");
     this.encryptionKey = key.length === 32 ? key : null;
@@ -693,7 +696,7 @@ export class GooglePerformanceSyncService {
               aggregationPeriod: metric.aggregationPeriod,
             },
           });
-          if (existing && existing.updatedAt > new Date(Date.now() - 1000)) {
+          if (existing && existing.syncedAt > new Date(Date.now() - 1000)) {
             updated++;
           } else {
             inserted++;
@@ -891,24 +894,24 @@ export class GooglePerformanceSyncService {
 
   /**
    * Resolves Google Ads access token for a workspace.
-   * Looks up most recent active ServiceEngagement and decrypts token if needed.
+   * Looks up most recent active ConnectedAccount for Google platform and decrypts token if needed.
    * Attempts token refresh if token has expired.
    */
   private async resolveAccessToken(workspaceId: string): Promise<string | null> {
-    const engagement = await this.serviceEngagementRepo.findOne({
+    const connectedAccount = await this.connectedAccountRepo.findOne({
       where: {
         workspaceId,
-        platformType: "google_ads",
+        platform: Platform.GOOGLE,
         isActive: true,
       },
       order: { createdAt: "DESC" },
     });
 
-    if (!engagement || !engagement.accessToken) {
+    if (!connectedAccount || !connectedAccount.accessToken) {
       return null;
     }
 
-    let token = engagement.accessToken;
+    let token = connectedAccount.accessToken;
 
     // Decrypt if needed
     if (this.encryptionKey && token.includes(":")) {
@@ -925,18 +928,22 @@ export class GooglePerformanceSyncService {
     }
 
     // Check if token is expired and attempt refresh
-    if (engagement.tokenExpiresAt && engagement.tokenExpiresAt < new Date()) {
-      if (engagement.refreshToken) {
+    if (connectedAccount.tokenExpiresAt && connectedAccount.tokenExpiresAt < new Date()) {
+      if (connectedAccount.refreshToken) {
         try {
+          // Get client credentials from config (not stored in ConnectedAccount)
+          const clientId = this.config.get<string>("GOOGLE_OAUTH_CLIENT_ID", "");
+          const clientSecret = this.config.get<string>("GOOGLE_OAUTH_CLIENT_SECRET", "");
+
           const newToken = await this.refreshAccessToken(
-            engagement.refreshToken,
-            engagement.clientId,
-            engagement.clientSecret,
+            connectedAccount.refreshToken,
+            clientId,
+            clientSecret,
           );
           token = newToken;
-          engagement.accessToken = newToken;
-          engagement.tokenExpiresAt = new Date(Date.now() + 3600000); // 1 hour from now
-          await this.serviceEngagementRepo.save(engagement);
+          connectedAccount.accessToken = newToken;
+          connectedAccount.tokenExpiresAt = new Date(Date.now() + 3600000); // 1 hour from now
+          await this.connectedAccountRepo.save(connectedAccount);
 
           this.logger.log({
             message: "Token refreshed successfully",
@@ -997,19 +1004,19 @@ export class GooglePerformanceSyncService {
 
   /**
    * Gets list of Google Ads customer IDs connected to a workspace.
-   * Fetches from ServiceEngagement records.
+   * Fetches from ConnectedAccount records.
    */
   private async getConnectedCustomerIds(workspaceId: string): Promise<string[]> {
-    const engagements = await this.serviceEngagementRepo.find({
+    const connectedAccounts = await this.connectedAccountRepo.find({
       where: {
         workspaceId,
-        platformType: "google_ads",
+        platform: Platform.GOOGLE,
         isActive: true,
       },
     });
 
-    return engagements
-      .map((e) => e.externalAccountId)
+    return connectedAccounts
+      .map((acc) => acc.externalAccountId)
       .filter((id): id is string => !!id)
       .map((id) => id.replace(/[^0-9]/g, "")); // Remove hyphens from customer ID
   }

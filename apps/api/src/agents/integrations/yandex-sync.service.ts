@@ -15,6 +15,7 @@ import { AgentProfile } from "../entities/agent-profile.entity";
 import { AgentPlatformMetrics } from "../entities/agent-platform-metrics.entity";
 import { ServiceEngagement } from "../entities/service-engagement.entity";
 import { Workspace } from "../../workspaces/entities/workspace.entity";
+import { ConnectedAccount } from "../../platforms/entities/connected-account.entity";
 import { Platform } from "@performa/shared";
 import { decrypt, encrypt } from "../../common/crypto.util";
 
@@ -193,6 +194,8 @@ export class YandexPerformanceSyncService {
     private readonly serviceEngagementRepo: Repository<ServiceEngagement>,
     @InjectRepository(Workspace)
     private readonly workspaceRepo: Repository<Workspace>,
+    @InjectRepository(ConnectedAccount)
+    private readonly connectedAccountRepo: Repository<ConnectedAccount>,
   ) {
     const key = this.config.get<string>("ENCRYPTION_KEY", "");
     this.encryptionKey = key.length === 32 ? key : null;
@@ -1164,26 +1167,20 @@ export class YandexPerformanceSyncService {
    * Attempts token refresh if token has expired.
    */
   private async resolveAccessToken(workspaceId: string): Promise<string | null> {
-    const engagement = await this.serviceEngagementRepo.findOne({
+    const connectedAccount = await this.connectedAccountRepo.findOne({
       where: {
         workspaceId,
+        platform: Platform.YANDEX,
+        isActive: true,
       },
-      relations: ["agentProfile"],
+      order: { createdAt: "DESC" },
     });
 
-    if (!engagement || !engagement.agentProfile) {
+    if (!connectedAccount || !connectedAccount.accessToken) {
       return null;
     }
 
-    // Extract token from metadata or custom field
-    // Note: This assumes a custom field exists on ServiceEngagement for storing platform tokens
-    // In a real implementation, you might have a separate table for platform credentials
-    const tokenField = (engagement as any).yandexAccessToken;
-    if (!tokenField) {
-      return null;
-    }
-
-    let token = tokenField;
+    let token = connectedAccount.accessToken;
 
     // Decrypt if needed
     if (this.encryptionKey && token.includes(":")) {
@@ -1200,21 +1197,18 @@ export class YandexPerformanceSyncService {
     }
 
     // Check if token is expired and attempt refresh
-    const tokenExpiresAt = (engagement as any).yandexTokenExpiresAt as Date | undefined;
-    const refreshToken = (engagement as any).yandexRefreshToken as string | undefined;
-
-    if (tokenExpiresAt && tokenExpiresAt < new Date()) {
-      if (refreshToken) {
+    if (connectedAccount.tokenExpiresAt && connectedAccount.tokenExpiresAt < new Date()) {
+      if (connectedAccount.refreshToken) {
         try {
-          const newToken = await this.refreshAccessToken(refreshToken);
+          const newToken = await this.refreshAccessToken(connectedAccount.refreshToken);
           token = newToken;
 
-          // Update engagement with new token
-          (engagement as any).yandexAccessToken = this.encryptionKey
+          // Update connected account with new token
+          connectedAccount.accessToken = this.encryptionKey
             ? encrypt(newToken, this.encryptionKey)
             : newToken;
-          (engagement as any).yandexTokenExpiresAt = new Date(Date.now() + 3600000); // 1 hour
-          await this.serviceEngagementRepo.save(engagement);
+          connectedAccount.tokenExpiresAt = new Date(Date.now() + 3600000); // 1 hour
+          await this.connectedAccountRepo.save(connectedAccount);
 
           this.logger.log({
             message: "Yandex token refreshed successfully",

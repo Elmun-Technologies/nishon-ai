@@ -390,15 +390,12 @@ export class MetaPerformanceSyncService {
 
     try {
       // Account-level insights include all campaigns in the account
+      // The Meta API getInsights method uses datePreset (e.g. "today", "this_month")
+      const datePreset = "last_30d"; // Default to 30 days
       const insights = await this.metaApi.getInsights(
         accountId,
         accessToken,
-        {
-          dateStart: formatDate(startDate),
-          dateEnd: formatDate(endDate),
-          timeIncrement: "1", // Daily
-          fields: "campaign_id,campaign_name,date_start,spend,impressions,clicks,conversions,conversion_value,ctr,cpc",
-        },
+        datePreset,
       );
 
       return insights || [];
