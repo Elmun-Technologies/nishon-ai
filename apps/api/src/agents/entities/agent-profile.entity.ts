@@ -161,9 +161,97 @@ export class AgentProfile {
   @UpdateDateColumn({ name: "updated_at" })
   updatedAt: Date;
 
+  // ─── Marketplace Relations ──────────────────────────────────────────────────
+
+  @Column({ type: "varchar", length: 50, default: "unverified", name: "certification_level" })
+  certificationLevel: "unverified" | "self_declared" | "verified" | "premium";
+
+  @Column({ nullable: true, name: "verification_level_updated_at" })
+  verificationLevelUpdatedAt: Date | null;
+
+  @Column({ nullable: true, name: "verified_by_admin" })
+  verifiedByAdmin: string | null;
+
+  @Column({ type: "text", array: true, nullable: true, name: "primary_countries" })
+  primaryCountries: string[] | null;
+
+  @Column({ type: "text", array: true, nullable: true, name: "supported_languages" })
+  supportedLanguages: string[] | null;
+
+  @Column({ nullable: true })
+  timezone: string | null;
+
+  @Column({ nullable: true, name: "last_performance_sync" })
+  lastPerformanceSync: Date | null;
+
+  @Column({ type: "varchar", length: 20, default: "never_synced", name: "performance_sync_status" })
+  performanceSyncStatus: "healthy" | "stale" | "failed" | "never_synced";
+
+  @Column({ default: false, name: "is_performance_data_verified" })
+  isPerformanceDataVerified: boolean;
+
+  @Column({ unique: true, nullable: true, name: "seo_slug" })
+  seoSlug: string | null;
+
+  @Column({ default: true, name: "is_indexable" })
+  isIndexable: boolean;
+
+  @Column({ default: 0, name: "page_view_count" })
+  pageViewCount: number;
+
+  @Column({ type: "jsonb", nullable: true, name: "specializations" })
+  specializations: { primary?: string[]; secondary?: string[] } | null;
+
+  @Column({ type: "text", array: true, nullable: true, name: "industries_served" })
+  industriesServed: string[] | null;
+
+  @Column({ type: "decimal", precision: 5, scale: 1, nullable: true, name: "average_response_time_hours" })
+  averageResponseTimeHours: number | null;
+
+  @Column({ type: "text", array: true, nullable: true, name: "communication_channels" })
+  communicationChannels: string[] | null;
+
+  @Column({ type: "time", nullable: true, name: "timezone_availability_start" })
+  timezoneAvailabilityStart: string | null;
+
+  @Column({ type: "time", nullable: true, name: "timezone_availability_end" })
+  timezoneAvailabilityEnd: string | null;
+
+  @Column({ nullable: true, name: "search_keywords" })
+  searchKeywords: string | null;
+
+  @Column({ type: "decimal", precision: 8, scale: 2, default: 0, name: "popularity_score" })
+  popularityScore: number;
+
+  @Column({ type: "decimal", precision: 3, scale: 2, default: 0, name: "fraud_risk_score" })
+  fraudRiskScore: number;
+
+  // ─── Relations ───────────────────────────────────────────────────────────────
+
   @OneToMany("ServiceEngagement", "agentProfile")
   engagements: any[];
 
   @OneToMany("AgentReview", "agentProfile")
   reviews: any[];
+
+  @OneToMany("AgentCertification", "agentProfile", { cascade: true })
+  certifications: any[];
+
+  @OneToMany("AgentCaseStudy", "agentProfile", { cascade: true })
+  caseStudies: any[];
+
+  @OneToMany("AgentLanguage", "agentProfile", { cascade: true })
+  languages: any[];
+
+  @OneToMany("AgentGeographicCoverage", "agentProfile", { cascade: true })
+  geographicCoverage: any[];
+
+  @OneToMany("AgentPlatformMetrics", "agentProfile", { cascade: true })
+  platformMetrics: any[];
+
+  @OneToMany("AgentHistoricalPerformance", "agentProfile", { cascade: true })
+  historicalPerformance: any[];
+
+  @OneToMany("AgentPerformanceSyncLog", "agentProfile", { cascade: true })
+  syncLogs: any[];
 }
