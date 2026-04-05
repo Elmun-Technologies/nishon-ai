@@ -42,6 +42,7 @@
   --text-primary: #111827;
   --text-secondary: #6B7280;
   --text-tertiary: #9CA3AF;
+  --button-ripple-color: rgba(17, 24, 39, 0.3);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -66,6 +67,7 @@
   --text-primary: #F1F5F9;
   --text-secondary: #CBD5E1;
   --text-tertiary: #94A3B8;
+  --button-ripple-color: rgba(248, 250, 252, 0.5);
 }
 
 @layer base {
