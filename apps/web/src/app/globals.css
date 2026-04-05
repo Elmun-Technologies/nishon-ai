@@ -46,6 +46,24 @@
   --text-muted: #6B7280;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --surface: #0F172A;
+    --surface-2: #1A202C;
+    --border: #334155;
+    --text-muted: #CBD5E1;
+  }
+}
+
+.dark {
+  color-scheme: dark;
+  --surface: #0F172A;
+  --surface-2: #1A202C;
+  --border: #334155;
+  --text-muted: #CBD5E1;
+}
+
 @layer base {
   * { box-sizing: border-box; }
 
