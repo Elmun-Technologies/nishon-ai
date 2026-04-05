@@ -308,7 +308,7 @@ export function CreativeAssets({
               <input
                 type="file"
                 accept="image/*"
-                className="w-full px-3 py-2 bg-surface-2 dark:bg-surface border border-border rounded-lg text-text-primary file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-surface file:text-text-primary hover:file:bg-[#6B2FB8]"
+                className="w-full px-3 py-2 bg-surface-2 border border-border rounded-lg text-text-primary file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-surface file:text-text-primary hover:file:bg-[#6B2FB8]"
                 onChange={(e) => {
                   const file = e.target.files?.[0]
                   if (file) {
@@ -447,7 +447,7 @@ export function CreativeAssets({
             <div>
               <Label>Meta Headline Limit</Label>
               <p className="text-sm text-text-tertiary">125 characters</p>
-              <div className="w-full bg-surface-2 dark:bg-surface-2 rounded-full h-2 mt-2">
+              <div className="w-full bg-surface-2-2 rounded-full h-2 mt-2">
                 <div 
                   className="bg-surface h-2 rounded-full" 
                   style={{ width: `${(formData.creatives.headlines[0]?.length || 0) / 125 * 100}%` }}
@@ -458,7 +458,7 @@ export function CreativeAssets({
             <div>
               <Label>Google Headline Limit</Label>
               <p className="text-sm text-text-tertiary">30 characters</p>
-              <div className="w-full bg-surface-2 dark:bg-surface-2 rounded-full h-2 mt-2">
+              <div className="w-full bg-surface-2-2 rounded-full h-2 mt-2">
                 <div 
                   className="bg-[#4285F4] h-2 rounded-full" 
                   style={{ width: `${(formData.creatives.headlines[0]?.length || 0) / 30 * 100}%` }}
@@ -469,7 +469,7 @@ export function CreativeAssets({
             <div>
               <Label>Yandex Headline Limit</Label>
               <p className="text-sm text-text-tertiary">56 characters</p>
-              <div className="w-full bg-surface-2 dark:bg-surface-2 rounded-full h-2 mt-2">
+              <div className="w-full bg-surface-2-2 rounded-full h-2 mt-2">
                 <div 
                   className="bg-[#FFCC00] h-2 rounded-full" 
                   style={{ width: `${(formData.creatives.headlines[0]?.length || 0) / 56 * 100}%` }}
@@ -480,7 +480,7 @@ export function CreativeAssets({
             <div>
               <Label>Meta Primary Text Limit</Label>
               <p className="text-sm text-text-tertiary">125 characters</p>
-              <div className="w-full bg-surface-2 dark:bg-surface-2 rounded-full h-2 mt-2">
+              <div className="w-full bg-surface-2-2 rounded-full h-2 mt-2">
                 <div 
                   className="bg-[#1877F2] h-2 rounded-full" 
                   style={{ width: `${(formData.creatives.primaryText?.length || 0) / 125 * 100}%` }}

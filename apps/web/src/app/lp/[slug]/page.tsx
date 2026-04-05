@@ -78,13 +78,13 @@ function FaqItem({ q, a }: { q: string; a: string }) {
     <div className="border border-border rounded-xl overflow-hidden">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between p-4 text-left bg-white hover:bg-surface-2 transition-colors"
+        className="w-full flex items-center justify-between p-4 text-left bg-surface-elevated hover:bg-surface-2 transition-colors"
       >
         <span className="font-medium text-text-primary text-sm pr-4">{q}</span>
         <span className="text-text-tertiary text-lg shrink-0">{open ? '−' : '+'}</span>
       </button>
       {open && (
-        <div className="px-4 pb-4 text-sm text-text-secondary leading-relaxed bg-white">
+        <div className="px-4 pb-4 text-sm text-text-secondary leading-relaxed bg-surface-elevated">
           {a}
         </div>
       )}
@@ -192,7 +192,7 @@ export default function LandingPagePublic() {
         </>
       )}
 
-      <div className="min-h-screen bg-white font-sans">
+      <div className="min-h-screen bg-surface-elevated font-sans">
 
         {/* Urgency bar */}
         {c.urgencyText && (
@@ -249,7 +249,7 @@ export default function LandingPagePublic() {
         )}
 
         {sections.includes('features') && c.features?.length > 0 && (
-          <section className="py-12 px-4 bg-white">
+          <section className="py-12 px-4 bg-surface-elevated">
             <div className="max-w-2xl mx-auto">
               <h2 className="text-2xl font-bold text-text-primary text-center mb-8">
                 Nima uchun biz?
@@ -277,7 +277,7 @@ export default function LandingPagePublic() {
         )}
 
         {sections.includes('testimonials') && c.testimonials?.length > 0 && (
-          <section className="py-12 px-4 bg-white">
+          <section className="py-12 px-4 bg-surface-elevated">
             <div className="max-w-2xl mx-auto">
               <h2 className="text-2xl font-bold text-text-primary text-center mb-8">
                 Mijozlarimiz fikri

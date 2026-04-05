@@ -226,7 +226,7 @@ export default function AudiencesPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search for audience..."
-              className="w-full md:max-w-sm rounded-lg border border-border bg-surface dark:bg-surface px-3 py-2 text-sm outline-none focus:border-[#8B80F9]"
+              className="w-full md:max-w-sm rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-[#8B80F9]"
             />
             <span className="text-xs px-2 py-1 rounded-full bg-[#151236] border border-border">{selected.length} selected</span>
           </div>
@@ -239,7 +239,7 @@ export default function AudiencesPage() {
                 className={`text-left px-3 py-2 rounded-lg text-sm border ${
                   stage.id === activeStage
                     ? 'bg-[#221B5A] border-[#8B80F9] text-white'
-                    : 'bg-surface dark:bg-surface border-border text-[#A1A1AA]'
+                    : 'bg-surface border-border text-[#A1A1AA]'
                 }`}
               >
                 {stage.label}
@@ -255,7 +255,7 @@ export default function AudiencesPage() {
                   key={audience.id}
                   onClick={() => toggleAudience(audience.id)}
                   className={`text-left rounded-xl border p-4 transition ${
-                    active ? 'border-[#8B80F9] bg-[#14113A]' : 'border-border bg-surface dark:bg-surface hover:border-[#4C478F]'
+                    active ? 'border-[#8B80F9] bg-[#14113A]' : 'border-border bg-surface hover:border-[#4C478F]'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
@@ -277,7 +277,7 @@ export default function AudiencesPage() {
           </div>
         </section>
 
-        <section className="rounded-xl border border-border bg-surface dark:bg-surface">
+        <section className="rounded-xl border border-border bg-surface">
           <div className="px-4 py-3 border-b border-[#1F1B4D] flex items-center justify-between">
             <p className="font-medium">Campaign Set Up</p>
             <span className="text-xs text-text-tertiary">Step 1 of 4</span>
@@ -286,13 +286,13 @@ export default function AudiencesPage() {
             <div className="inline-flex rounded-lg border border-border overflow-hidden">
               <button
                 onClick={() => setSplitByFunnel(true)}
-                className={`px-3 py-2 text-xs ${splitByFunnel ? 'bg-[#221B5A] text-white' : 'bg-surface dark:bg-surface text-[#A1A1AA]'}`}
+                className={`px-3 py-2 text-xs ${splitByFunnel ? 'bg-[#221B5A] text-white' : 'bg-surface text-[#A1A1AA]'}`}
               >
                 Split campaigns per funnel stage
               </button>
               <button
                 onClick={() => setSplitByFunnel(false)}
-                className={`px-3 py-2 text-xs ${!splitByFunnel ? 'bg-[#221B5A] text-white' : 'bg-surface dark:bg-surface text-[#A1A1AA]'}`}
+                className={`px-3 py-2 text-xs ${!splitByFunnel ? 'bg-[#221B5A] text-white' : 'bg-surface text-[#A1A1AA]'}`}
               >
                 Launch all ad sets to one campaign
               </button>
@@ -300,11 +300,11 @@ export default function AudiencesPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
               <input
-                className="md:col-span-2 rounded-lg border border-border bg-surface dark:bg-surface px-3 py-2 text-sm"
+                className="md:col-span-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm"
                 defaultValue="Performa - Acquisition Prospecting - Master Campaign"
               />
               <select
-                className="rounded-lg border border-border bg-surface dark:bg-surface px-3 py-2 text-sm"
+                className="rounded-lg border border-border bg-surface px-3 py-2 text-sm"
                 value={objective}
                 onChange={(e) => setObjective(e.target.value)}
               >
@@ -315,14 +315,14 @@ export default function AudiencesPage() {
                 <option>Awareness</option>
               </select>
               <div className="inline-flex rounded-lg border border-border overflow-hidden h-fit">
-                <button onClick={() => setBudgetType('CBO')} className={`px-3 py-2 text-xs ${budgetType === 'CBO' ? 'bg-[#221B5A] text-white' : 'bg-surface dark:bg-surface text-[#A1A1AA]'}`}>CBO</button>
-                <button onClick={() => setBudgetType('ABO')} className={`px-3 py-2 text-xs ${budgetType === 'ABO' ? 'bg-[#221B5A] text-white' : 'bg-surface dark:bg-surface text-[#A1A1AA]'}`}>ABO</button>
+                <button onClick={() => setBudgetType('CBO')} className={`px-3 py-2 text-xs ${budgetType === 'CBO' ? 'bg-[#221B5A] text-white' : 'bg-surface text-[#A1A1AA]'}`}>CBO</button>
+                <button onClick={() => setBudgetType('ABO')} className={`px-3 py-2 text-xs ${budgetType === 'ABO' ? 'bg-[#221B5A] text-white' : 'bg-surface text-[#A1A1AA]'}`}>ABO</button>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="rounded-xl border border-border bg-surface dark:bg-surface p-4 space-y-4">
+        <section className="rounded-xl border border-border bg-surface p-4 space-y-4">
           <div className="flex items-center justify-between">
             <p className="font-medium">Select the Ad Creatives</p>
             <button className="px-3 py-1.5 rounded-lg bg-[#8B80F9] text-text-primary text-xs font-semibold">Save Changes</button>
@@ -346,7 +346,7 @@ export default function AudiencesPage() {
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
             {[1, 2, 3, 4].map((n) => (
-              <div key={n} className="rounded-lg border border-border bg-surface dark:bg-surface p-2">
+              <div key={n} className="rounded-lg border border-border bg-surface p-2">
                 <div className="aspect-[4/5] rounded bg-[#16133B] mb-2" />
                 <p className="text-xs text-text-tertiary">Creative #{n}</p>
                 <p className="text-[11px] text-text-tertiary mt-1">ROAS, CTR, thumb-stop va spend metrikalari bo‘yicha saralash.</p>
@@ -355,7 +355,7 @@ export default function AudiencesPage() {
           </div>
         </section>
 
-        <section className="rounded-xl border border-border bg-surface dark:bg-surface p-4 space-y-4">
+        <section className="rounded-xl border border-border bg-surface p-4 space-y-4">
           <div className="flex items-center justify-between">
             <p className="font-medium">Set Up the Audiences</p>
             <button className="px-3 py-1.5 rounded-lg bg-[#8B80F9] text-text-primary text-xs font-semibold">Save Changes</button>
@@ -363,7 +363,7 @@ export default function AudiencesPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div className="rounded-lg border border-border p-3 space-y-3">
               <p className="text-sm font-medium">Choose Locations</p>
-              <select className="w-full rounded-lg border border-border bg-surface dark:bg-surface px-3 py-2 text-sm">
+              <select className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm">
                 <option>Worldwide</option>
                 <option>Uzbekistan</option>
                 <option>Kazakhstan</option>
@@ -373,7 +373,7 @@ export default function AudiencesPage() {
             </div>
             <div className="rounded-lg border border-border p-3 space-y-3">
               <p className="text-sm font-medium">Recency</p>
-              <select className="w-full rounded-lg border border-border bg-surface dark:bg-surface px-3 py-2 text-sm">
+              <select className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm">
                 <option>0-180 days</option>
                 <option>0-3 days</option>
                 <option>3-30 days</option>
@@ -388,17 +388,17 @@ export default function AudiencesPage() {
             </div>
             <div className="rounded-lg border border-border p-3 space-y-3">
               <p className="text-sm font-medium">Conversion + Budget</p>
-              <select className="w-full rounded-lg border border-border bg-surface dark:bg-surface px-3 py-2 text-sm">
+              <select className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm">
                 <option>Purchase</option>
                 <option>Add to Cart</option>
                 <option>Lead</option>
               </select>
-              <input className="w-full rounded-lg border border-border bg-surface dark:bg-surface px-3 py-2 text-sm" defaultValue="USD 10 / day" />
+              <input className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm" defaultValue="USD 10 / day" />
             </div>
           </div>
         </section>
 
-        <section className="rounded-xl border border-border bg-surface dark:bg-surface p-4 space-y-4">
+        <section className="rounded-xl border border-border bg-surface p-4 space-y-4">
           <div className="flex items-center justify-between">
             <p className="font-medium">Summary & Launch</p>
             <button className="px-4 py-2 rounded-lg bg-[#8B80F9] text-text-primary text-sm font-semibold">Launch</button>
@@ -415,7 +415,7 @@ export default function AudiencesPage() {
           </div>
         </section>
 
-        <section className="rounded-xl border border-border bg-surface dark:bg-surface p-4">
+        <section className="rounded-xl border border-border bg-surface p-4">
           <h3 className="text-base font-semibold mb-3">Target multi-network scope</h3>
           <div className="flex flex-wrap gap-2 mb-4">
             {TARGET_NETWORKS.map((network) => (

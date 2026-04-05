@@ -98,13 +98,13 @@ export const AdAccountsConnection: React.FC<AdAccountsConnectionProps> = ({ onCo
 
         {/* Already Connected Accounts */}
         {connectedAccounts.length > 0 && (
-          <Card className="border-green-200 bg-green-50 p-4">
+          <Card className="border-green-500/20 bg-green-500/10 p-4">
             <h4 className="font-semibold text-green-900 mb-3 flex items-center gap-2">
               <Check size={18} /> Ulangan hisoblar ({connectedAccounts.length}/3)
             </h4>
             <div className="space-y-2">
               {connectedAccounts.map((acc) => (
-                <div key={acc.platform} className="flex items-center justify-between p-3 bg-surface rounded-lg border border-green-200">
+                <div key={acc.platform} className="flex items-center justify-between p-3 bg-surface rounded-lg border border-green-500/20">
                   <span className="text-sm">
                     {platformInfo[acc.platform].icon} {platformInfo[acc.platform].name}
                   </span>
@@ -134,7 +134,7 @@ export const AdAccountsConnection: React.FC<AdAccountsConnectionProps> = ({ onCo
               >
                 <Card
                   className={`p-6 h-full flex flex-col gap-4 ${
-                    isConnected ? 'border-green-200 bg-green-50' : 'border-border hover:bg-surface-2'
+                    isConnected ? 'border-green-500/20 bg-green-500/10' : 'border-border hover:bg-surface-2'
                   }`}
                 >
                   <div className="flex items-start justify-between">
@@ -156,7 +156,7 @@ export const AdAccountsConnection: React.FC<AdAccountsConnectionProps> = ({ onCo
                     </div>
                   )}
                   {isConnected && (
-                    <div className="text-green-600 font-semibold text-sm mt-auto pt-4 border-t border-green-200">
+                    <div className="text-green-600 font-semibold text-sm mt-auto pt-4 border-t border-green-500/20">
                       ✓ Ulangan
                     </div>
                   )}
@@ -167,7 +167,7 @@ export const AdAccountsConnection: React.FC<AdAccountsConnectionProps> = ({ onCo
         </div>
 
         {availablePlatforms.length === 0 && (
-          <Card className="border-green-200 bg-green-50 p-6 text-center">
+          <Card className="border-green-500/20 bg-green-500/10 p-6 text-center">
             <div className="flex justify-center mb-3">
               <Check size={32} className="text-green-600" />
             </div>
@@ -224,8 +224,8 @@ export const AdAccountsConnection: React.FC<AdAccountsConnectionProps> = ({ onCo
           </div>
 
           {error && (
-            <div className="flex gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <AlertCircle size={20} className="text-red-600 flex-shrink-0 mt-0.5" />
+            <div className="flex gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
+              <AlertCircle size={20} className="text-red-500 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold text-red-900 text-sm">{error}</p>
               </div>
@@ -256,7 +256,7 @@ export const AdAccountsConnection: React.FC<AdAccountsConnectionProps> = ({ onCo
         </Card>
 
         {/* Info Card */}
-        <Card className="border-blue-200 bg-blue-50 p-6">
+        <Card className="border-blue-500/20 bg-blue-500/10 p-6">
           <div className="flex gap-4">
             <div className="text-2xl">ℹ️</div>
             <div>

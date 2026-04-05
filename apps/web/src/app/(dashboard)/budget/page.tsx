@@ -170,7 +170,7 @@ export default function BudgetPage() {
                         <p className="text-text-tertiary text-xs">{formatCurrency(allocated / 30)}/day</p>
                       </div>
                     </div>
-                    <div className="h-2 bg-surface-2 dark:bg-surface rounded-full overflow-hidden">
+                    <div className="h-2 bg-surface-2 rounded-full overflow-hidden">
                       <div
                         className="h-full rounded-full transition-all duration-700"
                         style={{ width: `${percentage}%`, backgroundColor: config.color }}

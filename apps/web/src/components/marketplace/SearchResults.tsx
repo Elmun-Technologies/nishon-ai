@@ -51,7 +51,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
     return (
       <div className={cn('', className)}>
         <Card padding="lg" className="text-center">
-          <div className="text-red-600 mb-4">
+          <div className="text-red-500 mb-4">
             <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"

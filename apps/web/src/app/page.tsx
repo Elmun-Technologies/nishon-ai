@@ -258,7 +258,7 @@ function CapabilityCard({
   const [open, setOpen] = useState(false)
 
   return (
-    <article className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur-sm transition hover:border-emerald-400/40 hover:bg-white/[0.06]">
+    <article className="rounded-3xl border border-white/10 bg-surface-elevated/[0.03] p-6 backdrop-blur-sm transition hover:border-emerald-400/40 hover:bg-surface-elevated/[0.06]">
       <h3 className="text-2xl font-semibold text-white">{title}</h3>
       <p className="mt-3 text-sm leading-relaxed text-text-tertiary">{desc}</p>
 
@@ -292,7 +292,7 @@ export default function SellerLandingPage() {
 
   return (
     <div className="min-h-screen bg-[#031314] text-white">
-      <div className="border-b border-emerald-300/20 bg-[#123436] py-2">
+      <div className="border-b border-emerald-500/30/20 bg-[#123436] py-2">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-8 px-6 text-sm text-emerald-50/90">
           {ticker.map((item, idx) => (
             <span key={`${item}-${idx}`}>{item}</span>
@@ -306,7 +306,7 @@ export default function SellerLandingPage() {
             Performa <span className="text-emerald-400">AI</span>
           </button>
 
-          <div className="hidden rounded-full border border-white/15 bg-white/[0.03] px-8 py-3 md:flex md:items-center md:gap-8 text-lg text-text-secondary">
+          <div className="hidden rounded-full border border-white/15 bg-surface-elevated/[0.03] px-8 py-3 md:flex md:items-center md:gap-8 text-lg text-text-secondary">
             <a href="#hero" className="hover:text-emerald-300">Home</a>
             <a href="#capabilities" className="hover:text-emerald-300">Solutions</a>
             <a href="#funnel" className="hover:text-emerald-300">ARR Funnel</a>
@@ -319,7 +319,7 @@ export default function SellerLandingPage() {
 
           <button
             onClick={() => router.push('/register')}
-            className="rounded-full border border-emerald-300/60 bg-emerald-500/20 px-7 py-3 text-lg font-medium text-white transition hover:bg-emerald-500/35"
+            className="rounded-full border border-emerald-500/30/60 bg-emerald-500/20 px-7 py-3 text-lg font-medium text-white transition hover:bg-emerald-500/35"
           >
             Contact Us ↗
           </button>
@@ -346,7 +346,7 @@ export default function SellerLandingPage() {
             </button>
             <button
               onClick={() => router.push('/login')}
-              className="rounded-full border border-white/20 bg-white/10 px-8 py-4 text-lg text-white transition hover:bg-white/20"
+              className="rounded-full border border-white/20 bg-surface-elevated/10 px-8 py-4 text-lg text-white transition hover:bg-surface-elevated/20"
             >
               Book a demo ⊕
             </button>
@@ -366,7 +366,7 @@ export default function SellerLandingPage() {
       </section>
 
       <section id="capabilities" className="px-6 pb-20">
-        <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-white/[0.02] p-8 md:p-12">
+        <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-surface-elevated/[0.02] p-8 md:p-12">
           <p className="text-sm uppercase tracking-[0.24em] text-emerald-300">Core capabilities</p>
           <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Loyihaning imkoniyatlari aniq va tartibli</h2>
           <p className="mt-4 max-w-4xl text-lg text-text-tertiary">
@@ -412,7 +412,7 @@ export default function SellerLandingPage() {
 
           <div className="mt-10 overflow-hidden rounded-3xl border border-white/10">
             <table className="min-w-full text-left text-sm">
-              <thead className="bg-white/[0.04] text-text-secondary">
+              <thead className="bg-surface-elevated/[0.04] text-text-secondary">
                 <tr>
                   <th className="px-5 py-4">Stage</th>
                   <th className="px-5 py-4">% Spend</th>
@@ -453,7 +453,7 @@ export default function SellerLandingPage() {
               <article
                 key={item.tab}
                 className={`rounded-2xl border p-5 ${
-                  index === 0 ? 'border-violet-300/60 bg-violet-400/10' : 'border-white/10 bg-white/[0.02]'
+                  index === 0 ? 'border-violet-300/60 bg-violet-400/10' : 'border-white/10 bg-surface-elevated/[0.02]'
                 }`}
               >
                 <h3 className="text-xl font-semibold text-white">{item.tab}</h3>
@@ -482,7 +482,7 @@ export default function SellerLandingPage() {
 
           <div className="mt-8 grid gap-4 md:grid-cols-2">
             {launchFlow.map((item) => (
-              <article key={item.step} className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
+              <article key={item.step} className="rounded-2xl border border-white/10 bg-surface-elevated/[0.02] p-6">
                 <h3 className="text-2xl font-semibold text-white">{item.step}</h3>
                 <p className="mt-2 text-base text-sky-200">{item.what}</p>
                 <ul className="mt-4 space-y-2 text-sm text-text-tertiary">
@@ -509,7 +509,7 @@ export default function SellerLandingPage() {
           </p>
 
           <div className="mt-8 grid gap-4 md:grid-cols-2">
-            <article className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
+            <article className="rounded-2xl border border-white/10 bg-surface-elevated/[0.02] p-6">
               <h3 className="text-2xl font-semibold text-white">End-to-end team flow</h3>
               <ol className="mt-4 space-y-3 text-sm text-text-tertiary">
                 {teamFlow.map((item, index) => (
@@ -523,7 +523,7 @@ export default function SellerLandingPage() {
               </ol>
             </article>
 
-            <article className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
+            <article className="rounded-2xl border border-white/10 bg-surface-elevated/[0.02] p-6">
               <h3 className="text-2xl font-semibold text-white">Permissions matrix</h3>
               <div className="mt-4 space-y-3">
                 {permissionMatrix.map((item) => (
@@ -576,7 +576,7 @@ export default function SellerLandingPage() {
 
           <div className="mt-10 grid gap-5 md:grid-cols-3">
             {reviews.map((review) => (
-              <article key={review.name} className="rounded-3xl border border-white/10 bg-white/[0.03] p-7">
+              <article key={review.name} className="rounded-3xl border border-white/10 bg-surface-elevated/[0.03] p-7">
                 <p className="text-2xl leading-relaxed text-text-secondary">{review.quote}</p>
                 <div className="mt-10 border-t border-white/10 pt-5">
                   <p className="text-lg font-semibold text-white">{review.name}</p>
@@ -600,10 +600,10 @@ export default function SellerLandingPage() {
             </ul>
           </div>
 
-          <div className="w-full max-w-xl rounded-3xl border border-white/10 bg-white/[0.03] p-7">
+          <div className="w-full max-w-xl rounded-3xl border border-white/10 bg-surface-elevated/[0.03] p-7">
             <h4 className="text-4xl font-semibold">Newsletter</h4>
             <p className="mt-3 text-lg text-text-tertiary">Performa yangiliklari, case study va amaliy guide’larni oling.</p>
-            <button className="mt-6 rounded-full border border-white/25 px-6 py-3 text-lg hover:border-emerald-300/70">
+            <button className="mt-6 rounded-full border border-white/25 px-6 py-3 text-lg hover:border-emerald-500/30/70">
               Sign Up ↗
             </button>
           </div>

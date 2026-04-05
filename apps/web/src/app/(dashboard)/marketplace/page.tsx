@@ -103,7 +103,7 @@ export default function MarketplacePage() {
       </div>
 
       {/* Info Card */}
-      <Card className="border-blue-200 bg-blue-50 p-6">
+      <Card className="border-blue-500/20 bg-blue-500/10 p-6">
         <div className="flex gap-4">
           <div className="text-3xl">ℹ️</div>
           <div>

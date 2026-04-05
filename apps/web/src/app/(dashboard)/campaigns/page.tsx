@@ -124,7 +124,7 @@ export default function CampaignsPage() {
           </Button>
           <button
             onClick={() => setShowCreatePanel(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface dark:bg-surface hover:bg-surface dark:hover:bg-surface-2 text-white dark:text-text-primary text-sm font-semibold transition-colors shadow-lg shadow-gray-200"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface hover:bg-surface dark:hover:bg-surface-2 text-white dark:text-text-primary text-sm font-semibold transition-colors shadow-lg shadow-gray-200"
           >
             <span className="text-base leading-none">+</span>
             Kampaniya yaratish
@@ -138,7 +138,7 @@ export default function CampaignsPage() {
       <AdsManagerPanel />
 
       {/* ── Filter tabs ── */}
-      <div className="flex items-center gap-1 bg-surface dark:bg-surface border border-border rounded-xl p-1 w-fit">
+      <div className="flex items-center gap-1 bg-surface border border-border rounded-xl p-1 w-fit">
         {(
           [
             { key: "all", label: "All" },
@@ -155,8 +155,8 @@ export default function CampaignsPage() {
               transition-all duration-200
               ${
                 filter === tab.key
-                  ? "bg-surface dark:bg-surface text-white dark:text-text-primary"
-                  : "text-text-tertiary hover:text-text-primary hover:bg-surface-2 dark:bg-surface"
+                  ? "bg-surface text-white dark:text-text-primary"
+                  : "text-text-tertiary hover:text-text-primary hover:bg-surface-2"
               }
             `}
           >
@@ -166,8 +166,8 @@ export default function CampaignsPage() {
                 text-xs px-1.5 py-0.5 rounded-full
                 ${
                   filter === tab.key
-                    ? "bg-surface dark:bg-surface/20 text-text-primary"
-                    : "bg-surface-2 dark:bg-surface text-text-tertiary"
+                    ? "bg-surface/20 text-text-primary"
+                    : "bg-surface-2 text-text-tertiary"
                 }
               `}
             >
@@ -209,7 +209,7 @@ export default function CampaignsPage() {
                 <Card
                   hoverable
                   onClick={() => setSelectedId(isSelected ? null : campaign.id)}
-                  className={`transition-all duration-200 ${isSelected ? "border-border/40 dark:border-white/40 bg-surface/5 dark:bg-surface/5" : ""}`}
+                  className={`transition-all duration-200 ${isSelected ? "border-border/40 dark:border-white/40 bg-surface/5/5" : ""}`}
                   padding="none"
                 >
                   <div className="flex items-center gap-4 p-5">
@@ -269,7 +269,7 @@ export default function CampaignsPage() {
                 </Card>
 
                 {isSelected && (
-                  <div className="mt-1 bg-surface-2 dark:bg-surface border border-border border-t-0 rounded-b-xl px-5 py-4">
+                  <div className="mt-1 bg-surface-2 border border-border border-t-0 rounded-b-xl px-5 py-4">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                       {[
                         {
@@ -394,7 +394,7 @@ export default function CampaignsPage() {
             onClick={() => setShowCreatePanel(false)}
           />
           {/* Panel */}
-          <div className="w-full max-w-lg bg-surface-2 dark:bg-surface border-l border-border flex flex-col shadow-2xl">
+          <div className="w-full max-w-lg bg-surface-2 border-l border-border flex flex-col shadow-2xl">
             {/* Panel header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-border">
               <div>
@@ -407,7 +407,7 @@ export default function CampaignsPage() {
               </div>
               <button
                 onClick={() => setShowCreatePanel(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-2 dark:bg-surface transition-colors"
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-2 transition-colors"
               >
                 ✕
               </button>

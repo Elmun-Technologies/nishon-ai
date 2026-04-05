@@ -117,7 +117,7 @@ export function Publish({
             <Label className="text-sm text-text-tertiary">Headlines</Label>
             <div className="space-y-1 mt-2">
               {formData.creatives.headlines.map((headline: string, index: number) => (
-                <div key={index} className="text-text-primary text-sm bg-surface-2 dark:bg-surface p-2 rounded">
+                <div key={index} className="text-text-primary text-sm bg-surface-2 p-2 rounded">
                   {headline}
                 </div>
               ))}
@@ -127,7 +127,7 @@ export function Publish({
             <Label className="text-sm text-text-tertiary">Descriptions</Label>
             <div className="space-y-1 mt-2">
               {formData.creatives.descriptions.map((description: string, index: number) => (
-                <div key={index} className="text-text-primary text-sm bg-surface-2 dark:bg-surface p-2 rounded">
+                <div key={index} className="text-text-primary text-sm bg-surface-2 p-2 rounded">
                   {description}
                 </div>
               ))}

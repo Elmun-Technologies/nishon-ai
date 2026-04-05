@@ -72,10 +72,10 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-surface-2 dark:bg-surface flex">
+    <div className="min-h-screen bg-surface-2 flex">
 
       {/* Left panel */}
-      <div className="hidden lg:flex lg:w-1/2 bg-white border-r border-border flex-col justify-between p-12">
+      <div className="hidden lg:flex lg:w-1/2 bg-surface-elevated border-r border-border flex-col justify-between p-12">
         <div>
           <h1 className="text-2xl font-bold text-text-primary">
             Performa <span className="text-text-secondary">AI</span>
@@ -84,7 +84,7 @@ export default function LoginPage() {
 
         <div>
           <div className="mb-8">
-            <div className="inline-flex items-center gap-2 bg-surface-2 dark:bg-surface border border-border rounded-full px-4 py-2 mb-6">
+            <div className="inline-flex items-center gap-2 bg-surface-2 border border-border rounded-full px-4 py-2 mb-6">
               <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span className="text-text-secondary text-sm font-medium">AI Agent Active</span>
             </div>
@@ -104,20 +104,20 @@ export default function LoginPage() {
               { value: '−40%', label: "Past CPA" },
               { value: '24/7', label: "AI monitoring" },
             ].map((stat) => (
-              <div key={stat.label} className="bg-surface-2 dark:bg-surface rounded-xl p-4 border border-border">
+              <div key={stat.label} className="bg-surface-2 rounded-xl p-4 border border-border">
                 <p className="text-2xl font-bold text-text-secondary">{stat.value}</p>
                 <p className="text-text-tertiary text-xs mt-1">{stat.label}</p>
               </div>
             ))}
           </div>
 
-          <div className="bg-surface-2 dark:bg-surface rounded-xl p-5 border border-border">
+          <div className="bg-surface-2 rounded-xl p-5 border border-border">
             <p className="text-text-secondary text-sm leading-relaxed mb-3">
               "Performa targetologimizni almashtirdi va birinchi oyda ROAS 2.8x oshdi.
               Endi kampaniya boshqarishga 0 soat sarflaymiz."
             </p>
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-[#E5E7EB] border border-border flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-surface-2 border border-border flex items-center justify-center">
                 <span className="text-xs font-bold text-text-secondary">JT</span>
               </div>
               <div>
@@ -142,7 +142,7 @@ export default function LoginPage() {
             </h1>
           </div>
 
-          <div className="bg-white border border-border rounded-xl p-6">
+          <div className="bg-surface-elevated border border-border rounded-xl p-6">
             <h2 className="text-xl font-semibold text-text-primary mb-6">Xush kelibsiz</h2>
 
             {/* Social login buttons */}
@@ -150,7 +150,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={handleGoogleLogin}
-                className="w-full flex items-center justify-center gap-3 bg-white hover:bg-surface-2 text-text-secondary font-medium py-2.5 px-4 rounded-lg border border-border transition-colors text-sm"
+                className="w-full flex items-center justify-center gap-3 bg-surface-elevated hover:bg-surface-2 text-text-secondary font-medium py-2.5 px-4 rounded-lg border border-border transition-colors text-sm"
               >
                 <GoogleIcon />
                 Google orqali kirish
@@ -166,9 +166,9 @@ export default function LoginPage() {
             </div>
 
             <div className="flex items-center gap-3 mb-4">
-              <div className="flex-1 h-px bg-surface-2 dark:bg-surface" />
+              <div className="flex-1 h-px bg-surface-2" />
               <span className="text-text-tertiary text-xs">yoki email bilan</span>
-              <div className="flex-1 h-px bg-surface-2 dark:bg-surface" />
+              <div className="flex-1 h-px bg-surface-2" />
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">

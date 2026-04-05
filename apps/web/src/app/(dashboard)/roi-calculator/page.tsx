@@ -157,7 +157,7 @@ function CompareRow({
 
   return (
     <div className={`grid grid-cols-3 gap-4 px-5 py-3.5 border-b border-border last:border-0 ${
-      highlight ? 'bg-[#111827]/5' : ''
+      highlight ? 'bg-text-primary/5' : ''
     }`}>
       <p className="text-text-tertiary text-sm">{label}</p>
 
@@ -202,7 +202,7 @@ function BigDiffCard({
 }) {
   const colors = {
     emerald: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
-    purple: 'text-text-secondary bg-surface-2 dark:bg-surface border-border',
+    purple: 'text-text-secondary bg-surface-2 border-border',
     amber: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
     blue: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
   }
@@ -344,7 +344,7 @@ export default function RoiCalculatorPage() {
             <label className="block text-sm font-medium text-text-tertiary mb-3">
               Oylik reklama byudjeti
             </label>
-            <div className="bg-surface-2 dark:bg-surface border border-border rounded-xl p-3 mb-2">
+            <div className="bg-surface-2 border border-border rounded-xl p-3 mb-2">
               <p className="text-2xl font-bold text-text-secondary text-center">
                 {formatCurrency(budget)}
               </p>
@@ -370,10 +370,10 @@ export default function RoiCalculatorPage() {
             <select
               value={industry}
               onChange={(e) => setIndustry(e.target.value)}
-              className="w-full bg-surface-2 dark:bg-surface border border-border rounded-xl px-4 py-3 text-text-primary text-sm focus:outline-none focus:border-border transition-all"
+              className="w-full bg-surface-2 border border-border rounded-xl px-4 py-3 text-text-primary text-sm focus:outline-none focus:border-border transition-all"
             >
               {Object.entries(INDUSTRY_DATA).map(([key, val]) => (
-                <option key={key} value={key} className="bg-surface-2 dark:bg-surface">
+                <option key={key} value={key} className="bg-surface-2">
                   {val.label}
                 </option>
               ))}
@@ -392,7 +392,7 @@ export default function RoiCalculatorPage() {
                   onClick={() => setMonths(m)}
                   className={`py-2.5 rounded-lg border text-sm font-medium transition-all ${
                     months === m
-                      ? 'border-border bg-surface-2 dark:bg-surface text-text-secondary'
+                      ? 'border-border bg-surface-2 text-text-secondary'
                       : 'border-border text-text-tertiary hover:border-border'
                   }`}
                 >
@@ -418,15 +418,15 @@ export default function RoiCalculatorPage() {
                   onClick={() => setPlatform(p.value)}
                   className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg border text-xs transition-all ${
                     platform === p.value
-                      ? 'border-border bg-surface-2 dark:bg-surface text-text-primary'
+                      ? 'border-border bg-surface-2 text-text-primary'
                       : 'border-border text-text-tertiary hover:border-border'
                   }`}
                 >
                   <span className={`w-3 h-3 rounded-full border shrink-0 flex items-center justify-center ${
-                    platform === p.value ? 'border-border' : 'border-[#4B5563]'
+                    platform === p.value ? 'border-border' : 'border-border'
                   }`}>
                     {platform === p.value && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#111827] block" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-text-primary block" />
                     )}
                   </span>
                   {p.label}
@@ -516,7 +516,7 @@ export default function RoiCalculatorPage() {
       {/* Detailed comparison table */}
       <Card padding="none">
         {/* Table header */}
-        <div className="grid grid-cols-3 gap-4 px-5 py-3 bg-surface-2 dark:bg-surface border-b border-border rounded-t-xl">
+        <div className="grid grid-cols-3 gap-4 px-5 py-3 bg-surface-2 border-b border-border rounded-t-xl">
           <p className="text-text-tertiary text-xs font-medium uppercase tracking-wide">
             Ko'rsatkich
           </p>
@@ -608,7 +608,7 @@ export default function RoiCalculatorPage() {
           </p>
         </Card>
 
-        <Card className="border-border bg-[#111827]/5">
+        <Card className="border-border bg-text-primary/5">
           <p className="text-text-secondary text-xs uppercase tracking-wide mb-2">
             {months} oyda Performa bilan
           </p>

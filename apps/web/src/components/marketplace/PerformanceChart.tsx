@@ -101,9 +101,9 @@ export const PerformanceChart: React.FC<PerformanceChartProps> = ({
               <div key={metric.label} className="flex items-center justify-between">
                 <span className="text-xs text-text-secondary">{metric.label}</span>
                 <span className={cn('text-sm font-semibold', {
-                  'text-emerald-600': metric.color === 'emerald',
+                  'text-emerald-500': metric.color === 'emerald',
                   'text-blue-600': metric.color === 'blue',
-                  'text-amber-600': metric.color === 'amber',
+                  'text-amber-500': metric.color === 'amber',
                   'text-violet-600': metric.color === 'violet',
                 })}>
                   {metric.value}
@@ -132,7 +132,7 @@ export const PerformanceChart: React.FC<PerformanceChartProps> = ({
               {metrics.map((metric) => (
                 <tr key={metric.date} className="border-b border-border hover:bg-surface-2 transition-colors">
                   <td className="py-2 px-3 text-text-secondary">{formatDate(metric.date)}</td>
-                  <td className="text-right py-2 px-3 font-medium text-emerald-600">
+                  <td className="text-right py-2 px-3 font-medium text-emerald-500">
                     {metric.roas.toFixed(2)}x
                   </td>
                   <td className="text-right py-2 px-3 text-text-primary">${metric.cpa.toFixed(2)}</td>

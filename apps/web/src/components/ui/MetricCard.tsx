@@ -48,8 +48,8 @@ const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
             {hasChange && !loading && (
               <span className={cn(
                 'inline-flex items-center gap-0.5 text-xs font-semibold mt-2 px-2 py-0.5 rounded-full',
-                isUp   && 'bg-green-50 dark:bg-green-950/40 text-green-600 dark:text-green-400',
-                isDown && 'bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400',
+                isUp   && 'bg-green-500/10 dark:bg-green-950/40 text-green-600 dark:text-green-400',
+                isDown && 'bg-red-500/10 dark:bg-red-950/40 text-red-500 dark:text-red-400',
                 !isUp && !isDown && 'bg-surface-2 text-text-secondary'
               )}>
                 {isUp ? '↑' : isDown ? '↓' : '→'} {Math.abs(change!)}%

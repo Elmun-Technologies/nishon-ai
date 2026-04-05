@@ -91,7 +91,7 @@ export function PlatformSelection({ selectedPlatforms, onPlatformToggle }: Platf
               <div className={`w-4 h-4 rounded border-2 ${
                 selectedPlatforms.includes(platform.id) 
                   ? 'bg-surface border-border' 
-                  : 'border-border bg-surface-2 dark:bg-surface'
+                  : 'border-border bg-surface-2'
               }`}>
                 {selectedPlatforms.includes(platform.id) && (
                   <svg className="w-3 h-3 text-text-primary mt-0.5 ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

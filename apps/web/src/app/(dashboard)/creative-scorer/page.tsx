@@ -81,7 +81,7 @@ function ScoreBar({ score, max = 10 }: { score: number; max?: number }) {
     pct >= 40 ? '#F59E0B' : '#EF4444'
   return (
     <div className="flex items-center gap-2">
-      <div className="flex-1 h-1.5 bg-surface-2 dark:bg-surface rounded-full overflow-hidden">
+      <div className="flex-1 h-1.5 bg-surface-2 rounded-full overflow-hidden">
         <div
           className="h-full rounded-full transition-all duration-700"
           style={{ width: `${pct}%`, backgroundColor: color }}
@@ -325,7 +325,7 @@ export default function CreativeScorerPage() {
                 relative rounded-xl border-2 border-dashed transition-all duration-200
                 min-h-[240px] flex items-center justify-center
                 ${isDragging
-                  ? 'border-border bg-surface-2 dark:bg-surface cursor-copy'
+                  ? 'border-border bg-surface-2 cursor-copy'
                   : file
                   ? 'border-border cursor-default'
                   : 'border-border hover:border-border/50 hover:bg-surface-2 cursor-pointer'
@@ -376,7 +376,7 @@ export default function CreativeScorerPage() {
                   <p className="text-text-tertiary text-xs mb-3">
                     Suring yoki bosing · JPG, PNG, WebP, MP4 · Max 10MB
                   </p>
-                  <div className="inline-flex items-center gap-2 bg-surface-2 dark:bg-surface border border-border rounded-lg px-3 py-1.5">
+                  <div className="inline-flex items-center gap-2 bg-surface-2 border border-border rounded-lg px-3 py-1.5">
                     <span className="text-text-secondary text-xs">Fayl tanlash</span>
                   </div>
                 </div>
@@ -408,7 +408,7 @@ export default function CreativeScorerPage() {
                       className={`
                         flex items-center gap-2.5 px-3 py-2.5 rounded-xl border text-sm transition-all text-left
                         ${platform === p.value
-                          ? 'border-border bg-surface-2 dark:bg-surface text-text-primary'
+                          ? 'border-border bg-surface-2 text-text-primary'
                           : 'border-border text-text-tertiary hover:border-border'
                         }
                       `}
@@ -417,7 +417,7 @@ export default function CreativeScorerPage() {
                         platform === p.value ? 'border-border' : 'border-border'
                       }`}>
                         {platform === p.value && (
-                          <span className="w-2 h-2 rounded-full bg-surface dark:bg-surface-2 block" />
+                          <span className="w-2 h-2 rounded-full bg-surface-2 block" />
                         )}
                       </span>
                       {p.label}
@@ -439,7 +439,7 @@ export default function CreativeScorerPage() {
                       className={`
                         px-3 py-2 rounded-lg border text-xs font-medium transition-all
                         ${creativeType === ct.value
-                          ? 'border-border bg-surface-2 dark:bg-surface text-text-secondary'
+                          ? 'border-border bg-surface-2 text-text-secondary'
                           : 'border-border text-text-tertiary hover:border-border'
                         }
                       `}
@@ -460,7 +460,7 @@ export default function CreativeScorerPage() {
                   value={goal}
                   onChange={(e) => setGoal(e.target.value)}
                   placeholder="Masalan: telefon sotish, kurs ro'yxatdan o'tkazish..."
-                  className="w-full bg-surface-2 dark:bg-surface border border-border rounded-xl px-4 py-3 text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-border transition-all text-sm"
+                  className="w-full bg-surface-2 border border-border rounded-xl px-4 py-3 text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-border transition-all text-sm"
                 />
               </div>
 
@@ -509,7 +509,7 @@ export default function CreativeScorerPage() {
           {loading && (
             <Card>
               <div className="py-12 text-center">
-                <div className="w-16 h-16 rounded-2xl bg-surface-2 dark:bg-surface border border-border flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 rounded-2xl bg-surface-2 border border-border flex items-center justify-center mx-auto mb-4">
                   <Spinner size="lg" />
                 </div>
                 <p className="text-text-primary font-medium mb-1">
@@ -562,7 +562,7 @@ export default function CreativeScorerPage() {
                 </div>
                 {!file && (
                   <div className="mt-3 pt-3 border-t border-border">
-                    <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                    <p className="text-xs text-amber-500 bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2">
                       📌 Demo natija ko'rsatilmoqda — chap tarafdan o'z kreativingizni yuklang
                     </p>
                   </div>
@@ -589,7 +589,7 @@ export default function CreativeScorerPage() {
                               {score}%
                             </span>
                           </div>
-                          <div className="h-1.5 bg-surface-2 dark:bg-surface-2 rounded-full overflow-hidden">
+                          <div className="h-1.5 bg-surface-2-2 rounded-full overflow-hidden">
                             <div
                               className="h-full rounded-full transition-all duration-700"
                               style={{

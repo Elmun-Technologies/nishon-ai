@@ -225,8 +225,8 @@ export function AdsManagerPanel() {
               onClick={() => setActiveTab(tab)}
               className={`px-3 py-1.5 rounded-md text-sm ${
                 activeTab === tab
-                  ? "bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400"
-                  : "text-text-tertiary hover:bg-surface-2 dark:bg-surface"
+                  ? "bg-indigo-500/10 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400"
+                  : "text-text-tertiary hover:bg-surface-2"
               }`}
             >
               {tab}
@@ -239,21 +239,21 @@ export function AdsManagerPanel() {
             Ads Manager 2.0
           </h2>
           <div className="flex flex-wrap items-center gap-2 justify-end">
-            <button className="px-4 py-2 rounded-lg border border-border text-sm bg-surface dark:bg-surface">
+            <button className="px-4 py-2 rounded-lg border border-border text-sm bg-surface">
               Filter Data
             </button>
             <button
               onClick={() => setShowSmartFilter(true)}
-              className="px-4 py-2 rounded-lg border border-border text-sm bg-surface dark:bg-surface"
+              className="px-4 py-2 rounded-lg border border-border text-sm bg-surface"
             >
               Smart Filter
             </button>
-            <button className="px-4 py-2 rounded-lg border border-border text-sm bg-surface dark:bg-surface">
+            <button className="px-4 py-2 rounded-lg border border-border text-sm bg-surface">
               Export PDF
             </button>
             <button
               onClick={() => setShowAutoReporting(true)}
-              className="px-4 py-2 rounded-lg border border-border text-sm bg-surface dark:bg-surface"
+              className="px-4 py-2 rounded-lg border border-border text-sm bg-surface"
             >
               Automated Reporting
             </button>
@@ -264,7 +264,7 @@ export function AdsManagerPanel() {
           <>
             <div className="overflow-x-auto border border-border rounded-xl">
               <table className="w-full min-w-[900px] text-sm">
-                <thead className="bg-surface-2 dark:bg-surface text-text-secondary">
+                <thead className="bg-surface-2 text-text-secondary">
                   <tr>
                     <th className="p-3 text-left">
                       <input
@@ -304,7 +304,7 @@ export function AdsManagerPanel() {
                       <td className="p-3">
                         <button
                           onClick={() => setShowAiSettings(true)}
-                          className="px-2 py-1 rounded-full text-xs bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400"
+                          className="px-2 py-1 rounded-full text-xs bg-indigo-500/10 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400"
                         >
                           AI Bidding
                         </button>
@@ -327,7 +327,7 @@ export function AdsManagerPanel() {
               ].map((stage) => (
                 <div
                   key={stage.stage}
-                  className="rounded-xl border border-border p-4 bg-surface-2 dark:bg-surface"
+                  className="rounded-xl border border-border p-4 bg-surface-2"
                 >
                   <p className="text-sm text-text-tertiary">{stage.stage}</p>
                   <p className="text-2xl font-bold text-indigo-700 dark:text-indigo-400 mt-2">
@@ -363,7 +363,7 @@ export function AdsManagerPanel() {
             <div className="rounded-xl border border-border p-4">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold">Top Landing Pages</h3>
-                <button className="px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400 text-sm">
+                <button className="px-3 py-1.5 rounded-lg bg-indigo-500/10 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400 text-sm">
                   See all landing pages
                 </button>
               </div>
@@ -405,7 +405,7 @@ export function AdsManagerPanel() {
                   ].map((label) => (
                     <div
                       key={label}
-                      className="rounded-lg border border-border p-3 bg-surface-2 dark:bg-surface"
+                      className="rounded-lg border border-border p-3 bg-surface-2"
                     >
                       {label}
                     </div>
@@ -420,7 +420,7 @@ export function AdsManagerPanel() {
                       <button
                         key={tab}
                         onClick={() => setAudienceView(tab)}
-                        className={`px-3 py-1 rounded-md text-sm ${audienceView === tab ? "bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400" : "text-text-tertiary"}`}
+                        className={`px-3 py-1 rounded-md text-sm ${audienceView === tab ? "bg-indigo-500/10 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400" : "text-text-tertiary"}`}
                       >
                         {tab}
                       </button>
@@ -468,7 +468,7 @@ export function AdsManagerPanel() {
                     <button
                       key={tab}
                       onClick={() => setLookalikeView(tab)}
-                      className={`px-3 py-1 rounded-md text-sm ${lookalikeView === tab ? "bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400" : "text-text-tertiary"}`}
+                      className={`px-3 py-1 rounded-md text-sm ${lookalikeView === tab ? "bg-indigo-500/10 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400" : "text-text-tertiary"}`}
                     >
                       {tab}
                     </button>
@@ -487,7 +487,7 @@ export function AdsManagerPanel() {
                 </h3>
                 <button
                   onClick={() => setShowFullFunnelInsights(true)}
-                  className="px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400 text-sm"
+                  className="px-3 py-1.5 rounded-lg bg-indigo-500/10 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400 text-sm"
                 >
                   Go to Madgicx Audiences
                 </button>
@@ -539,12 +539,12 @@ export function AdsManagerPanel() {
                 <span className="text-sm text-text-tertiary">ROAS (All)</span>
               </div>
               <div className="grid md:grid-cols-2 gap-3 text-sm">
-                <div className="rounded-lg border border-border p-3 bg-surface-2 dark:bg-surface">
+                <div className="rounded-lg border border-border p-3 bg-surface-2">
                   <p className="text-text-tertiary">Desktop</p>
                   <p className="text-3xl font-semibold mt-2">1.47</p>
                   <p className="text-xs text-text-tertiary">18.69% of spend</p>
                 </div>
-                <div className="rounded-lg border border-border p-3 bg-surface-2 dark:bg-surface">
+                <div className="rounded-lg border border-border p-3 bg-surface-2">
                   <p className="text-text-tertiary">Mobile</p>
                   <p className="text-3xl font-semibold mt-2">6.07</p>
                   <p className="text-xs text-text-tertiary">81.31% of spend</p>
@@ -607,16 +607,16 @@ export function AdsManagerPanel() {
                 Campaign Objective & Ad Delivery Optimization
               </h3>
               <div className="grid md:grid-cols-2 gap-3 text-sm">
-                <div className="rounded-lg border p-3 bg-surface-2 dark:bg-surface">
+                <div className="rounded-lg border p-3 bg-surface-2">
                   Conversions: 4.28
                 </div>
-                <div className="rounded-lg border p-3 bg-surface-2 dark:bg-surface">
+                <div className="rounded-lg border p-3 bg-surface-2">
                   Lead Generation: 0.00
                 </div>
-                <div className="rounded-lg border p-3 bg-surface-2 dark:bg-surface">
+                <div className="rounded-lg border p-3 bg-surface-2">
                   Landing Page Views: 0.00
                 </div>
-                <div className="rounded-lg border p-3 bg-surface-2 dark:bg-surface">
+                <div className="rounded-lg border p-3 bg-surface-2">
                   Amount Spent split shown
                 </div>
               </div>
@@ -736,7 +736,7 @@ export function AdsManagerPanel() {
 
         {activeTab === "Geo & Demo Insights" && (
           <div className="space-y-4">
-            <div className="rounded-xl border border-border p-4 bg-surface-2 dark:bg-surface">
+            <div className="rounded-xl border border-border p-4 bg-surface-2">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold">Geo & Demo Insights</h3>
                 <span className="text-sm text-text-tertiary">
@@ -785,7 +785,7 @@ export function AdsManagerPanel() {
               <div className="rounded-xl border border-border p-4">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-semibold">Maps</h3>
-                  <button className="px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400 text-sm">
+                  <button className="px-3 py-1.5 rounded-lg bg-indigo-500/10 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400 text-sm">
                     See All Locations
                   </button>
                 </div>
@@ -881,7 +881,7 @@ export function AdsManagerPanel() {
 
             <div className="rounded-xl border border-border p-4">
               <div className="flex items-center gap-3 mb-3">
-                <button className="px-3 py-1.5 rounded-md bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400 text-sm">
+                <button className="px-3 py-1.5 rounded-md bg-indigo-500/10 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400 text-sm">
                   Explore Audiences By Performance
                 </button>
                 <button className="px-3 py-1.5 rounded-md text-text-tertiary text-sm border border-border">
@@ -952,10 +952,10 @@ export function AdsManagerPanel() {
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold">Audience mixer</h3>
                 <div className="flex gap-2">
-                  <button className="px-3 py-1.5 rounded-lg border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 text-sm">
+                  <button className="px-3 py-1.5 rounded-lg border border-blue-500/20 dark:border-blue-800 text-blue-600 dark:text-blue-400 text-sm">
                     Clear selection
                   </button>
-                  <button className="px-3 py-1.5 rounded-lg border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 text-sm">
+                  <button className="px-3 py-1.5 rounded-lg border border-blue-500/20 dark:border-blue-800 text-blue-600 dark:text-blue-400 text-sm">
                     Save audience selection
                   </button>
                 </div>
@@ -1005,21 +1005,21 @@ export function AdsManagerPanel() {
                 (instead of building everything manually in Meta Ads Manager).
               </p>
               <div className="grid md:grid-cols-3 gap-3 mt-3 text-sm">
-                <div className="rounded-lg border border-border p-3 bg-surface-2 dark:bg-surface">
+                <div className="rounded-lg border border-border p-3 bg-surface-2">
                   <p className="font-medium">76 prebuilt audiences</p>
                   <p className="text-text-tertiary mt-1">
                     Cover acquisition, re-engagement, retargeting, and retention
                     in a few clicks.
                   </p>
                 </div>
-                <div className="rounded-lg border border-border p-3 bg-surface-2 dark:bg-surface">
+                <div className="rounded-lg border border-border p-3 bg-surface-2">
                   <p className="font-medium">AI + eRFM segmentation</p>
                   <p className="text-text-tertiary mt-1">
                     Audience quality improves through behavioral and value-based
                     signals from your customer data.
                   </p>
                 </div>
-                <div className="rounded-lg border border-border p-3 bg-surface-2 dark:bg-surface">
+                <div className="rounded-lg border border-border p-3 bg-surface-2">
                   <p className="font-medium">Built-in exclusions</p>
                   <p className="text-text-tertiary mt-1">
                     Acquisition excludes retargeting/retention, and retargeting
@@ -1027,7 +1027,7 @@ export function AdsManagerPanel() {
                   </p>
                 </div>
               </div>
-              <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm">
+              <div className="mt-4 rounded-lg border border-amber-500/20 bg-amber-500/10 p-3 text-sm">
                 <p className="font-medium text-amber-900">
                   Default exclusion policy (must-have)
                 </p>
@@ -1126,7 +1126,7 @@ export function AdsManagerPanel() {
               </div>
               <div className="mt-3 overflow-x-auto">
                 <table className="w-full min-w-[760px] text-sm border border-border rounded-lg">
-                  <thead className="bg-surface-2 dark:bg-surface">
+                  <thead className="bg-surface-2">
                     <tr>
                       <th className="text-left p-2">Facebook Ads Manager</th>
                       <th className="text-left p-2">
@@ -1179,7 +1179,7 @@ export function AdsManagerPanel() {
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold text-xl">One-Click Report</h3>
                 <div className="flex gap-2">
-                  <button className="px-3 py-1.5 rounded-lg border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 text-sm">
+                  <button className="px-3 py-1.5 rounded-lg border border-blue-500/20 dark:border-blue-800 text-blue-600 dark:text-blue-400 text-sm">
                     Data Sources
                   </button>
                   <button className="px-3 py-1.5 rounded-lg bg-blue-600 dark:bg-blue-500 text-white text-sm">
@@ -1187,7 +1187,7 @@ export function AdsManagerPanel() {
                   </button>
                 </div>
               </div>
-              <div className="mt-3 h-3 rounded-full bg-green-50 dark:bg-green-950">
+              <div className="mt-3 h-3 rounded-full bg-green-500/10 dark:bg-green-950">
                 <div className="h-full w-1/4 rounded-full bg-green-500 dark:bg-green-400" />
               </div>
               <p className="text-sm text-text-tertiary mt-2">6/1000 reports used</p>
@@ -1196,7 +1196,7 @@ export function AdsManagerPanel() {
             <div className="rounded-xl border border-border p-4">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold">Templates</h3>
-                <button className="px-3 py-1.5 rounded-lg border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 text-sm">
+                <button className="px-3 py-1.5 rounded-lg border border-blue-500/20 dark:border-blue-800 text-blue-600 dark:text-blue-400 text-sm">
                   Show All Templates
                 </button>
               </div>
@@ -1209,7 +1209,7 @@ export function AdsManagerPanel() {
                     key={name}
                     className="rounded-lg border border-border p-3"
                   >
-                    <div className="h-24 rounded-md bg-surface-2 dark:bg-surface mb-2" />
+                    <div className="h-24 rounded-md bg-surface-2 mb-2" />
                     <p className="font-medium">{name}</p>
                   </div>
                 ))}
@@ -1236,7 +1236,7 @@ export function AdsManagerPanel() {
                       {group.metrics.map((metric) => (
                         <div
                           key={metric.name}
-                          className="rounded-lg bg-surface-2 dark:bg-surface p-3"
+                          className="rounded-lg bg-surface-2 p-3"
                         >
                           <p className="font-medium">{metric.name}</p>
                           <p className="text-text-tertiary mt-1">
@@ -1279,7 +1279,7 @@ export function AdsManagerPanel() {
                   </div>
                 ))}
               </div>
-              <div className="mt-4 rounded-lg bg-surface-2 dark:bg-surface border border-border p-3 text-sm">
+              <div className="mt-4 rounded-lg bg-surface-2 border border-border p-3 text-sm">
                 <p className="font-medium">Tips, hints, and tricks</p>
                 <ul className="list-disc pl-5 mt-2 space-y-1 text-text-secondary">
                   <li>
@@ -1328,7 +1328,7 @@ export function AdsManagerPanel() {
                     ].map((source) => (
                       <div
                         key={source}
-                        className="rounded-md border border-border px-2 py-1.5 text-xs bg-surface-2 dark:bg-surface"
+                        className="rounded-md border border-border px-2 py-1.5 text-xs bg-surface-2"
                       >
                         {source}
                       </div>
@@ -1343,14 +1343,14 @@ export function AdsManagerPanel() {
               <div className="mt-3 rounded-lg border border-border p-3 text-sm">
                 <p className="font-medium">Customize & share</p>
                 <div className="grid md:grid-cols-3 gap-2 mt-2 text-text-secondary">
-                  <div className="rounded-md bg-surface-2 dark:bg-surface p-2">
+                  <div className="rounded-md bg-surface-2 p-2">
                     1) Set date range from the top-right selector.
                   </div>
-                  <div className="rounded-md bg-surface-2 dark:bg-surface p-2">
+                  <div className="rounded-md bg-surface-2 p-2">
                     2) Use ⚙ settings for currency, full width, and account
                     management.
                   </div>
-                  <div className="rounded-md bg-surface-2 dark:bg-surface p-2">
+                  <div className="rounded-md bg-surface-2 p-2">
                     3) Click Edit to drag/drop widgets, then Share to generate a
                     live public link.
                   </div>
@@ -1358,7 +1358,7 @@ export function AdsManagerPanel() {
               </div>
               <div className="mt-3 overflow-x-auto">
                 <table className="w-full min-w-[720px] text-sm border border-border rounded-lg">
-                  <thead className="bg-surface-2 dark:bg-surface">
+                  <thead className="bg-surface-2">
                     <tr>
                       <th className="p-2 text-left">Facebook Ads Manager</th>
                       <th className="p-2 text-left">
@@ -1423,7 +1423,7 @@ export function AdsManagerPanel() {
                     ].map((w) => (
                       <div
                         key={w}
-                        className="border rounded p-2 text-center bg-surface-2 dark:bg-surface"
+                        className="border rounded p-2 text-center bg-surface-2"
                       >
                         {w}
                       </div>
@@ -1719,7 +1719,7 @@ export function AdsManagerPanel() {
               ].map((cell) => (
                 <div
                   key={cell[0]}
-                  className="border border-border rounded-lg p-3 bg-surface-2 dark:bg-surface"
+                  className="border border-border rounded-lg p-3 bg-surface-2"
                 >
                   <p className="text-text-tertiary">{cell[0]}</p>
                   <p className="text-2xl font-semibold mt-2">{cell[1]}</p>
@@ -1754,7 +1754,7 @@ export function AdsManagerPanel() {
         <ModalShell title="Sharing" onClose={() => setShowShareOptions(false)}>
           <div className="space-y-4">
             <div className="flex gap-2">
-              <button className="px-3 py-2 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-blue-600 dark:text-blue-400">
+              <button className="px-3 py-2 rounded-lg bg-indigo-500/10 dark:bg-indigo-950 text-blue-600 dark:text-blue-400">
                 Link sharing
               </button>
               <button className="px-3 py-2 rounded-lg border border-border">
@@ -1813,7 +1813,7 @@ function ModalShell({
 }) {
   return (
     <div className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center p-4">
-      <div className="w-full max-w-4xl bg-surface dark:bg-surface rounded-2xl shadow-2xl border border-border">
+      <div className="w-full max-w-4xl bg-surface rounded-2xl shadow-2xl border border-border">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <h3 className="text-2xl text-text-primary font-semibold">{title}</h3>
           <button

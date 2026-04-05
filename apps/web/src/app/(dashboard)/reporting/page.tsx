@@ -48,7 +48,7 @@ const STATUS_STYLE: Record<string, string> = {
   ACTIVE:   'text-emerald-400 bg-emerald-400/10',
   PAUSED:   'text-amber-400 bg-amber-400/10',
   DELETED:  'text-red-400 bg-red-400/10',
-  ARCHIVED: 'text-text-tertiary bg-surface-2 dark:bg-surface',
+  ARCHIVED: 'text-text-tertiary bg-surface-2',
 }
 
 function MetricCell({ value, className = '' }: { value: string; className?: string }) {
@@ -203,7 +203,7 @@ export default function ReportingPage() {
 
         <div className="flex items-center gap-2">
           {/* Date range selector */}
-          <div className="flex items-center gap-1 bg-white border border-border rounded-xl p-1">
+          <div className="flex items-center gap-1 bg-surface-elevated border border-border rounded-xl p-1">
             {DAY_OPTIONS.map((d) => (
               <button
                 key={d}
@@ -211,7 +211,7 @@ export default function ReportingPage() {
                 className={`
                   px-3 py-1.5 rounded-lg text-xs font-medium transition-colors
                   ${days === d
-                    ? 'bg-[#111827] text-white'
+                    ? 'bg-text-primary text-white'
                     : 'text-text-tertiary hover:text-text-primary'
                   }
                 `}
@@ -242,7 +242,7 @@ export default function ReportingPage() {
             { label: 'Jami Kliklar', value: formatNumber(totals.clicks) },
             { label: 'Jami Ko\'rinishlar', value: formatNumber(totals.impressions) },
           ].map((item) => (
-            <div key={item.label} className="bg-white border border-border rounded-xl p-4">
+            <div key={item.label} className="bg-surface-elevated border border-border rounded-xl p-4">
               <p className="text-text-tertiary text-xs mb-1">{item.label}</p>
               <p className="text-text-primary text-lg font-bold">{item.value}</p>
             </div>
@@ -266,8 +266,8 @@ export default function ReportingPage() {
                 )}
                 className={`text-xs px-2.5 py-1 rounded-full border transition-all ${
                   activeMetrics.includes(m.id)
-                    ? 'bg-[#111827] text-white border-border'
-                    : 'bg-white text-text-tertiary border-border hover:border-border'
+                    ? 'bg-text-primary text-white border-border'
+                    : 'bg-surface-elevated text-text-tertiary border-border hover:border-border'
                 }`}
               >
                 {m.icon} {m.label}
@@ -279,10 +279,10 @@ export default function ReportingPage() {
         {activeMetrics.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {AVAILABLE_METRICS.filter((m) => activeMetrics.includes(m.id)).map((m) => (
-              <div key={m.id} className="bg-white border border-border rounded-xl p-4 relative group">
+              <div key={m.id} className="bg-surface-elevated border border-border rounded-xl p-4 relative group">
                 <button
                   onClick={() => setActiveMetrics((prev) => prev.filter((x) => x !== m.id))}
-                  className="absolute top-2 right-2 text-[#D1D5DB] hover:text-text-tertiary opacity-0 group-hover:opacity-100 transition-opacity text-xs leading-none"
+                  className="absolute top-2 right-2 text-text-tertiary hover:text-text-tertiary opacity-0 group-hover:opacity-100 transition-opacity text-xs leading-none"
                 >
                   ×
                 </button>
@@ -302,10 +302,10 @@ export default function ReportingPage() {
       </div>
 
       {/* ── Budget Simulation ── */}
-      <div className="bg-white border border-border rounded-xl overflow-hidden">
+      <div className="bg-surface-elevated border border-border rounded-xl overflow-hidden">
         <button
           onClick={() => setShowSimulation(!showSimulation)}
-          className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-surface-2 dark:bg-surface transition-colors"
+          className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-surface-2 transition-colors"
         >
           <div className="flex items-center gap-2">
             <span>🔮</span>
@@ -338,9 +338,9 @@ export default function ReportingPage() {
               </div>
               <div className="grid grid-cols-3 gap-3">
                 {[
-                  { label: 'Pessimistik', mult: 0.65, color: 'text-red-500', bg: 'bg-red-50 border-red-100' },
-                  { label: 'Realistik',   mult: 1.0,  color: 'text-text-secondary', bg: 'bg-surface-2 dark:bg-surface border-border' },
-                  { label: 'Optimistik',  mult: 1.35, color: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-100' },
+                  { label: 'Pessimistik', mult: 0.65, color: 'text-red-500', bg: 'bg-red-500/10 border-red-100' },
+                  { label: 'Realistik',   mult: 1.0,  color: 'text-text-secondary', bg: 'bg-surface-2 border-border' },
+                  { label: 'Optimistik',  mult: 1.35, color: 'text-emerald-500', bg: 'bg-emerald-500/10 border-emerald-100' },
                 ].map((s) => (
                   <div key={s.label} className={`border rounded-xl p-3 ${s.bg}`}>
                     <p className="text-text-tertiary text-xs mb-2">{s.label}</p>
@@ -361,7 +361,7 @@ export default function ReportingPage() {
         {loading ? (
           <div className="space-y-px">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-12 bg-white animate-pulse" style={{ opacity: 1 - i * 0.15 }} />
+              <div key={i} className="h-12 bg-surface-elevated animate-pulse" style={{ opacity: 1 - i * 0.15 }} />
             ))}
           </div>
         ) : !data || data.accounts.length === 0 ? (
@@ -418,7 +418,7 @@ export default function ReportingPage() {
                       {/* ── Account row ── */}
                       <tr
                         key={account.id}
-                        className="bg-surface-2 dark:bg-surface hover:bg-white cursor-pointer transition-colors"
+                        className="bg-surface-2 hover:bg-surface-elevated cursor-pointer transition-colors"
                         onClick={() => toggleExpand(account.id)}
                       >
                         <td className="px-4 py-3">
@@ -452,18 +452,18 @@ export default function ReportingPage() {
                       {isOpen && account.campaigns.map((campaign) => (
                         <tr
                           key={campaign.id}
-                          className="bg-white hover:bg-surface-2 dark:bg-surface transition-colors"
+                          className="bg-surface-elevated hover:bg-surface-2 transition-colors"
                         >
                           <td className="px-4 py-2.5">
                             <div className="flex items-center gap-2 pl-6">
                               {/* Indent line */}
-                              <span className="w-px h-4 bg-surface-2 dark:bg-surface shrink-0" />
+                              <span className="w-px h-4 bg-surface-2 shrink-0" />
                               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="text-text-tertiary shrink-0">
                                 <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                               </svg>
                               <span className="text-text-secondary text-sm">{campaign.name}</span>
                               {campaign.objective && (
-                                <span className="text-[10px] text-text-tertiary bg-surface-2 dark:bg-surface border border-border px-1.5 py-0.5 rounded">
+                                <span className="text-[10px] text-text-tertiary bg-surface-2 border border-border px-1.5 py-0.5 rounded">
                                   {campaign.objective.replace('OUTCOME_', '')}
                                 </span>
                               )}
@@ -471,7 +471,7 @@ export default function ReportingPage() {
                             {/* Tags row */}
                             <div className="pl-14 flex items-center gap-1.5 flex-wrap mt-1">
                               {(campaignTags[campaign.id] ?? campaign.tags ?? []).map((tag) => (
-                                <span key={tag} className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-[#E5E7EB] text-text-secondary border border-border">
+                                <span key={tag} className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-surface-2 text-text-secondary border border-border">
                                   {tag}
                                   <button onClick={() => removeTag(campaign.id, tag)} className="hover:text-red-400 leading-none">×</button>
                                 </span>
@@ -487,7 +487,7 @@ export default function ReportingPage() {
                                   }}
                                   onBlur={() => setEditingTagId(null)}
                                   placeholder="teg nomi..."
-                                  className="text-[10px] px-2 py-0.5 rounded-full bg-white border border-border text-text-primary placeholder-[#9CA3AF] outline-none w-24"
+                                  className="text-[10px] px-2 py-0.5 rounded-full bg-surface-elevated border border-border text-text-primary placeholder-[#9CA3AF] outline-none w-24"
                                 />
                               ) : (
                                 <button
@@ -500,7 +500,7 @@ export default function ReportingPage() {
                             </div>
                           </td>
                           <td className="px-3 py-2.5 text-right">
-                            <span className={`text-[10px] px-2 py-0.5 rounded font-medium ${STATUS_STYLE[campaign.status] ?? 'text-text-tertiary bg-surface-2 dark:bg-surface'}`}>
+                            <span className={`text-[10px] px-2 py-0.5 rounded font-medium ${STATUS_STYLE[campaign.status] ?? 'text-text-tertiary bg-surface-2'}`}>
                               {campaign.status}
                             </span>
                           </td>

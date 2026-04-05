@@ -68,7 +68,7 @@ export const SpecialistDetailHeader: React.FC<SpecialistDetailHeaderProps> = ({ 
 
             <div>
               <p className="text-xs text-text-secondary mb-1">Avg ROAS</p>
-              <p className="text-2xl font-bold text-emerald-600">{specialist.averageROAS.toFixed(1)}x</p>
+              <p className="text-2xl font-bold text-emerald-500">{specialist.averageROAS.toFixed(1)}x</p>
             </div>
 
             <div>

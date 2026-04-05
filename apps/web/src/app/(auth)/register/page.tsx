@@ -117,7 +117,7 @@ export default function RegisterPage() {
   const passwordStrength = getPasswordStrength(form.password)
 
   return (
-    <div className="min-h-screen bg-surface-2 dark:bg-surface flex items-center justify-center p-6">
+    <div className="min-h-screen bg-surface-2 flex items-center justify-center p-6">
       <div className="w-full max-w-md">
 
         {/* Logo */}
@@ -130,7 +130,7 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        <div className="bg-white border border-border rounded-xl p-6">
+        <div className="bg-surface-elevated border border-border rounded-xl p-6">
           <h2 className="text-xl font-semibold text-text-primary mb-6">
             Hisob yaratish
           </h2>
@@ -140,7 +140,7 @@ export default function RegisterPage() {
             <button
               type="button"
               onClick={handleGoogleRegister}
-              className="w-full flex items-center justify-center gap-3 bg-white hover:bg-surface-2 text-text-secondary font-medium py-2.5 px-4 rounded-lg border border-border transition-colors text-sm"
+              className="w-full flex items-center justify-center gap-3 bg-surface-elevated hover:bg-surface-2 text-text-secondary font-medium py-2.5 px-4 rounded-lg border border-border transition-colors text-sm"
             >
               <GoogleIcon />
               Google orqali ro'yxatdan o'tish
@@ -156,9 +156,9 @@ export default function RegisterPage() {
           </div>
 
           <div className="flex items-center gap-3 mb-4">
-            <div className="flex-1 h-px bg-surface-2 dark:bg-surface" />
+            <div className="flex-1 h-px bg-surface-2" />
             <span className="text-text-tertiary text-xs">yoki email bilan</span>
-            <div className="flex-1 h-px bg-surface-2 dark:bg-surface" />
+            <div className="flex-1 h-px bg-surface-2" />
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -204,7 +204,7 @@ export default function RegisterPage() {
                         className={`h-1 flex-1 rounded-full transition-all duration-300 ${
                           level <= passwordStrength.level
                             ? passwordStrength.color
-                            : 'bg-surface-2 dark:bg-surface'
+                            : 'bg-surface-2'
                         }`}
                       />
                     ))}

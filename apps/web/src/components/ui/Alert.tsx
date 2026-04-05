@@ -19,10 +19,10 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
     ref
   ) => {
     const variants = {
-      error: 'bg-red-50 border border-red-200 text-red-700',
-      warning: 'bg-amber-50 border border-amber-200 text-amber-700',
-      success: 'bg-emerald-50 border border-emerald-200 text-emerald-700',
-      info: 'bg-blue-50 border border-blue-200 text-blue-700'
+      error: 'bg-red-500/10 border border-red-500/20 text-red-500',
+      warning: 'bg-amber-500/10 border border-amber-500/20 text-amber-500',
+      success: 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-500',
+      info: 'bg-blue-500/10 border border-blue-500/20 text-blue-700'
     }
 
     return (

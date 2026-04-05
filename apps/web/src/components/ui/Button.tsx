@@ -31,7 +31,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       primary: 'bg-primary hover:bg-surface text-white border border-primary',
       secondary: 'bg-surface hover:bg-surface-secondary text-text-primary border border-border hover:border-border',
       ghost: 'bg-transparent hover:bg-surface-secondary text-text-secondary border border-transparent',
-      danger: 'bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 hover:border-red-300',
+      danger: 'bg-red-500/10 hover:bg-red-500/15 text-red-500 border border-red-500/20 hover:border-red-500/30',
     }
 
     const sizes = {
