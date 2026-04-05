@@ -2,6 +2,13 @@ import type { Config } from 'tailwindcss'
 
 const config: Config = {
   content: ['./src/**/*.{ts,tsx}'],
+  safelist: [
+    // Force generation of custom color utilities
+    'text-text-primary', 'text-text-secondary', 'text-text-tertiary',
+    'bg-surface', 'bg-surface-alt', 'bg-surface-secondary',
+    'border-border', 'border-border-light',
+    'hover:bg-surface-secondary', 'hover:text-text-secondary',
+  ],
   theme: {
     extend: {
       fontFamily: {
@@ -16,7 +23,7 @@ const config: Config = {
         'surface-alt': '#F9FAFB',
         'surface-secondary': '#F3F4F6',
 
-        // Semantic text colors (for text-* utilities)
+        // Text semantic colors - renamed to avoid double prefix
         'text-primary': '#111827',
         'text-secondary': '#6B7280',
         'text-tertiary': '#9CA3AF',
