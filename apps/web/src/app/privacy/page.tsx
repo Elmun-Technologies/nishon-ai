@@ -20,7 +20,7 @@ export default function Page() {
           <p className="text-sm text-text-tertiary">Last updated: March 22, 2026</p>
         </header>
 
-        <section className="space-y-3 rounded-xl border border-border bg-white p-6">
+        <section className="space-y-3 rounded-xl border border-border bg-surface-elevated p-6">
           <h2 className="text-xl font-semibold">Introduction</h2>
           <p className="text-text-secondary">
             Performa helps businesses manage, optimize, and scale campaigns across supported ad
@@ -30,7 +30,7 @@ export default function Page() {
           </p>
         </section>
 
-        <section className="space-y-3 rounded-xl border border-border bg-white p-6">
+        <section className="space-y-3 rounded-xl border border-border bg-surface-elevated p-6">
           <h2 className="text-xl font-semibold">Who we are</h2>
           <p className="text-text-secondary">
             Performa is a software platform that provides AI-assisted and autonomous campaign
@@ -39,7 +39,7 @@ export default function Page() {
           </p>
         </section>
 
-        <section className="space-y-4 rounded-xl border border-border bg-white p-6">
+        <section className="space-y-4 rounded-xl border border-border bg-surface-elevated p-6">
           <h2 className="text-xl font-semibold">What information we collect</h2>
           <h3 className="text-base font-semibold text-text-primary">Account information</h3>
           <ul className="list-disc space-y-2 pl-5 text-text-secondary">
@@ -72,7 +72,7 @@ export default function Page() {
           </ul>
         </section>
 
-        <section className="space-y-4 rounded-xl border border-border bg-white p-6">
+        <section className="space-y-4 rounded-xl border border-border bg-surface-elevated p-6">
           <h2 className="text-xl font-semibold">How we use data</h2>
           <ul className="list-disc space-y-2 pl-5 text-text-secondary">
             <li>To authenticate users and secure accounts and workspaces.</li>
@@ -90,7 +90,7 @@ export default function Page() {
           </ul>
         </section>
 
-        <section className="space-y-4 rounded-xl border border-border bg-white p-6">
+        <section className="space-y-4 rounded-xl border border-border bg-surface-elevated p-6">
           <h2 className="text-xl font-semibold">Third-party integrations and service providers</h2>
           <h3 className="text-base font-semibold text-text-primary">Meta</h3>
           <p className="text-text-secondary">
@@ -118,7 +118,7 @@ export default function Page() {
           </p>
         </section>
 
-        <section className="space-y-4 rounded-xl border border-border bg-white p-6">
+        <section className="space-y-4 rounded-xl border border-border bg-surface-elevated p-6">
           <h2 className="text-xl font-semibold">Data retention</h2>
           <p className="text-text-secondary">
             We retain information for as long as needed to provide services, maintain records,
@@ -161,7 +161,7 @@ export default function Page() {
           </p>
         </section>
 
-        <section className="space-y-4 rounded-xl border border-border bg-white p-6">
+        <section className="space-y-4 rounded-xl border border-border bg-surface-elevated p-6">
           <h2 className="text-xl font-semibold">Contact</h2>
           <p className="text-text-secondary">
             For privacy questions, access requests, or data-protection concerns, contact:

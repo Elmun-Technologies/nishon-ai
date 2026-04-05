@@ -163,7 +163,7 @@ export default function CreateAgentPage() {
                   key={emoji}
                   onClick={() => setForm(f => ({ ...f, avatar: emoji }))}
                   className={`w-10 h-10 rounded-xl text-xl flex items-center justify-center transition-all border-2 ${
-                    form.avatar === emoji ? 'border-border bg-surface-2 dark:bg-surface' : 'border-transparent hover:border-border'
+                    form.avatar === emoji ? 'border-border bg-surface-2' : 'border-transparent hover:border-border'
                   }`}
                 >
                   {emoji}
@@ -254,7 +254,7 @@ export default function CreateAgentPage() {
                 <button
                   key={n}
                   onClick={() => setForm(f => ({ ...f, niches: [...f.niches, n] }))}
-                  className="text-[10px] px-2.5 py-1 rounded-lg bg-surface-2 dark:bg-surface text-text-tertiary hover:bg-surface-2 dark:hover:bg-surface-2 transition-all"
+                  className="text-[10px] px-2.5 py-1 rounded-lg bg-surface-2 text-text-tertiary hover:bg-surface-2 dark:hover:bg-surface-2 transition-all"
                 >
                   + {n}
                 </button>
@@ -369,7 +369,7 @@ export default function CreateAgentPage() {
                   <div className="flex items-center gap-2 mb-1">
                     <span>{opt.badge}</span>
                     <span className="font-semibold text-sm text-text-primary">{opt.label}</span>
-                    {form.autopilotMode === opt.id && <span className="text-xs text-emerald-600 ml-auto">✓ Tanlangan</span>}
+                    {form.autopilotMode === opt.id && <span className="text-xs text-emerald-500 ml-auto">✓ Tanlangan</span>}
                   </div>
                   <p className="text-xs text-text-tertiary">{opt.desc}</p>
                 </button>
@@ -429,7 +429,7 @@ export default function CreateAgentPage() {
                   }))}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
                     form.supportedPlatforms.includes(p) || form.supportedPlatforms.length === 0
-                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                      ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
                       : 'bg-surface-2 text-text-tertiary border-border'
                   }`}
                 >
@@ -492,7 +492,7 @@ export default function CreateAgentPage() {
             <div className="text-left flex-1">
               <p className="font-semibold text-sm text-text-primary">{createdAgent.displayName}</p>
               <p className="text-xs text-text-tertiary">{createdAgent.title}</p>
-              <p className="text-xs text-amber-600 mt-0.5">⏳ Moderatsiya kutilmoqda</p>
+              <p className="text-xs text-amber-500 mt-0.5">⏳ Moderatsiya kutilmoqda</p>
             </div>
           </div>
 
@@ -506,7 +506,7 @@ export default function CreateAgentPage() {
             </button>
             <button
               onClick={() => router.push('/my-portfolio')}
-              className="bg-surface-2 hover:bg-surface-2 dark:bg-surface text-text-primary px-6 py-3 rounded-xl border border-border transition-all"
+              className="bg-surface-2 hover:bg-surface-2 text-text-primary px-6 py-3 rounded-xl border border-border transition-all"
             >
               Keyinroq
             </button>
@@ -516,9 +516,9 @@ export default function CreateAgentPage() {
 
       {/* Info box */}
       {step < 3 && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
-          <p className="text-xs text-amber-700 font-medium mb-1">💡 Monetizatsiya</p>
-          <p className="text-xs text-amber-600 leading-relaxed">
+        <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3">
+          <p className="text-xs text-amber-500 font-medium mb-1">💡 Monetizatsiya</p>
+          <p className="text-xs text-amber-500 leading-relaxed">
             Sizning AI agentingiz tadbirkorlarga ijaraga beriladi. Har bir to'lovdan siz <b>80%</b> olasiz,
             Performa platformasi <b>20%</b> komissiya oladi. Agent qanchalik ko'p foydalanilsa, daromad shunchalik ko'p.
           </p>

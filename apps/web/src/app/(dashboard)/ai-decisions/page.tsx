@@ -139,9 +139,9 @@ export default function AiDecisionsPage() {
       <div className="grid grid-cols-4 gap-3">
         {[
           { label: 'Jami', value: counts.all,      color: 'text-text-primary', bg: 'bg-surface' },
-          { label: 'Kutilmoqda', value: counts.pending,  color: 'text-amber-600', bg: 'bg-amber-50 border-amber-200' },
-          { label: 'Tasdiqlangan', value: counts.approved, color: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-200' },
-          { label: 'Rad etilgan', value: counts.rejected, color: 'text-red-500',    bg: 'bg-red-50 border-red-200' },
+          { label: 'Kutilmoqda', value: counts.pending,  color: 'text-amber-500', bg: 'bg-amber-500/10 border-amber-500/20' },
+          { label: 'Tasdiqlangan', value: counts.approved, color: 'text-emerald-500', bg: 'bg-emerald-500/10 border-emerald-500/20' },
+          { label: 'Rad etilgan', value: counts.rejected, color: 'text-red-500',    bg: 'bg-red-500/10 border-red-500/20' },
         ].map((s) => (
           <button
             key={s.label}
@@ -156,20 +156,20 @@ export default function AiDecisionsPage() {
 
       {/* ── Pending approval banner ── */}
       {counts.pending > 0 && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center gap-4">
+        <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 flex items-center gap-4">
           <span className="text-2xl">⏳</span>
           <div className="flex-1">
-            <p className="text-amber-700 font-medium text-sm">
+            <p className="text-amber-500 font-medium text-sm">
               {counts.pending} ta qaror sizning tasdiqlashingizni kutmoqda
             </p>
-            <p className="text-amber-600 text-xs mt-0.5">
+            <p className="text-amber-500 text-xs mt-0.5">
               Siz Yordamlashish rejimdasiz — AI harakatni amalga oshirishdan oldin sizni kutadi.
             </p>
           </div>
           <Button
             size="sm"
             onClick={() => setFilter('pending')}
-            className="bg-amber-100 text-amber-700 border border-amber-300 hover:bg-amber-200 shrink-0"
+            className="bg-amber-500/15 text-amber-500 border border-amber-500/30 hover:bg-amber-500/20 shrink-0"
           >
             Ko'rib chiqish →
           </Button>
@@ -207,7 +207,7 @@ export default function AiDecisionsPage() {
                     ? 'bg-surface/20 text-text-primary'
                     : tab.key === 'pending'
                     ? 'bg-amber-500/20 text-amber-400'
-                    : 'bg-surface-2 dark:bg-surface text-text-tertiary'
+                    : 'bg-surface-2 text-text-tertiary'
                   }
                 `}
               >
@@ -302,7 +302,7 @@ export default function AiDecisionsPage() {
                               variant="secondary"
                               loading={isThisLoading}
                               onClick={() => handleReject(decision.id)}
-                              className="text-red-500 border-red-200 hover:bg-red-50"
+                              className="text-red-500 border-red-500/20 hover:bg-red-500/10"
                             >
                               ✗ Rad etish
                             </Button>
@@ -310,7 +310,7 @@ export default function AiDecisionsPage() {
                               size="sm"
                               loading={isThisLoading}
                               onClick={() => handleApprove(decision.id)}
-                              className="bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100"
+                              className="bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 hover:bg-emerald-500/15"
                             >
                               ✓ Tasdiqlash
                             </Button>

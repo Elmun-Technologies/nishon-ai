@@ -62,12 +62,12 @@ export const CaseStudyCard: React.FC<CaseStudyCardProps> = ({ caseStudy, classNa
             {formatNumber(caseStudy.beforeMetric)}
           </p>
         </div>
-        <div className="bg-emerald-50 rounded-lg p-3">
-          <p className="text-xs text-emerald-600 mb-1">After</p>
-          <p className="text-lg font-bold text-emerald-600">
+        <div className="bg-emerald-500/10 rounded-lg p-3">
+          <p className="text-xs text-emerald-500 mb-1">After</p>
+          <p className="text-lg font-bold text-emerald-500">
             {formatNumber(caseStudy.afterMetric)}
           </p>
-          <p className="text-xs text-emerald-600 mt-1">+{improvementPercent}%</p>
+          <p className="text-xs text-emerald-500 mt-1">+{improvementPercent}%</p>
         </div>
       </div>
 

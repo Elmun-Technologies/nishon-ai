@@ -78,7 +78,7 @@ export function ValidationStatus({ status }: ValidationStatusProps) {
     valid: { bg: 'bg-green-500/20', text: 'text-green-400', label: '✓ Valid' },
     warning: { bg: 'bg-yellow-500/20', text: 'text-yellow-400', label: '⚠ Warnings' },
     error: { bg: 'bg-red-500/20', text: 'text-red-400', label: '✗ Errors' },
-    none: { bg: 'bg-surface-2 dark:bg-surface', text: 'text-text-tertiary', label: 'Not validated' }
+    none: { bg: 'bg-surface-2', text: 'text-text-tertiary', label: 'Not validated' }
   }
 
   const { bg, text, label } = config[status]

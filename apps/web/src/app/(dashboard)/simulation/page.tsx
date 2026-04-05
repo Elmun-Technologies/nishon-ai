@@ -108,20 +108,20 @@ export default function SimulationPage() {
       </div>
 
       {/* ── Reporting embed notice ── */}
-      <div className="flex items-start gap-4 bg-emerald-50 border border-emerald-200 rounded-2xl px-5 py-4">
+      <div className="flex items-start gap-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl px-5 py-4">
         <span className="text-2xl shrink-0">💡</span>
         <div className="flex-1 min-w-0">
           <p className="text-emerald-800 font-semibold text-sm mb-0.5">
             Simulyatsiya endi Hisobot ichida ham mavjud
           </p>
-          <p className="text-emerald-600 text-xs leading-relaxed">
+          <p className="text-emerald-500 text-xs leading-relaxed">
             Hisobot bo'limida "Byudjet Simulyatsiyasi" paneli orqali real kampaniya
             ko'rsatkichlariga asoslangan prognoz qilishingiz mumkin.
           </p>
         </div>
         <button
           onClick={() => router.push('/reporting')}
-          className="shrink-0 text-xs font-medium text-emerald-700 bg-emerald-100 hover:bg-emerald-200 border border-emerald-300 px-3 py-1.5 rounded-lg transition-colors"
+          className="shrink-0 text-xs font-medium text-emerald-500 bg-emerald-500/15 hover:bg-emerald-200 border border-emerald-500/30 px-3 py-1.5 rounded-lg transition-colors"
         >
           Hisobotga o'tish →
         </button>
@@ -159,7 +159,7 @@ export default function SimulationPage() {
               step={50}
               value={budget}
               onChange={(e) => setBudget(Number(e.target.value))}
-              className="w-full h-2 bg-surface-2 dark:bg-surface rounded-full appearance-none cursor-pointer
+              className="w-full h-2 bg-surface-2 rounded-full appearance-none cursor-pointer
                 [&::-webkit-slider-thumb]:appearance-none
                 [&::-webkit-slider-thumb]:w-5
                 [&::-webkit-slider-thumb]:h-5
@@ -188,7 +188,7 @@ export default function SimulationPage() {
                   className={`
                     text-xs px-3 py-1.5 rounded-lg border transition-all duration-200
                     ${budget === preset
-                      ? 'border-border bg-surface-2 dark:bg-surface text-text-secondary font-medium'
+                      ? 'border-border bg-surface-2 text-text-secondary font-medium'
                       : 'border-border text-text-tertiary hover:border-border/50 hover:text-text-primary'
                     }
                   `}
@@ -219,7 +219,7 @@ export default function SimulationPage() {
                     label: '😊 Realistic',
                     desc: 'Based on industry averages for your market',
                     color: 'border-border hover:border-border',
-                    active: 'border-border bg-surface-2 dark:bg-surface',
+                    active: 'border-border bg-surface-2',
                   },
                   {
                     key: 'optimistic',
@@ -347,7 +347,7 @@ export default function SimulationPage() {
                           </span>
                         </div>
                       </div>
-                      <div className="h-1.5 bg-surface-2 dark:bg-surface rounded-full overflow-hidden">
+                      <div className="h-1.5 bg-surface-2 rounded-full overflow-hidden">
                         <div
                           className="h-full rounded-full transition-all duration-500"
                           style={{

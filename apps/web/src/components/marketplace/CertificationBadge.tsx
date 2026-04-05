@@ -33,7 +33,7 @@ export const CertificationBadge: React.FC<CertificationBadgeProps> = ({
   return (
     <div className={cn('relative inline-block', className)}>
       <div
-        className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-purple-50 border border-purple-200 rounded-full text-xs font-medium text-purple-700 hover:bg-purple-100 transition-colors cursor-help"
+        className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-purple-500/10 border border-purple-500/20 rounded-full text-xs font-medium text-purple-700 hover:bg-purple-100 transition-colors cursor-help"
         onMouseEnter={() => setShowTooltipContent(true)}
         onMouseLeave={() => setShowTooltipContent(false)}
       >

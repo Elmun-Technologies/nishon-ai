@@ -92,7 +92,7 @@ function VerifiedBadge() {
 
 function ProBadge() {
   return (
-    <span className="inline-flex items-center gap-1 bg-[#111827]/15 border border-border text-text-secondary text-[10px] font-bold px-2 py-0.5 rounded-full">
+    <span className="inline-flex items-center gap-1 bg-text-primary/15 border border-border text-text-secondary text-[10px] font-bold px-2 py-0.5 rounded-full">
       ⭐ PRO
     </span>
   )
@@ -135,7 +135,7 @@ function RoasTrend({ data }: { data: { month: string; roas: number }[] }) {
 function TargetologistCard({ t }: { t: PortfolioTargetologist }) {
   return (
     <Link href={`/portfolio/${t.slug}`} className="block group">
-      <div className="bg-white border border-border group-hover:border-border rounded-2xl p-6 transition-all duration-300 group-hover:shadow-[0_0_30px_rgba(124,58,237,0.1)]">
+      <div className="bg-surface-elevated border border-border group-hover:border-border rounded-2xl p-6 transition-all duration-300 group-hover:shadow-[0_0_30px_rgba(124,58,237,0.1)]">
 
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
@@ -174,7 +174,7 @@ function TargetologistCard({ t }: { t: PortfolioTargetologist }) {
             { label: 'Kampaniya', value: t.stats.totalCampaigns },
             { label: 'Muvaffaqiyat', value: `${t.stats.successRate}%` },
           ].map(m => (
-            <div key={m.label} className="bg-surface-2 dark:bg-surface rounded-lg p-2 text-center">
+            <div key={m.label} className="bg-surface-2 rounded-lg p-2 text-center">
               <div className={`text-sm font-bold ${m.highlight ? 'text-text-secondary' : 'text-text-primary'}`}>{m.value}</div>
               <div className="text-text-tertiary text-[10px] mt-0.5">{m.label}</div>
             </div>
@@ -197,8 +197,8 @@ function TargetologistCard({ t }: { t: PortfolioTargetologist }) {
               key={p.id}
               className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded-full border ${
                 p.verified
-                  ? 'bg-surface-2 dark:bg-surface border-border text-text-primary'
-                  : 'bg-surface-2 dark:bg-surface border-border text-text-tertiary'
+                  ? 'bg-surface-2 border-border text-text-primary'
+                  : 'bg-surface-2 border-border text-text-tertiary'
               }`}
             >
               {p.icon} {p.name}
@@ -210,7 +210,7 @@ function TargetologistCard({ t }: { t: PortfolioTargetologist }) {
         {/* Niches */}
         <div className="flex flex-wrap gap-1.5 mb-5">
           {t.niches.slice(0, 3).map(n => (
-            <span key={n} className="text-[10px] bg-surface-2 dark:bg-surface text-text-tertiary px-2 py-0.5 rounded-md border border-border">
+            <span key={n} className="text-[10px] bg-surface-2 text-text-tertiary px-2 py-0.5 rounded-md border border-border">
               {n}
             </span>
           ))}
@@ -304,10 +304,10 @@ export default function PortfolioPage() {
   }), [allAgents])
 
   return (
-    <div className="min-h-screen bg-surface-2 dark:bg-surface text-text-primary">
+    <div className="min-h-screen bg-surface-2 text-text-primary">
 
       {/* ── NAV ── */}
-      <nav className="sticky top-0 z-50 border-b border-border bg-surface-2 dark:bg-surface/90 backdrop-blur-lg">
+      <nav className="sticky top-0 z-50 border-b border-border bg-surface-2/90 backdrop-blur-lg">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <button onClick={() => router.push('/')} className="text-xl font-extrabold">
             Performa <span className="text-text-secondary">AI</span>
@@ -321,7 +321,7 @@ export default function PortfolioPage() {
             </button>
             <button
               onClick={() => router.push('/login')}
-              className="text-sm bg-[#111827] hover:bg-[#1F2937] text-white px-5 py-2.5 rounded-lg font-semibold transition-all"
+              className="text-sm bg-text-primary hover:bg-surface-2 text-white px-5 py-2.5 rounded-lg font-semibold transition-all"
             >
               Kirish
             </button>
@@ -333,7 +333,7 @@ export default function PortfolioPage() {
       <div className="relative py-16 px-6 text-center border-b border-border overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-[#7C3AED]/5 to-transparent pointer-events-none" />
         <div className="relative max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 bg-surface-2 dark:bg-surface border border-border rounded-full px-4 py-1.5 mb-5">
+          <div className="inline-flex items-center gap-2 bg-surface-2 border border-border rounded-full px-4 py-1.5 mb-5">
             <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
             <span className="text-text-secondary text-xs font-bold uppercase tracking-widest">Live Portfolio Tracking</span>
           </div>
@@ -345,14 +345,14 @@ export default function PortfolioPage() {
           </p>
 
           {/* aggregate stats */}
-          <div className="inline-grid grid-cols-4 gap-px bg-surface-2 dark:bg-surface rounded-2xl overflow-hidden border border-border">
+          <div className="inline-grid grid-cols-4 gap-px bg-surface-2 rounded-2xl overflow-hidden border border-border">
             {[
               { v: totals.targetologists, l: 'Targetolog' },
               { v: formatSpend(totals.spendManaged), l: 'Boshqarilgan' },
               { v: `${totals.avgROAS}x`, l: "O'rtacha ROAS" },
               { v: totals.campaigns, l: 'Kampaniyalar' },
             ].map(s => (
-              <div key={s.l} className="bg-white px-6 py-4 text-center">
+              <div key={s.l} className="bg-surface-elevated px-6 py-4 text-center">
                 <div className="text-2xl font-extrabold text-text-primary">{s.v}</div>
                 <div className="text-text-tertiary text-xs mt-0.5">{s.l}</div>
               </div>
@@ -374,7 +374,7 @@ export default function PortfolioPage() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Ism yoki niche..."
-                className="w-full bg-white border border-border rounded-lg px-3 py-2.5 text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-border/50"
+                className="w-full bg-surface-elevated border border-border rounded-lg px-3 py-2.5 text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-border/50"
               />
             </div>
 
@@ -382,9 +382,9 @@ export default function PortfolioPage() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setVerifiedOnly(!verifiedOnly)}
-                className={`w-10 h-5 rounded-full transition-colors ${verifiedOnly ? 'bg-[#111827]' : 'bg-surface-2 dark:bg-surface'}`}
+                className={`w-10 h-5 rounded-full transition-colors ${verifiedOnly ? 'bg-text-primary' : 'bg-surface-2'}`}
               >
-                <div className={`w-4 h-4 rounded-full bg-white mx-0.5 transition-transform ${verifiedOnly ? 'translate-x-5' : 'translate-x-0'}`} />
+                <div className={`w-4 h-4 rounded-full bg-surface-elevated mx-0.5 transition-transform ${verifiedOnly ? 'translate-x-5' : 'translate-x-0'}`} />
               </button>
               <span className="text-sm text-text-primary">Faqat tasdiqlangan</span>
             </div>
@@ -399,8 +399,8 @@ export default function PortfolioPage() {
                     onClick={() => togglePlatform(p.id)}
                     className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all ${
                       selectedPlatforms.includes(p.id)
-                        ? 'bg-[#111827]/15 border border-border/40 text-text-primary'
-                        : 'bg-white border border-border text-text-tertiary hover:border-border'
+                        ? 'bg-text-primary/15 border border-border/40 text-text-primary'
+                        : 'bg-surface-elevated border border-border text-text-tertiary hover:border-border'
                     }`}
                   >
                     <span>{p.icon}</span>
@@ -437,8 +437,8 @@ export default function PortfolioPage() {
                     onClick={() => toggleNiche(n)}
                     className={`text-xs px-2.5 py-1 rounded-full border transition-all ${
                       selectedNiches.includes(n)
-                        ? 'bg-[#E5E7EB] border-border/50 text-text-primary'
-                        : 'bg-white border-border text-text-tertiary hover:border-border'
+                        ? 'bg-surface-2 border-border/50 text-text-primary'
+                        : 'bg-surface-elevated border-border text-text-tertiary hover:border-border'
                     }`}
                   >
                     {n}
@@ -473,8 +473,8 @@ export default function PortfolioPage() {
                   onClick={() => setAgentTypeFilter(t.key as any)}
                   className={`px-4 py-2 text-sm font-medium rounded-xl transition-all ${
                     agentTypeFilter === t.key
-                      ? 'bg-[#111827] text-white'
-                      : 'bg-white border border-border text-text-tertiary hover:text-text-primary'
+                      ? 'bg-text-primary text-white'
+                      : 'bg-surface-elevated border border-border text-text-tertiary hover:text-text-primary'
                   }`}
                 >
                   {t.label}
@@ -493,7 +493,7 @@ export default function PortfolioPage() {
                 <select
                   value={sortBy}
                   onChange={e => setSortBy(e.target.value)}
-                  className="bg-white border border-border text-text-primary text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-border/50"
+                  className="bg-surface-elevated border border-border text-text-primary text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-border/50"
                 >
                   {SORT_OPTIONS.map(o => (
                     <option key={o.value} value={o.value}>{o.label}</option>
@@ -533,7 +533,7 @@ export default function PortfolioPage() {
           </p>
           <button
             onClick={() => router.push('/register')}
-            className="bg-[#111827] hover:bg-[#1F2937] text-white font-bold px-10 py-4 rounded-xl shadow-[0_0_30px_rgba(124,58,237,0.3)] hover:shadow-[0_0_50px_rgba(124,58,237,0.5)] transition-all"
+            className="bg-text-primary hover:bg-surface-2 text-white font-bold px-10 py-4 rounded-xl shadow-[0_0_30px_rgba(124,58,237,0.3)] hover:shadow-[0_0_50px_rgba(124,58,237,0.5)] transition-all"
           >
             Portfolio yaratish — bepul →
           </button>

@@ -300,8 +300,8 @@ export default function LandingPageEditor() {
             disabled={publishing}
             className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-all ${
               page.isPublished
-                ? 'bg-red-50 text-red-600 border border-red-200 hover:bg-red-100'
-                : 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
+                ? 'bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500/15'
+                : 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 hover:bg-emerald-500/15'
             }`}
           >
             {publishing ? '...' : page.isPublished ? '⏸ Nashrni to\'xtatish' : '🚀 Nashr etish'}
@@ -311,15 +311,15 @@ export default function LandingPageEditor() {
 
       {/* Published URL */}
       {page.isPublished && (
-        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 flex items-center gap-3">
-          <span className="text-emerald-600 text-lg">✅</span>
+        <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 flex items-center gap-3">
+          <span className="text-emerald-500 text-lg">✅</span>
           <div className="flex-1 min-w-0">
-            <p className="text-xs text-emerald-700 font-medium">Sahifangiz faol</p>
-            <p className="text-xs text-emerald-600 truncate">{publicUrl}</p>
+            <p className="text-xs text-emerald-500 font-medium">Sahifangiz faol</p>
+            <p className="text-xs text-emerald-500 truncate">{publicUrl}</p>
           </div>
           <button
             onClick={() => navigator.clipboard.writeText(publicUrl)}
-            className="text-xs text-emerald-700 font-medium shrink-0"
+            className="text-xs text-emerald-500 font-medium shrink-0"
           >
             Nusxa
           </button>
@@ -340,7 +340,7 @@ export default function LandingPageEditor() {
       </button>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-surface-2 dark:bg-surface p-1 rounded-xl">
+      <div className="flex gap-1 bg-surface-2 p-1 rounded-xl">
         {[
           { key: 'content', label: 'Matn' },
           { key: 'design', label: 'Dizayn' },
@@ -442,7 +442,7 @@ export default function LandingPageEditor() {
                       <button
                         onClick={() => toggleSection(sec.key)}
                         className={`text-xs px-2 py-0.5 rounded-lg ${
-                          active ? 'text-red-500 hover:bg-red-50' : 'text-emerald-600 hover:bg-emerald-50'
+                          active ? 'text-red-500 hover:bg-red-500/10' : 'text-emerald-500 hover:bg-emerald-500/10'
                         }`}
                       >
                         {active ? 'O\'chir' : 'Qo\'sh'}
@@ -501,7 +501,7 @@ export default function LandingPageEditor() {
         <div className="space-y-5">
 
           {/* Meta Pixel */}
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+          <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-3">
               <span className="text-lg">📘</span>
               <h3 className="font-semibold text-text-primary text-sm">Meta Pixel (Facebook/Instagram)</h3>
@@ -517,7 +517,7 @@ export default function LandingPageEditor() {
             </ol>
             <input
               type="text"
-              className="w-full border border-blue-200 rounded-xl px-3 py-2 text-sm bg-surface focus:outline-none focus:ring-2 focus:ring-blue-300"
+              className="w-full border border-blue-500/20 rounded-xl px-3 py-2 text-sm bg-surface focus:outline-none focus:ring-2 focus:ring-blue-300"
               value={page.metaPixelId || ''}
               onChange={e => setPage(p => p ? { ...p, metaPixelId: e.target.value } : p)}
               placeholder="123456789012345"
@@ -525,7 +525,7 @@ export default function LandingPageEditor() {
           </div>
 
           {/* Google Analytics */}
-          <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
+          <div className="bg-orange-500/10 border border-orange-500/20 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-3">
               <span className="text-lg">📊</span>
               <h3 className="font-semibold text-text-primary text-sm">Google Analytics (GA4)</h3>
@@ -540,7 +540,7 @@ export default function LandingPageEditor() {
             </ol>
             <input
               type="text"
-              className="w-full border border-orange-200 rounded-xl px-3 py-2 text-sm bg-surface focus:outline-none focus:ring-2 focus:ring-orange-300"
+              className="w-full border border-orange-500/20 rounded-xl px-3 py-2 text-sm bg-surface focus:outline-none focus:ring-2 focus:ring-orange-300"
               value={page.googleAnalyticsId || ''}
               onChange={e => setPage(p => p ? { ...p, googleAnalyticsId: e.target.value } : p)}
               placeholder="G-XXXXXXXXXX"
@@ -552,7 +552,7 @@ export default function LandingPageEditor() {
           </Button>
 
           {(page.metaPixelId || page.googleAnalyticsId) && (
-            <p className="text-xs text-emerald-600 text-center">
+            <p className="text-xs text-emerald-500 text-center">
               ✅ Pixel(lar) sahifaga avtomatik qo'shilgan
             </p>
           )}

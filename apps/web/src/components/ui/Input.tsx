@@ -43,7 +43,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               'flex w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-body-sm text-text-primary placeholder-text-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary transition-all duration-200',
               leftIcon && 'pl-10',
               rightIcon && 'pr-10',
-              error && 'border-red-300 focus-visible:ring-red-100 focus-visible:border-red-400',
+              error && 'border-red-500/30 focus-visible:ring-red-100 focus-visible:border-red-400',
               className
             )}
             ref={ref}
@@ -56,7 +56,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           )}
         </div>
         {error && (
-          <p className="text-red-600 text-caption">{error}</p>
+          <p className="text-red-500 text-caption">{error}</p>
         )}
       </div>
     )

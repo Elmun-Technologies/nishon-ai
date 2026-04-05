@@ -68,7 +68,7 @@ const ACTION_LABELS: Record<ActionType, string> = {
 const STATUS_COLORS: Record<string, string> = {
   success: 'text-emerald-400 bg-emerald-400/10',
   failed: 'text-red-400 bg-red-400/10',
-  no_match: 'text-text-tertiary bg-surface-2 dark:bg-surface',
+  no_match: 'text-text-tertiary bg-surface-2',
   skipped: 'text-amber-400 bg-amber-400/10',
 }
 
@@ -388,7 +388,7 @@ export default function TriggerSetsPage() {
                     onClick={() => handleToggle(ts)}
                     className={`
                       relative mt-0.5 inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors duration-200
-                      ${ts.enabled ? 'bg-surface' : 'bg-surface-2 dark:bg-surface'}
+                      ${ts.enabled ? 'bg-surface' : 'bg-surface-2'}
                     `}
                   >
                     <span
@@ -411,7 +411,7 @@ export default function TriggerSetsPage() {
                       ))}
                       <span className="text-[11px] text-text-tertiary">→</span>
                       {ts.actions.map((a, i) => (
-                        <span key={i} className="text-[11px] bg-surface-2 dark:bg-surface border border-border text-text-secondary px-2 py-0.5 rounded-md">
+                        <span key={i} className="text-[11px] bg-surface-2 border border-border text-text-secondary px-2 py-0.5 rounded-md">
                           {ACTION_LABELS[a.type as ActionType] ?? a.type}
                           {a.value ? ` ${a.value}%` : ''}
                         </span>
@@ -424,7 +424,7 @@ export default function TriggerSetsPage() {
                 <div className="flex items-center gap-3 shrink-0">
                   {/* Last run status */}
                   {ts.lastRunStatus && (
-                    <span className={`text-[11px] px-2 py-0.5 rounded-md font-medium ${STATUS_COLORS[ts.lastRunStatus] ?? 'text-text-tertiary bg-surface-2 dark:bg-surface'}`}>
+                    <span className={`text-[11px] px-2 py-0.5 rounded-md font-medium ${STATUS_COLORS[ts.lastRunStatus] ?? 'text-text-tertiary bg-surface-2'}`}>
                       {STATUS_LABELS[ts.lastRunStatus] ?? ts.lastRunStatus}
                     </span>
                   )}

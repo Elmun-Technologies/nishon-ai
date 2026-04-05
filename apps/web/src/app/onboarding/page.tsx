@@ -313,7 +313,7 @@ function OptionCard({
       className={`
         text-left p-4 rounded-xl border transition-all duration-200 w-full
         ${selected
-          ? 'border-[#111827] bg-[#F3F4F6] ring-1 ring-[#111827]/30'
+          ? 'border-[#111827] bg-surface-2 ring-1 ring-[#111827]/30'
           : 'border-border hover:border-border hover:bg-surface-2'
         }
       `}
@@ -358,7 +358,7 @@ function TagSelector({
               text-sm px-3 py-1.5 rounded-lg border transition-all duration-200
               ${
                 isSelected
-                  ? 'border-[#111827] bg-[#F3F4F6] text-text-secondary font-medium'
+                  ? 'border-[#111827] bg-surface-2 text-text-secondary font-medium'
                   : isDisabled
                     ? 'border-border text-[#3A3A4A] cursor-not-allowed'
                     : 'border-border text-text-tertiary hover:border-border hover:text-text-primary'
@@ -632,7 +632,7 @@ export default function OnboardingPage() {
               <div
                 key={s.id}
                 className={`flex-1 h-1.5 rounded-full transition-all duration-500 ${
-                  s.id <= step ? 'bg-[#111827]' : 'bg-[#F3F4F6]'
+                  s.id <= step ? 'bg-text-primary' : 'bg-surface-2'
                 }`}
               />
             ))}
@@ -646,11 +646,11 @@ export default function OnboardingPage() {
         </div>
 
         {/* Card */}
-        <div className="bg-white border border-border rounded-2xl overflow-hidden">
+        <div className="bg-surface-elevated border border-border rounded-2xl overflow-hidden">
           {/* Header */}
           <div className="px-7 pt-7 pb-5 border-b border-border">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#F3F4F6] border border-border flex items-center justify-center text-xl">
+              <div className="w-10 h-10 rounded-xl bg-surface-2 border border-border flex items-center justify-center text-xl">
                 {STEPS[step - 1]?.icon}
               </div>
               <div>
@@ -739,7 +739,7 @@ export default function OnboardingPage() {
                             flex items-center gap-2.5 px-4 py-2.5 rounded-xl border text-sm transition-all
                             ${
                               selected
-                                ? 'border-[#111827] bg-[#F3F4F6] text-text-primary font-medium'
+                                ? 'border-[#111827] bg-surface-2 text-text-primary font-medium'
                                 : 'border-border text-text-tertiary hover:border-border'
                             }
                           `}
@@ -747,8 +747,8 @@ export default function OnboardingPage() {
                           <span
                             className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${
                               selected
-                                ? 'bg-[#111827] border-[#111827]'
-                                : 'border-[#4B5563]'
+                                ? 'bg-text-primary border-[#111827]'
+                                : 'border-border'
                             }`}
                           >
                             {selected && <span className="text-text-primary text-xs">✓</span>}
@@ -775,7 +775,7 @@ export default function OnboardingPage() {
                           w-full flex items-center gap-3 px-4 py-3 rounded-xl border text-sm transition-all text-left
                           ${
                             form.monthlyRevenue === r.value
-                              ? 'border-[#111827] bg-[#F3F4F6] text-text-primary'
+                              ? 'border-[#111827] bg-surface-2 text-text-primary'
                               : 'border-border text-text-tertiary hover:border-border'
                           }
                         `}
@@ -784,11 +784,11 @@ export default function OnboardingPage() {
                           className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
                             form.monthlyRevenue === r.value
                               ? 'border-[#111827]'
-                              : 'border-[#4B5563]'
+                              : 'border-border'
                           }`}
                         >
                           {form.monthlyRevenue === r.value && (
-                            <span className="w-2 h-2 rounded-full bg-[#111827] block" />
+                            <span className="w-2 h-2 rounded-full bg-text-primary block" />
                           )}
                         </span>
                         {r.label}
@@ -936,7 +936,7 @@ export default function OnboardingPage() {
                             px-5 py-2.5 rounded-xl border font-medium text-sm transition-all
                             ${
                               sel
-                                ? 'border-[#111827] bg-[#F3F4F6] text-text-secondary'
+                                ? 'border-[#111827] bg-surface-2 text-text-secondary'
                                 : 'border-border text-text-tertiary hover:border-border'
                             }
                           `}
@@ -1031,7 +1031,7 @@ export default function OnboardingPage() {
                           flex items-center gap-2.5 px-4 py-3 rounded-xl border text-sm transition-all
                           ${
                             form.platforms.includes(p.value)
-                              ? 'border-[#111827] bg-[#F3F4F6] text-text-primary font-medium'
+                              ? 'border-[#111827] bg-surface-2 text-text-primary font-medium'
                               : 'border-border text-text-tertiary hover:border-border'
                           }
                         `}
@@ -1096,7 +1096,7 @@ export default function OnboardingPage() {
                           w-full flex items-center gap-3 px-4 py-3 rounded-xl border text-sm transition-all text-left
                           ${
                             form.kpiPriority === kpi.value
-                              ? 'border-[#111827] bg-[#F3F4F6] text-text-primary'
+                              ? 'border-[#111827] bg-surface-2 text-text-primary'
                               : 'border-border text-text-tertiary hover:border-border'
                           }
                         `}
@@ -1105,11 +1105,11 @@ export default function OnboardingPage() {
                           className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
                             form.kpiPriority === kpi.value
                               ? 'border-[#111827]'
-                              : 'border-[#4B5563]'
+                              : 'border-border'
                           }`}
                         >
                           {form.kpiPriority === kpi.value && (
-                            <span className="w-2 h-2 rounded-full bg-[#111827] block" />
+                            <span className="w-2 h-2 rounded-full bg-text-primary block" />
                           )}
                         </span>
                         {kpi.label}
@@ -1177,7 +1177,7 @@ export default function OnboardingPage() {
                           text-xs px-3 py-1.5 rounded-lg border transition-all
                           ${
                             form.monthlyBudget === p
-                              ? 'border-[#111827] bg-[#F3F4F6] text-text-secondary'
+                              ? 'border-[#111827] bg-surface-2 text-text-secondary'
                               : 'border-border text-text-tertiary hover:border-border'
                           }
                         `}
@@ -1269,7 +1269,7 @@ export default function OnboardingPage() {
                 </div>
 
                 {/* Summary preview */}
-                <div className="bg-[#111827]/5 border border-[#111827]/15 rounded-xl p-4">
+                <div className="bg-text-primary/5 border border-[#111827]/15 rounded-xl p-4">
                   <p className="text-text-secondary text-xs font-medium mb-2">
                     📋 Ma'lumotlar xulosasi (AI ga yuboriladigan):
                   </p>
@@ -1288,7 +1288,7 @@ export default function OnboardingPage() {
             {/* ══ STEP 6: AI Analysis ══ */}
             {step === 6 && (
               <div className="py-6 text-center">
-                <div className="w-20 h-20 rounded-2xl bg-[#F3F4F6] border border-border flex items-center justify-center mx-auto mb-5">
+                <div className="w-20 h-20 rounded-2xl bg-surface-2 border border-border flex items-center justify-center mx-auto mb-5">
                   <Spinner size="lg" />
                 </div>
                 <h3 className="text-lg font-semibold text-text-primary mb-2">
@@ -1320,14 +1320,14 @@ export default function OnboardingPage() {
                           i < analysisStep
                             ? 'bg-emerald-500/20 text-emerald-400'
                             : i === analysisStep
-                              ? 'bg-[#E5E7EB] border border-[#111827]/50'
-                              : 'bg-[#F3F4F6]'
+                              ? 'bg-surface-2 border border-[#111827]/50'
+                              : 'bg-surface-2'
                         }`}
                       >
                         {i < analysisStep ? (
                           <span className="text-xs">✓</span>
                         ) : i === analysisStep ? (
-                          <span className="w-2 h-2 rounded-full bg-[#111827] animate-pulse block" />
+                          <span className="w-2 h-2 rounded-full bg-text-primary animate-pulse block" />
                         ) : null}
                       </div>
                       <p className={`text-sm ${i <= analysisStep ? 'text-text-primary' : 'text-text-tertiary'}`}>
@@ -1374,7 +1374,7 @@ export default function OnboardingPage() {
                     { icon: '💰', label: 'Est. CPA', value: strategy.monthlyForecast?.estimatedCpa ? `$${Number(strategy.monthlyForecast.estimatedCpa).toFixed(0)}` : '—', color: 'text-text-primary' },
                     { icon: '📊', label: 'Ishonch darajasi', value: strategy.monthlyForecast?.confidence ?? '—', color: 'text-text-secondary' },
                   ].map(({ icon, label, value, color }) => (
-                    <div key={label} className="bg-white border border-border rounded-xl p-3">
+                    <div key={label} className="bg-surface-elevated border border-border rounded-xl p-3">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-sm">{icon}</span>
                         <p className="text-text-tertiary text-xs">{label}</p>
@@ -1390,7 +1390,7 @@ export default function OnboardingPage() {
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-xl">💰</span>
                       <h3 className="font-semibold text-text-primary">Byudjet taqsimoti</h3>
-                      <span className="bg-[#F3F4F6] text-text-secondary text-xs px-2 py-0.5 rounded-full border border-border">
+                      <span className="bg-surface-2 text-text-secondary text-xs px-2 py-0.5 rounded-full border border-border">
                         ${form.monthlyBudget.toLocaleString()}/oy
                       </span>
                     </div>
@@ -1406,10 +1406,10 @@ export default function OnboardingPage() {
                             key={idx}
                             className={`rounded-xl border p-3.5 ${
                               isPrimary
-                                ? 'bg-[#F0FDF4] border-emerald-200'
+                                ? 'bg-[#F0FDF4] border-emerald-500/20'
                                 : isSecondary
                                   ? 'bg-surface-2 border-border'
-                                  : 'bg-white border-[#F3F4F6]'
+                                  : 'bg-surface-elevated border-[#F3F4F6]'
                             }`}
                           >
                             {/* Channel header */}
@@ -1420,7 +1420,7 @@ export default function OnboardingPage() {
                                   {ch.channelName}
                                 </span>
                                 {isPrimary && (
-                                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">
+                                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500 border border-emerald-500/20">
                                     Asosiy
                                   </span>
                                 )}
@@ -1434,7 +1434,7 @@ export default function OnboardingPage() {
                             </div>
 
                             {/* Progress bar */}
-                            <div className="h-1.5 bg-[#E5E7EB] rounded-full mb-2 overflow-hidden">
+                            <div className="h-1.5 bg-surface-2 rounded-full mb-2 overflow-hidden">
                               <div
                                 className={`h-full rounded-full transition-all duration-700 ${
                                   isPrimary ? 'bg-emerald-500' : 'bg-[#6B7280]'
@@ -1447,7 +1447,7 @@ export default function OnboardingPage() {
                               <p className="text-text-tertiary text-xs leading-relaxed flex-1 pr-4">
                                 {ch.rationale}
                               </p>
-                              <span className={`text-xs font-semibold shrink-0 ${isPrimary ? 'text-emerald-600' : 'text-text-secondary'}`}>
+                              <span className={`text-xs font-semibold shrink-0 ${isPrimary ? 'text-emerald-500' : 'text-text-secondary'}`}>
                                 {ch.percentage}%
                               </span>
                             </div>
@@ -1458,7 +1458,7 @@ export default function OnboardingPage() {
                                 {ch.tactics.slice(0, 3).map((t: string, ti: number) => (
                                   <span
                                     key={ti}
-                                    className="text-[10px] px-2 py-0.5 rounded-full bg-white border border-border text-text-tertiary"
+                                    className="text-[10px] px-2 py-0.5 rounded-full bg-surface-elevated border border-border text-text-tertiary"
                                   >
                                     {t}
                                   </span>
@@ -1482,7 +1482,7 @@ export default function OnboardingPage() {
                   <div className="flex items-center gap-2 mb-4">
                     <span className="text-xl">📝</span>
                     <h3 className="font-semibold text-text-primary">Tayyor Reklama Skriptlari</h3>
-                    <span className="bg-[#F3F4F6] text-text-secondary text-xs px-2 py-0.5 rounded-full border border-border">
+                    <span className="bg-surface-2 text-text-secondary text-xs px-2 py-0.5 rounded-full border border-border">
                       AI tomonidan yozilgan
                     </span>
                   </div>
@@ -1500,7 +1500,7 @@ export default function OnboardingPage() {
                       </p>
                       <div className="flex flex-wrap gap-2 justify-center mt-3">
                         {form.platforms.map((p) => (
-                          <span key={p} className="text-xs text-text-tertiary bg-white px-2 py-1 rounded-lg border border-border">
+                          <span key={p} className="text-xs text-text-tertiary bg-surface-elevated px-2 py-1 rounded-lg border border-border">
                             {p === 'meta' ? '📘 Meta' : p === 'google' ? '🔍 Google' :
                              p === 'tiktok' ? '🎵 TikTok' : p === 'youtube' ? '▶️ YouTube' :
                              p === 'telegram' ? '✈️ Telegram' : p} ✍️
@@ -1535,7 +1535,7 @@ export default function OnboardingPage() {
                               onClick={() => setActiveScriptTab(platform)}
                               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
                                 activeScriptTab === platform
-                                  ? 'bg-[#111827] text-white'
+                                  ? 'bg-text-primary text-white'
                                   : 'bg-surface-2 text-text-tertiary border border-border hover:text-text-primary'
                               }`}
                             >
@@ -1611,7 +1611,7 @@ export default function OnboardingPage() {
                                       <p className="text-text-tertiary text-xs">{bc.primaryText}</p>
                                       <p className="text-text-tertiary text-xs">{bc.description}</p>
                                     </div>
-                                    <span className="bg-[#F3F4F6] text-text-secondary text-xs px-2 py-1 rounded-lg border border-border shrink-0 whitespace-nowrap">
+                                    <span className="bg-surface-2 text-text-secondary text-xs px-2 py-1 rounded-lg border border-border shrink-0 whitespace-nowrap">
                                       {bc.ctaButton}
                                     </span>
                                   </div>
@@ -1695,7 +1695,7 @@ export default function OnboardingPage() {
                                 {ts.hashtags.length > 0 && (
                                   <div className="flex flex-wrap gap-1.5 pt-1">
                                     {ts.hashtags.map((tag) => (
-                                      <span key={tag} className="text-xs text-text-secondary bg-[#111827]/5 px-2 py-0.5 rounded">
+                                      <span key={tag} className="text-xs text-text-secondary bg-text-primary/5 px-2 py-0.5 rounded">
                                         {tag}
                                       </span>
                                     ))}
@@ -1755,7 +1755,7 @@ export default function OnboardingPage() {
 
                       {/* General tips */}
                       {scripts.generalTips && scripts.generalTips.length > 0 && (
-                        <div className="bg-[#111827]/5 border border-[#111827]/15 rounded-xl p-4">
+                        <div className="bg-text-primary/5 border border-[#111827]/15 rounded-xl p-4">
                           <p className="text-text-secondary text-xs font-medium mb-2">💡 Kreativ tavsiyalar</p>
                           <ul className="space-y-1">
                             {scripts.generalTips.map((tip, i) => (
@@ -1804,7 +1804,7 @@ export default function OnboardingPage() {
                     fullWidth
                     size="lg"
                     onClick={() => router.push('/landing-page')}
-                    className="bg-[#111827] text-white"
+                    className="bg-text-primary text-white"
                   >
                     🚀 Landing Page yaratish →
                   </Button>

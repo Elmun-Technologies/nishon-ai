@@ -272,7 +272,7 @@ function ScoreCircle({ score, label, color }: { score: number; label: string; co
     <div className={`flex flex-col items-center p-4 rounded-xl border ${bg} ${border}`}>
       <span className={`text-4xl font-black ${text}`}>{score}</span>
       <span className="text-text-tertiary text-xs mt-1 text-center">{label}</span>
-      <div className="w-full bg-surface-2 dark:bg-surface rounded-full h-1.5 mt-2">
+      <div className="w-full bg-surface-2 rounded-full h-1.5 mt-2">
         <div className="h-full rounded-full" style={{ width: `${score}%`, backgroundColor: c }} />
       </div>
     </div>
@@ -546,7 +546,7 @@ export default function CompetitorsPage() {
       {loading && (
         <Card>
           <div className="py-10 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-surface-2 dark:bg-surface border border-border flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 rounded-2xl bg-surface-2 border border-border flex items-center justify-center mx-auto mb-4">
               <Spinner size="lg" />
             </div>
             <h3 className="text-text-primary font-semibold mb-1">
@@ -569,9 +569,9 @@ export default function CompetitorsPage() {
       {result && !loading && (
         <div className="space-y-5">
           {result === MOCK_RESULT && (
-            <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+            <div className="flex items-center gap-3 bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-3">
               <span className="text-amber-500 text-lg shrink-0">💡</span>
-              <p className="text-amber-700 text-sm">
+              <p className="text-amber-500 text-sm">
                 <span className="font-medium">Demo natija</span> — Texnomart bilan solishtirish ko'rsatilmoqda. Haqiqiy tahlil uchun raqobatchi ma'lumotlarini yuqorida kiriting.
               </p>
             </div>

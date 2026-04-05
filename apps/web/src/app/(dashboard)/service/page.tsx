@@ -80,7 +80,7 @@ function AgentCardItem({
           <div className="flex items-center gap-1.5 flex-wrap">
             <span className="font-bold text-text-primary text-sm">{agent.displayName}</span>
             {agent.isVerified && (
-              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-600">✓ TASDIQLANGAN</span>
+              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500">✓ TASDIQLANGAN</span>
             )}
             {agent.agentType === 'ai' && (
               <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-violet-50 border border-violet-200 text-violet-600">🤖 AI</span>
@@ -118,7 +118,7 @@ function AgentCardItem({
       {/* Platforms */}
       <div className="flex flex-wrap gap-1 mb-3">
         {agent.platforms.slice(0, 5).map(p => (
-          <span key={p} className="text-[10px] px-2 py-0.5 rounded-full bg-surface-2 dark:bg-surface text-text-tertiary border border-border">
+          <span key={p} className="text-[10px] px-2 py-0.5 rounded-full bg-surface-2 text-text-tertiary border border-border">
             {PLATFORM_ICONS[p] || '📢'} {p}
           </span>
         ))}
@@ -247,11 +247,11 @@ export default function ServiceSelectionPage() {
 
       {/* Current engagement banner */}
       {currentEngagement && (
-        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+        <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-emerald-700 font-semibold text-sm">✅ Faol: {currentEngagement.agentProfile?.displayName}</p>
-              <p className="text-emerald-600 text-xs mt-0.5">{currentEngagement.agentProfile?.title}</p>
+              <p className="text-emerald-500 font-semibold text-sm">✅ Faol: {currentEngagement.agentProfile?.displayName}</p>
+              <p className="text-emerald-500 text-xs mt-0.5">{currentEngagement.agentProfile?.title}</p>
               <p className="text-text-tertiary text-xs mt-1">
                 Ulangan: {new Date(currentEngagement.startDate).toLocaleDateString('uz-UZ')}
                 {' · '}
@@ -263,7 +263,7 @@ export default function ServiceSelectionPage() {
             <button
               onClick={handleCancel}
               disabled={cancelling}
-              className="text-xs text-red-500 hover:text-red-700 border border-red-200 px-3 py-1.5 rounded-lg hover:bg-red-50 transition-all shrink-0"
+              className="text-xs text-red-500 hover:text-red-500 border border-red-500/20 px-3 py-1.5 rounded-lg hover:bg-red-500/10 transition-all shrink-0"
             >
               {cancelling ? '...' : 'Bekor qilish'}
             </button>
@@ -308,15 +308,15 @@ export default function ServiceSelectionPage() {
             <div className="text-2xl mb-2">{card.icon}</div>
             <p className="font-semibold text-text-primary text-sm">{card.title}</p>
             <p className="text-text-tertiary text-xs mt-1 leading-relaxed">{card.desc}</p>
-            {card.active && <p className="text-xs text-emerald-600 font-medium mt-2">✓ Faol</p>}
+            {card.active && <p className="text-xs text-emerald-500 font-medium mt-2">✓ Faol</p>}
           </button>
         ))}
       </div>
 
       {/* Monetization note */}
-      <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
-        <p className="text-xs text-amber-700 font-medium mb-1">💡 Monetizatsiya modeli</p>
-        <p className="text-xs text-amber-600 leading-relaxed">
+      <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3">
+        <p className="text-xs text-amber-500 font-medium mb-1">💡 Monetizatsiya modeli</p>
+        <p className="text-xs text-amber-500 leading-relaxed">
           Jonli targetologlar uchun: ular oylik to'lov oladi, Performa 15% komissiya oladi.
           AI agentlar uchun: ba'zilari bepul (subscription bilan), ba'zilari oylik to'lov + kichik komissiya.
           O'z AI agentingizni yaratib, boshqalarga ijaraga bersangiz — siz 80% daromad olasiz.
@@ -339,7 +339,7 @@ export default function ServiceSelectionPage() {
                 className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
                   tab === t.key
                     ? 'bg-surface text-white'
-                    : 'bg-surface-2 dark:bg-surface text-text-tertiary hover:text-text-secondary'
+                    : 'bg-surface-2 text-text-tertiary hover:text-text-secondary'
                 }`}
               >
                 {t.label}

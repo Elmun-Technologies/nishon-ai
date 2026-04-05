@@ -330,8 +330,8 @@ export default function AutoOptimizationPage() {
             subtitle: 'Inson ekspert',
             desc: "Sertifikatlangan targetolog reklamalaringizni qo'lda boshqaradi. Haftalik hisobot va strategik maslahatlar.",
             badge: 'Premium',
-            badgeColor: 'bg-amber-100 text-amber-700 border-amber-200',
-            borderActive: 'border-amber-500 bg-amber-50',
+            badgeColor: 'bg-amber-500/15 text-amber-500 border-amber-500/20',
+            borderActive: 'border-amber-500 bg-amber-500/10',
           },
           {
             key: 'self' as const,
@@ -388,9 +388,9 @@ export default function AutoOptimizationPage() {
       {/* ══ APPROACH: SPECIALIST ══════════════════════════════════════════════════ */}
       {approach === 'specialist' && (
         <div className="space-y-4">
-          <Card className="border-amber-200 bg-amber-50">
+          <Card className="border-amber-500/20 bg-amber-500/10">
             <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-amber-100 border border-amber-200 flex items-center justify-center text-2xl shrink-0">
+              <div className="w-14 h-14 rounded-2xl bg-amber-500/15 border border-amber-500/20 flex items-center justify-center text-2xl shrink-0">
                 👨‍💼
               </div>
               <div className="flex-1">
@@ -427,9 +427,9 @@ export default function AutoOptimizationPage() {
               { name: 'Growth', price: '$599/oy', features: ['3 platforma', '15 kampaniya', 'Kunlik monitoring', 'Video call'], highlight: true },
               { name: 'Enterprise', price: 'So\'rovnoma', features: ['Cheksiz platforma', 'Dedikatsiya', 'Onsite xizmat', 'SLA kafolat'] },
             ].map((plan) => (
-              <Card key={plan.name} className={plan.highlight ? 'border-amber-400 bg-amber-50' : ''}>
+              <Card key={plan.name} className={plan.highlight ? 'border-amber-400 bg-amber-500/10' : ''}>
                 <div className="mb-3">
-                  {plan.highlight && <span className="text-[10px] font-semibold text-amber-600 bg-amber-100 border border-amber-200 px-2 py-0.5 rounded-full">Eng mashhur</span>}
+                  {plan.highlight && <span className="text-[10px] font-semibold text-amber-500 bg-amber-500/15 border border-amber-500/20 px-2 py-0.5 rounded-full">Eng mashhur</span>}
                   <p className="text-text-primary font-bold text-lg mt-1">{plan.name}</p>
                   <p className="text-text-secondary font-semibold text-base">{plan.price}</p>
                 </div>
@@ -464,7 +464,7 @@ export default function AutoOptimizationPage() {
                   onClick={() => setMode('recommend')}
                   className={`text-left p-4 rounded-xl border transition-all ${
                     mode === 'recommend'
-                      ? 'border-border bg-surface-2 dark:bg-surface'
+                      ? 'border-border bg-surface-2'
                       : 'border-border hover:border-border'
                   }`}
                 >

@@ -152,7 +152,7 @@ function ReviewCard({ r }: { r: PortfolioTargetologist['reviews'][0] }) {
           <Star key={i} size={14} className={i < r.rating ? 'text-amber-400 fill-amber-400' : 'text-text-secondary'} />
         ))}
         {r.verified && (
-          <span className="ml-2 text-[10px] text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
+          <span className="ml-2 text-[10px] text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
             <CheckCircle2 size={10} /> Tasdiqlangan
           </span>
         )}
@@ -214,7 +214,7 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-surface-elevated flex items-center justify-center">
         <div className="w-10 h-10 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
       </div>
     )
@@ -223,7 +223,7 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
   const t = loadedProfile
   if (!t) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center text-center px-6">
+      <div className="min-h-screen bg-surface-elevated flex items-center justify-center text-center px-6">
         <div>
           <div className="text-6xl mb-4">👤</div>
           <h2 className="text-2xl font-bold text-text-primary mb-2">Targetolog topilmadi</h2>
@@ -237,7 +237,7 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
   }
 
   return (
-    <div className="min-h-screen bg-white text-text-primary overflow-x-hidden">
+    <div className="min-h-screen bg-surface-elevated text-text-primary overflow-x-hidden">
 
       {/* ═══ ANIMATED BG ═══ */}
       <div className="fixed inset-0 z-0 opacity-30 pointer-events-none">
@@ -245,7 +245,7 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
       </div>
 
       {/* ═══ STICKY NAV ═══ */}
-      <nav className="sticky top-0 z-50 backdrop-blur-xl bg-white/70 border-b border-border/50">
+      <nav className="sticky top-0 z-50 backdrop-blur-xl bg-surface-elevated/70 border-b border-border/50">
         <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
           <button onClick={() => router.push('/portfolio')} className="flex items-center gap-2 text-text-tertiary hover:text-text-primary transition-colors text-sm font-medium">
             ← Katalog
@@ -281,12 +281,12 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
                   <div className="flex flex-wrap items-center gap-2 mb-1">
                     <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">{t.name}</h1>
                     {t.verified && (
-                      <span className="inline-flex items-center gap-1 bg-emerald-50 border border-emerald-200 text-emerald-600 text-xs font-bold px-2.5 py-1 rounded-full">
+                      <span className="inline-flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-xs font-bold px-2.5 py-1 rounded-full">
                         <CheckCircle2 size={12} /> Tasdiqlangan
                       </span>
                     )}
                     {t.proMember && (
-                      <span className="bg-gradient-to-r from-amber-100 to-amber-50 border border-amber-200 text-amber-700 text-xs font-bold px-2.5 py-1 rounded-full">⭐ PRO</span>
+                      <span className="bg-gradient-to-r from-amber-100 to-amber-50 border border-amber-500/20 text-amber-500 text-xs font-bold px-2.5 py-1 rounded-full">⭐ PRO</span>
                     )}
                   </div>
                   <p className="text-text-tertiary text-base">{t.title}</p>
@@ -304,7 +304,7 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
               <div className="flex flex-wrap gap-2 mb-6">
                 {t.platforms.map(p => (
                   <span key={p.id}
-                    className="flex items-center gap-1.5 text-xs px-3 py-2 rounded-xl bg-white/60 backdrop-blur border border-border/50 text-text-secondary font-medium shadow-sm">
+                    className="flex items-center gap-1.5 text-xs px-3 py-2 rounded-xl bg-surface-elevated/60 backdrop-blur border border-border/50 text-text-secondary font-medium shadow-sm">
                     {p.icon} {p.name}
                     {p.verified && <CheckCircle2 size={12} className="text-emerald-500" />}
                     <span className="text-text-tertiary">({p.accountsConnected})</span>
@@ -315,7 +315,7 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
               {/* Niche tags */}
               <div className="flex flex-wrap gap-2">
                 {t.niches.map(n => (
-                  <span key={n} className="text-xs bg-cyan-50 text-cyan-700 border border-cyan-200 px-3 py-1.5 rounded-lg font-medium">
+                  <span key={n} className="text-xs bg-cyan-500/10 text-cyan-700 border border-cyan-200 px-3 py-1.5 rounded-lg font-medium">
                     {n}
                   </span>
                 ))}
@@ -457,13 +457,13 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
               <div className="divide-y divide-border">
                 {t.recentCampaigns.map(c => {
                   const statusColors: Record<string, string> = {
-                    active: 'bg-emerald-50 text-emerald-600 border-emerald-200',
+                    active: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
                     completed: 'bg-surface-2 text-text-tertiary border-border',
-                    paused: 'bg-amber-50 text-amber-600 border-amber-200',
+                    paused: 'bg-amber-500/10 text-amber-500 border-amber-500/20',
                   }
                   const statusLabels: Record<string, string> = { active: 'Faol', completed: 'Tugadi', paused: 'Pauza' }
                   return (
-                    <div key={c.id} className="flex items-center gap-4 py-4 px-6 hover:bg-white/60 transition-colors">
+                    <div key={c.id} className="flex items-center gap-4 py-4 px-6 hover:bg-surface-elevated/60 transition-colors">
                       <span className="text-xl flex-shrink-0">{PLATFORM_META[c.platform]?.icon ?? '📊'}</span>
                       <div className="flex-1 min-w-0">
                         <div className="text-text-primary text-sm font-semibold truncate">{c.niche}</div>
@@ -531,7 +531,7 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
                 Hozir boshlash <ArrowRight size={16} />
               </button>
               <button onClick={() => router.push('/portfolio')}
-                className="bg-white border border-border text-text-secondary px-8 py-3.5 rounded-xl font-medium hover:bg-surface-2 transition-all">
+                className="bg-surface-elevated border border-border text-text-secondary px-8 py-3.5 rounded-xl font-medium hover:bg-surface-2 transition-all">
                 Boshqa mutaxassislar
               </button>
             </div>
@@ -554,7 +554,7 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
       {/* ═══ CONTACT MODAL ═══ */}
       {contactOpen && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-6">
-          <GlassCard className="p-8 w-full max-w-md bg-white/90">
+          <GlassCard className="p-8 w-full max-w-md bg-surface-elevated/90">
             <div className="flex items-center justify-between mb-6">
               <h3 className="font-bold text-xl">{t.name} bilan bog&apos;lanish</h3>
               <button onClick={() => setContactOpen(false)} className="text-text-tertiary hover:text-text-primary text-xl transition-colors">✕</button>
@@ -582,7 +582,7 @@ export default function TargetologistProfilePage({ params }: { params: Promise<{
       )}
 
       {/* ═══ FLOATING MOBILE CTA ═══ */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden backdrop-blur-xl bg-white/80 border-t border-border/50 px-4 py-3">
+      <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden backdrop-blur-xl bg-surface-elevated/80 border-t border-border/50 px-4 py-3">
         <div className="flex items-center gap-3 max-w-lg mx-auto">
           <div className="flex-1 min-w-0">
             <div className="font-bold text-sm truncate">{t.name}</div>

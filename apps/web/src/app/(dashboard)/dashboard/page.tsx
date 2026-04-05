@@ -92,7 +92,7 @@ export default function DashboardPage() {
   if (!ws) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="max-w-md w-full text-center p-10 bg-surface dark:bg-surface border border-border rounded-2xl shadow-xl">
+        <div className="max-w-md w-full text-center p-10 bg-surface border border-border rounded-2xl shadow-xl">
           <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-violet-600 rounded-2xl flex items-center justify-center mx-auto mb-5 text-3xl shadow-lg shadow-blue-500/30">
             🚀
           </div>
@@ -137,12 +137,12 @@ export default function DashboardPage() {
 
       {/* Alerts */}
       {error && (
-        <div className="flex items-center gap-3 px-4 py-3 bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 rounded-xl text-red-700 dark:text-red-300 text-sm">
+        <div className="flex items-center gap-3 px-4 py-3 bg-red-500/10 dark:bg-red-950/50 border border-red-500/20 dark:border-red-800 rounded-xl text-red-500 dark:text-red-300 text-sm">
           <span>⚠️</span> {error}
         </div>
       )}
       {optimizeMsg && (
-        <div className="flex items-center gap-3 px-4 py-3 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 rounded-xl text-emerald-700 dark:text-emerald-300 text-sm">
+        <div className="flex items-center gap-3 px-4 py-3 bg-emerald-500/10 dark:bg-emerald-950/50 border border-emerald-500/20 dark:border-emerald-800 rounded-xl text-emerald-500 dark:text-emerald-300 text-sm">
           <span>✓</span> {optimizeMsg}
         </div>
       )}
@@ -174,7 +174,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {currentWorkspace && <LearningMonitor workspaceId={currentWorkspace.id} />}
         {forecast && forecast.daily?.length > 0 && (
-          <div className="lg:col-span-2 bg-surface dark:bg-surface border border-border/60 rounded-xl p-6 hover:border-border dark:hover:border-border hover:shadow-lg transition-all duration-300">
+          <div className="lg:col-span-2 bg-surface border border-border/60 rounded-xl p-6 hover:border-border dark:hover:border-border hover:shadow-lg transition-all duration-300">
             <div className="flex items-start justify-between mb-4">
               <div>
                 <h2 className="text-base font-semibold text-text-primary flex items-center gap-2">
@@ -202,7 +202,7 @@ export default function DashboardPage() {
 
       {/* Top Ads */}
       {topAds.length > 0 && (
-        <div className="bg-surface dark:bg-surface border border-border/60 rounded-xl p-6 hover:border-border dark:hover:border-border hover:shadow-lg transition-all duration-300">
+        <div className="bg-surface border border-border/60 rounded-xl p-6 hover:border-border dark:hover:border-border hover:shadow-lg transition-all duration-300">
           <div className="flex items-center justify-between mb-5">
             <div>
               <h2 className="text-base font-semibold text-text-primary">🏆 Eng yaxshi kampaniyalar</h2>
@@ -216,8 +216,8 @@ export default function DashboardPage() {
             {topAds.map((ad, idx) => (
               <div key={ad.campaignId} className="group bg-surface-2 border border-border/50 rounded-xl p-4 hover:border-border dark:hover:border-border hover:bg-surface dark:hover:bg-surface hover:shadow-md transition-all duration-200">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-bold text-text-tertiary bg-surface-2 dark:bg-surface-2 px-2 py-0.5 rounded-md">#{idx + 1}</span>
-                  <span className={`text-xs px-2 py-0.5 rounded-md font-medium ${ad.status === 'ACTIVE' ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400' : 'bg-surface-2 dark:bg-surface-2 text-text-tertiary'}`}>
+                  <span className="text-xs font-bold text-text-tertiary bg-surface-2-2 px-2 py-0.5 rounded-md">#{idx + 1}</span>
+                  <span className={`text-xs px-2 py-0.5 rounded-md font-medium ${ad.status === 'ACTIVE' ? 'bg-emerald-500/10 dark:bg-emerald-950 text-emerald-500 dark:text-emerald-400' : 'bg-surface-2-2 text-text-tertiary'}`}>
                     {ad.status}
                   </span>
                 </div>
@@ -244,14 +244,14 @@ export default function DashboardPage() {
 
       {/* AI Strategy + Autopilot */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 bg-surface dark:bg-surface border border-border/60 rounded-xl p-6 hover:border-border dark:hover:border-border hover:shadow-lg transition-all duration-300">
+        <div className="lg:col-span-2 bg-surface border border-border/60 rounded-xl p-6 hover:border-border dark:hover:border-border hover:shadow-lg transition-all duration-300">
           <div className="flex items-start justify-between mb-5">
             <div>
               <div className="flex items-center gap-2.5 mb-1">
                 <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-blue-600 rounded-lg flex items-center justify-center text-sm">🤖</div>
                 <h2 className="font-semibold text-text-primary">AI Strategy</h2>
                 {ws.aiStrategy && (
-                  <span className="text-xs bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded-full font-medium">Active</span>
+                  <span className="text-xs bg-emerald-500/10 dark:bg-emerald-950 text-emerald-500 dark:text-emerald-400 border border-emerald-500/20 dark:border-emerald-800 px-2 py-0.5 rounded-full font-medium">Active</span>
                 )}
               </div>
               <p className="text-text-tertiary text-sm">Generated by Performa based on your business profile</p>
@@ -259,7 +259,7 @@ export default function DashboardPage() {
             <button
               onClick={handleRunOptimization}
               disabled={optimizing}
-              className="px-3 py-1.5 bg-surface-2 dark:bg-surface hover:bg-surface-2 dark:hover:bg-surface-2 border border-border text-text-secondary text-xs font-medium rounded-lg transition-all duration-200 disabled:opacity-50"
+              className="px-3 py-1.5 bg-surface-2 hover:bg-surface-2 dark:hover:bg-surface-2 border border-border text-text-secondary text-xs font-medium rounded-lg transition-all duration-200 disabled:opacity-50"
             >
               Run optimization
             </button>
@@ -278,7 +278,7 @@ export default function DashboardPage() {
                         <span className="text-text-secondary capitalize">{platform}</span>
                         <span className="text-text-primary dark:text-text-secondary font-semibold">{String(pct)}%</span>
                       </div>
-                      <div className="h-1.5 bg-surface-2 dark:bg-surface-2 rounded-full overflow-hidden">
+                      <div className="h-1.5 bg-surface-2-2 rounded-full overflow-hidden">
                         <div className="h-full bg-gradient-to-r from-violet-500 to-blue-500 rounded-full transition-all duration-700" style={{ width: `${pct}%` }} />
                       </div>
                     </div>
@@ -292,7 +292,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Autopilot */}
-        <div className="bg-surface dark:bg-surface border border-border/60 rounded-xl p-6 hover:border-border dark:hover:border-border hover:shadow-lg transition-all duration-300">
+        <div className="bg-surface border border-border/60 rounded-xl p-6 hover:border-border dark:hover:border-border hover:shadow-lg transition-all duration-300">
           <div className="flex items-center gap-2.5 mb-5">
             <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center text-sm">⚡</div>
             <h2 className="font-semibold text-text-primary">Autopilot</h2>
@@ -310,7 +310,7 @@ export default function DashboardPage() {
                   onClick={() => router.push('/settings')}
                   className={`p-3 rounded-xl border transition-all duration-200 cursor-pointer ${
                     isActive
-                      ? 'border-border bg-surface-2 dark:bg-surface shadow-sm'
+                      ? 'border-border bg-surface-2 shadow-sm'
                       : 'border-border hover:border-border dark:hover:border-border hover:bg-surface-2 dark:hover:bg-surface/50'
                   }`}
                 >
@@ -320,7 +320,7 @@ export default function DashboardPage() {
                       <p className={`text-sm font-semibold ${isActive ? 'text-text-primary' : 'text-text-tertiary'}`}>{option.label}</p>
                       <p className="text-text-tertiary text-xs">{option.desc}</p>
                     </div>
-                    {isActive && <span className="w-2 h-2 rounded-full bg-surface dark:bg-surface-2 shrink-0" />}
+                    {isActive && <span className="w-2 h-2 rounded-full bg-surface-2 shrink-0" />}
                   </div>
                 </div>
               )
@@ -347,7 +347,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-surface dark:bg-surface border border-border/60 rounded-xl px-6 py-4 flex items-center justify-between hover:border-border dark:hover:border-border transition-all duration-200">
+      <div className="bg-surface border border-border/60 rounded-xl px-6 py-4 flex items-center justify-between hover:border-border dark:hover:border-border transition-all duration-200">
         <p className="text-text-tertiary text-sm font-medium shrink-0">Tezkor amallar</p>
         <div className="flex items-center gap-2 flex-wrap justify-end">
           {[

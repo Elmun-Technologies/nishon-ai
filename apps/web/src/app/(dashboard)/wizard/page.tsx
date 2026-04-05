@@ -640,7 +640,7 @@ export default function CampaignWizardPage() {
           <span className="text-sm text-text-tertiary">Progress</span>
           <span className="text-sm text-text-primary">{currentStep}/{totalSteps}</span>
         </div>
-        <div className="w-full bg-surface-2 dark:bg-surface rounded-full h-2">
+        <div className="w-full bg-surface-2 rounded-full h-2">
           <div 
             className="bg-surface h-2 rounded-full transition-all duration-300"
             style={{ width: `${(currentStep / totalSteps) * 100}%` }}
@@ -675,7 +675,7 @@ export default function CampaignWizardPage() {
               <p className="text-[11px] text-text-tertiary">{m.label}</p>
               <p className="text-base font-bold text-text-primary">{m.isText ? m.value : `${m.value}/100`}</p>
               {!m.isText && (
-                <div className="w-full h-1.5 rounded-full bg-surface-2 dark:bg-surface mt-2 overflow-hidden">
+                <div className="w-full h-1.5 rounded-full bg-surface-2 mt-2 overflow-hidden">
                   <div
                     className={`h-full rounded-full ${Number(m.value) >= 70 ? 'bg-emerald-400' : Number(m.value) >= 50 ? 'bg-amber-400' : 'bg-rose-400'}`}
                     style={{ width: `${m.value}%` }}
@@ -771,7 +771,7 @@ function Step1Platforms({ formData, setFormData }: { formData: CampaignFormData,
               <div className={`w-4 h-4 rounded border-2 ${
                 formData.platforms.includes(platform.id) 
                   ? 'bg-surface border-border' 
-                  : 'border-border bg-surface-2 dark:bg-surface'
+                  : 'border-border bg-surface-2'
               }`}>
                 {formData.platforms.includes(platform.id) && (
                   <svg className="w-3 h-3 text-text-primary mt-0.5 ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -833,7 +833,7 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
     setFormData(prev => ({ ...prev, schedule: { ...prev.schedule, hours: next } }))
   }
 
-  const cls = "w-full px-3 py-2 bg-surface-2 dark:bg-surface border border-border rounded-lg text-text-primary focus:outline-none focus:border-border"
+  const cls = "w-full px-3 py-2 bg-surface-2 border border-border rounded-lg text-text-primary focus:outline-none focus:border-border"
   const lbl = "block text-sm font-medium text-text-tertiary mb-2"
 
   const quickLinks: string[] = formData.extensions.quickLinks || []
@@ -933,7 +933,7 @@ function Step2CampaignSettings({ formData, setFormData }: { formData: CampaignFo
                   const active = selectedHours.includes(key)
                   return (
                     <button key={h} type="button" onClick={() => toggleHour(key)}
-                      className={`py-1 rounded text-xs font-mono transition-colors ${active ? 'bg-surface text-white' : 'bg-surface-2 dark:bg-surface text-text-tertiary hover:bg-surface-2 dark:bg-surface-2'}`}>
+                      className={`py-1 rounded text-xs font-mono transition-colors ${active ? 'bg-surface text-white' : 'bg-surface-2 text-text-tertiary hover:bg-surface-2-2'}`}>
                       {String(h).padStart(2, '0')}
                     </button>
                   )
@@ -1292,7 +1292,7 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
   const [kwInput, setKwInput] = useState('')
   const [kwMatch, setKwMatch] = useState<'broad'|'phrase'|'exact'>('broad')
 
-  const cls = "w-full px-3 py-2 bg-surface-2 dark:bg-surface border border-border rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-border"
+  const cls = "w-full px-3 py-2 bg-surface-2 border border-border rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-border"
   const lbl = "block text-sm font-medium text-text-tertiary mb-1"
 
   const addGeo = () => {
@@ -1385,13 +1385,13 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
           <button
             type="button"
             onClick={() => setFormData(prev => ({ ...prev, geoTargeting: { ...prev.geoTargeting, mode: 'list' } }))}
-            className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${formData.geoTargeting.mode === 'list' ? 'bg-surface text-white' : 'bg-surface-2 dark:bg-surface text-text-tertiary'}`}>
+            className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${formData.geoTargeting.mode === 'list' ? 'bg-surface text-white' : 'bg-surface-2 text-text-tertiary'}`}>
             List Mode
           </button>
           <button
             type="button"
             onClick={() => setFormData(prev => ({ ...prev, geoTargeting: { ...prev.geoTargeting, mode: 'map' } }))}
-            className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${formData.geoTargeting.mode === 'map' ? 'bg-surface text-white' : 'bg-surface-2 dark:bg-surface text-text-tertiary'}`}>
+            className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${formData.geoTargeting.mode === 'map' ? 'bg-surface text-white' : 'bg-surface-2 text-text-tertiary'}`}>
             Map Mode (Radius)
           </button>
         </div>
@@ -1490,7 +1490,7 @@ function Step3AdGroupSettings({ formData, setFormData, onGenerateKeywords, aiLoa
             onKeyDown={e => e.key === 'Enter' && addKw()}
             className={`${cls} flex-1`} placeholder="Type keyword, press Enter" />
           <select value={kwMatch} onChange={e => setKwMatch(e.target.value as any)}
-            className="px-3 py-2 bg-surface-2 dark:bg-surface border border-border rounded-lg text-text-primary text-sm">
+            className="px-3 py-2 bg-surface-2 border border-border rounded-lg text-text-primary text-sm">
             <option value="broad">Broad</option>
             <option value="phrase">Phrase</option>
             <option value="exact">Exact</option>
@@ -1701,7 +1701,7 @@ function Step4Creative({ formData, setFormData, onGenerateAdCopy, aiLoading }: {
   const primaryPlatform = formData.platforms[0] || 'meta'
   const limits = CHAR_LIMITS[primaryPlatform] || CHAR_LIMITS.meta
 
-  const cls = "w-full px-3 py-2 bg-surface-2 dark:bg-surface border border-border rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-border"
+  const cls = "w-full px-3 py-2 bg-surface-2 border border-border rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-border"
   const lbl = "block text-sm font-medium text-text-tertiary mb-1"
 
   const headlines: string[] = formData.creative.headlines.length >= 3
@@ -1864,7 +1864,7 @@ function Step4Creative({ formData, setFormData, onGenerateAdCopy, aiLoading }: {
         {formData.creative.images.length > 0 && (
           <div className="space-y-2">
             {formData.creative.images.map((file, i) => (
-              <div key={i} className="flex items-center justify-between bg-surface-2 dark:bg-surface rounded-lg px-3 py-2">
+              <div key={i} className="flex items-center justify-between bg-surface-2 rounded-lg px-3 py-2">
                 <span className="text-text-primary text-sm truncate">{(file as File).name}</span>
                 <button type="button" onClick={() => setFormData(prev => ({ ...prev, creative: { ...prev.creative, images: prev.creative.images.filter((_, j) => j !== i) } }))}
                   className="text-text-tertiary hover:text-red-400 ml-2 shrink-0">×</button>
@@ -2034,7 +2034,7 @@ function Step5Preview({ formData }: { formData: CampaignFormData }) {
                 <div className="flex gap-2 mb-4">
                   {['feed', 'stories'].map(tab => (
                     <button key={tab} type="button" onClick={() => setTab(platform, tab)}
-                      className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${getTab(platform) === tab ? 'bg-surface text-white' : 'bg-surface-2 dark:bg-surface text-text-tertiary hover:text-text-primary'}`}>
+                      className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${getTab(platform) === tab ? 'bg-surface text-white' : 'bg-surface-2 text-text-tertiary hover:text-text-primary'}`}>
                       {tab === 'feed' ? '📰 Feed' : '📲 Stories'}
                     </button>
                   ))}
@@ -2190,7 +2190,7 @@ function Step6Publish({ formData, onPublish, loading }: { formData: CampaignForm
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {CHECKLIST.map(item => (
-            <div key={item.key} className={`flex items-center gap-3 px-3 py-2 rounded-lg ${item.ok ? 'bg-green-500/10' : 'bg-surface-2 dark:bg-surface'}`}>
+            <div key={item.key} className={`flex items-center gap-3 px-3 py-2 rounded-lg ${item.ok ? 'bg-green-500/10' : 'bg-surface-2'}`}>
               <span className={item.ok ? 'text-green-400' : 'text-text-tertiary'}>
                 {item.ok ? '✓' : '○'}
               </span>

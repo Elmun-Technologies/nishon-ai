@@ -368,7 +368,7 @@ export default function SettingsPage() {
                 ${activeTab === tab.id
                   ? tab.danger
                     ? 'bg-red-500/10 text-red-400 border border-red-500/20'
-                    : 'bg-surface-2 dark:bg-surface text-text-primary border border-border'
+                    : 'bg-surface-2 text-text-primary border border-border'
                   : tab.danger
                   ? 'text-red-400/60 hover:text-red-400 hover:bg-red-500/5 border border-transparent'
                   : 'text-text-tertiary hover:text-text-primary hover:bg-surface-2 border border-transparent'
@@ -499,7 +499,7 @@ export default function SettingsPage() {
                   <div>
                     <p className="text-sm font-medium text-text-primary">{user?.name ?? '—'}</p>
                     <p className="text-xs text-text-tertiary">{user?.email ?? '—'}</p>
-                    <span className="inline-block mt-1 text-xs px-2 py-0.5 rounded-md bg-surface-2 dark:bg-surface text-text-secondary border border-border capitalize">
+                    <span className="inline-block mt-1 text-xs px-2 py-0.5 rounded-md bg-surface-2 text-text-secondary border border-border capitalize">
                       {user?.plan ?? 'free'} plan
                     </span>
                   </div>
@@ -567,7 +567,7 @@ export default function SettingsPage() {
                     {metaConnected === true ? (
                       <Link
                         href={integration.href}
-                        className="text-xs px-3 py-1.5 rounded-lg border border-border text-text-secondary hover:bg-surface-2 dark:bg-surface transition-colors shrink-0"
+                        className="text-xs px-3 py-1.5 rounded-lg border border-border text-text-secondary hover:bg-surface-2 transition-colors shrink-0"
                       >
                         Manage
                       </Link>
@@ -577,7 +577,7 @@ export default function SettingsPage() {
                           type="button"
                           onClick={handleMetaConnect}
                           disabled={!currentWorkspace?.id || metaConnecting}
-                          className="text-xs px-3 py-1.5 rounded-lg border border-border text-text-secondary hover:bg-surface-2 dark:bg-surface disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                          className="text-xs px-3 py-1.5 rounded-lg border border-border text-text-secondary hover:bg-surface-2 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                         >
                           {metaConnecting ? 'Connecting…' : 'Connect'}
                         </button>
@@ -609,7 +609,7 @@ export default function SettingsPage() {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
                             <p className="text-sm font-medium text-text-primary">{integration.name}</p>
-                            <span className="text-xs px-1.5 py-0.5 rounded-md bg-amber-100/50 text-amber-700 border border-amber-200">
+                            <span className="text-xs px-1.5 py-0.5 rounded-md bg-amber-500/15/50 text-amber-500 border border-amber-500/20">
                               Tez orada
                             </span>
                           </div>
@@ -734,7 +734,7 @@ export default function SettingsPage() {
                       onClick={() => item.onChange((v: boolean) => !v)}
                       className={`
                         relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 shrink-0 ml-6
-                        ${item.value ? 'bg-surface' : 'bg-surface-2 dark:bg-surface'}
+                        ${item.value ? 'bg-surface' : 'bg-surface-2'}
                       `}
                     >
                       <span
@@ -869,7 +869,7 @@ export default function SettingsPage() {
                           type="button"
                           onClick={() => setPolicy((p) => ({ ...p, [item.key]: !p[item.key] }))}
                           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 shrink-0 ${
-                            policy[item.key] ? 'bg-surface' : 'bg-surface-2 dark:bg-surface'
+                            policy[item.key] ? 'bg-surface' : 'bg-surface-2'
                           }`}
                         >
                           <span className={`inline-block h-4 w-4 transform rounded-full bg-surface shadow transition-transform duration-200 ${
@@ -890,7 +890,7 @@ export default function SettingsPage() {
                           type="range" min={5} max={50} step={5}
                           value={policy.maxAutoBudgetChangePct}
                           onChange={(e) => setPolicy((p) => ({ ...p, maxAutoBudgetChangePct: Number(e.target.value) }))}
-                          className="w-full h-2 bg-surface-2 dark:bg-surface rounded-full appearance-none cursor-pointer
+                          className="w-full h-2 bg-surface-2 rounded-full appearance-none cursor-pointer
                             [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4
                             [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full
                             [&::-webkit-slider-thumb]:bg-surface [&::-webkit-slider-thumb]:cursor-pointer"

@@ -173,7 +173,7 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
               onClick={() => set('objective', obj.value)}
               className={`flex flex-col items-center gap-2 p-4 rounded-xl border text-center transition-all duration-150 ${
                 form.objective === obj.value
-                  ? 'border-border/50 bg-surface-2 dark:bg-surface text-text-primary'
+                  ? 'border-border/50 bg-surface-2 text-text-primary'
                   : 'border-border bg-surface text-text-tertiary hover:border-border hover:text-text-primary'
               }`}
             >
@@ -300,7 +300,7 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
                     className={`py-2 rounded-lg text-xs font-medium transition-all duration-100 ${
                       selected
                         ? 'bg-surface text-white'
-                        : 'bg-surface-2 text-text-tertiary hover:bg-surface-2 dark:bg-surface hover:text-text-primary'
+                        : 'bg-surface-2 text-text-tertiary hover:bg-surface-2 hover:text-text-primary'
                     }`}
                   >
                     {h.toString().padStart(2, '0')}
