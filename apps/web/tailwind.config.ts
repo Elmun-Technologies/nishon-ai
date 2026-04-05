@@ -2,7 +2,6 @@ import type { Config } from 'tailwindcss'
 
 const config: Config = {
   content: ['./src/**/*.{ts,tsx}'],
-  darkMode: 'class',
   theme: {
     extend: {
       fontFamily: {
@@ -12,43 +11,19 @@ const config: Config = {
         // Primary brand color
         primary: '#111827',
 
-        // Neutral grays - with dark mode variants
-        surface: {
-          light: '#ffffff',
-          dark: '#0F172A',
-        },
-        'surface-alt': {
-          light: '#F9FAFB',
-          dark: '#1A202C',
-        },
-        'surface-secondary': {
-          light: '#F3F4F6',
-          dark: '#1E293B',
-        },
+        // Neutral grays
+        surface: '#ffffff',
+        'surface-alt': '#F9FAFB',
+        'surface-secondary': '#F3F4F6',
 
-        // Text colors - with dark mode variants
-        'text-primary': {
-          light: '#111827',
-          dark: '#F1F5F9',
-        },
-        'text-secondary': {
-          light: '#6B7280',
-          dark: '#CBD5E1',
-        },
-        'text-tertiary': {
-          light: '#9CA3AF',
-          dark: '#94A3B8',
-        },
+        // Text colors
+        'text-primary': '#111827',
+        'text-secondary': '#6B7280',
+        'text-tertiary': '#9CA3AF',
 
-        // Borders - with dark mode variants
-        border: {
-          light: '#E5E7EB',
-          dark: '#334155',
-        },
-        'border-light': {
-          light: '#F3F4F6',
-          dark: '#475569',
-        },
+        // Borders
+        border: '#E5E7EB',
+        'border-light': '#F3F4F6',
 
         // Semantic colors
         success: '#10B981',
