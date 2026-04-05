@@ -95,7 +95,7 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="w-64 bg-surface border-r border-border flex flex-col shrink-0">
+    <aside className="w-64 bg-surface dark:bg-surface text-text-primary dark:text-text-primary border-r border-border flex flex-col shrink-0">
       {/* Header */}
       <div className="px-6 py-5 border-b border-border">
         <div className="flex items-center gap-3 mb-1">

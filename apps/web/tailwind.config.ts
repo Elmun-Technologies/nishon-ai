@@ -18,19 +18,19 @@ const config: Config = {
         // Primary brand color
         primary: '#111827',
 
-        // Neutral grays
-        surface: '#ffffff',
-        'surface-alt': '#F9FAFB',
-        'surface-secondary': '#F3F4F6',
+        // Neutral grays - use CSS variables for dark mode support
+        surface: 'var(--surface)',
+        'surface-alt': 'var(--surface-2)',
+        'surface-secondary': 'var(--surface-2)',
 
-        // Text semantic colors - renamed to avoid double prefix
-        'text-primary': '#111827',
-        'text-secondary': '#6B7280',
-        'text-tertiary': '#9CA3AF',
+        // Text semantic colors - use CSS variables for dark mode
+        'text-primary': 'var(--text-primary)',
+        'text-secondary': 'var(--text-secondary)',
+        'text-tertiary': 'var(--text-tertiary)',
 
-        // Borders
-        border: '#E5E7EB',
-        'border-light': '#F3F4F6',
+        // Borders - use CSS variables
+        border: 'var(--border)',
+        'border-light': 'var(--border)',
 
         // Semantic colors
         success: '#10B981',
