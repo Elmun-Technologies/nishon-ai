@@ -89,16 +89,16 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
     <div className="space-y-6">
       {/* Search Preview */}
       <Card padding="lg">
-        <h4 className="text-md font-semibold text-[#111827] mb-3">Search Ad Preview</h4>
-        <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg p-4">
-          <div className="text-sm text-[#6B7280] mb-2">Search query: {data.searchQuery}</div>
+        <h4 className="text-md font-semibold text-slate-900 dark:text-slate-50 mb-3">Search Ad Preview</h4>
+        <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg p-4">
+          <div className="text-sm text-slate-500 dark:text-slate-400 mb-2">Search query: {data.searchQuery}</div>
           <div className="space-y-2">
             <div>
               <div className="text-[#FFCC00] text-sm font-medium">{data.ad.title1}</div>
               <div className="text-[#FFCC00] text-sm">{data.ad.title2}</div>
             </div>
-            <div className="text-[#111827]">{data.ad.text}</div>
-            <div className="text-[#6B7280] text-sm">{data.ad.url}</div>
+            <div className="text-slate-900 dark:text-slate-50">{data.ad.text}</div>
+            <div className="text-slate-500 dark:text-slate-400 text-sm">{data.ad.url}</div>
             <div className="flex gap-2 mt-2">
               <Badge variant="secondary">{data.ad.cta}</Badge>
             </div>
@@ -108,8 +108,8 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
 
       {/* Banner Preview */}
       <Card padding="lg">
-        <h4 className="text-md font-semibold text-[#111827] mb-3">Banner Ad Preview</h4>
-        <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg p-4">
+        <h4 className="text-md font-semibold text-slate-900 dark:text-slate-50 mb-3">Banner Ad Preview</h4>
+        <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg p-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <img 
@@ -119,8 +119,8 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
               />
             </div>
             <div>
-              <div className="text-[#111827] font-semibold mb-2">{data.banner.title}</div>
-              <div className="text-[#6B7280] text-sm">{data.banner.description}</div>
+              <div className="text-slate-900 dark:text-slate-50 font-semibold mb-2">{data.banner.title}</div>
+              <div className="text-slate-500 dark:text-slate-400 text-sm">{data.banner.description}</div>
             </div>
           </div>
         </div>
@@ -130,9 +130,9 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
 
   const renderGooglePreview = (data: any) => (
     <Card padding="lg">
-      <h4 className="text-md font-semibold text-[#111827] mb-3">Search Ad Preview</h4>
-      <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg p-4">
-        <div className="text-sm text-[#6B7280] mb-2">Search query: {data.searchQuery}</div>
+      <h4 className="text-md font-semibold text-slate-900 dark:text-slate-50 mb-3">Search Ad Preview</h4>
+      <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg p-4">
+        <div className="text-sm text-slate-500 dark:text-slate-400 mb-2">Search query: {data.searchQuery}</div>
         <div className="space-y-2">
           <div>
             <div className="text-[#4285F4] text-sm font-medium">
@@ -140,13 +140,13 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
             </div>
             <div className="text-[#4285F4] text-sm">{data.ad.headline3}</div>
           </div>
-          <div className="text-[#111827]">
+          <div className="text-slate-900 dark:text-slate-50">
             {data.ad.description1}
           </div>
-          <div className="text-[#111827]">
+          <div className="text-slate-900 dark:text-slate-50">
             {data.ad.description2}
           </div>
-          <div className="text-[#6B7280] text-sm">
+          <div className="text-slate-500 dark:text-slate-400 text-sm">
             {data.ad.displayUrl}/{data.ad.path1}/{data.ad.path2}
           </div>
           <div className="flex gap-2 mt-2">
@@ -167,8 +167,8 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
             onClick={() => setMetaView(view as 'feed' | 'stories')}
             className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               metaView === view
-                ? 'bg-[#6366F1] text-[#111827]'
-                : 'bg-[#1F2937] text-[#9CA3AF] hover:bg-[#374151]'
+                ? 'bg-[#6366F1] text-slate-900 dark:text-slate-50'
+                : 'bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-slate-700'
             }`}
           >
             {view === 'feed' ? '📰 Feed' : '📱 Stories'}
@@ -179,12 +179,12 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
       {/* Feed Preview */}
       {metaView === 'feed' && (
         <Card padding="lg">
-          <h4 className="text-sm font-semibold text-[#111827] mb-3">Feed Ad Preview</h4>
+          <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-50 mb-3">Feed Ad Preview</h4>
           {/* Mobile phone mockup */}
           <div className="flex justify-center">
-            <div className="w-72 bg-white rounded-3xl overflow-hidden shadow-2xl">
+            <div className="w-72 bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-2xl">
               {/* Phone top bar */}
-              <div className="bg-white px-4 pt-3 pb-2 flex items-center gap-2 border-b border-gray-100">
+              <div className="bg-white dark:bg-slate-900 px-4 pt-3 pb-2 flex items-center gap-2 border-b border-gray-100">
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500" />
                 <div>
                   <div className="text-xs font-semibold text-gray-900">Your Brand</div>
@@ -194,7 +194,7 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
               </div>
               {/* Image */}
               <div className="w-full h-72 bg-gradient-to-br from-[#6366F1] to-[#A855F7] flex items-center justify-center">
-                <span className="text-[#111827] text-4xl">🖼️</span>
+                <span className="text-slate-900 dark:text-slate-50 text-4xl">🖼️</span>
               </div>
               {/* Actions */}
               <div className="px-3 py-2 flex items-center gap-4 border-b border-gray-100">
@@ -203,11 +203,11 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
                 <span className="text-gray-700 text-xl">↗</span>
               </div>
               {/* Content */}
-              <div className="px-3 py-2 bg-white">
+              <div className="px-3 py-2 bg-white dark:bg-slate-900">
                 <div className="font-semibold text-gray-900 text-sm">{data.ad.headline}</div>
                 <div className="text-gray-500 text-xs mt-0.5">{data.ad.description}</div>
                 <div className="text-gray-700 text-xs mt-1 line-clamp-2">{data.ad.primaryText}</div>
-                <button className="mt-2 w-full bg-[#1877F2] text-[#111827] text-xs py-2 rounded-lg font-semibold">
+                <button className="mt-2 w-full bg-[#1877F2] text-slate-900 dark:text-slate-50 text-xs py-2 rounded-lg font-semibold">
                   {data.ad.cta.replace(/_/g, ' ').toUpperCase()}
                 </button>
               </div>
@@ -219,41 +219,41 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
       {/* Stories Preview */}
       {metaView === 'stories' && (
         <Card padding="lg">
-          <h4 className="text-sm font-semibold text-[#111827] mb-3">Stories Ad Preview (9:16)</h4>
+          <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-50 mb-3">Stories Ad Preview (9:16)</h4>
           <div className="flex justify-center gap-6 flex-wrap">
             {/* Mobile Stories */}
             <div>
-              <p className="text-xs text-[#9CA3AF] text-center mb-2">Mobile</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500 text-center mb-2">Mobile</p>
               <div className="w-44 h-80 rounded-2xl overflow-hidden shadow-2xl relative bg-gradient-to-br from-[#6366F1] to-[#A855F7]">
                 {/* Top gradient overlay */}
                 <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
                 {/* Progress bars */}
                 <div className="absolute top-3 left-2 right-2 flex gap-1">
-                  <div className="flex-1 h-0.5 bg-white rounded-full" />
-                  <div className="flex-1 h-0.5 bg-white/40 rounded-full" />
-                  <div className="flex-1 h-0.5 bg-white/40 rounded-full" />
+                  <div className="flex-1 h-0.5 bg-white dark:bg-slate-900 rounded-full" />
+                  <div className="flex-1 h-0.5 bg-white dark:bg-slate-900/40 rounded-full" />
+                  <div className="flex-1 h-0.5 bg-white dark:bg-slate-900/40 rounded-full" />
                 </div>
                 {/* Top bar */}
                 <div className="absolute top-6 left-2 right-2 flex items-center gap-1.5">
-                  <div className="w-5 h-5 rounded-full bg-white/30" />
-                  <span className="text-[#111827] text-[9px] font-semibold">Your Brand</span>
-                  <span className="text-[#111827]/60 text-[8px] ml-0.5">• Sponsored</span>
+                  <div className="w-5 h-5 rounded-full bg-white dark:bg-slate-900/30" />
+                  <span className="text-slate-900 dark:text-slate-50 text-[9px] font-semibold">Your Brand</span>
+                  <span className="text-slate-900 dark:text-slate-50/60 text-[8px] ml-0.5">• Sponsored</span>
                 </div>
                 {/* Center content */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center px-3">
-                  <div className="text-[#111827] text-4xl mb-3">🖼️</div>
-                  <div className="text-[#111827] font-bold text-xs text-center leading-tight">
+                  <div className="text-slate-900 dark:text-slate-50 text-4xl mb-3">🖼️</div>
+                  <div className="text-slate-900 dark:text-slate-50 font-bold text-xs text-center leading-tight">
                     {data.ad.headline}
                   </div>
-                  <div className="text-[#111827]/80 text-[9px] text-center mt-1">
+                  <div className="text-slate-900 dark:text-slate-50/80 text-[9px] text-center mt-1">
                     {data.ad.description}
                   </div>
                 </div>
                 {/* CTA swipe up */}
                 <div className="absolute bottom-4 left-2 right-2">
                   <div className="text-center">
-                    <div className="text-[#111827] text-xs">↑</div>
-                    <button className="w-full bg-white text-[#1877F2] text-[10px] font-bold py-1.5 rounded-full mt-1">
+                    <div className="text-slate-900 dark:text-slate-50 text-xs">↑</div>
+                    <button className="w-full bg-white dark:bg-slate-900 text-[#1877F2] text-[10px] font-bold py-1.5 rounded-full mt-1">
                       {data.ad.cta.replace(/_/g, ' ').toUpperCase()}
                     </button>
                   </div>
@@ -263,29 +263,29 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
 
             {/* Desktop Stories (wider) */}
             <div>
-              <p className="text-xs text-[#9CA3AF] text-center mb-2">Desktop</p>
-              <div className="w-56 h-80 rounded-2xl overflow-hidden shadow-2xl relative bg-gradient-to-br from-[#A855F7] to-[#EC4899]">
+              <p className="text-xs text-slate-400 dark:text-slate-500 text-center mb-2">Desktop</p>
+              <div className="w-56 h-80 rounded-2xl overflow-hidden shadow-2xl relative bg-gradient-to-br from-[#A855F7] to-pink-500">
                 <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
                 <div className="absolute top-3 left-2 right-2 flex gap-1">
-                  <div className="flex-1 h-0.5 bg-white rounded-full" />
-                  <div className="flex-1 h-0.5 bg-white/40 rounded-full" />
+                  <div className="flex-1 h-0.5 bg-white dark:bg-slate-900 rounded-full" />
+                  <div className="flex-1 h-0.5 bg-white dark:bg-slate-900/40 rounded-full" />
                 </div>
                 <div className="absolute top-6 left-2 right-2 flex items-center gap-1.5">
-                  <div className="w-5 h-5 rounded-full bg-white/30" />
-                  <span className="text-[#111827] text-[9px] font-semibold">Your Brand</span>
-                  <span className="text-[#111827]/60 text-[8px]">• Sponsored</span>
+                  <div className="w-5 h-5 rounded-full bg-white dark:bg-slate-900/30" />
+                  <span className="text-slate-900 dark:text-slate-50 text-[9px] font-semibold">Your Brand</span>
+                  <span className="text-slate-900 dark:text-slate-50/60 text-[8px]">• Sponsored</span>
                 </div>
                 <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
-                  <div className="text-[#111827] text-5xl mb-3">🖼️</div>
-                  <div className="text-[#111827] font-bold text-sm text-center leading-tight">
+                  <div className="text-slate-900 dark:text-slate-50 text-5xl mb-3">🖼️</div>
+                  <div className="text-slate-900 dark:text-slate-50 font-bold text-sm text-center leading-tight">
                     {data.ad.headline}
                   </div>
-                  <div className="text-[#111827]/80 text-[10px] text-center mt-2">
+                  <div className="text-slate-900 dark:text-slate-50/80 text-[10px] text-center mt-2">
                     {data.ad.primaryText?.substring(0, 60)}...
                   </div>
                 </div>
                 <div className="absolute bottom-4 left-3 right-3">
-                  <button className="w-full bg-white text-[#1877F2] text-xs font-bold py-2 rounded-full">
+                  <button className="w-full bg-white dark:bg-slate-900 text-[#1877F2] text-xs font-bold py-2 rounded-full">
                     {data.ad.cta.replace(/_/g, ' ').toUpperCase()}
                   </button>
                 </div>
@@ -297,20 +297,20 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
 
       {/* Audience Preview */}
       <Card padding="lg">
-        <h4 className="text-sm font-semibold text-[#111827] mb-3">Target Audience</h4>
-        <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg p-4">
+        <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-50 mb-3">Target Audience</h4>
+        <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg p-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <div className="text-[#6B7280] text-xs">Age</div>
-              <div className="text-[#111827] text-sm">{data.audience.age}</div>
+              <div className="text-slate-500 dark:text-slate-400 text-xs">Age</div>
+              <div className="text-slate-900 dark:text-slate-50 text-sm">{data.audience.age}</div>
             </div>
             <div>
-              <div className="text-[#6B7280] text-xs">Interests</div>
-              <div className="text-[#111827] text-sm">{data.audience.interests}</div>
+              <div className="text-slate-500 dark:text-slate-400 text-xs">Interests</div>
+              <div className="text-slate-900 dark:text-slate-50 text-sm">{data.audience.interests}</div>
             </div>
             <div>
-              <div className="text-[#6B7280] text-xs">Location</div>
-              <div className="text-[#111827] text-sm">{data.audience.location}</div>
+              <div className="text-slate-500 dark:text-slate-400 text-xs">Location</div>
+              <div className="text-slate-900 dark:text-slate-50 text-sm">{data.audience.location}</div>
             </div>
           </div>
         </div>
@@ -320,8 +320,8 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
 
   const renderTelegramPreview = (data: any) => (
     <Card padding="lg">
-      <h4 className="text-md font-semibold text-[#111827] mb-3">Telegram Ad Preview</h4>
-      <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg p-4">
+      <h4 className="text-md font-semibold text-slate-900 dark:text-slate-50 mb-3">Telegram Ad Preview</h4>
+      <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg p-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="md:col-span-1">
             <img 
@@ -331,8 +331,8 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
             />
           </div>
           <div className="md:col-span-2 space-y-2">
-            <div className="text-[#111827] font-semibold">{data.ad.title}</div>
-            <div className="text-[#6B7280] text-sm">{data.ad.description}</div>
+            <div className="text-slate-900 dark:text-slate-50 font-semibold">{data.ad.title}</div>
+            <div className="text-slate-500 dark:text-slate-400 text-sm">{data.ad.description}</div>
             <div className="flex gap-2 mt-2">
               <Badge variant="secondary">{data.ad.cta}</Badge>
             </div>
@@ -344,11 +344,11 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
 
   return (
     <div className="space-y-8">
-      <h2 className="text-xl font-semibold text-[#111827]">Preview</h2>
+      <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50">Preview</h2>
       
       {selectedPlatforms.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-[#6B7280]">Select platforms in Step 1 to see previews</p>
+          <p className="text-slate-500 dark:text-slate-400">Select platforms in Step 1 to see previews</p>
         </div>
       ) : (
         <Tabs value={activePlatform || selectedPlatforms[0]} onValueChange={setActivePlatform}>
@@ -369,7 +369,7 @@ export function Preview({ formData, selectedPlatforms }: PreviewProps) {
                 <Card padding="lg">
                   <div className="space-y-6">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold text-[#111827]">{previewData.title}</h3>
+                      <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50">{previewData.title}</h3>
                       <Badge variant="secondary">
                         {platform === 'yandex' && '📘'}
                         {platform === 'google' && '🔍'}

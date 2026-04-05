@@ -104,7 +104,7 @@ export const AdAccountsConnection: React.FC<AdAccountsConnectionProps> = ({ onCo
             </h4>
             <div className="space-y-2">
               {connectedAccounts.map((acc) => (
-                <div key={acc.platform} className="flex items-center justify-between p-3 bg-white rounded-lg border border-green-200">
+                <div key={acc.platform} className="flex items-center justify-between p-3 bg-white dark:bg-slate-900 rounded-lg border border-green-200">
                   <span className="text-sm">
                     {platformInfo[acc.platform].icon} {platformInfo[acc.platform].name}
                   </span>

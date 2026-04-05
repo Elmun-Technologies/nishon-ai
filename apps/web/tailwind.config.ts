@@ -2,6 +2,7 @@ import type { Config } from 'tailwindcss'
 
 const config: Config = {
   content: ['./src/**/*.{ts,tsx}'],
+  darkMode: 'class',
   theme: {
     extend: {
       fontFamily: {
@@ -11,19 +12,43 @@ const config: Config = {
         // Primary brand color
         primary: '#111827',
 
-        // Neutral grays
-        surface: '#ffffff',
-        'surface-alt': '#F9FAFB',
-        'surface-secondary': '#F3F4F6',
+        // Neutral grays - with dark mode variants
+        surface: {
+          light: '#ffffff',
+          dark: '#0F172A',
+        },
+        'surface-alt': {
+          light: '#F9FAFB',
+          dark: '#1A202C',
+        },
+        'surface-secondary': {
+          light: '#F3F4F6',
+          dark: '#1E293B',
+        },
 
-        // Text colors
-        'text-primary': '#111827',
-        'text-secondary': '#6B7280',
-        'text-tertiary': '#9CA3AF',
+        // Text colors - with dark mode variants
+        'text-primary': {
+          light: '#111827',
+          dark: '#F1F5F9',
+        },
+        'text-secondary': {
+          light: '#6B7280',
+          dark: '#CBD5E1',
+        },
+        'text-tertiary': {
+          light: '#9CA3AF',
+          dark: '#94A3B8',
+        },
 
-        // Borders
-        border: '#E5E7EB',
-        'border-light': '#F3F4F6',
+        // Borders - with dark mode variants
+        border: {
+          light: '#E5E7EB',
+          dark: '#334155',
+        },
+        'border-light': {
+          light: '#F3F4F6',
+          dark: '#475569',
+        },
 
         // Semantic colors
         success: '#10B981',
@@ -55,6 +80,18 @@ const config: Config = {
         '1': '1px',
         '1.5': '1.5px',
         '2': '2px',
+      },
+      backgroundColor: {
+        light: {
+          primary: '#ffffff',
+          secondary: '#F9FAFB',
+          tertiary: '#F3F4F6',
+        },
+        dark: {
+          primary: '#0F172A',
+          secondary: '#1E293B',
+          tertiary: '#334155',
+        },
       },
     },
   },

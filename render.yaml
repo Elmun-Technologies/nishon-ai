@@ -22,7 +22,11 @@ services:
       - key: API_BASE_URL
         value: https://performa-ai-api.onrender.com   # ← change to your Render URL
       - key: FRONTEND_URL
+<<<<<<< HEAD
         value: https://performa-ai.vercel.app          # ← change to your Vercel URL
+=======
+        value: https://performa-ai.vercel.app,*.vercel.app
+>>>>>>> codex/continue-implementation-nqisfu
 
       # ── Database ───────────────────────────────────────────────────────────
       - key: DATABASE_URL

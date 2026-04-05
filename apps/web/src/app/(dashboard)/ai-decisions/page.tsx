@@ -122,8 +122,8 @@ export default function AiDecisionsPage() {
       {/* ── Page header ── */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#111827] mb-1">AI Qarorlar Jurnali</h1>
-          <p className="text-[#6B7280] text-sm">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50 mb-1">AI Qarorlar Jurnali</h1>
+          <p className="text-slate-500 dark:text-slate-400 text-sm">
             Performa qilgan va tavsiya etgan har bir harakat — to'liq asoslama bilan
           </p>
         </div>
@@ -138,7 +138,7 @@ export default function AiDecisionsPage() {
       {/* ── Stats summary ── */}
       <div className="grid grid-cols-4 gap-3">
         {[
-          { label: 'Jami', value: counts.all,      color: 'text-[#111827]', bg: 'bg-white' },
+          { label: 'Jami', value: counts.all,      color: 'text-slate-900 dark:text-slate-50', bg: 'bg-white dark:bg-slate-900' },
           { label: 'Kutilmoqda', value: counts.pending,  color: 'text-amber-600', bg: 'bg-amber-50 border-amber-200' },
           { label: 'Tasdiqlangan', value: counts.approved, color: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-200' },
           { label: 'Rad etilgan', value: counts.rejected, color: 'text-red-500',    bg: 'bg-red-50 border-red-200' },
@@ -148,7 +148,7 @@ export default function AiDecisionsPage() {
             onClick={() => setFilter(s.label === 'Jami' ? 'all' : s.label === 'Kutilmoqda' ? 'pending' : s.label === 'Tasdiqlangan' ? 'approved' : 'rejected')}
             className={`border rounded-xl p-3 text-left transition-all hover:shadow-sm ${s.bg}`}
           >
-            <p className="text-[#6B7280] text-xs mb-1">{s.label}</p>
+            <p className="text-slate-500 dark:text-slate-400 text-xs mb-1">{s.label}</p>
             <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
           </button>
         ))}
@@ -177,7 +177,7 @@ export default function AiDecisionsPage() {
       )}
 
       {/* ── Filter tabs ── */}
-      <div className="flex items-center gap-1 bg-white border border-[#E5E7EB] rounded-xl p-1 w-fit">
+      <div className="flex items-center gap-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-1 w-fit">
         {(
           [
             { key: 'all', label: 'Barchasi' },
@@ -193,8 +193,8 @@ export default function AiDecisionsPage() {
               flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
               transition-all duration-200
               ${filter === tab.key
-                ? 'bg-[#111827] text-white'
-                : 'text-[#6B7280] hover:text-[#111827] hover:bg-[#F9FAFB]'
+                ? 'bg-slate-900 text-white'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50 hover:bg-slate-50 dark:bg-slate-800/50'
               }
             `}
           >
@@ -204,10 +204,10 @@ export default function AiDecisionsPage() {
                 className={`
                   text-xs px-1.5 py-0.5 rounded-full
                   ${filter === tab.key
-                    ? 'bg-white/20 text-[#111827]'
+                    ? 'bg-white dark:bg-slate-900/20 text-slate-900 dark:text-slate-50'
                     : tab.key === 'pending'
                     ? 'bg-amber-500/20 text-amber-400'
-                    : 'bg-[#F3F4F6] text-[#6B7280]'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                   }
                 `}
               >
@@ -250,12 +250,12 @@ export default function AiDecisionsPage() {
                   className={`
                     transition-all duration-200
                     ${isPending ? 'border-amber-500/30' : ''}
-                    ${isExpanded ? 'border-[#D1D5DB]' : ''}
+                    ${isExpanded ? 'border-slate-300 dark:border-slate-600' : ''}
                   `}
                 >
                   <div className="p-5">
                     <div className="flex items-start gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-[#F9FAFB] border border-[#E5E7EB] flex items-center justify-center text-lg shrink-0 mt-0.5">
+                      <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-lg shrink-0 mt-0.5">
                         {config.icon}
                       </div>
 
@@ -273,21 +273,21 @@ export default function AiDecisionsPage() {
                             <Badge variant="danger">Rad etildi</Badge>
                           )}
 
-                          <span className="text-[#6B7280] text-xs ml-auto">
+                          <span className="text-slate-500 dark:text-slate-400 text-xs ml-auto">
                             {timeAgo(decision.createdAt)}
                           </span>
                         </div>
 
-                        <p className="text-[#374151] text-sm leading-relaxed">
+                        <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
                           {decision.reason}
                         </p>
 
                         {decision.estimatedImpact && (
-                          <div className="flex items-start gap-2 mt-2.5 bg-[#F9FAFB] rounded-lg px-3 py-2">
-                            <span className="text-[#374151] text-xs font-medium shrink-0 mt-0.5">
+                          <div className="flex items-start gap-2 mt-2.5 bg-slate-50 dark:bg-slate-800/50 rounded-lg px-3 py-2">
+                            <span className="text-slate-700 dark:text-slate-300 text-xs font-medium shrink-0 mt-0.5">
                               💡 Kutilayotgan ta'sir:
                             </span>
-                            <p className="text-[#9CA3AF] text-xs leading-relaxed">
+                            <p className="text-slate-400 dark:text-slate-500 text-xs leading-relaxed">
                               {decision.estimatedImpact}
                             </p>
                           </div>
@@ -319,7 +319,7 @@ export default function AiDecisionsPage() {
                           (decision.beforeState || decision.afterState) && (
                             <button
                               onClick={() => setExpandedId(isExpanded ? null : decision.id)}
-                              className="text-[#6B7280] hover:text-[#374151] text-xs flex items-center gap-1 transition-colors"
+                              className="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300 text-xs flex items-center gap-1 transition-colors"
                             >
                               {isExpanded ? 'Yopish ↑' : 'Batafsil ↓'}
                             </button>
@@ -331,13 +331,13 @@ export default function AiDecisionsPage() {
 
                   {isExpanded && (decision.beforeState || decision.afterState) && (
                     <div className="px-5 pb-5 pt-0">
-                      <div className="border-t border-[#E5E7EB] pt-4">
-                        <p className="text-[#6B7280] text-xs font-medium uppercase tracking-wide mb-3">
+                      <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
+                        <p className="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wide mb-3">
                           Oldin → Keyin
                         </p>
                         <div className="grid grid-cols-2 gap-3">
-                          <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4">
-                            <p className="text-[#6B7280] text-xs font-medium mb-2 flex items-center gap-1.5">
+                          <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
+                            <p className="text-slate-500 dark:text-slate-400 text-xs font-medium mb-2 flex items-center gap-1.5">
                               <span className="w-2 h-2 rounded-full bg-red-400" />
                               Oldin
                             </p>
@@ -345,22 +345,22 @@ export default function AiDecisionsPage() {
                               <div className="space-y-1.5">
                                 {Object.entries(decision.beforeState).map(([key, val]) => (
                                   <div key={key} className="flex justify-between text-xs">
-                                    <span className="text-[#6B7280] capitalize">
+                                    <span className="text-slate-500 dark:text-slate-400 capitalize">
                                       {key.replace(/([A-Z])/g, ' $1').trim()}
                                     </span>
-                                    <span className="text-[#9CA3AF] font-mono">
+                                    <span className="text-slate-400 dark:text-slate-500 font-mono">
                                       {typeof val === 'number' ? val.toLocaleString() : String(val)}
                                     </span>
                                   </div>
                                 ))}
                               </div>
                             ) : (
-                              <p className="text-[#6B7280] text-xs">Ma'lumot yo'q</p>
+                              <p className="text-slate-500 dark:text-slate-400 text-xs">Ma'lumot yo'q</p>
                             )}
                           </div>
 
-                          <div className="bg-[#F9FAFB] border border-emerald-500/20 rounded-xl p-4">
-                            <p className="text-[#6B7280] text-xs font-medium mb-2 flex items-center gap-1.5">
+                          <div className="bg-slate-50 dark:bg-slate-800/50 border border-emerald-500/20 rounded-xl p-4">
+                            <p className="text-slate-500 dark:text-slate-400 text-xs font-medium mb-2 flex items-center gap-1.5">
                               <span className="w-2 h-2 rounded-full bg-emerald-400" />
                               Keyin
                             </p>
@@ -368,7 +368,7 @@ export default function AiDecisionsPage() {
                               <div className="space-y-1.5">
                                 {Object.entries(decision.afterState).map(([key, val]) => (
                                   <div key={key} className="flex justify-between text-xs">
-                                    <span className="text-[#6B7280] capitalize">
+                                    <span className="text-slate-500 dark:text-slate-400 capitalize">
                                       {key.replace(/([A-Z])/g, ' $1').trim()}
                                     </span>
                                     <span className="text-emerald-400 font-mono">
@@ -378,7 +378,7 @@ export default function AiDecisionsPage() {
                                 ))}
                               </div>
                             ) : (
-                              <p className="text-[#6B7280] text-xs">Bajarilishi kutilmoqda</p>
+                              <p className="text-slate-500 dark:text-slate-400 text-xs">Bajarilishi kutilmoqda</p>
                             )}
                           </div>
                         </div>
@@ -396,10 +396,10 @@ export default function AiDecisionsPage() {
         <div className="flex items-start gap-3 px-2">
           <span className="text-lg mt-0.5">🔍</span>
           <div>
-            <p className="text-[#111827] text-sm font-medium mb-0.5">
+            <p className="text-slate-900 dark:text-slate-50 text-sm font-medium mb-0.5">
               Performa nima uchun bu jurnalni ko'rsatadi?
             </p>
-            <p className="text-[#6B7280] text-xs leading-relaxed">
+            <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">
               Shaffoflik bizning asosiy tamoyilimiz. AI qilgan har bir optimizatsiya
               qarori bu yerda asoslamasi, kutilayotgan ta'siri va natijasi bilan qayd etiladi.
               Reklama byudjetingiz bilan nima bo'layotganini — va nima uchun — doimo bilishingiz kerak.

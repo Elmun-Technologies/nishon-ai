@@ -42,34 +42,34 @@ export function Publish({
 
   return (
     <div className="space-y-8">
-      <h2 className="text-xl font-semibold text-[#111827]">Publish Campaign</h2>
+      <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50">Publish Campaign</h2>
       
       {/* Campaign Summary */}
       <Card padding="lg">
-        <h3 className="text-lg font-semibold text-[#111827] mb-4">Campaign Summary</h3>
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Campaign Summary</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
-            <Label className="text-sm text-[#6B7280]">Campaign Name</Label>
-            <p className="text-[#111827] font-medium">{formData.name}</p>
+            <Label className="text-sm text-slate-500 dark:text-slate-400">Campaign Name</Label>
+            <p className="text-slate-900 dark:text-slate-50 font-medium">{formData.name}</p>
           </div>
           <div>
-            <Label className="text-sm text-[#6B7280]">Objective</Label>
-            <p className="text-[#111827] font-medium">{formData.objective}</p>
+            <Label className="text-sm text-slate-500 dark:text-slate-400">Objective</Label>
+            <p className="text-slate-900 dark:text-slate-50 font-medium">{formData.objective}</p>
           </div>
           <div>
-            <Label className="text-sm text-[#6B7280]">Budget</Label>
-            <p className="text-[#111827] font-medium">{formData.budget.amount} {formData.budget.currency} ({formData.budget.type})</p>
+            <Label className="text-sm text-slate-500 dark:text-slate-400">Budget</Label>
+            <p className="text-slate-900 dark:text-slate-50 font-medium">{formData.budget.amount} {formData.budget.currency} ({formData.budget.type})</p>
           </div>
           <div>
-            <Label className="text-sm text-[#6B7280]">Duration</Label>
-            <p className="text-[#111827] font-medium">
+            <Label className="text-sm text-slate-500 dark:text-slate-400">Duration</Label>
+            <p className="text-slate-900 dark:text-slate-50 font-medium">
               {formData.schedule.startDate} to {formData.schedule.endDate}
             </p>
           </div>
         </div>
         
         <div className="mt-4">
-          <Label className="text-sm text-[#6B7280]">Selected Platforms</Label>
+          <Label className="text-sm text-slate-500 dark:text-slate-400">Selected Platforms</Label>
           <div className="flex flex-wrap gap-2 mt-2">
             {selectedPlatforms.map(platform => (
               <Badge key={platform} variant="secondary">
@@ -82,26 +82,26 @@ export function Publish({
 
       {/* Ad Groups Summary */}
       <Card padding="lg">
-        <h3 className="text-lg font-semibold text-[#111827] mb-4">Ad Groups</h3>
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Ad Groups</h3>
         <div className="space-y-4">
           {formData.adGroups.map((adGroup: any, index: number) => (
-            <div key={index} className="border border-[#E5E7EB] rounded-lg p-4">
+            <div key={index} className="border border-slate-200 dark:border-slate-700 rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
-                <h4 className="text-[#111827] font-medium">{adGroup.name}</h4>
+                <h4 className="text-slate-900 dark:text-slate-50 font-medium">{adGroup.name}</h4>
                 <Badge variant="secondary">{adGroup.scenario}</Badge>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                 <div>
-                  <span className="text-[#6B7280]">Keywords:</span>
-                  <span className="text-[#111827] ml-2">{adGroup.keywords.length}</span>
+                  <span className="text-slate-500 dark:text-slate-400">Keywords:</span>
+                  <span className="text-slate-900 dark:text-slate-50 ml-2">{adGroup.keywords.length}</span>
                 </div>
                 <div>
-                  <span className="text-[#6B7280]">Locations:</span>
-                  <span className="text-[#111827] ml-2">{adGroup.geoTargeting.locations?.length || 0}</span>
+                  <span className="text-slate-500 dark:text-slate-400">Locations:</span>
+                  <span className="text-slate-900 dark:text-slate-50 ml-2">{adGroup.geoTargeting.locations?.length || 0}</span>
                 </div>
                 <div>
-                  <span className="text-[#6B7280]">Audience Segments:</span>
-                  <span className="text-[#111827] ml-2">{adGroup.audienceSegments?.length || 0}</span>
+                  <span className="text-slate-500 dark:text-slate-400">Audience Segments:</span>
+                  <span className="text-slate-900 dark:text-slate-50 ml-2">{adGroup.audienceSegments?.length || 0}</span>
                 </div>
               </div>
             </div>
@@ -111,23 +111,23 @@ export function Publish({
 
       {/* Creative Assets Summary */}
       <Card padding="lg">
-        <h3 className="text-lg font-semibold text-[#111827] mb-4">Creative Assets</h3>
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Creative Assets</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label className="text-sm text-[#6B7280]">Headlines</Label>
+            <Label className="text-sm text-slate-500 dark:text-slate-400">Headlines</Label>
             <div className="space-y-1 mt-2">
               {formData.creatives.headlines.map((headline: string, index: number) => (
-                <div key={index} className="text-[#111827] text-sm bg-[#F3F4F6] p-2 rounded">
+                <div key={index} className="text-slate-900 dark:text-slate-50 text-sm bg-slate-100 dark:bg-slate-800 p-2 rounded">
                   {headline}
                 </div>
               ))}
             </div>
           </div>
           <div>
-            <Label className="text-sm text-[#6B7280]">Descriptions</Label>
+            <Label className="text-sm text-slate-500 dark:text-slate-400">Descriptions</Label>
             <div className="space-y-1 mt-2">
               {formData.creatives.descriptions.map((description: string, index: number) => (
-                <div key={index} className="text-[#111827] text-sm bg-[#F3F4F6] p-2 rounded">
+                <div key={index} className="text-slate-900 dark:text-slate-50 text-sm bg-slate-100 dark:bg-slate-800 p-2 rounded">
                   {description}
                 </div>
               ))}
@@ -137,12 +137,12 @@ export function Publish({
         
         {formData.creatives.imageUrl && (
           <div className="mt-4">
-            <Label className="text-sm text-[#6B7280]">Creative Image</Label>
+            <Label className="text-sm text-slate-500 dark:text-slate-400">Creative Image</Label>
             <div className="mt-2">
               <img 
                 src={formData.creatives.imageUrl} 
                 alt="Creative preview"
-                className="max-w-md h-auto rounded-lg border border-[#E5E7EB]"
+                className="max-w-md h-auto rounded-lg border border-slate-200 dark:border-slate-700"
               />
             </div>
           </div>
@@ -152,7 +152,7 @@ export function Publish({
       {/* Publishing Status */}
       {showProgress && (
         <Card padding="lg">
-          <h3 className="text-lg font-semibold text-[#111827] mb-4">Publishing Progress</h3>
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Publishing Progress</h3>
           
           {isPublishing && (
             <Alert variant="info" className="mb-4">
@@ -187,7 +187,7 @@ export function Publish({
               const isInProgress = status.status === 'in_progress'
 
               return (
-                <div key={platform} className="border border-[#E5E7EB] rounded-lg p-4">
+                <div key={platform} className="border border-slate-200 dark:border-slate-700 rounded-lg p-4">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-3">
                       <Badge variant="secondary">
@@ -197,7 +197,7 @@ export function Publish({
                         {platform === 'telegram' && '✈️'}
                         {platform.charAt(0).toUpperCase() + platform.slice(1)}
                       </Badge>
-                      <span className="text-[#111827] font-medium">{platform.charAt(0).toUpperCase() + platform.slice(1)}</span>
+                      <span className="text-slate-900 dark:text-slate-50 font-medium">{platform.charAt(0).toUpperCase() + platform.slice(1)}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       {isSuccess && <Badge variant="success">Success</Badge>}
@@ -250,7 +250,7 @@ export function Publish({
             </Button>
           </div>
           
-          <div className="text-sm text-[#6B7280]">
+          <div className="text-sm text-slate-500 dark:text-slate-400">
             {selectedPlatforms.length === 0 ? 'Select platforms to enable publishing' : 
              `${selectedPlatforms.length} platform(s) selected`}
           </div>
@@ -259,25 +259,25 @@ export function Publish({
 
       {/* Next Steps */}
       <Card padding="lg">
-        <h3 className="text-lg font-semibold text-[#111827] mb-4">What Happens Next</h3>
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">What Happens Next</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="space-y-2">
-            <h4 className="text-[#111827] font-medium">Platform Review</h4>
-            <p className="text-sm text-[#6B7280]">
+            <h4 className="text-slate-900 dark:text-slate-50 font-medium">Platform Review</h4>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               Each platform will review your campaign for compliance with their policies.
             </p>
           </div>
           
           <div className="space-y-2">
-            <h4 className="text-[#111827] font-medium">Campaign Activation</h4>
-            <p className="text-sm text-[#6B7280]">
+            <h4 className="text-slate-900 dark:text-slate-50 font-medium">Campaign Activation</h4>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               Once approved, your campaign will go live according to your schedule.
             </p>
           </div>
           
           <div className="space-y-2">
-            <h4 className="text-[#111827] font-medium">Performance Monitoring</h4>
-            <p className="text-sm text-[#6B7280]">
+            <h4 className="text-slate-900 dark:text-slate-50 font-medium">Performance Monitoring</h4>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               Monitor performance and make optimizations through the dashboard.
             </p>
           </div>

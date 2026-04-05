@@ -75,7 +75,10 @@ dist
 
 # Gatsby files
 .cache/
-public
+/public
+# Exception: allow fonts in apps/web/public
+!/apps/web/public/
+!/apps/web/public/**
 
 # Storybook build outputs
 .out

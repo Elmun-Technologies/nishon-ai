@@ -56,10 +56,10 @@ function Field({
   multiline?: boolean
   placeholder?: string
 }) {
-  const cls = 'w-full border border-[#E5E7EB] rounded-xl px-3 py-2 text-sm text-[#111827] bg-white focus:outline-none focus:ring-2 focus:ring-[#111827]/20 resize-none'
+  const cls = 'w-full border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-900 dark:text-slate-50 bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/20 resize-none'
   return (
     <div>
-      <label className="block text-xs font-medium text-[#6B7280] mb-1">{label}</label>
+      <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{label}</label>
       {multiline ? (
         <textarea
           rows={3}
@@ -244,12 +244,12 @@ export default function LandingPageEditor() {
     return (
       <div className="max-w-lg mx-auto px-4 py-12 text-center">
         <div className="text-6xl mb-4">🚀</div>
-        <h1 className="text-2xl font-bold text-[#111827] mb-2">Landing Page yaratish</h1>
-        <p className="text-[#6B7280] mb-2 text-sm leading-relaxed">
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50 mb-2">Landing Page yaratish</h1>
+        <p className="text-slate-500 dark:text-slate-400 mb-2 text-sm leading-relaxed">
           AI sizning biznesingiz ma'lumotlaridan kelib chiqib professional sotuvchi
           landing sahifani avtomatik yaratadi.
         </p>
-        <ul className="text-sm text-[#6B7280] mb-8 space-y-1">
+        <ul className="text-sm text-slate-500 dark:text-slate-400 mb-8 space-y-1">
           <li>✅ Uzb tilida matnlar</li>
           <li>✅ Meta Pixel + Google Analytics ulash</li>
           <li>✅ Qo'ng'iroq va WhatsApp tugmalar</li>
@@ -266,7 +266,7 @@ export default function LandingPageEditor() {
             <><Spinner size="sm" /> AI Landing Page yaratmoqda...</>
           ) : '🤖 AI bilan yaratish'}
         </Button>
-        <p className="text-xs text-[#9CA3AF] mt-3">Taxminan 10–20 soniya</p>
+        <p className="text-xs text-slate-400 dark:text-slate-500 mt-3">Taxminan 10–20 soniya</p>
       </div>
     )
   }
@@ -279,9 +279,9 @@ export default function LandingPageEditor() {
       {/* Header */}
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-[#111827]">Landing Page</h1>
-          <p className="text-[#6B7280] text-xs mt-0.5">
-            Ko'ruvlar: <span className="font-medium text-[#374151]">{page.viewCount}</span>
+          <h1 className="text-xl font-bold text-slate-900 dark:text-slate-50">Landing Page</h1>
+          <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">
+            Ko'ruvlar: <span className="font-medium text-slate-700 dark:text-slate-300">{page.viewCount}</span>
           </p>
         </div>
         <div className="flex gap-2 items-center">
@@ -290,7 +290,7 @@ export default function LandingPageEditor() {
               href={publicUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs px-3 py-1.5 rounded-lg border border-[#E5E7EB] text-[#374151] hover:bg-[#F9FAFB]"
+              className="text-xs px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:bg-slate-800/50"
             >
               🔗 Ko'rish
             </a>
@@ -334,13 +334,13 @@ export default function LandingPageEditor() {
       <button
         onClick={handleGenerate}
         disabled={generating}
-        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed border-[#D1D5DB] text-sm text-[#6B7280] hover:text-[#111827] hover:border-[#111827] transition-all"
+        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed border-slate-300 dark:border-slate-600 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50 hover:border-slate-900 transition-all"
       >
         {generating ? <><Spinner size="sm" /> Qayta yaratilmoqda...</> : '🔄 AI bilan qayta yaratish'}
       </button>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-[#F3F4F6] p-1 rounded-xl">
+      <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
         {[
           { key: 'content', label: 'Matn' },
           { key: 'design', label: 'Dizayn' },
@@ -352,8 +352,8 @@ export default function LandingPageEditor() {
             onClick={() => setTab(t.key as any)}
             className={`flex-1 py-2 text-xs font-medium rounded-lg transition-all ${
               tab === t.key
-                ? 'bg-white text-[#111827] shadow-sm'
-                : 'text-[#6B7280] hover:text-[#374151]'
+                ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50 shadow-sm'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300'
             }`}
           >
             {t.label}
@@ -374,12 +374,12 @@ export default function LandingPageEditor() {
 
           {/* Trust badges */}
           <div>
-            <label className="block text-xs font-medium text-[#6B7280] mb-2">Ishonch belgilari (3 ta)</label>
+            <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Ishonch belgilari (3 ta)</label>
             {(page.content?.trustBadges || ['', '', '']).map((badge: string, i: number) => (
               <input
                 key={i}
                 type="text"
-                className="w-full border border-[#E5E7EB] rounded-xl px-3 py-2 text-sm text-[#111827] bg-white focus:outline-none mb-1.5"
+                className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-900 dark:text-slate-50 bg-white dark:bg-slate-900 focus:outline-none mb-1.5"
                 value={badge}
                 onChange={e => {
                   const badges = [...(page.content?.trustBadges || ['', '', ''])]
@@ -403,7 +403,7 @@ export default function LandingPageEditor() {
 
           {/* Color scheme */}
           <div>
-            <label className="block text-xs font-medium text-[#6B7280] mb-3">Rang sxemasi</label>
+            <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-3">Rang sxemasi</label>
             <div className="grid grid-cols-4 gap-2">
               {COLOR_OPTIONS.map(opt => (
                 <button
@@ -411,12 +411,12 @@ export default function LandingPageEditor() {
                   onClick={() => updateContent('colorScheme', opt.key)}
                   className={`flex flex-col items-center gap-1.5 p-2 rounded-xl border-2 transition-all ${
                     page.content?.colorScheme === opt.key
-                      ? 'border-[#111827]'
-                      : 'border-transparent hover:border-[#E5E7EB]'
+                      ? 'border-slate-900'
+                      : 'border-transparent hover:border-slate-200 dark:border-slate-700'
                   }`}
                 >
                   <div className="w-8 h-8 rounded-lg" style={{ background: opt.bg }} />
-                  <span className="text-[10px] text-[#6B7280]">{opt.label}</span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400">{opt.label}</span>
                 </button>
               ))}
             </div>
@@ -424,8 +424,8 @@ export default function LandingPageEditor() {
 
           {/* Section order */}
           <div>
-            <label className="block text-xs font-medium text-[#6B7280] mb-2">Bo'limlar tartibi</label>
-            <p className="text-[10px] text-[#9CA3AF] mb-3">Yoqish/o'chirish yoki tartibini o'zgartiring</p>
+            <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Bo'limlar tartibi</label>
+            <p className="text-[10px] text-slate-400 dark:text-slate-500 mb-3">Yoqish/o'chirish yoki tartibini o'zgartiring</p>
             <div className="space-y-1.5">
               {ALL_SECTIONS.map(sec => {
                 const active = (page.content?.sections || []).includes(sec.key)
@@ -433,11 +433,11 @@ export default function LandingPageEditor() {
                   <div
                     key={sec.key}
                     className={`flex items-center gap-3 p-3 rounded-xl border ${
-                      active ? 'bg-white border-[#E5E7EB]' : 'bg-[#F9FAFB] border-transparent opacity-50'
+                      active ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700' : 'bg-slate-50 dark:bg-slate-800/50 border-transparent opacity-50'
                     }`}
                   >
                     <span className="text-sm">{sec.icon}</span>
-                    <span className="text-sm text-[#374151] flex-1">{sec.label}</span>
+                    <span className="text-sm text-slate-700 dark:text-slate-300 flex-1">{sec.label}</span>
                     {!sec.required && (
                       <button
                         onClick={() => toggleSection(sec.key)}
@@ -450,8 +450,8 @@ export default function LandingPageEditor() {
                     )}
                     {active && (
                       <div className="flex gap-1">
-                        <button onClick={() => moveSectionUp(sec.key)} className="text-[#9CA3AF] hover:text-[#374151] px-1">↑</button>
-                        <button onClick={() => moveSectionDown(sec.key)} className="text-[#9CA3AF] hover:text-[#374151] px-1">↓</button>
+                        <button onClick={() => moveSectionUp(sec.key)} className="text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:text-slate-300 px-1">↑</button>
+                        <button onClick={() => moveSectionDown(sec.key)} className="text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:text-slate-300 px-1">↓</button>
                       </div>
                     )}
                   </div>
@@ -469,7 +469,7 @@ export default function LandingPageEditor() {
       {/* ── CONTACT TAB ── */}
       {tab === 'contact' && (
         <div className="space-y-4">
-          <p className="text-xs text-[#6B7280]">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             Sahifadagi "Bog'lanish" tugmasi ushbu ma'lumotlarga bog'lanadi.
           </p>
           <Field
@@ -504,12 +504,12 @@ export default function LandingPageEditor() {
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-3">
               <span className="text-lg">📘</span>
-              <h3 className="font-semibold text-[#111827] text-sm">Meta Pixel (Facebook/Instagram)</h3>
+              <h3 className="font-semibold text-slate-900 dark:text-slate-50 text-sm">Meta Pixel (Facebook/Instagram)</h3>
             </div>
-            <p className="text-xs text-[#6B7280] mb-3 leading-relaxed">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-3 leading-relaxed">
               Meta Pixel lead va konversiyalarni kuzatadi. Pixel ID ni Facebook Ads Manager dan oling:
             </p>
-            <ol className="text-xs text-[#6B7280] mb-3 space-y-1 list-decimal list-inside">
+            <ol className="text-xs text-slate-500 dark:text-slate-400 mb-3 space-y-1 list-decimal list-inside">
               <li>Facebook Ads Manager → Events Manager</li>
               <li>"Web" → "Meta Pixel" ni tanlang</li>
               <li>Yangi pixel yarating yoki mavjudini tanlang</li>
@@ -517,7 +517,7 @@ export default function LandingPageEditor() {
             </ol>
             <input
               type="text"
-              className="w-full border border-blue-200 rounded-xl px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300"
+              className="w-full border border-blue-200 rounded-xl px-3 py-2 text-sm bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-300"
               value={page.metaPixelId || ''}
               onChange={e => setPage(p => p ? { ...p, metaPixelId: e.target.value } : p)}
               placeholder="123456789012345"
@@ -528,19 +528,19 @@ export default function LandingPageEditor() {
           <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-3">
               <span className="text-lg">📊</span>
-              <h3 className="font-semibold text-[#111827] text-sm">Google Analytics (GA4)</h3>
+              <h3 className="font-semibold text-slate-900 dark:text-slate-50 text-sm">Google Analytics (GA4)</h3>
             </div>
-            <p className="text-xs text-[#6B7280] mb-3 leading-relaxed">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-3 leading-relaxed">
               Google Analytics sayt trafigini tahlil qiladi. GA4 measurement ID ni oling:
             </p>
-            <ol className="text-xs text-[#6B7280] mb-3 space-y-1 list-decimal list-inside">
+            <ol className="text-xs text-slate-500 dark:text-slate-400 mb-3 space-y-1 list-decimal list-inside">
               <li>analytics.google.com → saytingizni tanlang</li>
               <li>Admin → Data Streams → Web stream</li>
               <li>Measurement ID (G-XXXXXXXX) ni nusxa oling</li>
             </ol>
             <input
               type="text"
-              className="w-full border border-orange-200 rounded-xl px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-300"
+              className="w-full border border-orange-200 rounded-xl px-3 py-2 text-sm bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-300"
               value={page.googleAnalyticsId || ''}
               onChange={e => setPage(p => p ? { ...p, googleAnalyticsId: e.target.value } : p)}
               placeholder="G-XXXXXXXXXX"

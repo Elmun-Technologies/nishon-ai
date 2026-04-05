@@ -168,6 +168,14 @@ export const aiAgent = {
     platform: string
     matchType?: string
   }) => apiClient.post('/ai-agent/wizard/keywords', data),
+  scoreCreative: (data: {
+    imageBase64: string
+    mimeType: string
+    platform: string
+    creativeType: string
+    goal: string
+    workspaceContext: any
+  }) => apiClient.post('/ai-agent/score-creative', data),
 }
 
 export const campaigns = {

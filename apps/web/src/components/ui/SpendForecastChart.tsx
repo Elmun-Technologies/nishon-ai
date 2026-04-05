@@ -199,14 +199,14 @@ export function SpendForecastChart({
       {/* Legend */}
       <div className="flex items-center gap-5 mt-2 px-1">
         <div className="flex items-center gap-1.5">
-          <span className="w-5 h-0.5 bg-[#111827] rounded-full inline-block" />
-          <span className="text-xs text-[#6B7280]">
+          <span className="w-5 h-0.5 bg-slate-900 rounded-full inline-block" />
+          <span className="text-xs text-slate-500">
             Haqiqiy xarajat — {formatK(spendToDate)}
           </span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-5 h-px border-t-2 border-dashed border-[#A78BFA] inline-block" />
-          <span className="text-xs text-[#6B7280]">
+          <span className="w-5 h-px border-t-2 border-dashed border-violet-400 inline-block" />
+          <span className="text-xs text-slate-500">
             Bashorat — {formatK(predictedTotal)}
           </span>
         </div>

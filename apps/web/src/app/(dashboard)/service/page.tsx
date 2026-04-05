@@ -68,7 +68,7 @@ function AgentCardItem({
       : `$${agent.monthlyRate}/oy`
 
   return (
-    <div className={`bg-white border rounded-2xl p-5 ${agent.isFeatured ? 'border-violet-200 ring-1 ring-violet-100' : 'border-[#E5E7EB]'}`}>
+    <div className={`bg-white dark:bg-slate-900 border rounded-2xl p-5 ${agent.isFeatured ? 'border-violet-200 ring-1 ring-violet-100' : 'border-slate-200 dark:border-slate-700'}`}>
       {/* Header */}
       <div className="flex items-start gap-3 mb-3">
         <div
@@ -78,7 +78,7 @@ function AgentCardItem({
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="font-bold text-[#111827] text-sm">{agent.displayName}</span>
+            <span className="font-bold text-slate-900 dark:text-slate-50 text-sm">{agent.displayName}</span>
             {agent.isVerified && (
               <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-600">✓ TASDIQLANGAN</span>
             )}
@@ -86,15 +86,15 @@ function AgentCardItem({
               <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-violet-50 border border-violet-200 text-violet-600">🤖 AI</span>
             )}
           </div>
-          <p className="text-[#6B7280] text-xs mt-0.5 truncate">{agent.title}</p>
-          {agent.location && <p className="text-[10px] text-[#9CA3AF] mt-0.5">📍 {agent.location}</p>}
+          <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5 truncate">{agent.title}</p>
+          {agent.location && <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">📍 {agent.location}</p>}
         </div>
         <div className="text-right shrink-0">
           {agent.cachedRating > 0 && (
-            <p className="text-sm font-bold text-[#111827]">⭐ {agent.cachedRating.toFixed(1)}</p>
+            <p className="text-sm font-bold text-slate-900 dark:text-slate-50">⭐ {agent.cachedRating.toFixed(1)}</p>
           )}
           {agent.cachedReviewCount > 0 && (
-            <p className="text-[10px] text-[#9CA3AF]">{agent.cachedReviewCount} sharh</p>
+            <p className="text-[10px] text-slate-400 dark:text-slate-500">{agent.cachedReviewCount} sharh</p>
           )}
         </div>
       </div>
@@ -107,9 +107,9 @@ function AgentCardItem({
             { label: 'Kampaniya', value: stats.totalCampaigns?.toLocaleString() },
             { label: 'Muvaffaqiyat', value: `${stats.successRate}%` },
           ].map(s => (
-            <div key={s.label} className="bg-[#F9FAFB] rounded-lg p-2 text-center">
-              <p className="text-xs font-bold text-[#111827]">{s.value}</p>
-              <p className="text-[10px] text-[#9CA3AF]">{s.label}</p>
+            <div key={s.label} className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-2 text-center">
+              <p className="text-xs font-bold text-slate-900 dark:text-slate-50">{s.value}</p>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500">{s.label}</p>
             </div>
           ))}
         </div>
@@ -118,7 +118,7 @@ function AgentCardItem({
       {/* Platforms */}
       <div className="flex flex-wrap gap-1 mb-3">
         {agent.platforms.slice(0, 5).map(p => (
-          <span key={p} className="text-[10px] px-2 py-0.5 rounded-full bg-[#F3F4F6] text-[#6B7280] border border-[#E5E7EB]">
+          <span key={p} className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
             {PLATFORM_ICONS[p] || '📢'} {p}
           </span>
         ))}
@@ -127,17 +127,17 @@ function AgentCardItem({
       {/* Niches */}
       <div className="flex flex-wrap gap-1 mb-4">
         {agent.niches.slice(0, 3).map(n => (
-          <span key={n} className="text-[10px] px-2 py-0.5 rounded bg-[#F9FAFB] text-[#9CA3AF] border border-[#E5E7EB]">
+          <span key={n} className="text-[10px] px-2 py-0.5 rounded bg-slate-50 dark:bg-slate-800/50 text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-slate-700">
             {n}
           </span>
         ))}
       </div>
 
       {/* Price + Hire */}
-      <div className="flex items-center justify-between pt-3 border-t border-[#F3F4F6]">
+      <div className="flex items-center justify-between pt-3 border-t border-slate-100">
         <div>
-          <p className="text-[10px] text-[#9CA3AF]">Narxi</p>
-          <p className="text-sm font-semibold text-[#111827]">{priceLabel}</p>
+          <p className="text-[10px] text-slate-400 dark:text-slate-500">Narxi</p>
+          <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">{priceLabel}</p>
         </div>
         <Button
           size="sm"
@@ -236,8 +236,8 @@ export default function ServiceSelectionPage() {
 
       {/* Header */}
       <div>
-        <h1 className="text-xl font-bold text-[#111827]">Xizmat turini tanlash</h1>
-        <p className="text-[#6B7280] text-sm mt-1">
+        <h1 className="text-xl font-bold text-slate-900 dark:text-slate-50">Xizmat turini tanlash</h1>
+        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
           Reklamangizni kim boshqaradi — siz, jonli targetolog yoki AI agent?
         </p>
       </div>
@@ -252,7 +252,7 @@ export default function ServiceSelectionPage() {
             <div>
               <p className="text-emerald-700 font-semibold text-sm">✅ Faol: {currentEngagement.agentProfile?.displayName}</p>
               <p className="text-emerald-600 text-xs mt-0.5">{currentEngagement.agentProfile?.title}</p>
-              <p className="text-[#6B7280] text-xs mt-1">
+              <p className="text-slate-500 dark:text-slate-400 text-xs mt-1">
                 Ulangan: {new Date(currentEngagement.startDate).toLocaleDateString('uz-UZ')}
                 {' · '}
                 {currentEngagement.agreedPricingModel === 'commission'
@@ -301,13 +301,13 @@ export default function ServiceSelectionPage() {
             onClick={card.onClick || undefined}
             className={`text-left p-4 rounded-2xl border-2 transition-all ${
               card.active
-                ? 'border-[#111827] bg-[#F9FAFB]'
-                : 'border-[#E5E7EB] hover:border-[#D1D5DB] bg-white'
+                ? 'border-slate-900 bg-slate-50 dark:bg-slate-800/50'
+                : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900'
             }`}
           >
             <div className="text-2xl mb-2">{card.icon}</div>
-            <p className="font-semibold text-[#111827] text-sm">{card.title}</p>
-            <p className="text-[#6B7280] text-xs mt-1 leading-relaxed">{card.desc}</p>
+            <p className="font-semibold text-slate-900 dark:text-slate-50 text-sm">{card.title}</p>
+            <p className="text-slate-500 dark:text-slate-400 text-xs mt-1 leading-relaxed">{card.desc}</p>
             {card.active && <p className="text-xs text-emerald-600 font-medium mt-2">✓ Faol</p>}
           </button>
         ))}
@@ -338,8 +338,8 @@ export default function ServiceSelectionPage() {
                 onClick={() => setTab(t.key as any)}
                 className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
                   tab === t.key
-                    ? 'bg-[#111827] text-white'
-                    : 'bg-[#F3F4F6] text-[#6B7280] hover:text-[#374151]'
+                    ? 'bg-slate-900 text-white'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300'
                 }`}
               >
                 {t.label}
@@ -359,7 +359,7 @@ export default function ServiceSelectionPage() {
           </div>
 
           {filtered.length === 0 && (
-            <p className="text-center text-[#9CA3AF] py-8 text-sm">
+            <p className="text-center text-slate-400 dark:text-slate-500 py-8 text-sm">
               Bu kategoriyada hozircha agent yo'q
             </p>
           )}
@@ -367,7 +367,7 @@ export default function ServiceSelectionPage() {
           <div className="text-center mt-4">
             <button
               onClick={() => router.push('/portfolio')}
-              className="text-sm text-[#6B7280] hover:text-[#111827] underline"
+              className="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50 underline"
             >
               Batafsil profil ko'rish →
             </button>
@@ -376,9 +376,9 @@ export default function ServiceSelectionPage() {
       )}
 
       {/* Become a targetologist CTA */}
-      <div className="border border-[#E5E7EB] rounded-2xl p-5 text-center">
-        <p className="text-lg font-bold text-[#111827] mb-1">Targetolsiz yoki AI agent qurasizmi?</p>
-        <p className="text-[#6B7280] text-sm mb-4">
+      <div className="border border-slate-200 dark:border-slate-700 rounded-2xl p-5 text-center">
+        <p className="text-lg font-bold text-slate-900 dark:text-slate-50 mb-1">Targetolsiz yoki AI agent qurasizmi?</p>
+        <p className="text-slate-500 dark:text-slate-400 text-sm mb-4">
           O'z profilingizni yarating va Performa orqali qo'shimcha daromad qiling.
           Kuchli targetologlar 80% ga yaqin daromad oladi.
         </p>

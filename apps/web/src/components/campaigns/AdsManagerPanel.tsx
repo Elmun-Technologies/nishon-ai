@@ -216,17 +216,17 @@ export function AdsManagerPanel() {
   const allSelected = selected.length === SAMPLE_ROWS.length;
 
   return (
-    <Card className="border-[#DDE3F0]">
+    <Card className="border-slate-200 dark:border-slate-700">
       <div className="space-y-4">
-        <div className="flex flex-wrap gap-2 border-b border-[#E2E8F0] pb-3">
+        <div className="flex flex-wrap gap-2 border-b border-slate-200 dark:border-slate-700 pb-3">
           {INSIGHT_TABS.map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`px-3 py-1.5 rounded-md text-sm ${
                 activeTab === tab
-                  ? "bg-[#EEF2FF] text-[#4338CA]"
-                  : "text-[#64748B] hover:bg-[#F8FAFC]"
+                  ? "bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400"
+                  : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:bg-slate-800"
               }`}
             >
               {tab}
@@ -235,25 +235,25 @@ export function AdsManagerPanel() {
         </div>
 
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-semibold text-[#1F2937]">
+          <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50">
             Ads Manager 2.0
           </h2>
           <div className="flex flex-wrap items-center gap-2 justify-end">
-            <button className="px-4 py-2 rounded-lg border border-[#CBD5E1] text-sm bg-white">
+            <button className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 text-sm bg-white dark:bg-slate-900 dark:bg-slate-900">
               Filter Data
             </button>
             <button
               onClick={() => setShowSmartFilter(true)}
-              className="px-4 py-2 rounded-lg border border-[#CBD5E1] text-sm bg-white"
+              className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 text-sm bg-white dark:bg-slate-900 dark:bg-slate-900"
             >
               Smart Filter
             </button>
-            <button className="px-4 py-2 rounded-lg border border-[#CBD5E1] text-sm bg-white">
+            <button className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 text-sm bg-white dark:bg-slate-900 dark:bg-slate-900">
               Export PDF
             </button>
             <button
               onClick={() => setShowAutoReporting(true)}
-              className="px-4 py-2 rounded-lg border border-[#CBD5E1] text-sm bg-white"
+              className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 text-sm bg-white dark:bg-slate-900 dark:bg-slate-900"
             >
               Automated Reporting
             </button>
@@ -262,9 +262,9 @@ export function AdsManagerPanel() {
 
         {activeTab === "Meta Dashboard" && (
           <>
-            <div className="overflow-x-auto border border-[#E2E8F0] rounded-xl">
+            <div className="overflow-x-auto border border-slate-200 dark:border-slate-700 rounded-xl">
               <table className="w-full min-w-[900px] text-sm">
-                <thead className="bg-[#F8FAFC] text-[#475569]">
+                <thead className="bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
                   <tr>
                     <th className="p-3 text-left">
                       <input
@@ -286,7 +286,7 @@ export function AdsManagerPanel() {
                 </thead>
                 <tbody>
                   {SAMPLE_ROWS.map((row) => (
-                    <tr key={row.id} className="border-t border-[#E2E8F0]">
+                    <tr key={row.id} className="border-t border-slate-200 dark:border-slate-700">
                       <td className="p-3">
                         <input
                           type="checkbox"
@@ -304,7 +304,7 @@ export function AdsManagerPanel() {
                       <td className="p-3">
                         <button
                           onClick={() => setShowAiSettings(true)}
-                          className="px-2 py-1 rounded-full text-xs bg-[#EEF2FF] text-[#4338CA]"
+                          className="px-2 py-1 rounded-full text-xs bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400"
                         >
                           AI Bidding
                         </button>
@@ -327,10 +327,10 @@ export function AdsManagerPanel() {
               ].map((stage) => (
                 <div
                   key={stage.stage}
-                  className="rounded-xl border border-[#E2E8F0] p-4 bg-[#F8FAFC]"
+                  className="rounded-xl border border-slate-200 dark:border-slate-700 p-4 bg-slate-50 dark:bg-slate-800"
                 >
-                  <p className="text-sm text-[#64748B]">{stage.stage}</p>
-                  <p className="text-2xl font-bold text-[#4338CA] mt-2">
+                  <p className="text-sm text-slate-500 dark:text-slate-400">{stage.stage}</p>
+                  <p className="text-2xl font-bold text-indigo-700 dark:text-indigo-400 mt-2">
                     {stage.budget}
                   </p>
                 </div>
@@ -360,16 +360,16 @@ export function AdsManagerPanel() {
 
         {activeTab === "Targeting Insights" && (
           <div className="space-y-4">
-            <div className="rounded-xl border border-[#E2E8F0] p-4">
+            <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold">Top Landing Pages</h3>
-                <button className="px-3 py-1.5 rounded-lg bg-[#EEF2FF] text-[#4338CA] text-sm">
+                <button className="px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400 text-sm">
                   See all landing pages
                 </button>
               </div>
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-[#64748B]">
+                  <tr className="text-slate-500 dark:text-slate-400">
                     <th className="text-left p-2">Link</th>
                     <th className="text-left p-2">Amount Spent</th>
                     <th className="text-left p-2">ROAS (All)</th>
@@ -381,7 +381,7 @@ export function AdsManagerPanel() {
                     ["https://site.com/lp-b", "$140", "3.26"],
                     ["Ads without landing pages", "$1,741", "2.92"],
                   ].map((r) => (
-                    <tr key={r[0]} className="border-t border-[#E2E8F0]">
+                    <tr key={r[0]} className="border-t border-slate-200 dark:border-slate-700">
                       <td className="p-2">{r[0]}</td>
                       <td className="p-2">{r[1]}</td>
                       <td className="p-2">{r[2]}</td>
@@ -392,7 +392,7 @@ export function AdsManagerPanel() {
             </div>
 
             <div className="grid lg:grid-cols-2 gap-4">
-              <div className="rounded-xl border border-[#E2E8F0] p-4">
+              <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
                 <h3 className="font-semibold mb-3">
                   Expand Interest & Lookalike Expansion
                 </h3>
@@ -405,7 +405,7 @@ export function AdsManagerPanel() {
                   ].map((label) => (
                     <div
                       key={label}
-                      className="rounded-lg border border-[#E2E8F0] p-3 bg-[#F8FAFC]"
+                      className="rounded-lg border border-slate-200 dark:border-slate-700 p-3 bg-slate-50 dark:bg-slate-800"
                     >
                       {label}
                     </div>
@@ -413,14 +413,14 @@ export function AdsManagerPanel() {
                 </div>
               </div>
 
-              <div className="rounded-xl border border-[#E2E8F0] p-4">
+              <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
                 <div className="flex items-center gap-2 mb-3">
                   {(["Audience Size", "Potential Reach"] as const).map(
                     (tab) => (
                       <button
                         key={tab}
                         onClick={() => setAudienceView(tab)}
-                        className={`px-3 py-1 rounded-md text-sm ${audienceView === tab ? "bg-[#EEF2FF] text-[#4338CA]" : "text-[#64748B]"}`}
+                        className={`px-3 py-1 rounded-md text-sm ${audienceView === tab ? "bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400" : "text-slate-500 dark:text-slate-400"}`}
                       >
                         {tab}
                       </button>
@@ -438,7 +438,7 @@ export function AdsManagerPanel() {
                   ].map((tier) => (
                     <div
                       key={tier}
-                      className="grid grid-cols-3 rounded-lg border border-[#E2E8F0] p-2"
+                      className="grid grid-cols-3 rounded-lg border border-slate-200 dark:border-slate-700 p-2"
                     >
                       <span>{tier}</span>
                       <span>$1,029</span>
@@ -450,7 +450,7 @@ export function AdsManagerPanel() {
             </div>
 
             <div className="grid lg:grid-cols-2 gap-4">
-              <div className="rounded-xl border border-[#E2E8F0] p-4">
+              <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
                 <h3 className="font-semibold mb-3">WiFi</h3>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div className="rounded-lg border p-3">WiFi Only</div>
@@ -460,7 +460,7 @@ export function AdsManagerPanel() {
                 </div>
               </div>
 
-              <div className="rounded-xl border border-[#E2E8F0] p-4">
+              <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
                 <div className="flex items-center gap-2 mb-3">
                   {(
                     ["Lookalike %", "Recency", "Lookalike & Recency"] as const
@@ -468,7 +468,7 @@ export function AdsManagerPanel() {
                     <button
                       key={tab}
                       onClick={() => setLookalikeView(tab)}
-                      className={`px-3 py-1 rounded-md text-sm ${lookalikeView === tab ? "bg-[#EEF2FF] text-[#4338CA]" : "text-[#64748B]"}`}
+                      className={`px-3 py-1 rounded-md text-sm ${lookalikeView === tab ? "bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400" : "text-slate-500 dark:text-slate-400"}`}
                     >
                       {tab}
                     </button>
@@ -480,14 +480,14 @@ export function AdsManagerPanel() {
               </div>
             </div>
 
-            <div className="rounded-xl border border-[#E2E8F0] p-4">
+            <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold">
                   Targeting Insights Across the Full Funnel
                 </h3>
                 <button
                   onClick={() => setShowFullFunnelInsights(true)}
-                  className="px-3 py-1.5 rounded-lg bg-[#EEF2FF] text-[#4338CA] text-sm"
+                  className="px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400 text-sm"
                 >
                   Go to Madgicx Audiences
                 </button>
@@ -501,14 +501,14 @@ export function AdsManagerPanel() {
                 ].map((row) => (
                   <div
                     key={row}
-                    className="grid grid-cols-6 rounded-lg border border-[#E2E8F0] p-2"
+                    className="grid grid-cols-6 rounded-lg border border-slate-200 dark:border-slate-700 p-2"
                   >
                     <span className="font-medium">{row}</span>
                     <span>Amount Spent</span>
                     <span>ROAS</span>
                     <span>Cost per Purchase</span>
                     <span>Outbound CTR</span>
-                    <span className="text-[#64748B]">Trend ↗</span>
+                    <span className="text-slate-500 dark:text-slate-400">Trend ↗</span>
                   </div>
                 ))}
               </div>
@@ -533,26 +533,26 @@ export function AdsManagerPanel() {
 
         {activeTab === "Auction Analytics" && (
           <div className="space-y-4">
-            <div className="rounded-xl border border-[#E2E8F0] p-4">
+            <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold">Placement & Device</h3>
-                <span className="text-sm text-[#64748B]">ROAS (All)</span>
+                <span className="text-sm text-slate-500 dark:text-slate-400">ROAS (All)</span>
               </div>
               <div className="grid md:grid-cols-2 gap-3 text-sm">
-                <div className="rounded-lg border border-[#E2E8F0] p-3 bg-[#F8FAFC]">
-                  <p className="text-[#64748B]">Desktop</p>
+                <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-3 bg-slate-50 dark:bg-slate-800">
+                  <p className="text-slate-500 dark:text-slate-400">Desktop</p>
                   <p className="text-3xl font-semibold mt-2">1.47</p>
-                  <p className="text-xs text-[#94A3B8]">18.69% of spend</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500">18.69% of spend</p>
                 </div>
-                <div className="rounded-lg border border-[#E2E8F0] p-3 bg-[#F8FAFC]">
-                  <p className="text-[#64748B]">Mobile</p>
+                <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-3 bg-slate-50 dark:bg-slate-800">
+                  <p className="text-slate-500 dark:text-slate-400">Mobile</p>
                   <p className="text-3xl font-semibold mt-2">6.07</p>
-                  <p className="text-xs text-[#94A3B8]">81.31% of spend</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500">81.31% of spend</p>
                 </div>
               </div>
               <div className="mt-3 overflow-x-auto">
                 <table className="w-full text-sm">
-                  <thead className="text-[#64748B]">
+                  <thead className="text-slate-500 dark:text-slate-400">
                     <tr>
                       <th className="text-left p-2">Platform & Placement</th>
                       <th className="text-left p-2">Device</th>
@@ -573,7 +573,7 @@ export function AdsManagerPanel() {
                         "1.68",
                       ],
                     ].map((r) => (
-                      <tr key={r[0]} className="border-t border-[#E2E8F0]">
+                      <tr key={r[0]} className="border-t border-slate-200 dark:border-slate-700">
                         {r.map((c, i) => (
                           <td key={i} className="p-2">
                             {c}
@@ -586,7 +586,7 @@ export function AdsManagerPanel() {
               </div>
             </div>
 
-            <div className="rounded-xl border border-[#E2E8F0] p-4">
+            <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
               <h3 className="font-semibold mb-3">
                 Campaign Type & Budget (CBO vs ABO)
               </h3>
@@ -602,27 +602,27 @@ export function AdsManagerPanel() {
               </div>
             </div>
 
-            <div className="rounded-xl border border-[#E2E8F0] p-4">
+            <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
               <h3 className="font-semibold mb-3">
                 Campaign Objective & Ad Delivery Optimization
               </h3>
               <div className="grid md:grid-cols-2 gap-3 text-sm">
-                <div className="rounded-lg border p-3 bg-[#F8FAFC]">
+                <div className="rounded-lg border p-3 bg-slate-50 dark:bg-slate-800">
                   Conversions: 4.28
                 </div>
-                <div className="rounded-lg border p-3 bg-[#F8FAFC]">
+                <div className="rounded-lg border p-3 bg-slate-50 dark:bg-slate-800">
                   Lead Generation: 0.00
                 </div>
-                <div className="rounded-lg border p-3 bg-[#F8FAFC]">
+                <div className="rounded-lg border p-3 bg-slate-50 dark:bg-slate-800">
                   Landing Page Views: 0.00
                 </div>
-                <div className="rounded-lg border p-3 bg-[#F8FAFC]">
+                <div className="rounded-lg border p-3 bg-slate-50 dark:bg-slate-800">
                   Amount Spent split shown
                 </div>
               </div>
             </div>
 
-            <div className="rounded-xl border border-[#E2E8F0] p-4">
+            <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
               <h3 className="font-semibold mb-3">
                 Automatic Bid vs Manual Bid
               </h3>
@@ -636,7 +636,7 @@ export function AdsManagerPanel() {
               </div>
             </div>
 
-            <div className="rounded-xl border border-[#E2E8F0] p-4">
+            <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
               <h3 className="font-semibold mb-3">Learning Phase</h3>
               <div className="space-y-2 text-sm">
                 <div className="grid grid-cols-4 border rounded-lg p-2">
@@ -661,7 +661,7 @@ export function AdsManagerPanel() {
             </div>
 
             <div className="grid lg:grid-cols-2 gap-4">
-              <div className="rounded-xl border border-[#E2E8F0] p-4">
+              <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
                 <h3 className="font-semibold mb-3">Ranking Benchmarks</h3>
                 <div className="space-y-2 text-sm">
                   <div className="grid grid-cols-4 border rounded p-2">
@@ -684,7 +684,7 @@ export function AdsManagerPanel() {
                   </div>
                 </div>
               </div>
-              <div className="rounded-xl border border-[#E2E8F0] p-4">
+              <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
                 <h3 className="font-semibold mb-3">Ad Type</h3>
                 <div className="space-y-2 text-sm">
                   <div className="grid grid-cols-4 border rounded p-2">
@@ -709,12 +709,12 @@ export function AdsManagerPanel() {
               </div>
             </div>
 
-            <div className="rounded-xl border border-[#E2E8F0] p-4">
+            <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
               <h3 className="font-semibold mb-3">Days & Hours</h3>
-              <div className="h-28 rounded-lg bg-gradient-to-r from-[#EEF2FF] to-[#E0F2FE]" />
+              <div className="h-28 rounded-lg bg-gradient-to-r from-indigo-50 to-sky-100 dark:from-indigo-950 dark:to-sky-950" />
             </div>
 
-            <div className="rounded-xl border border-[#E2E8F0] p-4">
+            <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
               <h3 className="font-semibold mb-3">Frequency Breakdown</h3>
               <div className="grid grid-cols-6 text-sm gap-2">
                 {[
@@ -736,28 +736,28 @@ export function AdsManagerPanel() {
 
         {activeTab === "Geo & Demo Insights" && (
           <div className="space-y-4">
-            <div className="rounded-xl border border-[#E2E8F0] p-4 bg-[#F8FAFC]">
+            <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4 bg-slate-50 dark:bg-slate-800">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold">Geo & Demo Insights</h3>
-                <span className="text-sm text-[#64748B]">
+                <span className="text-sm text-slate-500 dark:text-slate-400">
                   Primary Market: Uzbekistan + CIS
                 </span>
               </div>
-              <p className="text-sm text-[#64748B] mt-2">
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
                 Loyiha hozir Oʻzbekiston va MDH bozoriga fokuslangan; keyingi
                 bosqichda xalqaro scaling qoʻshiladi.
               </p>
             </div>
 
             <div className="grid lg:grid-cols-3 gap-4">
-              <div className="rounded-xl border border-[#E2E8F0] p-4">
+              <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
                 <h3 className="font-semibold mb-2">Wasted Spend</h3>
-                <p className="text-4xl font-bold text-[#EF4444]">26%</p>
-                <p className="text-sm text-[#64748B]">
+                <p className="text-4xl font-bold text-red-500 dark:text-red-400">26%</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">
                   Potential uplift +1206.99%
                 </p>
               </div>
-              <div className="rounded-xl border border-[#E2E8F0] p-4">
+              <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
                 <h3 className="font-semibold mb-2">Trending Countries</h3>
                 <div className="space-y-2 text-sm">
                   {[
@@ -772,8 +772,8 @@ export function AdsManagerPanel() {
                       <span
                         className={
                           row[1].startsWith("-")
-                            ? "text-[#EF4444] font-semibold"
-                            : "text-[#22C55E] font-semibold"
+                            ? "text-red-500 dark:text-red-400 font-semibold"
+                            : "text-green-500 dark:text-green-400 font-semibold"
                         }
                       >
                         {row[1]}
@@ -782,20 +782,20 @@ export function AdsManagerPanel() {
                   ))}
                 </div>
               </div>
-              <div className="rounded-xl border border-[#E2E8F0] p-4">
+              <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-semibold">Maps</h3>
-                  <button className="px-3 py-1.5 rounded-lg bg-[#EEF2FF] text-[#4338CA] text-sm">
+                  <button className="px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400 text-sm">
                     See All Locations
                   </button>
                 </div>
-                <div className="h-52 rounded-lg bg-gradient-to-br from-[#E0ECFF] via-[#F8FAFC] to-[#D1FAE5] flex items-center justify-center text-[#64748B] text-sm">
+                <div className="h-52 rounded-lg bg-gradient-to-br from-blue-100 via-slate-50 to-emerald-100 dark:from-blue-950 dark:via-slate-800 dark:to-emerald-950 flex items-center justify-center text-slate-500 dark:text-slate-400 text-sm">
                   Geo heatmap preview
                 </div>
               </div>
             </div>
 
-            <div className="rounded-xl border border-[#E2E8F0] p-4">
+            <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
               <h3 className="font-semibold mb-3">International Scaling</h3>
               <div className="space-y-2 text-sm">
                 {[
@@ -817,7 +817,7 @@ export function AdsManagerPanel() {
             </div>
 
             <div className="grid lg:grid-cols-2 gap-4">
-              <div className="rounded-xl border border-[#E2E8F0] p-4">
+              <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
                 <h3 className="font-semibold mb-3">Age & Gender</h3>
                 <div className="space-y-2 text-sm">
                   {[
@@ -838,7 +838,7 @@ export function AdsManagerPanel() {
                 </div>
               </div>
 
-              <div className="rounded-xl border border-[#E2E8F0] p-4">
+              <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
                 <h3 className="font-semibold mb-3">Language</h3>
                 <div className="space-y-2 text-sm">
                   {[
@@ -864,33 +864,33 @@ export function AdsManagerPanel() {
 
         {activeTab === "Creative Insights" && (
           <div className="space-y-4">
-            <div className="rounded-xl border border-[#E2E8F0] p-4">
+            <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-semibold text-xl">Audience Studio</h3>
-                  <p className="text-sm text-[#64748B] mt-1">
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                     Top audience performance, interest discovery, and audience
                     mixer
                   </p>
                 </div>
-                <button className="px-4 py-2 rounded-lg bg-[#2563EB] text-white text-sm">
+                <button className="px-4 py-2 rounded-lg bg-blue-600 dark:bg-blue-500 text-white text-sm">
                   Launch
                 </button>
               </div>
             </div>
 
-            <div className="rounded-xl border border-[#E2E8F0] p-4">
+            <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
               <div className="flex items-center gap-3 mb-3">
-                <button className="px-3 py-1.5 rounded-md bg-[#EEF2FF] text-[#4338CA] text-sm">
+                <button className="px-3 py-1.5 rounded-md bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400 text-sm">
                   Explore Audiences By Performance
                 </button>
-                <button className="px-3 py-1.5 rounded-md text-[#64748B] text-sm border border-[#E2E8F0]">
+                <button className="px-3 py-1.5 rounded-md text-slate-500 dark:text-slate-400 text-sm border border-slate-200 dark:border-slate-700">
                   Discover New Interests
                 </button>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
-                  <thead className="text-[#64748B]">
+                  <thead className="text-slate-500 dark:text-slate-400">
                     <tr>
                       <th className="text-left p-2">Audience Name</th>
                       <th className="text-left p-2">Type</th>
@@ -935,7 +935,7 @@ export function AdsManagerPanel() {
                         "13.8M",
                       ],
                     ].map((row) => (
-                      <tr key={row[0]} className="border-t border-[#E2E8F0]">
+                      <tr key={row[0]} className="border-t border-slate-200 dark:border-slate-700">
                         {row.map((cell, i) => (
                           <td key={i} className="p-2">
                             {cell}
@@ -948,14 +948,14 @@ export function AdsManagerPanel() {
               </div>
             </div>
 
-            <div className="rounded-xl border border-[#E2E8F0] p-4">
+            <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold">Audience mixer</h3>
                 <div className="flex gap-2">
-                  <button className="px-3 py-1.5 rounded-lg border border-[#BFDBFE] text-[#2563EB] text-sm">
+                  <button className="px-3 py-1.5 rounded-lg border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 text-sm">
                     Clear selection
                   </button>
-                  <button className="px-3 py-1.5 rounded-lg border border-[#BFDBFE] text-[#2563EB] text-sm">
+                  <button className="px-3 py-1.5 rounded-lg border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 text-sm">
                     Save audience selection
                   </button>
                 </div>
@@ -965,7 +965,7 @@ export function AdsManagerPanel() {
                   <p className="text-sm font-medium mb-2">
                     Included (0 intersection)
                   </p>
-                  <ul className="text-sm space-y-1 text-[#334155]">
+                  <ul className="text-sm space-y-1 text-slate-700 dark:text-slate-300">
                     <li>Lookalike (UZ 1%-2%) — 2.6M</li>
                     <li>Lookalike (KZ 2%-3%) — 2.4M</li>
                     <li>Lookalike (KG 3%-4%) — 1.2M</li>
@@ -973,7 +973,7 @@ export function AdsManagerPanel() {
                 </div>
                 <div className="border rounded-lg p-3">
                   <p className="text-sm font-medium mb-2">1st intersection</p>
-                  <ul className="text-sm space-y-1 text-[#334155]">
+                  <ul className="text-sm space-y-1 text-slate-700 dark:text-slate-300">
                     <li>Gigi Hadid — 5.5M</li>
                     <li>Kris Jenner — 11.9M</li>
                     <li>Kendall Jenner — 20.7M</li>
@@ -981,14 +981,14 @@ export function AdsManagerPanel() {
                 </div>
                 <div className="border rounded-lg p-3">
                   <p className="text-sm font-medium mb-2">2nd intersection</p>
-                  <ul className="text-sm space-y-1 text-[#334155]">
+                  <ul className="text-sm space-y-1 text-slate-700 dark:text-slate-300">
                     <li>System of a Down — 5.6M</li>
                     <li>Rammstein — 6.8M</li>
                     <li>Linkin Park — 16M</li>
                   </ul>
                 </div>
               </div>
-              <div className="mt-3 border rounded-lg p-3 text-sm text-[#64748B]">
+              <div className="mt-3 border rounded-lg p-3 text-sm text-slate-500 dark:text-slate-400">
                 Excluded audiences: none
               </div>
               <div className="mt-3 text-sm">
@@ -996,32 +996,32 @@ export function AdsManagerPanel() {
               </div>
             </div>
 
-            <div className="rounded-xl border border-[#E2E8F0] p-4">
+            <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
               <h3 className="font-semibold text-lg">
                 How to uncover winning audiences with Audience Launcher
               </h3>
-              <p className="text-sm text-[#64748B] mt-1">
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                 Launch AI-powered, prebuilt full-funnel audiences in minutes
                 (instead of building everything manually in Meta Ads Manager).
               </p>
               <div className="grid md:grid-cols-3 gap-3 mt-3 text-sm">
-                <div className="rounded-lg border border-[#E2E8F0] p-3 bg-[#F8FAFC]">
+                <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-3 bg-slate-50 dark:bg-slate-800">
                   <p className="font-medium">76 prebuilt audiences</p>
-                  <p className="text-[#64748B] mt-1">
+                  <p className="text-slate-500 dark:text-slate-400 mt-1">
                     Cover acquisition, re-engagement, retargeting, and retention
                     in a few clicks.
                   </p>
                 </div>
-                <div className="rounded-lg border border-[#E2E8F0] p-3 bg-[#F8FAFC]">
+                <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-3 bg-slate-50 dark:bg-slate-800">
                   <p className="font-medium">AI + eRFM segmentation</p>
-                  <p className="text-[#64748B] mt-1">
+                  <p className="text-slate-500 dark:text-slate-400 mt-1">
                     Audience quality improves through behavioral and value-based
                     signals from your customer data.
                   </p>
                 </div>
-                <div className="rounded-lg border border-[#E2E8F0] p-3 bg-[#F8FAFC]">
+                <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-3 bg-slate-50 dark:bg-slate-800">
                   <p className="font-medium">Built-in exclusions</p>
-                  <p className="text-[#64748B] mt-1">
+                  <p className="text-slate-500 dark:text-slate-400 mt-1">
                     Acquisition excludes retargeting/retention, and retargeting
                     excludes retention by default.
                   </p>
@@ -1055,9 +1055,9 @@ export function AdsManagerPanel() {
                 </ul>
               </div>
 
-              <div className="mt-4 rounded-lg border border-[#E2E8F0] p-3">
+              <div className="mt-4 rounded-lg border border-slate-200 dark:border-slate-700 p-3">
                 <p className="font-medium text-sm">Step-by-step launch flow</p>
-                <ol className="list-decimal pl-5 mt-2 text-sm text-[#475569] space-y-1">
+                <ol className="list-decimal pl-5 mt-2 text-sm text-slate-600 dark:text-slate-400 space-y-1">
                   <li>
                     Select a funnel stage and choose preconfigured audiences.
                   </li>
@@ -1079,9 +1079,9 @@ export function AdsManagerPanel() {
                 </ol>
               </div>
               <div className="mt-3 grid md:grid-cols-2 gap-3 text-sm">
-                <div className="rounded-lg border border-[#E2E8F0] p-3">
+                <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-3">
                   <p className="font-medium">Recommended by funnel stage</p>
-                  <ul className="list-disc pl-5 mt-2 space-y-1 text-[#475569]">
+                  <ul className="list-disc pl-5 mt-2 space-y-1 text-slate-600 dark:text-slate-400">
                     <li>
                       <span className="font-medium">Acquisition:</span> Video
                       Addicts lookalike, Super lookalike, Top-URL lookalikes,
@@ -1102,9 +1102,9 @@ export function AdsManagerPanel() {
                     </li>
                   </ul>
                 </div>
-                <div className="rounded-lg border border-[#E2E8F0] p-3">
+                <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-3">
                   <p className="font-medium">eRFM logic (simplified)</p>
-                  <ul className="list-disc pl-5 mt-2 space-y-1 text-[#475569]">
+                  <ul className="list-disc pl-5 mt-2 space-y-1 text-slate-600 dark:text-slate-400">
                     <li>
                       <span className="font-medium">Value tiers:</span>{" "}
                       Silver/Low, Gold/Medium, Platinum/High.
@@ -1125,8 +1125,8 @@ export function AdsManagerPanel() {
                 </div>
               </div>
               <div className="mt-3 overflow-x-auto">
-                <table className="w-full min-w-[760px] text-sm border border-[#E2E8F0] rounded-lg">
-                  <thead className="bg-[#F8FAFC]">
+                <table className="w-full min-w-[760px] text-sm border border-slate-200 dark:border-slate-700 rounded-lg">
+                  <thead className="bg-slate-50 dark:bg-slate-800">
                     <tr>
                       <th className="text-left p-2">Facebook Ads Manager</th>
                       <th className="text-left p-2">
@@ -1161,7 +1161,7 @@ export function AdsManagerPanel() {
                         "Ad picker with performance context for better budget decisions",
                       ],
                     ].map((row) => (
-                      <tr key={row[0]} className="border-t border-[#E2E8F0]">
+                      <tr key={row[0]} className="border-t border-slate-200 dark:border-slate-700">
                         <td className="p-2">{row[0]}</td>
                         <td className="p-2">{row[1]}</td>
                       </tr>
@@ -1175,28 +1175,28 @@ export function AdsManagerPanel() {
 
         {activeTab === "Ad Copy Insights" && (
           <div className="space-y-4">
-            <div className="rounded-xl border border-[#E2E8F0] p-4">
+            <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold text-xl">One-Click Report</h3>
                 <div className="flex gap-2">
-                  <button className="px-3 py-1.5 rounded-lg border border-[#BFDBFE] text-[#2563EB] text-sm">
+                  <button className="px-3 py-1.5 rounded-lg border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 text-sm">
                     Data Sources
                   </button>
-                  <button className="px-3 py-1.5 rounded-lg bg-[#2563EB] text-white text-sm">
+                  <button className="px-3 py-1.5 rounded-lg bg-blue-600 dark:bg-blue-500 text-white text-sm">
                     Create Report
                   </button>
                 </div>
               </div>
-              <div className="mt-3 h-3 rounded-full bg-[#E8F5E9]">
-                <div className="h-full w-1/4 rounded-full bg-[#22C55E]" />
+              <div className="mt-3 h-3 rounded-full bg-green-50 dark:bg-green-950">
+                <div className="h-full w-1/4 rounded-full bg-green-500 dark:bg-green-400" />
               </div>
-              <p className="text-sm text-[#64748B] mt-2">6/1000 reports used</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">6/1000 reports used</p>
             </div>
 
-            <div className="rounded-xl border border-[#E2E8F0] p-4">
+            <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold">Templates</h3>
-                <button className="px-3 py-1.5 rounded-lg border border-[#BFDBFE] text-[#2563EB] text-sm">
+                <button className="px-3 py-1.5 rounded-lg border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 text-sm">
                   Show All Templates
                 </button>
               </div>
@@ -1207,20 +1207,20 @@ export function AdsManagerPanel() {
                 ].map((name) => (
                   <div
                     key={name}
-                    className="rounded-lg border border-[#E2E8F0] p-3"
+                    className="rounded-lg border border-slate-200 dark:border-slate-700 p-3"
                   >
-                    <div className="h-24 rounded-md bg-[#F8FAFC] mb-2" />
+                    <div className="h-24 rounded-md bg-slate-50 dark:bg-slate-800 mb-2" />
                     <p className="font-medium">{name}</p>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="rounded-xl border border-[#E2E8F0] p-4">
+            <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
               <h3 className="font-semibold text-lg">
                 Which metrics should you track?
               </h3>
-              <p className="text-sm text-[#64748B] mt-1">
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                 Prioritize metrics that help you customize dashboards, optimize
                 ad accounts, understand acquisition costs, and monitor
                 profitability.
@@ -1229,21 +1229,21 @@ export function AdsManagerPanel() {
                 {ONE_CLICK_METRIC_GROUPS.map((group) => (
                   <div
                     key={group.title}
-                    className="rounded-lg border border-[#E2E8F0] p-3"
+                    className="rounded-lg border border-slate-200 dark:border-slate-700 p-3"
                   >
                     <h4 className="font-semibold text-sm">{group.title}</h4>
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-2 mt-2 text-sm">
                       {group.metrics.map((metric) => (
                         <div
                           key={metric.name}
-                          className="rounded-lg bg-[#F8FAFC] p-3"
+                          className="rounded-lg bg-slate-50 dark:bg-slate-800 p-3"
                         >
                           <p className="font-medium">{metric.name}</p>
-                          <p className="text-[#64748B] mt-1">
+                          <p className="text-slate-500 dark:text-slate-400 mt-1">
                             {metric.description}
                           </p>
                           {metric.formula && (
-                            <p className="text-xs text-[#334155] mt-2">
+                            <p className="text-xs text-slate-700 dark:text-slate-300 mt-2">
                               Formula: {metric.formula}
                             </p>
                           )}
@@ -1255,11 +1255,11 @@ export function AdsManagerPanel() {
               </div>
             </div>
 
-            <div className="rounded-xl border border-[#E2E8F0] p-4">
+            <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
               <h3 className="font-semibold text-lg">
                 How to pick your template
               </h3>
-              <p className="text-sm text-[#64748B] mt-1">
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                 Choose a prebuilt report based on your business model, then
                 customize widgets and sources.
               </p>
@@ -1267,21 +1267,21 @@ export function AdsManagerPanel() {
                 {ONE_CLICK_TEMPLATES.map((template) => (
                   <div
                     key={template.name}
-                    className="rounded-lg border border-[#E2E8F0] p-3"
+                    className="rounded-lg border border-slate-200 dark:border-slate-700 p-3"
                   >
-                    <p className="text-xs text-[#2563EB] font-semibold">
+                    <p className="text-xs text-blue-600 dark:text-blue-400 font-semibold">
                       {template.fit}
                     </p>
                     <p className="font-medium mt-1">{template.name}</p>
-                    <p className="text-[#64748B] mt-2">
+                    <p className="text-slate-500 dark:text-slate-400 mt-2">
                       {template.description}
                     </p>
                   </div>
                 ))}
               </div>
-              <div className="mt-4 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] p-3 text-sm">
+              <div className="mt-4 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-3 text-sm">
                 <p className="font-medium">Tips, hints, and tricks</p>
-                <ul className="list-disc pl-5 mt-2 space-y-1 text-[#475569]">
+                <ul className="list-disc pl-5 mt-2 space-y-1 text-slate-600 dark:text-slate-400">
                   <li>
                     Track the same KPI across 3, 7, 14, and 30-day windows.
                   </li>
@@ -1297,25 +1297,25 @@ export function AdsManagerPanel() {
               </div>
             </div>
 
-            <div className="rounded-xl border border-[#E2E8F0] p-4">
+            <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
               <h3 className="font-semibold text-lg">
                 Track your live marketing data with Business Dashboard
               </h3>
-              <p className="text-sm text-[#64748B] mt-1">
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                 Connect Meta, TikTok, Shopify, Google Ads, GA4, and Klaviyo to
                 monitor real-time blended business performance in one place.
               </p>
               <div className="grid md:grid-cols-2 gap-3 mt-3 text-sm">
-                <div className="rounded-lg border border-[#E2E8F0] p-3">
+                <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-3">
                   <p className="font-medium">What you get</p>
-                  <ul className="list-disc pl-5 mt-2 space-y-1 text-[#475569]">
+                  <ul className="list-disc pl-5 mt-2 space-y-1 text-slate-600 dark:text-slate-400">
                     <li>Live blended summary across connected channels.</li>
                     <li>360° cross-platform marketing visibility.</li>
                     <li>Custom widgets and drag-and-drop layout control.</li>
                     <li>Blended metrics for deeper profitability insight.</li>
                   </ul>
                 </div>
-                <div className="rounded-lg border border-[#E2E8F0] p-3">
+                <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-3">
                   <p className="font-medium">Connect data sources</p>
                   <div className="mt-2 grid grid-cols-2 gap-2">
                     {[
@@ -1328,37 +1328,37 @@ export function AdsManagerPanel() {
                     ].map((source) => (
                       <div
                         key={source}
-                        className="rounded-md border border-[#CBD5E1] px-2 py-1.5 text-xs bg-[#F8FAFC]"
+                        className="rounded-md border border-slate-300 dark:border-slate-600 px-2 py-1.5 text-xs bg-slate-50 dark:bg-slate-800"
                       >
                         {source}
                       </div>
                     ))}
                   </div>
-                  <p className="text-xs text-[#64748B] mt-2">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
                     Add sources from the header icon row or the “Connect more
                     data sources” section.
                   </p>
                 </div>
               </div>
-              <div className="mt-3 rounded-lg border border-[#E2E8F0] p-3 text-sm">
+              <div className="mt-3 rounded-lg border border-slate-200 dark:border-slate-700 p-3 text-sm">
                 <p className="font-medium">Customize & share</p>
-                <div className="grid md:grid-cols-3 gap-2 mt-2 text-[#475569]">
-                  <div className="rounded-md bg-[#F8FAFC] p-2">
+                <div className="grid md:grid-cols-3 gap-2 mt-2 text-slate-600 dark:text-slate-400">
+                  <div className="rounded-md bg-slate-50 dark:bg-slate-800 p-2">
                     1) Set date range from the top-right selector.
                   </div>
-                  <div className="rounded-md bg-[#F8FAFC] p-2">
+                  <div className="rounded-md bg-slate-50 dark:bg-slate-800 p-2">
                     2) Use ⚙ settings for currency, full width, and account
                     management.
                   </div>
-                  <div className="rounded-md bg-[#F8FAFC] p-2">
+                  <div className="rounded-md bg-slate-50 dark:bg-slate-800 p-2">
                     3) Click Edit to drag/drop widgets, then Share to generate a
                     live public link.
                   </div>
                 </div>
               </div>
               <div className="mt-3 overflow-x-auto">
-                <table className="w-full min-w-[720px] text-sm border border-[#E2E8F0] rounded-lg">
-                  <thead className="bg-[#F8FAFC]">
+                <table className="w-full min-w-[720px] text-sm border border-slate-200 dark:border-slate-700 rounded-lg">
+                  <thead className="bg-slate-50 dark:bg-slate-800">
                     <tr>
                       <th className="p-2 text-left">Facebook Ads Manager</th>
                       <th className="p-2 text-left">
@@ -1385,7 +1385,7 @@ export function AdsManagerPanel() {
                         "Cross-channel view: Meta, TikTok, Shopify, Google Ads, GA4, Klaviyo",
                       ],
                     ].map((row) => (
-                      <tr key={row[0]} className="border-t border-[#E2E8F0]">
+                      <tr key={row[0]} className="border-t border-slate-200 dark:border-slate-700">
                         <td className="p-2">{row[0]}</td>
                         <td className="p-2">{row[1]}</td>
                       </tr>
@@ -1395,7 +1395,7 @@ export function AdsManagerPanel() {
               </div>
             </div>
 
-            <div className="rounded-xl border border-[#E2E8F0] p-4">
+            <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
               <div className="grid lg:grid-cols-[260px_1fr] gap-4">
                 <div className="border rounded-lg p-3">
                   <h4 className="font-semibold mb-2">Data sources</h4>
@@ -1423,7 +1423,7 @@ export function AdsManagerPanel() {
                     ].map((w) => (
                       <div
                         key={w}
-                        className="border rounded p-2 text-center bg-[#F8FAFC]"
+                        className="border rounded p-2 text-center bg-slate-50 dark:bg-slate-800"
                       >
                         {w}
                       </div>
@@ -1440,22 +1440,22 @@ export function AdsManagerPanel() {
                       ["Cost per Purchase", "€45.01"],
                     ].map((m) => (
                       <div key={m[0]} className="border rounded-lg p-3">
-                        <p className="text-xs text-[#64748B]">{m[0]}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">{m[0]}</p>
                         <p className="text-2xl font-semibold mt-1">{m[1]}</p>
                       </div>
                     ))}
                   </div>
-                  <div className="h-64 rounded-lg border bg-gradient-to-b from-[#EFF6FF] to-white" />
+                  <div className="h-64 rounded-lg border bg-gradient-to-b from-blue-50 to-white dark:from-blue-950 dark:to-slate-900" />
                   <div className="flex justify-end gap-2">
-                    <button className="px-3 py-1.5 rounded-lg border border-[#E2E8F0] text-sm">
+                    <button className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-sm">
                       Duplicate widget
                     </button>
-                    <button className="px-3 py-1.5 rounded-lg border border-[#E2E8F0] text-sm">
+                    <button className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-sm">
                       Delete widget
                     </button>
                     <button
                       onClick={() => setShowShareOptions(true)}
-                      className="px-3 py-1.5 rounded-lg bg-[#2563EB] text-white text-sm"
+                      className="px-3 py-1.5 rounded-lg bg-blue-600 dark:bg-blue-500 text-white text-sm"
                     >
                       Share Options
                     </button>
@@ -1472,7 +1472,7 @@ export function AdsManagerPanel() {
           activeTab !== "Geo & Demo Insights" &&
           activeTab !== "Creative Insights" &&
           activeTab !== "Ad Copy Insights" && (
-            <div className="rounded-xl border border-dashed border-[#CBD5E1] p-8 text-center text-[#64748B]">
+            <div className="rounded-xl border border-dashed border-slate-300 dark:border-slate-600 p-8 text-center text-slate-500 dark:text-slate-400">
               {activeTab} coming soon.
             </div>
           )}
@@ -1554,11 +1554,11 @@ export function AdsManagerPanel() {
           </div>
           <input
             placeholder="Email"
-            className="w-full border border-[#D1D5DB] rounded-lg px-3 py-2 mb-2"
+            className="w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 mb-2"
           />
           <input
             placeholder="CC"
-            className="w-full border border-[#D1D5DB] rounded-lg px-3 py-2"
+            className="w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2"
           />
           <div className="mt-6 flex justify-end gap-2">
             <Button
@@ -1608,7 +1608,7 @@ export function AdsManagerPanel() {
           </div>
           <input
             placeholder="Select Country"
-            className="w-full border border-[#D1D5DB] rounded-lg px-3 py-2 mt-4"
+            className="w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 mt-4"
           />
           <div className="mt-6 flex justify-end gap-2">
             <Button
@@ -1630,7 +1630,7 @@ export function AdsManagerPanel() {
           onClose={() => setShowFullFunnelInsights(false)}
         >
           <div className="space-y-3">
-            <div className="grid grid-cols-7 text-xs text-[#64748B] uppercase tracking-wide border-b pb-2">
+            <div className="grid grid-cols-7 text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide border-b pb-2">
               <span>% of spend</span>
               <span>Audience Type</span>
               <span>Live / Created</span>
@@ -1688,12 +1688,12 @@ export function AdsManagerPanel() {
             ].map((row) => (
               <div
                 key={row[1]}
-                className="grid grid-cols-7 text-sm border border-[#E2E8F0] rounded-lg p-2"
+                className="grid grid-cols-7 text-sm border border-slate-200 dark:border-slate-700 rounded-lg p-2"
               >
                 {row.map((cell, idx) => (
                   <span
                     key={idx}
-                    className={idx === 2 ? "text-[#16A34A] font-semibold" : ""}
+                    className={idx === 2 ? "text-green-600 dark:text-green-400 font-semibold" : ""}
                   >
                     {cell}
                   </span>
@@ -1719,17 +1719,17 @@ export function AdsManagerPanel() {
               ].map((cell) => (
                 <div
                   key={cell[0]}
-                  className="border border-[#E2E8F0] rounded-lg p-3 bg-[#F8FAFC]"
+                  className="border border-slate-200 dark:border-slate-700 rounded-lg p-3 bg-slate-50 dark:bg-slate-800"
                 >
-                  <p className="text-[#64748B]">{cell[0]}</p>
+                  <p className="text-slate-500 dark:text-slate-400">{cell[0]}</p>
                   <p className="text-2xl font-semibold mt-2">{cell[1]}</p>
-                  <button className="mt-2 px-2 py-1 rounded border border-[#93C5FD] text-[#2563EB] text-xs">
+                  <button className="mt-2 px-2 py-1 rounded border border-blue-300 dark:border-blue-700 text-blue-600 dark:text-blue-400 text-xs">
                     Create ad set
                   </button>
                 </div>
               ))}
             </div>
-            <div className="border border-[#E2E8F0] rounded-lg p-3">
+            <div className="border border-slate-200 dark:border-slate-700 rounded-lg p-3">
               <p className="font-semibold mb-2">
                 Top Recency & Lookalike for eRFM Module
               </p>
@@ -1754,16 +1754,16 @@ export function AdsManagerPanel() {
         <ModalShell title="Sharing" onClose={() => setShowShareOptions(false)}>
           <div className="space-y-4">
             <div className="flex gap-2">
-              <button className="px-3 py-2 rounded-lg bg-[#EEF2FF] text-[#2563EB]">
+              <button className="px-3 py-2 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-blue-600 dark:text-blue-400">
                 Link sharing
               </button>
-              <button className="px-3 py-2 rounded-lg border border-[#E2E8F0]">
+              <button className="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700">
                 Download report
               </button>
             </div>
             <div>
-              <label className="text-sm text-[#64748B]">Link sharing</label>
-              <select className="mt-1 w-full border border-[#D1D5DB] rounded-lg px-3 py-2">
+              <label className="text-sm text-slate-500 dark:text-slate-400">Link sharing</label>
+              <select className="mt-1 w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2">
                 <option>Disabled link</option>
                 <option>Public link</option>
               </select>
@@ -1813,12 +1813,12 @@ function ModalShell({
 }) {
   return (
     <div className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center p-4">
-      <div className="w-full max-w-4xl bg-white rounded-2xl shadow-2xl border border-[#E2E8F0]">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#E2E8F0]">
-          <h3 className="text-2xl text-[#0F172A] font-semibold">{title}</h3>
+      <div className="w-full max-w-4xl bg-white dark:bg-slate-900 dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-700">
+          <h3 className="text-2xl text-slate-900 dark:text-slate-50 font-semibold">{title}</h3>
           <button
             onClick={onClose}
-            className="text-2xl leading-none text-[#94A3B8]"
+            className="text-2xl leading-none text-slate-400 dark:text-slate-500"
           >
             ×
           </button>

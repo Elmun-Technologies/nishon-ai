@@ -111,10 +111,10 @@ export default function CampaignsPage() {
       <div className="flex items-start justify-between">
         <div>
           <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-2xl font-bold text-[#111827]">Campaigns</h1>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50">Campaigns</h1>
             <Badge variant="gray">{items.length} total</Badge>
           </div>
-          <p className="text-[#6B7280] text-sm">
+          <p className="text-slate-500 dark:text-slate-400 text-sm">
             All advertising campaigns managed by Performa
           </p>
         </div>
@@ -124,7 +124,7 @@ export default function CampaignsPage() {
           </Button>
           <button
             onClick={() => setShowCreatePanel(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#111827] hover:bg-[#1F2937] text-white text-sm font-semibold transition-colors shadow-lg shadow-gray-200"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 dark:bg-white dark:bg-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 text-sm font-semibold transition-colors shadow-lg shadow-gray-200"
           >
             <span className="text-base leading-none">+</span>
             Kampaniya yaratish
@@ -138,7 +138,7 @@ export default function CampaignsPage() {
       <AdsManagerPanel />
 
       {/* ── Filter tabs ── */}
-      <div className="flex items-center gap-1 bg-white border border-[#E5E7EB] rounded-xl p-1 w-fit">
+      <div className="flex items-center gap-1 bg-white dark:bg-slate-900 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-1 w-fit">
         {(
           [
             { key: "all", label: "All" },
@@ -155,8 +155,8 @@ export default function CampaignsPage() {
               transition-all duration-200
               ${
                 filter === tab.key
-                  ? "bg-[#111827] text-white"
-                  : "text-[#6B7280] hover:text-[#111827] hover:bg-[#F9FAFB]"
+                  ? "bg-slate-900 dark:bg-white dark:bg-slate-900 text-white dark:text-slate-900"
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50 hover:bg-slate-50 dark:bg-slate-800"
               }
             `}
           >
@@ -166,8 +166,8 @@ export default function CampaignsPage() {
                 text-xs px-1.5 py-0.5 rounded-full
                 ${
                   filter === tab.key
-                    ? "bg-white/20 text-[#111827]"
-                    : "bg-[#F3F4F6] text-[#6B7280]"
+                    ? "bg-white dark:bg-slate-900 dark:bg-slate-900/20 text-slate-900 dark:text-slate-50"
+                    : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
                 }
               `}
             >
@@ -209,7 +209,7 @@ export default function CampaignsPage() {
                 <Card
                   hoverable
                   onClick={() => setSelectedId(isSelected ? null : campaign.id)}
-                  className={`transition-all duration-200 ${isSelected ? "border-[#111827]/40 bg-[#111827]/5" : ""}`}
+                  className={`transition-all duration-200 ${isSelected ? "border-slate-900/40 dark:border-white/40 bg-white dark:bg-slate-900/5 dark:bg-white dark:bg-slate-900/5" : ""}`}
                   padding="none"
                 >
                   <div className="flex items-center gap-4 p-5">
@@ -217,7 +217,7 @@ export default function CampaignsPage() {
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-[#111827] text-sm truncate">
+                        <h3 className="font-semibold text-slate-900 dark:text-slate-50 text-sm truncate">
                           {campaign.name}
                         </h3>
                         {campaign.externalId && (
@@ -226,7 +226,7 @@ export default function CampaignsPage() {
                           </Badge>
                         )}
                       </div>
-                      <p className="text-[#6B7280] text-xs">
+                      <p className="text-slate-500 dark:text-slate-400 text-xs">
                         {OBJECTIVE_LABELS[campaign.objective] ??
                           campaign.objective}
                         {" · "}
@@ -238,11 +238,11 @@ export default function CampaignsPage() {
                     </div>
 
                     <div className="text-right shrink-0">
-                      <p className="text-[#111827] text-sm font-semibold">
+                      <p className="text-slate-900 dark:text-slate-50 text-sm font-semibold">
                         {formatCurrency(campaign.dailyBudget)}
-                        <span className="text-[#6B7280] font-normal">/day</span>
+                        <span className="text-slate-500 dark:text-slate-400 font-normal">/day</span>
                       </p>
-                      <p className="text-[#6B7280] text-xs mt-0.5">
+                      <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">
                         {formatCurrency(campaign.totalBudget)} total
                       </p>
                     </div>
@@ -252,7 +252,7 @@ export default function CampaignsPage() {
                     </div>
 
                     <div
-                      className={`text-[#6B7280] transition-transform duration-200 shrink-0 ${isSelected ? "rotate-180" : ""}`}
+                      className={`text-slate-500 dark:text-slate-400 transition-transform duration-200 shrink-0 ${isSelected ? "rotate-180" : ""}`}
                     >
                       <svg
                         width="16"
@@ -269,7 +269,7 @@ export default function CampaignsPage() {
                 </Card>
 
                 {isSelected && (
-                  <div className="mt-1 bg-[#F9FAFB] border border-[#D1D5DB] border-t-0 rounded-b-xl px-5 py-4">
+                  <div className="mt-1 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 border-t-0 rounded-b-xl px-5 py-4">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                       {[
                         {
@@ -292,17 +292,17 @@ export default function CampaignsPage() {
                         },
                       ].map(({ label, value }) => (
                         <div key={label}>
-                          <p className="text-[#6B7280] text-xs mb-1 uppercase tracking-wide">
+                          <p className="text-slate-500 dark:text-slate-400 text-xs mb-1 uppercase tracking-wide">
                             {label}
                           </p>
-                          <p className="text-[#111827] text-sm font-medium">
+                          <p className="text-slate-900 dark:text-slate-50 text-sm font-medium">
                             {value}
                           </p>
                         </div>
                       ))}
                     </div>
 
-                    <div className="flex items-center gap-2 pt-3 border-t border-[#E5E7EB]">
+                    <div className="flex items-center gap-2 pt-3 border-t border-slate-200 dark:border-slate-700">
                       {campaign.status === "active" ? (
                         <Button
                           variant="secondary"
@@ -346,7 +346,7 @@ export default function CampaignsPage() {
 
                       <div className="ml-auto">
                         {campaign.externalId && (
-                          <p className="text-[#6B7280] text-xs">
+                          <p className="text-slate-500 dark:text-slate-400 text-xs">
                             Platform ID: {campaign.externalId}
                           </p>
                         )}
@@ -366,10 +366,10 @@ export default function CampaignsPage() {
             <div className="flex items-center gap-3">
               <span className="text-xl">🔗</span>
               <div>
-                <p className="text-[#111827] text-sm font-medium">
+                <p className="text-slate-900 dark:text-slate-50 text-sm font-medium">
                   Ko'proq platformalar ulash
                 </p>
-                <p className="text-[#6B7280] text-xs">
+                <p className="text-slate-500 dark:text-slate-400 text-xs">
                   Google, TikTok yoki Telegram qo'shib qamrovni kengaytiring
                 </p>
               </div>
@@ -394,20 +394,20 @@ export default function CampaignsPage() {
             onClick={() => setShowCreatePanel(false)}
           />
           {/* Panel */}
-          <div className="w-full max-w-lg bg-[#F9FAFB] border-l border-[#E5E7EB] flex flex-col shadow-2xl">
+          <div className="w-full max-w-lg bg-slate-50 dark:bg-slate-800 border-l border-slate-200 dark:border-slate-700 flex flex-col shadow-2xl">
             {/* Panel header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[#E5E7EB]">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-700">
               <div>
-                <h2 className="text-[#111827] font-semibold">
+                <h2 className="text-slate-900 dark:text-slate-50 font-semibold">
                   Yangi kampaniya
                 </h2>
-                <p className="text-[#6B7280] text-xs mt-0.5">
+                <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">
                   {currentWorkspace?.name}
                 </p>
               </div>
               <button
                 onClick={() => setShowCreatePanel(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-lg text-[#6B7280] hover:text-[#111827] hover:bg-[#F9FAFB] transition-colors"
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50 hover:bg-slate-50 dark:bg-slate-800 transition-colors"
               >
                 ✕
               </button>
