@@ -64,6 +64,27 @@
   --text-muted: #CBD5E1;
 }
 
+/* Dark mode color overrides */
+@media (prefers-color-scheme: dark) {
+  .bg-surface { background-color: #0F172A !important; }
+  .bg-surface-alt { background-color: #1A202C !important; }
+  .bg-surface-secondary { background-color: #1E293B !important; }
+  .text-text-primary { color: #F1F5F9 !important; }
+  .text-text-secondary { color: #CBD5E1 !important; }
+  .text-text-tertiary { color: #94A3B8 !important; }
+  .border-border { border-color: #334155 !important; }
+  .border-border-light { border-color: #475569 !important; }
+}
+
+.dark .bg-surface { background-color: #0F172A !important; }
+.dark .bg-surface-alt { background-color: #1A202C !important; }
+.dark .bg-surface-secondary { background-color: #1E293B !important; }
+.dark .text-text-primary { color: #F1F5F9 !important; }
+.dark .text-text-secondary { color: #CBD5E1 !important; }
+.dark .text-text-tertiary { color: #94A3B8 !important; }
+.dark .border-border { border-color: #334155 !important; }
+.dark .border-border-light { border-color: #475569 !important; }
+
 @layer base {
   * { box-sizing: border-box; }
 
