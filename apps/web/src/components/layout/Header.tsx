@@ -68,11 +68,11 @@ export default function Header() {
   }
 
   return (
-    <header className="h-14 bg-white dark:bg-slate-900 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-6 flex items-center justify-between shrink-0 transition-colors">
+    <header className="h-14 bg-surface border-b border-border px-6 flex items-center justify-between shrink-0 transition-colors">
       <div>
-        <h1 className="text-slate-900 dark:text-slate-50 font-semibold text-sm">{page.title}</h1>
+        <h1 className="text-text-primary font-semibold text-sm">{page.title}</h1>
         {page.subtitle && (
-          <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">{page.subtitle}</p>
+          <p className="text-text-secondary text-xs mt-0.5">{page.subtitle}</p>
         )}
       </div>
 
@@ -83,10 +83,10 @@ export default function Header() {
             className={`
               flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium transition-colors
               ${currentWorkspace.autopilotMode === 'full_auto'
-                ? 'bg-emerald-50 dark:bg-emerald-950 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300'
+                ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
                 : currentWorkspace.autopilotMode === 'assisted'
-                ? 'bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300'
-                : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
+                ? 'bg-amber-50 border-amber-200 text-amber-700'
+                : 'bg-surface-secondary border-border text-text-secondary'
               }
             `}
           >
@@ -96,7 +96,7 @@ export default function Header() {
                   ? 'bg-emerald-500 animate-pulse'
                   : currentWorkspace.autopilotMode === 'assisted'
                   ? 'bg-amber-500'
-                  : 'bg-slate-400'
+                  : 'bg-gray-400'
               }`}
             />
             {currentWorkspace.autopilotMode === 'full_auto'
@@ -111,7 +111,7 @@ export default function Header() {
         {mounted && (
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-600 dark:text-slate-400"
+            className="p-2 rounded-lg hover:bg-surface-secondary transition-colors text-text-secondary"
             aria-label="Toggle theme"
           >
             {theme === 'dark' ? (

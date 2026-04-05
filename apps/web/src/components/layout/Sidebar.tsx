@@ -111,8 +111,8 @@ export default function Sidebar() {
         )}
       </div>
 
-      {/* Main Navigation - No scroll */}
-      <nav className="flex-1 px-2 py-4 space-y-3 overflow-hidden">
+      {/* Main Navigation */}
+      <nav className="flex-1 px-2 py-4 space-y-3 overflow-y-auto">
         {/* Dashboard */}
         <Link
           href="/dashboard"
