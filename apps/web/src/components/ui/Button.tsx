@@ -28,8 +28,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const baseClasses = 'inline-flex items-center justify-center rounded-lg font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95'
 
     const variants = {
-      primary: 'bg-primary hover:bg-gray-900 text-white border border-primary',
-      secondary: 'bg-surface hover:bg-surface-secondary text-text-primary border border-border hover:border-gray-400',
+      primary: 'bg-primary hover:bg-surface text-white border border-primary',
+      secondary: 'bg-surface hover:bg-surface-secondary text-text-primary border border-border hover:border-border',
       ghost: 'bg-transparent hover:bg-surface-secondary text-text-secondary border border-transparent',
       danger: 'bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 hover:border-red-300',
     }

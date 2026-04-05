@@ -52,8 +52,8 @@ export const CertificationBadge: React.FC<CertificationBadgeProps> = ({
       {showTooltip && showTooltipContent && (
         <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-max bg-text-primary text-white text-xs rounded-lg p-2 z-50 whitespace-nowrap shadow-lg">
           <div className="font-semibold">{certification.name}</div>
-          <div className="text-gray-300 text-xs">by {certification.issuer}</div>
-          <div className="text-gray-400 text-xs mt-1">Verified: {formatDate(certification.verifiedAt)}</div>
+          <div className="text-text-tertiary text-xs">by {certification.issuer}</div>
+          <div className="text-text-tertiary text-xs mt-1">Verified: {formatDate(certification.verifiedAt)}</div>
           {certification.expiresAt && (
             <div className="text-amber-200 text-xs">Expires: {formatDate(certification.expiresAt)}</div>
           )}

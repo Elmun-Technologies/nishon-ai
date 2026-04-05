@@ -25,7 +25,7 @@ export function BarChart({ data, className, color = '#7C3AED' }: BarChartProps) 
             className="w-full rounded-sm transition-all duration-300"
             style={{ height: `${(Number(d.value || 0) / max) * 100}%`, backgroundColor: color, minHeight: 2 }}
           />
-          {d.label && <span className="text-[10px] text-slate-500 truncate w-full text-center">{d.label}</span>}
+          {d.label && <span className="text-[10px] text-text-tertiary truncate w-full text-center">{d.label}</span>}
         </div>
       ))}
     </div>
@@ -134,7 +134,7 @@ export function PieChart({ data, className }: PieChartProps) {
         {data.map((d, i) => (
           <div key={i} className="flex items-center gap-2 text-xs">
             <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: d.color ?? defaultColors[i % defaultColors.length] }} />
-            <span className="text-slate-400">{d.label}</span>
+            <span className="text-text-tertiary">{d.label}</span>
             <span className="text-white font-medium ml-auto">{d.value}</span>
           </div>
         ))}

@@ -68,7 +68,7 @@ const ACTION_LABELS: Record<ActionType, string> = {
 const STATUS_COLORS: Record<string, string> = {
   success: 'text-emerald-400 bg-emerald-400/10',
   failed: 'text-red-400 bg-red-400/10',
-  no_match: 'text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800',
+  no_match: 'text-text-tertiary bg-surface-2 dark:bg-surface',
   skipped: 'text-amber-400 bg-amber-400/10',
 }
 
@@ -176,7 +176,7 @@ export default function TriggerSetsPage() {
   if (!currentWorkspace) {
     return (
       <div className="flex items-center justify-center h-full">
-        <p className="text-slate-500 dark:text-slate-400">Workspace tanlanmagan</p>
+        <p className="text-text-tertiary">Workspace tanlanmagan</p>
       </div>
     )
   }
@@ -207,10 +207,10 @@ export default function TriggerSetsPage() {
       {/* ── Header ── */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 dark:text-slate-50 flex items-center gap-2">
+          <h1 className="text-xl font-bold text-text-primary flex items-center gap-2">
             ⚡ Triggersetlar
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">
+          <p className="text-text-tertiary text-sm mt-0.5">
             Avtomatik qoidalar — har 30 daqiqada tekshiriladi
           </p>
         </div>
@@ -223,15 +223,15 @@ export default function TriggerSetsPage() {
 
       {/* ── Create form ── */}
       {showCreate && (
-        <Card className="border-slate-300 dark:border-slate-600">
+        <Card className="border-border">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold text-slate-900 dark:text-slate-50">Yangi triggerset</h2>
-            <button onClick={() => setShowCreate(false)} className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50 text-lg">×</button>
+            <h2 className="text-base font-semibold text-text-primary">Yangi triggerset</h2>
+            <button onClick={() => setShowCreate(false)} className="text-text-tertiary hover:text-text-primary text-lg">×</button>
           </div>
 
           {/* Name */}
           <div className="mb-4">
-            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1.5">Nomi</label>
+            <label className="block text-xs text-text-tertiary mb-1.5">Nomi</label>
             <Input
               value={form.name}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm((f) => ({ ...f, name: e.target.value }))}
@@ -241,13 +241,13 @@ export default function TriggerSetsPage() {
 
           {/* Conditions */}
           <div className="mb-4">
-            <p className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-2">Shart (AGAR)</p>
+            <p className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-2">Shart (AGAR)</p>
             {form.conditions.map((cond, idx) => (
-              <div key={idx} className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 mb-2 grid grid-cols-2 md:grid-cols-4 gap-2">
+              <div key={idx} className="bg-surface-2 border border-border rounded-xl p-3 mb-2 grid grid-cols-2 md:grid-cols-4 gap-2">
                 <div>
-                  <label className="block text-[10px] text-slate-500 dark:text-slate-400 mb-1">Metrika</label>
+                  <label className="block text-[10px] text-text-tertiary mb-1">Metrika</label>
                   <select
-                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-50 text-xs rounded-lg px-2 py-1.5"
+                    className="w-full bg-surface-2 border border-border text-text-primary text-xs rounded-lg px-2 py-1.5"
                     value={cond.metric}
                     onChange={(e) => updateCondition(idx, { metric: e.target.value as Metric })}
                   >
@@ -257,9 +257,9 @@ export default function TriggerSetsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[10px] text-slate-500 dark:text-slate-400 mb-1">Operator</label>
+                  <label className="block text-[10px] text-text-tertiary mb-1">Operator</label>
                   <select
-                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-50 text-xs rounded-lg px-2 py-1.5"
+                    className="w-full bg-surface-2 border border-border text-text-primary text-xs rounded-lg px-2 py-1.5"
                     value={cond.operator}
                     onChange={(e) => updateCondition(idx, { operator: e.target.value as Operator })}
                   >
@@ -269,21 +269,21 @@ export default function TriggerSetsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[10px] text-slate-500 dark:text-slate-400 mb-1">Qiymat</label>
+                  <label className="block text-[10px] text-text-tertiary mb-1">Qiymat</label>
                   <input
                     type="number"
-                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-50 text-xs rounded-lg px-2 py-1.5"
+                    className="w-full bg-surface-2 border border-border text-text-primary text-xs rounded-lg px-2 py-1.5"
                     value={cond.value}
                     onChange={(e) => updateCondition(idx, { value: parseFloat(e.target.value) || 0 })}
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] text-slate-500 dark:text-slate-400 mb-1">Davr (kun)</label>
+                  <label className="block text-[10px] text-text-tertiary mb-1">Davr (kun)</label>
                   <input
                     type="number"
                     min={1}
                     max={30}
-                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-50 text-xs rounded-lg px-2 py-1.5"
+                    className="w-full bg-surface-2 border border-border text-text-primary text-xs rounded-lg px-2 py-1.5"
                     value={cond.windowDays}
                     onChange={(e) => updateCondition(idx, { windowDays: parseInt(e.target.value) || 1 })}
                   />
@@ -294,13 +294,13 @@ export default function TriggerSetsPage() {
 
           {/* Actions */}
           <div className="mb-5">
-            <p className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-2">Amal (U HOLDA)</p>
+            <p className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-2">Amal (U HOLDA)</p>
             {form.actions.map((action, idx) => (
-              <div key={idx} className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 mb-2 grid grid-cols-1 md:grid-cols-2 gap-2">
+              <div key={idx} className="bg-surface-2 border border-border rounded-xl p-3 mb-2 grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-[10px] text-slate-500 dark:text-slate-400 mb-1">Amal turi</label>
+                  <label className="block text-[10px] text-text-tertiary mb-1">Amal turi</label>
                   <select
-                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-50 text-xs rounded-lg px-2 py-1.5"
+                    className="w-full bg-surface-2 border border-border text-text-primary text-xs rounded-lg px-2 py-1.5"
                     value={action.type}
                     onChange={(e) => updateAction(idx, { type: e.target.value as ActionType })}
                   >
@@ -311,12 +311,12 @@ export default function TriggerSetsPage() {
                 </div>
                 {(action.type === 'increase_budget' || action.type === 'decrease_budget') && (
                   <div>
-                    <label className="block text-[10px] text-slate-500 dark:text-slate-400 mb-1">Miqdor (%)</label>
+                    <label className="block text-[10px] text-text-tertiary mb-1">Miqdor (%)</label>
                     <input
                       type="number"
                       min={1}
                       max={100}
-                      className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-50 text-xs rounded-lg px-2 py-1.5"
+                      className="w-full bg-surface-2 border border-border text-text-primary text-xs rounded-lg px-2 py-1.5"
                       value={action.value ?? 10}
                       onChange={(e) => updateAction(idx, { value: parseInt(e.target.value) || 10 })}
                     />
@@ -324,10 +324,10 @@ export default function TriggerSetsPage() {
                 )}
                 {action.type === 'notify_telegram' && (
                   <div>
-                    <label className="block text-[10px] text-slate-500 dark:text-slate-400 mb-1">Xabar shablon (ixtiyoriy)</label>
+                    <label className="block text-[10px] text-text-tertiary mb-1">Xabar shablon (ixtiyoriy)</label>
                     <input
                       type="text"
-                      className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-50 text-xs rounded-lg px-2 py-1.5"
+                      className="w-full bg-surface-2 border border-border text-text-primary text-xs rounded-lg px-2 py-1.5"
                       placeholder="{name} kampaniyasi diqqat talab qiladi"
                       value={action.message ?? ''}
                       onChange={(e) => updateAction(idx, { message: e.target.value })}
@@ -351,14 +351,14 @@ export default function TriggerSetsPage() {
       {loading ? (
         <div className="space-y-3">
           {[1, 2].map((i) => (
-            <div key={i} className="h-24 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl animate-pulse" />
+            <div key={i} className="h-24 bg-surface border border-border rounded-xl animate-pulse" />
           ))}
         </div>
       ) : items.length === 0 ? (
         <Card className="text-center py-16">
           <span className="text-4xl block mb-3">⚡</span>
-          <p className="text-slate-900 dark:text-slate-50 font-semibold mb-1">Triggersetlar yo'q</p>
-          <p className="text-slate-500 dark:text-slate-400 text-sm mb-5">
+          <p className="text-text-primary font-semibold mb-1">Triggersetlar yo'q</p>
+          <p className="text-text-tertiary text-sm mb-5">
             Birinchi qoidangizni yarating — AI har 30 daqiqada tekshiradi
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-lg mx-auto text-left">
@@ -367,10 +367,10 @@ export default function TriggerSetsPage() {
               { icon: '🚀', title: 'Yuqori ROAS', desc: 'ROAS > 3x bo\'lsa byudjetni +20% oshir' },
               { icon: '📱', title: 'Ogohlantirish', desc: 'Xarajat limitga yetganda Telegram xabar' },
             ].map((ex) => (
-              <div key={ex.title} className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3">
+              <div key={ex.title} className="bg-surface-2 border border-border rounded-xl p-3">
                 <span className="text-xl mb-1.5 block">{ex.icon}</span>
-                <p className="text-slate-900 dark:text-slate-50 text-xs font-medium mb-0.5">{ex.title}</p>
-                <p className="text-slate-500 dark:text-slate-400 text-[11px]">{ex.desc}</p>
+                <p className="text-text-primary text-xs font-medium mb-0.5">{ex.title}</p>
+                <p className="text-text-tertiary text-[11px]">{ex.desc}</p>
               </div>
             ))}
           </div>
@@ -388,30 +388,30 @@ export default function TriggerSetsPage() {
                     onClick={() => handleToggle(ts)}
                     className={`
                       relative mt-0.5 inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors duration-200
-                      ${ts.enabled ? 'bg-slate-900' : 'bg-slate-100 dark:bg-slate-800'}
+                      ${ts.enabled ? 'bg-surface' : 'bg-surface-2 dark:bg-surface'}
                     `}
                   >
                     <span
                       className={`
-                        inline-block h-4 w-4 transform rounded-full bg-white dark:bg-slate-900 shadow transition-transform duration-200
+                        inline-block h-4 w-4 transform rounded-full bg-surface shadow transition-transform duration-200
                         ${ts.enabled ? 'translate-x-6' : 'translate-x-1'}
                       `}
                     />
                   </button>
 
                   <div className="min-w-0">
-                    <p className="text-slate-900 dark:text-slate-50 font-medium text-sm">{ts.name}</p>
+                    <p className="text-text-primary font-medium text-sm">{ts.name}</p>
 
                     {/* Conditions summary */}
                     <div className="flex flex-wrap gap-1 mt-1.5">
                       {ts.conditions.map((c, i) => (
-                        <span key={i} className="text-[11px] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 px-2 py-0.5 rounded-md">
+                        <span key={i} className="text-[11px] bg-surface-2 border border-border text-text-tertiary px-2 py-0.5 rounded-md">
                           {METRIC_LABELS[c.metric]} {c.operator} {c.value} ({c.windowDays}k)
                         </span>
                       ))}
-                      <span className="text-[11px] text-slate-500 dark:text-slate-400">→</span>
+                      <span className="text-[11px] text-text-tertiary">→</span>
                       {ts.actions.map((a, i) => (
-                        <span key={i} className="text-[11px] bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-md">
+                        <span key={i} className="text-[11px] bg-surface-2 dark:bg-surface border border-border text-text-secondary px-2 py-0.5 rounded-md">
                           {ACTION_LABELS[a.type as ActionType] ?? a.type}
                           {a.value ? ` ${a.value}%` : ''}
                         </span>
@@ -424,13 +424,13 @@ export default function TriggerSetsPage() {
                 <div className="flex items-center gap-3 shrink-0">
                   {/* Last run status */}
                   {ts.lastRunStatus && (
-                    <span className={`text-[11px] px-2 py-0.5 rounded-md font-medium ${STATUS_COLORS[ts.lastRunStatus] ?? 'text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800'}`}>
+                    <span className={`text-[11px] px-2 py-0.5 rounded-md font-medium ${STATUS_COLORS[ts.lastRunStatus] ?? 'text-text-tertiary bg-surface-2 dark:bg-surface'}`}>
                       {STATUS_LABELS[ts.lastRunStatus] ?? ts.lastRunStatus}
                     </span>
                   )}
 
                   {/* Total fires */}
-                  <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                  <span className="text-[11px] text-text-tertiary">
                     {ts.totalFires} marta ishladi
                   </span>
 
@@ -459,7 +459,7 @@ export default function TriggerSetsPage() {
 
               {/* Last run time */}
               {ts.lastRunAt && (
-                <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-2 ml-14">
+                <p className="text-[10px] text-text-tertiary mt-2 ml-14">
                   Oxirgi tekshiruv: {new Date(ts.lastRunAt).toLocaleString('uz-UZ')}
                 </p>
               )}

@@ -90,8 +90,8 @@ export const AdAccountsConnection: React.FC<AdAccountsConnectionProps> = ({ onCo
     return (
       <div className="space-y-6">
         <div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Qaysi platform uchun hisobni ulaysiz?</h3>
-          <p className="text-gray-600 text-sm">
+          <h3 className="text-xl font-bold text-text-primary mb-2">Qaysi platform uchun hisobni ulaysiz?</h3>
+          <p className="text-text-secondary text-sm">
             Reklama hisobingizni Performa platformasiga ulang va real vaqtda ma'lumotlarni kuzating
           </p>
         </div>
@@ -104,7 +104,7 @@ export const AdAccountsConnection: React.FC<AdAccountsConnectionProps> = ({ onCo
             </h4>
             <div className="space-y-2">
               {connectedAccounts.map((acc) => (
-                <div key={acc.platform} className="flex items-center justify-between p-3 bg-white dark:bg-slate-900 rounded-lg border border-green-200">
+                <div key={acc.platform} className="flex items-center justify-between p-3 bg-surface rounded-lg border border-green-200">
                   <span className="text-sm">
                     {platformInfo[acc.platform].icon} {platformInfo[acc.platform].name}
                   </span>
@@ -134,7 +134,7 @@ export const AdAccountsConnection: React.FC<AdAccountsConnectionProps> = ({ onCo
               >
                 <Card
                   className={`p-6 h-full flex flex-col gap-4 ${
-                    isConnected ? 'border-green-200 bg-green-50' : 'border-gray-200 hover:bg-gray-50'
+                    isConnected ? 'border-green-200 bg-green-50' : 'border-border hover:bg-surface-2'
                   }`}
                 >
                   <div className="flex items-start justify-between">
@@ -145,13 +145,13 @@ export const AdAccountsConnection: React.FC<AdAccountsConnectionProps> = ({ onCo
                   </div>
 
                   <div>
-                    <h4 className="font-bold text-gray-900 text-lg">{info.name}</h4>
-                    <p className="text-sm text-gray-600 mt-1">{info.description}</p>
-                    <p className="text-xs text-gray-500 mt-2">{info.details}</p>
+                    <h4 className="font-bold text-text-primary text-lg">{info.name}</h4>
+                    <p className="text-sm text-text-secondary mt-1">{info.description}</p>
+                    <p className="text-xs text-text-tertiary mt-2">{info.details}</p>
                   </div>
 
                   {!isConnected && (
-                    <div className="flex items-center gap-2 text-blue-600 font-semibold text-sm mt-auto pt-4 border-t border-gray-200">
+                    <div className="flex items-center gap-2 text-blue-600 font-semibold text-sm mt-auto pt-4 border-t border-border">
                       Tanlash <ArrowRight size={16} />
                     </div>
                   )}
@@ -196,14 +196,14 @@ export const AdAccountsConnection: React.FC<AdAccountsConnectionProps> = ({ onCo
             variant="ghost"
             size="sm"
             onClick={handleBackToSelect}
-            className="mb-4 text-gray-600 hover:text-gray-900"
+            className="mb-4 text-text-secondary hover:text-text-primary"
           >
             ← Orqaga
           </Button>
-          <h3 className="text-2xl font-bold text-gray-900 mb-2">
+          <h3 className="text-2xl font-bold text-text-primary mb-2">
             {info.icon} {info.name} ni ulash
           </h3>
-          <p className="text-gray-600">{info.description}</p>
+          <p className="text-text-secondary">{info.description}</p>
         </div>
 
         {/* Connection Card */}
@@ -215,8 +215,8 @@ export const AdAccountsConnection: React.FC<AdAccountsConnectionProps> = ({ onCo
           </div>
 
           <div>
-            <h4 className="text-xl font-bold text-gray-900 mb-2">Tayyor?</h4>
-            <p className="text-gray-600 text-sm">
+            <h4 className="text-xl font-bold text-text-primary mb-2">Tayyor?</h4>
+            <p className="text-text-secondary text-sm">
               Quyidagi tugmani bosing va {info.name} hisobingizga kirish ruxsatini bering.
               <br />
               Ruxsat berilgandan so'ng avtomatik ravishda qaytasiz.
@@ -250,7 +250,7 @@ export const AdAccountsConnection: React.FC<AdAccountsConnectionProps> = ({ onCo
             )}
           </Button>
 
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-text-tertiary">
             🔒 Sizning ma'lumotlaringiz xavfsiz. Biz faqat reklama hisoblarini boshqarish uchun kirish kerak.
           </p>
         </Card>

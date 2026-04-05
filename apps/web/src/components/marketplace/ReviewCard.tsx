@@ -38,7 +38,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ review, className }) => 
           {Array.from({ length: 5 }).map((_, i) => (
             <svg
               key={i}
-              className={cn('w-3.5 h-3.5', i < review.rating ? 'text-amber-400' : 'text-gray-300')}
+              className={cn('w-3.5 h-3.5', i < review.rating ? 'text-amber-400' : 'text-text-tertiary')}
               fill="currentColor"
               viewBox="0 0 20 20"
             >

@@ -54,7 +54,7 @@ export const SpecialistDetailHeader: React.FC<SpecialistDetailHeaderProps> = ({ 
                   {Array.from({ length: 5 }).map((_, i) => (
                     <svg
                       key={i}
-                      className={cn('w-4 h-4', i < Math.floor(specialist.rating) ? 'text-amber-400' : 'text-gray-300')}
+                      className={cn('w-4 h-4', i < Math.floor(specialist.rating) ? 'text-amber-400' : 'text-text-tertiary')}
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >

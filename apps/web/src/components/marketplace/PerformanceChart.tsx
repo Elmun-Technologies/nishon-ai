@@ -77,7 +77,7 @@ export const PerformanceChart: React.FC<PerformanceChartProps> = ({
                   <span className="text-xs font-medium text-text-primary">{platform}</span>
                   <span className="text-xs text-text-secondary">{percentage}%</span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="w-full bg-surface-2 rounded-full h-2">
                   <div
                     className="bg-blue-500 h-2 rounded-full transition-all"
                     style={{ width: `${percentage}%` }}
@@ -130,7 +130,7 @@ export const PerformanceChart: React.FC<PerformanceChartProps> = ({
             </thead>
             <tbody>
               {metrics.map((metric) => (
-                <tr key={metric.date} className="border-b border-border hover:bg-gray-50 transition-colors">
+                <tr key={metric.date} className="border-b border-border hover:bg-surface-2 transition-colors">
                   <td className="py-2 px-3 text-text-secondary">{formatDate(metric.date)}</td>
                   <td className="text-right py-2 px-3 font-medium text-emerald-600">
                     {metric.roas.toFixed(2)}x

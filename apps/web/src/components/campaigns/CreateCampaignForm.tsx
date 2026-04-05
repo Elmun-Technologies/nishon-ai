@@ -44,7 +44,7 @@ const HOUR_PRESETS = [
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
-  return <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">{children}</p>
+  return <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">{children}</p>
 }
 
 function TogglePill({
@@ -57,7 +57,7 @@ function TogglePill({
   onChange: (v: string) => void
 }) {
   return (
-    <div className="inline-flex rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-0.5">
+    <div className="inline-flex rounded-lg border border-border bg-surface p-0.5">
       {options.map((o) => (
         <button
           key={o.value}
@@ -65,8 +65,8 @@ function TogglePill({
           onClick={() => onChange(o.value)}
           className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-150 ${
             value === o.value
-              ? 'bg-slate-900 text-white shadow'
-              : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50'
+              ? 'bg-surface text-white shadow'
+              : 'text-text-tertiary hover:text-text-primary'
           }`}
         >
           {o.label}
@@ -158,7 +158,7 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
           value={form.name}
           onChange={(e) => set('name', e.target.value)}
           maxLength={255}
-          className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-slate-50 placeholder-slate-400 focus:outline-none focus:border-slate-900/50 focus:ring-1 focus:ring-slate-900/30 transition-colors"
+          className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-border/50 focus:ring-1 focus:ring-border/30 transition-colors"
         />
       </div>
 
@@ -173,13 +173,13 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
               onClick={() => set('objective', obj.value)}
               className={`flex flex-col items-center gap-2 p-4 rounded-xl border text-center transition-all duration-150 ${
                 form.objective === obj.value
-                  ? 'border-slate-900/50 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-50'
-                  : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-400 dark:text-slate-500 hover:border-slate-200 dark:border-slate-700 hover:text-slate-900 dark:text-slate-50'
+                  ? 'border-border/50 bg-surface-2 dark:bg-surface text-text-primary'
+                  : 'border-border bg-surface text-text-tertiary hover:border-border hover:text-text-primary'
               }`}
             >
               <span className="text-2xl">{obj.icon}</span>
               <span className="text-xs font-semibold">{obj.label}</span>
-              <span className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight">{obj.description}</span>
+              <span className="text-[10px] text-text-tertiary leading-tight">{obj.description}</span>
             </button>
           ))}
         </div>
@@ -204,7 +204,7 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
               placeholder="0"
               value={form.budget}
               onChange={(e) => set('budget', e.target.value)}
-              className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 pr-20 text-sm text-slate-900 dark:text-slate-50 placeholder-slate-400 focus:outline-none focus:border-slate-900/50 focus:ring-1 focus:ring-slate-900/30 transition-colors"
+              className="w-full bg-surface border border-border rounded-xl px-4 py-3 pr-20 text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-border/50 focus:ring-1 focus:ring-border/30 transition-colors"
             />
             {/* Currency toggle */}
             <div className="absolute right-2 top-1/2 -translate-y-1/2">
@@ -219,7 +219,7 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
 
         {/* Budget hint */}
         {form.budget && Number(form.budget) > 0 && (
-          <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+          <p className="mt-2 text-xs text-text-tertiary">
             {form.budgetType === 'weekly'
               ? `≈ ${form.currency === 'USD' ? '$' : '₸'}${(Number(form.budget) / 7).toFixed(2)} kunlik`
               : `≈ ${form.currency === 'USD' ? '$' : '₸'}${(Number(form.budget) * 7).toFixed(0)} haftalik`}
@@ -232,22 +232,22 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
         <SectionLabel>Sana oralig'i</SectionLabel>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Boshlanish</label>
+            <label className="block text-xs text-text-tertiary mb-1">Boshlanish</label>
             <input
               type="date"
               value={form.startDate}
               onChange={(e) => set('startDate', e.target.value)}
-              className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-slate-50 focus:outline-none focus:border-slate-900/50 focus:ring-1 focus:ring-slate-900/30 transition-colors [color-scheme:dark]"
+              className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-text-primary focus:outline-none focus:border-border/50 focus:ring-1 focus:ring-border/30 transition-colors [color-scheme:dark]"
             />
           </div>
           <div>
-            <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Tugash (ixtiyoriy)</label>
+            <label className="block text-xs text-text-tertiary mb-1">Tugash (ixtiyoriy)</label>
             <input
               type="date"
               value={form.endDate}
               min={form.startDate}
               onChange={(e) => set('endDate', e.target.value)}
-              className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-slate-50 focus:outline-none focus:border-slate-900/50 focus:ring-1 focus:ring-slate-900/30 transition-colors [color-scheme:dark]"
+              className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-text-primary focus:outline-none focus:border-border/50 focus:ring-1 focus:ring-border/30 transition-colors [color-scheme:dark]"
             />
           </div>
         </div>
@@ -272,7 +272,7 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
                   key={preset.label}
                   type="button"
                   onClick={() => applyHourPreset(preset.hours)}
-                  className="text-xs px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:border-slate-300 dark:border-slate-600 hover:text-slate-900 dark:text-slate-50 transition-colors"
+                  className="text-xs px-3 py-1.5 rounded-lg border border-border text-text-tertiary hover:border-border hover:text-text-primary transition-colors"
                 >
                   {preset.label}
                 </button>
@@ -281,7 +281,7 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
                 <button
                   type="button"
                   onClick={() => set('schedule', { ...form.schedule, hours: [] })}
-                  className="text-xs px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-red-400 transition-colors"
+                  className="text-xs px-3 py-1.5 rounded-lg border border-border text-text-tertiary hover:text-red-400 transition-colors"
                 >
                   Tozalash
                 </button>
@@ -299,8 +299,8 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
                     onClick={() => toggleHour(h)}
                     className={`py-2 rounded-lg text-xs font-medium transition-all duration-100 ${
                       selected
-                        ? 'bg-slate-900 text-white'
-                        : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:bg-slate-800 hover:text-slate-900 dark:text-slate-50'
+                        ? 'bg-surface text-white'
+                        : 'bg-surface-2 text-text-tertiary hover:bg-surface-2 dark:bg-surface hover:text-text-primary'
                     }`}
                   >
                     {h.toString().padStart(2, '0')}
@@ -310,9 +310,9 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
             </div>
 
             {form.schedule.hours.length > 0 && (
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-text-tertiary">
                 {form.schedule.hours.length} soat tanlandi:{' '}
-                <span className="text-slate-400 dark:text-slate-500">
+                <span className="text-text-tertiary">
                   {form.schedule.hours[0].toString().padStart(2,'0')}:00
                   {' – '}
                   {(form.schedule.hours[form.schedule.hours.length - 1] + 1).toString().padStart(2,'0')}:00
@@ -331,11 +331,11 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
       )}
 
       {/* ── Actions ──────────────────────────────────────────────── */}
-      <div className="flex items-center justify-end gap-3 pt-2 border-t border-slate-200 dark:border-slate-700">
+      <div className="flex items-center justify-end gap-3 pt-2 border-t border-border">
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50 transition-colors"
+          className="px-4 py-2 text-sm text-text-tertiary hover:text-text-primary transition-colors"
         >
           Bekor qilish
         </button>
@@ -345,8 +345,8 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
           onClick={handleSubmit}
           className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
             isValid && !saving
-              ? 'bg-slate-900 hover:bg-slate-800 text-white shadow-lg shadow-gray-200'
-              : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 cursor-not-allowed'
+              ? 'bg-surface hover:bg-surface text-white shadow-lg shadow-gray-200'
+              : 'bg-surface-2 text-text-tertiary border border-border cursor-not-allowed'
           }`}
         >
           {saving ? 'Yaratilmoqda…' : 'Kampaniya yaratish'}

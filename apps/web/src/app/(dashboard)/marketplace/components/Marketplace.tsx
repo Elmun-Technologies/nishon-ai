@@ -1,79 +1,23 @@
 'use client'
 
 import { useState } from 'react'
-import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
-import { LineChart } from '@/components/ui/Charts'
-import { Search, TrendingUp, Grid3X3, List } from 'lucide-react'
+import { Search, TrendingUp, Grid3X3, List, CheckCircle2 } from 'lucide-react'
 
 const MOCK_SPECIALISTS = [
-  {
-    id: 1,
-    name: 'Ahmed Hassan',
-    title: 'Senior Meta Specialist',
-    avatar: '👨‍💼',
-    rating: 4.9,
-    reviews: 287,
-    roas: 3.2,
-    experience: '5+ years',
-    platforms: ['meta', 'google'],
-    verified: true,
-    avgSpend: '$15k',
-    successRate: 94,
-    trend: [12, 15, 14, 18, 17, 21, 19],
-  },
-  {
-    id: 2,
-    name: 'Fatima Al-Rashid',
-    title: 'Google Ads Expert',
-    avatar: '👩‍💼',
-    rating: 4.8,
-    reviews: 156,
-    roas: 2.8,
-    experience: '4+ years',
-    platforms: ['google', 'yandex'],
-    verified: true,
-    avgSpend: '$12k',
-    successRate: 91,
-    trend: [10, 13, 12, 16, 15, 19, 17],
-  },
-  {
-    id: 3,
-    name: 'Davron Karimov',
-    title: 'Performance Marketing',
-    avatar: '👨‍💻',
-    rating: 4.7,
-    reviews: 203,
-    roas: 3.5,
-    experience: '6+ years',
-    platforms: ['meta', 'google', 'yandex'],
-    verified: true,
-    avgSpend: '$18k',
-    successRate: 96,
-    trend: [14, 17, 16, 20, 18, 23, 21],
-  },
-  {
-    id: 4,
-    name: 'Zarina Uzbek',
-    title: 'Yandex Specialist',
-    avatar: '👩‍💻',
-    rating: 4.6,
-    reviews: 142,
-    roas: 3.1,
-    experience: '3+ years',
-    platforms: ['yandex'],
-    verified: false,
-    avgSpend: '$8k',
-    successRate: 88,
-    trend: [9, 11, 10, 14, 13, 17, 15],
-  },
+  { id: 1, name: 'Ahmed Hassan', title: 'Senior Meta Specialist', avatar: '👨‍💼', rating: 4.9, reviews: 287, roas: 3.2, experience: '5+ years', platforms: ['meta', 'google'], verified: true, avgSpend: '$15k', successRate: 94 },
+  { id: 2, name: 'Fatima Al-Rashid', title: 'Google Ads Expert', avatar: '👩‍💼', rating: 4.8, reviews: 156, roas: 2.8, experience: '4+ years', platforms: ['google', 'yandex'], verified: true, avgSpend: '$12k', successRate: 91 },
+  { id: 3, name: 'Davron Karimov', title: 'Performance Marketing', avatar: '👨‍💻', rating: 4.7, reviews: 203, roas: 3.5, experience: '6+ years', platforms: ['meta', 'google', 'yandex'], verified: true, avgSpend: '$18k', successRate: 96 },
+  { id: 4, name: 'Zarina Uzbek', title: 'Yandex Specialist', avatar: '👩‍💻', rating: 4.6, reviews: 142, roas: 3.1, experience: '3+ years', platforms: ['yandex'], verified: false, avgSpend: '$8k', successRate: 88 },
 ]
 
-const TRENDING_SPECIALISTS = [
-  { name: 'Ahmed Hassan', trending: 'up', change: '+28.5%' },
-  { name: 'Davron Karimov', trending: 'up', change: '+15.3%' },
-  { name: 'Fatima Al-Rashid', trending: 'down', change: '-5.2%' },
+const TRENDING = [
+  { name: 'Ahmed Hassan', up: true, change: '+28.5%' },
+  { name: 'Davron Karimov', up: true, change: '+15.3%' },
+  { name: 'Fatima Al-Rashid', up: false, change: '-5.2%' },
 ]
+
+const PLATFORM_ICONS: Record<string, string> = { meta: '📘', google: '🔍', yandex: '🟡' }
 
 export function Marketplace() {
   const [sortBy, setSortBy] = useState('rating')
@@ -83,278 +27,196 @@ export function Marketplace() {
     minRating: 0,
     platforms: ['meta', 'google', 'yandex'],
     verified: false,
-    minExperience: 0,
   })
 
-  const filteredSpecialists = MOCK_SPECIALISTS.filter(s => {
+  const filtered = MOCK_SPECIALISTS.filter(s => {
     if (filters.verified && !s.verified) return false
     if (s.rating < filters.minRating) return false
     if (!filters.platforms.some(p => s.platforms.includes(p))) return false
     if (searchQuery && !s.name.toLowerCase().includes(searchQuery.toLowerCase())) return false
     return true
-  }).sort((a, b) => {
-    if (sortBy === 'rating') return b.rating - a.rating
-    if (sortBy === 'roas') return b.roas - a.roas
-    return b.reviews - a.reviews
-  })
+  }).sort((a, b) =>
+    sortBy === 'rating' ? b.rating - a.rating :
+    sortBy === 'roas'   ? b.roas - a.roas : b.reviews - a.reviews
+  )
+
+  const filterLabelClass = "text-text-tertiary text-xs font-semibold uppercase tracking-wider mb-2"
+  const filterItemClass = "flex items-center gap-2.5 cursor-pointer group text-sm text-text-secondary hover:text-text-primary"
 
   return (
-    <div className="min-h-screen bg-slate-950">
-      {/* Header */}
-      <div className="border-b border-slate-800 bg-slate-950 sticky top-0 z-40">
-        <div className="p-6 max-w-full">
-          <h1 className="text-3xl font-bold text-white mb-4">Marketplace</h1>
+    <div className="flex flex-col min-h-full" style={{ color: 'var(--c-text-primary)' }}>
 
-          {/* Search Bar */}
-          <div className="flex gap-3 mb-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-3 w-5 h-5 text-slate-500" />
-              <input
-                type="text"
-                placeholder="Search specialists..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
-              />
-            </div>
-          </div>
+      {/* Search */}
+      <div className="mb-6">
+        <div className="relative max-w-lg">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary" />
+          <input
+            type="text"
+            placeholder="Specialist qidirish..."
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="w-full pl-9 pr-4 py-2.5 text-sm rounded-lg focus:outline-none focus:ring-2 transition-colors"
+            style={{
+              background: 'var(--c-surface)',
+              border: '1px solid var(--c-border)',
+              color: 'var(--c-text-primary)',
+            }}
+          />
         </div>
       </div>
 
-      <div className="flex min-h-[calc(100vh-180px)]">
+      <div className="flex gap-6 min-h-0">
+
         {/* Sidebar Filters */}
-        <div className="w-72 border-r border-slate-800 bg-slate-950 p-6 overflow-y-auto">
-          <h3 className="text-white font-bold text-lg mb-6">Filter By</h3>
-
-          {/* Rating Filter */}
-          <div className="mb-6">
-            <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-3">Rating</p>
-            <div className="space-y-2">
-              {[
-                { label: 'All', value: 0 },
-                { label: '4.5+', value: 4.5 },
-                { label: '4.0+', value: 4.0 },
-                { label: '3.5+', value: 3.5 },
-              ].map(r => (
-                <label key={r.value} className="flex items-center gap-3 cursor-pointer group">
-                  <input
-                    type="radio"
-                    name="rating"
-                    value={r.value}
-                    checked={filters.minRating === r.value}
-                    onChange={() => setFilters(prev => ({ ...prev, minRating: r.value }))}
-                    className="rounded-full"
-                  />
-                  <span className="text-sm text-slate-200 group-hover:text-white">{r.label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Platform Filter */}
-          <div className="mb-6">
-            <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-3">Platforms</p>
-            <div className="space-y-2">
-              {['meta', 'google', 'yandex'].map(platform => (
-                <label key={platform} className="flex items-center gap-3 cursor-pointer group">
-                  <input
-                    type="checkbox"
-                    checked={filters.platforms.includes(platform)}
-                    onChange={() => {
-                      setFilters(prev => ({
-                        ...prev,
-                        platforms: prev.platforms.includes(platform)
-                          ? prev.platforms.filter(p => p !== platform)
-                          : [...prev.platforms, platform]
-                      }))
-                    }}
-                    className="rounded"
-                  />
-                  <span className="text-sm text-slate-200 group-hover:text-white capitalize">
-                    {platform === 'meta' && '📘'} {platform === 'google' && '🔍'} {platform === 'yandex' && '🟡'} {platform}
-                  </span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* ROAS Filter */}
-          <div className="mb-6">
-            <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-3">Min ROAS</p>
-            <div className="space-y-2">
-              {['2.0x+', '2.5x+', '3.0x+', '3.5x+'].map(roas => (
-                <label key={roas} className="flex items-center gap-3 cursor-pointer group">
-                  <input type="radio" name="roas" className="rounded-full" defaultChecked={roas === '2.5x+'} />
-                  <span className="text-sm text-slate-200 group-hover:text-white">{roas}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Experience Filter */}
-          <div className="mb-6">
-            <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-3">Experience</p>
-            <div className="space-y-2">
-              {['All', '3+ years', '5+ years', '10+ years'].map(exp => (
-                <label key={exp} className="flex items-center gap-3 cursor-pointer group">
-                  <input type="radio" name="exp" className="rounded-full" defaultChecked={exp === 'All'} />
-                  <span className="text-sm text-slate-200 group-hover:text-white">{exp}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Verified Filter */}
-          <div className="mb-6">
-            <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-3">Status</p>
-            <label className="flex items-center gap-3 cursor-pointer group">
-              <input
-                type="checkbox"
-                checked={filters.verified}
-                onChange={() => setFilters(prev => ({ ...prev, verified: !prev.verified }))}
-                className="rounded"
-              />
-              <span className="text-sm text-slate-200 group-hover:text-white">Is Verified</span>
-            </label>
-          </div>
-
-          {/* Average Monthly Spend */}
+        <div className="w-56 shrink-0 space-y-5">
+          {/* Rating */}
           <div>
-            <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-3">Avg Spend</p>
-            <div className="space-y-2">
-              {['<$5k', '$5k-$10k', '$10k-$20k', '$20k+'].map(spend => (
-                <label key={spend} className="flex items-center gap-3 cursor-pointer group">
-                  <input type="checkbox" className="rounded" />
-                  <span className="text-sm text-slate-200 group-hover:text-white">{spend}</span>
+            <p className={filterLabelClass}>Rating</p>
+            <div className="space-y-1.5">
+              {[{ label: 'Barchasi', value: 0 }, { label: '4.5+', value: 4.5 }, { label: '4.0+', value: 4.0 }, { label: '3.5+', value: 3.5 }].map(r => (
+                <label key={r.value} className={filterItemClass}>
+                  <input type="radio" name="rating" checked={filters.minRating === r.value}
+                    onChange={() => setFilters(p => ({ ...p, minRating: r.value }))} />
+                  {r.label}
                 </label>
               ))}
             </div>
+          </div>
+
+          {/* Platforms */}
+          <div>
+            <p className={filterLabelClass}>Platformalar</p>
+            <div className="space-y-1.5">
+              {['meta', 'google', 'yandex'].map(platform => (
+                <label key={platform} className={filterItemClass}>
+                  <input type="checkbox" checked={filters.platforms.includes(platform)}
+                    onChange={() => setFilters(p => ({
+                      ...p,
+                      platforms: p.platforms.includes(platform)
+                        ? p.platforms.filter(x => x !== platform)
+                        : [...p.platforms, platform]
+                    }))} />
+                  {PLATFORM_ICONS[platform]} {platform.charAt(0).toUpperCase() + platform.slice(1)}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Verified */}
+          <div>
+            <p className={filterLabelClass}>Status</p>
+            <label className={filterItemClass}>
+              <input type="checkbox" checked={filters.verified}
+                onChange={() => setFilters(p => ({ ...p, verified: !p.verified }))} />
+              Tasdiqlangan
+            </label>
           </div>
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 p-6">
-          {/* Trending Section */}
-          <div className="mb-8">
-            <h3 className="text-white font-bold text-lg mb-4 flex items-center gap-2">
-              <TrendingUp size={20} /> Trending Specialists
+        <div className="flex-1 min-w-0">
+
+          {/* Trending */}
+          <div className="mb-6">
+            <h3 className="text-text-primary font-semibold text-sm mb-3 flex items-center gap-1.5">
+              <TrendingUp size={15} /> Trending
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {TRENDING_SPECIALISTS.map((spec, idx) => (
-                <Card key={idx} className="p-4 bg-slate-800 border-slate-700 hover:border-green-500 transition-all">
-                  <div className="flex items-center justify-between">
-                    <p className="text-white font-semibold text-sm">{spec.name}</p>
-                    <span className={spec.trending === 'up' ? 'text-green-400 font-bold' : 'text-red-400 font-bold'}>
-                      {spec.trending === 'up' ? '↑' : '↓'} {spec.change}
-                    </span>
-                  </div>
-                </Card>
+            <div className="grid grid-cols-3 gap-3">
+              {TRENDING.map(s => (
+                <div key={s.name} className="rounded-lg px-3 py-2.5 flex items-center justify-between"
+                  style={{ background: 'var(--c-surface)', border: '1px solid var(--c-border)' }}>
+                  <p className="text-text-primary text-xs font-medium truncate">{s.name}</p>
+                  <span className={`text-xs font-bold ml-2 shrink-0 ${s.up ? 'text-success' : 'text-error'}`}>
+                    {s.up ? '↑' : '↓'} {s.change}
+                  </span>
+                </div>
               ))}
             </div>
           </div>
 
-          {/* Controls */}
-          <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
+          {/* Sort + View controls */}
+          <div className="flex items-center justify-between mb-5 gap-3">
             <div className="flex gap-2">
-              {[
-                { key: 'rating', label: '⭐ Top Rated' },
-                { key: 'roas', label: '📈 Best ROAS' },
-                { key: 'reviews', label: '💬 Most Reviews' },
-              ].map(sort => (
-                <button
-                  key={sort.key}
-                  onClick={() => setSortBy(sort.key)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    sortBy === sort.key
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
-                  }`}
-                >
-                  {sort.label}
+              {[{ key: 'rating', label: '⭐ Top Rated' }, { key: 'roas', label: '📈 ROAS' }, { key: 'reviews', label: '💬 Reviews' }].map(s => (
+                <button key={s.key} onClick={() => setSortBy(s.key)}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
+                  style={{
+                    background: sortBy === s.key ? 'var(--c-text-primary)' : 'var(--c-surface)',
+                    color: sortBy === s.key ? 'var(--c-surface)' : 'var(--c-text-secondary)',
+                    border: '1px solid var(--c-border)',
+                  }}>
+                  {s.label}
                 </button>
               ))}
             </div>
-
-            {/* View Toggle */}
-            <div className="flex gap-2">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`p-2 rounded transition-all ${
-                  viewMode === 'grid'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
-                }`}
-                title="Grid view"
-              >
-                <Grid3X3 size={18} />
-              </button>
-              <button
-                onClick={() => setViewMode('table')}
-                className={`p-2 rounded transition-all ${
-                  viewMode === 'table'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
-                }`}
-                title="Table view"
-              >
-                <List size={18} />
-              </button>
+            <div className="flex gap-1.5">
+              {[{ mode: 'grid' as const, Icon: Grid3X3 }, { mode: 'table' as const, Icon: List }].map(({ mode, Icon }) => (
+                <button key={mode} onClick={() => setViewMode(mode)}
+                  className="p-2 rounded-lg transition-colors"
+                  style={{
+                    background: viewMode === mode ? 'var(--c-text-primary)' : 'var(--c-surface)',
+                    color: viewMode === mode ? 'var(--c-surface)' : 'var(--c-text-secondary)',
+                    border: '1px solid var(--c-border)',
+                  }}>
+                  <Icon size={15} />
+                </button>
+              ))}
             </div>
           </div>
 
           {/* Grid View */}
           {viewMode === 'grid' && (
             <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
-              {filteredSpecialists.map(specialist => (
-                <div key={specialist.id} className="bg-slate-800 border border-slate-700 rounded-xl p-6 hover:border-blue-500 transition-all group">
+              {filtered.map(s => (
+                <div key={s.id} className="rounded-xl p-5 transition-all hover:shadow-md"
+                  style={{ background: 'var(--c-surface)', border: '1px solid var(--c-border)' }}>
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-xl">
-                        {specialist.avatar}
+                      <div className="w-11 h-11 rounded-xl flex items-center justify-center text-xl"
+                        style={{ background: 'var(--c-surface-2)' }}>
+                        {s.avatar}
                       </div>
                       <div>
-                        <h3 className="text-white font-semibold">{specialist.name}</h3>
-                        <p className="text-slate-400 text-sm">{specialist.title}</p>
+                        <div className="flex items-center gap-1.5">
+                          <h3 className="text-text-primary font-semibold text-sm">{s.name}</h3>
+                          {s.verified && <CheckCircle2 size={13} className="text-success" />}
+                        </div>
+                        <p className="text-text-secondary text-xs">{s.title}</p>
                       </div>
                     </div>
-                    {specialist.verified && <Badge className="bg-green-500/20 text-green-400 text-xs">✓</Badge>}
+                    <span className="text-text-secondary text-xs">{s.experience}</span>
                   </div>
 
                   <div className="grid grid-cols-4 gap-2 mb-4">
-                    <div className="bg-slate-950 rounded p-2 text-center">
-                      <p className="text-slate-500 text-xs">Rating</p>
-                      <p className="text-white font-bold">{specialist.rating}</p>
-                    </div>
-                    <div className="bg-slate-950 rounded p-2 text-center">
-                      <p className="text-slate-500 text-xs">ROAS</p>
-                      <p className="text-green-400 font-bold">{specialist.roas}x</p>
-                    </div>
-                    <div className="bg-slate-950 rounded p-2 text-center">
-                      <p className="text-slate-500 text-xs">Success</p>
-                      <p className="text-white font-bold">{specialist.successRate}%</p>
-                    </div>
-                    <div className="bg-slate-950 rounded p-2 text-center">
-                      <p className="text-slate-500 text-xs">Reviews</p>
-                      <p className="text-white font-bold text-sm">{specialist.reviews}</p>
-                    </div>
-                  </div>
-
-                  <div className="mb-3">
-                    <svg viewBox="0 0 100 30" className="w-full h-10 text-green-400">
-                      <polyline points="0,25 15,15 30,18 45,8 60,12 75,5 90,10 100,8" fill="none" stroke="currentColor" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
-                    </svg>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {specialist.platforms.map(p => (
-                      <Badge key={p} className="bg-slate-700 text-slate-200 text-xs uppercase">{p}</Badge>
+                    {[
+                      { label: 'Rating', value: String(s.rating) },
+                      { label: 'ROAS', value: `${s.roas}x`, green: true },
+                      { label: 'Success', value: `${s.successRate}%` },
+                      { label: 'Reviews', value: String(s.reviews) },
+                    ].map(m => (
+                      <div key={m.label} className="rounded-lg p-2 text-center"
+                        style={{ background: 'var(--c-surface-2)' }}>
+                        <p className="text-text-tertiary text-[10px] mb-0.5">{m.label}</p>
+                        <p className={`font-bold text-sm ${m.green ? 'text-success' : 'text-text-primary'}`}>{m.value}</p>
+                      </div>
                     ))}
                   </div>
 
-                  <div className="flex justify-between pt-4 border-t border-slate-700">
-                    <span className="text-slate-400 text-sm">Avg. {specialist.avgSpend}</span>
-                    <button className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-all">
-                      View →
+                  <div className="flex flex-wrap gap-1.5 mb-4">
+                    {s.platforms.map(p => (
+                      <span key={p} className="text-[11px] px-2 py-0.5 rounded-full font-medium"
+                        style={{ background: 'var(--c-surface-2)', border: '1px solid var(--c-border)', color: 'var(--c-text-secondary)' }}>
+                        {PLATFORM_ICONS[p]} {p}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className="flex items-center justify-between pt-3"
+                    style={{ borderTop: '1px solid var(--c-border)' }}>
+                    <span className="text-text-tertiary text-xs">Avg. {s.avgSpend}/oy</span>
+                    <button className="px-3 py-1.5 rounded-lg text-xs font-medium transition-opacity hover:opacity-80"
+                      style={{ background: 'var(--c-text-primary)', color: 'var(--c-surface)' }}>
+                      Profil →
                     </button>
                   </div>
                 </div>
@@ -364,54 +226,50 @@ export function Marketplace() {
 
           {/* Table View */}
           {viewMode === 'table' && (
-            <Card className="p-6 bg-slate-800 border-slate-700">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-slate-700">
-                      <th className="text-left py-3 px-4 text-slate-400 font-bold">Specialist</th>
-                      <th className="text-right py-3 px-4 text-slate-400 font-bold">Rating</th>
-                      <th className="text-right py-3 px-4 text-slate-400 font-bold">ROAS</th>
-                      <th className="text-right py-3 px-4 text-slate-400 font-bold">Success Rate</th>
-                      <th className="text-right py-3 px-4 text-slate-400 font-bold">Reviews</th>
-                      <th className="text-right py-3 px-4 text-slate-400 font-bold">Avg Spend</th>
-                      <th className="text-center py-3 px-4 text-slate-400 font-bold">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredSpecialists.map(specialist => (
-                      <tr key={specialist.id} className="border-b border-slate-700 hover:bg-slate-950 transition-all">
-                        <td className="py-3 px-4">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xl">{specialist.avatar}</span>
-                            <div>
-                              <p className="text-white font-medium">{specialist.name}</p>
-                              <p className="text-slate-500 text-xs">{specialist.title}</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="py-3 px-4 text-right text-white font-semibold">{specialist.rating}</td>
-                        <td className="py-3 px-4 text-right text-green-400 font-bold">{specialist.roas}x</td>
-                        <td className="py-3 px-4 text-right text-white">{specialist.successRate}%</td>
-                        <td className="py-3 px-4 text-right text-slate-400">{specialist.reviews}</td>
-                        <td className="py-3 px-4 text-right text-white">{specialist.avgSpend}</td>
-                        <td className="py-3 px-4 text-center">
-                          <button className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-all">
-                            View
-                          </button>
-                        </td>
-                      </tr>
+            <div className="rounded-xl overflow-hidden"
+              style={{ border: '1px solid var(--c-border)' }}>
+              <table className="w-full text-sm">
+                <thead style={{ background: 'var(--c-surface-2)' }}>
+                  <tr>
+                    {['Mutaxassis', 'Rating', 'ROAS', 'Muvaffaqiyat', 'Reviews', 'Sarflash', ''].map(h => (
+                      <th key={h} className="py-2.5 px-4 text-text-tertiary font-medium text-xs text-left last:text-center">{h}</th>
                     ))}
-                  </tbody>
-                </table>
-              </div>
-            </Card>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((s, i) => (
+                    <tr key={s.id} style={{ borderTop: i > 0 ? '1px solid var(--c-border)' : 'none' }}
+                      className="hover:opacity-80 transition-opacity">
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">{s.avatar}</span>
+                          <div>
+                            <p className="text-text-primary font-medium text-sm">{s.name}</p>
+                            <p className="text-text-tertiary text-xs">{s.title}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4 text-text-primary font-medium">⭐ {s.rating}</td>
+                      <td className="py-3 px-4 text-success font-bold">{s.roas}x</td>
+                      <td className="py-3 px-4 text-text-primary">{s.successRate}%</td>
+                      <td className="py-3 px-4 text-text-secondary">{s.reviews}</td>
+                      <td className="py-3 px-4 text-text-secondary">{s.avgSpend}</td>
+                      <td className="py-3 px-4 text-center">
+                        <button className="px-3 py-1 rounded-lg text-xs font-medium transition-opacity hover:opacity-80"
+                          style={{ background: 'var(--c-text-primary)', color: 'var(--c-surface)' }}>
+                          Profil
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
 
-          {/* No Results */}
-          {filteredSpecialists.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-slate-400 text-lg">No specialists found matching your criteria</p>
+          {filtered.length === 0 && (
+            <div className="text-center py-16">
+              <p className="text-text-tertiary text-sm">Hech qanday mutaxassis topilmadi</p>
             </div>
           )}
         </div>

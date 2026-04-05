@@ -83,9 +83,9 @@ export function ConversionMetrics({
 
   if (loading) {
     return (
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6">
+      <div className="bg-surface border border-border rounded-2xl p-6">
         <div className="flex items-center justify-center h-40">
-          <div className="w-8 h-8 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-border border-t-transparent rounded-full animate-spin" />
         </div>
       </div>
     )
@@ -93,9 +93,9 @@ export function ConversionMetrics({
 
   if (error || !data) {
     return (
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6">
+      <div className="bg-surface border border-border rounded-2xl p-6">
         <div className="text-center py-8">
-          <p className="text-sm text-slate-400 dark:text-slate-500">
+          <p className="text-sm text-text-tertiary">
             {error || 'No conversion data available'}
           </p>
         </div>
@@ -111,85 +111,85 @@ export function ConversionMetrics({
       {/* Summary Cards */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {/* Total Conversions */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-          <div className="text-xs text-slate-500 dark:text-slate-400 mb-2">Jami Konversiyalar</div>
-          <div className="text-2xl font-bold text-slate-900 dark:text-slate-50 mb-2">
+        <div className="bg-surface border border-border rounded-xl p-4">
+          <div className="text-xs text-text-tertiary mb-2">Jami Konversiyalar</div>
+          <div className="text-2xl font-bold text-text-primary mb-2">
             {formatNumber(summary.totalConversions)}
           </div>
-          <div className="text-xs text-slate-400 dark:text-slate-500">
+          <div className="text-xs text-text-tertiary">
             Bugun: {formatNumber(todayTrend.conversions)}
           </div>
         </div>
 
         {/* Conversion Value */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-          <div className="text-xs text-slate-500 dark:text-slate-400 mb-2">Konversiya Qiymati</div>
-          <div className="text-2xl font-bold text-slate-900 dark:text-slate-50 mb-2">
+        <div className="bg-surface border border-border rounded-xl p-4">
+          <div className="text-xs text-text-tertiary mb-2">Konversiya Qiymati</div>
+          <div className="text-2xl font-bold text-text-primary mb-2">
             {formatCurrency(summary.totalConversionValue)}
           </div>
-          <div className="text-xs text-slate-400 dark:text-slate-500">
+          <div className="text-xs text-text-tertiary">
             O'rtacha: {formatCurrency(summary.avgConversionValue)}
           </div>
         </div>
 
         {/* Cost Per Conversion (CPA) */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-          <div className="text-xs text-slate-500 dark:text-slate-400 mb-2">CPA (Oqit. Xarajati)</div>
-          <div className="text-2xl font-bold text-slate-900 dark:text-slate-50 mb-2">
+        <div className="bg-surface border border-border rounded-xl p-4">
+          <div className="text-xs text-text-tertiary mb-2">CPA (Oqit. Xarajati)</div>
+          <div className="text-2xl font-bold text-text-primary mb-2">
             {formatCurrency(summary.costPerConversion)}
           </div>
-          <div className="text-xs text-slate-400 dark:text-slate-500">
+          <div className="text-xs text-text-tertiary">
             Bugun: {formatCurrency(todayTrend.costPerConversion)}
           </div>
         </div>
 
         {/* Conversion Rate */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-          <div className="text-xs text-slate-500 dark:text-slate-400 mb-2">Konversiya Stavkasi</div>
-          <div className="text-2xl font-bold text-slate-900 dark:text-slate-50 mb-2">
+        <div className="bg-surface border border-border rounded-xl p-4">
+          <div className="text-xs text-text-tertiary mb-2">Konversiya Stavkasi</div>
+          <div className="text-2xl font-bold text-text-primary mb-2">
             {summary.conversionRateByClicks.toFixed(2)}%
           </div>
-          <div className="text-xs text-slate-400 dark:text-slate-500">
+          <div className="text-xs text-text-tertiary">
             Kliklar: {formatNumber(summary.totalClicks)}
           </div>
         </div>
       </div>
 
       {/* Conversion Trend Chart */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6">
+      <div className="bg-surface border border-border rounded-2xl p-6">
         <div className="mb-6">
-          <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-50">Konversiya Trendi</h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{startDate} - {endDate}</p>
+          <h3 className="text-sm font-semibold text-text-primary">Konversiya Trendi</h3>
+          <p className="text-xs text-text-tertiary mt-1">{startDate} - {endDate}</p>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-slate-200 dark:border-slate-700">
-                <th className="text-left py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400">Sana</th>
-                <th className="text-right py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400">Konversiyalar</th>
-                <th className="text-right py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400">Qiymat</th>
-                <th className="text-right py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400">Xarajat</th>
-                <th className="text-right py-3 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400">CPA</th>
+              <tr className="border-b border-border">
+                <th className="text-left py-3 px-4 text-xs font-semibold text-text-tertiary">Sana</th>
+                <th className="text-right py-3 px-4 text-xs font-semibold text-text-tertiary">Konversiyalar</th>
+                <th className="text-right py-3 px-4 text-xs font-semibold text-text-tertiary">Qiymat</th>
+                <th className="text-right py-3 px-4 text-xs font-semibold text-text-tertiary">Xarajat</th>
+                <th className="text-right py-3 px-4 text-xs font-semibold text-text-tertiary">CPA</th>
               </tr>
             </thead>
             <tbody>
               {trend.map((row) => (
                 <tr
                   key={row.date}
-                  className="border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:bg-slate-800/50 transition-colors"
+                  className="border-b border-border hover:bg-surface-2 transition-colors"
                 >
-                  <td className="py-3 px-4 text-slate-900 dark:text-slate-50">{row.date}</td>
-                  <td className="text-right py-3 px-4 text-slate-900 dark:text-slate-50 font-medium">
+                  <td className="py-3 px-4 text-text-primary">{row.date}</td>
+                  <td className="text-right py-3 px-4 text-text-primary font-medium">
                     {formatNumber(row.conversions)}
                   </td>
-                  <td className="text-right py-3 px-4 text-slate-900 dark:text-slate-50">
+                  <td className="text-right py-3 px-4 text-text-primary">
                     {formatCurrency(row.conversionValue)}
                   </td>
-                  <td className="text-right py-3 px-4 text-slate-900 dark:text-slate-50">
+                  <td className="text-right py-3 px-4 text-text-primary">
                     {formatCurrency(row.spend)}
                   </td>
-                  <td className="text-right py-3 px-4 text-slate-900 dark:text-slate-50">
+                  <td className="text-right py-3 px-4 text-text-primary">
                     {row.conversions > 0
                       ? formatCurrency(row.costPerConversion)
                       : '—'}

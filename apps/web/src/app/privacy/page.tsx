@@ -13,16 +13,16 @@ export default function Page() {
       <article className="space-y-8">
         <header className="space-y-3">
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Privacy Policy</h1>
-          <p className="text-slate-400 dark:text-slate-500">
+          <p className="text-text-tertiary">
             This Privacy Policy explains how Performa collects, uses, shares, stores, and
             protects information when you use our autonomous advertising platform.
           </p>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Last updated: March 22, 2026</p>
+          <p className="text-sm text-text-tertiary">Last updated: March 22, 2026</p>
         </header>
 
-        <section className="space-y-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
+        <section className="space-y-3 rounded-xl border border-border bg-white p-6">
           <h2 className="text-xl font-semibold">Introduction</h2>
-          <p className="text-slate-700 dark:text-slate-300">
+          <p className="text-text-secondary">
             Performa helps businesses manage, optimize, and scale campaigns across supported ad
             platforms. To provide these services, we process operational and user-provided data.
             This policy is written for users, partners, and platform reviewers who need clear
@@ -30,59 +30,59 @@ export default function Page() {
           </p>
         </section>
 
-        <section className="space-y-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
+        <section className="space-y-3 rounded-xl border border-border bg-white p-6">
           <h2 className="text-xl font-semibold">Who we are</h2>
-          <p className="text-slate-700 dark:text-slate-300">
+          <p className="text-text-secondary">
             Performa is a software platform that provides AI-assisted and autonomous campaign
             management workflows. We act as a service provider for users who connect their
             advertising accounts and workspace data to operate campaigns through Performa.
           </p>
         </section>
 
-        <section className="space-y-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
+        <section className="space-y-4 rounded-xl border border-border bg-white p-6">
           <h2 className="text-xl font-semibold">What information we collect</h2>
-          <h3 className="text-base font-semibold text-slate-900 dark:text-slate-50">Account information</h3>
-          <ul className="list-disc space-y-2 pl-5 text-slate-700 dark:text-slate-300">
+          <h3 className="text-base font-semibold text-text-primary">Account information</h3>
+          <ul className="list-disc space-y-2 pl-5 text-text-secondary">
             <li>Name, email address, login credentials, and authentication session data.</li>
             <li>Workspace membership and role-related access information.</li>
           </ul>
 
-          <h3 className="text-base font-semibold text-slate-900 dark:text-slate-50">Workspace and business information</h3>
-          <ul className="list-disc space-y-2 pl-5 text-slate-700 dark:text-slate-300">
+          <h3 className="text-base font-semibold text-text-primary">Workspace and business information</h3>
+          <ul className="list-disc space-y-2 pl-5 text-text-secondary">
             <li>Business profile details, campaign goals, budgets, and preferred strategies.</li>
             <li>Configuration settings used to generate recommendations and automations.</li>
           </ul>
 
-          <h3 className="text-base font-semibold text-slate-900 dark:text-slate-50">OAuth and integration data</h3>
-          <ul className="list-disc space-y-2 pl-5 text-slate-700 dark:text-slate-300">
+          <h3 className="text-base font-semibold text-text-primary">OAuth and integration data</h3>
+          <ul className="list-disc space-y-2 pl-5 text-text-secondary">
             <li>Access tokens, refresh tokens, and account identifiers from connected platforms.</li>
             <li>Connection metadata (for example, connection status and granted scopes).</li>
           </ul>
 
-          <h3 className="text-base font-semibold text-slate-900 dark:text-slate-50">Campaign and analytics data</h3>
-          <ul className="list-disc space-y-2 pl-5 text-slate-700 dark:text-slate-300">
+          <h3 className="text-base font-semibold text-text-primary">Campaign and analytics data</h3>
+          <ul className="list-disc space-y-2 pl-5 text-text-secondary">
             <li>Campaign performance metrics, ad account data, and optimization history.</li>
             <li>AI recommendation logs, user approvals/rejections, and execution outcomes.</li>
           </ul>
 
-          <h3 className="text-base font-semibold text-slate-900 dark:text-slate-50">Technical, device, and log data</h3>
-          <ul className="list-disc space-y-2 pl-5 text-slate-700 dark:text-slate-300">
+          <h3 className="text-base font-semibold text-text-primary">Technical, device, and log data</h3>
+          <ul className="list-disc space-y-2 pl-5 text-text-secondary">
             <li>IP address, browser/device characteristics, timestamps, and request metadata.</li>
             <li>Operational logs used for reliability, debugging, security, and abuse prevention.</li>
           </ul>
         </section>
 
-        <section className="space-y-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
+        <section className="space-y-4 rounded-xl border border-border bg-white p-6">
           <h2 className="text-xl font-semibold">How we use data</h2>
-          <ul className="list-disc space-y-2 pl-5 text-slate-700 dark:text-slate-300">
+          <ul className="list-disc space-y-2 pl-5 text-text-secondary">
             <li>To authenticate users and secure accounts and workspaces.</li>
             <li>To connect third-party ad accounts and synchronize campaign information.</li>
             <li>To provide campaign management, analytics, and AI-generated recommendations.</li>
             <li>To operate monitoring, fraud prevention, and platform abuse safeguards.</li>
             <li>To maintain, troubleshoot, and improve the performance of Performa services.</li>
           </ul>
-          <h3 className="text-base font-semibold text-slate-900 dark:text-slate-50">Legal basis and legitimate purpose</h3>
-          <ul className="list-disc space-y-2 pl-5 text-slate-700 dark:text-slate-300">
+          <h3 className="text-base font-semibold text-text-primary">Legal basis and legitimate purpose</h3>
+          <ul className="list-disc space-y-2 pl-5 text-text-secondary">
             <li>Contractual necessity: delivering the services requested by users.</li>
             <li>Legitimate interests: securing and improving the platform and user experience.</li>
             <li>Legal obligations: responding to applicable legal and regulatory requirements.</li>
@@ -90,58 +90,58 @@ export default function Page() {
           </ul>
         </section>
 
-        <section className="space-y-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
+        <section className="space-y-4 rounded-xl border border-border bg-white p-6">
           <h2 className="text-xl font-semibold">Third-party integrations and service providers</h2>
-          <h3 className="text-base font-semibold text-slate-900 dark:text-slate-50">Meta</h3>
-          <p className="text-slate-700 dark:text-slate-300">
+          <h3 className="text-base font-semibold text-text-primary">Meta</h3>
+          <p className="text-text-secondary">
             When you connect Meta accounts, Performa may access account and campaign data within
             the permissions you authorize.
           </p>
-          <h3 className="text-base font-semibold text-slate-900 dark:text-slate-50">Google</h3>
-          <p className="text-slate-700 dark:text-slate-300">
+          <h3 className="text-base font-semibold text-text-primary">Google</h3>
+          <p className="text-text-secondary">
             For connected Google advertising services, Performa processes account and campaign
             data as needed for reporting and optimization workflows.
           </p>
-          <h3 className="text-base font-semibold text-slate-900 dark:text-slate-50">TikTok</h3>
-          <p className="text-slate-700 dark:text-slate-300">
+          <h3 className="text-base font-semibold text-text-primary">TikTok</h3>
+          <p className="text-text-secondary">
             For connected TikTok ad accounts, we process integration and performance data within
             granted scopes.
           </p>
-          <h3 className="text-base font-semibold text-slate-900 dark:text-slate-50">Infrastructure and analytics</h3>
-          <p className="text-slate-700 dark:text-slate-300">
+          <h3 className="text-base font-semibold text-text-primary">Infrastructure and analytics</h3>
+          <p className="text-text-secondary">
             Performa relies on infrastructure and hosting providers to run the platform. These
             providers process data under service agreements and operational controls.
           </p>
-          <p className="text-slate-700 dark:text-slate-300">
+          <p className="text-text-secondary">
             Third-party platforms apply their own terms and privacy policies to data processed
             through their systems.
           </p>
         </section>
 
-        <section className="space-y-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
+        <section className="space-y-4 rounded-xl border border-border bg-white p-6">
           <h2 className="text-xl font-semibold">Data retention</h2>
-          <p className="text-slate-700 dark:text-slate-300">
+          <p className="text-text-secondary">
             We retain information for as long as needed to provide services, maintain records,
             resolve disputes, enforce agreements, and comply with legal obligations. Retention
             periods may vary by data category and operational need.
           </p>
 
           <h2 className="text-xl font-semibold">Data security</h2>
-          <p className="text-slate-700 dark:text-slate-300">
+          <p className="text-text-secondary">
             Performa uses administrative, technical, and organizational safeguards intended to
             protect data from unauthorized access, loss, or misuse. No internet-based system can
             guarantee absolute security, but we continuously improve our controls.
           </p>
 
           <h2 className="text-xl font-semibold">International data transfers</h2>
-          <p className="text-slate-700 dark:text-slate-300">
+          <p className="text-text-secondary">
             Depending on hosting and service providers, data may be processed in multiple
             jurisdictions. Where applicable, we use reasonable contractual and operational measures
             to support lawful and secure transfers.
           </p>
 
           <h2 className="text-xl font-semibold">User rights</h2>
-          <ul className="list-disc space-y-2 pl-5 text-slate-700 dark:text-slate-300">
+          <ul className="list-disc space-y-2 pl-5 text-text-secondary">
             <li>Request access to personal information associated with your account.</li>
             <li>Request correction or deletion where legally permissible.</li>
             <li>Request restriction or objection to certain processing where applicable.</li>
@@ -149,29 +149,29 @@ export default function Page() {
           </ul>
 
           <h2 className="text-xl font-semibold">Children&apos;s privacy</h2>
-          <p className="text-slate-700 dark:text-slate-300">
+          <p className="text-text-secondary">
             Performa is intended for business and professional users and is not directed to
             children. We do not knowingly collect personal data from children.
           </p>
 
           <h2 className="text-xl font-semibold">Changes to this policy</h2>
-          <p className="text-slate-700 dark:text-slate-300">
+          <p className="text-text-secondary">
             We may update this Privacy Policy as our platform, integrations, and legal obligations
             evolve. Material updates are reflected by the "Last updated" date on this page.
           </p>
         </section>
 
-        <section className="space-y-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-6">
+        <section className="space-y-4 rounded-xl border border-border bg-white p-6">
           <h2 className="text-xl font-semibold">Contact</h2>
-          <p className="text-slate-700 dark:text-slate-300">
+          <p className="text-text-secondary">
             For privacy questions, access requests, or data-protection concerns, contact:
           </p>
-          <p className="text-slate-700 dark:text-slate-300">
-            <a className="text-slate-700 dark:text-slate-300 hover:text-[#C4B5FD]" href="mailto:elmuntechnologies@gmail.com">
+          <p className="text-text-secondary">
+            <a className="text-text-secondary hover:text-[#C4B5FD]" href="mailto:elmuntechnologies@gmail.com">
               elmuntechnologies@gmail.com
             </a>
           </p>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <p className="text-sm text-text-tertiary">
             Disclaimer: This policy is provided for operational and compliance purposes and may be
             updated as the Performa platform evolves.
           </p>

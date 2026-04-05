@@ -21,7 +21,7 @@ export const CaseStudyCard: React.FC<CaseStudyCardProps> = ({ caseStudy, classNa
     <Card variant="elevated" padding="md" className={cn('overflow-hidden', className)}>
       {/* Image Gallery */}
       {caseStudy.screenshots && caseStudy.screenshots.length > 0 && (
-        <div className="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden mb-4">
+        <div className="relative w-full h-48 bg-surface-2 rounded-lg overflow-hidden mb-4">
           <Image
             src={caseStudy.screenshots[0]}
             alt={caseStudy.title}
@@ -56,7 +56,7 @@ export const CaseStudyCard: React.FC<CaseStudyCardProps> = ({ caseStudy, classNa
 
       {/* Metrics */}
       <div className="grid grid-cols-2 gap-3 mb-4 pb-4 border-b border-border">
-        <div className="bg-gray-50 rounded-lg p-3">
+        <div className="bg-surface-2 rounded-lg p-3">
           <p className="text-xs text-text-secondary mb-1">Before</p>
           <p className="text-lg font-bold text-text-primary">
             {formatNumber(caseStudy.beforeMetric)}

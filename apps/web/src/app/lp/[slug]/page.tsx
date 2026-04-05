@@ -75,16 +75,16 @@ function StarRating({ rating }: { rating: number }) {
 function FaqItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false)
   return (
-    <div className="border border-gray-200 rounded-xl overflow-hidden">
+    <div className="border border-border rounded-xl overflow-hidden">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between p-4 text-left bg-white hover:bg-gray-50 transition-colors"
+        className="w-full flex items-center justify-between p-4 text-left bg-white hover:bg-surface-2 transition-colors"
       >
-        <span className="font-medium text-gray-900 text-sm pr-4">{q}</span>
-        <span className="text-gray-400 text-lg shrink-0">{open ? '−' : '+'}</span>
+        <span className="font-medium text-text-primary text-sm pr-4">{q}</span>
+        <span className="text-text-tertiary text-lg shrink-0">{open ? '−' : '+'}</span>
       </button>
       {open && (
-        <div className="px-4 pb-4 text-sm text-gray-600 leading-relaxed bg-white">
+        <div className="px-4 pb-4 text-sm text-text-secondary leading-relaxed bg-white">
           {a}
         </div>
       )}
@@ -113,7 +113,7 @@ export default function LandingPagePublic() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-surface-2">
         <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
       </div>
     )
@@ -121,10 +121,10 @@ export default function LandingPagePublic() {
 
   if (notFound || !page) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-center px-4">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-surface-2 text-center px-4">
         <div className="text-5xl mb-4">🔍</div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Sahifa topilmadi</h1>
-        <p className="text-gray-500">Ushbu landing page mavjud emas yoki hali nashr etilmagan.</p>
+        <h1 className="text-2xl font-bold text-text-primary mb-2">Sahifa topilmadi</h1>
+        <p className="text-text-tertiary">Ushbu landing page mavjud emas yoki hali nashr etilmagan.</p>
       </div>
     )
   }
@@ -243,7 +243,7 @@ export default function LandingPagePublic() {
         {sections.includes('social_proof') && c.socialProof && (
           <section className="py-6 px-4" style={{ background: color.light }}>
             <div className="max-w-2xl mx-auto text-center">
-              <p className="font-bold text-gray-800 text-lg">{c.socialProof}</p>
+              <p className="font-bold text-text-primary text-lg">{c.socialProof}</p>
             </div>
           </section>
         )}
@@ -251,15 +251,15 @@ export default function LandingPagePublic() {
         {sections.includes('features') && c.features?.length > 0 && (
           <section className="py-12 px-4 bg-white">
             <div className="max-w-2xl mx-auto">
-              <h2 className="text-2xl font-bold text-gray-900 text-center mb-8">
+              <h2 className="text-2xl font-bold text-text-primary text-center mb-8">
                 Nima uchun biz?
               </h2>
               <div className="grid sm:grid-cols-3 gap-5">
                 {c.features.map((f, i) => (
                   <div key={i} className="text-center p-4 rounded-2xl" style={{ background: color.light }}>
                     <div className="text-3xl mb-3">{f.icon}</div>
-                    <h3 className="font-semibold text-gray-900 mb-1 text-sm">{f.title}</h3>
-                    <p className="text-gray-500 text-xs leading-relaxed">{f.description}</p>
+                    <h3 className="font-semibold text-text-primary mb-1 text-sm">{f.title}</h3>
+                    <p className="text-text-tertiary text-xs leading-relaxed">{f.description}</p>
                   </div>
                 ))}
               </div>
@@ -270,8 +270,8 @@ export default function LandingPagePublic() {
         {sections.includes('about') && c.description && (
           <section className="py-12 px-4" style={{ background: color.light }}>
             <div className="max-w-xl mx-auto text-center">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Biz haqimizda</h2>
-              <p className="text-gray-600 leading-relaxed">{c.description}</p>
+              <h2 className="text-2xl font-bold text-text-primary mb-4">Biz haqimizda</h2>
+              <p className="text-text-secondary leading-relaxed">{c.description}</p>
             </div>
           </section>
         )}
@@ -279,16 +279,16 @@ export default function LandingPagePublic() {
         {sections.includes('testimonials') && c.testimonials?.length > 0 && (
           <section className="py-12 px-4 bg-white">
             <div className="max-w-2xl mx-auto">
-              <h2 className="text-2xl font-bold text-gray-900 text-center mb-8">
+              <h2 className="text-2xl font-bold text-text-primary text-center mb-8">
                 Mijozlarimiz fikri
               </h2>
               <div className="grid sm:grid-cols-2 gap-4">
                 {c.testimonials.map((t, i) => (
-                  <div key={i} className="p-5 rounded-2xl border border-gray-100 bg-gray-50">
+                  <div key={i} className="p-5 rounded-2xl border border-gray-100 bg-surface-2">
                     <StarRating rating={t.rating || 5} />
-                    <p className="text-gray-700 text-sm leading-relaxed mb-3">"{t.text}"</p>
-                    <p className="text-gray-900 font-semibold text-sm">{t.name}</p>
-                    <p className="text-gray-400 text-xs">{t.role}</p>
+                    <p className="text-text-secondary text-sm leading-relaxed mb-3">"{t.text}"</p>
+                    <p className="text-text-primary font-semibold text-sm">{t.name}</p>
+                    <p className="text-text-tertiary text-xs">{t.role}</p>
                   </div>
                 ))}
               </div>
@@ -299,7 +299,7 @@ export default function LandingPagePublic() {
         {sections.includes('faq') && c.faq?.length > 0 && (
           <section className="py-12 px-4" style={{ background: color.light }}>
             <div className="max-w-xl mx-auto">
-              <h2 className="text-2xl font-bold text-gray-900 text-center mb-6">
+              <h2 className="text-2xl font-bold text-text-primary text-center mb-6">
                 Ko'p so'raladigan savollar
               </h2>
               <div className="space-y-2">
@@ -336,7 +336,7 @@ export default function LandingPagePublic() {
         )}
 
         {/* Powered by footer */}
-        <div className="py-3 text-center text-xs text-gray-400 bg-gray-50">
+        <div className="py-3 text-center text-xs text-text-tertiary bg-surface-2">
           Performa bilan yaratilgan
         </div>
       </div>

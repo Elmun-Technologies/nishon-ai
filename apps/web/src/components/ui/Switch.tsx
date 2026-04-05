@@ -26,21 +26,21 @@ export function Switch({ checked, onChange, label, description, disabled, id, cl
         disabled={disabled}
         onClick={() => !disabled && onChange(!checked)}
         className={cn(
-          'relative w-10 h-6 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-slate-900/30 shrink-0',
-          checked ? 'bg-slate-900' : 'bg-slate-100 dark:bg-slate-800'
+          'relative w-10 h-6 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-border/30 shrink-0',
+          checked ? 'bg-surface' : 'bg-surface-2 dark:bg-surface'
         )}
       >
         <span
           className={cn(
-            'absolute top-1 left-1 w-4 h-4 bg-white dark:bg-slate-900 rounded-full shadow transition-transform duration-200',
+            'absolute top-1 left-1 w-4 h-4 bg-surface rounded-full shadow transition-transform duration-200',
             checked && 'translate-x-4'
           )}
         />
       </button>
       {(label || description) && (
         <div>
-          {label && <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{label}</p>}
-          {description && <p className="text-xs text-slate-500 dark:text-slate-400">{description}</p>}
+          {label && <p className="text-sm font-medium text-text-primary">{label}</p>}
+          {description && <p className="text-xs text-text-tertiary">{description}</p>}
         </div>
       )}
     </label>

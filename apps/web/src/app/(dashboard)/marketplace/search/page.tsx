@@ -51,7 +51,7 @@ export default function SearchPage() {
     <div className="space-y-8">
       {/* Search Filters */}
       <div className="space-y-4">
-        <h1 className="text-3xl font-bold text-gray-900">Search Specialists</h1>
+        <h1 className="text-3xl font-bold text-text-primary">Search Specialists</h1>
         <Card className="p-6">
           <div className="space-y-4">
             <input
@@ -59,12 +59,12 @@ export default function SearchPage() {
               placeholder="Search by name, specialty, or keyword..."
               value={filters.search}
               onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <div className="grid gap-4 md:grid-cols-4">
               <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">Platforms</label>
-                <select className="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                <label className="block text-sm font-medium text-text-primary mb-2">Platforms</label>
+                <select className="w-full px-4 py-2 border border-border rounded-lg">
                   <option>All</option>
                   <option>Meta</option>
                   <option>Google</option>
@@ -72,16 +72,16 @@ export default function SearchPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">Min Rating</label>
-                <select className="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                <label className="block text-sm font-medium text-text-primary mb-2">Min Rating</label>
+                <select className="w-full px-4 py-2 border border-border rounded-lg">
                   <option>All</option>
                   <option>4.5+</option>
                   <option>4.0+</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">Min ROAS</label>
-                <select className="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                <label className="block text-sm font-medium text-text-primary mb-2">Min ROAS</label>
+                <select className="w-full px-4 py-2 border border-border rounded-lg">
                   <option>All</option>
                   <option>3x+</option>
                   <option>2x+</option>
@@ -97,7 +97,7 @@ export default function SearchPage() {
 
       {/* Results */}
       <div className="space-y-4">
-        <h2 className="text-xl font-bold text-gray-900">{specialists.length} Specialists Found</h2>
+        <h2 className="text-xl font-bold text-text-primary">{specialists.length} Specialists Found</h2>
         <div className="grid gap-4 md:grid-cols-2">
           {specialists.map((specialist) => (
             <Card key={specialist.id} className="p-6 space-y-4">
@@ -105,8 +105,8 @@ export default function SearchPage() {
                 <div className="flex items-center gap-4 flex-1">
                   <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600" />
                   <div>
-                    <h3 className="font-bold text-lg text-gray-900">{specialist.name}</h3>
-                    <p className="text-gray-600 text-sm">{specialist.title}</p>
+                    <h3 className="font-bold text-lg text-text-primary">{specialist.name}</h3>
+                    <p className="text-text-secondary text-sm">{specialist.title}</p>
                     <div className="flex gap-1 mt-1">
                       {specialist.badges.map((badge) => (
                         <Badge key={badge} variant="secondary" className="text-xs">
@@ -118,18 +118,18 @@ export default function SearchPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-4 py-4 border-t border-b border-gray-200">
+              <div className="grid grid-cols-3 gap-4 py-4 border-t border-b border-border">
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-900">{specialist.roas}x</p>
-                  <p className="text-xs text-gray-600">Avg ROAS</p>
+                  <p className="text-2xl font-bold text-text-primary">{specialist.roas}x</p>
+                  <p className="text-xs text-text-secondary">Avg ROAS</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-900">⭐{specialist.rating}</p>
-                  <p className="text-xs text-gray-600">Rating</p>
+                  <p className="text-2xl font-bold text-text-primary">⭐{specialist.rating}</p>
+                  <p className="text-xs text-text-secondary">Rating</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-900">{specialist.reviews}</p>
-                  <p className="text-xs text-gray-600">Reviews</p>
+                  <p className="text-2xl font-bold text-text-primary">{specialist.reviews}</p>
+                  <p className="text-xs text-text-secondary">Reviews</p>
                 </div>
               </div>
 

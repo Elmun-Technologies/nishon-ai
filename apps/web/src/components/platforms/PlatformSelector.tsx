@@ -99,8 +99,8 @@ function PlatformCard({ platform, selected, onToggle }: PlatformCardProps) {
       className={`
         relative w-full text-left p-5 rounded-2xl border transition-all duration-200 cursor-pointer
         ${selected
-          ? 'border-opacity-60 bg-white dark:bg-slate-900'
-          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-slate-200 dark:border-slate-700 hover:bg-white dark:bg-slate-900'
+          ? 'border-opacity-60 bg-surface'
+          : 'border-border bg-surface hover:border-border hover:bg-surface'
         }
       `}
       style={selected ? {
@@ -143,9 +143,9 @@ function PlatformCard({ platform, selected, onToggle }: PlatformCardProps) {
       {/* Platform info */}
       <div>
         <div className="flex items-center gap-2 mb-1">
-          <span className="text-sm font-semibold text-slate-900 dark:text-slate-50">{platform.name}</span>
+          <span className="text-sm font-semibold text-text-primary">{platform.name}</span>
         </div>
-        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{platform.description}</p>
+        <p className="text-xs text-text-tertiary leading-relaxed">{platform.description}</p>
 
         {/* Status badge */}
         <div className="mt-3">
@@ -215,14 +215,14 @@ export function PlatformSelector({
 
       {/* Selection summary */}
       {selected.length > 0 && (
-        <div className="mt-4 p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center gap-3">
+        <div className="mt-4 p-3 rounded-xl bg-surface border border-border flex items-center gap-3">
           <div className="flex -space-x-2">
             {selected.map((id) => {
               const p = platforms.find((pl) => pl.id === id)!
               return (
                 <div
                   key={id}
-                  className="w-7 h-7 rounded-lg flex items-center justify-center border-2 border-slate-950 dark:border-slate-700"
+                  className="w-7 h-7 rounded-lg flex items-center justify-center border-2 border-border"
                   style={{ backgroundColor: p.color + '20' }}
                   title={p.name}
                 >
@@ -231,14 +231,14 @@ export function PlatformSelector({
               )
             })}
           </div>
-          <p className="text-xs text-slate-400 dark:text-slate-500">
-            <span className="text-slate-900 dark:text-slate-50 font-medium">{selected.length}</span> ta platforma tanlandi
+          <p className="text-xs text-text-tertiary">
+            <span className="text-text-primary font-medium">{selected.length}</span> ta platforma tanlandi
           </p>
         </div>
       )}
 
       {selected.length === 0 && (
-        <p className="mt-4 text-xs text-center text-slate-500 dark:text-slate-400">
+        <p className="mt-4 text-xs text-center text-text-tertiary">
           Kamida {minSelect} ta platformani tanlang
         </p>
       )}

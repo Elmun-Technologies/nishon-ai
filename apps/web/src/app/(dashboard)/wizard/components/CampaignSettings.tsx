@@ -326,7 +326,7 @@ export function CampaignSettings({
                     className={`py-2 rounded text-xs font-medium transition-colors ${
                       active
                         ? 'bg-[#6366F1] text-white'
-                        : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                        : 'bg-surface text-text-tertiary hover:bg-surface-2'
                     }`}
                   >
                     {h}
@@ -334,7 +334,7 @@ export function CampaignSettings({
                 )
               })}
             </div>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-text-tertiary mt-1">
               {selectedHours.length === 0
                 ? 'Hech qaysi soat tanlanmagan'
                 : `${selectedHours.length} soat tanlangan`}
@@ -347,7 +347,7 @@ export function CampaignSettings({
       <Card padding="lg">
         <h3 className="text-lg font-semibold text-white mb-1">Strategy & Bidding</h3>
         {formData.platforms?.length > 0 && (
-          <p className="text-xs text-slate-500 mb-4">
+          <p className="text-xs text-text-tertiary mb-4">
             Showing strategies for{' '}
             <span className="text-violet-600 capitalize">{primaryPlatform}</span>
             {formData.platforms.length > 1 && ` (+${formData.platforms.length - 1} more)`}
@@ -359,7 +359,7 @@ export function CampaignSettings({
             <Label htmlFor="biddingStrategy">
               Bidding Strategy
               {formData.platforms?.length > 1 && (
-                <span className="ml-2 text-xs text-slate-500">
+                <span className="ml-2 text-xs text-text-tertiary">
                   ({activePlatform} uchun)
                 </span>
               )}
@@ -461,7 +461,7 @@ export function CampaignSettings({
             />
           ))}
         </div>
-        <p className="text-xs text-slate-500 mt-2">
+        <p className="text-xs text-text-tertiary mt-2">
           Dynamic params: {'{keyword}'}, {'{campaign_id}'}, {'{placement}'}
         </p>
       </Card>
@@ -483,9 +483,9 @@ export function CampaignSettings({
           {activeExtensions.includes('quickLinks') && (
             <div className="ml-6 space-y-3">
               {quickLinksList.map((link, i) => (
-                <div key={i} className="border border-slate-700 rounded-lg p-3 space-y-2">
+                <div key={i} className="border border-border rounded-lg p-3 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-400">Quick Link {i + 1}</span>
+                    <span className="text-sm text-text-tertiary">Quick Link {i + 1}</span>
                     {quickLinksList.length > 1 && (
                       <button
                         onClick={() => removeQuickLink(i)}
@@ -602,7 +602,7 @@ export function CampaignSettings({
         <h3 className="text-lg font-semibold text-white mb-4">AI Optimization</h3>
         <div className="space-y-4">
           {/* Master toggle */}
-          <div className="flex items-center gap-3 p-3 bg-slate-800 rounded-lg">
+          <div className="flex items-center gap-3 p-3 bg-surface rounded-lg">
             <Switch
               id="aiEnabled"
               checked={aiEnabled}
@@ -612,13 +612,13 @@ export function CampaignSettings({
             />
             <div>
               <Label htmlFor="aiEnabled">AI avtomatik tavsiyalarni qo'llash</Label>
-              <p className="text-xs text-slate-500">Barcha AI optimizatsiya funksiyalarini yoqish/o'chirish</p>
+              <p className="text-xs text-text-tertiary">Barcha AI optimizatsiya funksiyalarini yoqish/o'chirish</p>
             </div>
           </div>
 
           {/* Sub-toggles — shown only when master is ON */}
           {aiEnabled && (
-            <div className="ml-4 space-y-3 border-l-2 border-slate-700 pl-4">
+            <div className="ml-4 space-y-3 border-l-2 border-border pl-4">
               <div className="flex items-center gap-3">
                 <Switch
                   id="autoReplaceCreatives"
@@ -629,7 +629,7 @@ export function CampaignSettings({
                 />
                 <div>
                   <Label htmlFor="autoReplaceCreatives">Samarasiz kreatiflarni almashtirish</Label>
-                  <p className="text-xs text-slate-500">AI past ko'rsatkichli reklamalarni yangi variantlar bilan almashtiradi</p>
+                  <p className="text-xs text-text-tertiary">AI past ko'rsatkichli reklamalarni yangi variantlar bilan almashtiradi</p>
                 </div>
               </div>
 
@@ -643,7 +643,7 @@ export function CampaignSettings({
                 />
                 <div>
                   <Label htmlFor="optimizeAudience">Auditoriya sozlamalarini optimizatsiya</Label>
-                  <p className="text-xs text-slate-500">AI natijalarga qarab targeting ni moslashtiradi</p>
+                  <p className="text-xs text-text-tertiary">AI natijalarga qarab targeting ni moslashtiradi</p>
                 </div>
               </div>
 
@@ -657,14 +657,14 @@ export function CampaignSettings({
                 />
                 <div>
                   <Label htmlFor="weeklyBudgetOptimization">Haftalik byudjetni taqsimlash</Label>
-                  <p className="text-xs text-slate-500">AI byudjetni kun bo'yicha yaxshi natija uchun qayta taqsimlaydi</p>
+                  <p className="text-xs text-text-tertiary">AI byudjetni kun bo'yicha yaxshi natija uchun qayta taqsimlaydi</p>
                 </div>
               </div>
             </div>
           )}
 
           {/* Separate toggle: match text to query */}
-          <div className="flex items-center gap-3 pt-2 border-t border-slate-700">
+          <div className="flex items-center gap-3 pt-2 border-t border-border">
             <Switch
               id="dynamicText"
               checked={formData.aiOptimization.dynamicText}
@@ -674,7 +674,7 @@ export function CampaignSettings({
             />
             <div>
               <Label htmlFor="dynamicText">Reklama matnini so'rovga moslashtirish</Label>
-              <p className="text-xs text-slate-500">AI foydalanuvchi so'roviga qarab reklama matnini dinamik o'zgartiradi</p>
+              <p className="text-xs text-text-tertiary">AI foydalanuvchi so'roviga qarab reklama matnini dinamik o'zgartiradi</p>
             </div>
           </div>
         </div>
@@ -742,7 +742,7 @@ export function CampaignSettings({
 
                 {/* Age/Gender */}
                 <div>
-                  <h4 className="text-sm font-medium text-slate-400 uppercase tracking-wider mb-3">Yosh va Jins</h4>
+                  <h4 className="text-sm font-medium text-text-tertiary uppercase tracking-wider mb-3">Yosh va Jins</h4>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <BidInput label="Erkak" value={formData.bidAdjustments.genderAge.male ?? 1}
                       onChange={v => handleBidAdjustment('genderAge', { ...formData.bidAdjustments.genderAge, male: v })} />
@@ -763,7 +763,7 @@ export function CampaignSettings({
 
                 {/* Devices */}
                 <div>
-                  <h4 className="text-sm font-medium text-slate-400 uppercase tracking-wider mb-3">Qurilmalar</h4>
+                  <h4 className="text-sm font-medium text-text-tertiary uppercase tracking-wider mb-3">Qurilmalar</h4>
                   <div className="grid grid-cols-3 gap-3">
                     <BidInput label="Mobil" value={formData.bidAdjustments.devices.mobile ?? 1}
                       onChange={v => handleBidAdjustment('devices', { ...formData.bidAdjustments.devices, mobile: v })} />
@@ -776,7 +776,7 @@ export function CampaignSettings({
 
                 {/* Audience */}
                 <div>
-                  <h4 className="text-sm font-medium text-slate-400 uppercase tracking-wider mb-3">Auditoriya segmentlari</h4>
+                  <h4 className="text-sm font-medium text-text-tertiary uppercase tracking-wider mb-3">Auditoriya segmentlari</h4>
                   <div className="grid grid-cols-3 gap-3">
                     <BidInput label="Retargeting" value={formData.bidAdjustments.audience.retargeting ?? 1}
                       onChange={v => handleBidAdjustment('audience', { ...formData.bidAdjustments.audience, retargeting: v })} />
@@ -789,7 +789,7 @@ export function CampaignSettings({
 
                 {/* Ad Format */}
                 <div>
-                  <h4 className="text-sm font-medium text-slate-400 uppercase tracking-wider mb-3">Reklama formatlari</h4>
+                  <h4 className="text-sm font-medium text-text-tertiary uppercase tracking-wider mb-3">Reklama formatlari</h4>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <BidInput label="Image" value={formData.bidAdjustments.format.image ?? 1}
                       onChange={v => handleBidAdjustment('format', { ...formData.bidAdjustments.format, image: v })} />
@@ -804,7 +804,7 @@ export function CampaignSettings({
 
                 {/* Income */}
                 <div>
-                  <h4 className="text-sm font-medium text-slate-400 uppercase tracking-wider mb-3">Daromad darajasi</h4>
+                  <h4 className="text-sm font-medium text-text-tertiary uppercase tracking-wider mb-3">Daromad darajasi</h4>
                   <div className="grid grid-cols-3 gap-3">
                     <BidInput label="Past" value={formData.bidAdjustments.income.low ?? 1}
                       onChange={v => handleBidAdjustment('income', { ...formData.bidAdjustments.income, low: v })} />
@@ -817,7 +817,7 @@ export function CampaignSettings({
 
                 {/* Weather */}
                 <div>
-                  <h4 className="text-sm font-medium text-slate-400 uppercase tracking-wider mb-3">Ob-havo sharoiti</h4>
+                  <h4 className="text-sm font-medium text-text-tertiary uppercase tracking-wider mb-3">Ob-havo sharoiti</h4>
                   <div className="grid grid-cols-3 gap-3">
                     <BidInput label="Quyoshli" value={formData.bidAdjustments.weather.sunny ?? 1}
                       onChange={v => handleBidAdjustment('weather', { ...formData.bidAdjustments.weather, sunny: v })} />
@@ -830,7 +830,7 @@ export function CampaignSettings({
 
                 {/* KPI Correction — 7th type */}
                 <div>
-                  <h4 className="text-sm font-medium text-slate-400 uppercase tracking-wider mb-3">
+                  <h4 className="text-sm font-medium text-text-tertiary uppercase tracking-wider mb-3">
                     KPI Korreksiyasi
                     <span className="ml-2 text-[#6366F1] text-xs normal-case">(Target CPA/ROAS bo'yicha segmentlash)</span>
                   </h4>

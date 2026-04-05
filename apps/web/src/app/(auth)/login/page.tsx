@@ -72,27 +72,27 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex">
+    <div className="min-h-screen bg-surface-2 dark:bg-surface flex">
 
       {/* Left panel */}
-      <div className="hidden lg:flex lg:w-1/2 bg-white border-r border-slate-200 dark:border-slate-700 flex-col justify-between p-12">
+      <div className="hidden lg:flex lg:w-1/2 bg-white border-r border-border flex-col justify-between p-12">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50">
-            Performa <span className="text-slate-700 dark:text-slate-300">AI</span>
+          <h1 className="text-2xl font-bold text-text-primary">
+            Performa <span className="text-text-secondary">AI</span>
           </h1>
         </div>
 
         <div>
           <div className="mb-8">
-            <div className="inline-flex items-center gap-2 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full px-4 py-2 mb-6">
+            <div className="inline-flex items-center gap-2 bg-surface-2 dark:bg-surface border border-border rounded-full px-4 py-2 mb-6">
               <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-slate-700 dark:text-slate-300 text-sm font-medium">AI Agent Active</span>
+              <span className="text-text-secondary text-sm font-medium">AI Agent Active</span>
             </div>
-            <h2 className="text-4xl font-bold text-slate-900 dark:text-slate-50 leading-tight mb-4">
+            <h2 className="text-4xl font-bold text-text-primary leading-tight mb-4">
               Reklamalaringiz<br />
-              <span className="text-slate-700 dark:text-slate-300">o'zi ishlaydi.</span>
+              <span className="text-text-secondary">o'zi ishlaydi.</span>
             </h2>
-            <p className="text-slate-500 dark:text-slate-400 text-lg leading-relaxed">
+            <p className="text-text-tertiary text-lg leading-relaxed">
               Performa Meta, Google va TikTok kampaniyalaringizni
               mustaqil boshqaradi — har 2 soatda optimallashtiradi, har kuni hisobot beradi.
             </p>
@@ -104,31 +104,31 @@ export default function LoginPage() {
               { value: '−40%', label: "Past CPA" },
               { value: '24/7', label: "AI monitoring" },
             ].map((stat) => (
-              <div key={stat.label} className="bg-slate-50 dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
-                <p className="text-2xl font-bold text-slate-700 dark:text-slate-300">{stat.value}</p>
-                <p className="text-slate-500 dark:text-slate-400 text-xs mt-1">{stat.label}</p>
+              <div key={stat.label} className="bg-surface-2 dark:bg-surface rounded-xl p-4 border border-border">
+                <p className="text-2xl font-bold text-text-secondary">{stat.value}</p>
+                <p className="text-text-tertiary text-xs mt-1">{stat.label}</p>
               </div>
             ))}
           </div>
 
-          <div className="bg-slate-50 dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-700">
-            <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed mb-3">
+          <div className="bg-surface-2 dark:bg-surface rounded-xl p-5 border border-border">
+            <p className="text-text-secondary text-sm leading-relaxed mb-3">
               "Performa targetologimizni almashtirdi va birinchi oyda ROAS 2.8x oshdi.
               Endi kampaniya boshqarishga 0 soat sarflaymiz."
             </p>
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-[#E5E7EB] border border-slate-300 dark:border-slate-600 flex items-center justify-center">
-                <span className="text-xs font-bold text-slate-700 dark:text-slate-300">JT</span>
+              <div className="w-8 h-8 rounded-full bg-[#E5E7EB] border border-border flex items-center justify-center">
+                <span className="text-xs font-bold text-text-secondary">JT</span>
               </div>
               <div>
-                <p className="text-slate-900 dark:text-slate-50 text-xs font-medium">Jasur Toshmatov</p>
-                <p className="text-slate-500 dark:text-slate-400 text-xs">CEO, TechShop Uzbekistan</p>
+                <p className="text-text-primary text-xs font-medium">Jasur Toshmatov</p>
+                <p className="text-text-tertiary text-xs">CEO, TechShop Uzbekistan</p>
               </div>
             </div>
           </div>
         </div>
 
-        <p className="text-slate-500 dark:text-slate-400 text-xs">© 2025 Performa. All rights reserved.</p>
+        <p className="text-text-tertiary text-xs">© 2025 Performa. All rights reserved.</p>
       </div>
 
       {/* Right panel — form */}
@@ -137,20 +137,20 @@ export default function LoginPage() {
 
           {/* Mobile logo */}
           <div className="lg:hidden text-center mb-8">
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50">
-              Performa <span className="text-slate-700 dark:text-slate-300">AI</span>
+            <h1 className="text-2xl font-bold text-text-primary">
+              Performa <span className="text-text-secondary">AI</span>
             </h1>
           </div>
 
-          <div className="bg-white border border-slate-200 dark:border-slate-700 rounded-xl p-6">
-            <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-6">Xush kelibsiz</h2>
+          <div className="bg-white border border-border rounded-xl p-6">
+            <h2 className="text-xl font-semibold text-text-primary mb-6">Xush kelibsiz</h2>
 
             {/* Social login buttons */}
             <div className="flex flex-col gap-2 mb-4">
               <button
                 type="button"
                 onClick={handleGoogleLogin}
-                className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-50 text-gray-700 font-medium py-2.5 px-4 rounded-lg border border-gray-200 transition-colors text-sm"
+                className="w-full flex items-center justify-center gap-3 bg-white hover:bg-surface-2 text-text-secondary font-medium py-2.5 px-4 rounded-lg border border-border transition-colors text-sm"
               >
                 <GoogleIcon />
                 Google orqali kirish
@@ -158,7 +158,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={handleFacebookLogin}
-                className="w-full flex items-center justify-center gap-3 bg-[#1877F2] hover:bg-[#166FE5] text-slate-900 dark:text-slate-50 font-medium py-2.5 px-4 rounded-lg transition-colors text-sm"
+                className="w-full flex items-center justify-center gap-3 bg-[#1877F2] hover:bg-[#166FE5] text-text-primary font-medium py-2.5 px-4 rounded-lg transition-colors text-sm"
               >
                 <FacebookIcon />
                 Facebook orqali kirish
@@ -166,9 +166,9 @@ export default function LoginPage() {
             </div>
 
             <div className="flex items-center gap-3 mb-4">
-              <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800" />
-              <span className="text-slate-500 dark:text-slate-400 text-xs">yoki email bilan</span>
-              <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800" />
+              <div className="flex-1 h-px bg-surface-2 dark:bg-surface" />
+              <span className="text-text-tertiary text-xs">yoki email bilan</span>
+              <div className="flex-1 h-px bg-surface-2 dark:bg-surface" />
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -199,9 +199,9 @@ export default function LoginPage() {
               </Button>
             </form>
 
-            <p className="text-center text-slate-500 dark:text-slate-400 text-sm mt-5">
+            <p className="text-center text-text-tertiary text-sm mt-5">
               Hisobingiz yo'qmi?{' '}
-              <Link href="/register" className="text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:text-slate-50 transition-colors font-medium">
+              <Link href="/register" className="text-text-secondary hover:text-text-primary transition-colors font-medium">
                 Ro'yxatdan o'ting
               </Link>
             </p>

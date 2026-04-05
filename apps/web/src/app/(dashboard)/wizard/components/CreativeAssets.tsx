@@ -73,11 +73,11 @@ export function CreativeAssets({
 
   return (
     <div className="space-y-8">
-      <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50">Creative Assets</h2>
+      <h2 className="text-xl font-semibold text-text-primary">Creative Assets</h2>
       
       {/* Product Information */}
       <Card padding="lg">
-        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Product Information</h3>
+        <h3 className="text-lg font-semibold text-text-primary mb-4">Product Information</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <Label htmlFor="productName">Product Name</Label>
@@ -105,7 +105,7 @@ export function CreativeAssets({
       {/* Headlines */}
       <Card padding="lg">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Headlines</h3>
+          <h3 className="text-lg font-semibold text-text-primary">Headlines</h3>
           <Button 
             variant="secondary" 
             size="sm" 
@@ -132,7 +132,7 @@ export function CreativeAssets({
                   value={headline}
                   onChange={(e) => handleHeadlineChange(index, e.target.value)}
                 />
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                <p className="text-xs text-text-tertiary mt-1">
                   {headline.length}/30 characters (Google) | {headline.length}/56 characters (Yandex) | {headline.length}/125 characters (Meta)
                 </p>
               </div>
@@ -162,7 +162,7 @@ export function CreativeAssets({
       {/* Descriptions */}
       <Card padding="lg">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Descriptions</h3>
+          <h3 className="text-lg font-semibold text-text-primary">Descriptions</h3>
           <Button 
             variant="secondary" 
             size="sm" 
@@ -190,7 +190,7 @@ export function CreativeAssets({
                   value={description}
                   onChange={(e) => handleDescriptionChange(index, e.target.value)}
                 />
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                <p className="text-xs text-text-tertiary mt-1">
                   {description.length}/90 characters (Google) | {description.length}/81 characters (Yandex) | {description.length}/125 characters (Meta)
                 </p>
               </div>
@@ -219,7 +219,7 @@ export function CreativeAssets({
 
       {/* Primary Text */}
       <Card padding="lg">
-        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Primary Text</h3>
+        <h3 className="text-lg font-semibold text-text-primary mb-4">Primary Text</h3>
         <div className="space-y-4">
           <div>
             <Label>Primary Text</Label>
@@ -229,7 +229,7 @@ export function CreativeAssets({
               value={formData.creatives.primaryText}
               onChange={(e) => onFormDataChange('creatives', { ...formData.creatives, primaryText: e.target.value })}
             />
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            <p className="text-xs text-text-tertiary mt-1">
               {formData.creatives.primaryText.length}/125 characters (Meta limit)
             </p>
           </div>
@@ -263,7 +263,7 @@ export function CreativeAssets({
 
       {/* Call to Action */}
       <Card padding="lg">
-        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Call to Action</h3>
+        <h3 className="text-lg font-semibold text-text-primary mb-4">Call to Action</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <Label>CTA Button</Label>
@@ -290,7 +290,7 @@ export function CreativeAssets({
 
       {/* Image Upload */}
       <Card padding="lg">
-        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Image Upload</h3>
+        <h3 className="text-lg font-semibold text-text-primary mb-4">Image Upload</h3>
         <div className="space-y-4">
           <div>
             <Label>Recommended Aspect Ratio</Label>
@@ -308,7 +308,7 @@ export function CreativeAssets({
               <input
                 type="file"
                 accept="image/*"
-                className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-50 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-slate-900 file:text-slate-900 dark:text-slate-50 hover:file:bg-[#6B2FB8]"
+                className="w-full px-3 py-2 bg-surface-2 dark:bg-surface border border-border rounded-lg text-text-primary file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-surface file:text-text-primary hover:file:bg-[#6B2FB8]"
                 onChange={(e) => {
                   const file = e.target.files?.[0]
                   if (file) {
@@ -346,7 +346,7 @@ export function CreativeAssets({
           {formData.creatives.imageUrl && (
             <div className="mt-4">
               <Label>Preview</Label>
-              <div className="border border-slate-200 dark:border-slate-700 rounded-lg p-4">
+              <div className="border border-border rounded-lg p-4">
                 <img 
                   src={formData.creatives.imageUrl} 
                   alt="Creative preview"
@@ -359,8 +359,8 @@ export function CreativeAssets({
           {formData.creatives.imagePrompt && (
             <div className="mt-4">
               <Label>AI Image Prompt</Label>
-              <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-lg">
-                <p className="text-sm text-slate-500 dark:text-slate-400">{formData.creatives.imagePrompt}</p>
+              <div className="bg-surface-2 p-4 rounded-lg">
+                <p className="text-sm text-text-tertiary">{formData.creatives.imagePrompt}</p>
               </div>
             </div>
           )}
@@ -369,7 +369,7 @@ export function CreativeAssets({
 
       {/* Creative Testing */}
       <Card padding="lg">
-        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Creative Testing</h3>
+        <h3 className="text-lg font-semibold text-text-primary mb-4">Creative Testing</h3>
         <div className="space-y-4">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
@@ -384,7 +384,7 @@ export function CreativeAssets({
           
           {formData.creatives.enableTesting && (
             <div>
-              <h4 className="text-md font-medium text-slate-900 dark:text-slate-50 mb-3">Test Variants</h4>
+              <h4 className="text-md font-medium text-text-primary mb-3">Test Variants</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="flex items-center gap-3">
                   <Switch
@@ -441,15 +441,15 @@ export function CreativeAssets({
 
       {/* Platform-Specific Constraints */}
       <Card padding="lg">
-        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Platform-Specific Constraints</h3>
+        <h3 className="text-lg font-semibold text-text-primary mb-4">Platform-Specific Constraints</h3>
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <Label>Meta Headline Limit</Label>
-              <p className="text-sm text-slate-500 dark:text-slate-400">125 characters</p>
-              <div className="w-full bg-slate-700 dark:bg-slate-700 rounded-full h-2 mt-2">
+              <p className="text-sm text-text-tertiary">125 characters</p>
+              <div className="w-full bg-surface-2 dark:bg-surface-2 rounded-full h-2 mt-2">
                 <div 
-                  className="bg-slate-900 h-2 rounded-full" 
+                  className="bg-surface h-2 rounded-full" 
                   style={{ width: `${(formData.creatives.headlines[0]?.length || 0) / 125 * 100}%` }}
                 ></div>
               </div>
@@ -457,8 +457,8 @@ export function CreativeAssets({
             
             <div>
               <Label>Google Headline Limit</Label>
-              <p className="text-sm text-slate-500 dark:text-slate-400">30 characters</p>
-              <div className="w-full bg-slate-700 dark:bg-slate-700 rounded-full h-2 mt-2">
+              <p className="text-sm text-text-tertiary">30 characters</p>
+              <div className="w-full bg-surface-2 dark:bg-surface-2 rounded-full h-2 mt-2">
                 <div 
                   className="bg-[#4285F4] h-2 rounded-full" 
                   style={{ width: `${(formData.creatives.headlines[0]?.length || 0) / 30 * 100}%` }}
@@ -468,8 +468,8 @@ export function CreativeAssets({
             
             <div>
               <Label>Yandex Headline Limit</Label>
-              <p className="text-sm text-slate-500 dark:text-slate-400">56 characters</p>
-              <div className="w-full bg-slate-700 dark:bg-slate-700 rounded-full h-2 mt-2">
+              <p className="text-sm text-text-tertiary">56 characters</p>
+              <div className="w-full bg-surface-2 dark:bg-surface-2 rounded-full h-2 mt-2">
                 <div 
                   className="bg-[#FFCC00] h-2 rounded-full" 
                   style={{ width: `${(formData.creatives.headlines[0]?.length || 0) / 56 * 100}%` }}
@@ -479,8 +479,8 @@ export function CreativeAssets({
             
             <div>
               <Label>Meta Primary Text Limit</Label>
-              <p className="text-sm text-slate-500 dark:text-slate-400">125 characters</p>
-              <div className="w-full bg-slate-700 dark:bg-slate-700 rounded-full h-2 mt-2">
+              <p className="text-sm text-text-tertiary">125 characters</p>
+              <div className="w-full bg-surface-2 dark:bg-surface-2 rounded-full h-2 mt-2">
                 <div 
                   className="bg-[#1877F2] h-2 rounded-full" 
                   style={{ width: `${(formData.creatives.primaryText?.length || 0) / 125 * 100}%` }}

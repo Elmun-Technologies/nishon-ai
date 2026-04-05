@@ -68,7 +68,7 @@ export function ChatWidget() {
       {/* Floating button */}
       <button
         onClick={() => setOpen((o) => !o)}
-        className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-slate-900 hover:bg-slate-800 shadow-lg flex items-center justify-center transition-all"
+        className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-surface hover:bg-surface shadow-lg flex items-center justify-center transition-all"
         aria-label="AI Chat"
       >
         {open ? (
@@ -85,26 +85,26 @@ export function ChatWidget() {
 
       {/* Chat panel */}
       {open && (
-        <div className="fixed bottom-24 right-6 z-50 w-[360px] max-h-[520px] flex flex-col rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl overflow-hidden">
+        <div className="fixed bottom-24 right-6 z-50 w-[360px] max-h-[520px] flex flex-col rounded-2xl border border-border bg-surface shadow-xl overflow-hidden">
           {/* Header */}
-          <div className="flex items-center gap-3 px-4 py-3 bg-slate-900 border-b border-slate-800">
-            <div className="w-8 h-8 rounded-full bg-white dark:bg-slate-900/10 flex items-center justify-center text-white font-bold text-sm">N</div>
+          <div className="flex items-center gap-3 px-4 py-3 bg-surface border-b border-border">
+            <div className="w-8 h-8 rounded-full bg-surface/10 flex items-center justify-center text-white font-bold text-sm">N</div>
             <div>
               <div className="text-white font-semibold text-sm">Performa</div>
-              <div className="text-gray-400 text-xs">Kampaniya yordamchisi</div>
+              <div className="text-text-tertiary text-xs">Kampaniya yordamchisi</div>
             </div>
             <div className="ml-auto w-2 h-2 rounded-full bg-emerald-400"></div>
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-0 bg-slate-50 dark:bg-slate-800/50">
+          <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-0 bg-surface-2">
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div
                   className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm leading-relaxed ${
                     m.role === 'user'
-                      ? 'bg-slate-900 text-white rounded-br-sm'
-                      : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 rounded-bl-sm border border-slate-200 dark:border-slate-700'
+                      ? 'bg-surface text-white rounded-br-sm'
+                      : 'bg-surface text-text-secondary rounded-bl-sm border border-border'
                   }`}
                 >
                   {m.content}
@@ -113,11 +113,11 @@ export function ChatWidget() {
             ))}
             {loading && (
               <div className="flex justify-start">
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 px-3 py-2 rounded-2xl rounded-bl-sm">
+                <div className="bg-surface border border-border px-3 py-2 rounded-2xl rounded-bl-sm">
                   <div className="flex gap-1 items-center">
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                    <span className="w-1.5 h-1.5 rounded-full bg-text-tertiary animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-1.5 h-1.5 rounded-full bg-text-tertiary animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="w-1.5 h-1.5 rounded-full bg-text-tertiary animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
                 </div>
               </div>
@@ -127,12 +127,12 @@ export function ChatWidget() {
 
           {/* Suggested questions */}
           {messages.length === 1 && (
-            <div className="px-4 pb-2 pt-2 flex flex-wrap gap-2 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700">
+            <div className="px-4 pb-2 pt-2 flex flex-wrap gap-2 bg-surface border-t border-border">
               {SUGGESTED.map((s) => (
                 <button
                   key={s}
                   onClick={() => send(s)}
-                  className="text-xs px-2.5 py-1 rounded-full border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-900 hover:text-slate-900 dark:text-slate-50 transition-colors"
+                  className="text-xs px-2.5 py-1 rounded-full border border-border text-text-tertiary hover:border-border hover:text-text-primary transition-colors"
                 >
                   {s}
                 </button>
@@ -141,7 +141,7 @@ export function ChatWidget() {
           )}
 
           {/* Input */}
-          <div className="px-3 pb-3 pt-2 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+          <div className="px-3 pb-3 pt-2 border-t border-border bg-surface">
             <div className="flex gap-2">
               <input
                 type="text"
@@ -149,12 +149,12 @@ export function ChatWidget() {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && send()}
                 placeholder="Savol bering..."
-                className="flex-1 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-900 dark:text-slate-50 placeholder-slate-400 focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900/10"
+                className="flex-1 bg-surface-2 border border-border rounded-xl px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-border focus:ring-1 focus:ring-border/10"
               />
               <button
                 onClick={() => send()}
                 disabled={!input.trim() || loading}
-                className="w-9 h-9 rounded-xl bg-slate-900 disabled:opacity-40 flex items-center justify-center hover:bg-slate-800 transition-colors"
+                className="w-9 h-9 rounded-xl bg-surface disabled:opacity-40 flex items-center justify-center hover:bg-surface transition-colors"
               >
                 <svg className="w-4 h-4 text-white rotate-90" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M2 21l21-9L2 3v7l15 2-15 2z" />

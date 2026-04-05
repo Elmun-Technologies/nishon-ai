@@ -20,7 +20,7 @@ export function ValidationDisplay({ results, onFix }: ValidationDisplayProps) {
     return (
       <div className="text-center py-4">
         <div className="text-green-400 font-semibold mb-2">✓ All validations passed!</div>
-        <p className="text-slate-500 dark:text-slate-400">Your campaign is ready to proceed.</p>
+        <p className="text-text-tertiary">Your campaign is ready to proceed.</p>
       </div>
     )
   }
@@ -56,10 +56,10 @@ export function ValidationDisplay({ results, onFix }: ValidationDisplayProps) {
       )}
 
       {allErrors.length > 0 && (
-        <div className="flex justify-end pt-4 border-t border-slate-200 dark:border-slate-700">
+        <div className="flex justify-end pt-4 border-t border-border">
           <button
             onClick={onFix}
-            className="px-4 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-900/90 transition-colors"
+            className="px-4 py-2 bg-surface text-white rounded-lg hover:bg-surface/90 transition-colors"
           >
             Fix Issues
           </button>
@@ -78,7 +78,7 @@ export function ValidationStatus({ status }: ValidationStatusProps) {
     valid: { bg: 'bg-green-500/20', text: 'text-green-400', label: '✓ Valid' },
     warning: { bg: 'bg-yellow-500/20', text: 'text-yellow-400', label: '⚠ Warnings' },
     error: { bg: 'bg-red-500/20', text: 'text-red-400', label: '✗ Errors' },
-    none: { bg: 'bg-slate-100 dark:bg-slate-800', text: 'text-slate-500 dark:text-slate-400', label: 'Not validated' }
+    none: { bg: 'bg-surface-2 dark:bg-surface', text: 'text-text-tertiary', label: 'Not validated' }
   }
 
   const { bg, text, label } = config[status]

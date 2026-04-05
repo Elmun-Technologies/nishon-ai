@@ -168,28 +168,28 @@ export const PricingCard = ({
   const buttonClasses = `
     mt-auto w-full py-2.5 rounded-xl font-semibold text-[14px] transition font-sans
     ${buttonVariant === 'primary'
-      ? 'bg-cyan-400 hover:bg-cyan-300 text-gray-900'
-      : 'bg-black/10 hover:bg-black/20 text-gray-900 border border-black/20 dark:bg-white/10 dark:hover:bg-white/20 dark:text-white dark:border-white/20'
+      ? 'bg-cyan-400 hover:bg-cyan-300 text-text-primary'
+      : 'bg-black/10 hover:bg-black/20 text-text-primary border border-black/20 dark:bg-white/10 dark:hover:bg-white/20 dark:text-white dark:border-white/20'
     }
   `;
 
   return (
     <div className={cardClasses.trim()}>
       {isPopular && (
-        <div className="absolute -top-4 right-4 px-3 py-1 text-[12px] font-semibold rounded-full bg-cyan-400 text-gray-900">
+        <div className="absolute -top-4 right-4 px-3 py-1 text-[12px] font-semibold rounded-full bg-cyan-400 text-text-primary">
           Most Popular
         </div>
       )}
       <div className="mb-3">
-        <h2 className="text-[48px] font-extralight tracking-[-0.03em] text-gray-900 dark:text-white">{planName}</h2>
-        <p className="text-[16px] text-gray-600 dark:text-gray-300 mt-1 font-sans">{description}</p>
+        <h2 className="text-[48px] font-extralight tracking-[-0.03em] text-text-primary dark:text-white">{planName}</h2>
+        <p className="text-[16px] text-text-secondary mt-1 font-sans">{description}</p>
       </div>
       <div className="my-6 flex items-baseline gap-2">
-        <span className="text-[48px] font-extralight text-gray-900 dark:text-white">${price}</span>
-        <span className="text-[14px] text-gray-500 dark:text-gray-400 font-sans">/mo</span>
+        <span className="text-[48px] font-extralight text-text-primary dark:text-white">${price}</span>
+        <span className="text-[14px] text-text-tertiary font-sans">/mo</span>
       </div>
       <div className="w-full mb-5 h-px bg-gradient-to-r from-transparent via-black/10 to-transparent dark:via-white/20"></div>
-      <ul className="flex flex-col gap-2 text-[14px] text-gray-700 dark:text-gray-200 mb-6 font-sans">
+      <ul className="flex flex-col gap-2 text-[14px] text-text-secondary dark:text-text-secondary mb-6 font-sans">
         {features.map((feature, index) => (
           <li key={index} className="flex items-center gap-2">
             <CheckIcon className="text-cyan-400 w-4 h-4" /> {feature}
@@ -215,14 +215,14 @@ export const ModernPricingPage = ({
   showAnimatedBackground = true,
 }: ModernPricingPageProps) => {
   return (
-    <div className="bg-white dark:bg-black text-gray-900 dark:text-white min-h-screen w-full overflow-x-hidden">
+    <div className="bg-white dark:bg-black text-text-primary dark:text-white min-h-screen w-full overflow-x-hidden">
       {showAnimatedBackground && <ShaderCanvas />}
       <main className="relative w-full min-h-screen flex flex-col items-center justify-center px-4 py-8">
         <div className="w-full max-w-5xl mx-auto text-center mb-14">
           <h1 className="text-[48px] md:text-[64px] font-extralight leading-tight tracking-[-0.03em] bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-cyan-500 to-blue-600 dark:from-white dark:via-cyan-300 dark:to-blue-400">
             {title}
           </h1>
-          <p className="mt-3 text-[16px] md:text-[20px] text-gray-600 dark:text-gray-300 max-w-2xl mx-auto font-sans">
+          <p className="mt-3 text-[16px] md:text-[20px] text-text-secondary max-w-2xl mx-auto font-sans">
             {subtitle}
           </p>
         </div>

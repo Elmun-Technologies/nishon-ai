@@ -46,7 +46,7 @@ const PLATFORM_CONFIG: Record<
 const DEFAULT_CONFIG = {
   emoji: '📢',
   bg: 'bg-violet-600/10',
-  border: 'border-slate-900/20',
+  border: 'border-border/20',
 }
 
 export function PlatformIcon({ platform, size = 'md', className }: PlatformIconProps) {
