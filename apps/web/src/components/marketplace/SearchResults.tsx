@@ -80,7 +80,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
     return (
       <div className={cn('', className)}>
         <Card padding="lg" className="text-center">
-          <div className="text-gray-400 mb-4">
+          <div className="text-text-tertiary mb-4">
             <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
@@ -164,7 +164,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
                     'px-3 py-1 rounded-lg text-sm font-medium transition-colors',
                     pageNum === page
                       ? 'bg-primary text-white'
-                      : 'bg-surface border border-border text-text-primary hover:border-gray-400'
+                      : 'bg-surface border border-border text-text-primary hover:border-border'
                   )}
                 >
                   {pageNum}

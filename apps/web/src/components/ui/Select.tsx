@@ -10,31 +10,25 @@ export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElemen
 }
 
 const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
-  ({ className, label, error, options, placeholder, children, ...props }, ref) => {
-    return (
-      <div className="space-y-1">
-        {label && <label className="block text-sm font-medium text-slate-400 dark:text-slate-500">{label}</label>}
-        <select
-          ref={ref}
-          className={cn(
-            'flex w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 px-3 py-2.5 text-sm text-slate-900 dark:text-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-900/20 focus:border-slate-300 dark:border-slate-600 transition-all duration-200 [color-scheme:light]',
-            error && 'border-red-500/30',
-            className
-          )}
-          {...props}
-        >
-          {placeholder && <option value="">{placeholder}</option>}
-          {options
-            ? options.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))
-            : children}
-        </select>
-        {error && <p className="text-red-400 text-xs">{error}</p>}
-      </div>
-    )
-  }
+  ({ className, label, error, options, placeholder, children, ...props }, ref) => (
+    <div className="space-y-1">
+      {label && <label className="block text-xs font-medium text-text-secondary">{label}</label>}
+      <select
+        ref={ref}
+        className={cn(
+          'flex w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-sm text-text-primary',
+          'focus:outline-none focus:ring-2 focus:ring-text-primary/10 focus:border-text-primary transition-colors',
+          error && 'border-error/50',
+          className
+        )}
+        {...props}
+      >
+        {placeholder && <option value="">{placeholder}</option>}
+        {options ? options.map(o => <option key={o.value} value={o.value}>{o.label}</option>) : children}
+      </select>
+      {error && <p className="text-error text-xs">{error}</p>}
+    </div>
+  )
 )
 Select.displayName = 'Select'
-
 export { Select }

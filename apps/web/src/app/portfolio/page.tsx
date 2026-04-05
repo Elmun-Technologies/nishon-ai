@@ -92,7 +92,7 @@ function VerifiedBadge() {
 
 function ProBadge() {
   return (
-    <span className="inline-flex items-center gap-1 bg-[#111827]/15 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 text-[10px] font-bold px-2 py-0.5 rounded-full">
+    <span className="inline-flex items-center gap-1 bg-[#111827]/15 border border-border text-text-secondary text-[10px] font-bold px-2 py-0.5 rounded-full">
       ⭐ PRO
     </span>
   )
@@ -102,7 +102,7 @@ function StarRating({ rating }: { rating: number }) {
   return (
     <div className="flex items-center gap-1">
       <span className="text-yellow-400 text-sm">★</span>
-      <span className="text-slate-900 dark:text-slate-50 font-semibold text-sm">{rating.toFixed(1)}</span>
+      <span className="text-text-primary font-semibold text-sm">{rating.toFixed(1)}</span>
     </div>
   )
 }
@@ -135,17 +135,17 @@ function RoasTrend({ data }: { data: { month: string; roas: number }[] }) {
 function TargetologistCard({ t }: { t: PortfolioTargetologist }) {
   return (
     <Link href={`/portfolio/${t.slug}`} className="block group">
-      <div className="bg-white border border-slate-200 dark:border-slate-700 group-hover:border-slate-300 dark:border-slate-600 rounded-2xl p-6 transition-all duration-300 group-hover:shadow-[0_0_30px_rgba(124,58,237,0.1)]">
+      <div className="bg-white border border-border group-hover:border-border rounded-2xl p-6 transition-all duration-300 group-hover:shadow-[0_0_30px_rgba(124,58,237,0.1)]">
 
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${t.avatarColor} flex items-center justify-center text-sm font-black text-slate-900 dark:text-slate-50 shadow-lg`}>
+            <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${t.avatarColor} flex items-center justify-center text-sm font-black text-text-primary shadow-lg`}>
               {t.avatar}
             </div>
             <div>
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-slate-900 dark:text-slate-50 font-bold">{t.name}</span>
+                <span className="text-text-primary font-bold">{t.name}</span>
                 {t.verified && <VerifiedBadge />}
                 {t.proMember && <ProBadge />}
                 {(t as any).agentType === 'ai' && (
@@ -154,14 +154,14 @@ function TargetologistCard({ t }: { t: PortfolioTargetologist }) {
                   </span>
                 )}
               </div>
-              <div className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">{t.title}</div>
+              <div className="text-text-tertiary text-xs mt-0.5">{t.title}</div>
             </div>
           </div>
           <StarRating rating={t.rating} />
         </div>
 
         {/* Location + response */}
-        <div className="flex items-center gap-3 mb-4 text-xs text-slate-500 dark:text-slate-400">
+        <div className="flex items-center gap-3 mb-4 text-xs text-text-tertiary">
           <span>📍 {t.location}</span>
           <span>⚡ {t.responseTime}</span>
         </div>
@@ -174,9 +174,9 @@ function TargetologistCard({ t }: { t: PortfolioTargetologist }) {
             { label: 'Kampaniya', value: t.stats.totalCampaigns },
             { label: 'Muvaffaqiyat', value: `${t.stats.successRate}%` },
           ].map(m => (
-            <div key={m.label} className="bg-slate-50 dark:bg-slate-900 rounded-lg p-2 text-center">
-              <div className={`text-sm font-bold ${m.highlight ? 'text-slate-700 dark:text-slate-300' : 'text-slate-900 dark:text-slate-50'}`}>{m.value}</div>
-              <div className="text-slate-500 dark:text-slate-400 text-[10px] mt-0.5">{m.label}</div>
+            <div key={m.label} className="bg-surface-2 dark:bg-surface rounded-lg p-2 text-center">
+              <div className={`text-sm font-bold ${m.highlight ? 'text-text-secondary' : 'text-text-primary'}`}>{m.value}</div>
+              <div className="text-text-tertiary text-[10px] mt-0.5">{m.label}</div>
             </div>
           ))}
         </div>
@@ -184,8 +184,8 @@ function TargetologistCard({ t }: { t: PortfolioTargetologist }) {
         {/* Total spend + trend */}
         <div className="flex items-center justify-between mb-4">
           <div>
-            <div className="text-slate-500 dark:text-slate-400 text-xs">Jami boshqarilgan byudjet</div>
-            <div className="text-slate-900 dark:text-slate-50 font-bold text-lg">{formatSpend(t.stats.totalSpendManaged)}</div>
+            <div className="text-text-tertiary text-xs">Jami boshqarilgan byudjet</div>
+            <div className="text-text-primary font-bold text-lg">{formatSpend(t.stats.totalSpendManaged)}</div>
           </div>
           <RoasTrend data={t.monthlyPerformance} />
         </div>
@@ -197,8 +197,8 @@ function TargetologistCard({ t }: { t: PortfolioTargetologist }) {
               key={p.id}
               className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded-full border ${
                 p.verified
-                  ? 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-50'
-                  : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400'
+                  ? 'bg-surface-2 dark:bg-surface border-border text-text-primary'
+                  : 'bg-surface-2 dark:bg-surface border-border text-text-tertiary'
               }`}
             >
               {p.icon} {p.name}
@@ -210,23 +210,23 @@ function TargetologistCard({ t }: { t: PortfolioTargetologist }) {
         {/* Niches */}
         <div className="flex flex-wrap gap-1.5 mb-5">
           {t.niches.slice(0, 3).map(n => (
-            <span key={n} className="text-[10px] bg-slate-50 dark:bg-slate-900 text-slate-400 dark:text-slate-500 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">
+            <span key={n} className="text-[10px] bg-surface-2 dark:bg-surface text-text-tertiary px-2 py-0.5 rounded-md border border-border">
               {n}
             </span>
           ))}
           {t.niches.length > 3 && (
-            <span className="text-[10px] text-slate-500 dark:text-slate-400 px-2 py-0.5">+{t.niches.length - 3}</span>
+            <span className="text-[10px] text-text-tertiary px-2 py-0.5">+{t.niches.length - 3}</span>
           )}
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-700">
+        <div className="flex items-center justify-between pt-4 border-t border-border">
           <div>
-            <span className="text-slate-500 dark:text-slate-400 text-xs">Narxi: </span>
-            <span className="text-slate-900 dark:text-slate-50 font-semibold text-sm">${t.price.from}</span>
-            <span className="text-slate-500 dark:text-slate-400 text-xs">/{t.price.unit}</span>
+            <span className="text-text-tertiary text-xs">Narxi: </span>
+            <span className="text-text-primary font-semibold text-sm">${t.price.from}</span>
+            <span className="text-text-tertiary text-xs">/{t.price.unit}</span>
           </div>
-          <span className="text-slate-700 dark:text-slate-300 text-sm font-semibold group-hover:text-slate-700 dark:text-slate-300 transition-colors">
+          <span className="text-text-secondary text-sm font-semibold group-hover:text-text-secondary transition-colors">
             Profil ko'rish →
           </span>
         </div>
@@ -304,18 +304,18 @@ export default function PortfolioPage() {
   }), [allAgents])
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-50">
+    <div className="min-h-screen bg-surface-2 dark:bg-surface text-text-primary">
 
       {/* ── NAV ── */}
-      <nav className="sticky top-0 z-50 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/90 backdrop-blur-lg">
+      <nav className="sticky top-0 z-50 border-b border-border bg-surface-2 dark:bg-surface/90 backdrop-blur-lg">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <button onClick={() => router.push('/')} className="text-xl font-extrabold">
-            Performa <span className="text-slate-700 dark:text-slate-300">AI</span>
+            Performa <span className="text-text-secondary">AI</span>
           </button>
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.push('/portfolio/setup')}
-              className="text-sm text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:text-slate-50 transition-colors px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg"
+              className="text-sm text-text-tertiary hover:text-text-primary transition-colors px-4 py-2 border border-border rounded-lg"
             >
               Targetolog bo'lish →
             </button>
@@ -330,22 +330,22 @@ export default function PortfolioPage() {
       </nav>
 
       {/* ── HERO ── */}
-      <div className="relative py-16 px-6 text-center border-b border-slate-200 dark:border-slate-700 overflow-hidden">
+      <div className="relative py-16 px-6 text-center border-b border-border overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-[#7C3AED]/5 to-transparent pointer-events-none" />
         <div className="relative max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full px-4 py-1.5 mb-5">
+          <div className="inline-flex items-center gap-2 bg-surface-2 dark:bg-surface border border-border rounded-full px-4 py-1.5 mb-5">
             <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-            <span className="text-slate-700 dark:text-slate-300 text-xs font-bold uppercase tracking-widest">Live Portfolio Tracking</span>
+            <span className="text-text-secondary text-xs font-bold uppercase tracking-widest">Live Portfolio Tracking</span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-slate-50 mb-4">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-text-primary mb-4">
             Tasdiqlangan targetologlar
           </h1>
-          <p className="text-slate-400 dark:text-slate-500 text-lg max-w-xl mx-auto mb-8">
+          <p className="text-text-tertiary text-lg max-w-xl mx-auto mb-8">
             Haqiqiy kampaniya natijalari bilan. Real-time statistika. myfxbook uslubida — lekin reklama uchun.
           </p>
 
           {/* aggregate stats */}
-          <div className="inline-grid grid-cols-4 gap-px bg-slate-100 dark:bg-slate-800 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700">
+          <div className="inline-grid grid-cols-4 gap-px bg-surface-2 dark:bg-surface rounded-2xl overflow-hidden border border-border">
             {[
               { v: totals.targetologists, l: 'Targetolog' },
               { v: formatSpend(totals.spendManaged), l: 'Boshqarilgan' },
@@ -353,8 +353,8 @@ export default function PortfolioPage() {
               { v: totals.campaigns, l: 'Kampaniyalar' },
             ].map(s => (
               <div key={s.l} className="bg-white px-6 py-4 text-center">
-                <div className="text-2xl font-extrabold text-slate-900 dark:text-slate-50">{s.v}</div>
-                <div className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">{s.l}</div>
+                <div className="text-2xl font-extrabold text-text-primary">{s.v}</div>
+                <div className="text-text-tertiary text-xs mt-0.5">{s.l}</div>
               </div>
             ))}
           </div>
@@ -369,12 +369,12 @@ export default function PortfolioPage() {
 
             {/* Search */}
             <div>
-              <label className="text-slate-400 dark:text-slate-500 text-xs font-semibold uppercase tracking-wider block mb-2">Qidirish</label>
+              <label className="text-text-tertiary text-xs font-semibold uppercase tracking-wider block mb-2">Qidirish</label>
               <input
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Ism yoki niche..."
-                className="w-full bg-white border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2.5 text-sm text-slate-900 dark:text-slate-50 placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-slate-900 dark:border-slate-100/50"
+                className="w-full bg-white border border-border rounded-lg px-3 py-2.5 text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-border/50"
               />
             </div>
 
@@ -382,16 +382,16 @@ export default function PortfolioPage() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setVerifiedOnly(!verifiedOnly)}
-                className={`w-10 h-5 rounded-full transition-colors ${verifiedOnly ? 'bg-[#111827]' : 'bg-slate-100 dark:bg-slate-800'}`}
+                className={`w-10 h-5 rounded-full transition-colors ${verifiedOnly ? 'bg-[#111827]' : 'bg-surface-2 dark:bg-surface'}`}
               >
                 <div className={`w-4 h-4 rounded-full bg-white mx-0.5 transition-transform ${verifiedOnly ? 'translate-x-5' : 'translate-x-0'}`} />
               </button>
-              <span className="text-sm text-slate-900 dark:text-slate-50">Faqat tasdiqlangan</span>
+              <span className="text-sm text-text-primary">Faqat tasdiqlangan</span>
             </div>
 
             {/* Platforms */}
             <div>
-              <label className="text-slate-400 dark:text-slate-500 text-xs font-semibold uppercase tracking-wider block mb-3">Platformalar</label>
+              <label className="text-text-tertiary text-xs font-semibold uppercase tracking-wider block mb-3">Platformalar</label>
               <div className="space-y-2">
                 {ALL_PLATFORMS.map(p => (
                   <button
@@ -399,13 +399,13 @@ export default function PortfolioPage() {
                     onClick={() => togglePlatform(p.id)}
                     className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all ${
                       selectedPlatforms.includes(p.id)
-                        ? 'bg-[#111827]/15 border border-slate-900 dark:border-slate-100/40 text-slate-900 dark:text-slate-50'
-                        : 'bg-white border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:border-slate-200 dark:border-slate-700'
+                        ? 'bg-[#111827]/15 border border-border/40 text-text-primary'
+                        : 'bg-white border border-border text-text-tertiary hover:border-border'
                     }`}
                   >
                     <span>{p.icon}</span>
                     <span>{p.name}</span>
-                    {selectedPlatforms.includes(p.id) && <span className="ml-auto text-slate-700 dark:text-slate-300 font-bold">✓</span>}
+                    {selectedPlatforms.includes(p.id) && <span className="ml-auto text-text-secondary font-bold">✓</span>}
                   </button>
                 ))}
               </div>
@@ -413,8 +413,8 @@ export default function PortfolioPage() {
 
             {/* Min ROAS */}
             <div>
-              <label className="text-slate-400 dark:text-slate-500 text-xs font-semibold uppercase tracking-wider block mb-2">
-                Min ROAS: <span className="text-slate-900 dark:text-slate-50">{minROAS > 0 ? `${minROAS}x` : 'Hammasi'}</span>
+              <label className="text-text-tertiary text-xs font-semibold uppercase tracking-wider block mb-2">
+                Min ROAS: <span className="text-text-primary">{minROAS > 0 ? `${minROAS}x` : 'Hammasi'}</span>
               </label>
               <input
                 type="range" min={0} max={6} step={0.5}
@@ -422,14 +422,14 @@ export default function PortfolioPage() {
                 onChange={e => setMinROAS(Number(e.target.value))}
                 className="w-full accent-[#7C3AED]"
               />
-              <div className="flex justify-between text-[10px] text-slate-500 dark:text-slate-400 mt-1">
+              <div className="flex justify-between text-[10px] text-text-tertiary mt-1">
                 <span>0x</span><span>3x</span><span>6x+</span>
               </div>
             </div>
 
             {/* Niches */}
             <div>
-              <label className="text-slate-400 dark:text-slate-500 text-xs font-semibold uppercase tracking-wider block mb-3">Niche</label>
+              <label className="text-text-tertiary text-xs font-semibold uppercase tracking-wider block mb-3">Niche</label>
               <div className="flex flex-wrap gap-1.5">
                 {ALL_NICHES.map(n => (
                   <button
@@ -437,8 +437,8 @@ export default function PortfolioPage() {
                     onClick={() => toggleNiche(n)}
                     className={`text-xs px-2.5 py-1 rounded-full border transition-all ${
                       selectedNiches.includes(n)
-                        ? 'bg-[#E5E7EB] border-slate-900 dark:border-slate-100/50 text-slate-900 dark:text-slate-50'
-                        : 'bg-white border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:border-slate-200 dark:border-slate-700'
+                        ? 'bg-[#E5E7EB] border-border/50 text-text-primary'
+                        : 'bg-white border-border text-text-tertiary hover:border-border'
                     }`}
                   >
                     {n}
@@ -474,7 +474,7 @@ export default function PortfolioPage() {
                   className={`px-4 py-2 text-sm font-medium rounded-xl transition-all ${
                     agentTypeFilter === t.key
                       ? 'bg-[#111827] text-white'
-                      : 'bg-white border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50'
+                      : 'bg-white border border-border text-text-tertiary hover:text-text-primary'
                   }`}
                 >
                   {t.label}
@@ -484,16 +484,16 @@ export default function PortfolioPage() {
 
             {/* Sort + count */}
             <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
-              <p className="text-slate-400 dark:text-slate-500 text-sm">
-                <span className="text-slate-900 dark:text-slate-50 font-semibold">{filtered.length}</span>{' '}
+              <p className="text-text-tertiary text-sm">
+                <span className="text-text-primary font-semibold">{filtered.length}</span>{' '}
                 {agentTypeFilter === 'ai' ? 'AI agent' : agentTypeFilter === 'human' ? 'targetolog' : 'natija'} topildi
               </p>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-500 dark:text-slate-400">Saralash:</span>
+                <span className="text-xs text-text-tertiary">Saralash:</span>
                 <select
                   value={sortBy}
                   onChange={e => setSortBy(e.target.value)}
-                  className="bg-white border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-50 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-slate-900 dark:border-slate-100/50"
+                  className="bg-white border border-border text-text-primary text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-border/50"
                 >
                   {SORT_OPTIONS.map(o => (
                     <option key={o.value} value={o.value}>{o.label}</option>
@@ -505,10 +505,10 @@ export default function PortfolioPage() {
             {filtered.length === 0 ? (
               <div className="text-center py-24">
                 <div className="text-5xl mb-4">🔍</div>
-                <p className="text-slate-400 dark:text-slate-500">Hech qanday targetolog topilmadi</p>
+                <p className="text-text-tertiary">Hech qanday targetolog topilmadi</p>
                 <button
                   onClick={() => { setSelectedPlatforms([]); setSelectedNiches([]); setVerifiedOnly(false); setMinROAS(0); setSearch('') }}
-                  className="mt-4 text-slate-700 dark:text-slate-300 hover:text-slate-700 dark:text-slate-300 text-sm"
+                  className="mt-4 text-text-secondary hover:text-text-secondary text-sm"
                 >
                   Filtrlarni tozalash
                 </button>
@@ -525,10 +525,10 @@ export default function PortfolioPage() {
       </div>
 
       {/* ── CTA for targetologists ── */}
-      <div className="border-t border-slate-200 dark:border-slate-700 py-16 px-6 text-center">
+      <div className="border-t border-border py-16 px-6 text-center">
         <div className="max-w-2xl mx-auto">
-          <h2 className="text-3xl font-extrabold text-slate-900 dark:text-slate-50 mb-4">Targetolmisiz?</h2>
-          <p className="text-slate-400 dark:text-slate-500 mb-8">
+          <h2 className="text-3xl font-extrabold text-text-primary mb-4">Targetolmisiz?</h2>
+          <p className="text-text-tertiary mb-8">
             Performa ga qo'shiling — natijalaringizni real-time da ko'rsating va ko'proq mijoz toping.
           </p>
           <button

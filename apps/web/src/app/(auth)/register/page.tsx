@@ -117,21 +117,21 @@ export default function RegisterPage() {
   const passwordStrength = getPasswordStrength(form.password)
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-surface-2 dark:bg-surface flex items-center justify-center p-6">
       <div className="w-full max-w-md">
 
         {/* Logo */}
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50">
-            Performa <span className="text-slate-700 dark:text-slate-300">AI</span>
+          <h1 className="text-2xl font-bold text-text-primary">
+            Performa <span className="text-text-secondary">AI</span>
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
+          <p className="text-text-tertiary text-sm mt-1">
             AI bilan reklama boshqarishni boshlang
           </p>
         </div>
 
-        <div className="bg-white border border-slate-200 dark:border-slate-700 rounded-xl p-6">
-          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-6">
+        <div className="bg-white border border-border rounded-xl p-6">
+          <h2 className="text-xl font-semibold text-text-primary mb-6">
             Hisob yaratish
           </h2>
 
@@ -140,7 +140,7 @@ export default function RegisterPage() {
             <button
               type="button"
               onClick={handleGoogleRegister}
-              className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-50 text-gray-700 font-medium py-2.5 px-4 rounded-lg border border-gray-200 transition-colors text-sm"
+              className="w-full flex items-center justify-center gap-3 bg-white hover:bg-surface-2 text-text-secondary font-medium py-2.5 px-4 rounded-lg border border-border transition-colors text-sm"
             >
               <GoogleIcon />
               Google orqali ro'yxatdan o'tish
@@ -148,7 +148,7 @@ export default function RegisterPage() {
             <button
               type="button"
               onClick={handleFacebookRegister}
-              className="w-full flex items-center justify-center gap-3 bg-[#1877F2] hover:bg-[#166FE5] text-slate-900 dark:text-slate-50 font-medium py-2.5 px-4 rounded-lg transition-colors text-sm"
+              className="w-full flex items-center justify-center gap-3 bg-[#1877F2] hover:bg-[#166FE5] text-text-primary font-medium py-2.5 px-4 rounded-lg transition-colors text-sm"
             >
               <FacebookIcon />
               Facebook orqali ro'yxatdan o'tish
@@ -156,9 +156,9 @@ export default function RegisterPage() {
           </div>
 
           <div className="flex items-center gap-3 mb-4">
-            <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800" />
-            <span className="text-slate-500 dark:text-slate-400 text-xs">yoki email bilan</span>
-            <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800" />
+            <div className="flex-1 h-px bg-surface-2 dark:bg-surface" />
+            <span className="text-text-tertiary text-xs">yoki email bilan</span>
+            <div className="flex-1 h-px bg-surface-2 dark:bg-surface" />
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -204,12 +204,12 @@ export default function RegisterPage() {
                         className={`h-1 flex-1 rounded-full transition-all duration-300 ${
                           level <= passwordStrength.level
                             ? passwordStrength.color
-                            : 'bg-slate-100 dark:bg-slate-800'
+                            : 'bg-surface-2 dark:bg-surface'
                         }`}
                       />
                     ))}
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{passwordStrength.label}</p>
+                  <p className="text-xs text-text-tertiary mt-1">{passwordStrength.label}</p>
                 </div>
               )}
             </div>
@@ -232,9 +232,9 @@ export default function RegisterPage() {
             </Button>
           </form>
 
-          <p className="text-center text-slate-500 dark:text-slate-400 text-sm mt-5">
+          <p className="text-center text-text-tertiary text-sm mt-5">
             Hisobingiz bormi?{' '}
-            <Link href="/login" className="text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:text-slate-50 transition-colors font-medium">
+            <Link href="/login" className="text-text-secondary hover:text-text-primary transition-colors font-medium">
               Kirish
             </Link>
           </p>
@@ -244,7 +244,7 @@ export default function RegisterPage() {
           {["Kredit karta shart emas", "Bepul boshlash", 'Istalgan vaqt bekor qilish'].map((item) => (
             <div key={item} className="flex items-center gap-1.5">
               <span className="text-emerald-400 text-xs">✓</span>
-              <span className="text-slate-500 dark:text-slate-400 text-xs">{item}</span>
+              <span className="text-text-tertiary text-xs">{item}</span>
             </div>
           ))}
         </div>

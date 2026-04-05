@@ -62,8 +62,8 @@ export default function BudgetPage() {
       {/* ── Page header ── */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50 mb-1">Byudjet Taqsimoti</h1>
-          <p className="text-slate-500 dark:text-slate-400 text-sm">
+          <h1 className="text-2xl font-bold text-text-primary mb-1">Byudjet Taqsimoti</h1>
+          <p className="text-text-tertiary text-sm">
             AI tomonidan optimallashtirilgan platforma byudjet taqsimoti
           </p>
         </div>
@@ -103,10 +103,10 @@ export default function BudgetPage() {
           <Card key={label}>
             <div className="flex items-center gap-2 mb-3">
               <span className="text-lg">{icon}</span>
-              <p className="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wide">{label}</p>
+              <p className="text-text-tertiary text-xs font-medium uppercase tracking-wide">{label}</p>
             </div>
-            <p className="text-xl font-bold text-slate-900 dark:text-slate-50">{value}</p>
-            <p className="text-slate-500 dark:text-slate-400 text-xs mt-1 capitalize">{sub}</p>
+            <p className="text-xl font-bold text-text-primary">{value}</p>
+            <p className="text-text-tertiary text-xs mt-1 capitalize">{sub}</p>
           </Card>
         ))}
       </div>
@@ -116,18 +116,18 @@ export default function BudgetPage() {
         <Card>
           <div className="flex items-center gap-2 mb-5">
             <span className="text-lg">📈</span>
-            <h2 className="font-semibold text-slate-900 dark:text-slate-50">Joriy Ko'rsatkichlar</h2>
+            <h2 className="font-semibold text-text-primary">Joriy Ko'rsatkichlar</h2>
             <Badge variant="success" size="sm" dot>Real ma'lumot</Badge>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { label: 'Jami Xarajat', value: performance.totalSpend !== undefined ? formatCurrency(performance.totalSpend) : '—', color: 'text-slate-900 dark:text-slate-50' },
+              { label: 'Jami Xarajat', value: performance.totalSpend !== undefined ? formatCurrency(performance.totalSpend) : '—', color: 'text-text-primary' },
               { label: "O'rt. ROAS", value: performance.avgRoas !== undefined ? `${Number(performance.avgRoas).toFixed(1)}x` : '—', color: 'text-emerald-400' },
-              { label: "O'rt. CPA", value: performance.avgCpa !== undefined ? formatCurrency(performance.avgCpa) : '—', color: 'text-slate-900 dark:text-slate-50' },
-              { label: "O'rt. CTR", value: performance.avgCtr !== undefined ? `${(Number(performance.avgCtr) * 100).toFixed(2)}%` : '—', color: 'text-slate-900 dark:text-slate-50' },
+              { label: "O'rt. CPA", value: performance.avgCpa !== undefined ? formatCurrency(performance.avgCpa) : '—', color: 'text-text-primary' },
+              { label: "O'rt. CTR", value: performance.avgCtr !== undefined ? `${(Number(performance.avgCtr) * 100).toFixed(2)}%` : '—', color: 'text-text-primary' },
             ].map(({ label, value, color }) => (
-              <div key={label} className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-                <p className="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wide mb-2">{label}</p>
+              <div key={label} className="bg-surface-2 border border-border rounded-xl p-4">
+                <p className="text-text-tertiary text-xs font-medium uppercase tracking-wide mb-2">{label}</p>
                 <p className={`text-xl font-bold ${color}`}>{value}</p>
               </div>
             ))}
@@ -141,7 +141,7 @@ export default function BudgetPage() {
         <Card>
           <div className="flex items-center gap-2 mb-5">
             <span className="text-lg">📊</span>
-            <h2 className="font-semibold text-slate-900 dark:text-slate-50">Platforma Taqsimoti</h2>
+            <h2 className="font-semibold text-text-primary">Platforma Taqsimoti</h2>
             <Badge variant="purple" size="sm">AI Tavsiyasi</Badge>
           </div>
 
@@ -161,16 +161,16 @@ export default function BudgetPage() {
                       <div className="flex items-center gap-2.5">
                         <span className="text-base">{config.emoji}</span>
                         <div>
-                          <p className="text-slate-900 dark:text-slate-50 text-sm font-medium">{config.label}</p>
-                          <p className="text-slate-500 dark:text-slate-400 text-xs">{formatCurrency(allocated)}/month</p>
+                          <p className="text-text-primary text-sm font-medium">{config.label}</p>
+                          <p className="text-text-tertiary text-xs">{formatCurrency(allocated)}/month</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-slate-900 dark:text-slate-50 font-bold text-sm">{percentage}%</p>
-                        <p className="text-slate-500 dark:text-slate-400 text-xs">{formatCurrency(allocated / 30)}/day</p>
+                        <p className="text-text-primary font-bold text-sm">{percentage}%</p>
+                        <p className="text-text-tertiary text-xs">{formatCurrency(allocated / 30)}/day</p>
                       </div>
                     </div>
-                    <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                    <div className="h-2 bg-surface-2 dark:bg-surface rounded-full overflow-hidden">
                       <div
                         className="h-full rounded-full transition-all duration-700"
                         style={{ width: `${percentage}%`, backgroundColor: config.color }}
@@ -180,18 +180,18 @@ export default function BudgetPage() {
                 )
               })}
 
-              <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+              <div className="mt-4 pt-4 border-t border-border">
                 <div className="flex items-center gap-2 flex-wrap">
                   {platformStats.map(({ platform, percentage }) => {
                     const config = PLATFORM_CONFIG[platform] ?? { color: '#7C3AED', emoji: '📢' }
                     return (
                       <div
                         key={platform}
-                        className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5"
+                        className="flex items-center gap-1.5 bg-surface-2 border border-border rounded-lg px-2.5 py-1.5"
                       >
                         <div className="w-2 h-2 rounded-full" style={{ backgroundColor: config.color }} />
-                        <span className="text-slate-400 dark:text-slate-500 text-xs capitalize">{platform}</span>
-                        <span className="text-slate-900 dark:text-slate-50 text-xs font-medium">{percentage}%</span>
+                        <span className="text-text-tertiary text-xs capitalize">{platform}</span>
+                        <span className="text-text-primary text-xs font-medium">{percentage}%</span>
                       </div>
                     )
                   })}
@@ -204,14 +204,14 @@ export default function BudgetPage() {
         <Card>
           <div className="flex items-center gap-2 mb-5">
             <span className="text-lg">🎯</span>
-            <h2 className="font-semibold text-slate-900 dark:text-slate-50">Oylik Prognoz</h2>
+            <h2 className="font-semibold text-text-primary">Oylik Prognoz</h2>
           </div>
 
           {forecast ? (
             <div className="space-y-4">
               {[
-                { label: 'Taxminiy Lidlar', value: forecast.estimatedLeads ?? '—', icon: '🎯', color: 'text-slate-900 dark:text-slate-50' },
-                { label: 'Taxminiy Sotuvlar', value: forecast.estimatedSales ?? '—', icon: '🛒', color: 'text-slate-900 dark:text-slate-50' },
+                { label: 'Taxminiy Lidlar', value: forecast.estimatedLeads ?? '—', icon: '🎯', color: 'text-text-primary' },
+                { label: 'Taxminiy Sotuvlar', value: forecast.estimatedSales ?? '—', icon: '🛒', color: 'text-text-primary' },
                 {
                   label: 'Taxminiy ROAS',
                   value: forecast.estimatedRoas ? `${Number(forecast.estimatedRoas).toFixed(1)}x` : '—',
@@ -222,7 +222,7 @@ export default function BudgetPage() {
                   label: 'Taxminiy CPA',
                   value: forecast.estimatedCpa ? formatCurrency(forecast.estimatedCpa) : '—',
                   icon: '💵',
-                  color: 'text-slate-900 dark:text-slate-50',
+                  color: 'text-text-primary',
                 },
                 {
                   label: 'Taxminiy CTR',
@@ -230,17 +230,17 @@ export default function BudgetPage() {
                     ? `${(Number(forecast.estimatedCtr) * 100).toFixed(2)}%`
                     : '—',
                   icon: '👆',
-                  color: 'text-slate-900 dark:text-slate-50',
+                  color: 'text-text-primary',
                 },
-                { label: 'Ishonch darajasi', value: forecast.confidence ?? '—', icon: '🎲', color: 'text-slate-700 dark:text-slate-300' },
+                { label: 'Ishonch darajasi', value: forecast.confidence ?? '—', icon: '🎲', color: 'text-text-secondary' },
               ].map(({ label, value, icon, color }) => (
                 <div
                   key={label}
-                  className="flex items-center justify-between py-2.5 border-b border-slate-200 dark:border-slate-700 last:border-0"
+                  className="flex items-center justify-between py-2.5 border-b border-border last:border-0"
                 >
                   <div className="flex items-center gap-2.5">
                     <span className="text-base w-6">{icon}</span>
-                    <span className="text-slate-400 dark:text-slate-500 text-sm">{label}</span>
+                    <span className="text-text-tertiary text-sm">{label}</span>
                   </div>
                   <span className={`font-bold text-sm ${color}`}>{value}</span>
                 </div>
@@ -261,27 +261,27 @@ export default function BudgetPage() {
         <Card>
           <div className="flex items-center gap-2 mb-4">
             <span className="text-lg">🎨</span>
-            <h2 className="font-semibold text-slate-900 dark:text-slate-50">Kreativ Ko'rsatmalar</h2>
+            <h2 className="font-semibold text-text-primary">Kreativ Ko'rsatmalar</h2>
             <Badge variant="gray" size="sm">AI Strategiyadan</Badge>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-              <p className="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wide mb-2">Ton</p>
-              <p className="text-slate-900 dark:text-slate-50 text-sm">{strategy.creativeGuidelines.tone ?? '—'}</p>
+            <div className="bg-surface-2 border border-border rounded-xl p-4">
+              <p className="text-text-tertiary text-xs font-medium uppercase tracking-wide mb-2">Ton</p>
+              <p className="text-text-primary text-sm">{strategy.creativeGuidelines.tone ?? '—'}</p>
             </div>
-            <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-              <p className="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wide mb-2">Asosiy Xabarlar</p>
+            <div className="bg-surface-2 border border-border rounded-xl p-4">
+              <p className="text-text-tertiary text-xs font-medium uppercase tracking-wide mb-2">Asosiy Xabarlar</p>
               <ul className="space-y-1">
                 {(strategy.creativeGuidelines.keyMessages ?? []).map((msg: string, i: number) => (
-                  <li key={i} className="text-slate-900 dark:text-slate-50 text-sm flex items-start gap-2">
-                    <span className="text-slate-700 dark:text-slate-300 mt-0.5">•</span>
+                  <li key={i} className="text-text-primary text-sm flex items-start gap-2">
+                    <span className="text-text-secondary mt-0.5">•</span>
                     {msg}
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-              <p className="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wide mb-2">Harakatga Chaqiruv</p>
+            <div className="bg-surface-2 border border-border rounded-xl p-4">
+              <p className="text-text-tertiary text-xs font-medium uppercase tracking-wide mb-2">Harakatga Chaqiruv</p>
               <div className="flex flex-wrap gap-2">
                 {(strategy.creativeGuidelines.callToActions ?? []).map((cta: string, i: number) => (
                   <Badge key={i} variant="purple" size="sm">{cta}</Badge>
@@ -298,8 +298,8 @@ export default function BudgetPage() {
           <div className="flex items-center gap-3 px-2">
             <span className="text-xl">🧠</span>
             <div className="flex-1">
-              <p className="text-slate-900 dark:text-slate-50 text-sm font-medium">AI strategiya hali yo'q</p>
-              <p className="text-slate-500 dark:text-slate-400 text-xs">Birinchi AI strategiya va byudjet rejasini yaratish uchun Sozlamalarga o'ting.</p>
+              <p className="text-text-primary text-sm font-medium">AI strategiya hali yo'q</p>
+              <p className="text-text-tertiary text-xs">Birinchi AI strategiya va byudjet rejasini yaratish uchun Sozlamalarga o'ting.</p>
             </div>
             <Button variant="secondary" size="sm" onClick={() => window.location.href = '/settings'}>
               Sozlamalarga o'tish

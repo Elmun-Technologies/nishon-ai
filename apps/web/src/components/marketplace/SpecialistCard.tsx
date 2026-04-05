@@ -59,7 +59,7 @@ export const SpecialistCard: React.FC<SpecialistCardProps> = ({ specialist, clas
             {Array.from({ length: 5 }).map((_, i) => (
               <svg
                 key={i}
-                className={cn('w-3 h-3', i < Math.floor(specialist.rating) ? 'text-amber-400' : 'text-gray-300')}
+                className={cn('w-3 h-3', i < Math.floor(specialist.rating) ? 'text-amber-400' : 'text-text-tertiary')}
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >

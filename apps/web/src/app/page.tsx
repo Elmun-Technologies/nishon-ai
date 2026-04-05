@@ -260,9 +260,9 @@ function CapabilityCard({
   return (
     <article className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur-sm transition hover:border-emerald-400/40 hover:bg-white/[0.06]">
       <h3 className="text-2xl font-semibold text-white">{title}</h3>
-      <p className="mt-3 text-sm leading-relaxed text-slate-300">{desc}</p>
+      <p className="mt-3 text-sm leading-relaxed text-text-tertiary">{desc}</p>
 
-      <ul className="mt-4 space-y-2 text-sm text-slate-200">
+      <ul className="mt-4 space-y-2 text-sm text-text-secondary">
         {bullets.map((item) => (
           <li key={item} className="flex items-center gap-2">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
@@ -279,7 +279,7 @@ function CapabilityCard({
       </button>
 
       {open && (
-        <div className="mt-4 rounded-2xl border border-emerald-400/20 bg-emerald-400/5 p-4 text-sm text-slate-200">
+        <div className="mt-4 rounded-2xl border border-emerald-400/20 bg-emerald-400/5 p-4 text-sm text-text-secondary">
           Bu bo‘limda jamoangiz workflow, approval va natijalarni tartib bilan yuritadi. Har bir imkoniyat platforma kesimida alohida nazorat qilinadi.
         </div>
       )}
@@ -306,7 +306,7 @@ export default function SellerLandingPage() {
             Performa <span className="text-emerald-400">AI</span>
           </button>
 
-          <div className="hidden rounded-full border border-white/15 bg-white/[0.03] px-8 py-3 md:flex md:items-center md:gap-8 text-lg text-slate-200">
+          <div className="hidden rounded-full border border-white/15 bg-white/[0.03] px-8 py-3 md:flex md:items-center md:gap-8 text-lg text-text-secondary">
             <a href="#hero" className="hover:text-emerald-300">Home</a>
             <a href="#capabilities" className="hover:text-emerald-300">Solutions</a>
             <a href="#funnel" className="hover:text-emerald-300">ARR Funnel</a>
@@ -332,7 +332,7 @@ export default function SellerLandingPage() {
           <h1 className="max-w-5xl text-5xl font-semibold leading-tight md:text-7xl">
             Built for efficiency. <span className="text-emerald-300">Designed for control.</span>
           </h1>
-          <p className="mt-6 max-w-4xl text-xl text-slate-200">
+          <p className="mt-6 max-w-4xl text-xl text-text-secondary">
             Performa reklama operatsiyasini tartib bilan boshqaradi: kampaniya yaratishdan tortib publishing,
             optimization va reportinggacha. Maqsad — jamoaga kamroq qo‘l mehnati, ko‘proq aniq natija.
           </p>
@@ -359,7 +359,7 @@ export default function SellerLandingPage() {
           {stats.map((s) => (
             <div key={s.value} className="rounded-3xl border border-white/10 bg-black/25 p-8 text-center backdrop-blur-sm">
               <div className="text-7xl font-semibold text-white">{s.value}</div>
-              <p className="mt-4 text-2xl leading-tight text-slate-200">{s.text}</p>
+              <p className="mt-4 text-2xl leading-tight text-text-secondary">{s.text}</p>
             </div>
           ))}
         </div>
@@ -369,7 +369,7 @@ export default function SellerLandingPage() {
         <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-white/[0.02] p-8 md:p-12">
           <p className="text-sm uppercase tracking-[0.24em] text-emerald-300">Core capabilities</p>
           <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Loyihaning imkoniyatlari aniq va tartibli</h2>
-          <p className="mt-4 max-w-4xl text-lg text-slate-300">
+          <p className="mt-4 max-w-4xl text-lg text-text-tertiary">
             Har bir modul sotuvchi jamoa uchun alohida qiymat beradi: operatsion tezlik, nazorat, hamkorlik va
             rentabellik. Pastdagi kartalarda nima berishini oddiy tilda ko‘rasiz.
           </p>
@@ -386,7 +386,7 @@ export default function SellerLandingPage() {
         <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-[#050d22] p-8 md:p-12">
           <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">ARR framework</p>
           <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Budget allocation across the funnel</h2>
-          <p className="mt-4 max-w-4xl text-lg text-slate-300">
+          <p className="mt-4 max-w-4xl text-lg text-text-tertiary">
             Madgicx uslubidagi funnel modelini bizning platformaga moslashtirdik: Acquisition (80%), Retargeting (15%),
             Retention (5%). SaaS yoki lead-gen bo‘lsa Retention bosqichini qayta taqsimlash mumkin.
           </p>
@@ -401,10 +401,10 @@ export default function SellerLandingPage() {
                 <div className="relative z-10 grid gap-3 md:grid-cols-[1.6fr_auto_1.6fr] md:items-center">
                   <div>
                     <h3 className="text-3xl font-medium">{stage.name}</h3>
-                    <p className="mt-1 text-slate-300">{stage.tactic}</p>
+                    <p className="mt-1 text-text-tertiary">{stage.tactic}</p>
                   </div>
                   <div className="text-6xl font-semibold text-cyan-300">{stage.pct}%</div>
-                  <div className="text-right text-xl text-slate-100">{stage.audience}</div>
+                  <div className="text-right text-xl text-text-secondary">{stage.audience}</div>
                 </div>
               </div>
             ))}
@@ -412,7 +412,7 @@ export default function SellerLandingPage() {
 
           <div className="mt-10 overflow-hidden rounded-3xl border border-white/10">
             <table className="min-w-full text-left text-sm">
-              <thead className="bg-white/[0.04] text-slate-200">
+              <thead className="bg-white/[0.04] text-text-secondary">
                 <tr>
                   <th className="px-5 py-4">Stage</th>
                   <th className="px-5 py-4">% Spend</th>
@@ -424,7 +424,7 @@ export default function SellerLandingPage() {
               </thead>
               <tbody>
                 {funnelMetrics.map((row) => (
-                  <tr key={row.stage} className="border-t border-white/10 text-slate-300">
+                  <tr key={row.stage} className="border-t border-white/10 text-text-tertiary">
                     <td className="px-5 py-4 font-medium text-white">{row.stage}</td>
                     <td className="px-5 py-4">{row.spendShare}</td>
                     <td className="px-5 py-4">{row.roas}</td>
@@ -443,7 +443,7 @@ export default function SellerLandingPage() {
         <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-[#090b23] p-8 md:p-12">
           <p className="text-sm uppercase tracking-[0.24em] text-violet-300">Workspace settings</p>
           <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Madgicx uslubidagi boshqaruvni Performa ga moslashtirdik</h2>
-          <p className="mt-4 max-w-4xl text-lg text-slate-300">
+          <p className="mt-4 max-w-4xl text-lg text-text-tertiary">
             Profil menyusidan Workspace Settings’ga kirib, ad account, obuna, billing, user profile va team members
             bo‘limlarini bir joydan boshqarish mumkin. Productionda bu bo‘limlar real API bilan ishlaydi.
           </p>
@@ -457,7 +457,7 @@ export default function SellerLandingPage() {
                 }`}
               >
                 <h3 className="text-xl font-semibold text-white">{item.tab}</h3>
-                <ul className="mt-3 space-y-2 text-sm text-slate-300">
+                <ul className="mt-3 space-y-2 text-sm text-text-tertiary">
                   {item.points.map((point) => (
                     <li key={point} className="flex gap-2">
                       <span className="mt-1 h-1.5 w-1.5 rounded-full bg-violet-300" />
@@ -475,7 +475,7 @@ export default function SellerLandingPage() {
         <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-[#0a1520] p-8 md:p-12">
           <p className="text-sm uppercase tracking-[0.24em] text-sky-300">Meta campaign launch</p>
           <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Madgicx uslubidagi launch flow — Performa roadmap</h2>
-          <p className="mt-4 max-w-4xl text-lg text-slate-300">
+          <p className="mt-4 max-w-4xl text-lg text-text-tertiary">
             Siz yuborgan “Create New Ad → Audience Launcher → Setup → Summary” oqimini bizning platformaga moslab
             bosqichma-bosqich berdik. Hozir landingda feature map, keyingi bosqichda real interface/pages.
           </p>
@@ -485,7 +485,7 @@ export default function SellerLandingPage() {
               <article key={item.step} className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
                 <h3 className="text-2xl font-semibold text-white">{item.step}</h3>
                 <p className="mt-2 text-base text-sky-200">{item.what}</p>
-                <ul className="mt-4 space-y-2 text-sm text-slate-300">
+                <ul className="mt-4 space-y-2 text-sm text-text-tertiary">
                   {item.details.map((detail) => (
                     <li key={detail} className="flex items-start gap-2">
                       <span className="mt-1 h-1.5 w-1.5 rounded-full bg-sky-300" />
@@ -503,7 +503,7 @@ export default function SellerLandingPage() {
         <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-[#12102a] p-8 md:p-12">
           <p className="text-sm uppercase tracking-[0.24em] text-fuchsia-300">Team members workflow</p>
           <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Madgicx’dagi team management oqimi — professional darajada</h2>
-          <p className="mt-4 max-w-4xl text-lg text-slate-300">
+          <p className="mt-4 max-w-4xl text-lg text-text-tertiary">
             Create workspace, invite, accept invite, role berish, ad-account access taqsimlash va removal jarayonini
             Performa roadmapiga kiritdik. Bu bo‘lim agency va multi-account ishlash uchun asosiy blok.
           </p>
@@ -511,7 +511,7 @@ export default function SellerLandingPage() {
           <div className="mt-8 grid gap-4 md:grid-cols-2">
             <article className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
               <h3 className="text-2xl font-semibold text-white">End-to-end team flow</h3>
-              <ol className="mt-4 space-y-3 text-sm text-slate-300">
+              <ol className="mt-4 space-y-3 text-sm text-text-tertiary">
                 {teamFlow.map((item, index) => (
                   <li key={item} className="flex gap-3">
                     <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-fuchsia-400/20 text-xs text-fuchsia-300">
@@ -529,7 +529,7 @@ export default function SellerLandingPage() {
                 {permissionMatrix.map((item) => (
                   <div key={item.role} className="rounded-xl border border-white/10 bg-black/20 p-4">
                     <p className="text-lg font-semibold text-fuchsia-200">{item.role}</p>
-                    <ul className="mt-2 space-y-1 text-sm text-slate-300">
+                    <ul className="mt-2 space-y-1 text-sm text-text-tertiary">
                       {item.rights.map((right) => (
                         <li key={right}>• {right}</li>
                       ))}
@@ -544,12 +544,12 @@ export default function SellerLandingPage() {
 
       <section className="px-6 pb-20">
         <div className="mx-auto grid max-w-7xl gap-0 overflow-hidden rounded-[2rem] border border-white/10 md:grid-cols-2">
-          <div className="bg-slate-100 p-10 text-slate-800 md:p-16">
-            <p className="text-sm uppercase tracking-[0.2em] text-slate-500">Our story</p>
-            <h3 className="mt-4 text-4xl font-semibold leading-tight text-slate-900 md:text-5xl">
+          <div className="bg-surface-2 p-10 text-text-primary md:p-16">
+            <p className="text-sm uppercase tracking-[0.2em] text-text-tertiary">Our story</p>
+            <h3 className="mt-4 text-4xl font-semibold leading-tight text-text-primary md:text-5xl">
               Case Study Highlight
             </h3>
-            <p className="mt-6 text-xl leading-relaxed text-slate-700">
+            <p className="mt-6 text-xl leading-relaxed text-text-secondary">
               Mijozimiz kampaniya setup vaqtini 4 baravar qisqartirdi, approval jarayonini avtomatlashtirdi va
               marketing jamoasi strategik ishga qaytdi. Bu landingda aynan shu biznes qiymatini ochiq ko‘rsatdik.
             </p>
@@ -570,17 +570,17 @@ export default function SellerLandingPage() {
           <h2 className="text-center text-5xl font-semibold md:text-6xl">
             Reviews from our <span className="text-emerald-300">clients</span>
           </h2>
-          <p className="mx-auto mt-5 max-w-4xl text-center text-xl text-slate-300">
+          <p className="mx-auto mt-5 max-w-4xl text-center text-xl text-text-tertiary">
             Mijoz feedbacklari loyihaning amaliy qiymatini ko‘rsatadi: tezroq ish, yaxshiroq nazorat va barqaror o‘sish.
           </p>
 
           <div className="mt-10 grid gap-5 md:grid-cols-3">
             {reviews.map((review) => (
               <article key={review.name} className="rounded-3xl border border-white/10 bg-white/[0.03] p-7">
-                <p className="text-2xl leading-relaxed text-slate-200">{review.quote}</p>
+                <p className="text-2xl leading-relaxed text-text-secondary">{review.quote}</p>
                 <div className="mt-10 border-t border-white/10 pt-5">
                   <p className="text-lg font-semibold text-white">{review.name}</p>
-                  <p className="text-sm text-slate-400">{review.role}</p>
+                  <p className="text-sm text-text-tertiary">{review.role}</p>
                 </div>
               </article>
             ))}
@@ -593,7 +593,7 @@ export default function SellerLandingPage() {
           <div>
             <p className="text-sm uppercase tracking-[0.2em] text-emerald-300">For publishers</p>
             <h3 className="mt-3 text-4xl font-semibold">Hammasi bitta platformada</h3>
-            <ul className="mt-5 grid gap-2 text-lg text-slate-300 sm:grid-cols-2">
+            <ul className="mt-5 grid gap-2 text-lg text-text-tertiary sm:grid-cols-2">
               {suites.map((suite) => (
                 <li key={suite}>• {suite}</li>
               ))}
@@ -602,7 +602,7 @@ export default function SellerLandingPage() {
 
           <div className="w-full max-w-xl rounded-3xl border border-white/10 bg-white/[0.03] p-7">
             <h4 className="text-4xl font-semibold">Newsletter</h4>
-            <p className="mt-3 text-lg text-slate-300">Performa yangiliklari, case study va amaliy guide’larni oling.</p>
+            <p className="mt-3 text-lg text-text-tertiary">Performa yangiliklari, case study va amaliy guide’larni oling.</p>
             <button className="mt-6 rounded-full border border-white/25 px-6 py-3 text-lg hover:border-emerald-300/70">
               Sign Up ↗
             </button>

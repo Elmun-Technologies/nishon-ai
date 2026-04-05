@@ -19,8 +19,8 @@ export default function PlatformsPage() {
     <div className="max-w-5xl mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50 mb-2">Reklama Platformalari</h1>
-        <p className="text-sm text-slate-400 dark:text-slate-500">
+        <h1 className="text-2xl font-bold text-text-primary mb-2">Reklama Platformalari</h1>
+        <p className="text-sm text-text-tertiary">
           Qaysi platformalarda reklama yuritmoqchisiz? Bir yoki bir nechtasini tanlang.
           Keyingi bosqichlarda faqat shu platformalar uchun sozlamalar ko'rsatiladi.
         </p>
@@ -39,14 +39,14 @@ export default function PlatformsPage() {
         <button
           type="button"
           onClick={() => router.back()}
-          className="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50 transition-colors"
+          className="text-sm text-text-tertiary hover:text-text-primary transition-colors"
         >
           ← Orqaga
         </button>
 
         <div className="flex items-center gap-3">
           {canProceed && (
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-text-tertiary">
               {selectedPlatforms.length} ta platforma tanlandi
             </p>
           )}
@@ -57,8 +57,8 @@ export default function PlatformsPage() {
             className={`
               px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200
               ${canProceed
-                ? 'bg-slate-900 hover:bg-slate-800 text-white shadow-lg shadow-gray-200'
-                : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 cursor-not-allowed'
+                ? 'bg-surface hover:bg-surface text-white shadow-lg shadow-gray-200'
+                : 'bg-surface-2 text-text-tertiary border border-border cursor-not-allowed'
               }
             `}
           >
@@ -68,17 +68,17 @@ export default function PlatformsPage() {
       </div>
 
       {/* Info note */}
-      <div className="mt-6 p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+      <div className="mt-6 p-4 rounded-xl bg-surface border border-border">
         <div className="flex items-start gap-3">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth="2" className="shrink-0 mt-0.5">
             <circle cx="12" cy="12" r="10"/>
             <path d="M12 16v-4M12 8h.01"/>
           </svg>
           <div>
-            <p className="text-xs text-slate-400 dark:text-slate-500 leading-relaxed">
+            <p className="text-xs text-text-tertiary leading-relaxed">
               Platformani tanlash hisobingizni ulash emas.
               Bu faqat qaysi platformalar uchun AI tavsiyalar va sozlamalar ko'rsatilishini belgilaydi.
-              Haqiqiy ulanish uchun <span className="text-slate-700 dark:text-slate-300">Settings → Integrations</span> bo'limiga o'ting.
+              Haqiqiy ulanish uchun <span className="text-text-secondary">Settings → Integrations</span> bo'limiga o'ting.
             </p>
           </div>
         </div>

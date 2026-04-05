@@ -83,7 +83,7 @@ const AUTOPILOT_MODES = [
     label: 'Manual',
     description: 'AI only gives insights and suggestions. All changes are made by you.',
     badge: null,
-    dotColor: 'bg-slate-600',
+    dotColor: 'bg-surface-2',
   },
 ]
 
@@ -121,7 +121,7 @@ const INTEGRATIONS_STATIC = [
     name: 'TikTok Ads',
     description: 'Short-form video advertising on TikTok for Gen Z and Millennial audiences.',
     logo: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-slate-900 dark:text-slate-50">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-text-primary">
         <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.78a4.85 4.85 0 01-1.01-.09z"/>
       </svg>
     ),
@@ -348,8 +348,8 @@ export default function SettingsPage() {
     <div className="max-w-5xl mx-auto">
       {/* Page header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50">Settings</h1>
-        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+        <h1 className="text-2xl font-bold text-text-primary">Settings</h1>
+        <p className="mt-1 text-sm text-text-tertiary">
           Manage your workspace preferences, integrations, and account.
         </p>
       </div>
@@ -368,14 +368,14 @@ export default function SettingsPage() {
                 ${activeTab === tab.id
                   ? tab.danger
                     ? 'bg-red-500/10 text-red-400 border border-red-500/20'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-50 border border-slate-300 dark:border-slate-600'
+                    : 'bg-surface-2 dark:bg-surface text-text-primary border border-border'
                   : tab.danger
                   ? 'text-red-400/60 hover:text-red-400 hover:bg-red-500/5 border border-transparent'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50 hover:bg-slate-50 dark:bg-slate-800/50 border border-transparent'
+                  : 'text-text-tertiary hover:text-text-primary hover:bg-surface-2 border border-transparent'
                 }
               `}
             >
-              <span className={activeTab === tab.id ? (tab.danger ? 'text-red-400' : 'text-slate-700 dark:text-slate-300') : ''}>
+              <span className={activeTab === tab.id ? (tab.danger ? 'text-red-400' : 'text-text-secondary') : ''}>
                 {tab.icon}
               </span>
               {tab.label}
@@ -395,17 +395,17 @@ export default function SettingsPage() {
               <Card>
                 <div className="flex items-start justify-between mb-5">
                   <div>
-                    <h2 className="text-base font-semibold text-slate-900 dark:text-slate-50">Workspace</h2>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Basic workspace configuration.</p>
+                    <h2 className="text-base font-semibold text-text-primary">Workspace</h2>
+                    <p className="text-xs text-text-tertiary mt-0.5">Basic workspace configuration.</p>
                   </div>
-                  <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 px-2 py-1 rounded-lg">
+                  <span className="text-xs text-text-tertiary bg-surface-2 border border-border px-2 py-1 rounded-lg">
                     ID: {currentWorkspace?.id?.slice(0, 8) ?? '—'}
                   </span>
                 </div>
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-slate-400 dark:text-slate-500 mb-1.5" htmlFor="ws-name">
+                    <label className="block text-sm text-text-tertiary mb-1.5" htmlFor="ws-name">
                       Workspace Name
                     </label>
                     <Input
@@ -418,14 +418,14 @@ export default function SettingsPage() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm text-slate-400 dark:text-slate-500 mb-1.5">Industry</label>
-                      <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-300">
+                      <label className="block text-sm text-text-tertiary mb-1.5">Industry</label>
+                      <div className="rounded-lg border border-border bg-surface px-3 py-2.5 text-sm text-text-secondary">
                         {currentWorkspace?.industry ?? '—'}
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm text-slate-400 dark:text-slate-500 mb-1.5">Monthly Budget</label>
-                      <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-300">
+                      <label className="block text-sm text-text-tertiary mb-1.5">Monthly Budget</label>
+                      <div className="rounded-lg border border-border bg-surface px-3 py-2.5 text-sm text-text-secondary">
                         ${currentWorkspace?.monthlyBudget ?? '—'}
                       </div>
                     </div>
@@ -436,8 +436,8 @@ export default function SettingsPage() {
               {/* Autopilot Mode */}
               <Card>
                 <div className="mb-5">
-                  <h2 className="text-base font-semibold text-slate-900 dark:text-slate-50">Autopilot Mode</h2>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  <h2 className="text-base font-semibold text-text-primary">Autopilot Mode</h2>
+                  <p className="text-xs text-text-tertiary mt-0.5">
                     Control how much the AI acts on your behalf.
                   </p>
                 </div>
@@ -451,23 +451,23 @@ export default function SettingsPage() {
                         w-full flex items-start gap-4 p-4 rounded-xl border text-left
                         transition-all duration-150
                         ${autopilotMode === mode.value
-                          ? 'border-slate-900/40 bg-slate-900/5'
-                          : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:bg-slate-800/50'
+                          ? 'border-border/40 bg-surface/5'
+                          : 'border-border hover:border-border hover:bg-surface-2'
                         }
                       `}
                     >
                       {/* Radio circle */}
                       <div className={`
                         mt-0.5 w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center
-                        ${autopilotMode === mode.value ? 'border-slate-900' : 'border-slate-600'}
+                        ${autopilotMode === mode.value ? 'border-border' : 'border-border'}
                       `}>
                         {autopilotMode === mode.value && (
-                          <div className="w-2 h-2 rounded-full bg-slate-900" />
+                          <div className="w-2 h-2 rounded-full bg-surface" />
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className={`flex items-center gap-1.5 text-sm font-medium ${autopilotMode === mode.value ? 'text-slate-900 dark:text-slate-50' : 'text-slate-700 dark:text-slate-300'}`}>
+                          <span className={`flex items-center gap-1.5 text-sm font-medium ${autopilotMode === mode.value ? 'text-text-primary' : 'text-text-secondary'}`}>
                             <span className={`w-2 h-2 rounded-full ${mode.dotColor}`} />
                             {mode.label}
                           </span>
@@ -477,7 +477,7 @@ export default function SettingsPage() {
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">{mode.description}</p>
+                        <p className="text-xs text-text-tertiary mt-1 leading-relaxed">{mode.description}</p>
                       </div>
                     </button>
                   ))}
@@ -487,19 +487,19 @@ export default function SettingsPage() {
               {/* Account Info */}
               <Card>
                 <div className="mb-5">
-                  <h2 className="text-base font-semibold text-slate-900 dark:text-slate-50">Account</h2>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Your personal account details.</p>
+                  <h2 className="text-base font-semibold text-text-primary">Account</h2>
+                  <p className="text-xs text-text-tertiary mt-0.5">Your personal account details.</p>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-slate-200 border border-slate-300 dark:border-slate-600 flex items-center justify-center shrink-0">
-                    <span className="text-slate-700 dark:text-slate-300 text-lg font-bold">
+                  <div className="w-12 h-12 rounded-full bg-surface-2 border border-border flex items-center justify-center shrink-0">
+                    <span className="text-text-secondary text-lg font-bold">
                       {user?.name?.charAt(0)?.toUpperCase() ?? 'U'}
                     </span>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{user?.name ?? '—'}</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">{user?.email ?? '—'}</p>
-                    <span className="inline-block mt-1 text-xs px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 capitalize">
+                    <p className="text-sm font-medium text-text-primary">{user?.name ?? '—'}</p>
+                    <p className="text-xs text-text-tertiary">{user?.email ?? '—'}</p>
+                    <span className="inline-block mt-1 text-xs px-2 py-0.5 rounded-md bg-surface-2 dark:bg-surface text-text-secondary border border-border capitalize">
                       {user?.plan ?? 'free'} plan
                     </span>
                   </div>
@@ -529,8 +529,8 @@ export default function SettingsPage() {
               {/* Advertising Platforms */}
               <Card>
                 <div className="mb-5">
-                  <h2 className="text-base font-semibold text-slate-900 dark:text-slate-50">📢 Reklama Platformalari</h2>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  <h2 className="text-base font-semibold text-text-primary">📢 Reklama Platformalari</h2>
+                  <p className="text-xs text-text-tertiary mt-0.5">
                     Reklama accountingizni ulang va kampaniyalarni boshqaring
                   </p>
                 </div>
@@ -540,17 +540,17 @@ export default function SettingsPage() {
                 {INTEGRATIONS.map((integration) => (
                   <div
                     key={integration.id}
-                    className="flex items-center gap-4 p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
+                    className="flex items-center gap-4 p-4 rounded-xl border border-border bg-surface"
                   >
-                    <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-surface-2 border border-border flex items-center justify-center shrink-0">
                       {integration.logo}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{integration.name}</p>
+                        <p className="text-sm font-medium text-text-primary">{integration.name}</p>
                         {/* Dynamic connection status */}
                         {metaConnected === null && (
-                          <span className="text-xs px-1.5 py-0.5 rounded-md bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                          <span className="text-xs px-1.5 py-0.5 rounded-md bg-surface-2 text-text-tertiary border border-border">
                             Checking…
                           </span>
                         )}
@@ -561,13 +561,13 @@ export default function SettingsPage() {
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{integration.description}</p>
+                      <p className="text-xs text-text-tertiary mt-0.5">{integration.description}</p>
                     </div>
                     {/* Action */}
                     {metaConnected === true ? (
                       <Link
                         href={integration.href}
-                        className="text-xs px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:bg-slate-800 transition-colors shrink-0"
+                        className="text-xs px-3 py-1.5 rounded-lg border border-border text-text-secondary hover:bg-surface-2 dark:bg-surface transition-colors shrink-0"
                       >
                         Manage
                       </Link>
@@ -577,13 +577,13 @@ export default function SettingsPage() {
                           type="button"
                           onClick={handleMetaConnect}
                           disabled={!currentWorkspace?.id || metaConnecting}
-                          className="text-xs px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                          className="text-xs px-3 py-1.5 rounded-lg border border-border text-text-secondary hover:bg-surface-2 dark:bg-surface disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                         >
                           {metaConnecting ? 'Connecting…' : 'Connect'}
                         </button>
                         <Link
                           href={integration.href}
-                          className="text-xs px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50 hover:bg-slate-50 dark:bg-slate-800/50 transition-colors"
+                          className="text-xs px-3 py-1.5 rounded-lg border border-border text-text-tertiary hover:text-text-primary hover:bg-surface-2 transition-colors"
                         >
                           Details
                         </Link>
@@ -599,23 +599,23 @@ export default function SettingsPage() {
               <div className="space-y-5">
                 {/* Ad Platforms */}
                 <Card>
-                  <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">🔜 Tez orada: Reklama Platformalari</h3>
+                  <h3 className="text-sm font-semibold text-text-tertiary uppercase tracking-wider mb-4">🔜 Tez orada: Reklama Platformalari</h3>
                   <div className="space-y-2">
                     {INTEGRATIONS_STATIC.slice(0, 3).map((integration) => (
-                      <div key={integration.id} className="flex items-center gap-4 p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
-                        <div className="w-9 h-9 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-center shrink-0">
+                      <div key={integration.id} className="flex items-center gap-4 p-3 rounded-lg border border-border bg-surface-2">
+                        <div className="w-9 h-9 rounded-lg bg-surface border border-border flex items-center justify-center shrink-0">
                           {integration.logo}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{integration.name}</p>
+                            <p className="text-sm font-medium text-text-primary">{integration.name}</p>
                             <span className="text-xs px-1.5 py-0.5 rounded-md bg-amber-100/50 text-amber-700 border border-amber-200">
                               Tez orada
                             </span>
                           </div>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{integration.description}</p>
+                          <p className="text-xs text-text-tertiary mt-0.5">{integration.description}</p>
                         </div>
-                        <button disabled className="text-xs px-3 py-1.5 rounded-lg bg-slate-200 text-slate-500 dark:text-slate-400 cursor-not-allowed shrink-0">
+                        <button disabled className="text-xs px-3 py-1.5 rounded-lg bg-surface-2 text-text-tertiary cursor-not-allowed shrink-0">
                           Ulash
                         </button>
                       </div>
@@ -625,18 +625,18 @@ export default function SettingsPage() {
 
                 {/* CRM Integrations */}
                 <Card>
-                  <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">🔜 Tez orada: CRM Sistemalari</h3>
+                  <h3 className="text-sm font-semibold text-text-tertiary uppercase tracking-wider mb-4">🔜 Tez orada: CRM Sistemalari</h3>
                   <div className="space-y-2">
                     {INTEGRATIONS_STATIC.slice(3, 5).map((integration) => (
-                      <div key={integration.id} className="flex items-center gap-4 p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
-                        <div className="w-9 h-9 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-center shrink-0">
+                      <div key={integration.id} className="flex items-center gap-4 p-3 rounded-lg border border-border bg-surface-2">
+                        <div className="w-9 h-9 rounded-lg bg-surface border border-border flex items-center justify-center shrink-0">
                           {integration.logo}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{integration.name}</p>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{integration.description}</p>
+                          <p className="text-sm font-medium text-text-primary">{integration.name}</p>
+                          <p className="text-xs text-text-tertiary mt-0.5">{integration.description}</p>
                         </div>
-                        <button disabled className="text-xs px-3 py-1.5 rounded-lg bg-slate-200 text-slate-500 dark:text-slate-400 cursor-not-allowed shrink-0">
+                        <button disabled className="text-xs px-3 py-1.5 rounded-lg bg-surface-2 text-text-tertiary cursor-not-allowed shrink-0">
                           Ulash
                         </button>
                       </div>
@@ -646,18 +646,18 @@ export default function SettingsPage() {
 
                 {/* Analytics */}
                 <Card>
-                  <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">🔜 Tez orada: Analitika</h3>
+                  <h3 className="text-sm font-semibold text-text-tertiary uppercase tracking-wider mb-4">🔜 Tez orada: Analitika</h3>
                   <div className="space-y-2">
                     {INTEGRATIONS_STATIC.slice(5, 7).map((integration) => (
-                      <div key={integration.id} className="flex items-center gap-4 p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
-                        <div className="w-9 h-9 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-center shrink-0">
+                      <div key={integration.id} className="flex items-center gap-4 p-3 rounded-lg border border-border bg-surface-2">
+                        <div className="w-9 h-9 rounded-lg bg-surface border border-border flex items-center justify-center shrink-0">
                           {integration.logo}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{integration.name}</p>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{integration.description}</p>
+                          <p className="text-sm font-medium text-text-primary">{integration.name}</p>
+                          <p className="text-xs text-text-tertiary mt-0.5">{integration.description}</p>
                         </div>
-                        <button disabled className="text-xs px-3 py-1.5 rounded-lg bg-slate-200 text-slate-500 dark:text-slate-400 cursor-not-allowed shrink-0">
+                        <button disabled className="text-xs px-3 py-1.5 rounded-lg bg-surface-2 text-text-tertiary cursor-not-allowed shrink-0">
                           Ulash
                         </button>
                       </div>
@@ -667,18 +667,18 @@ export default function SettingsPage() {
 
                 {/* Messengers */}
                 <Card>
-                  <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">🔜 Tez orada: Xabarlar va Bildirishnomalar</h3>
+                  <h3 className="text-sm font-semibold text-text-tertiary uppercase tracking-wider mb-4">🔜 Tez orada: Xabarlar va Bildirishnomalar</h3>
                   <div className="space-y-2">
                     {INTEGRATIONS_STATIC.slice(7).map((integration) => (
-                      <div key={integration.id} className="flex items-center gap-4 p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
-                        <div className="w-9 h-9 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-center shrink-0">
+                      <div key={integration.id} className="flex items-center gap-4 p-3 rounded-lg border border-border bg-surface-2">
+                        <div className="w-9 h-9 rounded-lg bg-surface border border-border flex items-center justify-center shrink-0">
                           {integration.logo}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{integration.name}</p>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{integration.description}</p>
+                          <p className="text-sm font-medium text-text-primary">{integration.name}</p>
+                          <p className="text-xs text-text-tertiary mt-0.5">{integration.description}</p>
                         </div>
-                        <button disabled className="text-xs px-3 py-1.5 rounded-lg bg-slate-200 text-slate-500 dark:text-slate-400 cursor-not-allowed shrink-0">
+                        <button disabled className="text-xs px-3 py-1.5 rounded-lg bg-surface-2 text-text-tertiary cursor-not-allowed shrink-0">
                           Ulash
                         </button>
                       </div>
@@ -694,8 +694,8 @@ export default function SettingsPage() {
             <div className="space-y-4">
             <Card>
               <div className="mb-5">
-                <h2 className="text-base font-semibold text-slate-900 dark:text-slate-50">Notification Preferences</h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                <h2 className="text-base font-semibold text-text-primary">Notification Preferences</h2>
+                <p className="text-xs text-text-tertiary mt-0.5">
                   Choose what updates you want to receive.
                 </p>
               </div>
@@ -725,8 +725,8 @@ export default function SettingsPage() {
                 ].map((item) => (
                   <div key={item.key} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
                     <div>
-                      <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{item.label}</p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{item.description}</p>
+                      <p className="text-sm font-medium text-text-primary">{item.label}</p>
+                      <p className="text-xs text-text-tertiary mt-0.5">{item.description}</p>
                     </div>
                     {/* Toggle */}
                     <button
@@ -734,12 +734,12 @@ export default function SettingsPage() {
                       onClick={() => item.onChange((v: boolean) => !v)}
                       className={`
                         relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 shrink-0 ml-6
-                        ${item.value ? 'bg-slate-900' : 'bg-slate-100 dark:bg-slate-800'}
+                        ${item.value ? 'bg-surface' : 'bg-surface-2 dark:bg-surface'}
                       `}
                     >
                       <span
                         className={`
-                          inline-block h-4 w-4 transform rounded-full bg-white dark:bg-slate-900 shadow transition-transform duration-200
+                          inline-block h-4 w-4 transform rounded-full bg-surface shadow transition-transform duration-200
                           ${item.value ? 'translate-x-6' : 'translate-x-1'}
                         `}
                       />
@@ -748,7 +748,7 @@ export default function SettingsPage() {
                 ))}
               </div>
 
-              <div className="mt-5 pt-5 border-t border-slate-200 dark:border-slate-700 flex justify-end">
+              <div className="mt-5 pt-5 border-t border-border flex justify-end">
                 <Button onClick={handleSave} loading={saving}>
                   {saving ? 'Saving…' : 'Save Preferences'}
                 </Button>
@@ -759,25 +759,25 @@ export default function SettingsPage() {
 
             <Card>
               <div className="mb-4">
-                <h2 className="text-base font-semibold text-slate-900 dark:text-slate-50 flex items-center gap-2">
+                <h2 className="text-base font-semibold text-text-primary flex items-center gap-2">
                   <span>Telegram Kunlik Hisobot</span>
-                  <span className="text-xs bg-slate-200 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-full font-normal">Tavsiya etiladi</span>
+                  <span className="text-xs bg-surface-2 text-text-secondary px-2 py-0.5 rounded-full font-normal">Tavsiya etiladi</span>
                 </h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                <p className="text-xs text-text-tertiary mt-1">
                   Har kuni soat 09:00 da kampaniya natijalari Telegramga yuboriladi. Bot orqali Chat ID oling.
                 </p>
               </div>
 
-              <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg p-4 mb-4 text-xs text-slate-400 dark:text-slate-500 space-y-1.5">
-                <p className="font-medium text-slate-200">Qanday ulash:</p>
-                <p>1. Telegramda <span className="text-slate-700 dark:text-slate-300 font-mono">@PerformaAIBot</span> ga yozing</p>
-                <p>2. <span className="font-mono text-slate-900 dark:text-slate-50">/start</span> buyrug'ini yuboring</p>
+              <div className="bg-surface-2 border border-border rounded-lg p-4 mb-4 text-xs text-text-tertiary space-y-1.5">
+                <p className="font-medium text-text-secondary">Qanday ulash:</p>
+                <p>1. Telegramda <span className="text-text-secondary font-mono">@PerformaAIBot</span> ga yozing</p>
+                <p>2. <span className="font-mono text-text-primary">/start</span> buyrug'ini yuboring</p>
                 <p>3. Bot sizga Chat ID ni ko'rsatadi — uni quyida kiriting</p>
               </div>
 
               <div className="flex gap-3 items-end">
                 <div className="flex-1">
-                  <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1.5">Telegram Chat ID</label>
+                  <label className="block text-xs text-text-tertiary mb-1.5">Telegram Chat ID</label>
                   <Input
                     value={telegramChatId}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTelegramChatId(e.target.value)}
@@ -814,15 +814,15 @@ export default function SettingsPage() {
             <div className="space-y-4">
               <Card>
                 <div className="mb-5">
-                  <h2 className="text-base font-semibold text-slate-900 dark:text-slate-50">Avtomatik optimallashtirish ruxsatlari</h2>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  <h2 className="text-base font-semibold text-text-primary">Avtomatik optimallashtirish ruxsatlari</h2>
+                  <p className="text-xs text-text-tertiary mt-0.5">
                     Auto-apply rejimida AI qanday harakatlarni avtomatik bajarishi mumkinligini nazorat qiling.
                     Tasdiq talab qiladiganlar sizning roziligingizni kutadi.
                   </p>
                 </div>
 
                 {policyLoading ? (
-                  <div className="py-8 flex justify-center"><div className="w-5 h-5 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" /></div>
+                  <div className="py-8 flex justify-center"><div className="w-5 h-5 border-2 border-border border-t-transparent rounded-full animate-spin" /></div>
                 ) : (
                   <div className="space-y-0 divide-y divide-[#2A2A3A]">
                     {[
@@ -854,7 +854,7 @@ export default function SettingsPage() {
                       <div key={item.key} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
                         <div className="flex-1 min-w-0 pr-4">
                           <div className="flex items-center gap-2 mb-0.5">
-                            <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{item.label}</p>
+                            <p className="text-sm font-medium text-text-primary">{item.label}</p>
                             <span className={`text-xs px-1.5 py-0.5 rounded-full border ${
                               item.risk === 'low'
                                 ? 'text-emerald-400 border-emerald-500/20 bg-emerald-500/10'
@@ -863,16 +863,16 @@ export default function SettingsPage() {
                               {item.risk === 'low' ? 'xavfsiz' : 'yuqori xavf'}
                             </span>
                           </div>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{item.description}</p>
+                          <p className="text-xs text-text-tertiary leading-relaxed">{item.description}</p>
                         </div>
                         <button
                           type="button"
                           onClick={() => setPolicy((p) => ({ ...p, [item.key]: !p[item.key] }))}
                           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 shrink-0 ${
-                            policy[item.key] ? 'bg-slate-900' : 'bg-slate-100 dark:bg-slate-800'
+                            policy[item.key] ? 'bg-surface' : 'bg-surface-2 dark:bg-surface'
                           }`}
                         >
-                          <span className={`inline-block h-4 w-4 transform rounded-full bg-white dark:bg-slate-900 shadow transition-transform duration-200 ${
+                          <span className={`inline-block h-4 w-4 transform rounded-full bg-surface shadow transition-transform duration-200 ${
                             policy[item.key] ? 'translate-x-6' : 'translate-x-1'
                           }`} />
                         </button>
@@ -883,19 +883,19 @@ export default function SettingsPage() {
                     {policy.allowAutoBudgetChange && (
                       <div className="py-4">
                         <div className="flex items-center justify-between mb-2">
-                          <p className="text-sm text-slate-900 dark:text-slate-50">Maksimal byudjet o'zgarishi</p>
-                          <span className="text-slate-700 dark:text-slate-300 font-semibold text-sm">{policy.maxAutoBudgetChangePct}%</span>
+                          <p className="text-sm text-text-primary">Maksimal byudjet o'zgarishi</p>
+                          <span className="text-text-secondary font-semibold text-sm">{policy.maxAutoBudgetChangePct}%</span>
                         </div>
                         <input
                           type="range" min={5} max={50} step={5}
                           value={policy.maxAutoBudgetChangePct}
                           onChange={(e) => setPolicy((p) => ({ ...p, maxAutoBudgetChangePct: Number(e.target.value) }))}
-                          className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full appearance-none cursor-pointer
+                          className="w-full h-2 bg-surface-2 dark:bg-surface rounded-full appearance-none cursor-pointer
                             [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4
                             [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full
-                            [&::-webkit-slider-thumb]:bg-slate-900 [&::-webkit-slider-thumb]:cursor-pointer"
+                            [&::-webkit-slider-thumb]:bg-surface [&::-webkit-slider-thumb]:cursor-pointer"
                         />
-                        <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 mt-1">
+                        <div className="flex justify-between text-xs text-text-tertiary mt-1">
                           <span>5%</span><span>25%</span><span>50%</span>
                         </div>
                       </div>
@@ -903,8 +903,8 @@ export default function SettingsPage() {
                   </div>
                 )}
 
-                <div className="mt-5 pt-5 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                <div className="mt-5 pt-5 border-t border-border flex items-center justify-between">
+                  <p className="text-xs text-text-tertiary">
                     O'zgartirilmagan sozlamalar xavfsiz standartlardan foydalanadi
                   </p>
                   <Button
@@ -931,7 +931,7 @@ export default function SettingsPage() {
                   <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#A78BFA" strokeWidth={1.8} className="shrink-0 mt-0.5">
                     <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">
+                  <p className="text-text-tertiary text-xs leading-relaxed">
                     Barcha platforma mutatsiyalari (pauza, byudjet) uchun AI hech qachon sizning roziligingisiz harakat qilmaydi —
                     agar ruxsat bermagan bo'lsangiz. "Tavsiya" rejimida hech narsa avtomatik bajarilmaydi.
                   </p>
@@ -945,16 +945,16 @@ export default function SettingsPage() {
             <Card>
               <div className="mb-5">
                 <h2 className="text-base font-semibold text-red-400">Danger Zone</h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                <p className="text-xs text-text-tertiary mt-0.5">
                   These actions are irreversible. Please proceed with caution.
                 </p>
               </div>
               <div className="space-y-3">
                 {/* Reset strategy */}
-                <div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+                <div className="flex items-center justify-between p-4 rounded-xl border border-border bg-surface">
                   <div>
-                    <p className="text-sm font-medium text-slate-900 dark:text-slate-50">Reset AI Strategy</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    <p className="text-sm font-medium text-text-primary">Reset AI Strategy</p>
+                    <p className="text-xs text-text-tertiary mt-0.5">
                       Clears your current AI strategy. A new one will be generated on next visit.
                     </p>
                   </div>
@@ -967,7 +967,7 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between p-4 rounded-xl border border-red-500/20 bg-red-500/5">
                   <div>
                     <p className="text-sm font-medium text-red-400">Delete Workspace</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    <p className="text-xs text-text-tertiary mt-0.5">
                       Permanently deletes this workspace and all associated campaigns, data, and settings.
                     </p>
                   </div>

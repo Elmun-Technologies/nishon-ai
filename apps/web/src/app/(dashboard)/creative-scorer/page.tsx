@@ -81,13 +81,13 @@ function ScoreBar({ score, max = 10 }: { score: number; max?: number }) {
     pct >= 40 ? '#F59E0B' : '#EF4444'
   return (
     <div className="flex items-center gap-2">
-      <div className="flex-1 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+      <div className="flex-1 h-1.5 bg-surface-2 dark:bg-surface rounded-full overflow-hidden">
         <div
           className="h-full rounded-full transition-all duration-700"
           style={{ width: `${pct}%`, backgroundColor: color }}
         />
       </div>
-      <span className="text-xs font-mono text-slate-400 dark:text-slate-500 w-8 text-right">
+      <span className="text-xs font-mono text-text-tertiary w-8 text-right">
         {score}/{max}
       </span>
     </div>
@@ -300,10 +300,10 @@ export default function CreativeScorerPage() {
       {/* Header */}
       <div>
         <div className="flex items-center gap-3 mb-1">
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50">Creative Scorer</h1>
+          <h1 className="text-2xl font-bold text-text-primary">Creative Scorer</h1>
           <Badge variant="purple">🎨 AI Baholash</Badge>
         </div>
-        <p className="text-slate-500 dark:text-slate-400 text-sm">
+        <p className="text-text-tertiary text-sm">
           Reklama kreativingizni yuklang — AI 10 parametr bo'yicha baholab,
           reklamaga tayyor yoki yo'qligini aytadi
         </p>
@@ -325,10 +325,10 @@ export default function CreativeScorerPage() {
                 relative rounded-xl border-2 border-dashed transition-all duration-200
                 min-h-[240px] flex items-center justify-center
                 ${isDragging
-                  ? 'border-slate-900 dark:border-slate-100 bg-slate-100 dark:bg-slate-800 cursor-copy'
+                  ? 'border-border bg-surface-2 dark:bg-surface cursor-copy'
                   : file
-                  ? 'border-slate-200 dark:border-slate-700 cursor-default'
-                  : 'border-slate-200 dark:border-slate-700 hover:border-slate-900 dark:border-slate-100/50 hover:bg-slate-50 dark:bg-slate-900/50 cursor-pointer'
+                  ? 'border-border cursor-default'
+                  : 'border-border hover:border-border/50 hover:bg-surface-2 cursor-pointer'
                 }
               `}
             >
@@ -354,12 +354,12 @@ export default function CreativeScorerPage() {
                       e.stopPropagation()
                       handleReset()
                     }}
-                    className="absolute top-2 right-2 bg-black/60 text-slate-900 dark:text-slate-50 text-xs px-2 py-1 rounded-lg hover:bg-black/80 transition-colors"
+                    className="absolute top-2 right-2 bg-black/60 text-text-primary text-xs px-2 py-1 rounded-lg hover:bg-black/80 transition-colors"
                   >
                     ✕ O'chirish
                   </button>
                   {/* File info */}
-                  <div className="absolute bottom-2 left-2 bg-black/60 text-slate-900 dark:text-slate-50 text-xs px-2 py-1 rounded-lg">
+                  <div className="absolute bottom-2 left-2 bg-black/60 text-text-primary text-xs px-2 py-1 rounded-lg">
                     {file?.name} · {((file?.size ?? 0) / 1024).toFixed(0)}KB
                   </div>
                 </div>
@@ -368,16 +368,16 @@ export default function CreativeScorerPage() {
                   <div className="text-5xl mb-3">
                     {isDragging ? '📂' : '🖼'}
                   </div>
-                  <p className="text-slate-900 dark:text-slate-50 font-medium text-sm mb-1">
+                  <p className="text-text-primary font-medium text-sm mb-1">
                     {isDragging
                       ? 'Faylni bu yerga tashlang'
                       : 'Rasm yoki video yuklang'}
                   </p>
-                  <p className="text-slate-500 dark:text-slate-400 text-xs mb-3">
+                  <p className="text-text-tertiary text-xs mb-3">
                     Suring yoki bosing · JPG, PNG, WebP, MP4 · Max 10MB
                   </p>
-                  <div className="inline-flex items-center gap-2 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-1.5">
-                    <span className="text-slate-700 dark:text-slate-300 text-xs">Fayl tanlash</span>
+                  <div className="inline-flex items-center gap-2 bg-surface-2 dark:bg-surface border border-border rounded-lg px-3 py-1.5">
+                    <span className="text-text-secondary text-xs">Fayl tanlash</span>
                   </div>
                 </div>
               )}
@@ -397,7 +397,7 @@ export default function CreativeScorerPage() {
 
               {/* Platform */}
               <div>
-                <label className="block text-sm font-medium text-slate-400 dark:text-slate-500 mb-2">
+                <label className="block text-sm font-medium text-text-tertiary mb-2">
                   Platform
                 </label>
                 <div className="grid grid-cols-1 gap-1.5">
@@ -408,16 +408,16 @@ export default function CreativeScorerPage() {
                       className={`
                         flex items-center gap-2.5 px-3 py-2.5 rounded-xl border text-sm transition-all text-left
                         ${platform === p.value
-                          ? 'border-slate-900 dark:border-slate-100 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-50'
-                          : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:border-slate-600'
+                          ? 'border-border bg-surface-2 dark:bg-surface text-text-primary'
+                          : 'border-border text-text-tertiary hover:border-border'
                         }
                       `}
                     >
                       <span className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
-                        platform === p.value ? 'border-slate-900 dark:border-slate-100' : 'border-slate-600 dark:border-slate-500'
+                        platform === p.value ? 'border-border' : 'border-border'
                       }`}>
                         {platform === p.value && (
-                          <span className="w-2 h-2 rounded-full bg-slate-900 dark:bg-slate-100 block" />
+                          <span className="w-2 h-2 rounded-full bg-surface dark:bg-surface-2 block" />
                         )}
                       </span>
                       {p.label}
@@ -428,7 +428,7 @@ export default function CreativeScorerPage() {
 
               {/* Creative type */}
               <div>
-                <label className="block text-sm font-medium text-slate-400 dark:text-slate-500 mb-2">
+                <label className="block text-sm font-medium text-text-tertiary mb-2">
                   Kreativ turi
                 </label>
                 <div className="grid grid-cols-2 gap-2">
@@ -439,8 +439,8 @@ export default function CreativeScorerPage() {
                       className={`
                         px-3 py-2 rounded-lg border text-xs font-medium transition-all
                         ${creativeType === ct.value
-                          ? 'border-slate-900 dark:border-slate-100 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
-                          : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:border-slate-600'
+                          ? 'border-border bg-surface-2 dark:bg-surface text-text-secondary'
+                          : 'border-border text-text-tertiary hover:border-border'
                         }
                       `}
                     >
@@ -452,7 +452,7 @@ export default function CreativeScorerPage() {
 
               {/* Goal */}
               <div>
-                <label className="block text-sm font-medium text-slate-400 dark:text-slate-500 mb-2">
+                <label className="block text-sm font-medium text-text-tertiary mb-2">
                   Reklama maqsadi <span className="text-red-400">*</span>
                 </label>
                 <input
@@ -460,7 +460,7 @@ export default function CreativeScorerPage() {
                   value={goal}
                   onChange={(e) => setGoal(e.target.value)}
                   placeholder="Masalan: telefon sotish, kurs ro'yxatdan o'tkazish..."
-                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-slate-50 placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-slate-900 dark:border-slate-100 transition-all text-sm"
+                  className="w-full bg-surface-2 dark:bg-surface border border-border rounded-xl px-4 py-3 text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-border transition-all text-sm"
                 />
               </div>
 
@@ -487,16 +487,16 @@ export default function CreativeScorerPage() {
             <Card>
               <div className="py-12 text-center">
                 <div className="text-5xl mb-4">🎨</div>
-                <p className="text-slate-900 dark:text-slate-50 font-medium mb-2">
+                <p className="text-text-primary font-medium mb-2">
                   Kreativingizni baholaymiz
                 </p>
-                <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed max-w-xs mx-auto mb-6">
+                <p className="text-text-tertiary text-sm leading-relaxed max-w-xs mx-auto mb-6">
                   Rasm yoki video yuklang, platform tanlang va AI 10 parametr
                   bo'yicha baholab beradi
                 </p>
                 <div className="space-y-1.5 text-left max-w-xs mx-auto">
                   {Object.entries(PARAMETER_ICONS).map(([name, icon]) => (
-                    <div key={name} className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                    <div key={name} className="flex items-center gap-2 text-xs text-text-tertiary">
                       <span>{icon}</span> {name}
                     </div>
                   ))}
@@ -509,13 +509,13 @@ export default function CreativeScorerPage() {
           {loading && (
             <Card>
               <div className="py-12 text-center">
-                <div className="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 rounded-2xl bg-surface-2 dark:bg-surface border border-border flex items-center justify-center mx-auto mb-4">
                   <Spinner size="lg" />
                 </div>
-                <p className="text-slate-900 dark:text-slate-50 font-medium mb-1">
+                <p className="text-text-primary font-medium mb-1">
                   Kreativ tahlil qilinmoqda...
                 </p>
-                <p className="text-slate-500 dark:text-slate-400 text-sm mb-4">
+                <p className="text-text-tertiary text-sm mb-4">
                   GPT-4o Vision 10 parametrni tekshirmoqda
                 </p>
                 <div className="space-y-1.5 max-w-xs mx-auto">
@@ -526,7 +526,7 @@ export default function CreativeScorerPage() {
                     'Platform talablari solishtirilmoqda...',
                     'Natija tayyorlanmoqda...',
                   ].map((msg, i) => (
-                    <p key={i} className="text-slate-500 dark:text-slate-400 text-xs">{msg}</p>
+                    <p key={i} className="text-text-tertiary text-xs">{msg}</p>
                   ))}
                 </div>
               </div>
@@ -547,21 +547,21 @@ export default function CreativeScorerPage() {
                        result.verdict === 'needs_work' ? '⚠️ Yaxshilash kerak' :
                        '❌ Reklamaga tayyor emas'}
                     </div>
-                    <p className="text-slate-900 dark:text-slate-50 text-sm font-medium mb-1">
+                    <p className="text-text-primary text-sm font-medium mb-1">
                       {GRADE_CONFIG[result.grade].label}
                     </p>
-                    <p className="text-slate-400 dark:text-slate-500 text-xs leading-relaxed">
+                    <p className="text-text-tertiary text-xs leading-relaxed">
                       {result.verdictText}
                     </p>
                     <div className="flex items-center gap-3 mt-2">
-                      <span className="text-xs text-slate-500 dark:text-slate-400">
-                        Est. CTR: <span className="text-slate-700 dark:text-slate-300 font-medium">{result.estimatedCtr}</span>
+                      <span className="text-xs text-text-tertiary">
+                        Est. CTR: <span className="text-text-secondary font-medium">{result.estimatedCtr}</span>
                       </span>
                     </div>
                   </div>
                 </div>
                 {!file && (
-                  <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+                  <div className="mt-3 pt-3 border-t border-border">
                     <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
                       📌 Demo natija ko'rsatilmoqda — chap tarafdan o'z kreativingizni yuklang
                     </p>
@@ -572,7 +572,7 @@ export default function CreativeScorerPage() {
               {/* Platform fit */}
               {Object.keys(result.platformFit).length > 0 && (
                 <Card>
-                  <p className="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wide mb-3">
+                  <p className="text-text-tertiary text-xs font-medium uppercase tracking-wide mb-3">
                     Platform mosligi
                   </p>
                   <div className="space-y-2">
@@ -584,12 +584,12 @@ export default function CreativeScorerPage() {
                       return (
                         <div key={p}>
                           <div className="flex justify-between text-xs mb-1">
-                            <span className="text-slate-400 dark:text-slate-500">{labels[p] || p}</span>
+                            <span className="text-text-tertiary">{labels[p] || p}</span>
                             <span className={`font-medium ${score >= 70 ? 'text-emerald-400' : score >= 50 ? 'text-amber-400' : 'text-red-400'}`}>
                               {score}%
                             </span>
                           </div>
-                          <div className="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                          <div className="h-1.5 bg-surface-2 dark:bg-surface-2 rounded-full overflow-hidden">
                             <div
                               className="h-full rounded-full transition-all duration-700"
                               style={{
@@ -607,26 +607,26 @@ export default function CreativeScorerPage() {
 
               {/* 10 Parameters */}
               <Card padding="none">
-                <div className="px-5 py-3 border-b border-slate-200 dark:border-slate-700">
-                  <p className="text-slate-900 dark:text-slate-50 font-semibold text-sm">10 Parametr Tahlili</p>
+                <div className="px-5 py-3 border-b border-border">
+                  <p className="text-text-primary font-semibold text-sm">10 Parametr Tahlili</p>
                 </div>
-                <div className="divide-y divide-slate-200 dark:divide-slate-700">
+                <div className="divide-y divide-border dark:divide-border">
                   {result.parameters.map((param, i) => (
                     <div key={i} className="px-5 py-3">
                       <div className="flex items-start gap-3">
                         <StatusDot status={param.status} />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-1.5">
-                            <p className="text-slate-900 dark:text-slate-50 text-xs font-medium">
+                            <p className="text-text-primary text-xs font-medium">
                               {PARAMETER_ICONS[param.name] || '•'} {param.name}
                             </p>
                           </div>
                           <ScoreBar score={param.score} />
-                          <p className="text-slate-500 dark:text-slate-400 text-xs mt-1.5 leading-relaxed">
+                          <p className="text-text-tertiary text-xs mt-1.5 leading-relaxed">
                             {param.feedback}
                           </p>
                           {param.status !== 'good' && (
-                            <p className="text-slate-700 dark:text-slate-300 text-xs mt-1 flex items-start gap-1">
+                            <p className="text-text-secondary text-xs mt-1 flex items-start gap-1">
                               <span className="shrink-0">→</span>
                               {param.tip}
                             </p>
@@ -648,7 +648,7 @@ export default function CreativeScorerPage() {
                     {result.improvements.map((imp, i) => (
                       <div key={i} className="flex items-start gap-2.5 text-sm">
                         <span className="text-amber-400 font-bold shrink-0">{i + 1}.</span>
-                        <p className="text-slate-700 dark:text-slate-300">{imp}</p>
+                        <p className="text-text-secondary">{imp}</p>
                       </div>
                     ))}
                   </div>
@@ -661,8 +661,8 @@ export default function CreativeScorerPage() {
                   <div className="flex items-start gap-3">
                     <span className="text-xl shrink-0">🔬</span>
                     <div>
-                      <p className="text-slate-900 dark:text-slate-50 text-sm font-medium mb-1">A/B Test tavsiyasi</p>
-                      <p className="text-slate-400 dark:text-slate-500 text-sm leading-relaxed">
+                      <p className="text-text-primary text-sm font-medium mb-1">A/B Test tavsiyasi</p>
+                      <p className="text-text-tertiary text-sm leading-relaxed">
                         {result.abTestSuggestion}
                       </p>
                     </div>
