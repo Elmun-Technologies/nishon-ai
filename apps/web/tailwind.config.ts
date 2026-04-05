@@ -2,6 +2,7 @@ import type { Config } from 'tailwindcss'
 
 const config: Config = {
   content: ['./src/**/*.{ts,tsx}'],
+  darkMode: 'class',
   theme: {
     extend: {
       fontFamily: {
@@ -11,19 +12,19 @@ const config: Config = {
         // Primary brand color
         primary: '#111827',
 
-        // Neutral grays
-        surface: '#ffffff',
-        'surface-alt': '#F9FAFB',
-        'surface-secondary': '#F3F4F6',
+        // Neutral grays - using CSS variables for dark mode
+        surface: 'rgb(var(--color-surface) / <alpha-value>)',
+        'surface-alt': 'rgb(var(--color-surface-alt) / <alpha-value>)',
+        'surface-secondary': 'rgb(var(--color-surface-secondary) / <alpha-value>)',
 
-        // Text colors
-        'text-primary': '#111827',
-        'text-secondary': '#6B7280',
-        'text-tertiary': '#9CA3AF',
+        // Text colors - using CSS variables for dark mode
+        'text-primary': 'rgb(var(--color-text-primary) / <alpha-value>)',
+        'text-secondary': 'rgb(var(--color-text-secondary) / <alpha-value>)',
+        'text-tertiary': 'rgb(var(--color-text-tertiary) / <alpha-value>)',
 
-        // Borders
-        border: '#E5E7EB',
-        'border-light': '#F3F4F6',
+        // Borders - using CSS variables for dark mode
+        border: 'rgb(var(--color-border) / <alpha-value>)',
+        'border-light': 'rgb(var(--color-border-light) / <alpha-value>)',
 
         // Semantic colors
         success: '#10B981',

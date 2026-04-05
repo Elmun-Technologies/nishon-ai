@@ -1,0 +1,7 @@
+{
+  "buildCommand": "pnpm build",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "env": {
+    "TURBO_TOKEN": "@turbo_token"
+  }
+}
