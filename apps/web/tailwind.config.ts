@@ -16,7 +16,7 @@ const config: Config = {
         'surface-alt': '#F9FAFB',
         'surface-secondary': '#F3F4F6',
 
-        // Text colors
+        // Semantic text colors (for text-* utilities)
         'text-primary': '#111827',
         'text-secondary': '#6B7280',
         'text-tertiary': '#9CA3AF',
