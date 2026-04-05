@@ -2,8 +2,6 @@
 import * as React from 'react'
 import { cn } from '@/lib/utils'
 
-// ── Simple usage ───────────────────────────────────────────
-
 interface Tab {
   key: string
   label: string
@@ -14,7 +12,6 @@ export interface TabsProps {
   tabs?: Tab[]
   activeTab?: string
   onChange?: (key: string) => void
-  // Compound usage props
   value?: string | null
   onValueChange?: React.Dispatch<React.SetStateAction<string | null>>
   children?: React.ReactNode
@@ -27,20 +24,15 @@ const TabsContext = React.createContext<{ value: string | null; onChange: (v: st
 })
 
 export function Tabs({ tabs, activeTab, onChange, value, onValueChange, children, className }: TabsProps) {
-  // Compound usage
   if (children) {
-    const currentValue = value ?? null
-    const handleChange = (v: string) => onValueChange?.(v)
     return (
-      <TabsContext.Provider value={{ value: currentValue, onChange: handleChange }}>
+      <TabsContext.Provider value={{ value: value ?? null, onChange: (v) => onValueChange?.(v) }}>
         <div className={cn('space-y-4', className)}>{children}</div>
       </TabsContext.Provider>
     )
   }
-
-  // Simple usage
   return (
-    <div className={cn('flex items-center gap-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-1 w-fit', className)}>
+    <div className={cn('flex items-center gap-1 bg-surface border border-border rounded-xl p-1 w-fit', className)}>
       {(tabs ?? []).map((tab) => (
         <button
           key={tab.key}
@@ -49,24 +41,21 @@ export function Tabs({ tabs, activeTab, onChange, value, onValueChange, children
           className={cn(
             'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200',
             (activeTab ?? value) === tab.key
-              ? 'bg-slate-900 text-white'
-              : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50 hover:bg-slate-50 dark:bg-slate-800/50'
+              ? 'bg-text-primary text-surface'
+              : 'text-text-secondary hover:text-text-primary hover:bg-surface-2'
           )}
         >
-          {tab.icon}
-          {tab.label}
+          {tab.icon}{tab.label}
         </button>
       ))}
     </div>
   )
 }
 
-// ── Compound sub-components ────────────────────────────────
-
 export interface TabsListProps { children: React.ReactNode; className?: string }
 export function TabsList({ children, className }: TabsListProps) {
   return (
-    <div className={cn('flex items-center gap-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-1 w-fit', className)}>
+    <div className={cn('flex items-center gap-1 bg-surface border border-border rounded-xl p-1 w-fit', className)}>
       {children}
     </div>
   )
@@ -81,7 +70,8 @@ export function TabsTrigger({ value, children, className }: TabsTriggerProps) {
       onClick={() => ctx.onChange(value)}
       className={cn(
         'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200',
-        ctx.value === value ? 'bg-slate-900 text-white' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50 hover:bg-slate-50 dark:bg-slate-800/50'
+        ctx.value === value ? 'bg-text-primary text-surface' : 'text-text-secondary hover:text-text-primary hover:bg-surface-2',
+        className
       )}
     >
       {children}
