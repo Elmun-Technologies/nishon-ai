@@ -5,7 +5,8 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import {
   LayoutGrid, Rocket, Zap, BarChart3, Brain, Wallet,
-  Settings2, LogOut, Users, Sparkles, TrendingUp, ShoppingBag, ChevronDown,
+  Settings2, LogOut, Users, Sparkles, TrendingUp, ShoppingBag, ChevronDown, Palette,
+  Wand2, Users2, Folder, Palette as PaletteIcon, Package, Image,
 } from 'lucide-react'
 
 const CATEGORIES = [
@@ -41,6 +42,17 @@ const CATEGORIES = [
       { href: '/my-portfolio',    label: 'Portfolio',        icon: TrendingUp },
     ],
   },
+  {
+    id: 'creative', label: 'Create', icon: Wand2,
+    items: [
+      { href: '/creative-hub',           label: 'Creative Hub',    icon: Palette },
+      { href: '/creative-hub/ai-actors',  label: 'AI Actors',      icon: Users2 },
+      { href: '/creative-hub/projects',   label: 'Projects',       icon: Folder },
+      { href: '/creative-hub/brand-kit',  label: 'Brand Kit',      icon: PaletteIcon },
+      { href: '/creative-hub/products',   label: 'Products',       icon: Package },
+      { href: '/creative-hub/media',      label: 'Media Library',   icon: Image },
+    ],
+  },
 ]
 
 const BOTTOM_NAV = [{ href: '/settings', label: 'Sozlamalar', icon: Settings2 }]
@@ -50,7 +62,7 @@ export default function Sidebar() {
   const router = useRouter()
   const { currentWorkspace, user, logout } = useWorkspaceStore()
   const [expanded, setExpanded] = useState<Record<string, boolean>>({
-    advertising: true, analytics: true, optimization: true, tools: true,
+    advertising: true, analytics: true, optimization: true, tools: true, creative: true,
   })
 
   function toggle(id: string) {
