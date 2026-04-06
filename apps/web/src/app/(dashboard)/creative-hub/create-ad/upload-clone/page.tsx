@@ -13,6 +13,7 @@ export default function UploadClonePage() {
   const [currentStep, setCurrentStep] = useState<StepId>('upload')
   const [uploadedImage, setUploadedImage] = useState(false)
   const [isMediaModalOpen, setIsMediaModalOpen] = useState(false)
+  const [selectedMedias, setSelectedMedias] = useState<MediaItem[]>([])
 
   const steps = ['upload', 'configure', 'preview', 'launch']
 
