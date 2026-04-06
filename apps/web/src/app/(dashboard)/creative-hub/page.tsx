@@ -86,40 +86,54 @@ export default function CreativeHubPage() {
 
       {/* Categories Grid */}
       <div className="space-y-6">
-        {categories.map((category) => (
-          <div key={category.id} className="space-y-3">
-            {/* Section Header */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">{category.icon}</span>
-                <div>
-                  <h3 className="font-semibold text-text-primary">{category.title}</h3>
-                  <p className="text-sm text-text-secondary">{category.description}</p>
-                </div>
-              </div>
-              <Link
-                href={`/creative-hub/templates/${category.id}`}
-                className="text-info font-medium hover:underline flex items-center gap-1 whitespace-nowrap"
-              >
-                See all <ArrowRight size={16} />
-              </Link>
-            </div>
+        {categories.map((category) => {
+          const categoryPaths: Record<string, string> = {
+            'social-ugc': '/creative-hub/templates/social-ugc',
+            'image-ads': '/creative-hub/templates/image-ads',
+            'tech-electronics': '/creative-hub/templates/tech-electronics',
+            'health': '/creative-hub/templates/health',
+            'apps': '/creative-hub/templates/apps',
+            'fashion': '/creative-hub/templates/fashion-beauty',
+            'ecommerce': '/creative-hub/templates/ecommerce',
+            'finance': '/creative-hub/templates/finance',
+          }
 
-            {/* Placeholder Cards Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-              {[...Array(6)].map((_, i) => (
-                <div
-                  key={i}
-                  className="aspect-video rounded-lg bg-surface-2 border border-border hover:border-border-hover transition-colors cursor-pointer group"
-                >
-                  <div className="w-full h-full flex items-center justify-center group-hover:bg-surface-3 transition-colors rounded-lg">
-                    <span className="text-text-tertiary text-sm">Template {i + 1}</span>
+          return (
+            <div key={category.id} className="space-y-3">
+              {/* Section Header */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">{category.icon}</span>
+                  <div>
+                    <h3 className="font-semibold text-text-primary">{category.title}</h3>
+                    <p className="text-sm text-text-secondary">{category.description}</p>
                   </div>
                 </div>
-              ))}
+                <Link
+                  href={categoryPaths[category.id] || '#'}
+                  className="text-info font-medium hover:underline flex items-center gap-1 whitespace-nowrap"
+                >
+                  See all <ArrowRight size={16} />
+                </Link>
+              </div>
+
+              {/* Placeholder Cards Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                {[...Array(6)].map((_, i) => (
+                  <Link
+                    key={i}
+                    href={`${categoryPaths[category.id] || '#'}/${i + 1}`}
+                    className="aspect-video rounded-lg bg-surface-2 border border-border hover:border-border-hover transition-colors cursor-pointer group"
+                  >
+                    <div className="w-full h-full flex items-center justify-center group-hover:bg-surface-3 transition-colors rounded-lg">
+                      <span className="text-text-tertiary text-sm">Template {i + 1}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )

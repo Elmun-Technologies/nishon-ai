@@ -277,16 +277,143 @@ export default function ProductPageWizardPage() {
         )}
 
         {currentStep === 'preview' && (
-          <div className="text-center py-12">
-            <h2 className="text-2xl font-bold text-text-primary mb-2">Preview</h2>
-            <p className="text-text-secondary">Generate preview coming soon...</p>
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold text-text-primary mb-2">Preview & Review</h2>
+              <p className="text-text-secondary">
+                Review your generated ad creatives before launching
+              </p>
+            </div>
+
+            {/* Generated Ads Preview */}
+            <div className="space-y-4">
+              <h3 className="font-semibold text-text-primary">Generated Variations</h3>
+              <div className="grid grid-cols-3 gap-4">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="rounded-lg overflow-hidden border border-border bg-surface-2 hover:border-border-hover transition-colors group cursor-pointer">
+                    <div className="aspect-square bg-gradient-to-br from-info/10 to-success/10 flex items-center justify-center relative">
+                      <span className="text-text-tertiary">Variation {i}</span>
+                      <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-success flex items-center justify-center text-white text-xs font-bold">
+                        ✓
+                      </div>
+                    </div>
+                    <div className="p-3">
+                      <p className="text-sm font-medium text-text-primary">Creative #{i}</p>
+                      <p className="text-xs text-text-tertiary mt-1">1080x1080 • PNG</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Performance Prediction */}
+            <div className="p-6 rounded-lg border border-border bg-surface-2 space-y-4">
+              <h3 className="font-semibold text-text-primary">Performance Metrics</h3>
+              <div className="grid grid-cols-3 gap-4">
+                {[
+                  { label: 'Est. CTR', value: '3.2%' },
+                  { label: 'Est. CPC', value: '$0.45' },
+                  { label: 'Est. ROAS', value: '2.8x' },
+                ].map((metric) => (
+                  <div key={metric.label} className="text-center">
+                    <p className="text-2xl font-bold text-info">{metric.value}</p>
+                    <p className="text-xs text-text-secondary mt-1">{metric.label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Continue Button */}
+            <div className="flex gap-3 pt-4">
+              <button
+                onClick={() => setCurrentStep('configure')}
+                className="px-6 py-2 border border-border rounded-lg font-medium text-text-primary hover:bg-surface-2 transition-colors"
+              >
+                Back
+              </button>
+              <button
+                onClick={() => setCurrentStep('launch')}
+                className="px-6 py-2 bg-text-primary text-surface rounded-lg font-medium hover:opacity-90 transition-all"
+              >
+                Next Step
+              </button>
+            </div>
           </div>
         )}
 
         {currentStep === 'launch' && (
-          <div className="text-center py-12">
-            <h2 className="text-2xl font-bold text-text-primary mb-2">Launch</h2>
-            <p className="text-text-secondary">Launch your ads coming soon...</p>
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold text-text-primary mb-2">Launch Your Ads</h2>
+              <p className="text-text-secondary">
+                Select platforms and configure your ad campaigns
+              </p>
+            </div>
+
+            {/* Platform Selection */}
+            <div className="p-6 rounded-lg border border-border bg-surface-2 space-y-4">
+              <h3 className="font-semibold text-text-primary mb-4">Select Platforms</h3>
+              <div className="space-y-3">
+                {[
+                  { name: 'Facebook / Instagram', desc: 'Reach billions of users' },
+                  { name: 'TikTok', desc: 'Connect with younger audiences' },
+                  { name: 'Google Ads', desc: 'Capture high-intent searches' },
+                  { name: 'LinkedIn', desc: 'Target business professionals' },
+                ].map((platform) => (
+                  <label key={platform.name} className="flex items-center gap-3 p-3 border border-border rounded-lg hover:bg-surface-3 cursor-pointer transition-colors">
+                    <input type="checkbox" defaultChecked className="w-4 h-4 rounded accent-info" />
+                    <div>
+                      <p className="font-medium text-text-primary">{platform.name}</p>
+                      <p className="text-xs text-text-secondary">{platform.desc}</p>
+                    </div>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Budget Setting */}
+            <div className="p-6 rounded-lg border border-border bg-surface-2 space-y-4">
+              <h3 className="font-semibold text-text-primary">Campaign Budget</h3>
+              <div>
+                <label className="block text-sm font-medium text-text-primary mb-2">Daily Budget</label>
+                <div className="flex gap-2">
+                  <span className="flex items-center px-3 py-2 bg-surface text-text-secondary">$</span>
+                  <input
+                    type="number"
+                    placeholder="50"
+                    className="flex-1 px-3 py-2 border border-border rounded-lg bg-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-info/50"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Campaign Duration */}
+            <div className="p-6 rounded-lg border border-border bg-surface-2 space-y-4">
+              <h3 className="font-semibold text-text-primary">Campaign Duration</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-text-primary mb-2">Start Date</label>
+                  <input type="date" className="w-full px-3 py-2 border border-border rounded-lg bg-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-info/50" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-text-primary mb-2">End Date</label>
+                  <input type="date" className="w-full px-3 py-2 border border-border rounded-lg bg-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-info/50" />
+                </div>
+              </div>
+            </div>
+
+            {/* Continue Button */}
+            <div className="flex gap-3 pt-4">
+              <button
+                onClick={() => setCurrentStep('preview')}
+                className="px-6 py-2 border border-border rounded-lg font-medium text-text-primary hover:bg-surface-2 transition-colors"
+              >
+                Back
+              </button>
+              <button className="px-6 py-2 bg-success text-surface rounded-lg font-medium hover:opacity-90 transition-all">
+                Launch Campaigns
+              </button>
+            </div>
           </div>
         )}
       </div>
