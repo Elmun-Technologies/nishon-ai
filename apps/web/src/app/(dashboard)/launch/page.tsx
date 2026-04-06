@@ -24,20 +24,27 @@ export default function LaunchPage() {
   const [launchMode, setLaunchMode] = useState<LaunchMode>('self')
   const [activeTab, setActiveTab] = useState<'drafts' | 'ai_drafts' | 'templates' | 'launches'>('drafts')
   const [search, setSearch] = useState('')
+  const [launchModeConfirmed, setLaunchModeConfirmed] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
   const handlePlatformPick = (nextPlatform: Platform) => {
+    setPlatform(nextPlatform)
+    setLaunchModeConfirmed(false)
+    setLaunchMode('self')
+  }
+
+  const handleLaunchModeConfirm = () => {
+    if (!platform) return
     if (launchMode === 'ai') {
-      router.push(`/create-agent?platform=${nextPlatform}`)
+      router.push(`/create-agent?platform=${platform}`)
       return
     }
     if (launchMode === 'expert') {
-      router.push(`/service?platform=${nextPlatform}`)
+      router.push(`/service?platform=${platform}`)
       return
     }
-    // Self-launch flow continues in the full wizard experience
-    router.push(`/wizard?platform=${nextPlatform}&launchMode=self`)
+    setLaunchModeConfirmed(true)
   }
 
   // Meta form state
@@ -153,7 +160,7 @@ export default function LaunchPage() {
             <p className="text-text-tertiary text-sm">Create and launch campaigns at scale</p>
           </div>
           <button
-            onClick={() => setLaunchMode('self')}
+            onClick={() => setPlatform('meta')}
             className="px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold"
           >
             + New campaign
@@ -171,7 +178,7 @@ export default function LaunchPage() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id as typeof activeTab)}
               className={`pb-3 text-sm font-medium border-b-2 ${
-                activeTab === tab.id ? 'border-border dark:border-white text-text-primary' : 'border-transparent text-text-tertiary hover:text-text-primary'
+                activeTab === tab.id ? 'border-text-primary text-text-primary' : 'border-transparent text-text-tertiary hover:text-text-primary'
               }`}
             >
               {tab.label}
@@ -183,66 +190,88 @@ export default function LaunchPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search drafts..."
-          className="w-full md:w-[420px] border border-border rounded-xl px-4 py-2.5 text-sm"
+          className="w-full md:w-[420px] border border-border bg-surface rounded-xl px-4 py-2.5 text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-border"
         />
 
-        <div className="rounded-2xl border border-border bg-surface p-4">
-          <p className="text-xs text-text-tertiary mb-3">Launch usuli</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {[
-              { id: 'self', title: "O'zim launch qilaman", desc: 'Wizard orqali qo‘lda sozlab ishga tushirish' },
-              { id: 'ai', title: "AI agent launch qilsin", desc: 'AI draft + avtomatik optimizatsiya oqimi' },
-              { id: 'expert', title: 'Marketplace mutaxassis', desc: 'Jonli ekspert natijalarini ko‘rib tanlash' },
-            ].map((mode) => (
+        {/* ── Platform Selection FIRST ── */}
+        <div>
+          <p className="text-xs text-text-tertiary mb-3 uppercase tracking-wider font-medium">Platforma tanlang</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {PLATFORMS.map(p => (
               <button
-                key={mode.id}
-                onClick={() => setLaunchMode(mode.id as LaunchMode)}
-                className={`text-left rounded-xl border p-3 transition-colors ${
-                  launchMode === mode.id
-                    ? 'border-border dark:border-white bg-surface-2'
-                    : 'border-border hover:border-border'
-                }`}
+                key={p.id}
+                onClick={() => handlePlatformPick(p.id as Platform)}
+                className="group relative overflow-hidden rounded-2xl border-2 border-border bg-surface p-6 text-left transition-all hover:border-violet-500/50 hover:shadow-lg"
               >
-                <p className="text-sm font-semibold text-text-primary">{mode.title}</p>
-                <p className="text-xs text-text-tertiary mt-1">{mode.desc}</p>
+                <div className="relative space-y-3">
+                  <h3 className="text-lg font-bold text-text-primary">{p.name}</h3>
+                  <p className="text-sm text-text-tertiary">{p.desc}</p>
+                  <div className="pt-3">
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-violet-500">
+                      Tanlash →
+                    </span>
+                  </div>
+                </div>
               </button>
             ))}
           </div>
         </div>
 
+        <div className="rounded-2xl border border-dashed border-border bg-surface p-10 text-center">
+          <p className="text-xl font-bold text-text-primary mb-2">Hali kampaniya qoralama yo&apos;q</p>
+          <p className="text-sm text-text-tertiary mb-5">
+            Avval platforma tanlang, keyin ishga tushirish usulini belgilang.
+          </p>
+          <div className="flex items-center justify-center gap-2 flex-wrap">
+            <button onClick={() => setPlatform('meta')} className="px-4 py-2 rounded-xl bg-violet-600 text-white text-sm font-medium">+ Yangi kampaniya</button>
+            <button onClick={() => setPlatform('google')} className="px-4 py-2 rounded-xl border border-border text-sm text-text-secondary hover:bg-surface-2 transition-colors">🔍 Google Ads</button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ── LAUNCH MODE SELECTION (after platform pick, before wizard) ──
+  if (platform && !launchModeConfirmed) {
+    const platformInfo = PLATFORMS.find(p => p.id === platform)
+    return (
+      <div className="max-w-3xl mx-auto space-y-6 py-6">
+        <div>
+          <button onClick={() => setPlatform(null)} className="text-text-tertiary hover:text-text-primary text-sm mb-3 flex items-center gap-1">
+            ← Platformaga qaytish
+          </button>
+          <h1 className="text-2xl font-bold text-text-primary mb-1">{platformInfo?.name}</h1>
+          <p className="text-text-tertiary text-sm">Launch usulini tanlang</p>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {PLATFORMS.map(p => (
+          {[
+            { id: 'self', icon: '🎯', title: "O'zim launch qilaman", desc: "Wizard orqali qo'lda sozlab ishga tushirish. To'liq nazorat sizda." },
+            { id: 'ai', icon: '🤖', title: 'AI agent launch qilsin', desc: "AI draft yaratadi va avtomatik optimizatsiya qiladi. Siz faqat tasdiqlaysiz." },
+            { id: 'expert', icon: '👨‍💼', title: 'Marketplace mutaxassis', desc: "Jonli ekspert natijalarini ko'ring va xizmat buyurtma bering." },
+          ].map((mode) => (
             <button
-              key={p.id}
-              onClick={() => handlePlatformPick(p.id as Platform)}
-              className="group relative overflow-hidden rounded-2xl border-2 border-border bg-surface p-6 text-left transition-all hover:border-border hover:shadow-lg"
+              key={mode.id}
+              onClick={() => setLaunchMode(mode.id as LaunchMode)}
+              className={`text-left rounded-2xl border-2 p-5 transition-all ${
+                launchMode === mode.id
+                  ? 'border-violet-500 bg-violet-500/5'
+                  : 'border-border hover:border-text-tertiary'
+              }`}
             >
-              <div className="absolute inset-0 bg-gradient-to-br opacity-0 transition-opacity group-hover:opacity-5" style={{
-                backgroundImage: `linear-gradient(to bottom right, var(--tw-gradient-stops))`,
-              }} />
-              <div className="relative space-y-3">
-                <h3 className="text-lg font-bold text-text-primary">{p.name}</h3>
-                <p className="text-sm text-text-tertiary">{p.desc}</p>
-                <div className="pt-3">
-                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-text-secondary">
-                    {launchMode === 'self' ? 'Wizardni boshlash →' : launchMode === 'ai' ? 'AI agentga yuborish →' : 'Ekspertga yuborish →'}
-                  </span>
-                </div>
-              </div>
+              <div className="text-3xl mb-3">{mode.icon}</div>
+              <p className="text-sm font-bold text-text-primary mb-1">{mode.title}</p>
+              <p className="text-xs text-text-tertiary leading-relaxed">{mode.desc}</p>
             </button>
           ))}
         </div>
 
-        <div className="rounded-2xl border border-dashed border-border bg-surface p-10 text-center">
-          <p className="text-xl font-bold text-text-primary mb-2">No campaign drafts yet</p>
-          <p className="text-sm text-text-tertiary mb-5">
-            Platforma tanlang va ishga tushirish usulini belgilang: self, AI agent yoki marketplace mutaxassis.
-          </p>
-          <div className="flex items-center justify-center gap-2 flex-wrap">
-            <button onClick={() => setLaunchMode('self')} className="px-4 py-2 rounded-xl bg-violet-600 text-white text-sm font-medium">+ Start a new campaign</button>
-            <button onClick={() => setLaunchMode('ai')} className="px-4 py-2 rounded-xl border border-border text-sm text-text-secondary">✧ Try AI Launch</button>
-          </div>
-        </div>
+        <button
+          onClick={handleLaunchModeConfirm}
+          className="w-full bg-violet-600 hover:bg-violet-700 text-white py-3.5 rounded-xl font-semibold text-sm transition-colors"
+        >
+          {launchMode === 'self' ? 'Wizardni boshlash →' : launchMode === 'ai' ? 'AI agentga yuborish →' : 'Ekspertga yuborish →'}
+        </button>
       </div>
     )
   }
@@ -255,7 +284,7 @@ export default function LaunchPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <button onClick={() => setPlatform(null)} className="text-text-tertiary hover:text-text-primary text-sm mb-2 flex items-center gap-1">
+            <button onClick={() => setLaunchModeConfirmed(false)} className="text-text-tertiary hover:text-text-primary text-sm mb-2 flex items-center gap-1">
               ← Orqaga
             </button>
             <h1 className="text-2xl font-bold text-text-primary">📘 Meta Kampaniyasi</h1>
@@ -446,7 +475,7 @@ export default function LaunchPage() {
       <div className="max-w-2xl mx-auto space-y-6 py-6">
         <div className="flex items-center justify-between">
           <div>
-            <button onClick={() => setPlatform(null)} className="text-text-tertiary hover:text-text-primary text-sm mb-2 flex items-center gap-1">
+            <button onClick={() => setLaunchModeConfirmed(false)} className="text-text-tertiary hover:text-text-primary text-sm mb-2 flex items-center gap-1">
               ← Orqaga
             </button>
             <h1 className="text-2xl font-bold text-text-primary">🔍 Google Ads Kampaniyasi</h1>
@@ -476,7 +505,7 @@ export default function LaunchPage() {
               ))}
             </div>
             <div className="flex gap-2">
-              <button onClick={() => setPlatform(null)} className="flex-1 bg-surface-2 hover:bg-surface-2 dark:hover:bg-surface-2 text-text-primary py-3 rounded-xl font-semibold">
+              <button onClick={() => setLaunchModeConfirmed(false)} className="flex-1 bg-surface-2 hover:bg-surface-2 text-text-primary py-3 rounded-xl font-semibold">
                 ← Orqaga
               </button>
               <button onClick={() => setGoogleStep(2)} className="flex-1 bg-surface hover:bg-surface dark:hover:bg-surface-2 text-white dark:text-text-primary py-3 rounded-xl font-semibold">
@@ -565,7 +594,7 @@ export default function LaunchPage() {
       <div className="max-w-2xl mx-auto space-y-6 py-6">
         <div className="flex items-center justify-between">
           <div>
-            <button onClick={() => setPlatform(null)} className="text-text-tertiary hover:text-text-primary text-sm mb-2">
+            <button onClick={() => setLaunchModeConfirmed(false)} className="text-text-tertiary hover:text-text-primary text-sm mb-2">
               ← Orqaga
             </button>
             <h1 className="text-2xl font-bold text-text-primary">🟡 Yandex Direct Kampaniyasi</h1>
@@ -594,7 +623,7 @@ export default function LaunchPage() {
               ))}
             </div>
             <div className="flex gap-2">
-              <button onClick={() => setPlatform(null)} className="flex-1 bg-surface-2 py-3 rounded-xl font-semibold">← Orqaga</button>
+              <button onClick={() => setLaunchModeConfirmed(false)} className="flex-1 bg-surface-2 py-3 rounded-xl font-semibold">← Orqaga</button>
               <button onClick={() => setYandexStep(2)} className="flex-1 bg-surface text-white dark:text-text-primary py-3 rounded-xl font-semibold">Davom →</button>
             </div>
           </div>
