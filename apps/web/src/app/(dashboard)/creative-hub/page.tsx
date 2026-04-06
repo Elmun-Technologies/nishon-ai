@@ -121,7 +121,7 @@ export default function CreativeHubPage() {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
                 {[...Array(6)].map((_, i) => (
                   <Link
-                    key={i}
+                    key={`${category.id}-${i}`}
                     href={`${categoryPaths[category.id] || '#'}/${i + 1}`}
                     className="aspect-video rounded-lg bg-surface-2 border border-border hover:border-border-hover transition-colors cursor-pointer group"
                   >

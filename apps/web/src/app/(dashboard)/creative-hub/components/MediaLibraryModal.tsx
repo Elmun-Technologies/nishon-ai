@@ -28,10 +28,11 @@ interface MediaLibraryModalProps {
 export function MediaLibraryModal({ isOpen, onClose, onSelect }: MediaLibraryModalProps) {
   const [selectedItems, setSelectedItems] = useState<string[]>([])
   const [filterType, setFilterType] = useState<'all' | 'image' | 'video'>('all')
+  const [searchQuery, setSearchQuery] = useState('')
 
-  const filteredItems = filterType === 'all'
-    ? mockMediaItems
-    : mockMediaItems.filter(item => item.type === filterType)
+  const filteredItems = mockMediaItems
+    .filter(item => filterType === 'all' || item.type === filterType)
+    .filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()))
 
   const handleSelect = (id: string) => {
     setSelectedItems(prev =>
@@ -66,6 +67,8 @@ export function MediaLibraryModal({ isOpen, onClose, onSelect }: MediaLibraryMod
           <input
             type="text"
             placeholder="Search media..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full px-3 py-2 border border-border rounded-lg bg-surface-2 text-text-primary focus:outline-none focus:ring-2 focus:ring-info/50"
           />
 

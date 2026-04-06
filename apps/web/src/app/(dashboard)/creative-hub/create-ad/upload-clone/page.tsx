@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Upload, CheckCircle, Users2, Image as ImageIcon } from 'lucide-react'
+import { Upload, CheckCircle, Users2, Image as ImageIcon, Sparkles } from 'lucide-react'
 import { MediaLibraryModal } from '../../components/MediaLibraryModal'
 
 type StepId = 'upload' | 'configure' | 'preview' | 'launch'
@@ -18,8 +18,6 @@ export default function UploadClonePage() {
   const [currentStep, setCurrentStep] = useState<StepId>('upload')
   const [uploadedImage, setUploadedImage] = useState(false)
   const [isMediaModalOpen, setIsMediaModalOpen] = useState(false)
-  const [selectedMedias, setSelectedMedias] = useState<MediaItem[]>([])
-  const [selectedActors, setSelectedActors] = useState<string[]>([])
 
   const steps = ['upload', 'configure', 'preview', 'launch']
 
@@ -280,6 +278,3 @@ export default function UploadClonePage() {
     </div>
   )
 }
-
-// Add Sparkles icon import fix
-import { Sparkles } from 'lucide-react'

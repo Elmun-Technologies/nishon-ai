@@ -16,7 +16,7 @@ export default function BrandKitPage() {
     outcome: '',
   })
 
-  const [brandProfiles, setBrandProfiles] = useState<BrandProfile[]>([])
+  const [brandProfiles] = useState<BrandProfile[]>([])
 
   const handleInputChange = (field: string, value: string) => {
     setBrandInfo((prev) => ({ ...prev, [field]: value }))

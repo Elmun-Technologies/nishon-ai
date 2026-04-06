@@ -16,14 +16,6 @@ interface Step {
 export default function ProductPageWizardPage() {
   const [currentStep, setCurrentStep] = useState<StepId>('input')
   const [productUrl, setProductUrl] = useState('')
-  const [savedProduct, setSavedProduct] = useState(false)
-
-  const steps: Step[] = [
-    { id: 'input', label: 'Input', status: currentStep === 'input' ? 'in_progress' : currentStep === 'input' ? 'pending' : 'completed' },
-    { id: 'configure', label: 'Configure', status: currentStep === 'configure' ? 'in_progress' : 'pending' },
-    { id: 'preview', label: 'Preview', status: currentStep === 'preview' ? 'in_progress' : 'pending' },
-    { id: 'launch', label: 'Launch', status: currentStep === 'launch' ? 'in_progress' : 'pending' },
-  ]
 
   const getStepStatus = (stepId: StepId): StepStatus => {
     const stepOrder = ['input', 'configure', 'preview', 'launch']
@@ -34,6 +26,13 @@ export default function ProductPageWizardPage() {
     if (stepIndex === currentIndex) return 'in_progress'
     return 'pending'
   }
+
+  const steps: Step[] = [
+    { id: 'input', label: 'Input', status: getStepStatus('input') },
+    { id: 'configure', label: 'Configure', status: getStepStatus('configure') },
+    { id: 'preview', label: 'Preview', status: getStepStatus('preview') },
+    { id: 'launch', label: 'Launch', status: getStepStatus('launch') },
+  ]
 
   return (
     <div className="flex gap-6">

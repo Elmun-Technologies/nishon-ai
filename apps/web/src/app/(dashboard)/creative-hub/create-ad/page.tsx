@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { ArrowRight, Globe, Upload, Eye } from 'lucide-react'
 
 type CreationMethod = 'product-page' | 'upload-clone' | 'competitor' | null
@@ -28,6 +29,7 @@ const methods = [
 ]
 
 export default function CreateAdWizardPage() {
+  const router = useRouter()
   const [selected, setSelected] = useState<CreationMethod>(null)
 
   const handleMethodSelect = (method: CreationMethod) => {
@@ -43,8 +45,7 @@ export default function CreateAdWizardPage() {
       'competitor': '/creative-hub/create-ad/competitor',
     }
 
-    // In a real app, we'd use router.push here
-    window.location.href = methodPaths[selected]
+    router.push(methodPaths[selected])
   }
 
   return (
