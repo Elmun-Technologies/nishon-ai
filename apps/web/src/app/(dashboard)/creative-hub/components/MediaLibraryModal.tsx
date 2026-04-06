@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Upload, X, Image as ImageIcon, Video } from 'lucide-react'
 
-interface MediaItem {
+export interface MediaItem {
   id: string
   name: string
   type: 'image' | 'video'

@@ -5,14 +5,9 @@ import Link from 'next/link'
 import { Upload, CheckCircle, Users2, Image as ImageIcon, Sparkles } from 'lucide-react'
 import { MediaLibraryModal } from '../../components/MediaLibraryModal'
 
-type StepId = 'upload' | 'configure' | 'preview' | 'launch'
+import { MediaItem } from '../../components/MediaLibraryModal'
 
-interface MediaItem {
-  id: string
-  name: string
-  type: 'image' | 'video'
-  size: string
-}
+type StepId = 'upload' | 'configure' | 'preview' | 'launch'
 
 export default function UploadClonePage() {
   const [currentStep, setCurrentStep] = useState<StepId>('upload')
