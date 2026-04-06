@@ -211,7 +211,7 @@ export default function AudiencesPage() {
         <div>
           <h2 className="text-xl font-semibold">Audience Launcher</h2>
           <p className="text-xs text-text-tertiary mt-1">
-            Performa full-funnel targeting strategy — Madgicx workflow adapted for our platform.
+            Performa full-funnel targeting strategy — optimized workflow for maximum ROAS.
           </p>
         </div>
         <button className="px-4 py-2 rounded-lg bg-[#8B80F9] text-text-primary text-sm font-semibold disabled:opacity-40" disabled={selected.length === 0}>
@@ -444,7 +444,7 @@ export default function AudiencesPage() {
           </div>
 
           <div className="mt-4 rounded-lg border border-border p-3">
-            <p className="text-sm font-medium mb-2">Madgicx vs Ads Manager (nima uchun bu section kerak)</p>
+            <p className="text-sm font-medium mb-2">Performa vs Facebook Ads Manager (nima uchun bu section kerak)</p>
             <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-[#A1A1AA]">
               <li>• Performa’da preset audiences va exclusionlar oldindan beriladi.</li>
               <li>• AI lookalike segmentlar bilan sifat + hajm balansini yaxshilaydi.</li>
