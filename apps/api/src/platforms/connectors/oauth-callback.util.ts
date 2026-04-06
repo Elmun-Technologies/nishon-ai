@@ -1,7 +1,7 @@
 import { ConfigService } from "@nestjs/config";
 
 const OAUTH_CALLBACK_PATHS = {
-  meta: "/platforms/meta/callback",
+  meta: "/meta/callback",
   google: "/platforms/google/callback",
   tiktok: "/platforms/tiktok/callback",
   yandex: "/platforms/yandex/callback",
