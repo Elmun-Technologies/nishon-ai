@@ -2,10 +2,11 @@
 
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, CheckCircle, Users, Globe, Rocket } from 'lucide-react'
+import { ArrowLeft, CheckCircle, Users, Globe, Rocket, Settings } from 'lucide-react'
 import { useAudienceStore } from '@/stores/audience.store'
 import { useRetargetingStore } from '@/stores/retargeting.store'
 import type { Platform } from '@/types/retargeting'
+import { PlatformConfigForm } from './components/PlatformConfigForm'
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 
@@ -16,7 +17,7 @@ const PLATFORMS: { value: Platform; label: string; icon: string }[] = [
   { value: 'yandex', label: 'Yandex Direct',               icon: '🔴' },
 ]
 
-const STEP_LABELS = ['Auditoriya', 'Platforma va byudjet', 'Tasdiqlash']
+const STEP_LABELS = ['Auditoriya', 'Platforma va byudjet', 'Platform moslashtirish', 'Tasdiqlash']
 
 // ─── Step Indicator ───────────────────────────────────────────────────────────
 
@@ -250,7 +251,58 @@ function Step2({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
   )
 }
 
-function Step3({ onBack, onLaunch }: { onBack: () => void; onLaunch: () => void }) {
+function Step3({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
+  const { wizard, updateWizard } = useRetargetingStore()
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-xl font-bold text-text-primary flex items-center gap-2">
+          <Settings size={22} /> Platform moslashtirish
+        </h2>
+        <p className="text-text-secondary text-sm mt-1">
+          Har bir platformani o'z sozlamalariga muvofiq sozlang
+        </p>
+      </div>
+
+      {/* Platform Configuration Tabs */}
+      <div className="space-y-6">
+        {wizard.selectedPlatforms.map((platform) => (
+          <PlatformConfigForm
+            key={platform}
+            platform={platform}
+            initialConfig={wizard.platformConfigs[platform]}
+            onConfigChange={(config) => {
+              updateWizard({
+                platformConfigs: {
+                  ...wizard.platformConfigs,
+                  [platform]: config,
+                },
+              })
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="flex justify-between pt-2">
+        <button
+          onClick={onBack}
+          className="px-5 py-2 border border-border rounded-lg text-text-primary hover:bg-surface-2 transition-colors"
+        >
+          ← Orqaga
+        </button>
+        <button
+          onClick={onNext}
+          className="px-5 py-2 rounded-lg font-medium transition-all bg-info text-surface hover:opacity-90"
+        >
+          Davom etish →
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function Step4({ onBack, onLaunch }: { onBack: () => void; onLaunch: () => void }) {
   const { wizard } = useRetargetingStore()
   const PLATFORM_ICONS: Record<Platform, string> = {
     meta: '📘', google: '🔵', tiktok: '🎵', yandex: '🔴',
@@ -294,7 +346,10 @@ function Step3({ onBack, onLaunch }: { onBack: () => void; onLaunch: () => void 
       </div>
 
       <div className="flex justify-between pt-2">
-        <button onClick={onBack} className="px-5 py-2 border border-border rounded-lg text-text-primary hover:bg-surface-2 transition-colors">
+        <button
+          onClick={onBack}
+          className="px-5 py-2 border border-border rounded-lg text-text-primary hover:bg-surface-2 transition-colors"
+        >
           ← Orqaga
         </button>
         <button
@@ -334,7 +389,10 @@ export default function RetargetingWizardPage() {
         <Step2 onNext={() => setWizardStep(3)} onBack={() => setWizardStep(1)} />
       )}
       {wizard.step === 3 && (
-        <Step3 onBack={() => setWizardStep(2)} onLaunch={handleLaunch} />
+        <Step3 onNext={() => setWizardStep(4)} onBack={() => setWizardStep(2)} />
+      )}
+      {wizard.step === 4 && (
+        <Step4 onBack={() => setWizardStep(3)} onLaunch={handleLaunch} />
       )}
     </div>
   )

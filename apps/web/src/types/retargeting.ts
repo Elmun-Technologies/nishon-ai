@@ -19,7 +19,7 @@ export interface Audience {
 // ─── Campaign Types ─────────────────────────────────────────────────────────
 
 export type CampaignStatus = 'active' | 'paused' | 'draft' | 'ended'
-export type BudgetType = 'CBO' | 'ABO'
+export type BudgetType = 'CBO' | 'ABO' | 'daily_budget'
 export type Platform = 'meta' | 'google' | 'tiktok' | 'yandex'
 
 export interface RetargetingCampaign {
@@ -35,6 +35,7 @@ export interface RetargetingCampaign {
   startDate: string
   endDate?: string
   createdAt: string
+  platformSettings?: Record<string, any>  // Platform-specific configuration
 }
 
 // ─── Funnel Types ────────────────────────────────────────────────────────────
@@ -65,7 +66,7 @@ export interface AudienceMetrics {
 // ─── Wizard Types ─────────────────────────────────────────────────────────────
 
 export interface RetargetingWizardState {
-  step: 1 | 2 | 3
+  step: 1 | 2 | 3 | 4
   selectedAudience: Audience | null
   selectedPlatforms: Platform[]
   budgetType: BudgetType
@@ -73,4 +74,5 @@ export interface RetargetingWizardState {
   startDate: string
   endDate: string
   campaignName: string
+  platformConfigs: Record<Platform, Record<string, any>>  // Platform-specific configs per platform
 }
