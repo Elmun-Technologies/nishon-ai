@@ -1,13 +1,16 @@
 'use client'
 
-import { Upload } from 'lucide-react'
+import { Image, Upload } from 'lucide-react'
 
 export default function CreativeHubMediaPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-text-primary">Media</h1>
+        <h1 className="text-3xl font-bold text-text-primary flex items-center gap-3">
+          <Image size={32} />
+          Media Library
+        </h1>
         <p className="text-text-secondary mt-2">
           Loyihangiz uchun media fayllarini boshqaring
         </p>
