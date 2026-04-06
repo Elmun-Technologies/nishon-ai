@@ -326,30 +326,67 @@ export default function SellerLandingPage() {
         </div>
       </nav>
 
-      <section id="hero" className="relative overflow-hidden px-6 pb-20 pt-16">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_70%_10%,rgba(52,211,153,0.25),transparent_38%),radial-gradient(circle_at_20%_40%,rgba(16,185,129,0.12),transparent_42%)]" />
+      <section id="hero" className="relative overflow-hidden px-6 pb-32 pt-24">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_70%_10%,rgba(52,211,153,0.4),transparent_38%),radial-gradient(circle_at_20%_40%,rgba(16,185,129,0.2),transparent_42%)]" />
+        <div className="pointer-events-none absolute -left-40 top-20 h-80 w-80 rounded-full bg-emerald-500/10 blur-3xl" />
+        <div className="pointer-events-none absolute -right-40 bottom-20 h-80 w-80 rounded-full bg-cyan-500/10 blur-3xl" />
+
         <div className="relative mx-auto max-w-7xl">
-          <h1 className="max-w-5xl text-5xl font-semibold leading-tight md:text-7xl">
-            Built for efficiency. <span className="text-emerald-300">Designed for control.</span>
+          <div className="mb-8 inline-flex rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-300">
+            ✨ Madgicx asosida qurilgan — Pro marketoqlar uchun
+          </div>
+
+          <h1 className="max-w-5xl text-6xl font-bold leading-tight md:text-8xl">
+            Reklamani <span className="bg-gradient-to-r from-emerald-300 to-cyan-300 bg-clip-text text-transparent">yanada tez</span> boshqaring.
           </h1>
-          <p className="mt-6 max-w-4xl text-xl text-text-secondary">
-            Performa reklama operatsiyasini tartib bilan boshqaradi: kampaniya yaratishdan tortib publishing,
-            optimization va reportinggacha. Maqsad — jamoaga kamroq qo‘l mehnati, ko‘proq aniq natija.
+          <p className="mt-8 max-w-3xl text-xl leading-relaxed text-text-secondary">
+            Performa — 4 ta platformani (Meta, Google, TikTok, Yandex) bitta joydan boshqaradigan, avtomatsiya va AI bilan ishlayotgan markolog platforma. Kampaniya setup 4 baravar tezlashtiring, ROAS 50% ga oshiring.
           </p>
 
-          <div className="mt-10 flex flex-wrap gap-4">
+          <div className="mt-12 flex flex-wrap gap-3">
             <button
-              onClick={() => router.push('/register')}
-              className="rounded-full bg-emerald-500 px-8 py-4 text-lg font-semibold text-white transition hover:bg-emerald-400"
+              onClick={() => router.push(‘/register’)}
+              className="group rounded-full bg-gradient-to-r from-emerald-500 to-cyan-500 px-8 py-4 text-lg font-semibold text-white shadow-lg shadow-emerald-500/25 transition hover:shadow-xl hover:shadow-emerald-500/40"
             >
-              Explore the Platform ↗
+              Boshlang — Bepul sinab ko’ring ↗
             </button>
             <button
-              onClick={() => router.push('/login')}
+              onClick={() => router.push(‘/marketplace’)}
+              className="rounded-full border border-emerald-500/40 bg-emerald-500/10 px-8 py-4 text-lg font-semibold text-emerald-200 transition hover:border-emerald-500/60 hover:bg-emerald-500/20"
+            >
+              Markolog yoki agentni topish
+            </button>
+            <button
+              onClick={() => router.push(‘/login’)}
               className="rounded-full border border-white/20 bg-surface-elevated/10 px-8 py-4 text-lg text-white transition hover:bg-surface-elevated/20"
             >
-              Book a demo ⊕
+              Demo so’rash ⊕
             </button>
+          </div>
+
+          <div className="mt-16 pt-8 border-t border-white/10">
+            <p className="text-sm uppercase tracking-widest text-text-tertiary">Ishongan kompaniyalar</p>
+            <div className="mt-6 flex flex-wrap items-center gap-8 text-text-secondary">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-emerald-300">500+</div>
+                <div className="text-sm">Faol markolog</div>
+              </div>
+              <div className="h-10 w-px bg-white/10" />
+              <div className="text-center">
+                <div className="text-3xl font-bold text-emerald-300">$2B+</div>
+                <div className="text-sm">Boshqariladigan byudjet</div>
+              </div>
+              <div className="h-10 w-px bg-white/10" />
+              <div className="text-center">
+                <div className="text-3xl font-bold text-emerald-300">4.8★</div>
+                <div className="text-sm">Umumiy reytingi</div>
+              </div>
+              <div className="h-10 w-px bg-white/10" />
+              <div className="text-center">
+                <div className="text-3xl font-bold text-emerald-300">50%+</div>
+                <div className="text-sm">Orta ROAS o’sishi</div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -366,18 +403,42 @@ export default function SellerLandingPage() {
       </section>
 
       <section id="capabilities" className="px-6 pb-20">
-        <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-surface-elevated/[0.02] p-8 md:p-12">
-          <p className="text-sm uppercase tracking-[0.24em] text-emerald-300">Core capabilities</p>
-          <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Loyihaning imkoniyatlari aniq va tartibli</h2>
-          <p className="mt-4 max-w-4xl text-lg text-text-tertiary">
-            Har bir modul sotuvchi jamoa uchun alohida qiymat beradi: operatsion tezlik, nazorat, hamkorlik va
-            rentabellik. Pastdagi kartalarda nima berishini oddiy tilda ko‘rasiz.
-          </p>
+        <div className="mx-auto max-w-7xl">
+          <div className="text-center mb-16">
+            <p className="text-sm uppercase tracking-[0.24em] text-emerald-300">Nima beramiz</p>
+            <h2 className="mt-3 text-5xl font-bold md:text-6xl">
+              Barcha markolog kerak narsasi bitta platformada
+            </h2>
+            <p className="mt-6 max-w-3xl mx-auto text-xl text-text-secondary">
+              Campaign Management, Creative Control, Analytics, Finance & Governance. Har bir feature markolog uchun o’z qiymatini beradi.
+            </p>
+          </div>
 
-          <div className="mt-10 grid gap-5 md:grid-cols-2">
+          <div className="grid gap-6 md:grid-cols-2">
             {capabilities.map((item) => (
               <CapabilityCard key={item.title} {...item} />
             ))}
+          </div>
+
+          {/* Key Benefits */}
+          <div className="mt-20 rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 p-12">
+            <h3 className="text-3xl font-bold mb-10">Amaliy natijalar</h3>
+            <div className="grid gap-8 md:grid-cols-3">
+              {[
+                { icon: ‘⚡’, title: ‘Setup vaqti 75% qisqaradi’, desc: ‘4 kundan 1 soatga’ },
+                { icon: ‘📈’, title: ‘ROAS 50% ortadi’, desc: ‘Avtomatsiya va smart budget split’ },
+                { icon: ‘👥’, title: ‘Team productivity 3 baravar’, desc: ‘Admin ish yo\’q, faqat strategiya’ },
+                { icon: ‘💰’, title: ‘Byudjet ehtiyoji 30% qisqaradi’, desc: ‘Smart allocation bilan’ },
+                { icon: ‘🎯’, title: ‘Campaign accuracy 90%+’, desc: ‘AI yordamida shikasta kamroq’ },
+                { icon: ‘📊’, title: ‘Real-time insights’, desc: ‘Har 30 minutda yangil data’ },
+              ].map((benefit) => (
+                <div key={benefit.title} className="text-center">
+                  <div className="text-5xl mb-3">{benefit.icon}</div>
+                  <h4 className="text-xl font-semibold text-white">{benefit.title}</h4>
+                  <p className="text-text-tertiary mt-2">{benefit.desc}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
