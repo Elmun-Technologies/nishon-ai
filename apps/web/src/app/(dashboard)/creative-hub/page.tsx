@@ -66,9 +66,9 @@ export default function CreativeHubPage() {
       </div>
 
       {/* Create & Launch Ads Section */}
-      <div className="rounded-lg border border-border bg-surface-2 p-8 hover:bg-surface-3 transition-colors">
+      <Link href="/creative-hub/create-ad" className="block rounded-lg border border-border bg-surface-2 p-8 hover:bg-surface-3 transition-colors group">
         <div className="flex items-start justify-between">
-          <div>
+          <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
               <Sparkles size={24} className="text-text-primary" />
               <h2 className="text-2xl font-bold text-text-primary">Create & Launch Ads</h2>
@@ -76,13 +76,13 @@ export default function CreativeHubPage() {
             <p className="text-text-secondary">
               Pick a style, generate creatives with AI, and launch them as ads to find your next winner.
             </p>
-            <button className="mt-4 px-6 py-2 bg-text-primary text-surface rounded-lg font-medium hover:opacity-90 transition-opacity flex items-center gap-2">
+            <div className="mt-4 inline-flex px-6 py-2 bg-text-primary text-surface rounded-lg font-medium group-hover:opacity-90 transition-opacity items-center gap-2">
               Boshlash
               <ArrowRight size={18} />
-            </button>
+            </div>
           </div>
         </div>
-      </div>
+      </Link>
 
       {/* Categories Grid */}
       <div className="space-y-6">
