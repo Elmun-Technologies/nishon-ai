@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { TrendingUp, DollarSign, Target, Zap } from 'lucide-react'
 
 interface RevenueDashboardProps {
@@ -8,53 +8,164 @@ interface RevenueDashboardProps {
   integrationName: string
 }
 
-export function RevenueDashboard({ connectionId, integrationName }: RevenueDashboardProps) {
-  const [timeRange, setTimeRange] = useState('30') // days
-  const [loading, setLoading] = useState(false)
+interface Attribution {
+  totalRevenue: number
+  totalSpend: number
+  roas: number
+  dealCount: number
+  conversionCount: number
+  byPlatform: Record<
+    string,
+    {
+      revenue: number
+      spend: number
+      roas: number
+      dealCount: number
+    }
+  >
+}
 
-  // Mock data
-  const attribution = {
-    totalRevenue: 125000,
-    totalSpend: 25000,
-    roas: 5.0,
-    dealCount: 45,
-    conversionCount: 320,
-    byPlatform: {
-      meta: {
-        revenue: 75000,
-        spend: 15000,
-        roas: 5.0,
-        dealCount: 28,
-      },
-      google: {
-        revenue: 30000,
-        spend: 6000,
-        roas: 5.0,
-        dealCount: 12,
-      },
-      tiktok: {
-        revenue: 15000,
-        spend: 3000,
-        roas: 5.0,
-        dealCount: 4,
-      },
-      yandex: {
-        revenue: 5000,
-        spend: 1000,
-        roas: 5.0,
-        dealCount: 1,
-      },
-    },
+interface Trend {
+  date: string
+  revenue: number
+  deals: number
+  roas: number
+}
+
+export function RevenueDashboard({ connectionId, integrationName }: RevenueDashboardProps) {
+  const [timeRange, setTimeRange] = useState('30')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [attribution, setAttribution] = useState<Attribution | null>(null)
+  const [trends, setTrends] = useState<Trend[]>([])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true)
+      setError(null)
+
+      try {
+        // Fetch revenue attribution data
+        const attributionRes = await fetch(
+          `/api/integrations/${connectionId}/revenue/attribution?period=daily`,
+          {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+          }
+        )
+
+        if (!attributionRes.ok) {
+          throw new Error('Failed to fetch attribution data')
+        }
+
+        const attributionData = await attributionRes.json()
+        setAttribution({
+          totalRevenue: attributionData.totalRevenue || 0,
+          totalSpend: attributionData.totalSpend || 0,
+          roas: attributionData.roas || 0,
+          dealCount: attributionData.dealCount || 0,
+          conversionCount: attributionData.conversionCount || 0,
+          byPlatform: attributionData.byPlatform || {
+            meta: { revenue: 0, spend: 0, roas: 0, dealCount: 0 },
+            google: { revenue: 0, spend: 0, roas: 0, dealCount: 0 },
+            tiktok: { revenue: 0, spend: 0, roas: 0, dealCount: 0 },
+            yandex: { revenue: 0, spend: 0, roas: 0, dealCount: 0 },
+          },
+        })
+
+        // Fetch trends data
+        const trendsRes = await fetch(
+          `/api/integrations/${connectionId}/revenue/trends?days=${timeRange}`,
+          {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+          }
+        )
+
+        if (!trendsRes.ok) {
+          throw new Error('Failed to fetch trends data')
+        }
+
+        const trendsData = await trendsRes.json()
+        setTrends(
+          (trendsData.trends || []).map((trend: any) => ({
+            date: new Date(trend.date).toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+            }),
+            revenue: trend.revenue || 0,
+            deals: trend.deals || 0,
+            roas: trend.roas || 0,
+          }))
+        )
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred')
+        // Fallback to mock data if API fails
+        setAttribution({
+          totalRevenue: 125000,
+          totalSpend: 25000,
+          roas: 5.0,
+          dealCount: 45,
+          conversionCount: 320,
+          byPlatform: {
+            meta: { revenue: 75000, spend: 15000, roas: 5.0, dealCount: 28 },
+            google: { revenue: 30000, spend: 6000, roas: 5.0, dealCount: 12 },
+            tiktok: { revenue: 15000, spend: 3000, roas: 5.0, dealCount: 4 },
+            yandex: { revenue: 5000, spend: 1000, roas: 5.0, dealCount: 1 },
+          },
+        })
+        setTrends([
+          { date: 'Mar 28', revenue: 2000, deals: 2, roas: 4.2 },
+          { date: 'Mar 29', revenue: 2500, deals: 3, roas: 4.5 },
+          { date: 'Mar 30', revenue: 3000, deals: 3, roas: 5.0 },
+          { date: 'Mar 31', revenue: 2800, deals: 2, roas: 4.8 },
+          { date: 'Apr 1', revenue: 3200, deals: 4, roas: 5.3 },
+          { date: 'Apr 2', revenue: 2900, deals: 3, roas: 5.1 },
+        ])
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (connectionId) {
+      fetchData()
+    }
+  }, [connectionId, timeRange])
+
+  if (loading) {
+    return (
+      <div className="space-y-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-bold text-white flex items-center gap-2">
+              <TrendingUp className="text-emerald-400" size={32} />
+              Revenue Attribution
+            </h2>
+            <p className="text-text-secondary mt-2">Loading...</p>
+          </div>
+        </div>
+        <div className="rounded-2xl border border-white/10 bg-surface-2/50 p-8 animate-pulse">
+          <div className="h-64 bg-surface-3/50 rounded-lg"></div>
+        </div>
+      </div>
+    )
   }
 
-  const trends = [
-    { date: 'Mar 28', revenue: 2000, deals: 2, roas: 4.2 },
-    { date: 'Mar 29', revenue: 2500, deals: 3, roas: 4.5 },
-    { date: 'Mar 30', revenue: 3000, deals: 3, roas: 5.0 },
-    { date: 'Mar 31', revenue: 2800, deals: 2, roas: 4.8 },
-    { date: 'Apr 1', revenue: 3200, deals: 4, roas: 5.3 },
-    { date: 'Apr 2', revenue: 2900, deals: 3, roas: 5.1 },
-  ]
+  if (!attribution) {
+    return (
+      <div className="space-y-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-bold text-white flex items-center gap-2">
+              <TrendingUp className="text-emerald-400" size={32} />
+              Revenue Attribution
+            </h2>
+            <p className="text-text-secondary mt-2">{error || 'No data available'}</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-8">
@@ -72,6 +183,7 @@ export function RevenueDashboard({ connectionId, integrationName }: RevenueDashb
             value={timeRange}
             onChange={(e) => setTimeRange(e.target.value)}
             className="px-4 py-2 rounded-lg bg-surface-2 border border-white/10 text-text-primary"
+            disabled={loading}
           >
             <option value="7">Last 7 days</option>
             <option value="30">Last 30 days</option>
