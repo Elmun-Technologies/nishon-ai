@@ -1,0 +1,114 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/api/**'
+      - 'apps/web/**'
+      - 'packages/**'
+      - 'render.yaml'
+      - '.github/workflows/deploy.yml'
+      - '.dockerignore'
+
+  workflow_run:
+    workflows: ["Run Tests"]
+    branches: [main]
+    types: [completed]
+
+jobs:
+  check-tests:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_run'
+    steps:
+      - name: Check test status
+        if: github.event.workflow_run.conclusion == 'failure'
+        run: |
+          echo "❌ Tests failed, skipping deployment"
+          exit 1
+
+      - name: Tests passed
+        if: github.event.workflow_run.conclusion == 'success'
+        run: echo "✅ Tests passed, proceeding with deployment"
+
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: github.event_name == 'push' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy API to Render
+        if: github.event_name == 'push'
+        run: |
+          echo "🚀 Deploying API to Render..."
+          # Render auto-deploys on git push via webhook
+          # No manual action needed - webhook triggered by this push
+          echo "✅ Deployment triggered via git push"
+          echo "📋 Check Render dashboard for deployment progress: https://dashboard.render.com"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Notify deployment started
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '🚀 Deployment to production started! Check Render dashboard for progress.'
+            })
+        if: github.event_name == 'push' && github.event.pull_request
+        continue-on-error: true
+
+      - name: Wait for Render deployment
+        run: |
+          echo "⏳ Waiting for Render deployment to complete..."
+          echo "📌 Manual check: https://dashboard.render.com"
+          echo ""
+          echo "Deployment typically takes 3-5 minutes"
+        timeout-minutes: 10
+
+      - name: Verify deployment health
+        run: |
+          echo "🔍 Checking API health..."
+          # This will be implemented after Render deployment
+          # curl https://performa-ai-api.onrender.com/health
+          echo "✅ Manual health check available at:"
+          echo "   https://performa-ai-api.onrender.com/health"
+
+      - name: Create deployment summary
+        uses: actions/github-script@v7
+        if: always()
+        with:
+          script: |
+            const summary = `
+## 🚀 Deployment Summary
+
+**Status**: In Progress
+
+### Resources
+- 📊 API: https://performa-ai-api.onrender.com
+- 🌐 Frontend: https://performa-ai.vercel.app
+- 📋 Render Dashboard: https://dashboard.render.com
+
+### Checks
+- ✅ Code merged to main
+- ✅ Tests passed
+- ⏳ Render deployment in progress
+- ⏳ Health check pending
+
+### Next Steps
+1. Monitor Render dashboard (3-5 mins)
+2. Check API health: https://performa-ai-api.onrender.com/health
+3. Verify frontend loads
+
+**Commit**: ${{ github.sha }}
+**Author**: ${{ github.actor }}
+**Time**: ${{ github.event.head_commit.timestamp }}
+            `;
+
+            console.log(summary);

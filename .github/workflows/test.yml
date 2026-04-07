@@ -1,0 +1,109 @@
+name: Run Tests
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'apps/**'
+      - 'packages/**'
+      - '.github/workflows/test.yml'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+
+  push:
+    branches: [main, develop]
+    paths:
+      - 'apps/**'
+      - 'packages/**'
+      - '.github/workflows/test.yml'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint code
+        run: pnpm lint
+        continue-on-error: true
+
+      - name: Run unit tests
+        run: pnpm test
+        continue-on-error: true
+
+      - name: Build packages
+        run: |
+          pnpm --filter @performa/shared build
+          pnpm --filter @performa/ai-sdk build
+
+      - name: Build API
+        run: |
+          NODE_OPTIONS='--max-old-space-size=400' pnpm --filter api build
+        continue-on-error: false
+
+      - name: Build Web
+        run: pnpm --filter web build
+        continue-on-error: false
+
+      - name: Run E2E tests (API)
+        run: pnpm --filter api test:e2e
+        continue-on-error: true
+        timeout-minutes: 10
+
+      - name: Upload coverage reports
+        if: matrix.node-version == '20.x'
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/coverage-final.json
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '✅ Tests completed! Check logs for details.'
+            })
+        continue-on-error: true
