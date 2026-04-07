@@ -86,4 +86,4 @@ dist
 
 # Temporary folders
 tmp/
-temp/
+temp/.turbo/
