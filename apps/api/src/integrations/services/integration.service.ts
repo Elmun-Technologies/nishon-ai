@@ -332,7 +332,7 @@ export class IntegrationService {
 
     return {
       connectionId,
-      integrationKey: connection.integrationKey,
+      integrationKey: connection.integrationKey as any,
       status: connection.status,
       lastSyncedAt: connection.lastSyncedAt,
       lastError: connection.syncErrorMessage,

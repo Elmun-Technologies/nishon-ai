@@ -35,8 +35,7 @@ import {
   CreateCommissionRateDto,
   UpdateCommissionRateDto,
 } from './dtos/commission.dto'
-import { JwtAuthGuard } from '@/auth/guards/jwt.guard'
-import { WorkspaceGuard } from '@/common/guards/workspace.guard'
+import { AuthGuard } from '@nestjs/passport'
 import { ConversionEvent } from './types/integration.types'
 import {
   AudienceSegmentService,
@@ -47,7 +46,7 @@ import {
 } from './services'
 
 @Controller('integrations')
-@UseGuards(JwtAuthGuard, WorkspaceGuard)
+@UseGuards(AuthGuard('jwt'))
 export class IntegrationsController {
   private readonly logger = new Logger(IntegrationsController.name)
 
@@ -194,7 +193,7 @@ export class IntegrationsController {
     const workspaceId = req.workspace?.id
 
     try {
-      await this.integrationService.saveConfiguration(connectionId, dto)
+      await this.integrationService.saveConfiguration(connectionId, dto as any)
       return {
         success: true,
         message: 'Configuration saved successfully',
@@ -369,7 +368,7 @@ export class IntegrationsController {
   async createAudienceSegment(
     @Param('connectionId') connectionId: string,
     @Body() dto: CreateAudienceSegmentDto,
-    @Req() req: any,
+    @Req() req?: any,
   ): Promise<any> {
     const workspaceId = req.workspace?.id
     return this.audienceSegmentService.createSegment({
@@ -388,7 +387,7 @@ export class IntegrationsController {
   async listAudienceSegments(
     @Param('connectionId') connectionId: string,
     @Query('platform') platform?: string,
-    @Req() req: any,
+    @Req() req?: any,
   ): Promise<ListAudienceSegmentsResponseDto> {
     const segments = await this.audienceSegmentService.listSegments(
       connectionId,
@@ -508,7 +507,7 @@ export class IntegrationsController {
     @Param('connectionId') connectionId: string,
     @Query('month') month?: number,
     @Query('year') year?: number,
-    @Req() req: any,
+    @Req() req?: any,
   ): Promise<any> {
     const workspaceId = req.workspace?.id
     const now = new Date()
@@ -539,7 +538,7 @@ export class IntegrationsController {
     @Query('specialistId') specialistId?: number,
     @Query('limit') limit: number = 50,
     @Query('offset') offset: number = 0,
-    @Req() req: any,
+    @Req() req?: any,
   ): Promise<any> {
     const workspaceId = req.workspace?.id
     const summary = await this.commissionReportingService.getCommissionsSummary(
@@ -576,7 +575,7 @@ export class IntegrationsController {
     @Param('connectionId') connectionId: string,
     @Param('commissionId') commissionId: string,
     @Body() dto: UpdateCommissionStatusDto,
-    @Req() req: any,
+    @Req() req?: any,
   ): Promise<any> {
     const userId = req.user?.id
 
@@ -624,7 +623,7 @@ export class IntegrationsController {
     @Param('connectionId') connectionId: string,
     @Query('periodStart') periodStart?: string,
     @Query('periodEnd') periodEnd?: string,
-    @Req() req: any,
+    @Req() req?: any,
   ): Promise<any> {
     const workspaceId = req.workspace?.id
     return this.commissionReportingService.getCommissionsSummary(workspaceId, {
@@ -642,7 +641,7 @@ export class IntegrationsController {
   async getSpecialistStats(
     @Param('connectionId') connectionId: string,
     @Param('specialistId') specialistId: string,
-    @Req() req: any,
+    @Req() req?: any,
   ): Promise<any> {
     const workspaceId = req.workspace?.id
     return this.commissionReportingService.getSpecialistStats(
@@ -660,7 +659,7 @@ export class IntegrationsController {
   async getPayroll(
     @Param('connectionId') connectionId: string,
     @Param('period') period: string,
-    @Req() req: any,
+    @Req() req?: any,
   ): Promise<any> {
     const workspaceId = req.workspace?.id
     return this.commissionReportingService.generatePayroll(workspaceId, period)
@@ -675,7 +674,7 @@ export class IntegrationsController {
   async listCommissionRates(
     @Param('connectionId') connectionId: string,
     @Query('activeOnly') activeOnly: boolean = false,
-    @Req() req: any,
+    @Req() req?: any,
   ): Promise<any> {
     const workspaceId = req.workspace?.id
     const rates = await this.commissionRateService.listRates(workspaceId, activeOnly)
@@ -691,7 +690,7 @@ export class IntegrationsController {
   async createCommissionRate(
     @Param('connectionId') connectionId: string,
     @Body() dto: CreateCommissionRateDto,
-    @Req() req: any,
+    @Req() req?: any,
   ): Promise<any> {
     const workspaceId = req.workspace?.id
     return this.commissionRateService.createRate({

@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { Repository } from 'typeorm'
+import { Repository, MoreThanOrEqual } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
 import { AxiosInstance } from 'axios'
 import {
@@ -201,7 +201,7 @@ export class DealPullSyncService {
 
     if (campaignId) {
       linkedDeal.campaignId = campaignId
-      linkedDeal.platform = platform || null
+      linkedDeal.platform = (platform as 'google' | 'meta' | 'tiktok' | 'yandex' | null) || null
 
       // TODO: Fetch campaign ad spend from Nishon campaigns table
       // For now, we'll assume campaign data exists
@@ -321,7 +321,7 @@ export class DealPullSyncService {
       where: {
         connectionId,
         status: 'won',
-        wonAt: since ? { gte: since } : undefined,
+        wonAt: since ? MoreThanOrEqual(since) : undefined,
       },
     })
 
@@ -432,7 +432,7 @@ export class DealPullSyncService {
       where: {
         connectionId,
         status: 'won',
-        wonAt: since ? { gte: since } : undefined,
+        wonAt: since ? MoreThanOrEqual(since) : undefined,
       },
       order: { wonAt: 'ASC' },
     })
