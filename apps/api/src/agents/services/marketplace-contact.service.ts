@@ -65,6 +65,7 @@ export class MarketplaceContactService {
 
     return {
       id: saved.id,
+      success: true,
       status: "success",
       message: "Your message has been sent to the specialist",
     };

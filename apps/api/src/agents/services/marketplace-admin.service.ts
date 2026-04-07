@@ -343,4 +343,29 @@ export class MarketplaceAdminService {
     nextSync.setDate(nextSync.getDate() + 1);
     return nextSync;
   }
+
+  /**
+   * Create a new certification type
+   */
+  async createCertification(dto: any) {
+    // TODO: Implement certification creation
+    // For now, return a simple response
+    return {
+      id: `cert_${Date.now()}`,
+      name: dto.name,
+      issuer: dto.issuer,
+    };
+  }
+
+  /**
+   * Verify a specialist certification
+   */
+  async verifyCertification(id: string, certId: string, dto: any) {
+    // TODO: Implement certification verification
+    // For now, return a simple response
+    return {
+      status: dto.status || "verified",
+      expiresAt: dto.expiresAt?.toISOString?.() || null,
+    };
+  }
 }

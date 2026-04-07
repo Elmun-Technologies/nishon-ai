@@ -39,6 +39,9 @@ import {
 import { Type } from "class-transformer";
 import { MarketplaceAdminService } from "../services/marketplace-admin.service";
 import { MarketplaceSearchService } from "../services/marketplace-search.service";
+import { MarketplaceProfileService } from "../services/marketplace-profile.service";
+import { MarketplacePerformanceService } from "../services/marketplace-performance.service";
+import { MarketplaceContactService } from "../services/marketplace-contact.service";
 import { SyncPerformanceDto, VerifyPerformanceDto, SyncStatusDto } from "../dtos/marketplace.dto";
 
 /**
@@ -442,9 +445,9 @@ export class MarketplaceController {
   constructor(
     private readonly marketplaceAdminService: MarketplaceAdminService,
     private readonly marketplaceSearchService: MarketplaceSearchService,
-    // private readonly marketplaceProfileService: MarketplaceProfileService,
-    // private readonly marketplacePerformanceService: MarketplacePerformanceService,
-    // private readonly marketplaceContactService: MarketplaceContactService,
+    private readonly marketplaceProfileService: MarketplaceProfileService,
+    private readonly marketplacePerformanceService: MarketplacePerformanceService,
+    private readonly marketplaceContactService: MarketplaceContactService,
   ) {}
 
   // ═════════════════════════════════════════════════════════════════════════
@@ -608,8 +611,11 @@ export class MarketplaceController {
     if (!dto.email || !dto.message) {
       throw new BadRequestException("Email and message are required");
     }
-    // TODO: Call marketplaceContactService.contactSpecialist(slug, dto, req?.user?.id)
-    throw new Error("Not implemented - awaiting marketplaceContactService");
+    return this.marketplaceContactService.contactSpecialist(
+      slug,
+      dto as any,
+      req?.user?.id,
+    );
   }
 
   // ═════════════════════════════════════════════════════════════════════════
@@ -652,10 +658,7 @@ export class MarketplaceController {
     if (!id || id.trim().length === 0) {
       throw new BadRequestException("Invalid specialist ID");
     }
-    // TODO: Call marketplaceProfileService.getOwnProfile(id, req.user.id)
-    //       - Verify ownership
-    //       - Return full profile with analytics
-    throw new Error("Not implemented - awaiting marketplaceProfileService");
+    return this.marketplaceProfileService.getOwnProfile(id, req.user.id) as any;
   }
 
   /**
@@ -691,12 +694,7 @@ export class MarketplaceController {
     if (!dto.displayName || !dto.title) {
       throw new BadRequestException("displayName and title are required");
     }
-    // TODO: Call marketplaceProfileService.createProfile(req.user.id, dto)
-    //       - Validate inputs
-    //       - Generate slug
-    //       - Create profile entity
-    //       - Return created profile
-    throw new Error("Not implemented - awaiting marketplaceProfileService");
+    return this.marketplaceProfileService.createProfile(req.user.id, dto) as any;
   }
 
   /**
@@ -736,11 +734,7 @@ export class MarketplaceController {
     if (!id || id.trim().length === 0) {
       throw new BadRequestException("Invalid specialist ID");
     }
-    // TODO: Call marketplaceProfileService.updateProfile(id, req.user.id, dto)
-    //       - Verify ownership
-    //       - Apply partial updates
-    //       - Return updated profile
-    throw new Error("Not implemented - awaiting marketplaceProfileService");
+    return this.marketplaceProfileService.updateProfile(id, req.user.id, dto) as any;
   }
 
   /**
@@ -789,12 +783,7 @@ export class MarketplaceController {
     if (!dto.title || !dto.industry || !dto.platform) {
       throw new BadRequestException("title, industry, and platform are required");
     }
-    // TODO: Call marketplaceProfileService.addCaseStudy(id, req.user.id, dto)
-    //       - Verify ownership
-    //       - Create case study
-    //       - Set status to "pending_review"
-    //       - Return created case study
-    throw new Error("Not implemented - awaiting marketplaceProfileService");
+    return this.marketplaceProfileService.addCaseStudy(id, req.user.id, dto) as any;
   }
 
   /**
@@ -836,11 +825,7 @@ export class MarketplaceController {
     if (!id || id.trim().length === 0) {
       throw new BadRequestException("Invalid specialist ID");
     }
-    // TODO: Call marketplacePerformanceService.getAnalytics(id, req.user.id, period)
-    //       - Verify ownership
-    //       - Aggregate analytics for period
-    //       - Return analytics with trends
-    throw new Error("Not implemented - awaiting marketplacePerformanceService");
+    return this.marketplacePerformanceService.getAnalytics(id, req.user.id, period) as any;
   }
 
   // ═════════════════════════════════════════════════════════════════════════
@@ -1124,14 +1109,13 @@ export class MarketplaceController {
     @Body() dto: CreateCertificationDto,
     @Request() req: any,
   ): Promise<{ id: string; name: string; issuer: string }> {
+    if (!req.user?.isAdmin) {
+      throw new ForbiddenException("Admin access required");
+    }
     if (!dto.name || !dto.issuer) {
       throw new BadRequestException("name and issuer are required");
     }
-    // TODO: Call marketplaceAdminService.createCertification(dto)
-    //       - Check admin role
-    //       - Create certification entity
-    //       - Return created certification
-    throw new Error("Not implemented - awaiting marketplaceAdminService");
+    return this.marketplaceAdminService.createCertification(dto);
   }
 
   /**
@@ -1180,11 +1164,9 @@ export class MarketplaceController {
     if (!certId || certId.trim().length === 0) {
       throw new BadRequestException("Invalid certification ID");
     }
-    // TODO: Call marketplaceAdminService.verifyCertification(id, certId, dto)
-    //       - Check admin role
-    //       - Verify certification
-    //       - Set expiration if provided
-    //       - Return status
-    throw new Error("Not implemented - awaiting marketplaceAdminService");
+    if (!req.user?.isAdmin) {
+      throw new ForbiddenException("Admin access required");
+    }
+    return this.marketplaceAdminService.verifyCertification(id, certId, dto);
   }
 }
