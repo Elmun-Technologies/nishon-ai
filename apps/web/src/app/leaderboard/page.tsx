@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Star, TrendingUp, Award, Crown, Target } from 'lucide-react'
+import { useI18n } from '@/i18n/use-i18n'
 
 const LEADERBOARD_DATA = [
   {
@@ -109,15 +110,16 @@ const LEADERBOARD_DATA = [
   },
 ]
 
-const TABS = [
-  { id: 'overall', label: 'Overall Rankings', icon: '🏆' },
-  { id: 'rising', label: 'Rising Stars', icon: '🌟' },
-  { id: 'roas', label: 'ROAS Leaders', icon: '📈' },
-  { id: 'rating', label: 'Top Rated', icon: '⭐' },
-]
-
 export default function LeaderboardPage() {
+  const { t } = useI18n()
   const [activeTab, setActiveTab] = useState('overall')
+
+  const TABS = [
+    { id: 'overall', label: t('leaderboard.overall'), icon: '🏆' },
+    { id: 'rising', label: t('leaderboard.rising'), icon: '🌟' },
+    { id: 'roas', label: t('leaderboard.roasLeaders'), icon: '📈' },
+    { id: 'rating', label: t('leaderboard.topRated'), icon: '⭐' },
+  ]
 
   const sortedByTab = {
     overall: LEADERBOARD_DATA,
@@ -136,12 +138,12 @@ export default function LeaderboardPage() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-4xl font-bold flex items-center gap-2">
-                <Crown size={32} className="text-yellow-400" /> Leaderboard
+                <Crown size={32} className="text-yellow-400" /> {t('leaderboard.title')}
               </h1>
-              <p className="text-text-secondary mt-2">Top performing specialists on Nishon AI</p>
+              <p className="text-text-secondary mt-2">{t('leaderboard.subtitle')}</p>
             </div>
             <Link href="/" className="text-emerald-300 hover:text-emerald-200 transition-colors">
-              ← Back Home
+              ← {t('common.home')}
             </Link>
           </div>
 
@@ -168,7 +170,7 @@ export default function LeaderboardPage() {
         {/* Featured Section - Top 3 */}
         {activeTab === 'overall' && (
           <div className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-text-primary">🏆 Top 3 Champions</h2>
+            <h2 className="text-2xl font-bold mb-6 text-text-primary">{t('leaderboard.top3')}</h2>
             <div className="grid gap-6 md:grid-cols-3">
               {displayData.slice(0, 3).map((specialist, idx) => (
                 <Link
@@ -235,15 +237,15 @@ export default function LeaderboardPage() {
             <table className="w-full">
               <thead className="bg-surface-elevated/[0.04] border-b border-white/10">
                 <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">Rank</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">Specialist</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">Level</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">Rating</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">ROAS</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">Campaigns</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">Specialty</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">Badges</th>
-                  <th className="px-6 py-4 text-right text-sm font-semibold text-text-secondary">Points</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">{t('leaderboard.rank')}</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">{t('leaderboard.specialist')}</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">{t('leaderboard.level')}</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">{t('leaderboard.rating')}</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">{t('leaderboard.roas')}</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">{t('leaderboard.campaigns')}</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">{t('leaderboard.specialty')}</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">{t('leaderboard.badges')}</th>
+                  <th className="px-6 py-4 text-right text-sm font-semibold text-text-secondary">{t('leaderboard.points')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/10">
@@ -306,29 +308,29 @@ export default function LeaderboardPage() {
 
         {/* Info Section */}
         <div className="mt-12 rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 p-8">
-          <h3 className="text-2xl font-bold text-white mb-4">How the Leaderboard Works</h3>
+          <h3 className="text-2xl font-bold text-white mb-4">{t('leaderboard.howWorks')}</h3>
           <div className="grid md:grid-cols-3 gap-6">
             {[
               {
                 icon: '🎯',
-                title: 'Points System',
-                desc: 'Earn points from successful campaigns, client reviews, and achievements',
+                titleKey: 'leaderboard.pointsSystem',
+                descKey: 'leaderboard.pointsDesc',
               },
               {
                 icon: '🏆',
-                title: 'Levels',
-                desc: 'Progress from Novice to Legend as you accumulate points and unlock badges',
+                titleKey: 'leaderboard.levels',
+                descKey: 'leaderboard.levelsDesc',
               },
               {
                 icon: '🎖️',
-                title: 'Badges',
-                desc: 'Collect badges for reaching milestones and demonstrating expertise',
+                titleKey: 'leaderboard.badgesReward',
+                descKey: 'leaderboard.badgesDesc',
               },
             ].map((item) => (
-              <div key={item.title}>
+              <div key={item.titleKey}>
                 <div className="text-4xl mb-3">{item.icon}</div>
-                <h4 className="font-semibold text-white mb-2">{item.title}</h4>
-                <p className="text-sm text-text-tertiary">{item.desc}</p>
+                <h4 className="font-semibold text-white mb-2">{t(item.titleKey)}</h4>
+                <p className="text-sm text-text-tertiary">{t(item.descKey)}</p>
               </div>
             ))}
           </div>
