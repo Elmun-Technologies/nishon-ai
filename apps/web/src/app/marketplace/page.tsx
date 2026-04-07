@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Star, MapPin, Award, TrendingUp, Users, DollarSign, Clock, Check } from 'lucide-react'
+import { useI18n } from '@/i18n/use-i18n'
 import type { Specialist, SpecialistLevel, CertificationType, SpecialtyType } from '@/types/marketplace'
 
 const MOCK_SPECIALISTS: Specialist[] = [
@@ -161,7 +162,7 @@ const CERTIFICATIONS = [
   { id: 'yandex', label: 'Yandex Expert', icon: '🔴' },
 ]
 
-function SpecialistCard({ specialist }: { specialist: Specialist }) {
+function SpecialistCard({ specialist, t }: { specialist: Specialist; t: (key: string) => string }) {
   return (
     <Link href={`/marketplace/specialists/${specialist.id}`}>
       <div className="group rounded-2xl border border-white/10 bg-surface-2/50 p-6 hover:border-emerald-500/50 hover:bg-surface-2 transition-all cursor-pointer">
@@ -179,7 +180,7 @@ function SpecialistCard({ specialist }: { specialist: Specialist }) {
           </div>
           <div className="text-right">
             <div className="text-2xl font-bold text-emerald-400">${specialist.basePrice}</div>
-            <p className="text-xs text-text-tertiary">/soat</p>
+            <p className="text-xs text-text-tertiary">/hour</p>
           </div>
         </div>
 
@@ -200,26 +201,26 @@ function SpecialistCard({ specialist }: { specialist: Specialist }) {
         {/* Quick Stats */}
         <div className="grid grid-cols-2 gap-3 mb-4 py-3 border-y border-white/10">
           <div>
-            <p className="text-xs text-text-tertiary">Campaigns</p>
+            <p className="text-xs text-text-tertiary">{t('marketplace.results')}</p>
             <p className="text-lg font-semibold text-white">{specialist.campaignsManaged}</p>
           </div>
           <div>
-            <p className="text-xs text-text-tertiary">Success Rate</p>
+            <p className="text-xs text-text-tertiary">{t('portfolio.successRate')}</p>
             <p className="text-lg font-semibold text-white">{specialist.successRate}%</p>
           </div>
           <div>
-            <p className="text-xs text-text-tertiary">Experience</p>
+            <p className="text-xs text-text-tertiary">{t('portfolio.experience')}</p>
             <p className="text-lg font-semibold text-white">{specialist.experience} yil</p>
           </div>
           <div>
-            <p className="text-xs text-text-tertiary">Response Time</p>
+            <p className="text-xs text-text-tertiary">{t('portfolio.responseTime')}</p>
             <p className="text-lg font-semibold text-white">{specialist.responseTime}h</p>
           </div>
         </div>
 
         {/* Certifications */}
         <div className="mb-4">
-          <p className="text-xs text-text-tertiary mb-2">Sertifikatsiyalar</p>
+          <p className="text-xs text-text-tertiary mb-2">{t('marketplace.certifications')}</p>
           <div className="flex flex-wrap gap-1">
             {specialist.certifications.map((cert) => {
               const certData = CERTIFICATIONS.find((c) => c.id === cert)
@@ -268,6 +269,7 @@ function SpecialistCard({ specialist }: { specialist: Specialist }) {
 }
 
 export default function MarketplacePage() {
+  const { t } = useI18n()
   const [filters, setFilters] = useState({
     level: [] as SpecialistLevel[],
     certification: [] as CertificationType[],
@@ -303,11 +305,11 @@ export default function MarketplacePage() {
         <div className="mx-auto max-w-7xl px-6 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold">Marketplace</h1>
-              <p className="text-text-secondary mt-1">Verified markolog va agentliklar bilan ishlang</p>
+              <h1 className="text-3xl font-bold">{t('marketplace.title')}</h1>
+              <p className="text-text-secondary mt-1">{t('marketplace.subtitle')}</p>
             </div>
             <Link href="/" className="text-emerald-300 hover:text-emerald-200 transition-colors">
-              ← Asosiy sahifa
+              ← {t('common.home')}
             </Link>
           </div>
         </div>
@@ -317,10 +319,10 @@ export default function MarketplacePage() {
         {/* Featured Section */}
         {featuredSpecialists.length > 0 && (
           <section className="mb-16">
-            <h2 className="text-3xl font-bold mb-8">⭐ Featured Specialists</h2>
+            <h2 className="text-3xl font-bold mb-8">{t('marketplace.featured')}</h2>
             <div className="grid gap-6 md:grid-cols-3">
               {featuredSpecialists.map((specialist) => (
-                <SpecialistCard key={specialist.id} specialist={specialist} />
+                <SpecialistCard key={specialist.id} specialist={specialist} t={t} />
               ))}
             </div>
           </section>
@@ -328,11 +330,11 @@ export default function MarketplacePage() {
 
         {/* Filters */}
         <section className="mb-12">
-          <h2 className="text-2xl font-bold mb-6">Filterlash</h2>
+          <h2 className="text-2xl font-bold mb-6">{t('marketplace.filters')}</h2>
           <div className="rounded-2xl border border-white/10 bg-surface-2/50 p-6 space-y-6">
             {/* Sorting */}
             <div>
-              <label className="block text-sm font-semibold text-text-primary mb-3">Saralash</label>
+              <label className="block text-sm font-semibold text-text-primary mb-3">{t('marketplace.sorting')}</label>
               <div className="flex gap-3">
                 {(['rating', 'roas', 'price'] as const).map((option) => (
                   <button
@@ -344,9 +346,9 @@ export default function MarketplacePage() {
                         : 'bg-white/10 text-text-secondary hover:bg-white/20'
                     }`}
                   >
-                    {option === 'rating' && 'Reytingi bo\'yicha'}
-                    {option === 'roas' && 'ROAS bo\'yicha'}
-                    {option === 'price' && 'Narx bo\'yicha'}
+                    {option === 'rating' && t('marketplace.sortBy.rating')}
+                    {option === 'roas' && t('marketplace.sortBy.roas')}
+                    {option === 'price' && t('marketplace.sortBy.price')}
                   </button>
                 ))}
               </div>
@@ -448,34 +450,34 @@ export default function MarketplacePage() {
         <section>
           <div className="mb-6">
             <h2 className="text-2xl font-bold">
-              Topildi: <span className="text-emerald-400">{sorted.length}</span> ta specialist
+              {t('marketplace.results')}: <span className="text-emerald-400">{sorted.length}</span> {t('marketplace.specialist')}
             </h2>
           </div>
 
           {sorted.length > 0 ? (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {sorted.map((specialist) => (
-                <SpecialistCard key={specialist.id} specialist={specialist} />
+                <SpecialistCard key={specialist.id} specialist={specialist} t={t} />
               ))}
             </div>
           ) : (
             <div className="rounded-2xl border border-white/10 bg-surface-2/50 p-12 text-center">
-              <p className="text-text-tertiary text-lg">Filterlarga mos specialist topilmadi. Filterlari o'zgartiring.</p>
+              <p className="text-text-tertiary text-lg">{t('marketplace.noResults')}</p>
             </div>
           )}
         </section>
 
         {/* CTA Section */}
         <section className="mt-16 rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 p-12 text-center">
-          <h2 className="text-3xl font-bold mb-4">O'zingiz markolog bo'lishni xohlaysizmi?</h2>
+          <h2 className="text-3xl font-bold mb-4">{t('marketplace.cta.title')}</h2>
           <p className="text-text-secondary mb-6 max-w-2xl mx-auto">
-            Performa marketplace'ga qo'shiling va yuzlab biznesga shuning reklama xizmatlarini taqdim eting.
+            {t('marketplace.cta.subtitle')}
           </p>
           <Link
             href="/register?role=specialist"
             className="inline-block px-8 py-3 bg-emerald-500 text-white font-semibold rounded-full hover:bg-emerald-400 transition-colors"
           >
-            Specialist sifatida ro'yxatdan o'tish ↗
+            {t('marketplace.cta.button')}
           </Link>
         </section>
       </div>

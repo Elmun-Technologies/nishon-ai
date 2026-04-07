@@ -23,6 +23,7 @@ import { TeamInvitesModule } from "./team-invites/team-invites.module";
 import { BillingModule } from "./billing/billing.module";
 import { LaunchOrchestratorModule } from "./launch-orchestrator/launch-orchestrator.module";
 import { WorkspaceServiceModule } from "./workspace-service/workspace-service.module";
+import { IntegrationsModule } from "./integrations/integrations.module";
 import { validateEnv } from "./config/env.validation";
 import { HealthController } from "./health/health.controller";
 import { HealthService } from "./health/health.service";
@@ -85,6 +86,7 @@ import { RequestLoggingInterceptor } from "./common/interceptors/request-logging
     BillingModule,
     LaunchOrchestratorModule,
     WorkspaceServiceModule,
+    IntegrationsModule,
   ],
   controllers: [HealthController],
   providers: [
