@@ -47,6 +47,10 @@ export class User {
   @Column({ default: false })
   isEmailVerified: boolean;
 
+  /** Platform administrator — grants access to admin-only endpoints */
+  @Column({ default: false })
+  isAdmin: boolean;
+
   @Column({ type: "text", nullable: true, select: false })
   // Stores hashed refresh token in DB for invalidation on logout
   refreshToken: string | null;

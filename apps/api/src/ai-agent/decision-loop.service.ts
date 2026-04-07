@@ -237,7 +237,11 @@ export class DecisionLoopService {
       return;
     }
 
-    const encryptionKey = this.config.get<string>("ENCRYPTION_KEY", "00000000000000000000000000000000");
+    const encryptionKey = this.config.get<string>("ENCRYPTION_KEY");
+    if (!encryptionKey || encryptionKey.length !== 32) {
+      this.logger.error("ENCRYPTION_KEY is not set or is not 32 characters — cannot decrypt tokens");
+      return;
+    }
     const accessToken = this.decryptToken(account.accessToken, encryptionKey);
     const advertiserId = account.externalAccountId;
 

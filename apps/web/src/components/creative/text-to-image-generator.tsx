@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Loader2, Download, Copy, Sparkles } from 'lucide-react'
+import apiClient from '@/lib/api-client'
 
 interface TextToImageGeneratorProps {
   onSave: (creative: any) => void
@@ -9,18 +10,32 @@ interface TextToImageGeneratorProps {
 
 export function TextToImageGenerator({ onSave }: TextToImageGeneratorProps) {
   const [prompt, setPrompt] = useState('')
+  const [artStyle, setArtStyle] = useState('Photorealistic')
+  const [quality, setQuality] = useState('Standard')
   const [loading, setLoading] = useState(false)
-  const [generated, setGenerated] = useState<string | null>(null)
+  const [generated, setGenerated] = useState<any>(null)
+  const [error, setError] = useState<string | null>(null)
 
   const handleGenerate = async () => {
     setLoading(true)
-    
-    setTimeout(() => {
-      setGenerated(
-        'https://images.unsplash.com/photo-1618005182384-a83a8e7b9b47?w=800&h=600&fit=crop'
-      )
+    setError(null)
+
+    try {
+      const res = await apiClient.post('/creatives/generate/text-to-image', {
+        prompt,
+        artStyle,
+        quality,
+      })
+      setGenerated({
+        imageUrl: res.data.generatedUrl,
+        revisedPrompt: res.data.metadata?.revisedPrompt,
+        raw: res.data,
+      })
+    } catch (err: any) {
+      setError(err?.response?.data?.message || err?.message || 'Image generation failed')
+    } finally {
       setLoading(false)
-    }, 2500)
+    }
   }
 
   return (
@@ -29,7 +44,7 @@ export function TextToImageGenerator({ onSave }: TextToImageGeneratorProps) {
         <div>
           <h3 className="text-2xl font-bold text-white mb-2">Text-to-Image Generator</h3>
           <p className="text-text-secondary">
-            Describe an image and AI will create it for you. Perfect for quick creative mockups.
+            Describe an image and AI will create it for you. Powered by DALL-E 3.
           </p>
         </div>
 
@@ -54,7 +69,11 @@ export function TextToImageGenerator({ onSave }: TextToImageGeneratorProps) {
               <label className="block text-sm font-medium text-white mb-2">
                 Art Style
               </label>
-              <select className="w-full px-4 py-2 rounded-lg bg-surface-3 border border-white/10 text-white focus:border-purple-500 focus:outline-none">
+              <select
+                value={artStyle}
+                onChange={(e) => setArtStyle(e.target.value)}
+                className="w-full px-4 py-2 rounded-lg bg-surface-3 border border-white/10 text-white focus:border-purple-500 focus:outline-none"
+              >
                 <option>Photorealistic</option>
                 <option>Illustration</option>
                 <option>Digital Art</option>
@@ -67,10 +86,14 @@ export function TextToImageGenerator({ onSave }: TextToImageGeneratorProps) {
               <label className="block text-sm font-medium text-white mb-2">
                 Quality
               </label>
-              <select className="w-full px-4 py-2 rounded-lg bg-surface-3 border border-white/10 text-white focus:border-purple-500 focus:outline-none">
+              <select
+                value={quality}
+                onChange={(e) => setQuality(e.target.value)}
+                className="w-full px-4 py-2 rounded-lg bg-surface-3 border border-white/10 text-white focus:border-purple-500 focus:outline-none"
+              >
                 <option>Standard</option>
-                <option>High (Slower)</option>
-                <option>Ultra (Slowest)</option>
+                <option>High</option>
+                <option>Ultra</option>
               </select>
             </div>
           </div>
@@ -83,23 +106,35 @@ export function TextToImageGenerator({ onSave }: TextToImageGeneratorProps) {
             {loading && <Loader2 className="animate-spin" size={20} />}
             {loading ? 'Generating Image...' : 'Generate Image'}
           </button>
+
+          {error && (
+            <div className="rounded-lg bg-red-500/10 border border-red-500/30 p-3 text-sm text-red-300">
+              {error}
+            </div>
+          )}
         </div>
 
         {generated && (
           <div className="space-y-4 pt-8 border-t border-white/10">
             <h3 className="text-lg font-bold text-white">Generated Image</h3>
-            
+
             <div className="rounded-lg overflow-hidden bg-black aspect-video">
               <img
-                src={generated}
+                src={generated.imageUrl}
                 alt="Generated"
                 className="w-full h-full object-cover"
               />
             </div>
 
+            {generated.revisedPrompt && (
+              <p className="text-xs text-text-tertiary italic">
+                DALL-E revised prompt: {generated.revisedPrompt}
+              </p>
+            )}
+
             <div className="flex gap-2">
               <button
-                onClick={() => onSave({ imageUrl: generated, type: 'text-to-image', prompt })}
+                onClick={() => onSave(generated.raw)}
                 className="flex-1 py-2 rounded-lg bg-emerald-500 text-white font-medium hover:bg-emerald-600 transition-colors"
               >
                 Save Creative
