@@ -277,7 +277,7 @@ function IntegrationCard({ integration, onConfigure, onTest }: IntegrationCardPr
             {Object.entries(integration.stats).map(([key, value]) => (
               <div key={key}>
                 <p className="text-xs text-text-tertiary capitalize">{key}</p>
-                <p className="text-lg font-semibold text-emerald-400">{value}</p>
+                <p className="text-lg font-semibold text-emerald-400">{String(value)}</p>
               </div>
             ))}
           </div>
