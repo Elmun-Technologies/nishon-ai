@@ -34,7 +34,10 @@ async function bootstrap() {
   app.use(helmet());
   app.getHttpAdapter().getInstance().set("trust proxy", 1);
   app.use(createRequestIdMiddleware(requestContext));
-  app.use(createRateLimitMiddleware(configService, logger));
+
+  // Initialize Redis-based rate limiting (async)
+  const rateLimitMiddleware = await createRateLimitMiddleware(configService, logger);
+  app.use(rateLimitMiddleware);
 
   const nodeEnv = configService.get<string>("NODE_ENV", "development");
   const port = Number(configService.get<string>("PORT", "3001"));
