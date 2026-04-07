@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import {
   LayoutGrid, Rocket, Zap, BarChart3, Brain, Wallet,
-  Settings2, LogOut, Users, Sparkles, TrendingUp, ShoppingBag, ChevronDown, Palette,
+  Settings2, LogOut, Users, Star, TrendingUp, ShoppingBag, ChevronDown, Palette,
   Wand2, Users2, Folder, Palette as PaletteIcon, Package, Image, RefreshCcw, Workflow,
 } from 'lucide-react'
 
@@ -34,11 +34,11 @@ const CATEGORIES = [
     ],
   },
   {
-    id: 'tools', label: 'Tools & Resources', icon: Sparkles,
+    id: 'tools', label: 'Tools & Resources', icon: Star,
     items: [
       { href: '/retargeting',     label: 'Retargeting',      icon: RefreshCcw },
       { href: '/automation',      label: 'Avtomatsiya',      icon: Workflow },
-      { href: '/creative-scorer', label: 'Kreativ Baholash', icon: Sparkles },
+      { href: '/creative-scorer', label: 'Kreativ Baholash', icon: Star },
       { href: '/competitors',     label: 'Raqobatchilar',    icon: Users },
       { href: '/landing-page',    label: 'Landing Page',     icon: TrendingUp },
       { href: '/my-portfolio',    label: 'Portfolio',        icon: TrendingUp },

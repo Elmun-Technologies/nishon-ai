@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Loader2, Download, Copy, Sparkles } from 'lucide-react'
+import { Loader2, Download, Copy } from 'lucide-react'
 
 interface TextToImageGeneratorProps {
   onSave: (creative: any) => void

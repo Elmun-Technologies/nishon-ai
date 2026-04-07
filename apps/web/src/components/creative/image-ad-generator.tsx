@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Upload, Loader2, Download, Copy } from 'lucide-react'
+import { Upload, Loader2, Download, Copy, Star } from 'lucide-react'
 
 interface ImageAdGeneratorProps {
   onSave: (creative: any) => void
@@ -166,7 +166,7 @@ export function ImageAdGenerator({ onSave }: ImageAdGeneratorProps) {
         ) : (
           <div className="rounded-xl border border-white/10 bg-surface-2 p-12 flex items-center justify-center h-96">
             <div className="text-center">
-              <Sparkles className="mx-auto text-text-secondary mb-4" size={48} />
+              <Star className="mx-auto text-text-secondary mb-4" size={48} />
               <p className="text-text-secondary">
                 Generate image ads by entering a prompt
               </p>
