@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Upload, Loader2, Download, Copy } from 'lucide-react'
+import { Upload, Loader2, Download, Copy, Sparkles } from 'lucide-react'
+import apiClient from '@/lib/api-client'
 
 interface ImageAdGeneratorProps {
   onSave: (creative: any) => void
@@ -9,27 +10,33 @@ interface ImageAdGeneratorProps {
 
 export function ImageAdGenerator({ onSave }: ImageAdGeneratorProps) {
   const [prompt, setPrompt] = useState('')
+  const [stylePreset, setStylePreset] = useState('Professional Product')
+  const [aspectRatio, setAspectRatio] = useState('1:1')
   const [loading, setLoading] = useState(false)
   const [generated, setGenerated] = useState<any>(null)
+  const [error, setError] = useState<string | null>(null)
 
   const handleGenerate = async () => {
     setLoading(true)
-    
-    // Simulate API call to image generation (would use Stability AI, Midjourney, etc.)
-    setTimeout(() => {
-      const mockImages = [
-        'https://images.unsplash.com/photo-1552664730-d307ca884978?w=500&h=500&fit=crop',
-        'https://images.unsplash.com/photo-1552881914-55da08ca7da0?w=500&h=500&fit=crop',
-        'https://images.unsplash.com/photo-1483389127117-b6a2102724ae?w=500&h=500&fit=crop',
-      ]
-      
-      setGenerated({
-        images: mockImages,
-        headline: 'Transform Your Business Today',
-        copy: 'Join thousands of successful marketers using AI-powered creatives.',
+    setError(null)
+
+    try {
+      const res = await apiClient.post('/creatives/generate/image', {
+        prompt,
+        stylePreset,
+        aspectRatio,
       })
+      setGenerated({
+        images: res.data.generatedUrls?.length ? res.data.generatedUrls : [res.data.generatedUrl],
+        headline: res.data.metadata?.revisedPrompt?.slice(0, 60) || 'Transform Your Business Today',
+        copy: prompt,
+        raw: res.data,
+      })
+    } catch (err: any) {
+      setError(err?.response?.data?.message || err?.message || 'Image generation failed')
+    } finally {
       setLoading(false)
-    }, 2000)
+    }
   }
 
   return (
@@ -38,7 +45,7 @@ export function ImageAdGenerator({ onSave }: ImageAdGeneratorProps) {
       <div className="col-span-1 space-y-6">
         <div className="rounded-xl border border-white/10 bg-surface-2 p-6">
           <h3 className="text-lg font-bold text-white mb-4">Image Prompt</h3>
-          
+
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-white mb-2">
@@ -56,7 +63,11 @@ export function ImageAdGenerator({ onSave }: ImageAdGeneratorProps) {
               <label className="block text-sm font-medium text-white mb-2">
                 Style Preset
               </label>
-              <select className="w-full px-4 py-2 rounded-lg bg-surface-3 border border-white/10 text-white focus:border-purple-500 focus:outline-none">
+              <select
+                value={stylePreset}
+                onChange={(e) => setStylePreset(e.target.value)}
+                className="w-full px-4 py-2 rounded-lg bg-surface-3 border border-white/10 text-white focus:border-purple-500 focus:outline-none"
+              >
                 <option>Professional Product</option>
                 <option>Lifestyle</option>
                 <option>Luxury</option>
@@ -69,10 +80,14 @@ export function ImageAdGenerator({ onSave }: ImageAdGeneratorProps) {
               <label className="block text-sm font-medium text-white mb-2">
                 Aspect Ratio
               </label>
-              <select className="w-full px-4 py-2 rounded-lg bg-surface-3 border border-white/10 text-white focus:border-purple-500 focus:outline-none">
-                <option>1:1 (Square)</option>
-                <option>4:5 (Instagram)</option>
-                <option>16:9 (Landscape)</option>
+              <select
+                value={aspectRatio}
+                onChange={(e) => setAspectRatio(e.target.value)}
+                className="w-full px-4 py-2 rounded-lg bg-surface-3 border border-white/10 text-white focus:border-purple-500 focus:outline-none"
+              >
+                <option value="1:1">1:1 (Square)</option>
+                <option value="4:5">4:5 (Instagram)</option>
+                <option value="16:9">16:9 (Landscape)</option>
               </select>
             </div>
 
@@ -84,6 +99,12 @@ export function ImageAdGenerator({ onSave }: ImageAdGeneratorProps) {
               {loading && <Loader2 className="animate-spin" size={20} />}
               {loading ? 'Generating...' : 'Generate Image'}
             </button>
+
+            {error && (
+              <div className="rounded-lg bg-red-500/10 border border-red-500/30 p-3 text-sm text-red-300">
+                {error}
+              </div>
+            )}
           </div>
         </div>
 
@@ -103,7 +124,7 @@ export function ImageAdGenerator({ onSave }: ImageAdGeneratorProps) {
           <>
             <div className="rounded-xl border border-white/10 bg-surface-2 p-6">
               <h3 className="text-lg font-bold text-white mb-4">Generated Images</h3>
-              
+
               <div className="grid grid-cols-3 gap-4 mb-6">
                 {generated.images.map((img: string, idx: number) => (
                   <div
@@ -131,7 +152,7 @@ export function ImageAdGenerator({ onSave }: ImageAdGeneratorProps) {
                   </label>
                   <input
                     type="text"
-                    value={generated.headline}
+                    defaultValue={generated.headline}
                     className="w-full px-4 py-2 rounded-lg bg-surface-3 border border-white/10 text-white focus:border-purple-500 focus:outline-none"
                   />
                 </div>
@@ -141,14 +162,14 @@ export function ImageAdGenerator({ onSave }: ImageAdGeneratorProps) {
                     Copy
                   </label>
                   <textarea
-                    value={generated.copy}
+                    defaultValue={generated.copy}
                     className="w-full px-4 py-2 rounded-lg bg-surface-3 border border-white/10 text-white focus:border-purple-500 focus:outline-none h-24 resize-none"
                   />
                 </div>
 
                 <div className="flex gap-2">
                   <button
-                    onClick={() => onSave(generated)}
+                    onClick={() => onSave(generated.raw)}
                     className="flex-1 py-2 rounded-lg bg-emerald-500 text-white font-medium hover:bg-emerald-600 transition-colors"
                   >
                     Save Creative

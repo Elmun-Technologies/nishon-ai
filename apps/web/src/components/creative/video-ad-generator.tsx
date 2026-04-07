@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Loader2, Download, Copy, Play } from 'lucide-react'
+import apiClient from '@/lib/api-client'
 
 interface VideoAdGeneratorProps {
   onSave: (creative: any) => void
@@ -9,21 +10,36 @@ interface VideoAdGeneratorProps {
 
 export function VideoAdGenerator({ onSave }: VideoAdGeneratorProps) {
   const [script, setScript] = useState('')
+  const [avatarStyle, setAvatarStyle] = useState('Professional Woman')
+  const [duration, setDuration] = useState('15')
+  const [background, setBackground] = useState('Office')
   const [loading, setLoading] = useState(false)
   const [generated, setGenerated] = useState<any>(null)
+  const [error, setError] = useState<string | null>(null)
 
   const handleGenerate = async () => {
     setLoading(true)
-    
-    setTimeout(() => {
-      setGenerated({
-        videoUrl: 'https://example.com/video.mp4',
-        duration: '15s',
-        avatarStyle: 'Professional Woman',
-        script: script || 'Discover the future of marketing with our AI-powered platform.',
+    setError(null)
+
+    try {
+      const res = await apiClient.post('/creatives/generate/video', {
+        script,
+        avatarStyle,
+        duration,
+        background,
       })
+      setGenerated({
+        videoUrl: res.data.generatedUrl,
+        duration: `${duration}s`,
+        avatarStyle: res.data.metadata?.avatarStyle ?? avatarStyle,
+        script: script,
+        raw: res.data,
+      })
+    } catch (err: any) {
+      setError(err?.response?.data?.message || err?.message || 'Video generation failed')
+    } finally {
       setLoading(false)
-    }, 3000)
+    }
   }
 
   return (
@@ -32,7 +48,7 @@ export function VideoAdGenerator({ onSave }: VideoAdGeneratorProps) {
       <div className="col-span-1 space-y-6">
         <div className="rounded-xl border border-white/10 bg-surface-2 p-6">
           <h3 className="text-lg font-bold text-white mb-4">Video Settings</h3>
-          
+
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-white mb-2">
@@ -50,7 +66,11 @@ export function VideoAdGenerator({ onSave }: VideoAdGeneratorProps) {
               <label className="block text-sm font-medium text-white mb-2">
                 Avatar Style
               </label>
-              <select className="w-full px-4 py-2 rounded-lg bg-surface-3 border border-white/10 text-white focus:border-purple-500 focus:outline-none">
+              <select
+                value={avatarStyle}
+                onChange={(e) => setAvatarStyle(e.target.value)}
+                className="w-full px-4 py-2 rounded-lg bg-surface-3 border border-white/10 text-white focus:border-purple-500 focus:outline-none"
+              >
                 <option>Professional Woman</option>
                 <option>Professional Man</option>
                 <option>Friendly Woman</option>
@@ -63,10 +83,14 @@ export function VideoAdGenerator({ onSave }: VideoAdGeneratorProps) {
               <label className="block text-sm font-medium text-white mb-2">
                 Video Duration
               </label>
-              <select className="w-full px-4 py-2 rounded-lg bg-surface-3 border border-white/10 text-white focus:border-purple-500 focus:outline-none">
-                <option>15 seconds</option>
-                <option>30 seconds</option>
-                <option>60 seconds</option>
+              <select
+                value={duration}
+                onChange={(e) => setDuration(e.target.value)}
+                className="w-full px-4 py-2 rounded-lg bg-surface-3 border border-white/10 text-white focus:border-purple-500 focus:outline-none"
+              >
+                <option value="15">15 seconds</option>
+                <option value="30">30 seconds</option>
+                <option value="60">60 seconds</option>
               </select>
             </div>
 
@@ -74,7 +98,11 @@ export function VideoAdGenerator({ onSave }: VideoAdGeneratorProps) {
               <label className="block text-sm font-medium text-white mb-2">
                 Background
               </label>
-              <select className="w-full px-4 py-2 rounded-lg bg-surface-3 border border-white/10 text-white focus:border-purple-500 focus:outline-none">
+              <select
+                value={background}
+                onChange={(e) => setBackground(e.target.value)}
+                className="w-full px-4 py-2 rounded-lg bg-surface-3 border border-white/10 text-white focus:border-purple-500 focus:outline-none"
+              >
                 <option>Office</option>
                 <option>Studio</option>
                 <option>Outdoor</option>
@@ -91,6 +119,12 @@ export function VideoAdGenerator({ onSave }: VideoAdGeneratorProps) {
               {loading && <Loader2 className="animate-spin" size={20} />}
               {loading ? 'Generating...' : 'Generate Video'}
             </button>
+
+            {error && (
+              <div className="rounded-lg bg-red-500/10 border border-red-500/30 p-3 text-sm text-red-300">
+                {error}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -100,10 +134,21 @@ export function VideoAdGenerator({ onSave }: VideoAdGeneratorProps) {
         {generated ? (
           <div className="rounded-xl border border-white/10 bg-surface-2 p-6 space-y-6">
             <h3 className="text-lg font-bold text-white">Video Preview</h3>
-            
-            <div className="relative rounded-lg overflow-hidden bg-black aspect-video flex items-center justify-center">
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20" />
-              <Play className="text-white" size={64} />
+
+            <div className="relative rounded-lg overflow-hidden bg-black aspect-video">
+              {generated.videoUrl ? (
+                <video
+                  src={generated.videoUrl}
+                  controls
+                  className="w-full h-full object-contain"
+                  poster=""
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full">
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20" />
+                  <Play className="text-white" size={64} />
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-3 gap-4">
@@ -123,7 +168,7 @@ export function VideoAdGenerator({ onSave }: VideoAdGeneratorProps) {
 
             <div className="flex gap-2">
               <button
-                onClick={() => onSave(generated)}
+                onClick={() => onSave(generated.raw)}
                 className="flex-1 py-2 rounded-lg bg-emerald-500 text-white font-medium hover:bg-emerald-600 transition-colors"
               >
                 Save Creative
