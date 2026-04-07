@@ -1,12 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { Repository } from 'typeorm'
+import { Repository, MoreThanOrEqual } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
 import { AxiosInstance } from 'axios'
 import {
   ConversionEvent,
   FieldMapping,
   AmoCRMLeadPayload,
-  SyncLog as ISyncLog,
 } from '../types/integration.types'
 import { SyncLog } from '../entities/sync-log.entity'
 import { SyncEventType, SyncStatus } from '../types/integration.types'
@@ -307,7 +306,7 @@ export class ConversionToLeadSyncService {
     const logs = await this.syncLogRepository.find({
       where: {
         connectionId,
-        createdAt: { gte: since },
+        createdAt: MoreThanOrEqual(since),
       },
     })
 

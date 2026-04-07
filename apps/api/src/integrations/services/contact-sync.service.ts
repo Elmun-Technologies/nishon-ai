@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common'
+import { Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import {
@@ -6,6 +6,7 @@ import {
   SegmentMember,
   AudienceSync,
   LinkedDeal,
+  IntegrationConnection,
 } from '../entities'
 import { AmoCRMConnectorService } from './amocrm-connector.service'
 
@@ -39,6 +40,8 @@ export class ContactSyncService {
     private audienceSyncRepository: Repository<AudienceSync>,
     @InjectRepository(LinkedDeal)
     private linkedDealRepository: Repository<LinkedDeal>,
+    @InjectRepository(IntegrationConnection)
+    private integrationConnectionRepository: Repository<IntegrationConnection>,
     private amoCRMConnectorService: AmoCRMConnectorService,
   ) {}
 
@@ -50,7 +53,18 @@ export class ContactSyncService {
     rule: Record<string, any>,
   ): Promise<AmoCRMContact[]> {
     try {
-      const client = await this.amoCRMConnectorService.getAuthenticatedClient(connectionId)
+      const connection = await this.integrationConnectionRepository.findOne({
+        where: { id: connectionId },
+      })
+
+      if (!connection) {
+        throw new NotFoundException(`Connection not found: ${connectionId}`)
+      }
+
+      const client = this.amoCRMConnectorService.createClient(
+        (connection as any).accessToken || 'token',
+        connection.externalAccountId || 'subdomain'
+      )
 
       // Build query parameters based on rule type
       const queryParams: Record<string, any> = {

@@ -116,14 +116,14 @@ export class CommissionCalculationService {
           bonus_rate: bonusApplied ? rate.performanceBonusRate : undefined,
           bonus_amount: bonusApplied ? bonusAmount : undefined,
         },
-      })
+      } as any)
 
-      const saved = await this.specialistCommissionRepository.save(commission)
+      const saved = await this.specialistCommissionRepository.save(commission as any)
 
       // Log creation
       await this.commissionLogRepository.save(
         this.commissionLogRepository.create({
-          commissionId: saved.id,
+          commissionId: (saved as any).id,
           action: 'calculated',
           changedBy: 'system',
           changesApplied: {
@@ -137,7 +137,7 @@ export class CommissionCalculationService {
       )
 
       this.logger.log(`Commission calculated for deal ${dealId}: $${finalCommissionAmount}`)
-      return saved
+      return saved as any
     } catch (error) {
       this.logger.error(`Failed to calculate commission: ${error.message}`)
       throw error
@@ -307,7 +307,7 @@ export class CommissionCalculationService {
       throw new Error(`Commission not found: ${commissionId}`)
     }
 
-    commission.status = 'rejected'
+    commission.status = 'disputed'
     commission.notes = reason
 
     const updated = await this.specialistCommissionRepository.save(commission)

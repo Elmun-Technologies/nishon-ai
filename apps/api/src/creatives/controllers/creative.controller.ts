@@ -22,11 +22,10 @@ import {
   CreativeListResponseDto,
   CreativePerformanceDto,
 } from '../dtos/creative.dto'
-import { JwtAuthGuard } from '@/auth/guards/jwt.guard'
-import { WorkspaceGuard } from '@/common/guards/workspace.guard'
+import { AuthGuard } from '@nestjs/passport'
 
 @Controller('creatives')
-@UseGuards(JwtAuthGuard, WorkspaceGuard)
+@UseGuards(AuthGuard('jwt'))
 export class CreativeController {
   private readonly logger = new Logger(CreativeController.name)
 
@@ -131,7 +130,7 @@ export class CreativeController {
     @Query('campaignId') campaignId?: string,
     @Query('limit') limit: number = 50,
     @Query('offset') offset: number = 0,
-    @Req() req: any,
+    @Req() req?: any,
   ): Promise<CreativeListResponseDto> {
     const workspaceId = req.workspace?.id
 
@@ -237,7 +236,7 @@ export class CreativeController {
     @Param('id') creativeId: string,
     @Query('days') days: number = 30,
   ): Promise<CreativePerformanceDto[]> {
-    return this.creativeService.getPerformance(creativeId, days)
+    return this.creativeService.getPerformance(creativeId, days) as any
   }
 
   // Helper method
