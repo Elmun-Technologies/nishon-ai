@@ -489,7 +489,7 @@ export function AdsManagerPanel() {
                   onClick={() => setShowFullFunnelInsights(true)}
                   className="px-3 py-1.5 rounded-lg bg-indigo-500/10 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400 text-sm"
                 >
-                  Go to Madgicx Audiences
+                  Go to Audiences Manager
                 </button>
               </div>
               <div className="space-y-2 text-sm">
@@ -1130,7 +1130,7 @@ export function AdsManagerPanel() {
                     <tr>
                       <th className="text-left p-2">Facebook Ads Manager</th>
                       <th className="text-left p-2">
-                        Madgicx Audience Launcher
+                        Performa Audience Manager
                       </th>
                     </tr>
                   </thead>

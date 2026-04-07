@@ -510,7 +510,7 @@ export default function SellerLandingPage() {
       <section id="workspace-settings" className="px-6 pb-20">
         <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-[#090b23] p-8 md:p-12">
           <p className="text-sm uppercase tracking-[0.24em] text-violet-300">Workspace settings</p>
-          <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Madgicx uslubidagi boshqaruvni Performa ga moslashtirdik</h2>
+          <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Professional-grade kampaniya boshqaruvni Performa ga moslashtirdik</h2>
           <p className="mt-4 max-w-4xl text-lg text-text-tertiary">
             Profil menyusidan Workspace Settings’ga kirib, ad account, obuna, billing, user profile va team members
             bo‘limlarini bir joydan boshqarish mumkin. Productionda bu bo‘limlar real API bilan ishlaydi.
@@ -542,7 +542,7 @@ export default function SellerLandingPage() {
       <section id="meta-launch-flow" className="px-6 pb-20">
         <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-[#0a1520] p-8 md:p-12">
           <p className="text-sm uppercase tracking-[0.24em] text-sky-300">Meta campaign launch</p>
-          <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Madgicx uslubidagi launch flow — Performa roadmap</h2>
+          <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Optimized kampaniya launch flow — Performa roadmap</h2>
           <p className="mt-4 max-w-4xl text-lg text-text-tertiary">
             Siz yuborgan “Create New Ad → Audience Launcher → Setup → Summary” oqimini bizning platformaga moslab
             bosqichma-bosqich berdik. Hozir landingda feature map, keyingi bosqichda real interface/pages.
@@ -570,7 +570,7 @@ export default function SellerLandingPage() {
       <section id="team-workflow" className="px-6 pb-20">
         <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-[#12102a] p-8 md:p-12">
           <p className="text-sm uppercase tracking-[0.24em] text-fuchsia-300">Team members workflow</p>
-          <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Madgicx’dagi team management oqimi — professional darajada</h2>
+          <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Professional team management workflow — Performa’s way</h2>
           <p className="mt-4 max-w-4xl text-lg text-text-tertiary">
             Create workspace, invite, accept invite, role berish, ad-account access taqsimlash va removal jarayonini
             Performa roadmapiga kiritdik. Bu bo‘lim agency va multi-account ishlash uchun asosiy blok.
