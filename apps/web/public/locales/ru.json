@@ -1,0 +1,276 @@
+{
+  "common": {
+    "home": "Главная",
+    "dashboard": "Панель управления",
+    "settings": "Настройки",
+    "logout": "Выход",
+    "language": "Язык",
+    "loading": "Загрузка...",
+    "error": "Ошибка",
+    "success": "Успех!",
+    "confirm": "Подтвердить",
+    "cancel": "Отмена",
+    "save": "Сохранить",
+    "delete": "Удалить",
+    "edit": "Редактировать",
+    "back": "Назад",
+    "next": "Далее",
+    "previous": "Назад",
+    "search": "Поиск",
+    "filter": "Фильтр",
+    "sort": "Сортировка",
+    "rating": "Рейтинг",
+    "reviews": "Отзывы",
+    "price": "Цена",
+    "contact": "Контакт",
+    "message": "Сообщение",
+    "send": "Отправить",
+    "view": "Просмотр",
+    "more": "Больше",
+    "less": "Меньше"
+  },
+
+  "navigation": {
+    "home": "Главная",
+    "marketplace": "Маркетплейс",
+    "leaderboard": "Рейтинг",
+    "portfolio": "Портфолио",
+    "dashboard": "Панель управления",
+    "creativeHub": "Creative Hub",
+    "campaigns": "Кампании",
+    "analytics": "Аналитика",
+    "automation": "Автоматизация",
+    "retargeting": "Ретаргетинг",
+    "audiences": "Аудитории",
+    "settings": "Настройки"
+  },
+
+  "landing": {
+    "hero": {
+      "badge": "✨ Создано на основе Madgicx — для профессиональных маркетологов",
+      "title1": "Управляйте рекламой",
+      "title2": "быстрее",
+      "title3": "и эффективнее.",
+      "subtitle": "Performa — платформа для маркетологов, управляющая 4 платформами (Meta, Google, TikTok, Yandex) из одного места, с автоматизацией и AI. Ускорьте настройку кампаний в 4 раза, увеличьте ROAS на 50%.",
+      "buttonStart": "Начните — Попробуйте бесплатно ↗",
+      "buttonMarketplace": "Найти маркетолога или агентство",
+      "buttonLeaderboard": "🏆 Посмотреть топ-специалистов",
+      "buttonDemo": "Запросить демо ⊕",
+      "trust": {
+        "marketers": "Активных маркетологов",
+        "budget": "Управляемого бюджета",
+        "rating": "Общий рейтинг",
+        "growth": "Средний рост ROAS"
+      }
+    },
+
+    "capabilities": {
+      "title": "Все, что нужно маркетологу, в одной платформе",
+      "subtitle": "Управление кампаниями, контроль креатива, аналитика, финансы и управление. Каждая функция приносит свою ценность для маркетолога.",
+      "benefits": {
+        "speed": "Настройка на 75% быстрее",
+        "speedDesc": "С 4 дней до 1 часа",
+        "roas": "ROAS на 50% выше",
+        "roasDesc": "С автоматизацией и умным распределением бюджета",
+        "productivity": "Производительность команды в 3 раза",
+        "productivityDesc": "Без административной работы, только стратегия",
+        "budget": "Потребность в бюджете на 30% ниже",
+        "budgetDesc": "С умным распределением",
+        "accuracy": "Точность кампаний 90%+",
+        "accuracyDesc": "С помощью AI меньше ошибок",
+        "insights": "Insights в реальном времени",
+        "insightsDesc": "Новые данные каждые 30 минут"
+      }
+    },
+
+    "funnel": {
+      "title": "Распределение бюджета по воронке",
+      "subtitle": "Мы адаптировали модель воронки в стиле Madgicx для нашей платформы"
+    }
+  },
+
+  "marketplace": {
+    "title": "Маркетплейс",
+    "subtitle": "Работайте с проверенными маркетологами и агентствами",
+    "featured": "⭐ Избранные специалисты",
+    "filters": "Фильтры",
+    "sorting": "Сортировка",
+    "results": "Найдено",
+    "specialist": "специалистов",
+    "hireTo": "Нанять",
+    "viewProfile": "Смотреть профиль",
+    "minRating": "Минимальный рейтинг",
+    "minRoas": "Минимальный ROAS",
+    "specialties": "Специализация",
+    "certifications": "Сертификаты",
+    "sortBy": {
+      "rating": "По рейтингу",
+      "roas": "По ROAS",
+      "price": "По цене"
+    },
+    "cta": {
+      "title": "Хотите быть маркетологом?",
+      "subtitle": "Присоединитесь к маркетплейсу Performa и предоставляйте услуги сотням компаний.",
+      "button": "Зарегистрироваться как специалист ↗"
+    }
+  },
+
+  "portfolio": {
+    "title": "Портфолио",
+    "level": "Уровень",
+    "experience": "Опыт",
+    "campaigns": "Кампании",
+    "clients": "Клиенты",
+    "specialization": "Специализация",
+    "badges": "Значки",
+    "certifications": "Сертификаты",
+    "testimonials": "Отзывы",
+    "overview": "Обзор",
+    "statistics": "Статистика",
+    "achievements": "Достижения",
+    "industries": "Отрасли",
+    "verified": "Проверено",
+    "successRate": "Процент успеха",
+    "responseTime": "Время ответа",
+    "totalSpend": "Общие расходы",
+    "averageRoas": "Средний ROAS",
+    "hire": "Начать работу",
+    "sendMessage": "Отправить сообщение",
+    "contactButton": "Связаться"
+  },
+
+  "leaderboard": {
+    "title": "Рейтинг",
+    "subtitle": "Топ-специалисты на Nishon AI",
+    "overall": "Общий рейтинг",
+    "rising": "Восходящие звезды",
+    "roasLeaders": "Лидеры по ROAS",
+    "topRated": "Лучше всего оценённые",
+    "rank": "Ранг",
+    "specialist": "Специалист",
+    "level": "Уровень",
+    "rating": "Рейтинг",
+    "roas": "ROAS",
+    "campaigns": "Кампании",
+    "specialty": "Специализация",
+    "badges": "Значки",
+    "points": "Баллы",
+    "top3": "🏆 Топ-3 чемпионов",
+    "gold": "🥇 1-е место",
+    "silver": "🥈 2-е место",
+    "bronze": "🥉 3-е место",
+    "howWorks": "Как работает рейтинг",
+    "pointsSystem": "Система баллов",
+    "pointsDesc": "Зарабатывайте баллы за успешные кампании, отзывы клиентов и достижения",
+    "levels": "Уровни",
+    "levelsDesc": "Продвигайтесь от новичка к легенде по мере накопления баллов и открытия значков",
+    "badgesReward": "Значки",
+    "badgesDesc": "Собирайте значки за достижение вех и демонстрацию опыта"
+  },
+
+  "badges": {
+    "title": "Значки",
+    "unlocked": "Открыто",
+    "locked": "Закрыто",
+    "rarity": "Редкость",
+    "common": "Обычный",
+    "rare": "Редкий",
+    "epic": "Эпический",
+    "legendary": "Легендарный",
+    "requirements": "Требования",
+    "rewards": "Награды",
+    "points": "Баллы",
+    "milestone": "Значки за вехи",
+    "skills": "Значки мастерства",
+    "certifications": "Значки сертификатов",
+    "achievements": "Значки достижений",
+    "industry": "Значки отраслей"
+  },
+
+  "levels": {
+    "novice": "Новичок",
+    "apprentice": "Ученик",
+    "expert": "Эксперт",
+    "master": "Мастер",
+    "legend": "Легенда",
+    "pointsTo": "Баллов до следующего уровня",
+    "progress": "Прогресс"
+  },
+
+  "dashboard": {
+    "title": "Панель управления",
+    "welcome": "Добро пожаловать",
+    "overview": "Обзор",
+    "campaigns": "Кампании",
+    "analytics": "Аналитика",
+    "creativeHub": "Creative Hub",
+    "retargeting": "Ретаргетинг",
+    "automation": "Автоматизация",
+    "audiences": "Аудитории",
+    "portfolio": "Портфолио",
+    "activeNow": "Сейчас активно",
+    "totalSpend": "Общие расходы",
+    "averageRoas": "Средний ROAS",
+    "campaigns": "Кампании",
+    "views": "Просмотры"
+  },
+
+  "automation": {
+    "title": "Автоматизация",
+    "subtitle": "Стратегии автоматической оптимизации на основе Madgicx",
+    "strategies": "Стратегии",
+    "create": "Новая стратегия",
+    "enabled": "Включено",
+    "disabled": "Отключено",
+    "execute": "Выполнить",
+    "executions": "Исполнения",
+    "success": "Успех",
+    "failed": "Ошибка"
+  },
+
+  "retargeting": {
+    "title": "Ретаргетинг",
+    "campaigns": "Кампании",
+    "audiences": "Аудитории",
+    "funnel": "Воронка",
+    "create": "Новая кампания",
+    "launch": "Запустить",
+    "budget": "Бюджет",
+    "daily": "Ежедневно",
+    "total": "Всего"
+  },
+
+  "creative": {
+    "title": "Creative Hub",
+    "createAd": "Создать объявление",
+    "templates": "Шаблоны",
+    "mediaLibrary": "Медиа библиотека",
+    "products": "Товары",
+    "brandKit": "Brand Kit",
+    "aiActors": "AI Актёры",
+    "projects": "Проекты"
+  },
+
+  "auth": {
+    "login": "Вход",
+    "signup": "Регистрация",
+    "email": "Email",
+    "password": "Пароль",
+    "forgotPassword": "Забыли пароль?",
+    "remember": "Запомнить меня",
+    "loginButton": "Вход",
+    "signupButton": "Регистрация",
+    "haveAccount": "У вас есть аккаунт?",
+    "noAccount": "У вас нет аккаунта?",
+    "logout": "Выход"
+  },
+
+  "errors": {
+    "notFound": "Не найдено",
+    "unauthorized": "Неавторизованный доступ",
+    "forbidden": "Доступ запрещён",
+    "serverError": "Ошибка сервера",
+    "tryAgain": "Попробуйте снова",
+    "goHome": "На главную"
+  }
+}

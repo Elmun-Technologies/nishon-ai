@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useI18n } from '@/i18n/use-i18n'
 
 const ticker = ['Summit 26 · Stockholm', 'Wednesday April 15, 2026', 'Request Your Ticket Now']
 
@@ -289,6 +290,7 @@ function CapabilityCard({
 
 export default function SellerLandingPage() {
   const router = useRouter()
+  const { t } = useI18n()
 
   return (
     <div className="min-h-screen bg-[#031314] text-white">
@@ -333,14 +335,14 @@ export default function SellerLandingPage() {
 
         <div className="relative mx-auto max-w-7xl">
           <div className="mb-8 inline-flex rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-300">
-            ✨ Madgicx asosida qurilgan — Pro marketoqlar uchun
+            {t(‘landing.hero.badge’)}
           </div>
 
           <h1 className="max-w-5xl text-6xl font-bold leading-tight md:text-8xl">
-            Reklamani <span className="bg-gradient-to-r from-emerald-300 to-cyan-300 bg-clip-text text-transparent">yanada tez</span> boshqaring.
+            {t(‘landing.hero.title1’)} <span className="bg-gradient-to-r from-emerald-300 to-cyan-300 bg-clip-text text-transparent">{t(‘landing.hero.title2’)}</span> {t(‘landing.hero.title3’)}
           </h1>
           <p className="mt-8 max-w-3xl text-xl leading-relaxed text-text-secondary">
-            Performa — 4 ta platformani (Meta, Google, TikTok, Yandex) bitta joydan boshqaradigan, avtomatsiya va AI bilan ishlayotgan markolog platforma. Kampaniya setup 4 baravar tezlashtiring, ROAS 50% ga oshiring.
+            {t(‘landing.hero.subtitle’)}
           </p>
 
           <div className="mt-12 flex flex-wrap gap-3">
@@ -348,49 +350,49 @@ export default function SellerLandingPage() {
               onClick={() => router.push(‘/register’)}
               className="group rounded-full bg-gradient-to-r from-emerald-500 to-cyan-500 px-8 py-4 text-lg font-semibold text-white shadow-lg shadow-emerald-500/25 transition hover:shadow-xl hover:shadow-emerald-500/40"
             >
-              Boshlang — Bepul sinab ko’ring ↗
+              {t(‘landing.hero.buttonStart’)}
             </button>
             <button
               onClick={() => router.push(‘/marketplace’)}
               className="rounded-full border border-emerald-500/40 bg-emerald-500/10 px-8 py-4 text-lg font-semibold text-emerald-200 transition hover:border-emerald-500/60 hover:bg-emerald-500/20"
             >
-              Markolog yoki agentni topish
+              {t(‘landing.hero.buttonMarketplace’)}
             </button>
             <button
               onClick={() => router.push(‘/leaderboard’)}
               className="rounded-full border border-cyan-500/40 bg-cyan-500/10 px-8 py-4 text-lg font-semibold text-cyan-200 transition hover:border-cyan-500/60 hover:bg-cyan-500/20"
             >
-              🏆 Top Performers ko’rish
+              {t(‘landing.hero.buttonLeaderboard’)}
             </button>
             <button
               onClick={() => router.push(‘/login’)}
               className="rounded-full border border-white/20 bg-surface-elevated/10 px-8 py-4 text-lg text-white transition hover:bg-surface-elevated/20"
             >
-              Demo so’rash ⊕
+              {t(‘landing.hero.buttonDemo’)}
             </button>
           </div>
 
           <div className="mt-16 pt-8 border-t border-white/10">
-            <p className="text-sm uppercase tracking-widest text-text-tertiary">Ishongan kompaniyalar</p>
+            <p className="text-sm uppercase tracking-widest text-text-tertiary">Trusted by</p>
             <div className="mt-6 flex flex-wrap items-center gap-8 text-text-secondary">
               <div className="text-center">
                 <div className="text-3xl font-bold text-emerald-300">500+</div>
-                <div className="text-sm">Faol markolog</div>
+                <div className="text-sm">{t(‘landing.hero.trust.marketers’)}</div>
               </div>
               <div className="h-10 w-px bg-white/10" />
               <div className="text-center">
                 <div className="text-3xl font-bold text-emerald-300">$2B+</div>
-                <div className="text-sm">Boshqariladigan byudjet</div>
+                <div className="text-sm">{t(‘landing.hero.trust.budget’)}</div>
               </div>
               <div className="h-10 w-px bg-white/10" />
               <div className="text-center">
                 <div className="text-3xl font-bold text-emerald-300">4.8★</div>
-                <div className="text-sm">Umumiy reytingi</div>
+                <div className="text-sm">{t(‘landing.hero.trust.rating’)}</div>
               </div>
               <div className="h-10 w-px bg-white/10" />
               <div className="text-center">
                 <div className="text-3xl font-bold text-emerald-300">50%+</div>
-                <div className="text-sm">Orta ROAS o’sishi</div>
+                <div className="text-sm">{t(‘landing.hero.trust.growth’)}</div>
               </div>
             </div>
           </div>
@@ -411,12 +413,12 @@ export default function SellerLandingPage() {
       <section id="capabilities" className="px-6 pb-20">
         <div className="mx-auto max-w-7xl">
           <div className="text-center mb-16">
-            <p className="text-sm uppercase tracking-[0.24em] text-emerald-300">Nima beramiz</p>
+            <p className="text-sm uppercase tracking-[0.24em] text-emerald-300">Features</p>
             <h2 className="mt-3 text-5xl font-bold md:text-6xl">
-              Barcha markolog kerak narsasi bitta platformada
+              {t(‘landing.capabilities.title’)}
             </h2>
             <p className="mt-6 max-w-3xl mx-auto text-xl text-text-secondary">
-              Campaign Management, Creative Control, Analytics, Finance & Governance. Har bir feature markolog uchun o’z qiymatini beradi.
+              {t(‘landing.capabilities.subtitle’)}
             </p>
           </div>
 
@@ -428,20 +430,20 @@ export default function SellerLandingPage() {
 
           {/* Key Benefits */}
           <div className="mt-20 rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 p-12">
-            <h3 className="text-3xl font-bold mb-10">Amaliy natijalar</h3>
+            <h3 className="text-3xl font-bold mb-10">Results</h3>
             <div className="grid gap-8 md:grid-cols-3">
               {[
-                { icon: ‘⚡’, title: ‘Setup vaqti 75% qisqaradi’, desc: ‘4 kundan 1 soatga’ },
-                { icon: ‘📈’, title: ‘ROAS 50% ortadi’, desc: ‘Avtomatsiya va smart budget split’ },
-                { icon: ‘👥’, title: ‘Team productivity 3 baravar’, desc: ‘Admin ish yo\’q, faqat strategiya’ },
-                { icon: ‘💰’, title: ‘Byudjet ehtiyoji 30% qisqaradi’, desc: ‘Smart allocation bilan’ },
-                { icon: ‘🎯’, title: ‘Campaign accuracy 90%+’, desc: ‘AI yordamida shikasta kamroq’ },
-                { icon: ‘📊’, title: ‘Real-time insights’, desc: ‘Har 30 minutda yangil data’ },
+                { icon: ‘⚡’, key: ‘speed’, titleKey: ‘benefits.speed’, descKey: ‘benefits.speedDesc’ },
+                { icon: ‘📈’, key: ‘roas’, titleKey: ‘benefits.roas’, descKey: ‘benefits.roasDesc’ },
+                { icon: ‘👥’, key: ‘productivity’, titleKey: ‘benefits.productivity’, descKey: ‘benefits.productivityDesc’ },
+                { icon: ‘💰’, key: ‘budget’, titleKey: ‘benefits.budget’, descKey: ‘benefits.budgetDesc’ },
+                { icon: ‘🎯’, key: ‘accuracy’, titleKey: ‘benefits.accuracy’, descKey: ‘benefits.accuracyDesc’ },
+                { icon: ‘📊’, key: ‘insights’, titleKey: ‘benefits.insights’, descKey: ‘benefits.insightsDesc’ },
               ].map((benefit) => (
-                <div key={benefit.title} className="text-center">
+                <div key={benefit.key} className="text-center">
                   <div className="text-5xl mb-3">{benefit.icon}</div>
-                  <h4 className="text-xl font-semibold text-white">{benefit.title}</h4>
-                  <p className="text-text-tertiary mt-2">{benefit.desc}</p>
+                  <h4 className="text-xl font-semibold text-white">{t(`landing.capabilities.${benefit.titleKey}`)}</h4>
+                  <p className="text-text-tertiary mt-2">{t(`landing.capabilities.${benefit.descKey}`)}</p>
                 </div>
               ))}
             </div>
@@ -452,10 +454,9 @@ export default function SellerLandingPage() {
       <section id="funnel" className="px-6 pb-20">
         <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-[#050d22] p-8 md:p-12">
           <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">ARR framework</p>
-          <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Budget allocation across the funnel</h2>
+          <h2 className="mt-3 text-4xl font-semibold md:text-5xl">{t(‘landing.funnel.title’)}</h2>
           <p className="mt-4 max-w-4xl text-lg text-text-tertiary">
-            Madgicx uslubidagi funnel modelini bizning platformaga moslashtirdik: Acquisition (80%), Retargeting (15%),
-            Retention (5%). SaaS yoki lead-gen bo‘lsa Retention bosqichini qayta taqsimlash mumkin.
+            {t(‘landing.funnel.subtitle’)}
           </p>
 
           <div className="mt-10 space-y-4">

@@ -4,6 +4,7 @@ import { useWorkspaceStore } from '@/stores/workspace.store'
 import { useTheme } from 'next-themes'
 import { Moon, Sun } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher'
 
 const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   '/dashboard':            { title: 'Dashboard',         subtitle: 'Overview of your advertising performance' },
@@ -60,6 +61,9 @@ export default function Header() {
              currentWorkspace.autopilotMode === 'assisted'  ? 'Assisted' : 'Manual'}
           </div>
         )}
+
+        {/* Language switcher */}
+        <LanguageSwitcher />
 
         {/* Theme toggle */}
         {mounted && (

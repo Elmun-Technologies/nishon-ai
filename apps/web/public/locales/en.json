@@ -1,0 +1,276 @@
+{
+  "common": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "settings": "Settings",
+    "logout": "Logout",
+    "language": "Language",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success!",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "rating": "Rating",
+    "reviews": "Reviews",
+    "price": "Price",
+    "contact": "Contact",
+    "message": "Message",
+    "send": "Send",
+    "view": "View",
+    "more": "More",
+    "less": "Less"
+  },
+
+  "navigation": {
+    "home": "Home",
+    "marketplace": "Marketplace",
+    "leaderboard": "Leaderboard",
+    "portfolio": "Portfolio",
+    "dashboard": "Dashboard",
+    "creativeHub": "Creative Hub",
+    "campaigns": "Campaigns",
+    "analytics": "Analytics",
+    "automation": "Automation",
+    "retargeting": "Retargeting",
+    "audiences": "Audiences",
+    "settings": "Settings"
+  },
+
+  "landing": {
+    "hero": {
+      "badge": "✨ Built on Madgicx — For Pro Marketers",
+      "title1": "Manage ads",
+      "title2": "faster",
+      "title3": "and smarter.",
+      "subtitle": "Performa — A marketer's platform that manages 4 platforms (Meta, Google, TikTok, Yandex) from one place, with automation and AI. Speed up campaign setup 4x, increase ROAS by 50%.",
+      "buttonStart": "Get Started — Try for Free ↗",
+      "buttonMarketplace": "Find a Marketer or Agency",
+      "buttonLeaderboard": "🏆 View Top Performers",
+      "buttonDemo": "Request Demo ⊕",
+      "trust": {
+        "marketers": "Active Marketers",
+        "budget": "Managed Budget",
+        "rating": "Average Rating",
+        "growth": "Average ROAS Growth"
+      }
+    },
+
+    "capabilities": {
+      "title": "Everything a marketer needs in one platform",
+      "subtitle": "Campaign Management, Creative Control, Analytics, Finance & Governance. Each feature brings unique value to your marketing team.",
+      "benefits": {
+        "speed": "Setup 75% faster",
+        "speedDesc": "From 4 days to 1 hour",
+        "roas": "ROAS 50% higher",
+        "roasDesc": "With automation and smart budget split",
+        "productivity": "Team productivity 3x",
+        "productivityDesc": "No admin work, just strategy",
+        "budget": "Budget need 30% less",
+        "budgetDesc": "With smart allocation",
+        "accuracy": "Campaign accuracy 90%+",
+        "accuracyDesc": "AI-powered, fewer mistakes",
+        "insights": "Real-time insights",
+        "insightsDesc": "Fresh data every 30 minutes"
+      }
+    },
+
+    "funnel": {
+      "title": "Budget allocation across the funnel",
+      "subtitle": "We adapted the Madgicx-style funnel model for our platform"
+    }
+  },
+
+  "marketplace": {
+    "title": "Marketplace",
+    "subtitle": "Work with verified marketers and agencies",
+    "featured": "⭐ Featured Specialists",
+    "filters": "Filters",
+    "sorting": "Sorting",
+    "results": "Found",
+    "specialist": "specialists",
+    "hireTo": "Hire",
+    "viewProfile": "View Profile",
+    "minRating": "Minimum Rating",
+    "minRoas": "Minimum ROAS",
+    "specialties": "Specialties",
+    "certifications": "Certifications",
+    "sortBy": {
+      "rating": "By Rating",
+      "roas": "By ROAS",
+      "price": "By Price"
+    },
+    "cta": {
+      "title": "Want to be a marketer?",
+      "subtitle": "Join the Performa marketplace and offer your services to hundreds of businesses.",
+      "button": "Register as a Specialist ↗"
+    }
+  },
+
+  "portfolio": {
+    "title": "Portfolio",
+    "level": "Level",
+    "experience": "Experience",
+    "campaigns": "Campaigns",
+    "clients": "Clients",
+    "specialization": "Specialization",
+    "badges": "Badges",
+    "certifications": "Certifications",
+    "testimonials": "Testimonials",
+    "overview": "Overview",
+    "statistics": "Statistics",
+    "achievements": "Achievements",
+    "industries": "Industries",
+    "verified": "Verified",
+    "successRate": "Success Rate",
+    "responseTime": "Response Time",
+    "totalSpend": "Total Spend",
+    "averageRoas": "Average ROAS",
+    "hire": "Get Started",
+    "sendMessage": "Send Message",
+    "contactButton": "Contact"
+  },
+
+  "leaderboard": {
+    "title": "Leaderboard",
+    "subtitle": "Top performing specialists on Nishon AI",
+    "overall": "Overall Rankings",
+    "rising": "Rising Stars",
+    "roasLeaders": "ROAS Leaders",
+    "topRated": "Top Rated",
+    "rank": "Rank",
+    "specialist": "Specialist",
+    "level": "Level",
+    "rating": "Rating",
+    "roas": "ROAS",
+    "campaigns": "Campaigns",
+    "specialty": "Specialty",
+    "badges": "Badges",
+    "points": "Points",
+    "top3": "🏆 Top 3 Champions",
+    "gold": "🥇 1st",
+    "silver": "🥈 2nd",
+    "bronze": "🥉 3rd",
+    "howWorks": "How the Leaderboard Works",
+    "pointsSystem": "Points System",
+    "pointsDesc": "Earn points from successful campaigns, client reviews, and achievements",
+    "levels": "Levels",
+    "levelsDesc": "Progress from Novice to Legend as you accumulate points and unlock badges",
+    "badgesReward": "Badges",
+    "badgesDesc": "Collect badges for reaching milestones and demonstrating expertise"
+  },
+
+  "badges": {
+    "title": "Badges",
+    "unlocked": "Unlocked",
+    "locked": "Locked",
+    "rarity": "Rarity",
+    "common": "Common",
+    "rare": "Rare",
+    "epic": "Epic",
+    "legendary": "Legendary",
+    "requirements": "Requirements",
+    "rewards": "Rewards",
+    "points": "Points",
+    "milestone": "Milestone Badges",
+    "skills": "Skill Badges",
+    "certifications": "Certification Badges",
+    "achievements": "Achievement Badges",
+    "industry": "Industry Badges"
+  },
+
+  "levels": {
+    "novice": "Novice",
+    "apprentice": "Apprentice",
+    "expert": "Expert",
+    "master": "Master",
+    "legend": "Legend",
+    "pointsTo": "Points to next level",
+    "progress": "Progress"
+  },
+
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome",
+    "overview": "Overview",
+    "campaigns": "Campaigns",
+    "analytics": "Analytics",
+    "creativeHub": "Creative Hub",
+    "retargeting": "Retargeting",
+    "automation": "Automation",
+    "audiences": "Audiences",
+    "portfolio": "Portfolio",
+    "activeNow": "Active Now",
+    "totalSpend": "Total Spend",
+    "averageRoas": "Average ROAS",
+    "campaigns": "Campaigns",
+    "views": "Views"
+  },
+
+  "automation": {
+    "title": "Automation",
+    "subtitle": "Madgicx-based automatic optimization strategies",
+    "strategies": "Strategies",
+    "create": "New Strategy",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "execute": "Execute",
+    "executions": "Executions",
+    "success": "Success",
+    "failed": "Failed"
+  },
+
+  "retargeting": {
+    "title": "Retargeting",
+    "campaigns": "Campaigns",
+    "audiences": "Audiences",
+    "funnel": "Funnel",
+    "create": "New Campaign",
+    "launch": "Launch",
+    "budget": "Budget",
+    "daily": "Daily",
+    "total": "Total"
+  },
+
+  "creative": {
+    "title": "Creative Hub",
+    "createAd": "Create Ad",
+    "templates": "Templates",
+    "mediaLibrary": "Media Library",
+    "products": "Products",
+    "brandKit": "Brand Kit",
+    "aiActors": "AI Actors",
+    "projects": "Projects"
+  },
+
+  "auth": {
+    "login": "Login",
+    "signup": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "remember": "Remember Me",
+    "loginButton": "Login",
+    "signupButton": "Sign Up",
+    "haveAccount": "Have an account?",
+    "noAccount": "Don't have an account?",
+    "logout": "Logout"
+  },
+
+  "errors": {
+    "notFound": "Not Found",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Forbidden",
+    "serverError": "Server Error",
+    "tryAgain": "Try Again",
+    "goHome": "Go Home"
+  }
+}

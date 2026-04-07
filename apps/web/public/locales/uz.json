@@ -1,0 +1,276 @@
+{
+  "common": {
+    "home": "Asosiy sahifa",
+    "dashboard": "Dashboard",
+    "settings": "Sozlamalar",
+    "logout": "Chiqish",
+    "language": "Til",
+    "loading": "Yuklanmoqda...",
+    "error": "Xatolik",
+    "success": "Muvaffaqiyat!",
+    "confirm": "Tasdiqlash",
+    "cancel": "Bekor qilish",
+    "save": "Saqlash",
+    "delete": "O'chirish",
+    "edit": "Tahrir qilish",
+    "back": "Orqaga",
+    "next": "Keyingi",
+    "previous": "Oldingi",
+    "search": "Qidirish",
+    "filter": "Filtrlash",
+    "sort": "Saralash",
+    "rating": "Reytingi",
+    "reviews": "Omonatlari",
+    "price": "Narx",
+    "contact": "Aloqa",
+    "message": "Xabar",
+    "send": "Yuborish",
+    "view": "Ko'rish",
+    "more": "Ko'proq",
+    "less": "Kamroq"
+  },
+
+  "navigation": {
+    "home": "Asosiy sahifa",
+    "marketplace": "Marketplace",
+    "leaderboard": "Reytingi",
+    "portfolio": "Portfolio",
+    "dashboard": "Dashboard",
+    "creativeHub": "Creative Hub",
+    "campaigns": "Kampaniyalar",
+    "analytics": "Analitika",
+    "automation": "Avtomatsiya",
+    "retargeting": "Retargeting",
+    "audiences": "Auditoriyalar",
+    "settings": "Sozlamalar"
+  },
+
+  "landing": {
+    "hero": {
+      "badge": "✨ Madgicx asosida qurilgan — Pro marketoqlar uchun",
+      "title1": "Reklamani",
+      "title2": "yanada tez",
+      "title3": "boshqaring.",
+      "subtitle": "Performa — 4 ta platformani (Meta, Google, TikTok, Yandex) bitta joydan boshqaradigan, avtomatsiya va AI bilan ishlayotgan markolog platforma. Kampaniya setup 4 baravar tezlashtiring, ROAS 50% ga oshiring.",
+      "buttonStart": "Boshlang — Bepul sinab ko'ring ↗",
+      "buttonMarketplace": "Markolog yoki agentni topish",
+      "buttonLeaderboard": "🏆 Top Performers ko'rish",
+      "buttonDemo": "Demo so'rash ⊕",
+      "trust": {
+        "marketers": "Faol markolog",
+        "budget": "Boshqariladigan byudjet",
+        "rating": "Umumiy reytingi",
+        "growth": "Orta ROAS o'sishi"
+      }
+    },
+
+    "capabilities": {
+      "title": "Barcha markolog kerak narsasi bitta platformada",
+      "subtitle": "Campaign Management, Creative Control, Analytics, Finance & Governance. Har bir feature markolog uchun o'z qiymatini beradi.",
+      "benefits": {
+        "speed": "Setup 75% qisqaradi",
+        "speedDesc": "4 kundan 1 soatga",
+        "roas": "ROAS 50% ortadi",
+        "roasDesc": "Avtomatsiya va smart budget split",
+        "productivity": "Team productivity 3 baravar",
+        "productivityDesc": "Admin ish yo'q, faqat strategiya",
+        "budget": "Byudjet ehtiyoji 30% qisqaradi",
+        "budgetDesc": "Smart allocation bilan",
+        "accuracy": "Campaign accuracy 90%+",
+        "accuracyDesc": "AI yordamida shikasta kamroq",
+        "insights": "Real-time insights",
+        "insightsDesc": "Har 30 minutda yangil data"
+      }
+    },
+
+    "funnel": {
+      "title": "Budget allocation across the funnel",
+      "subtitle": "Madgicx uslubidagi funnel modelini bizning platformaga moslashtirdik"
+    }
+  },
+
+  "marketplace": {
+    "title": "Marketplace",
+    "subtitle": "Verified markolog va agentliklar bilan ishlang",
+    "featured": "⭐ Featured Specialists",
+    "filters": "Filterlash",
+    "sorting": "Saralash",
+    "results": "Topildi",
+    "specialist": "ta specialist",
+    "hireTo": "Hire",
+    "viewProfile": "Profil ko'rish",
+    "minRating": "Minimal Reytingi",
+    "minRoas": "Minimal ROAS",
+    "specialties": "Mutahassisliklari",
+    "certifications": "Sertifikatsiyalar",
+    "sortBy": {
+      "rating": "Reytingi bo'yicha",
+      "roas": "ROAS bo'yicha",
+      "price": "Narx bo'yicha"
+    },
+    "cta": {
+      "title": "O'zingiz markolog bo'lishni xohlaysizmi?",
+      "subtitle": "Performa marketplace'ga qo'shiling va yuzlab biznesga shuning reklama xizmatlarini taqdim eting.",
+      "button": "Specialist sifatida ro'yxatdan o'tish ↗"
+    }
+  },
+
+  "portfolio": {
+    "title": "Portfolio",
+    "level": "Level",
+    "experience": "Tajriba",
+    "campaigns": "Kampaniyalar",
+    "clients": "Kliyentlar",
+    "specialization": "Specialization",
+    "badges": "Badgeler",
+    "certifications": "Sertifikatsiyalar",
+    "testimonials": "Omonatlari",
+    "overview": "Haqida",
+    "statistics": "Statistika",
+    "achievements": "Achievements",
+    "industries": "Sohalari",
+    "verified": "Tekshirilgan",
+    "successRate": "Success Rate",
+    "responseTime": "Javob vaqti",
+    "totalSpend": "Jami xarajat",
+    "averageRoas": "O'rtacha ROAS",
+    "hire": "Ishga olib boshlang",
+    "sendMessage": "Xabar yuborish",
+    "contactButton": "Murojaat qilish"
+  },
+
+  "leaderboard": {
+    "title": "Leaderboard",
+    "subtitle": "Top performing specialists on Nishon AI",
+    "overall": "Overall Rankings",
+    "rising": "Rising Stars",
+    "roasLeaders": "ROAS Leaders",
+    "topRated": "Top Rated",
+    "rank": "Rank",
+    "specialist": "Specialist",
+    "level": "Level",
+    "rating": "Reytingi",
+    "roas": "ROAS",
+    "campaigns": "Kampaniyalar",
+    "specialty": "Soha",
+    "badges": "Badgeler",
+    "points": "Balls",
+    "top3": "🏆 Top 3 Champions",
+    "gold": "🥇 1-chi",
+    "silver": "🥈 2-chi",
+    "bronze": "🥉 3-chi",
+    "howWorks": "How the Leaderboard Works",
+    "pointsSystem": "Points System",
+    "pointsDesc": "Earn points from successful campaigns, client reviews, and achievements",
+    "levels": "Levels",
+    "levelsDesc": "Progress from Novice to Legend as you accumulate points and unlock badges",
+    "badgesReward": "Badges",
+    "badgesDesc": "Collect badges for reaching milestones and demonstrating expertise"
+  },
+
+  "badges": {
+    "title": "Badgeler",
+    "unlocked": "Unlocked",
+    "locked": "Locked",
+    "rarity": "Rarity",
+    "common": "Common",
+    "rare": "Rare",
+    "epic": "Epic",
+    "legendary": "Legendary",
+    "requirements": "Requirements",
+    "rewards": "Rewards",
+    "points": "Balls",
+    "milestone": "Milestone Badges",
+    "skills": "Skill Badges",
+    "certifications": "Certification Badges",
+    "achievements": "Achievement Badges",
+    "industry": "Industry Badges"
+  },
+
+  "levels": {
+    "novice": "Novice",
+    "apprentice": "Apprentice",
+    "expert": "Expert",
+    "master": "Master",
+    "legend": "Legend",
+    "pointsTo": "Balls to next level",
+    "progress": "Progress"
+  },
+
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Xush kelibsiz",
+    "overview": "Umumiy ko'rinish",
+    "campaigns": "Kampaniyalar",
+    "analytics": "Analitika",
+    "creativeHub": "Creative Hub",
+    "retargeting": "Retargeting",
+    "automation": "Avtomatsiya",
+    "audiences": "Auditoriyalar",
+    "portfolio": "Portfolio",
+    "activeNow": "Hozir faol",
+    "totalSpend": "Jami xarajat",
+    "averageRoas": "O'rtacha ROAS",
+    "campaigns": "Kampaniyalar",
+    "views": "Ko'rishlar"
+  },
+
+  "automation": {
+    "title": "Avtomatsiya",
+    "subtitle": "Madgicx asosida qurilgan avtomatik optimizatsiya strategiyalari",
+    "strategies": "Strategiyalar",
+    "create": "Yangi strategiya",
+    "enabled": "Faol",
+    "disabled": "Noaktiv",
+    "execute": "Ijro qilish",
+    "executions": "Ijrolar",
+    "success": "Muvaffaqiyat",
+    "failed": "Muvaffaqiyatsiz"
+  },
+
+  "retargeting": {
+    "title": "Retargeting",
+    "campaigns": "Kampaniyalar",
+    "audiences": "Auditoriyalar",
+    "funnel": "Funnel",
+    "create": "Yangi kampaniya",
+    "launch": "Ishga tushirish",
+    "budget": "Byudjet",
+    "daily": "Kunlik",
+    "total": "Jami"
+  },
+
+  "creative": {
+    "title": "Creative Hub",
+    "createAd": "Reklama yaratish",
+    "templates": "Shablonlar",
+    "mediaLibrary": "Media Library",
+    "products": "Mahsulotlar",
+    "brandKit": "Brand Kit",
+    "aiActors": "AI Actorlari",
+    "projects": "Loyihalar"
+  },
+
+  "auth": {
+    "login": "Kirish",
+    "signup": "Ro'yxatdan o'tish",
+    "email": "Email",
+    "password": "Parol",
+    "forgotPassword": "Parolni unutdingizmi?",
+    "remember": "Meni eslab qol",
+    "loginButton": "Kirish",
+    "signupButton": "Ro'yxatdan o'tish",
+    "haveAccount": "Akkauntingiz bormi?",
+    "noAccount": "Akkauntingiz yo'qmi?",
+    "logout": "Chiqish"
+  },
+
+  "errors": {
+    "notFound": "Topilmadi",
+    "unauthorized": "Ruxsatlanmagan",
+    "forbidden": "Taqiqlangan",
+    "serverError": "Server xatosi",
+    "tryAgain": "Qayta urinib ko'ring",
+    "goHome": "Asosiy sahifaga o'tish"
+  }
+}
