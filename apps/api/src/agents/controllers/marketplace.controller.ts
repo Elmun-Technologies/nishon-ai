@@ -852,7 +852,7 @@ export class MarketplaceController {
    * Manually trigger performance data sync
    */
   @Post("admin/specialists/:id/sync-performance")
-  @UseGuards(AuthGuard("jwt")) // TODO: Add AdminGuard
+  @UseGuards(AuthGuard("jwt"))
   @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -885,6 +885,11 @@ export class MarketplaceController {
     @Body() dto: SyncPerformanceDto,
     @Request() req: any,
   ): Promise<{ synced: boolean; records: number; nextSync: Date; fraudRiskScore?: number }> {
+    // Validate admin access
+    if (!req.user?.isAdmin) {
+      throw new ForbiddenException("Admin access required");
+    }
+
     // Validate input
     if (!id || id.trim().length === 0) {
       throw new BadRequestException("Invalid specialist ID");
@@ -927,7 +932,7 @@ export class MarketplaceController {
    * Verify specialist performance data
    */
   @Post("admin/specialists/:id/verify-performance")
-  @UseGuards(AuthGuard("jwt")) // TODO: Add AdminGuard
+  @UseGuards(AuthGuard("jwt"))
   @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -960,6 +965,11 @@ export class MarketplaceController {
     @Body() dto: VerifyPerformanceDto,
     @Request() req: any,
   ): Promise<{ status: "verified" | "rejected"; fraudRiskLevel: string }> {
+    // Validate admin access
+    if (!req.user?.isAdmin) {
+      throw new ForbiddenException("Admin access required");
+    }
+
     // Validate input
     if (!id || id.trim().length === 0) {
       throw new BadRequestException("Invalid specialist ID");
@@ -1010,7 +1020,7 @@ export class MarketplaceController {
    * Monitor all specialist syncs
    */
   @Get("admin/specialists/sync-status")
-  @UseGuards(AuthGuard("jwt")) // TODO: Add AdminGuard
+  @UseGuards(AuthGuard("jwt"))
   @ApiBearerAuth()
   @ApiOperation({
     summary: "Get sync status",
@@ -1037,6 +1047,11 @@ export class MarketplaceController {
     @Query("limit") limit?: string,
     @Request() req?: any,
   ): Promise<SyncStatusDto[]> {
+    // Validate admin access
+    if (!req?.user?.isAdmin) {
+      throw new ForbiddenException("Admin access required");
+    }
+
     try {
       // Validate status parameter if provided
       const validStatuses = ["pending", "in_progress", "completed", "failed"];
