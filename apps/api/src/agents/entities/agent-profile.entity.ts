@@ -257,4 +257,10 @@ export class AgentProfile {
 
   @OneToMany("FraudDetectionAudit", "agentProfile", { cascade: true })
   fraudAudits: any[];
+
+  @OneToMany("SpecialistContact", "specialist", { cascade: true })
+  contacts: any[];
+
+  @OneToMany("SpecialistAnalytics", "specialist", { cascade: true })
+  analytics: any[];
 }
