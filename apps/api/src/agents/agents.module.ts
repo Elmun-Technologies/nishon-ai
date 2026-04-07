@@ -18,6 +18,9 @@ import { PerformanceSyncService } from "./services/performance-sync.service";
 import { CertificationService } from "./services/certification.service";
 import { CertificationController } from "./services/certification.controller";
 import { MarketplaceSearchService } from "./services/marketplace-search.service";
+import { MarketplaceProfileService } from "./services/marketplace-profile.service";
+import { MarketplaceContactService } from "./services/marketplace-contact.service";
+import { MarketplacePerformanceService } from "./services/marketplace-performance.service";
 import { FraudDetectionService } from "./services/fraud-detection.service";
 import { FraudDetectionAdminService } from "./services/fraud-detection-admin.service";
 import { MarketplaceAdminService } from "./services/marketplace-admin.service";
@@ -26,6 +29,7 @@ import { MetaPerformanceSyncService } from "./integrations/meta-sync.service";
 import { GooglePerformanceSyncService } from "./integrations/google-sync.service";
 import { YandexPerformanceSyncService } from "./integrations/yandex-sync.service";
 import { MarketplaceController } from "./controllers/marketplace.controller";
+import { AgentCaseStudy } from "./entities/agent-case-study.entity";
 import { Workspace } from "../workspaces/entities/workspace.entity";
 import { User } from "../users/entities/user.entity";
 import { ConnectedAccount } from "../platforms/entities/connected-account.entity";
@@ -41,6 +45,7 @@ import { ConnectedAccount } from "../platforms/entities/connected-account.entity
       AgentHistoricalPerformance,
       AgentPerformanceSyncLog,
       AgentCertification,
+      AgentCaseStudy,
       AgentLanguage,
       AgentGeographicCoverage,
       MarketplaceCertification,
@@ -56,6 +61,9 @@ import { ConnectedAccount } from "../platforms/entities/connected-account.entity
     PerformanceSyncService,
     CertificationService,
     MarketplaceSearchService,
+    MarketplaceProfileService,
+    MarketplaceContactService,
+    MarketplacePerformanceService,
     FraudDetectionService,
     FraudDetectionAdminService,
     MarketplaceAdminService,
@@ -69,6 +77,9 @@ import { ConnectedAccount } from "../platforms/entities/connected-account.entity
     PerformanceSyncService,
     CertificationService,
     MarketplaceSearchService,
+    MarketplaceProfileService,
+    MarketplaceContactService,
+    MarketplacePerformanceService,
     FraudDetectionService,
     FraudDetectionAdminService,
     MarketplaceAdminService,

@@ -3,6 +3,7 @@ import {
   Logger,
   BadRequestException,
   NotFoundException,
+  ConflictException,
   InternalServerErrorException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -12,6 +13,8 @@ import { MetaPerformanceSyncService, PerformanceSyncResult } from "../integratio
 import { GooglePerformanceSyncService } from "../integrations/google-sync.service";
 import { YandexPerformanceSyncService } from "../integrations/yandex-sync.service";
 import { AgentProfile } from "../entities/agent-profile.entity";
+import { AgentCertification } from "../entities/agent-certification.entity";
+import { MarketplaceCertification } from "../entities/marketplace-certification.entity";
 import { AgentPerformanceSyncLog } from "../entities/agent-performance-sync-log.entity";
 import { FraudDetectionAdminService } from "./fraud-detection-admin.service";
 import { SyncStatusDto } from "../dtos/marketplace.dto";
@@ -40,6 +43,10 @@ export class MarketplaceAdminService {
     private readonly agentProfileRepo: Repository<AgentProfile>,
     @InjectRepository(AgentPerformanceSyncLog)
     private readonly syncLogRepo: Repository<AgentPerformanceSyncLog>,
+    @InjectRepository(MarketplaceCertification)
+    private readonly certificationRepo: Repository<MarketplaceCertification>,
+    @InjectRepository(AgentCertification)
+    private readonly agentCertificationRepo: Repository<AgentCertification>,
   ) {}
 
   /**
@@ -331,12 +338,88 @@ export class MarketplaceAdminService {
     return results;
   }
 
+  // ─── Certifications ────────────────────────────────────────────────────────
+
+  /**
+   * Create a new certification type available for specialists to earn.
+   * Admin-only. Slug is auto-generated from name.
+   */
+  async createCertification(dto: {
+    name: string;
+    issuer: string;
+    description?: string;
+    iconUrl?: string;
+    badgeColor?: string;
+  }): Promise<MarketplaceCertification> {
+    const slug = dto.name
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .trim()
+      .replace(/\s+/g, '-');
+
+    const existing = await this.certificationRepo.findOne({ where: { slug } });
+    if (existing) {
+      throw new ConflictException(`Certification '${dto.name}' already exists`);
+    }
+
+    const cert = this.certificationRepo.create({
+      name: dto.name,
+      slug,
+      issuer: dto.issuer,
+      description: dto.description ?? null,
+      iconUrl: dto.iconUrl ?? null,
+      badgeColor: dto.badgeColor ?? '#6366f1',
+      isActive: true,
+    });
+
+    const saved = await this.certificationRepo.save(cert);
+    this.logger.log(`Certification created: ${saved.id} (${saved.name})`);
+    return saved;
+  }
+
+  /**
+   * Approve or reject a specialist's certification claim.
+   * Admin-only. Updates status, sets verifiedAt and expiresAt.
+   */
+  async verifyCertification(
+    agentProfileId: string,
+    certificationId: string,
+    dto: { verified: boolean; expiresAt?: string },
+    adminId: string,
+  ): Promise<{ status: 'verified' | 'rejected'; expiresAt?: string }> {
+    const agentCert = await this.agentCertificationRepo.findOne({
+      where: { agentProfileId, certificationId },
+    });
+
+    if (!agentCert) {
+      throw new NotFoundException(
+        `No certification ${certificationId} found for specialist ${agentProfileId}`,
+      );
+    }
+
+    agentCert.verificationStatus = dto.verified ? 'approved' : 'rejected';
+    agentCert.verified = dto.verified;
+    agentCert.verifiedAt = dto.verified ? new Date() : null;
+    agentCert.verifiedBy = adminId;
+    agentCert.expiresAt = dto.expiresAt ? new Date(dto.expiresAt) : null;
+
+    await this.agentCertificationRepo.save(agentCert);
+
+    this.logger.log(
+      `Certification ${certificationId} for specialist ${agentProfileId} → ${agentCert.verificationStatus} by admin ${adminId}`,
+    );
+
+    return {
+      status: dto.verified ? 'verified' : 'rejected',
+      expiresAt: agentCert.expiresAt?.toISOString(),
+    };
+  }
+
+  // ─── Private helpers ───────────────────────────────────────────────────────
+
   /**
    * Calculates the next scheduled sync date based on last sync.
    * Syncs are scheduled for 24 hours after the last sync.
-   *
-   * @param lastSyncDate The date of the last sync
-   * @returns Next scheduled sync date
    */
   private calculateNextSyncDate(lastSyncDate: Date): Date {
     const nextSync = new Date(lastSyncDate);
