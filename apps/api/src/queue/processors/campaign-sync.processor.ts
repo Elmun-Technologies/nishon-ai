@@ -48,7 +48,10 @@ export class CampaignSyncProcessor {
     private readonly config: ConfigService,
   ) {
     const key = this.config.get<string>("ENCRYPTION_KEY", "");
-    this.encryptionKey = key.length === 32 ? key : "00000000000000000000000000000000";
+    if (!key || key.length !== 32) {
+      this.logger.error("ENCRYPTION_KEY is not set or is not 32 characters — token decryption will fail");
+    }
+    this.encryptionKey = key;
   }
 
   @Process("sync-campaign-metrics")
@@ -156,12 +159,18 @@ export class CampaignSyncProcessor {
               .filter((a) => a.action_type === "offsite_conversion.fb_pixel_purchase")
               .reduce((sum, a) => sum + parseInt(a.value || "0"), 0);
 
+            // Extract revenue from action_values (purchase conversion value)
+            const actionValues = insight.action_values ?? [];
+            const revenue = actionValues
+              .filter((a) => a.action_type === "offsite_conversion.fb_pixel_purchase")
+              .reduce((sum, a) => sum + parseFloat(a.value || "0"), 0);
+
             await this.upsertMetric(ad.id, insight.date_start, {
               impressions: insight.impressions,
               clicks: insight.clicks,
               spend: insight.spend,
               conversions,
-              revenue: 0,
+              revenue,
             });
           }
         }
@@ -217,7 +226,7 @@ export class CampaignSyncProcessor {
             clicks: row.clicks,
             spend: row.costMicros / 1_000_000,
             conversions: row.conversions,
-            revenue: 0,
+            revenue: row.conversionValue ?? 0,
           });
         }
       }
@@ -256,6 +265,8 @@ export class CampaignSyncProcessor {
             clicks: row.clicks,
             spend: row.spend,
             conversions: row.conversions,
+            // TikTok Ads API does not expose conversion_value in standard reporting;
+            // revenue tracking requires TikTok Pixel events or offline conversion upload
             revenue: 0,
           });
         }
@@ -292,6 +303,8 @@ export class CampaignSyncProcessor {
             clicks: row.clicks,
             spend: row.cost,
             conversions: row.conversions,
+            // Yandex Direct API returns conversions via goals but does not provide
+            // conversion value in standard stat reports; needs Yandex.Metrika integration
             revenue: 0,
           });
         }

@@ -310,12 +310,12 @@ export class MetaConnector {
       clicks: number;
       spend: number;
       actions: Array<{ action_type: string; value: string }>;
+      action_values: Array<{ action_type: string; value: string }>;
       date_start: string;
     }>
   > {
-    const fields =
-      params.fields.join(",") ||
-      "impressions,clicks,spend,actions,ctr,cpm,cpp,reach";
+    const defaultFields = "impressions,clicks,spend,actions,action_values,ctr,cpm,cpp,reach";
+    const fields = params.fields.length > 0 ? params.fields.join(",") : defaultFields;
 
     const data = await this.apiGet<{ data: any[] }>(
       `${META_BASE_URL}/${objectId}/insights`,
@@ -335,6 +335,7 @@ export class MetaConnector {
       clicks: parseInt(row.clicks || "0"),
       spend: parseFloat(row.spend || "0"),
       actions: row.actions || [],
+      action_values: row.action_values || [],
       date_start: row.date_start,
     }));
   }

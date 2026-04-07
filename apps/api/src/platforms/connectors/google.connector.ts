@@ -440,6 +440,7 @@ export class GoogleConnector {
     clicks: number;
     costMicros: number;
     conversions: number;
+  conversionValue: number;
   }>> {
     const campaignFilter = params.campaignId
       ? ` AND campaign.id = ${params.campaignId}`
@@ -453,7 +454,8 @@ export class GoogleConnector {
         metrics.impressions,
         metrics.clicks,
         metrics.cost_micros,
-        metrics.conversions
+        metrics.conversions,
+        metrics.conversions_value
       FROM campaign
       WHERE segments.date BETWEEN '${params.since}' AND '${params.until}'
         AND campaign.status != 'REMOVED'
@@ -471,6 +473,7 @@ export class GoogleConnector {
       clicks: Number(row.metrics?.clicks ?? 0),
       costMicros: Number(row.metrics?.cost_micros ?? 0),
       conversions: Number(row.metrics?.conversions ?? 0),
+      conversionValue: Number(row.metrics?.conversions_value ?? 0),
     }));
   }
 
