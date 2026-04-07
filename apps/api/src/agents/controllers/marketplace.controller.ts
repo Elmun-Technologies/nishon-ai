@@ -38,6 +38,7 @@ import {
 } from "class-validator";
 import { Type } from "class-transformer";
 import { MarketplaceAdminService } from "../services/marketplace-admin.service";
+import { MarketplaceSearchService } from "../services/marketplace-search.service";
 import { SyncPerformanceDto, VerifyPerformanceDto, SyncStatusDto } from "../dtos/marketplace.dto";
 
 /**
@@ -440,7 +441,7 @@ class AnalyticsDto {
 export class MarketplaceController {
   constructor(
     private readonly marketplaceAdminService: MarketplaceAdminService,
-    // private readonly marketplaceSearchService: MarketplaceSearchService,
+    private readonly marketplaceSearchService: MarketplaceSearchService,
     // private readonly marketplaceProfileService: MarketplaceProfileService,
     // private readonly marketplacePerformanceService: MarketplacePerformanceService,
     // private readonly marketplaceContactService: MarketplaceContactService,
@@ -480,8 +481,7 @@ export class MarketplaceController {
   async searchSpecialists(
     @Query() query: SearchSpecialistsQueryDto,
   ): Promise<SearchSpecialistsResponseDto> {
-    // TODO: Call marketplaceSearchService.searchSpecialists(query)
-    throw new Error("Not implemented - awaiting marketplaceSearchService");
+    return this.marketplaceSearchService.searchSpecialists(query);
   }
 
   /**
@@ -499,8 +499,7 @@ export class MarketplaceController {
     type: MarketplaceFiltersDto,
   })
   async getFilters(): Promise<MarketplaceFiltersDto> {
-    // TODO: Call marketplaceSearchService.getAvailableFilters()
-    throw new Error("Not implemented - awaiting marketplaceSearchService");
+    return this.marketplaceSearchService.getAvailableFilters();
   }
 
   /**
@@ -529,8 +528,7 @@ export class MarketplaceController {
     if (!slug || slug.trim().length === 0) {
       throw new BadRequestException("Invalid specialist slug");
     }
-    // TODO: Call marketplaceSearchService.getSpecialistDetail(slug)
-    throw new Error("Not implemented - awaiting marketplaceSearchService");
+    return this.marketplaceSearchService.getSpecialistDetail(slug);
   }
 
   /**
@@ -562,8 +560,7 @@ export class MarketplaceController {
     if (!slug || slug.trim().length === 0) {
       throw new BadRequestException("Invalid specialist slug");
     }
-    // TODO: Call marketplaceSearchService.getSpecialistPerformance(slug, query.period, query.platform)
-    throw new Error("Not implemented - awaiting marketplaceSearchService");
+    return this.marketplaceSearchService.getSpecialistPerformance(slug, query.period, query.platform);
   }
 
   /**
