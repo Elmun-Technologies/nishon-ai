@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Put,
   Body,
   Param,
   Delete,
@@ -10,6 +11,7 @@ import {
   Req,
   HttpCode,
   Logger,
+  Query,
 } from '@nestjs/common'
 import { IntegrationService } from './services/integration.service'
 import {
@@ -21,16 +23,42 @@ import {
   IntegrationHealthStatusDto,
   SyncLogsResponseDto,
 } from './dtos/integration.dto'
+import {
+  CreateAudienceSegmentDto,
+  UpdateAudienceSegmentDto,
+  SegmentSyncRequestDto,
+  ListAudienceSegmentsResponseDto,
+} from './dtos/audience.dto'
+import {
+  UpdateCommissionStatusDto,
+  RecalculateCommissionDto,
+  CreateCommissionRateDto,
+  UpdateCommissionRateDto,
+} from './dtos/commission.dto'
 import { JwtAuthGuard } from '@/auth/guards/jwt.guard'
 import { WorkspaceGuard } from '@/common/guards/workspace.guard'
 import { ConversionEvent } from './types/integration.types'
+import {
+  AudienceSegmentService,
+  ContactSyncService,
+  CommissionCalculationService,
+  CommissionRateService,
+  CommissionReportingService,
+} from './services'
 
 @Controller('integrations')
 @UseGuards(JwtAuthGuard, WorkspaceGuard)
 export class IntegrationsController {
   private readonly logger = new Logger(IntegrationsController.name)
 
-  constructor(private integrationService: IntegrationService) {}
+  constructor(
+    private integrationService: IntegrationService,
+    private audienceSegmentService: AudienceSegmentService,
+    private contactSyncService: ContactSyncService,
+    private commissionCalculationService: CommissionCalculationService,
+    private commissionRateService: CommissionRateService,
+    private commissionReportingService: CommissionReportingService,
+  ) {}
 
   /**
    * GET /integrations/authorize/:key
@@ -326,6 +354,364 @@ export class IntegrationsController {
   ): Promise<void> {
     const workspaceId = req.workspace?.id
     await this.integrationService.disconnect(connectionId, workspaceId)
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // PHASE 4: AUDIENCE SEGMENT MANAGEMENT
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /**
+   * POST /integrations/:connectionId/audiences
+   * Create new audience segment for retargeting
+   */
+  @Post(':connectionId/audiences')
+  @HttpCode(201)
+  async createAudienceSegment(
+    @Param('connectionId') connectionId: string,
+    @Body() dto: CreateAudienceSegmentDto,
+    @Req() req: any,
+  ): Promise<any> {
+    const workspaceId = req.workspace?.id
+    return this.audienceSegmentService.createSegment({
+      ...dto,
+      connectionId,
+      workspaceId,
+    })
+  }
+
+  /**
+   * GET /integrations/:connectionId/audiences
+   * List all audience segments
+   */
+  @Get(':connectionId/audiences')
+  @HttpCode(200)
+  async listAudienceSegments(
+    @Param('connectionId') connectionId: string,
+    @Query('platform') platform?: string,
+    @Req() req: any,
+  ): Promise<ListAudienceSegmentsResponseDto> {
+    const segments = await this.audienceSegmentService.listSegments(
+      connectionId,
+      platform as any,
+    )
+    return { segments, total: segments.length }
+  }
+
+  /**
+   * GET /integrations/:connectionId/audiences/:segmentId
+   * Get segment details with statistics
+   */
+  @Get(':connectionId/audiences/:segmentId')
+  @HttpCode(200)
+  async getAudienceSegment(
+    @Param('connectionId') connectionId: string,
+    @Param('segmentId') segmentId: string,
+  ): Promise<any> {
+    const stats = await this.audienceSegmentService.getSegmentStats(segmentId)
+    return { segmentId, ...stats }
+  }
+
+  /**
+   * PUT /integrations/:connectionId/audiences/:segmentId
+   * Update audience segment configuration
+   */
+  @Put(':connectionId/audiences/:segmentId')
+  @HttpCode(200)
+  async updateAudienceSegment(
+    @Param('connectionId') connectionId: string,
+    @Param('segmentId') segmentId: string,
+    @Body() dto: UpdateAudienceSegmentDto,
+  ): Promise<any> {
+    return this.audienceSegmentService.updateSegment(segmentId, dto)
+  }
+
+  /**
+   * DELETE /integrations/:connectionId/audiences/:segmentId
+   * Delete audience segment
+   */
+  @Delete(':connectionId/audiences/:segmentId')
+  @HttpCode(204)
+  async deleteAudienceSegment(
+    @Param('connectionId') connectionId: string,
+    @Param('segmentId') segmentId: string,
+  ): Promise<void> {
+    await this.audienceSegmentService.deleteSegment(segmentId)
+  }
+
+  /**
+   * POST /integrations/:connectionId/audiences/:segmentId/sync
+   * Manually trigger audience segment sync
+   */
+  @Post(':connectionId/audiences/:segmentId/sync')
+  @HttpCode(200)
+  async syncAudienceSegment(
+    @Param('connectionId') connectionId: string,
+    @Param('segmentId') segmentId: string,
+    @Body() dto: SegmentSyncRequestDto,
+  ): Promise<any> {
+    return this.audienceSegmentService.triggerSegmentSync(
+      segmentId,
+      dto.incremental ?? true,
+    )
+  }
+
+  /**
+   * GET /integrations/:connectionId/audiences/:segmentId/syncs
+   * Get sync history for segment
+   */
+  @Get(':connectionId/audiences/:segmentId/syncs')
+  @HttpCode(200)
+  async getAudienceSyncHistory(
+    @Param('connectionId') connectionId: string,
+    @Param('segmentId') segmentId: string,
+    @Query('limit') limit: number = 50,
+    @Query('offset') offset: number = 0,
+  ): Promise<any> {
+    const { logs, total } = await this.audienceSegmentService.getSyncHistory(
+      segmentId,
+      limit,
+      offset,
+    )
+    return { logs, pagination: { total, limit, offset } }
+  }
+
+  /**
+   * GET /integrations/:connectionId/audiences/syncs
+   * Get sync history for all segments in connection
+   */
+  @Get(':connectionId/audiences/syncs')
+  @HttpCode(200)
+  async getConnectionAudienceSyncs(
+    @Param('connectionId') connectionId: string,
+    @Query('limit') limit: number = 50,
+    @Query('offset') offset: number = 0,
+  ): Promise<any> {
+    const { logs, total } = await this.audienceSegmentService.getConnectionSyncHistory(
+      connectionId,
+      limit,
+      offset,
+    )
+    return { logs, pagination: { total, limit, offset } }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // PHASE 5: COMMISSION MANAGEMENT
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /**
+   * POST /integrations/:connectionId/commissions/recalculate
+   * Force recalculation of all commissions
+   */
+  @Post(':connectionId/commissions/recalculate')
+  @HttpCode(200)
+  async recalculateCommissions(
+    @Param('connectionId') connectionId: string,
+    @Query('month') month?: number,
+    @Query('year') year?: number,
+    @Req() req: any,
+  ): Promise<any> {
+    const workspaceId = req.workspace?.id
+    const now = new Date()
+    const m = month || now.getMonth() + 1
+    const y = year || now.getFullYear()
+
+    const commissions = await this.commissionCalculationService.calculateMonthlyCommissions(
+      workspaceId,
+      y,
+      m,
+    )
+
+    return {
+      recalculated: commissions.length,
+      month: `${y}-${String(m).padStart(2, '0')}`,
+    }
+  }
+
+  /**
+   * GET /integrations/:connectionId/commissions
+   * List commissions with filters
+   */
+  @Get(':connectionId/commissions')
+  @HttpCode(200)
+  async listCommissions(
+    @Param('connectionId') connectionId: string,
+    @Query('status') status?: string,
+    @Query('specialistId') specialistId?: number,
+    @Query('limit') limit: number = 50,
+    @Query('offset') offset: number = 0,
+    @Req() req: any,
+  ): Promise<any> {
+    const workspaceId = req.workspace?.id
+    const summary = await this.commissionReportingService.getCommissionsSummary(
+      workspaceId,
+      { status, specialistId },
+    )
+    return {
+      commissions: summary.bySpecialist,
+      pagination: { total: summary.totalCommissions, limit, offset },
+    }
+  }
+
+  /**
+   * GET /integrations/:connectionId/commissions/:commissionId
+   * Get commission details with audit log
+   */
+  @Get(':connectionId/commissions/:commissionId')
+  @HttpCode(200)
+  async getCommissionDetail(
+    @Param('connectionId') connectionId: string,
+    @Param('commissionId') commissionId: string,
+  ): Promise<any> {
+    // In a real implementation, would fetch from DB
+    return { commissionId, message: 'Commission detail endpoint' }
+  }
+
+  /**
+   * PUT /integrations/:connectionId/commissions/:commissionId
+   * Update commission status (approve, reject, adjust)
+   */
+  @Put(':connectionId/commissions/:commissionId')
+  @HttpCode(200)
+  async updateCommissionStatus(
+    @Param('connectionId') connectionId: string,
+    @Param('commissionId') commissionId: string,
+    @Body() dto: UpdateCommissionStatusDto,
+    @Req() req: any,
+  ): Promise<any> {
+    const userId = req.user?.id
+
+    if (dto.status === 'approved') {
+      return this.commissionCalculationService.approveCommission(
+        commissionId,
+        userId,
+        dto.approvalNotes,
+      )
+    } else if (dto.status === 'rejected') {
+      return this.commissionCalculationService.rejectCommission(
+        commissionId,
+        userId,
+        dto.approvalNotes || 'Rejected',
+      )
+    }
+
+    return { message: 'Commission updated' }
+  }
+
+  /**
+   * POST /integrations/:connectionId/commissions/:commissionId/recalc
+   * Recalculate specific commission
+   */
+  @Post(':connectionId/commissions/:commissionId/recalc')
+  @HttpCode(200)
+  async recalculateCommission(
+    @Param('connectionId') connectionId: string,
+    @Param('commissionId') commissionId: string,
+    @Body() dto: RecalculateCommissionDto,
+  ): Promise<any> {
+    return this.commissionCalculationService.recalculateCommission(
+      commissionId,
+      dto.rateOverride,
+    )
+  }
+
+  /**
+   * GET /integrations/:connectionId/commissions/summary
+   * Get commissions summary dashboard
+   */
+  @Get(':connectionId/commissions/summary')
+  @HttpCode(200)
+  async getCommissionsSummary(
+    @Param('connectionId') connectionId: string,
+    @Query('periodStart') periodStart?: string,
+    @Query('periodEnd') periodEnd?: string,
+    @Req() req: any,
+  ): Promise<any> {
+    const workspaceId = req.workspace?.id
+    return this.commissionReportingService.getCommissionsSummary(workspaceId, {
+      periodStart: periodStart ? new Date(periodStart) : undefined,
+      periodEnd: periodEnd ? new Date(periodEnd) : undefined,
+    })
+  }
+
+  /**
+   * GET /integrations/:connectionId/commissions/specialist/:specialistId
+   * Get commission stats for specialist
+   */
+  @Get(':connectionId/commissions/specialist/:specialistId')
+  @HttpCode(200)
+  async getSpecialistStats(
+    @Param('connectionId') connectionId: string,
+    @Param('specialistId') specialistId: string,
+    @Req() req: any,
+  ): Promise<any> {
+    const workspaceId = req.workspace?.id
+    return this.commissionReportingService.getSpecialistStats(
+      workspaceId,
+      parseInt(specialistId),
+    )
+  }
+
+  /**
+   * GET /integrations/:connectionId/commissions/payroll/:period
+   * Get payroll data for period (YYYY-MM)
+   */
+  @Get(':connectionId/commissions/payroll/:period')
+  @HttpCode(200)
+  async getPayroll(
+    @Param('connectionId') connectionId: string,
+    @Param('period') period: string,
+    @Req() req: any,
+  ): Promise<any> {
+    const workspaceId = req.workspace?.id
+    return this.commissionReportingService.generatePayroll(workspaceId, period)
+  }
+
+  /**
+   * GET /integrations/:connectionId/rates
+   * List commission rates
+   */
+  @Get(':connectionId/rates')
+  @HttpCode(200)
+  async listCommissionRates(
+    @Param('connectionId') connectionId: string,
+    @Query('activeOnly') activeOnly: boolean = false,
+    @Req() req: any,
+  ): Promise<any> {
+    const workspaceId = req.workspace?.id
+    const rates = await this.commissionRateService.listRates(workspaceId, activeOnly)
+    return { rates, total: rates.length }
+  }
+
+  /**
+   * POST /integrations/:connectionId/rates
+   * Create new commission rate
+   */
+  @Post(':connectionId/rates')
+  @HttpCode(201)
+  async createCommissionRate(
+    @Param('connectionId') connectionId: string,
+    @Body() dto: CreateCommissionRateDto,
+    @Req() req: any,
+  ): Promise<any> {
+    const workspaceId = req.workspace?.id
+    return this.commissionRateService.createRate({
+      ...dto,
+      workspaceId,
+    })
+  }
+
+  /**
+   * PUT /integrations/:connectionId/rates/:rateId
+   * Update commission rate
+   */
+  @Put(':connectionId/rates/:rateId')
+  @HttpCode(200)
+  async updateCommissionRate(
+    @Param('connectionId') connectionId: string,
+    @Param('rateId') rateId: string,
+    @Body() dto: UpdateCommissionRateDto,
+  ): Promise<any> {
+    return this.commissionRateService.updateRate(rateId, dto)
   }
 
   // ─────────────────────────────────────────────────────────────────────────

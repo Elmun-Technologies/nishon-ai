@@ -13,6 +13,7 @@ import {
   SyncStatus,
 } from '../types/integration.types'
 import { AmoCRMConnectorService } from './amocrm-connector.service'
+import { ContactSyncService } from './contact-sync.service'
 
 @Injectable()
 export class DealPullSyncService {
@@ -25,7 +26,8 @@ export class DealPullSyncService {
     private revenueSyncLogRepository: Repository<RevenueSyncLog>,
     @InjectRepository(CampaignRevenue)
     private campaignRevenueRepository: Repository<CampaignRevenue>,
-    private amoCrmConnector: AmoCRMConnectorService
+    private amoCrmConnector: AmoCRMConnectorService,
+    private contactSyncService: ContactSyncService,
   ) {}
 
   /**
@@ -221,7 +223,18 @@ export class DealPullSyncService {
     }
 
     linkedDeal.lastSyncedAt = new Date()
-    await this.linkedDealRepository.save(linkedDeal)
+    const savedDeal = await this.linkedDealRepository.save(linkedDeal)
+
+    // PHASE 4 INTEGRATION: Update audiences based on deal status
+    try {
+      await this.contactSyncService.updateSegmentFromDeal(
+        savedDeal.id,
+        linkedDeal.status
+      )
+    } catch (error) {
+      this.logger.warn(`Failed to update audience segments for deal: ${error.message}`)
+      // Don't throw - this is non-blocking
+    }
 
     return {
       hasRoas,
