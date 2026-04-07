@@ -357,6 +357,12 @@ export default function SellerLandingPage() {
               Markolog yoki agentni topish
             </button>
             <button
+              onClick={() => router.push(‘/leaderboard’)}
+              className="rounded-full border border-cyan-500/40 bg-cyan-500/10 px-8 py-4 text-lg font-semibold text-cyan-200 transition hover:border-cyan-500/60 hover:bg-cyan-500/20"
+            >
+              🏆 Top Performers ko’rish
+            </button>
+            <button
               onClick={() => router.push(‘/login’)}
               className="rounded-full border border-white/20 bg-surface-elevated/10 px-8 py-4 text-lg text-white transition hover:bg-surface-elevated/20"
             >
