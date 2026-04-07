@@ -237,7 +237,10 @@ export class DecisionLoopService {
       return;
     }
 
-    const encryptionKey = this.config.get<string>("ENCRYPTION_KEY", "00000000000000000000000000000000");
+    const encryptionKey = this.config.get<string>("ENCRYPTION_KEY");
+    if (!encryptionKey) {
+      throw new Error("ENCRYPTION_KEY environment variable is required and must not be default");
+    }
     const accessToken = this.decryptToken(account.accessToken, encryptionKey);
     const advertiserId = account.externalAccountId;
 

@@ -14,7 +14,9 @@ import {
   forwardRef,
   HttpCode,
   HttpStatus,
+  UnauthorizedException,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { CertificationService } from './certification.service';
 import {
   CreateCertificationDTO,
@@ -68,15 +70,15 @@ export class CertificationController {
    * Requires admin authorization
    */
   @Post()
+  @UseGuards(AuthGuard('jwt'))
   async createCertification(
     @Body() data: CreateCertificationDTO,
     @Request() req: any,
   ): Promise<CertificationDetailDTO> {
-    // TODO: Add @UseGuards(AdminGuard) when auth system is in place
-    // For now, check if user has admin role (implement based on your auth)
-    // if (!req.user?.isAdmin) {
-    //   throw new ForbiddenException('Only admins can create certifications');
-    // }
+    // Check if user has admin role
+    if (!req.user?.isAdmin) {
+      throw new ForbiddenException('Only admins can create certifications');
+    }
 
     return this.certService.createCertification(data);
   }
@@ -151,15 +153,18 @@ export class CertificationController {
    * Sets verification status and expiration date
    */
   @Patch('agents/:agentId/:certId/verify')
+  @UseGuards(AuthGuard('jwt'))
   async verifyCertification(
     @Param('agentId') agentId: string,
     @Param('certId') certId: string,
     @Body() data: VerifyCertificationDTO,
     @Request() req: any,
   ): Promise<AgentCertificationDetailDTO> {
-    // TODO: Add @UseGuards(AdminGuard) and extract adminId from req.user
-    // const adminId = req.user?.id;
-    // if (!adminId) {
+    const adminId = req.user?.id;
+    if (!req.user?.isAdmin) {
+      throw new ForbiddenException('Only admins can verify certifications');
+    }
+    if (!adminId) {
     //   throw new ForbiddenException('Only admins can verify certifications');
     // }
 
@@ -172,13 +177,17 @@ export class CertificationController {
    * Remove certification from agent
    */
   @Delete('agents/:agentId/:certId')
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.NO_CONTENT)
   async removeCertification(
     @Param('agentId') agentId: string,
     @Param('certId') certId: string,
     @Request() req: any,
   ): Promise<void> {
-    // TODO: Verify user is admin or agent owner
+    // Verify user is admin or agent owner
+    if (!req.user?.isAdmin && req.user?.id !== agentId) {
+      throw new ForbiddenException('You do not have permission to remove this certification');
+    }
     // if (req.user?.id !== agentId && !req.user?.isAdmin) {
     //   throw new ForbiddenException('You can only remove your own certifications');
     // }
@@ -197,15 +206,15 @@ export class CertificationController {
    *   - offset: number - Pagination offset (default 0)
    */
   @Get('admin/pending')
+  @UseGuards(AuthGuard('jwt'))
   async getPendingCertifications(
     @Request() req: any,
     @Query('limit') limit?: string,
     @Query('offset') offset?: string,
   ): Promise<{ items: AgentCertificationDetailDTO[]; total: number }> {
-    // TODO: Add @UseGuards(AdminGuard)
-    // if (!req.user?.isAdmin) {
-    //   throw new ForbiddenException('Only admins can view pending certifications');
-    // }
+    if (!req.user?.isAdmin) {
+      throw new ForbiddenException('Only admins can view pending certifications');
+    }
 
     const limitNum = limit ? Math.min(parseInt(limit, 10), 100) : 50;
     const offsetNum = offset ? parseInt(offset, 10) : 0;
@@ -248,10 +257,14 @@ export class CertificationController {
    * Should be called via scheduled task or admin endpoint
    */
   @Post('admin/cleanup-expired')
+  @UseGuards(AuthGuard('jwt'))
   async cleanupExpiredCertifications(
     @Request() req: any,
   ): Promise<{ cleaned: number }> {
-    // TODO: Add @UseGuards(AdminGuard)
+    if (!req.user?.isAdmin) {
+      throw new ForbiddenException('Only admins can cleanup expired certifications');
+    }
+    // Previous line already checked above
     // if (!req.user?.isAdmin) {
     //   throw new ForbiddenException('Only admins can run cleanup');
     // }

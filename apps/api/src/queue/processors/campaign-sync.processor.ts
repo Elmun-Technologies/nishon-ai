@@ -47,8 +47,11 @@ export class CampaignSyncProcessor {
     private readonly yandexConnector: YandexConnector,
     private readonly config: ConfigService,
   ) {
-    const key = this.config.get<string>("ENCRYPTION_KEY", "");
-    this.encryptionKey = key.length === 32 ? key : "00000000000000000000000000000000";
+    const key = this.config.get<string>("ENCRYPTION_KEY");
+    if (!key || key.length !== 32) {
+      throw new Error("ENCRYPTION_KEY must be set and exactly 32 characters long");
+    }
+    this.encryptionKey = key;
   }
 
   @Process("sync-campaign-metrics")
