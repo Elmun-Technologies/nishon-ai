@@ -21,7 +21,7 @@ const STEP_LABELS = ['Auditoriya', 'Platforma va byudjet', 'Platform moslashtiri
 
 // ─── Step Indicator ───────────────────────────────────────────────────────────
 
-function StepBar({ current }: { current: 1 | 2 | 3 }) {
+function StepBar({ current }: { current: 1 | 2 | 3 | 4 }) {
   return (
     <div className="flex items-center gap-2 mb-8">
       {STEP_LABELS.map((label, i) => {

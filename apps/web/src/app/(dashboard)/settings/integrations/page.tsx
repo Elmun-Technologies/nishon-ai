@@ -168,7 +168,7 @@ export default function IntegrationsPage() {
               key={integration.id}
               integration={integration}
               onConfigure={() => {
-                setSelectedIntegration(integration)
+                setSelectedIntegration(integration as any)
                 setShowConfigModal(true)
               }}
               onTest={() => console.log('Test:', integration.name)}
