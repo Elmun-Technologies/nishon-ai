@@ -1,3 +1,6 @@
 export { IntegrationConnection } from './integration-connection.entity'
 export { IntegrationConfigEntity } from './integration-config.entity'
 export { SyncLog } from './sync-log.entity'
+export { LinkedDeal } from './linked-deal.entity'
+export { RevenueSyncLog } from './revenue-sync-log.entity'
+export { CampaignRevenue } from './campaign-revenue.entity'

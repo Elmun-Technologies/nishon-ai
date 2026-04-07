@@ -1,4 +1,5 @@
 export { EncryptionService } from './encryption.service'
 export { AmoCRMConnectorService } from './amocrm-connector.service'
 export { ConversionToLeadSyncService } from './conversion-to-lead-sync.service'
+export { DealPullSyncService } from './deal-pull-sync.service'
 export { IntegrationService } from './integration.service'

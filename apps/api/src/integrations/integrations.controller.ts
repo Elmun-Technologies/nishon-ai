@@ -256,6 +256,65 @@ export class IntegrationsController {
   }
 
   /**
+   * POST /integrations/:connectionId/sync/deals
+   * Sync deals from AmoCRM and calculate ROAS
+   */
+  @Post(':connectionId/sync/deals')
+  @HttpCode(200)
+  async syncDeals(
+    @Param('connectionId') connectionId: string,
+    @Req() req: any
+  ): Promise<any> {
+    const workspaceId = req.workspace?.id
+    const lookbackDays = req.query.lookbackDays ? parseInt(req.query.lookbackDays) : 90
+
+    return this.integrationService.syncDealsAndCalculateRoas(
+      connectionId,
+      workspaceId,
+      lookbackDays
+    )
+  }
+
+  /**
+   * GET /integrations/:connectionId/revenue/attribution
+   * Get revenue attribution data (ROAS by platform)
+   */
+  @Get(':connectionId/revenue/attribution')
+  @HttpCode(200)
+  async getRevenueAttribution(
+    @Param('connectionId') connectionId: string,
+    @Req() req: any
+  ): Promise<any> {
+    const workspaceId = req.workspace?.id
+    return this.integrationService.getRevenueAttribution(connectionId, workspaceId)
+  }
+
+  /**
+   * GET /integrations/:connectionId/revenue/trends
+   * Get revenue trends over time
+   */
+  @Get(':connectionId/revenue/trends')
+  @HttpCode(200)
+  async getRevenueTrends(
+    @Param('connectionId') connectionId: string,
+    @Req() req: any
+  ): Promise<any> {
+    const workspaceId = req.workspace?.id
+    const days = req.query.days ? parseInt(req.query.days) : 30
+
+    const trends = await this.integrationService.getRevenueTrends(
+      connectionId,
+      workspaceId,
+      days
+    )
+
+    return {
+      trends,
+      period: days,
+    }
+  }
+
+  /**
    * DELETE /integrations/:connectionId
    * Disconnect integration
    */

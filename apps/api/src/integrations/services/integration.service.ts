@@ -18,6 +18,7 @@ import {
 import { EncryptionService } from './encryption.service'
 import { AmoCRMConnectorService } from './amocrm-connector.service'
 import { ConversionToLeadSyncService } from './conversion-to-lead-sync.service'
+import { DealPullSyncService } from './deal-pull-sync.service'
 
 @Injectable()
 export class IntegrationService {
@@ -30,7 +31,8 @@ export class IntegrationService {
     private syncLogRepository: Repository<SyncLog>,
     private encryptionService: EncryptionService,
     private amoCrmConnector: AmoCRMConnectorService,
-    private conversionToLeadSync: ConversionToLeadSyncService
+    private conversionToLeadSync: ConversionToLeadSyncService,
+    private dealPullSync: DealPullSyncService
   ) {}
 
   /**
@@ -420,6 +422,61 @@ export class IntegrationService {
     await this.connectionRepository.delete(connectionId)
     await this.configRepository.delete({ connectionId })
     await this.syncLogRepository.delete({ connectionId })
+  }
+
+  /**
+   * Sync deals and calculate ROAS
+   */
+  async syncDealsAndCalculateRoas(
+    connectionId: string,
+    workspaceId: string,
+    lookbackDays: number = 90
+  ): Promise<{
+    dealsProcessed: number
+    dealsWithRoas: number
+    dealsFailed: number
+    totalRevenue: number
+    aggregateRoas: number | null
+  }> {
+    const connection = await this.getConnectionWithTokens(connectionId, workspaceId)
+
+    if (connection.integrationKey !== 'amocrm') {
+      throw new BadRequestException('This integration does not support deal syncing')
+    }
+
+    const accessToken = await this.getValidAccessToken(connection)
+    const client = this.amoCrmConnector.createClient(
+      accessToken,
+      connection.externalAccountId
+    )
+
+    return this.dealPullSync.syncDealsAndCalculateRoas(
+      connectionId,
+      client,
+      lookbackDays
+    )
+  }
+
+  /**
+   * Get revenue attribution data
+   */
+  async getRevenueAttribution(connectionId: string, workspaceId: string): Promise<any> {
+    // Verify connection exists
+    await this.getConnectionWithTokens(connectionId, workspaceId)
+    return this.dealPullSync.getRevenueAttribution(connectionId)
+  }
+
+  /**
+   * Get revenue trends
+   */
+  async getRevenueTrends(
+    connectionId: string,
+    workspaceId: string,
+    days: number = 30
+  ): Promise<any> {
+    // Verify connection exists
+    await this.getConnectionWithTokens(connectionId, workspaceId)
+    return this.dealPullSync.getRevenueTrends(connectionId, days)
   }
 
   /**

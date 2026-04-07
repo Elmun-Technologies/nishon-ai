@@ -170,3 +170,47 @@ export class SyncLogsResponseDto {
   logs: SyncLogEntryDto[]
   total: number
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Deal Sync DTOs
+
+export class DealSyncResultDto {
+  dealsProcessed: number
+  dealsWithRoas: number
+  dealsFailed: number
+  totalRevenue: number
+  aggregateRoas: number | null
+}
+
+export class PlatformRevenueDto {
+  revenue: number
+  spend: number
+  roas: number | null
+  dealCount: number
+}
+
+export class RevenueAttributionDto {
+  totalRevenue: number
+  totalSpend: number
+  roas: number | null
+  dealCount: number
+  conversionCount: number
+  byPlatform: {
+    meta: PlatformRevenueDto
+    google: PlatformRevenueDto
+    tiktok: PlatformRevenueDto
+    yandex: PlatformRevenueDto
+  }
+}
+
+export class RevenueTrendDto {
+  date: Date
+  revenue: number
+  deals: number
+  roas: number | null
+}
+
+export class RevenueTrendsResponseDto {
+  trends: RevenueTrendDto[]
+  period: number
+}

@@ -5,11 +5,15 @@ import {
   IntegrationConnection,
   IntegrationConfigEntity,
   SyncLog,
+  LinkedDeal,
+  RevenueSyncLog,
+  CampaignRevenue,
 } from './entities'
 import {
   EncryptionService,
   AmoCRMConnectorService,
   ConversionToLeadSyncService,
+  DealPullSyncService,
   IntegrationService,
 } from './services'
 import { IntegrationsController } from './integrations.controller'
@@ -21,6 +25,9 @@ import { IntegrationsController } from './integrations.controller'
       IntegrationConnection,
       IntegrationConfigEntity,
       SyncLog,
+      LinkedDeal,
+      RevenueSyncLog,
+      CampaignRevenue,
     ]),
   ],
   controllers: [IntegrationsController],
@@ -28,6 +35,7 @@ import { IntegrationsController } from './integrations.controller'
     EncryptionService,
     AmoCRMConnectorService,
     ConversionToLeadSyncService,
+    DealPullSyncService,
     IntegrationService,
   ],
   exports: [
@@ -35,6 +43,7 @@ import { IntegrationsController } from './integrations.controller'
     EncryptionService,
     AmoCRMConnectorService,
     ConversionToLeadSyncService,
+    DealPullSyncService,
   ],
 })
 export class IntegrationsModule {}
