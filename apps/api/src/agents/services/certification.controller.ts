@@ -23,6 +23,8 @@ import {
   CertificationDetailDTO,
   AgentCertificationDetailDTO,
 } from './certification.service';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { AdminGuard } from '../../common/guards/admin.guard';
 
 /**
  * CertificationController handles all certification-related HTTP endpoints
@@ -65,19 +67,13 @@ export class CertificationController {
 
   /**
    * Create new certification type (admin only)
-   * Requires admin authorization
    */
   @Post()
+  @UseGuards(JwtAuthGuard, AdminGuard)
   async createCertification(
     @Body() data: CreateCertificationDTO,
     @Request() req: any,
   ): Promise<CertificationDetailDTO> {
-    // TODO: Add @UseGuards(AdminGuard) when auth system is in place
-    // For now, check if user has admin role (implement based on your auth)
-    // if (!req.user?.isAdmin) {
-    //   throw new ForbiddenException('Only admins can create certifications');
-    // }
-
     return this.certService.createCertification(data);
   }
 
@@ -107,16 +103,16 @@ export class CertificationController {
    * Sets status to pending_review for admin verification
    */
   @Post(':certId/agents/:agentId')
+  @UseGuards(JwtAuthGuard)
   async addCertificationToAgent(
     @Param('certId') certId: string,
     @Param('agentId') agentId: string,
     @Body() data: AddCertificationDTO,
     @Request() req: any,
   ): Promise<AgentCertificationDetailDTO> {
-    // TODO: Verify requesting user owns the agent or is admin
-    // if (req.user?.id !== agentId && !req.user?.isAdmin) {
-    //   throw new ForbiddenException('You can only add certifications to your own profile');
-    // }
+    if (req.user?.id !== agentId && !req.user?.isAdmin) {
+      throw new ForbiddenException('You can only add certifications to your own profile');
+    }
 
     return this.certService.addCertificationToAgent(
       agentId,
@@ -151,20 +147,14 @@ export class CertificationController {
    * Sets verification status and expiration date
    */
   @Patch('agents/:agentId/:certId/verify')
+  @UseGuards(JwtAuthGuard, AdminGuard)
   async verifyCertification(
     @Param('agentId') agentId: string,
     @Param('certId') certId: string,
     @Body() data: VerifyCertificationDTO,
     @Request() req: any,
   ): Promise<AgentCertificationDetailDTO> {
-    // TODO: Add @UseGuards(AdminGuard) and extract adminId from req.user
-    // const adminId = req.user?.id;
-    // if (!adminId) {
-    //   throw new ForbiddenException('Only admins can verify certifications');
-    // }
-
-    // For now, use a placeholder
-    const adminId = req.user?.id || 'system';
+    const adminId = req.user.id;
     return this.certService.verifyCertification(certId, data, adminId);
   }
 
@@ -172,16 +162,16 @@ export class CertificationController {
    * Remove certification from agent
    */
   @Delete('agents/:agentId/:certId')
+  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async removeCertification(
     @Param('agentId') agentId: string,
     @Param('certId') certId: string,
     @Request() req: any,
   ): Promise<void> {
-    // TODO: Verify user is admin or agent owner
-    // if (req.user?.id !== agentId && !req.user?.isAdmin) {
-    //   throw new ForbiddenException('You can only remove your own certifications');
-    // }
+    if (req.user?.id !== agentId && !req.user?.isAdmin) {
+      throw new ForbiddenException('You can only remove your own certifications');
+    }
 
     return this.certService.removeCertificationFromAgent(certId);
   }
@@ -197,16 +187,12 @@ export class CertificationController {
    *   - offset: number - Pagination offset (default 0)
    */
   @Get('admin/pending')
+  @UseGuards(JwtAuthGuard, AdminGuard)
   async getPendingCertifications(
     @Request() req: any,
     @Query('limit') limit?: string,
     @Query('offset') offset?: string,
   ): Promise<{ items: AgentCertificationDetailDTO[]; total: number }> {
-    // TODO: Add @UseGuards(AdminGuard)
-    // if (!req.user?.isAdmin) {
-    //   throw new ForbiddenException('Only admins can view pending certifications');
-    // }
-
     const limitNum = limit ? Math.min(parseInt(limit, 10), 100) : 50;
     const offsetNum = offset ? parseInt(offset, 10) : 0;
 
@@ -248,14 +234,8 @@ export class CertificationController {
    * Should be called via scheduled task or admin endpoint
    */
   @Post('admin/cleanup-expired')
-  async cleanupExpiredCertifications(
-    @Request() req: any,
-  ): Promise<{ cleaned: number }> {
-    // TODO: Add @UseGuards(AdminGuard)
-    // if (!req.user?.isAdmin) {
-    //   throw new ForbiddenException('Only admins can run cleanup');
-    // }
-
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  async cleanupExpiredCertifications(): Promise<{ cleaned: number }> {
     const cleaned = await this.certService.cleanupExpiredCertifications();
     return { cleaned };
   }

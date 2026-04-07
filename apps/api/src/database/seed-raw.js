@@ -25,8 +25,13 @@ async function seed() {
       return
     }
 
-    // Create demo user
-    const hashedPassword = await bcrypt.hash('demo1234', 12)
+    // Create demo user — password from env, never hardcoded
+    const demoPassword = process.env.DEMO_USER_PASSWORD
+    if (!demoPassword) {
+      console.error('❌ DEMO_USER_PASSWORD env var is not set. Aborting seed.')
+      return
+    }
+    const hashedPassword = await bcrypt.hash(demoPassword, 12)
     const userResult = await pool.query(
       'INSERT INTO users (email, password, name, plan, is_email_verified, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, NOW(), NOW()) RETURNING id',
       ['demo@performa.ai', hashedPassword, 'Demo User', 'PRO', true]
