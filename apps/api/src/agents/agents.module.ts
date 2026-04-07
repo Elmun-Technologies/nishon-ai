@@ -18,6 +18,9 @@ import { PerformanceSyncService } from "./services/performance-sync.service";
 import { CertificationService } from "./services/certification.service";
 import { CertificationController } from "./services/certification.controller";
 import { MarketplaceSearchService } from "./services/marketplace-search.service";
+import { MarketplaceProfileService } from "./services/marketplace-profile.service";
+import { MarketplacePerformanceService } from "./services/marketplace-performance.service";
+import { MarketplaceContactService } from "./services/marketplace-contact.service";
 import { FraudDetectionService } from "./services/fraud-detection.service";
 import { FraudDetectionAdminService } from "./services/fraud-detection-admin.service";
 import { MarketplaceAdminService } from "./services/marketplace-admin.service";
@@ -29,6 +32,9 @@ import { MarketplaceController } from "./controllers/marketplace.controller";
 import { Workspace } from "../workspaces/entities/workspace.entity";
 import { User } from "../users/entities/user.entity";
 import { ConnectedAccount } from "../platforms/entities/connected-account.entity";
+import { AgentCaseStudy } from "./entities/agent-case-study.entity";
+import { SpecialistContact } from "./entities/specialist-contact.entity";
+import { SpecialistAnalytics } from "./entities/specialist-analytics.entity";
 
 @Module({
   imports: [
@@ -41,10 +47,13 @@ import { ConnectedAccount } from "../platforms/entities/connected-account.entity
       AgentHistoricalPerformance,
       AgentPerformanceSyncLog,
       AgentCertification,
+      AgentCaseStudy,
       AgentLanguage,
       AgentGeographicCoverage,
       MarketplaceCertification,
       FraudDetectionAudit,
+      SpecialistContact,
+      SpecialistAnalytics,
       Workspace,
       User,
       ConnectedAccount,
@@ -56,6 +65,9 @@ import { ConnectedAccount } from "../platforms/entities/connected-account.entity
     PerformanceSyncService,
     CertificationService,
     MarketplaceSearchService,
+    MarketplaceProfileService,
+    MarketplacePerformanceService,
+    MarketplaceContactService,
     FraudDetectionService,
     FraudDetectionAdminService,
     MarketplaceAdminService,
@@ -69,6 +81,9 @@ import { ConnectedAccount } from "../platforms/entities/connected-account.entity
     PerformanceSyncService,
     CertificationService,
     MarketplaceSearchService,
+    MarketplaceProfileService,
+    MarketplacePerformanceService,
+    MarketplaceContactService,
     FraudDetectionService,
     FraudDetectionAdminService,
     MarketplaceAdminService,
