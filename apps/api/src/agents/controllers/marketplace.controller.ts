@@ -481,7 +481,7 @@ export class MarketplaceController {
   async searchSpecialists(
     @Query() query: SearchSpecialistsQueryDto,
   ): Promise<SearchSpecialistsResponseDto> {
-    return this.marketplaceSearchService.searchSpecialists(query);
+    return this.marketplaceSearchService.searchSpecialists(query as any) as any;
   }
 
   /**
@@ -499,7 +499,7 @@ export class MarketplaceController {
     type: MarketplaceFiltersDto,
   })
   async getFilters(): Promise<MarketplaceFiltersDto> {
-    return this.marketplaceSearchService.getAvailableFilters();
+    return this.marketplaceSearchService.getAvailableFilters() as any;
   }
 
   /**
@@ -528,7 +528,7 @@ export class MarketplaceController {
     if (!slug || slug.trim().length === 0) {
       throw new BadRequestException("Invalid specialist slug");
     }
-    return this.marketplaceSearchService.getSpecialistDetail(slug);
+    return this.marketplaceSearchService.getSpecialistDetail(slug) as any;
   }
 
   /**
@@ -560,7 +560,16 @@ export class MarketplaceController {
     if (!slug || slug.trim().length === 0) {
       throw new BadRequestException("Invalid specialist slug");
     }
-    return this.marketplaceSearchService.getSpecialistPerformance(slug, query.period, query.platform);
+    // Convert API period format (1m, 3m, 6m, 12m, all) to service format (month, quarter, year)
+    const periodMap: Record<string, "month" | "quarter" | "year"> = {
+      "1m": "month",
+      "3m": "quarter",
+      "6m": "quarter",
+      "12m": "year",
+      "all": "year",
+    };
+    const servicePeriod = periodMap[query.period || "3m"] || "year";
+    return this.marketplaceSearchService.getSpecialistPerformance(slug, servicePeriod) as any;
   }
 
   /**

@@ -160,15 +160,10 @@ export class CertificationController {
     @Body() data: VerifyCertificationDTO,
     @Request() req: any,
   ): Promise<AgentCertificationDetailDTO> {
-    const adminId = req.user?.id;
     if (!req.user?.isAdmin) {
       throw new ForbiddenException('Only admins can verify certifications');
     }
-    if (!adminId) {
-    //   throw new ForbiddenException('Only admins can verify certifications');
-    // }
 
-    // For now, use a placeholder
     const adminId = req.user?.id || 'system';
     return this.certService.verifyCertification(certId, data, adminId);
   }
