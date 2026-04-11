@@ -5,6 +5,9 @@ import {
   getTokenLimitByTask,
 } from './model-router'
 
+/** Tasks that require long AI responses — given a more generous timeout */
+const LONG_RUNNING_TASKS = new Set<AgentTask>(['strategy', 'competitor', 'creative', 'landing-page'])
+
 export interface CompleteOptions {
   /** Controls creativity. 0 = deterministic, 1 = creative. Default: 0.7 */
   temperature?: number
@@ -25,6 +28,12 @@ export interface CompleteOptions {
   taskType?: AgentTask
   /** Label used in structured logs (e.g. 'StrategyEngine', 'DecisionLoop') */
   agentName?: string
+  /**
+   * When true, instructs the OpenAI client to use JSON mode
+   * (`response_format: { type: 'json_object' }`).
+   * Set automatically by `completeJson()`.
+   */
+  jsonMode?: boolean
 }
 
 export interface CompleteResult {
@@ -69,7 +78,7 @@ export class PerformaAiClient {
     if (this.provider === 'openai') {
       const config: ConstructorParameters<typeof OpenAI>[0] = {
         apiKey,
-        timeout: 60_000,  // 60 s — generous timeout for complex prompts
+        timeout: 120_000, // 120 s — complex tasks (strategy/competitor) need more time
         maxRetries: 0,    // retries handled manually with backoff below
       }
       if (baseURL) {
@@ -96,7 +105,7 @@ export class PerformaAiClient {
         if (this.provider === 'anthropic') {
           return this.completeAnthropic(prompt, systemPrompt, model, maxTokens, temperature)
         }
-        return this.completeOpenAi(prompt, systemPrompt, model, maxTokens, temperature)
+        return this.completeOpenAi(prompt, systemPrompt, model, maxTokens, temperature, options.jsonMode)
       },
       options,
     )
@@ -105,6 +114,8 @@ export class PerformaAiClient {
   /**
    * JSON completion. Expects the model to return valid JSON and parses it.
    * Strips markdown code-fences automatically.
+   * When using OpenAI, enables JSON mode (`response_format: json_object`)
+   * to guarantee valid JSON output without the need for post-processing fences.
    */
   async completeJson<T = any>(
     prompt: string,
@@ -114,6 +125,7 @@ export class PerformaAiClient {
     const result = await this.complete(prompt, systemPrompt, {
       ...options,
       temperature: options.temperature ?? 0.3, // lower temp → more deterministic JSON
+      jsonMode: true, // signal OpenAI to use response_format: json_object
     })
 
     try {
@@ -254,9 +266,10 @@ export class PerformaAiClient {
           throw new Error(msg)
         }
 
+        // Exponential backoff: 1s, 2s, 4s
         const waitMs = Math.pow(2, attempt - 1) * 1000
         console.warn(
-          `[PerformaAI] agent=${label} task=${task} attempt=${attempt} failed —` +
+          `[PerformaAI] agent=${label} task=${task} attempt=${attempt}/${this.maxRetries} failed —` +
           ` retrying in ${waitMs}ms (status=${error?.status})`,
         )
         await this.sleep(waitMs)
@@ -276,6 +289,7 @@ export class PerformaAiClient {
     model: string,
     maxTokens: number,
     temperature: number,
+    jsonMode = false,
   ): Promise<{ content: string; tokensUsed: number; model: string }> {
     if (!this.openai) {
       throw new Error('OpenAI client is not initialized.')
@@ -285,6 +299,10 @@ export class PerformaAiClient {
       model,
       temperature,
       max_tokens: maxTokens,
+      // JSON mode guarantees valid JSON output — avoids markdown fences and
+      // hallucinated text that breaks JSON.parse().
+      // Only enabled when explicitly requested (via completeJson / jsonMode flag).
+      ...(jsonMode ? { response_format: { type: 'json_object' as const } } : {}),
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: prompt },
