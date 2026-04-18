@@ -1,8 +1,7 @@
 {
-  "buildCommand": "cd apps/web && pnpm build",
+  "buildCommand": "pnpm install && pnpm --filter web build",
   "outputDirectory": "apps/web/.next",
   "framework": "nextjs",
-  "nodeVersion": "22.11.0",
   "env": {
     "NEXT_TELEMETRY_DISABLED": "1"
   }
