@@ -2,12 +2,14 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { useRealtimeRefresh } from '@/hooks/useRealtimeRefresh'
+import { useI18n } from '@/i18n/use-i18n'
 import { Badge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { PageSpinner } from '@/components/ui/Spinner'
 import { Alert } from '@/components/ui/Alert'
+import { PageHeader } from '@/components/ui'
 import { aiDecisions as aiDecisionsApi } from '@/lib/api-client'
 import { timeAgo } from '@/lib/utils'
 
@@ -39,6 +41,7 @@ const ACTION_CONFIG: Record<
 }
 
 export default function AiDecisionsPage() {
+  const { t } = useI18n()
   const { currentWorkspace } = useWorkspaceStore()
 
   const [decisions, setDecisions] = useState<AiDecision[]>([])
@@ -57,7 +60,7 @@ export default function AiDecisionsPage() {
       const res = await aiDecisionsApi.list(currentWorkspace.id)
       setDecisions((res.data as any) ?? [])
     } catch (err: any) {
-      setFetchError(err?.message ?? 'Failed to load AI decisions')
+      setFetchError(err?.message ?? t('aiDecisions.loadFailed', 'Failed to load AI decisions'))
     } finally {
       setLoading(false)
     }
@@ -79,7 +82,7 @@ export default function AiDecisionsPage() {
         prev.map((d) => d.id === id ? { ...d, isApproved: true, isExecuted: true } : d)
       )
     } catch (err: any) {
-      setActionError(err?.message ?? 'Failed to approve decision')
+      setActionError(err?.message ?? t('aiDecisions.approveFailed', 'Failed to approve decision'))
     } finally {
       setActionLoading(null)
     }
@@ -94,7 +97,7 @@ export default function AiDecisionsPage() {
         prev.map((d) => d.id === id ? { ...d, isApproved: false } : d)
       )
     } catch (err: any) {
-      setActionError(err?.message ?? 'Failed to reject decision')
+      setActionError(err?.message ?? t('aiDecisions.rejectFailed', 'Failed to reject decision'))
     } finally {
       setActionLoading(null)
     }
@@ -119,24 +122,21 @@ export default function AiDecisionsPage() {
   return (
     <div className="space-y-6 max-w-4xl">
 
-      {/* ── Page header ── */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary mb-1">AI Qarorlar Jurnali</h1>
-          <p className="text-text-tertiary text-sm">
-            Performa qilgan va tavsiya etgan har bir harakat — to'liq asoslama bilan
-          </p>
-        </div>
-        <Button variant="secondary" size="sm" onClick={fetchDecisions}>
-          ↻ Yangilash
-        </Button>
-      </div>
+      <PageHeader
+        title={t('navigation.aiDecisions', 'AI Decisions')}
+        subtitle={t('aiDecisions.subtitle', 'Every AI action and recommendation with transparent reasoning')}
+        actions={
+          <Button variant="secondary" size="sm" onClick={fetchDecisions}>
+            {t('common.refresh', 'Refresh')}
+          </Button>
+        }
+      />
 
       {fetchError && <Alert variant="error">{fetchError}</Alert>}
       {actionError && <Alert variant="error">{actionError}</Alert>}
 
       {/* ── Stats summary ── */}
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { label: 'Jami', value: counts.all,      color: 'text-text-primary', bg: 'bg-surface' },
           { label: 'Kutilmoqda', value: counts.pending,  color: 'text-amber-500', bg: 'bg-amber-500/10 border-amber-500/20' },

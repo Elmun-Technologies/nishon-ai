@@ -3,12 +3,14 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useWorkspaceStore } from "@/stores/workspace.store";
 import { useRealtimeRefresh } from "@/hooks/useRealtimeRefresh";
+import { useI18n } from "@/i18n/use-i18n";
 import { Button } from "@/components/ui/Button";
 import { Badge, CampaignStatusBadge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { PageSpinner } from "@/components/ui/Spinner";
 import { Alert } from "@/components/ui/Alert";
+import { Dialog, PageHeader } from "@/components/ui";
 import { PlatformIcon } from "@/components/ui/PlatformIcon";
 import { campaigns as campaignsApi } from "@/lib/api-client";
 import { formatCurrency, timeAgo } from "@/lib/utils";
@@ -38,6 +40,7 @@ const OBJECTIVE_LABELS: Record<string, string> = {
 };
 
 export default function CampaignsPage() {
+  const { t } = useI18n();
   const router = useRouter();
   const { currentWorkspace } = useWorkspaceStore();
   const [items, setItems] = useState<Campaign[]>([]);
@@ -59,7 +62,7 @@ export default function CampaignsPage() {
       const res = await campaignsApi.list(currentWorkspace.id);
       setItems((res.data as any) ?? []);
     } catch (err: any) {
-      setError(err?.message ?? "Failed to load campaigns");
+      setError(err?.message ?? t("campaigns.loadFailed", "Failed to load campaigns"));
     } finally {
       setLoading(false);
     }
@@ -85,7 +88,7 @@ export default function CampaignsPage() {
         prev.map((c) => (c.id === id ? { ...c, status: newStatus } : c)),
       );
     } catch (err: any) {
-      setActionError(err?.message ?? "Failed to update campaign status");
+      setActionError(err?.message ?? t("campaigns.updateFailed", "Failed to update campaign status"));
     } finally {
       setActionLoading(null);
     }
@@ -107,30 +110,21 @@ export default function CampaignsPage() {
 
   return (
     <div className="space-y-6 max-w-7xl">
-      {/* ── Page header ── */}
-      <div className="flex items-start justify-between">
-        <div>
-          <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-2xl font-bold text-text-primary">Campaigns</h1>
-            <Badge variant="gray">{items.length} total</Badge>
+      <PageHeader
+        title={t("navigation.campaigns", "Campaigns")}
+        subtitle={t("campaigns.subtitle", "All advertising campaigns managed by Performa")}
+        actions={
+          <div className="flex items-center gap-2">
+            <Badge variant="gray">{items.length} {t("campaigns.total", "total")}</Badge>
+            <Button variant="secondary" size="sm" onClick={fetchCampaigns}>
+              {t("campaigns.refresh", "Refresh")}
+            </Button>
+            <Button onClick={() => setShowCreatePanel(true)}>
+              + {t("campaigns.create", "Create Campaign")}
+            </Button>
           </div>
-          <p className="text-text-tertiary text-sm">
-            All advertising campaigns managed by Performa
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="secondary" size="sm" onClick={fetchCampaigns}>
-            ↻ Yangilash
-          </Button>
-          <button
-            onClick={() => setShowCreatePanel(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface hover:bg-surface dark:hover:bg-surface-2 text-white dark:text-text-primary text-sm font-semibold transition-colors shadow-lg shadow-gray-200"
-          >
-            <span className="text-base leading-none">+</span>
-            Kampaniya yaratish
-          </button>
-        </div>
-      </div>
+        }
+      />
 
       {error && <Alert variant="error">{error}</Alert>}
       {actionError && <Alert variant="error">{actionError}</Alert>}
@@ -183,18 +177,18 @@ export default function CampaignsPage() {
           <EmptyState
             icon="📢"
             title={
-              filter === "all" ? "No campaigns yet" : `No ${filter} campaigns`
+              filter === "all" ? t("campaigns.noCampaigns", "No campaigns yet") : t("campaigns.noCampaignsWithStatus", `No ${filter} campaigns`)
             }
             description={
               filter === "all"
-                ? "Create your first campaign using the wizard or connect your ad account to sync existing campaigns."
-                : `You have no campaigns with "${filter}" status right now.`
+                ? t("campaigns.noCampaignsDescription", "Create your first campaign using the wizard or connect your ad account to sync existing campaigns.")
+                : t("campaigns.noCampaignsWithStatusDescription", `You have no campaigns with "${filter}" status right now.`)
             }
           />
           {filter === "all" && (
             <div className="flex justify-center pb-6">
               <Button variant="primary" onClick={() => router.push("/wizard")}>
-                + Create Campaign
+                + {t("campaigns.create", "Create Campaign")}
               </Button>
             </div>
           )}
@@ -367,10 +361,10 @@ export default function CampaignsPage() {
               <span className="text-xl">🔗</span>
               <div>
                 <p className="text-text-primary text-sm font-medium">
-                  Ko'proq platformalar ulash
+                  {t("campaigns.connectMorePlatforms", "Connect more ad platforms")}
                 </p>
                 <p className="text-text-tertiary text-xs">
-                  Google, TikTok yoki Telegram qo'shib qamrovni kengaytiring
+                  {t("campaigns.connectMorePlatformsHint", "Add Google, TikTok, or Telegram to expand your reach.")}
                 </p>
               </div>
             </div>
@@ -379,54 +373,31 @@ export default function CampaignsPage() {
               size="sm"
               onClick={() => (window.location.href = "/settings/meta")}
             >
-              Platforma ulash
+              {t("campaigns.connectPlatform", "Connect platform")}
             </Button>
           </div>
         </Card>
       )}
 
-      {/* ── Create Campaign slide-over panel ── */}
-      {showCreatePanel && (
-        <div className="fixed inset-0 z-50 flex">
-          {/* Backdrop */}
-          <div
-            className="flex-1 bg-black/60 backdrop-blur-sm"
-            onClick={() => setShowCreatePanel(false)}
+      <Dialog
+        open={showCreatePanel}
+        onClose={() => setShowCreatePanel(false)}
+        title={t("campaigns.newCampaign", "New campaign")}
+        className="max-w-3xl"
+      >
+        <p className="mb-4 text-xs text-text-tertiary">{currentWorkspace?.name}</p>
+        <div className="max-h-[70vh] overflow-y-auto pr-1">
+          <CreateCampaignForm
+            workspaceId={currentWorkspace?.id ?? ""}
+            platform="meta"
+            onSuccess={() => {
+              setShowCreatePanel(false);
+              fetchCampaigns();
+            }}
+            onCancel={() => setShowCreatePanel(false)}
           />
-          {/* Panel */}
-          <div className="w-full max-w-lg bg-surface-2 border-l border-border flex flex-col shadow-2xl">
-            {/* Panel header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-              <div>
-                <h2 className="text-text-primary font-semibold">
-                  Yangi kampaniya
-                </h2>
-                <p className="text-text-tertiary text-xs mt-0.5">
-                  {currentWorkspace?.name}
-                </p>
-              </div>
-              <button
-                onClick={() => setShowCreatePanel(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-2 transition-colors"
-              >
-                ✕
-              </button>
-            </div>
-            {/* Panel body */}
-            <div className="flex-1 overflow-y-auto px-6 py-5">
-              <CreateCampaignForm
-                workspaceId={currentWorkspace?.id ?? ""}
-                platform="meta"
-                onSuccess={() => {
-                  setShowCreatePanel(false);
-                  fetchCampaigns();
-                }}
-                onCancel={() => setShowCreatePanel(false)}
-              />
-            </div>
-          </div>
         </div>
-      )}
+      </Dialog>
     </div>
   );
 }

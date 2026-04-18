@@ -127,8 +127,34 @@ export const auth = {
   login: (data: { email: string; password: string }) =>
     apiClient.post('/auth/login', data),
   me: () => apiClient.get('/auth/me'),
+  updateMe: (body: { name?: string; email?: string }) =>
+    apiClient.patch('/auth/me', body),
   googleUrl: () => `${API_BASE_URL}/auth/google`,
   facebookUrl: () => `${API_BASE_URL}/auth/facebook`,
+}
+
+/** Workspace team: invites, members, roles (Nest `TeamInvitesController` @ `/team`) */
+export const team = {
+  listMembers: (workspaceId: string) =>
+    apiClient.get(`/team/workspaces/${workspaceId}/members`),
+  createInvites: (body: {
+    workspaceId: string
+    emails: string[]
+    role?: 'admin' | 'advertiser'
+    note?: string
+  }) => apiClient.post('/team/invites', body),
+  revokeInvite: (inviteId: string) =>
+    apiRequest('DELETE', `/team/invites/${inviteId}`),
+  updateMemberRole: (body: {
+    workspaceId: string
+    memberUserId: string
+    role: 'owner' | 'admin' | 'advertiser'
+  }) => apiClient.patch('/team/members/role', body),
+  updateMemberAdAccounts: (body: {
+    workspaceId: string
+    memberUserId: string
+    allowedAdAccountIds: string[]
+  }) => apiClient.patch('/team/members/ad-accounts', body),
 }
 
 export const workspaces = {
@@ -142,6 +168,52 @@ export const workspaces = {
   getPolicy: (id: string) => apiClient.get(`/workspaces/${id}/policy`),
   updatePolicy: (id: string, policy: any) =>
     apiClient.patch(`/workspaces/${id}/policy`, policy),
+}
+
+export const billing = {
+  listInvoices: (workspaceId: string) =>
+    apiClient.get(`/billing/workspaces/${workspaceId}/invoices`),
+  listPaymentMethods: (workspaceId: string) =>
+    apiClient.get(`/billing/workspaces/${workspaceId}/payment-methods`),
+  addPaymentMethod: (body: {
+    workspaceId: string
+    brand: string
+    last4: string
+    isDefault?: boolean
+  }) => apiClient.post('/billing/payment-methods', body),
+  setDefaultPaymentMethod: (workspaceId: string, methodId: string) =>
+    apiClient.patch(`/billing/workspaces/${workspaceId}/payment-methods/${methodId}/default`, {}),
+  getBillingContact: (workspaceId: string) =>
+    apiClient.get(`/billing/workspaces/${workspaceId}/contact`),
+  updateBillingContact: (
+    workspaceId: string,
+    body: {
+      yourName?: string
+      companyName?: string
+      workEmail?: string
+      phoneNumber?: string
+      country?: string
+      region?: string
+      city?: string
+      address?: string
+      postalCode?: string
+      taxId?: string
+    },
+  ) => apiClient.patch(`/billing/workspaces/${workspaceId}/contact`, body),
+  getPlans: () => apiClient.get('/billing/subscription/plans'),
+  createOrder: (body: { workspaceId: string; targetPlan: string }) =>
+    apiClient.post('/billing/subscription/order', body),
+  getOrderStatus: (orderId: string) =>
+    apiClient.get(`/billing/subscription/order/${orderId}/status`),
+}
+
+export const mcpCredentials = {
+  list: (workspaceId: string) =>
+    apiClient.get(`/mcp/credentials?workspaceId=${encodeURIComponent(workspaceId)}`),
+  create: (workspaceId: string) =>
+    apiClient.post('/mcp/credentials', { workspaceId }),
+  revoke: (credentialId: string, workspaceId: string) =>
+    apiRequest('DELETE', `/mcp/credentials/${credentialId}?workspaceId=${encodeURIComponent(workspaceId)}`),
 }
 
 export const aiAgent = {

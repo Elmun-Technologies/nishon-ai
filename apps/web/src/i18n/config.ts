@@ -1,13 +1,13 @@
 // ─── Language Configuration ───────────────────────────────────────────────────
 
 export const LANGUAGES = {
-  uz: { name: 'Uzbek', flag: '🇺🇿', dir: 'ltr' },
+  uz: { name: "O'zbek", flag: '🇺🇿', dir: 'ltr' },
   ru: { name: 'Русский', flag: '🇷🇺', dir: 'ltr' },
   en: { name: 'English', flag: '🇬🇧', dir: 'ltr' },
 } as const
 
 export type Language = keyof typeof LANGUAGES
-export const DEFAULT_LANGUAGE: Language = 'uz'
+export const DEFAULT_LANGUAGE: Language = 'en'
 export const LANGUAGES_LIST = Object.entries(LANGUAGES).map(([code, config]) => ({
   code: code as Language,
   ...config,

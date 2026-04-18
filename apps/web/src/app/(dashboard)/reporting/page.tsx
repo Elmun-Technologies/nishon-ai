@@ -2,9 +2,11 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
+import { useI18n } from '@/i18n/use-i18n'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Alert } from '@/components/ui/Alert'
+import { PageHeader } from '@/components/ui'
 import { meta as metaApi } from '@/lib/api-client'
 import { formatCurrency, formatNumber } from '@/lib/utils'
 
@@ -85,6 +87,7 @@ const AVAILABLE_METRICS = [
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ReportingPage() {
+  const { t } = useI18n()
   const { currentWorkspace } = useWorkspaceStore()
   const [data, setData] = useState<ReportData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -114,7 +117,7 @@ export default function ReportingPage() {
           setExpanded(new Set([d.accounts[0].id]))
         }
       })
-      .catch(() => setError('Hisobotni yuklashda xatolik. Meta Ads ulanganligini tekshiring.'))
+      .catch(() => setError(t('reporting.loadError', 'Failed to load reporting. Check if Meta Ads is connected.')))
       .finally(() => setLoading(false))
   }, [currentWorkspace?.id, days])
 
@@ -128,7 +131,7 @@ export default function ReportingPage() {
       const { csv, filename } = res.data as { csv: string; filename: string }
       downloadCSV(csv, filename)
     } catch {
-      setError('CSV eksportda xatolik')
+      setError(t('reporting.exportError', 'CSV export failed'))
     } finally {
       setExporting(false)
     }
@@ -182,7 +185,7 @@ export default function ReportingPage() {
   if (!currentWorkspace) {
     return (
       <div className="flex items-center justify-center h-full">
-        <p className="text-text-tertiary">Workspace tanlanmagan</p>
+        <p className="text-text-tertiary">{t('reporting.workspaceMissing', 'No workspace selected')}</p>
       </div>
     )
   }
@@ -190,47 +193,39 @@ export default function ReportingPage() {
   return (
     <div className="space-y-5 max-w-6xl">
 
-      {/* ── Header ── */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h1 className="text-xl font-bold text-text-primary flex items-center gap-2">
-            📊 Hisobot
-          </h1>
-          <p className="text-text-tertiary text-sm mt-0.5">
-            Meta Ads — Account → Kampaniya darajasida ko'rsatkichlar
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {/* Date range selector */}
-          <div className="flex items-center gap-1 bg-surface-elevated border border-border rounded-xl p-1">
-            {DAY_OPTIONS.map((d) => (
-              <button
-                key={d}
-                onClick={() => setDays(d)}
-                className={`
-                  px-3 py-1.5 rounded-lg text-xs font-medium transition-colors
-                  ${days === d
-                    ? 'bg-text-primary text-white'
-                    : 'text-text-tertiary hover:text-text-primary'
-                  }
-                `}
-              >
-                {d}k
-              </button>
-            ))}
+      <PageHeader
+        title={t('navigation.reporting', 'Reporting')}
+        subtitle={t('reporting.subtitle', 'Meta Ads account-to-campaign performance breakdown')}
+        actions={
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 bg-surface-elevated border border-border rounded-xl p-1">
+              {DAY_OPTIONS.map((d) => (
+                <button
+                  key={d}
+                  onClick={() => setDays(d)}
+                  className={`
+                    px-3 py-1.5 rounded-lg text-xs font-medium transition-colors
+                    ${days === d
+                      ? 'bg-text-primary text-white'
+                      : 'text-text-tertiary hover:text-text-primary'
+                    }
+                  `}
+                >
+                  {d}d
+                </button>
+              ))}
+            </div>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleExport}
+              loading={exporting}
+            >
+              {t('reporting.exportCsv', 'Export CSV')}
+            </Button>
           </div>
-
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={handleExport}
-            loading={exporting}
-          >
-            ↓ CSV Export
-          </Button>
-        </div>
-      </div>
+        }
+      />
 
       {error && <Alert variant="error">{error}</Alert>}
 

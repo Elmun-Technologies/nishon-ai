@@ -199,7 +199,7 @@ export default function LeaderboardPage() {
 
                     <div className="space-y-3 py-4 border-y border-white/10">
                       <div className="flex items-center justify-between">
-                        <span className="text-text-tertiary">Rating</span>
+                        <span className="text-text-tertiary">{t('pages.leaderboard.rating')}</span>
                         <span className="flex items-center gap-1">
                           {specialist.rating}
                           <Star size={16} className="text-yellow-400 fill-yellow-400" />
@@ -210,7 +210,7 @@ export default function LeaderboardPage() {
                         <span className="text-emerald-400 font-semibold">{specialist.roas}x</span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-text-tertiary">Points</span>
+                        <span className="text-text-tertiary">{t('pages.leaderboard.points')}</span>
                         <span className="font-bold text-white">{specialist.points}</span>
                       </div>
                     </div>

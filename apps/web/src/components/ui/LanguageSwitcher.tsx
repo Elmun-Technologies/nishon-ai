@@ -6,7 +6,7 @@ import { ChevronDown } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 
 export function LanguageSwitcher() {
-  const { language, setLanguage } = useI18n()
+  const { language, setLanguage, t } = useI18n()
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -28,7 +28,7 @@ export function LanguageSwitcher() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg hover:bg-surface-2 transition-colors text-sm"
-        aria-label="Change language"
+        aria-label={t('common.language', 'Language')}
         aria-expanded={isOpen}
       >
         <span className="text-base">{currentLang?.flag}</span>

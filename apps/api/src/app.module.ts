@@ -24,6 +24,7 @@ import { BillingModule } from "./billing/billing.module";
 import { LaunchOrchestratorModule } from "./launch-orchestrator/launch-orchestrator.module";
 import { WorkspaceServiceModule } from "./workspace-service/workspace-service.module";
 import { IntegrationsModule } from "./integrations/integrations.module";
+import { McpModule } from "./mcp/mcp.module";
 import { validateEnv } from "./config/env.validation";
 import { HealthController } from "./health/health.controller";
 import { HealthService } from "./health/health.service";
@@ -87,6 +88,7 @@ import { RequestLoggingInterceptor } from "./common/interceptors/request-logging
     LaunchOrchestratorModule,
     WorkspaceServiceModule,
     IntegrationsModule,
+    McpModule,
   ],
   controllers: [HealthController],
   providers: [

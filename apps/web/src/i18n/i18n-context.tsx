@@ -15,7 +15,32 @@ export interface I18nContextType {
 
 // ─── Create Context ───────────────────────────────────────────────────────────
 
-export const I18nContext = createContext<I18nContextType | undefined>(undefined)
+const EMPTY_TRANSLATIONS = {} as Translations
+
+function mergeDeep<T extends Record<string, any>>(base: T, patch: Record<string, any>): T {
+  const out: Record<string, any> = { ...base }
+  for (const [key, value] of Object.entries(patch ?? {})) {
+    if (
+      value &&
+      typeof value === 'object' &&
+      !Array.isArray(value) &&
+      typeof out[key] === 'object' &&
+      out[key] !== null
+    ) {
+      out[key] = mergeDeep(out[key], value)
+    } else {
+      out[key] = value
+    }
+  }
+  return out as T
+}
+
+export const I18nContext = createContext<I18nContextType>({
+  language: DEFAULT_LANGUAGE,
+  translations: EMPTY_TRANSLATIONS,
+  setLanguage: () => {},
+  t: (key: string, defaultValue?: string) => defaultValue ?? key,
+})
 
 // ─── Provider Component ───────────────────────────────────────────────────────
 
@@ -29,34 +54,39 @@ export function I18nProvider({
   defaultLanguage = DEFAULT_LANGUAGE,
 }: I18nProviderProps) {
   const [language, setLanguageState] = useState<Language>(defaultLanguage)
-  const [translations, setTranslations] = useState<Translations | null>(null)
-  const [isClient, setIsClient] = useState(false)
+  const [translations, setTranslations] = useState<Translations>(EMPTY_TRANSLATIONS)
+  const [fallbackEn, setFallbackEn] = useState<Translations>(EMPTY_TRANSLATIONS)
 
-  // Initialize client-side
+  // Initialize from localStorage only. If absent, keep English default.
   useEffect(() => {
-    setIsClient(true)
-
-    // Get saved language from localStorage
-    const savedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY) as Language
+    if (typeof window === 'undefined') return
+    const savedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY) as Language | null
     if (savedLanguage) {
       setLanguageState(savedLanguage)
-      return
-    }
-
-    // Try to detect browser language
-    const browserLang = navigator.language.split('-')[0] as Language
-    if (['uz', 'ru', 'en'].includes(browserLang)) {
-      setLanguageState(browserLang)
     }
   }, [])
 
   // Load translations when language changes
   useEffect(() => {
+    const loadFallbackEnglish = async () => {
+      try {
+        const enResponse = await fetch('/locales/en.json')
+        const enData = await enResponse.json()
+        setFallbackEn(enData)
+      } catch (error) {
+        console.error('Failed to load English fallback translations:', error)
+      }
+    }
+
+    void loadFallbackEnglish()
+  }, [])
+
+  useEffect(() => {
     const loadTranslations = async () => {
       try {
         const response = await fetch(`/locales/${language}.json`)
         const data = await response.json()
-        setTranslations(data)
+        setTranslations(mergeDeep(fallbackEn, data))
         localStorage.setItem(LANGUAGE_STORAGE_KEY, language)
         document.documentElement.lang = language
       } catch (error) {
@@ -65,7 +95,7 @@ export function I18nProvider({
     }
 
     loadTranslations()
-  }, [language])
+  }, [language, fallbackEn])
 
   const setLanguage = useCallback((lang: Language) => {
     setLanguageState(lang)
@@ -73,16 +103,10 @@ export function I18nProvider({
 
   const t = useCallback(
     (key: string, defaultValue: string = key): string => {
-      if (!translations) return defaultValue
-
       return getNestedTranslation(translations, key) || defaultValue
     },
     [translations]
   )
-
-  if (!isClient || !translations) {
-    return <>{children}</>
-  }
 
   return (
     <I18nContext.Provider

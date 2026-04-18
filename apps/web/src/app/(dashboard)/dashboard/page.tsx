@@ -2,9 +2,11 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useWorkspaceStore } from '@/stores/workspace.store'
+import { useI18n } from '@/i18n/use-i18n'
 import { useRealtimeRefresh } from '@/hooks/useRealtimeRefresh'
 import { MetricCard } from '@/components/ui/MetricCard'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { Alert, Button, DataTable, PageHeader } from '@/components/ui'
 import { workspaces as workspacesApi, aiAgent, meta as metaApi } from '@/lib/api-client'
 import { formatCurrency, formatNumber } from '@/lib/utils'
 import { SpendForecastChart } from '@/components/ui/SpendForecastChart'
@@ -39,6 +41,7 @@ interface TopAd {
 }
 
 export default function DashboardPage() {
+  const { t } = useI18n()
   const router = useRouter()
   const { currentWorkspace } = useWorkspaceStore()
   const [performance, setPerformance] = useState<PerformanceSummary | null>(null)
@@ -76,10 +79,10 @@ export default function DashboardPage() {
     setOptimizing(true); setOptimizeMsg(''); setError('')
     try {
       await aiAgent.optimize(currentWorkspace.id)
-      setOptimizeMsg('Optimization complete — check AI Decisions for results.')
+      setOptimizeMsg(t('dashboard.optimizationDone', 'Optimization complete — check AI Decisions for results.'))
       setTimeout(() => setOptimizeMsg(''), 4000)
     } catch (err: any) {
-      setError(err?.message ?? 'Optimization failed')
+      setError(err?.message ?? t('dashboard.optimizationFailed', 'Optimization failed'))
       setTimeout(() => setError(''), 4000)
     } finally { setOptimizing(false) }
   }
@@ -96,16 +99,13 @@ export default function DashboardPage() {
           <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-violet-600 rounded-2xl flex items-center justify-center mx-auto mb-5 text-3xl shadow-lg shadow-blue-500/30">
             🚀
           </div>
-          <h2 className="text-text-primary text-xl font-bold mb-2">Welcome to Performa</h2>
+          <h2 className="text-text-primary text-xl font-bold mb-2">{t('dashboard.welcomeToPerforma', 'Welcome to Performa')}</h2>
           <p className="text-text-tertiary text-sm mb-6 leading-relaxed">
-            Complete onboarding to create your first workspace and let AI manage your ad campaigns.
+            {t('dashboard.completeOnboarding', 'Complete onboarding to create your first workspace and let AI manage your ad campaigns.')}
           </p>
-          <button
-            onClick={() => router.push('/onboarding')}
-            className="w-full py-3 bg-gradient-to-r from-blue-500 to-violet-600 hover:from-blue-600 hover:to-violet-700 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg shadow-blue-500/30 active:scale-95"
-          >
-            Start Setup →
-          </button>
+          <Button onClick={() => router.push('/onboarding')} className="w-full">
+            {t('dashboard.startSetup', 'Start Setup')} →
+          </Button>
         </div>
       </div>
     )
@@ -114,37 +114,22 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6 max-w-7xl">
 
-      {/* Page header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary">Dashboard</h1>
-          <p className="text-sm text-text-tertiary mt-0.5">
-            {currentWorkspace?.name} · Real-time overview
-          </p>
-        </div>
-        <button
-          onClick={handleRunOptimization}
-          disabled={optimizing}
-          className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-violet-500/25 active:scale-95"
-        >
-          {optimizing ? (
-            <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Optimizing...</>
-          ) : (
-            <><span>⚡</span> Run AI Optimization</>
-          )}
-        </button>
-      </div>
+      <PageHeader
+        title={t('navigation.dashboard', 'Dashboard')}
+        subtitle={`${currentWorkspace?.name ?? ''} · ${t('dashboard.realtimeOverview', 'Real-time overview')}`}
+        actions={
+          <Button onClick={handleRunOptimization} disabled={optimizing}>
+            {optimizing ? t('dashboard.optimizing', 'Optimizing...') : t('dashboard.runOptimization', 'Run AI Optimization')}
+          </Button>
+        }
+      />
 
       {/* Alerts */}
       {error && (
-        <div className="flex items-center gap-3 px-4 py-3 bg-red-500/10 dark:bg-red-950/50 border border-red-500/20 dark:border-red-800 rounded-xl text-red-500 dark:text-red-300 text-sm">
-          <span>⚠️</span> {error}
-        </div>
+        <Alert variant="error">⚠️ {error}</Alert>
       )}
       {optimizeMsg && (
-        <div className="flex items-center gap-3 px-4 py-3 bg-emerald-500/10 dark:bg-emerald-950/50 border border-emerald-500/20 dark:border-emerald-800 rounded-xl text-emerald-500 dark:text-emerald-300 text-sm">
-          <span>✓</span> {optimizeMsg}
-        </div>
+        <Alert variant="success">✓ {optimizeMsg}</Alert>
       )}
 
       {/* Meta source badge */}
@@ -152,10 +137,10 @@ export default function DashboardPage() {
         <div className="flex items-center gap-2 text-xs text-text-tertiary">
           <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0 animate-pulse" />
           <span>
-            Ko'rsatkichlar <span className="text-text-primary dark:text-text-secondary font-medium">Meta Ads</span> dan real vaqt rejimida olinmoqda
+            {t('dashboard.metaRealtimePrefix', 'Metrics are streamed in real-time from')} <span className="text-text-primary dark:text-text-secondary font-medium">Meta Ads</span>
           </span>
           <a href="/settings/meta" className="text-blue-500 hover:text-blue-600 dark:text-blue-400 hover:underline ml-1">
-            sozlamalar →
+            {t('dashboard.settingsLink', 'settings')} →
           </a>
         </div>
       )}
@@ -205,40 +190,36 @@ export default function DashboardPage() {
         <div className="bg-surface border border-border/60 rounded-xl p-6 hover:border-border dark:hover:border-border hover:shadow-lg transition-all duration-300">
           <div className="flex items-center justify-between mb-5">
             <div>
-              <h2 className="text-base font-semibold text-text-primary">🏆 Eng yaxshi kampaniyalar</h2>
-              <p className="text-xs text-text-tertiary mt-0.5">CTR bo'yicha top {topAds.length} ta · so'nggi 30 kun</p>
+              <h2 className="text-base font-semibold text-text-primary">🏆 {t('dashboard.topCampaigns', 'Top campaigns')}</h2>
+              <p className="text-xs text-text-tertiary mt-0.5">{t('dashboard.topCampaignsSubtitle', `Top ${topAds.length} by CTR · last 30 days`)}</p>
             </div>
-            <button onClick={() => router.push('/settings/meta')} className="text-sm text-text-tertiary hover:text-text-primary dark:hover:text-text-secondary font-medium transition-colors">
-              Barchasi →
-            </button>
+            <Button variant="secondary" size="sm" onClick={() => router.push('/settings/meta')}>
+              {t('common.view', 'View')} →
+            </Button>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
-            {topAds.map((ad, idx) => (
-              <div key={ad.campaignId} className="group bg-surface-2 border border-border/50 rounded-xl p-4 hover:border-border dark:hover:border-border hover:bg-surface dark:hover:bg-surface hover:shadow-md transition-all duration-200">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-bold text-text-tertiary bg-surface-2-2 px-2 py-0.5 rounded-md">#{idx + 1}</span>
-                  <span className={`text-xs px-2 py-0.5 rounded-md font-medium ${ad.status === 'ACTIVE' ? 'bg-emerald-500/10 dark:bg-emerald-950 text-emerald-500 dark:text-emerald-400' : 'bg-surface-2-2 text-text-tertiary'}`}>
-                    {ad.status}
+          <DataTable
+            rows={topAds}
+            rowKey={(row) => row.campaignId}
+            columns={[
+              {
+                key: 'campaign',
+                header: t('dashboard.campaign', 'Campaign'),
+                render: (row) => <span className="font-medium text-text-primary">{row.name}</span>,
+              },
+              {
+                key: 'status',
+                header: t('dashboard.status', 'Status'),
+                render: (row) => (
+                  <span className={`rounded-full px-2 py-1 text-xs ${row.status === 'ACTIVE' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-surface-2 text-text-tertiary'}`}>
+                    {row.status}
                   </span>
-                </div>
-                <p className="text-text-primary dark:text-text-secondary text-xs font-medium leading-tight mb-3 line-clamp-2 min-h-[2.5rem]">{ad.name}</p>
-                <div className="mb-3">
-                  <p className="text-text-tertiary text-[10px] uppercase tracking-wider">CTR</p>
-                  <p className="text-text-primary text-lg font-bold">{ad.ctr.toFixed(2)}%</p>
-                </div>
-                <div className="grid grid-cols-2 gap-2 pt-3 border-t border-border">
-                  <div>
-                    <p className="text-text-tertiary text-[10px] uppercase tracking-wider">Xarajat</p>
-                    <p className="text-text-secondary text-xs font-semibold">{formatCurrency(ad.spend)}</p>
-                  </div>
-                  <div>
-                    <p className="text-text-tertiary text-[10px] uppercase tracking-wider">Kliklar</p>
-                    <p className="text-text-secondary text-xs font-semibold">{formatNumber(ad.clicks)}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+                ),
+              },
+              { key: 'ctr', header: 'CTR', render: (row) => `${row.ctr.toFixed(2)}%` },
+              { key: 'spend', header: t('dashboard.spend', 'Spend'), render: (row) => formatCurrency(row.spend) },
+              { key: 'clicks', header: t('dashboard.clicks', 'Clicks'), render: (row) => formatNumber(row.clicks) },
+            ]}
+          />
         </div>
       )}
 

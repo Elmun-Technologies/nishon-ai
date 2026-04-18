@@ -1,11 +1,13 @@
 'use client'
 import { useState } from 'react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
+import { useI18n } from '@/i18n/use-i18n'
 import { autoOptimization } from '@/lib/api-client'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Spinner } from '@/components/ui/Spinner'
+import { PageHeader } from '@/components/ui'
 
 // ─── Types (mirrors backend OptimizationReport) ───────────────────────────────
 
@@ -252,6 +254,7 @@ type Tab = 'run' | 'history'
 type OptimizationApproach = 'ai_agent' | 'specialist' | 'self'
 
 export default function AutoOptimizationPage() {
+  const { t } = useI18n()
   const { currentWorkspace } = useWorkspaceStore()
 
   const [tab, setTab] = useState<Tab>('run')
@@ -273,7 +276,7 @@ export default function AutoOptimizationPage() {
       const res = await autoOptimization.run(workspaceId, { ...DEMO_PAYLOAD, mode })
       setReport((res as any).data)
     } catch (err: any) {
-      setError(err?.message ?? 'Optimization failed')
+      setError(err?.message ?? t('autoOptimization.runFailed', 'Optimization failed'))
     } finally {
       setLoading(false)
     }
@@ -301,14 +304,10 @@ export default function AutoOptimizationPage() {
   return (
     <div className="space-y-6 max-w-5xl">
 
-      {/* ── Header ── */}
-      <div>
-        <h1 className="text-2xl font-bold text-text-primary mb-1">Auto-Optimallashtirish</h1>
-        <p className="text-text-tertiary text-sm">
-          AI reklama kampaniyangizni tahlil qiladi, muammolarni aniqlaydi va harakatlarni tavsiya qiladi.
-          Har bir harakat xavf darajasi va tasdiqlash talabiga qarab boshqariladi.
-        </p>
-      </div>
+      <PageHeader
+        title={t('navigation.autoOptimization', 'Auto Optimization')}
+        subtitle={t('autoOptimization.subtitle', 'AI analyzes campaigns, detects issues, and prioritizes governed actions.')}
+      />
 
       {/* ── Approach selector ── */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -379,7 +378,7 @@ export default function AutoOptimizationPage() {
                   : 'text-text-tertiary hover:text-text-primary'
               }`}
             >
-              {t === 'run' ? 'Tahlil' : 'Tarix'}
+              {t === 'run' ? t('autoOptimization.analysisTab', 'Analysis') : t('autoOptimization.historyTab', 'History')}
             </button>
           ))}
         </div>

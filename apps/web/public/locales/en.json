@@ -27,9 +27,11 @@
     "send": "Send",
     "view": "View",
     "more": "More",
-    "less": "Less"
+    "less": "Less",
+    "all": "All",
+    "refresh": "Refresh",
+    "apply": "Apply"
   },
-
   "navigation": {
     "home": "Home",
     "marketplace": "Marketplace",
@@ -42,9 +44,30 @@
     "automation": "Automation",
     "retargeting": "Retargeting",
     "audiences": "Audiences",
-    "settings": "Settings"
+    "settings": "Settings",
+    "marketing": "Marketing",
+    "launch": "Launch",
+    "reporting": "Reporting",
+    "aiDecisions": "AI Decisions",
+    "performance": "Performance",
+    "optimization": "Optimization",
+    "budget": "Budget",
+    "autoOptimization": "Auto Optimization",
+    "roi": "ROI Calculator",
+    "tools": "Tools & Resources",
+    "creative": "Creative",
+    "creativeScorer": "Creative Scorer",
+    "competitors": "Competitors",
+    "landingPage": "Landing Page",
+    "aiAssistant": "AI Assistant",
+    "aiActors": "AI Actors",
+    "projects": "Projects",
+    "brandKit": "Brand Kit",
+    "products": "Products",
+    "mediaLibrary": "Media Library",
+    "workspace": "Workspace",
+    "simulation": "Simulation"
   },
-
   "landing": {
     "hero": {
       "badge": "✨ Built on Madgicx — For Pro Marketers",
@@ -63,7 +86,6 @@
         "growth": "Average ROAS Growth"
       }
     },
-
     "capabilities": {
       "title": "Everything a marketer needs in one platform",
       "subtitle": "Campaign Management, Creative Control, Analytics, Finance & Governance. Each feature brings unique value to your marketing team.",
@@ -82,13 +104,11 @@
         "insightsDesc": "Fresh data every 30 minutes"
       }
     },
-
     "funnel": {
       "title": "Budget allocation across the funnel",
       "subtitle": "We adapted the Madgicx-style funnel model for our platform"
     }
   },
-
   "marketplace": {
     "title": "Marketplace",
     "subtitle": "Work with verified marketers and agencies",
@@ -104,6 +124,8 @@
     "minRating": "Minimum Rating",
     "minRoas": "Minimum ROAS",
     "specialties": "Specialties",
+    "platforms": "Platforms",
+    "loadError": "Failed to load specialists",
     "sortBy": {
       "rating": "By Rating",
       "roas": "By ROAS",
@@ -115,7 +137,6 @@
       "button": "Register as a Specialist ↗"
     }
   },
-
   "portfolio": {
     "title": "Portfolio",
     "level": "Level",
@@ -139,7 +160,6 @@
     "sendMessage": "Send Message",
     "contactButton": "Contact"
   },
-
   "leaderboard": {
     "title": "Leaderboard",
     "subtitle": "Top performing specialists on Nishon AI",
@@ -168,7 +188,6 @@
     "badgesReward": "Badges",
     "badgesDesc": "Collect badges for reaching milestones and demonstrating expertise"
   },
-
   "badges": {
     "title": "Badges",
     "unlocked": "Unlocked",
@@ -187,7 +206,6 @@
     "achievements": "Achievement Badges",
     "industry": "Industry Badges"
   },
-
   "levels": {
     "novice": "Novice",
     "apprentice": "Apprentice",
@@ -197,7 +215,6 @@
     "pointsTo": "Points to next level",
     "progress": "Progress"
   },
-
   "dashboard": {
     "title": "Dashboard",
     "welcome": "Welcome",
@@ -212,10 +229,24 @@
     "activeNow": "Active Now",
     "totalSpend": "Total Spend",
     "averageRoas": "Average ROAS",
-    "campaigns": "Campaigns",
-    "views": "Views"
+    "views": "Views",
+    "optimizationDone": "Optimization complete - check AI Decisions for results.",
+    "optimizationFailed": "Optimization failed",
+    "welcomeToPerforma": "Welcome to Performa",
+    "completeOnboarding": "Complete onboarding to create your first workspace and let AI manage your ad campaigns.",
+    "startSetup": "Start Setup",
+    "realtimeOverview": "Real-time overview",
+    "optimizing": "Optimizing...",
+    "runOptimization": "Run AI Optimization",
+    "metaRealtimePrefix": "Metrics are streamed in real-time from",
+    "settingsLink": "settings",
+    "topCampaigns": "Top campaigns",
+    "topCampaignsSubtitle": "Top campaigns by CTR in the last 30 days",
+    "campaign": "Campaign",
+    "status": "Status",
+    "spend": "Spend",
+    "clicks": "Clicks"
   },
-
   "automation": {
     "title": "Automation",
     "subtitle": "Madgicx-based automatic optimization strategies",
@@ -228,7 +259,6 @@
     "success": "Success",
     "failed": "Failed"
   },
-
   "retargeting": {
     "title": "Retargeting",
     "campaigns": "Campaigns",
@@ -238,9 +268,10 @@
     "launch": "Launch",
     "budget": "Budget",
     "daily": "Daily",
-    "total": "Total"
+    "total": "Total",
+    "subtitle": "Manage audiences and monitor retargeting campaigns",
+    "newCampaign": "New campaign"
   },
-
   "creative": {
     "title": "Creative Hub",
     "createAd": "Create Ad",
@@ -251,7 +282,6 @@
     "aiActors": "AI Actors",
     "projects": "Projects"
   },
-
   "auth": {
     "login": "Login",
     "signup": "Sign Up",
@@ -265,7 +295,6 @@
     "noAccount": "Don't have an account?",
     "logout": "Logout"
   },
-
   "errors": {
     "notFound": "Not Found",
     "unauthorized": "Unauthorized",
@@ -273,5 +302,177 @@
     "serverError": "Server Error",
     "tryAgain": "Try Again",
     "goHome": "Go Home"
+  },
+  "workspaceSettings": {
+    "title": "Workspace settings",
+    "workspace": "Workspace",
+    "classicSettings": "Classic settings",
+    "tabs": {
+      "adAccounts": "Ad accounts",
+      "products": "Products & Usage",
+      "payments": "Payments",
+      "profile": "User Profile",
+      "team": "Team Members",
+      "mcp": "MCP Integration",
+      "help": "Resource Center"
+    },
+    "team": {
+      "invite": "Invite team member",
+      "inviteHint": "Send an email invitation. The user should be registered with the same email.",
+      "pendingInvites": "Pending invites",
+      "permissions": "Permissions",
+      "role": "Role",
+      "adAccountsAccess": "Member ad-account permissions"
+    },
+    "payments": {
+      "loadError": "Failed to load payment data",
+      "addCardError": "Failed to add card",
+      "saveBillingError": "Failed to save billing info",
+      "addPaymentMethod": "Add payment method",
+      "editContactDetails": "Edit contact details"
+    },
+    "products": {
+      "loadError": "Failed to load product information",
+      "orderError": "Order was not created"
+    },
+    "mcp": {
+      "title": "MCP integration",
+      "createCredentials": "Create Client ID / Client Secret",
+      "existingCredentials": "Existing credentials",
+      "noCredentials": "No credentials yet"
+    }
+  },
+  "pages": {
+    "marketplace": {
+      "perMonth": "/month",
+      "priceNegotiable": "Price negotiable",
+      "campaigns": "Campaigns",
+      "success": "Success",
+      "profile": "Profile",
+      "trending": "Trending",
+      "minimumRating": "Minimum Rating"
+    },
+    "leaderboard": {
+      "rating": "Rating",
+      "points": "Points"
+    },
+    "integrations": {
+      "title": "Integrations Hub",
+      "subtitle": "Connect and manage all your business tools in one place",
+      "connected": "Connected",
+      "pending": "Pending",
+      "available": "Available",
+      "syncHealth": "Sync Health",
+      "connectedIntegrations": "Connected Integrations",
+      "pendingSetup": "Pending Setup",
+      "availableIntegrations": "Available Integrations"
+    }
+  },
+  "campaigns": {
+    "subtitle": "All advertising campaigns managed by Performa",
+    "total": "total",
+    "refresh": "Refresh",
+    "create": "Create Campaign",
+    "newCampaign": "New campaign",
+    "noCampaigns": "No campaigns yet",
+    "noCampaignsWithStatus": "No campaigns in this status",
+    "noCampaignsDescription": "Create your first campaign using the wizard or connect your ad account to sync existing campaigns.",
+    "noCampaignsWithStatusDescription": "You have no campaigns in this status right now.",
+    "connectMorePlatforms": "Connect more ad platforms",
+    "connectMorePlatformsHint": "Add Google, TikTok, or Telegram to expand your reach.",
+    "connectPlatform": "Connect platform",
+    "loadFailed": "Failed to load campaigns",
+    "updateFailed": "Failed to update campaign status"
+  },
+  "reporting": {
+    "loadError": "Failed to load reporting. Check if Meta Ads is connected.",
+    "exportError": "CSV export failed",
+    "workspaceMissing": "No workspace selected",
+    "subtitle": "Meta Ads account-to-campaign performance breakdown",
+    "exportCsv": "Export CSV"
+  },
+  "performance": {
+    "loadFailed": "Failed to load performance data",
+    "subtitle": "Monitor and analyze your campaign performance",
+    "lastDays": "Last",
+    "days": "days",
+    "startTracking": "Start tracking your performance",
+    "startTrackingDescription": "Launch your first campaign to see real-time metrics here.",
+    "launchWithAi": "Launch with AI",
+    "createManually": "Create manually",
+    "name": "Name",
+    "account": "Account",
+    "status": "Status",
+    "spend": "Spend",
+    "clicks": "Clicks"
+  },
+  "creativeScorer": {
+    "maxSizeError": "File size must be less than 10MB",
+    "fileTypeError": "Only JPG, PNG, WebP, GIF, or MP4 files are supported",
+    "uploadRequired": "Please upload a file",
+    "goalRequired": "Please enter your campaign goal",
+    "scoreFailed": "Creative scoring failed",
+    "subtitle": "Upload your ad creative and get AI scoring across 10 quality dimensions",
+    "aiScoring": "AI scoring"
+  },
+  "audiences": {
+    "subtitle": "Build full-funnel audience sets and launch them consistently",
+    "launcherTitle": "Audience Launcher",
+    "launcherSubtitle": "Performa full-funnel targeting strategy with an optimized workflow for maximum ROAS.",
+    "selected": "selected",
+    "noAudienceSelected": "No audience selected yet."
+  },
+  "autoOptimization": {
+    "runFailed": "Optimization failed",
+    "subtitle": "AI analyzes campaigns, detects issues, and prioritizes governed actions.",
+    "analysisTab": "Analysis",
+    "historyTab": "History"
+  },
+  "budget": {
+    "subtitle": "AI-optimized budget allocation across channels",
+    "autoRebalanceOn": "Auto-rebalance on",
+    "realData": "Live data",
+    "aiRecommendation": "AI recommendation",
+    "noAllocationDescription": "Complete onboarding to get AI budget recommendations.",
+    "noForecastDescription": "Generate an AI strategy in onboarding to see KPI forecasts.",
+    "fromAiStrategy": "From AI strategy",
+    "noStrategyDescription": "Go to settings to generate your first AI strategy and budget plan.",
+    "goToSettings": "Go to settings"
+  },
+  "aiDecisions": {
+    "loadFailed": "Failed to load AI decisions",
+    "approveFailed": "Failed to approve decision",
+    "rejectFailed": "Failed to reject decision",
+    "subtitle": "Every AI action and recommendation with transparent reasoning"
+  },
+  "sidebar": {
+    "autopilot": {
+      "fullAuto": "Full Auto",
+      "assisted": "Assisted",
+      "manual": "Manual",
+      "fullAutoHint": "AI manages campaigns automatically.",
+      "assistedHint": "AI suggests actions, you approve.",
+      "manualHint": "AI insights only, manual execution."
+    }
+  },
+  "header": {
+    "workspaceSubtitle": "ad accounts, subscription, payments, team, MCP",
+    "toggleTheme": "Toggle theme",
+    "dashboardSubtitle": "Overview of your advertising performance",
+    "campaignsSubtitle": "All campaigns managed by Performa",
+    "audiencesSubtitle": "Build and launch full-funnel audiences",
+    "aiDecisionsSubtitle": "Every action the AI has taken — with full reasoning",
+    "budgetSubtitle": "Allocation and performance by platform",
+    "simulationSubtitle": "Forecast results before committing budget",
+    "competitorsSubtitle": "Competitive intelligence and SWOT benchmarking",
+    "creativeScorerSubtitle": "AI-powered ad creative evaluation",
+    "roiSubtitle": "Estimate profitability before scaling ads",
+    "settingsSubtitle": "Workspace and account configuration",
+    "reportingSubtitle": "Campaign-level metrics and trends",
+    "marketplaceSubtitle": "Professional marketing specialists",
+    "launchSubtitle": "Create and launch campaigns efficiently",
+    "autoOptimizationSubtitle": "Automation settings and execution policy",
+    "landingPageSubtitle": "AI-powered landing page builder",
+    "portfolioSubtitle": "Manage your specialist profile"
   }
 }

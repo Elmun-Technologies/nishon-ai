@@ -18,6 +18,7 @@ const config: Config = {
         // CSS variable based — auto-switch light/dark
         surface:          'var(--c-surface)',
         'surface-2':      'var(--c-surface-2)',
+        'surface-secondary': 'var(--c-surface-2)',
         'surface-elevated': 'var(--c-surface-elevated)',
         border:           'var(--c-border)',
         'text-primary':   'var(--c-text-primary)',
@@ -25,6 +26,7 @@ const config: Config = {
         'text-tertiary':  'var(--c-text-tertiary)',
 
         // Brand
+        primary:  'var(--c-primary)',
         accent:   '#111827',
         success:  '#10B981',
         warning:  '#F59E0B',

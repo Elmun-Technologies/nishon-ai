@@ -28,6 +28,8 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
     return (
       <div
         ref={ref}
+        role="alert"
+        aria-live={variant === 'error' ? 'assertive' : 'polite'}
         className={cn(
           'rounded-lg px-4 py-3 text-sm',
           variants[variant],

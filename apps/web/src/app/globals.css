@@ -37,6 +37,7 @@
   --c-text-primary:     #111827;
   --c-text-secondary:   #6B7280;
   --c-text-tertiary:    #9CA3AF;
+  --c-primary:          #2563EB;
   --button-ripple-color: rgba(17, 24, 39, 0.15);
 }
 
@@ -49,6 +50,7 @@
   --c-text-primary:     #F1F5F9;
   --c-text-secondary:   #94A3B8;
   --c-text-tertiary:    #64748B;
+  --c-primary:          #3B82F6;
   --button-ripple-color: rgba(241, 245, 249, 0.2);
 }
 
@@ -82,11 +84,8 @@
   ::-webkit-scrollbar-thumb:hover { background: var(--c-text-tertiary); }
 
   :focus-visible {
-    outline: 2px solid #111827;
+    outline: 2px solid var(--c-primary);
     outline-offset: 2px;
-  }
-  .dark :focus-visible {
-    outline-color: #F1F5F9;
   }
 }
 

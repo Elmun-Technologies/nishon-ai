@@ -45,10 +45,10 @@ function SpecialistCard({ specialist, t }: { specialist: SpecialistCard; t: (key
             {specialist.monthlyRate ? (
               <>
                 <div className="text-xl font-bold text-emerald-400">${specialist.monthlyRate.toLocaleString()}</div>
-                <p className="text-xs text-text-tertiary">/oy</p>
+                <p className="text-xs text-text-tertiary">{t('pages.marketplace.perMonth')}</p>
               </>
             ) : (
-              <div className="text-sm text-text-tertiary">Narx kelishiladi</div>
+              <div className="text-sm text-text-tertiary">{t('pages.marketplace.priceNegotiable')}</div>
             )}
           </div>
         </div>
@@ -74,11 +74,11 @@ function SpecialistCard({ specialist, t }: { specialist: SpecialistCard; t: (key
         {/* Quick Stats */}
         <div className="grid grid-cols-2 gap-3 mb-4 py-3 border-y border-white/10">
           <div>
-            <p className="text-xs text-text-tertiary">Kampaniyalar</p>
+            <p className="text-xs text-text-tertiary">{t('pages.marketplace.campaigns')}</p>
             <p className="text-lg font-semibold text-white">{totalCampaigns ?? '—'}</p>
           </div>
           <div>
-            <p className="text-xs text-text-tertiary">Muvaffaqiyat</p>
+            <p className="text-xs text-text-tertiary">{t('pages.marketplace.success')}</p>
             <p className="text-lg font-semibold text-white">{successRate != null ? `${successRate}%` : '—'}</p>
           </div>
         </div>
@@ -113,7 +113,7 @@ function SpecialistCard({ specialist, t }: { specialist: SpecialistCard; t: (key
             )}
           </div>
           <span className="px-3 py-1.5 rounded-full bg-emerald-500/20 text-emerald-300 text-sm font-medium group-hover:bg-emerald-500/30 transition-colors">
-            Profil →
+            {t('pages.marketplace.profile')} →
           </span>
         </div>
       </div>
@@ -194,7 +194,7 @@ export default function MarketplacePage() {
                 {([
                   { key: 'rating' as const, label: t('marketplace.sortBy.rating') },
                   { key: 'roas' as const, label: t('marketplace.sortBy.roas') },
-                  { key: 'trending' as const, label: '🔥 Trending' },
+                  { key: 'trending' as const, label: `🔥 ${t('pages.marketplace.trending')}` },
                 ]).map(({ key, label }) => (
                   <button
                     key={key}
@@ -213,7 +213,7 @@ export default function MarketplacePage() {
 
             {/* Rating Filter */}
             <div>
-              <label className="block text-sm font-semibold text-text-primary mb-3">Minimal Reytingi</label>
+              <label className="block text-sm font-semibold text-text-primary mb-3">{t('pages.marketplace.minimumRating')}</label>
               <div className="flex gap-2">
                 {[0, 4.0, 4.5, 4.8].map((rating) => (
                   <button
@@ -225,7 +225,7 @@ export default function MarketplacePage() {
                         : 'bg-white/10 text-text-secondary hover:bg-white/20'
                     }`}
                   >
-                    {rating === 0 ? 'Barchasi' : `${rating}+`}
+                    {rating === 0 ? t('common.all', 'All') : `${rating}+`}
                   </button>
                 ))}
               </div>
@@ -233,7 +233,7 @@ export default function MarketplacePage() {
 
             {/* ROAS Filter */}
             <div>
-              <label className="block text-sm font-semibold text-text-primary mb-3">Minimal ROAS</label>
+              <label className="block text-sm font-semibold text-text-primary mb-3">{t('marketplace.minRoas', 'Minimum ROAS')}</label>
               <div className="flex gap-2">
                 {[0, 3, 4, 5].map((roas) => (
                   <button
@@ -245,7 +245,7 @@ export default function MarketplacePage() {
                         : 'bg-white/10 text-text-secondary hover:bg-white/20'
                     }`}
                   >
-                    {roas === 0 ? 'Barchasi' : `${roas}x+`}
+                    {roas === 0 ? t('common.all', 'All') : `${roas}x+`}
                   </button>
                 ))}
               </div>
@@ -253,7 +253,7 @@ export default function MarketplacePage() {
 
             {/* Niches */}
             <div>
-              <label className="block text-sm font-semibold text-text-primary mb-3">Mutahassisliklari</label>
+              <label className="block text-sm font-semibold text-text-primary mb-3">{t('marketplace.specialties', 'Specialties')}</label>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
                 {NICHES.map((niche) => (
                   <button
@@ -273,7 +273,7 @@ export default function MarketplacePage() {
 
             {/* Platforms */}
             <div>
-              <label className="block text-sm font-semibold text-text-primary mb-3">Platformalar</label>
+              <label className="block text-sm font-semibold text-text-primary mb-3">{t('marketplace.platforms', 'Platforms')}</label>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 {PLATFORMS.map((platform) => (
                   <button
@@ -305,14 +305,14 @@ export default function MarketplacePage() {
           {loading && (
             <div className="flex items-center justify-center py-20 gap-3 text-text-tertiary">
               <Loader2 size={20} className="animate-spin" />
-              <span>Yuklanmoqda...</span>
+              <span>{t('common.loading', 'Loading...')}</span>
             </div>
           )}
 
           {/* Error */}
           {error && !loading && (
             <div className="rounded-2xl border border-white/10 bg-surface-2/50 p-12 text-center">
-              <p className="text-text-secondary text-lg">Mutaxassislarni yuklashda xatolik yuz berdi</p>
+              <p className="text-text-secondary text-lg">{t('marketplace.loadError', 'Failed to load specialists')}</p>
               <p className="text-text-tertiary text-sm mt-2">{error.message}</p>
             </div>
           )}

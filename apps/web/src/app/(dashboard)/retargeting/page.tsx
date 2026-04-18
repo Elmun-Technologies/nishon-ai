@@ -1,7 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { RefreshCcw, Plus, Users, Megaphone, TrendingUp, Play, Pause, ArrowRight } from 'lucide-react'
+import { Plus, Users, Megaphone, TrendingUp, Play, Pause, ArrowRight } from 'lucide-react'
+import { useI18n } from '@/i18n/use-i18n'
+import { PageHeader } from '@/components/ui'
 import { useAudienceStore } from '@/stores/audience.store'
 import { useRetargetingStore } from '@/stores/retargeting.store'
 import type { FunnelStage, CampaignStatus } from '@/types/retargeting'
@@ -35,6 +37,7 @@ function fmtNum(n: number) {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function RetargetingPage() {
+  const { t } = useI18n()
   const { audiences, metrics, getByStage } = useAudienceStore()
   const { campaigns, updateCampaignStatus } = useRetargetingStore()
 
@@ -46,24 +49,18 @@ export default function RetargetingPage() {
 
   return (
     <div className="space-y-8">
-
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary flex items-center gap-2">
-            <RefreshCcw size={24} /> Retargeting
-          </h1>
-          <p className="text-text-secondary mt-1">
-            Auditoriyalarni boshqaring va kampaniyalarni kuzating
-          </p>
-        </div>
-        <Link
-          href="/retargeting/wizard"
-          className="flex items-center gap-2 px-4 py-2 bg-info text-surface rounded-lg font-medium hover:opacity-90 transition-opacity"
-        >
-          <Plus size={18} /> Yangi kampaniya
-        </Link>
-      </div>
+      <PageHeader
+        title={t('navigation.retargeting', 'Retargeting')}
+        subtitle={t('retargeting.subtitle', 'Manage audiences and monitor retargeting campaigns')}
+        actions={
+          <Link
+            href="/retargeting/wizard"
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:opacity-95"
+          >
+            <Plus size={16} /> {t('retargeting.newCampaign', 'New campaign')}
+          </Link>
+        }
+      />
 
       {/* Stats Row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -162,7 +159,7 @@ export default function RetargetingPage() {
                         onClick={() =>
                           updateCampaignStatus(c.id, c.status === 'active' ? 'paused' : 'active')
                         }
-                        className="p-1.5 rounded-lg hover:bg-surface-3 text-text-tertiary hover:text-text-primary transition-colors"
+                        className="p-1.5 rounded-lg hover:bg-surface-2 text-text-tertiary hover:text-text-primary transition-colors"
                         title={c.status === 'active' ? 'Paused qilish' : 'Yoqish'}
                       >
                         {c.status === 'active' ? <Pause size={15} /> : <Play size={15} />}

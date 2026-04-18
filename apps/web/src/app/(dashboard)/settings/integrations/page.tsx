@@ -109,10 +109,10 @@ export default function IntegrationsPage() {
       <div>
         <h1 className="text-3xl font-bold text-white flex items-center gap-2">
           <Zap className="text-yellow-400" size={32} />
-          Integrations Hub
+          {t('pages.integrations.title')}
         </h1>
         <p className="text-text-secondary mt-2">
-          Connect and manage all your business tools in one place
+          {t('pages.integrations.subtitle')}
         </p>
       </div>
 
@@ -121,7 +121,7 @@ export default function IntegrationsPage() {
         <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-text-tertiary">Connected</p>
+              <p className="text-sm text-text-tertiary">{t('pages.integrations.connected')}</p>
               <p className="text-3xl font-bold text-emerald-400">2</p>
             </div>
             <Check className="text-emerald-400" size={32} />
@@ -131,7 +131,7 @@ export default function IntegrationsPage() {
         <div className="rounded-2xl border border-yellow-500/30 bg-yellow-500/10 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-text-tertiary">Pending</p>
+              <p className="text-sm text-text-tertiary">{t('pages.integrations.pending')}</p>
               <p className="text-3xl font-bold text-yellow-400">1</p>
             </div>
             <Clock className="text-yellow-400" size={32} />
@@ -141,7 +141,7 @@ export default function IntegrationsPage() {
         <div className="rounded-2xl border border-blue-500/30 bg-blue-500/10 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-text-tertiary">Available</p>
+              <p className="text-sm text-text-tertiary">{t('pages.integrations.available')}</p>
               <p className="text-3xl font-bold text-blue-400">{AVAILABLE_INTEGRATIONS.length}</p>
             </div>
             <Plus className="text-blue-400" size={32} />
@@ -151,7 +151,7 @@ export default function IntegrationsPage() {
         <div className="rounded-2xl border border-purple-500/30 bg-purple-500/10 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-text-tertiary">Sync Health</p>
+              <p className="text-sm text-text-tertiary">{t('pages.integrations.syncHealth')}</p>
               <p className="text-3xl font-bold text-purple-400">99.8%</p>
             </div>
             <TrendingUp className="text-purple-400" size={32} />
@@ -161,7 +161,7 @@ export default function IntegrationsPage() {
 
       {/* Connected Section */}
       <section className="space-y-4">
-        <h2 className="text-2xl font-bold text-white">Connected Integrations</h2>
+        <h2 className="text-2xl font-bold text-white">{t('pages.integrations.connectedIntegrations')}</h2>
         <div className="space-y-3">
           {CONNECTED_INTEGRATIONS.map((integration) => (
             <IntegrationCard
@@ -179,7 +179,7 @@ export default function IntegrationsPage() {
 
       {/* Pending Section */}
       <section className="space-y-4">
-        <h2 className="text-2xl font-bold text-white">Pending Setup</h2>
+        <h2 className="text-2xl font-bold text-white">{t('pages.integrations.pendingSetup')}</h2>
         <div className="space-y-3">
           {PENDING_INTEGRATIONS.map((integration) => (
             <PendingIntegrationCard
@@ -193,7 +193,7 @@ export default function IntegrationsPage() {
 
       {/* Available Section */}
       <section className="space-y-4">
-        <h2 className="text-2xl font-bold text-white">Available Integrations</h2>
+        <h2 className="text-2xl font-bold text-white">{t('pages.integrations.availableIntegrations')}</h2>
         <div className="grid grid-cols-3 gap-4">
           {AVAILABLE_INTEGRATIONS.map((integration) => (
             <AvailableIntegrationCard

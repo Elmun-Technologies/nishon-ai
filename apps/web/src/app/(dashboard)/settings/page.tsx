@@ -352,6 +352,12 @@ export default function SettingsPage() {
         <p className="mt-1 text-sm text-text-tertiary">
           Manage your workspace preferences, integrations, and account.
         </p>
+        <Link
+          href="/settings/workspace"
+          className="mt-4 inline-flex items-center gap-2 rounded-xl border border-violet-500/30 bg-violet-500/10 px-4 py-2 text-sm font-medium text-violet-200 transition-colors hover:bg-violet-500/15"
+        >
+          Workspace hub → Ad accounts, obuna, to‘lov, jamoa, MCP (yangi tuzilma)
+        </Link>
       </div>
 
       <div className="flex gap-6">

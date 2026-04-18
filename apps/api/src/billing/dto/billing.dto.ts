@@ -32,3 +32,55 @@ export class CreateInvoiceDto {
   @IsString()
   pdfUrl?: string;
 }
+
+export class UpdateBillingContactDto {
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  yourName?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  companyName?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  workEmail?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  phoneNumber?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(80)
+  country?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(80)
+  region?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(80)
+  city?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  address?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(40)
+  postalCode?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(80)
+  taxId?: string;
+}

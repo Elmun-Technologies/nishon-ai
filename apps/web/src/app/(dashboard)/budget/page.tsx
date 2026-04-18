@@ -1,11 +1,13 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
+import { useI18n } from '@/i18n/use-i18n'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { PageSpinner } from '@/components/ui/Spinner'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { PageHeader } from '@/components/ui'
 import { workspaces as workspacesApi } from '@/lib/api-client'
 import { formatCurrency } from '@/lib/utils'
 
@@ -29,6 +31,7 @@ const PLATFORM_CONFIG: Record<string, { color: string; emoji: string; label: str
 }
 
 export default function BudgetPage() {
+  const { t } = useI18n()
   const { currentWorkspace } = useWorkspaceStore()
   const [performance, setPerformance] = useState<PerformanceSummary | null>(null)
   const [loading, setLoading] = useState(false)
@@ -59,18 +62,11 @@ export default function BudgetPage() {
   return (
     <div className="space-y-6 max-w-5xl">
 
-      {/* ── Page header ── */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary mb-1">Byudjet Taqsimoti</h1>
-          <p className="text-text-tertiary text-sm">
-            AI tomonidan optimallashtirilgan platforma byudjet taqsimoti
-          </p>
-        </div>
-        {strategy?.autoRebalance && (
-          <Badge variant="success" dot>Auto-rebalance on</Badge>
-        )}
-      </div>
+      <PageHeader
+        title={t('navigation.budget', 'Budget')}
+        subtitle={t('budget.subtitle', 'AI-optimized budget allocation across channels')}
+        actions={strategy?.autoRebalance ? <Badge variant="success" dot>{t('budget.autoRebalanceOn', 'Auto-rebalance on')}</Badge> : null}
+      />
 
       {/* ── Total budget summary ── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -117,7 +113,7 @@ export default function BudgetPage() {
           <div className="flex items-center gap-2 mb-5">
             <span className="text-lg">📈</span>
             <h2 className="font-semibold text-text-primary">Joriy Ko'rsatkichlar</h2>
-            <Badge variant="success" size="sm" dot>Real ma'lumot</Badge>
+            <Badge variant="success" size="sm" dot>{t('budget.realData', 'Live data')}</Badge>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
@@ -142,14 +138,14 @@ export default function BudgetPage() {
           <div className="flex items-center gap-2 mb-5">
             <span className="text-lg">📊</span>
             <h2 className="font-semibold text-text-primary">Platforma Taqsimoti</h2>
-            <Badge variant="purple" size="sm">AI Tavsiyasi</Badge>
+            <Badge variant="purple" size="sm">{t('budget.aiRecommendation', 'AI recommendation')}</Badge>
           </div>
 
           {platformStats.length === 0 ? (
             <EmptyState
               icon="📊"
               title="Taqsimot belgilanmagan"
-              description="AI byudjet tavsiyalarini olish uchun onboardingni yakunlang."
+              description={t('budget.noAllocationDescription', 'Complete onboarding to get AI budget recommendations.')}
             />
           ) : (
             <div className="space-y-5">
@@ -250,7 +246,7 @@ export default function BudgetPage() {
             <EmptyState
               icon="🧠"
               title="Hali prognoz yo'q"
-              description="KPI prognozini ko'rish uchun onboarding davomida AI strategiyasini yarating."
+              description={t('budget.noForecastDescription', 'Generate an AI strategy in onboarding to see KPI forecasts.')}
             />
           )}
         </Card>
@@ -262,7 +258,7 @@ export default function BudgetPage() {
           <div className="flex items-center gap-2 mb-4">
             <span className="text-lg">🎨</span>
             <h2 className="font-semibold text-text-primary">Kreativ Ko'rsatmalar</h2>
-            <Badge variant="gray" size="sm">AI Strategiyadan</Badge>
+            <Badge variant="gray" size="sm">{t('budget.fromAiStrategy', 'From AI strategy')}</Badge>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-surface-2 border border-border rounded-xl p-4">
@@ -299,10 +295,10 @@ export default function BudgetPage() {
             <span className="text-xl">🧠</span>
             <div className="flex-1">
               <p className="text-text-primary text-sm font-medium">AI strategiya hali yo'q</p>
-              <p className="text-text-tertiary text-xs">Birinchi AI strategiya va byudjet rejasini yaratish uchun Sozlamalarga o'ting.</p>
+              <p className="text-text-tertiary text-xs">{t('budget.noStrategyDescription', 'Go to settings to generate your first AI strategy and budget plan.')}</p>
             </div>
             <Button variant="secondary" size="sm" onClick={() => window.location.href = '/settings'}>
-              Sozlamalarga o'tish
+              {t('budget.goToSettings', 'Go to settings')}
             </Button>
           </div>
         </Card>

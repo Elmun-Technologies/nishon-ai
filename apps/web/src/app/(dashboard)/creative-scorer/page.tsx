@@ -1,11 +1,13 @@
 'use client'
 import { useState, useRef, useCallback } from 'react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
+import { useI18n } from '@/i18n/use-i18n'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Alert } from '@/components/ui/Alert'
 import { Badge } from '@/components/ui/Badge'
 import { Spinner } from '@/components/ui/Spinner'
+import { PageHeader } from '@/components/ui'
 import apiClient from '@/lib/api-client'
 
 // ─── TYPES ───────────────────────────────────────────────────────────────────
@@ -175,6 +177,7 @@ const DEMO_SCORE: CreativeScore = {
 // ─── MAIN PAGE ────────────────────────────────────────────────────────────────
 
 export default function CreativeScorerPage() {
+  const { t } = useI18n()
   const { currentWorkspace } = useWorkspaceStore()
 
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -195,13 +198,13 @@ export default function CreativeScorerPage() {
 
     const maxSize = 10 * 1024 * 1024 // 10MB
     if (selectedFile.size > maxSize) {
-      setError('Fayl hajmi 10MB dan oshmasligi kerak')
+      setError(t('creativeScorer.maxSizeError', 'File size must be less than 10MB'))
       return
     }
 
     const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'video/mp4']
     if (!allowed.includes(selectedFile.type)) {
-      setError('Faqat JPG, PNG, WebP, GIF yoki MP4 formatlar qabul qilinadi')
+      setError(t('creativeScorer.fileTypeError', 'Only JPG, PNG, WebP, GIF, or MP4 files are supported'))
       return
     }
 
@@ -238,8 +241,8 @@ export default function CreativeScorerPage() {
   // ─── SCORE FUNCTION ──────────────────────────────────────────────────────
 
   async function handleScore() {
-    if (!file) { setError('Iltimos, fayl yuklang'); return }
-    if (!goal) { setError('Reklama maqsadini kiriting'); return }
+    if (!file) { setError(t('creativeScorer.uploadRequired', 'Please upload a file')); return }
+    if (!goal) { setError(t('creativeScorer.goalRequired', 'Please enter your campaign goal')); return }
 
     setLoading(true)
     setError('')
@@ -265,7 +268,7 @@ export default function CreativeScorerPage() {
 
       setResult(res.data)
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Baholashda xatolik yuz berdi')
+      setError(err.response?.data?.message || t('creativeScorer.scoreFailed', 'Creative scoring failed'))
     } finally {
       setLoading(false)
     }
@@ -296,18 +299,11 @@ export default function CreativeScorerPage() {
 
   return (
     <div className="space-y-6 max-w-4xl">
-
-      {/* Header */}
-      <div>
-        <div className="flex items-center gap-3 mb-1">
-          <h1 className="text-2xl font-bold text-text-primary">Creative Scorer</h1>
-          <Badge variant="purple">🎨 AI Baholash</Badge>
-        </div>
-        <p className="text-text-tertiary text-sm">
-          Reklama kreativingizni yuklang — AI 10 parametr bo'yicha baholab,
-          reklamaga tayyor yoki yo'qligini aytadi
-        </p>
-      </div>
+      <PageHeader
+        title={t('navigation.creativeScorer', 'Creative Scorer')}
+        subtitle={t('creativeScorer.subtitle', 'Upload your ad creative and get AI scoring across 10 quality dimensions')}
+        actions={<Badge variant="purple">🎨 {t('creativeScorer.aiScoring', 'AI scoring')}</Badge>}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 

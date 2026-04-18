@@ -1,6 +1,8 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { useI18n } from '@/i18n/use-i18n'
+import { PageHeader } from '@/components/ui'
 
 type FunnelStage = 'acquisition' | 'reengagement' | 'retargeting' | 'retention'
 
@@ -183,6 +185,7 @@ const IMPLEMENTATION_CHECKLIST: Array<{ module: string; items: string[] }> = [
 ]
 
 export default function AudiencesPage() {
+  const { t } = useI18n()
   const [activeStage, setActiveStage] = useState<FunnelStage>('acquisition')
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<string[]>([])
@@ -206,16 +209,21 @@ export default function AudiencesPage() {
   }
 
   return (
-    <div className="min-h-full rounded-2xl border border-[#1E1B4B] bg-[#08071A] text-text-secondary overflow-hidden">
+    <div className="space-y-4">
+      <PageHeader
+        title={t('navigation.audiences', 'Audiences')}
+        subtitle={t('audiences.subtitle', 'Build full-funnel audience sets and launch them consistently')}
+      />
+      <div className="min-h-full rounded-2xl border border-[#1E1B4B] bg-[#08071A] text-text-secondary overflow-hidden">
       <div className="border-b border-[#1F1B4D] px-5 py-4 flex items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-semibold">Audience Launcher</h2>
+          <h2 className="text-xl font-semibold">{t('audiences.launcherTitle', 'Audience Launcher')}</h2>
           <p className="text-xs text-text-tertiary mt-1">
-            Performa full-funnel targeting strategy — optimized workflow for maximum ROAS.
+            {t('audiences.launcherSubtitle', 'Performa full-funnel targeting strategy with an optimized workflow for maximum ROAS.')}
           </p>
         </div>
         <button className="px-4 py-2 rounded-lg bg-[#8B80F9] text-text-primary text-sm font-semibold disabled:opacity-40" disabled={selected.length === 0}>
-          Next
+          {t('common.next', 'Next')}
         </button>
       </div>
 
@@ -228,7 +236,7 @@ export default function AudiencesPage() {
               placeholder="Search for audience..."
               className="w-full md:max-w-sm rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-[#8B80F9]"
             />
-            <span className="text-xs px-2 py-1 rounded-full bg-[#151236] border border-border">{selected.length} selected</span>
+            <span className="text-xs px-2 py-1 rounded-full bg-[#151236] border border-border">{selected.length} {t('audiences.selected', 'selected')}</span>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-2">
@@ -331,7 +339,7 @@ export default function AudiencesPage() {
             <p className="text-xs text-text-tertiary mb-2">Your selected audiences</p>
             <div className="flex flex-wrap gap-2">
               {selected.length === 0 ? (
-                <span className="text-xs text-text-tertiary">No audience selected yet.</span>
+                <span className="text-xs text-text-tertiary">{t('audiences.noAudienceSelected', 'No audience selected yet.')}</span>
               ) : (
                 selected.map((id) => {
                   const item = AUDIENCES.find((a) => a.id === id)
@@ -493,6 +501,7 @@ export default function AudiencesPage() {
           </div>
         </section>
       </div>
+    </div>
     </div>
   )
 }

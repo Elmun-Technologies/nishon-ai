@@ -38,7 +38,19 @@ export class UpdateWorkspaceDto {
 
   @IsOptional()
   @IsString()
+  industry?: string
+
+  @IsOptional()
+  @IsString()
   productDescription?: string
+
+  @IsOptional()
+  @IsString()
+  targetAudience?: string
+
+  @IsOptional()
+  @IsString()
+  targetLocation?: string
 
   @IsOptional()
   @IsNumber()
