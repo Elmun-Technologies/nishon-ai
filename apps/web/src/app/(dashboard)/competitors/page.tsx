@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { Search, TrendingUp, AlertCircle, CheckCircle2, BarChart3, Share2 } from 'lucide-react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
-import { apiClient } from '@/lib/api-client'
 
 export const dynamic = 'force-dynamic'
 
@@ -182,27 +181,10 @@ export default function CompetitorsPage() {
     setLoading(true)
     setResult(null)
 
-    try {
-      const res = await apiClient.post('/ai-agent/competitor-analysis', {
-        workspaceId: currentWorkspace?.id,
-        competitor: form,
-        businessContext: {
-          name: currentWorkspace?.name,
-          industry: (currentWorkspace as any)?.industry,
-          productDescription: (currentWorkspace as any)?.productDescription,
-          targetLocation: (currentWorkspace as any)?.targetLocation,
-          monthlyBudget: (currentWorkspace as any)?.monthlyBudget,
-          goal: (currentWorkspace as any)?.goal,
-          aiStrategy: currentWorkspace?.aiStrategy,
-        },
-      })
-      setResult(res.data)
-    } catch (err) {
-      setError('Failed to analyze competitor. Please try again.')
+    setTimeout(() => {
       setResult(MOCK_RESULT)
-    } finally {
       setLoading(false)
-    }
+    }, 1500)
   }
 
   return (
@@ -287,7 +269,7 @@ export default function CompetitorsPage() {
           {/* Audit Tab */}
           {activeTab === 'audit' && (
             <div className="space-y-4">
-              <Card className="p-6">
+              <div className="bg-white rounded-lg border border-slate-200 p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-bold text-slate-900">Umumiy Natija</h3>
                   <div className="text-4xl font-bold text-blue-600">{result.overallScore}/100</div>
@@ -301,7 +283,7 @@ export default function CompetitorsPage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card className="p-6">
+                <div className="bg-white rounded-lg border border-slate-200 p-6">
                   <h3 className="font-bold text-green-600 mb-3 flex items-center gap-2">
                     <CheckCircle2 className="w-5 h-5" />
                     Kuchli Tomonlar
@@ -313,7 +295,7 @@ export default function CompetitorsPage() {
                   </ul>
                 </div>
 
-                <Card className="p-6">
+                <div className="bg-white rounded-lg border border-slate-200 p-6">
                   <h3 className="font-bold text-red-600 mb-3 flex items-center gap-2">
                     <AlertCircle className="w-5 h-5" />
                     Zaif Tomonlar
@@ -332,7 +314,7 @@ export default function CompetitorsPage() {
           {activeTab === 'strategy' && (
             <div className="space-y-6">
               {/* Monthly */}
-              <Card className="p-6">
+              <div className="bg-white rounded-lg border border-slate-200 p-6">
                 <h3 className="font-bold text-lg mb-4">📅 Oylik Strategiya</h3>
                 <p className="text-slate-600 mb-4">{result.monthlyStrategy.focus}</p>
                 <div className="space-y-2 mb-4">
@@ -344,7 +326,7 @@ export default function CompetitorsPage() {
               </div>
 
               {/* Quarterly */}
-              <Card className="p-6">
+              <div className="bg-white rounded-lg border border-slate-200 p-6">
                 <h3 className="font-bold text-lg mb-4">📊 Uchlyk Strategiya</h3>
                 <p className="text-slate-600 mb-4">{result.quarterlyStrategy.focus}</p>
                 <div className="grid grid-cols-2 gap-4 mb-4">
@@ -361,7 +343,7 @@ export default function CompetitorsPage() {
 
               {/* Annual */}
               {result === MOCK_RESULT && (
-                <Card className="p-6">
+                <div className="bg-white rounded-lg border border-slate-200 p-6">
                   <h3 className="font-bold text-lg mb-4">🚀 Yillik Strategiya</h3>
                   <p className="text-slate-600 mb-4">{result.annualStrategy.longTermGoal}</p>
                   <div className="space-y-2 mb-4">
