@@ -5,6 +5,9 @@ import { BillingInvoice } from './entities/billing-invoice.entity'
 import { PaymentMethod } from './entities/payment-method.entity'
 import { PaymeTransaction } from './entities/payme-transaction.entity'
 import { User } from '../users/entities/user.entity'
+import { Workspace } from '../workspaces/entities/workspace.entity'
+import { WorkspaceMember } from '../workspace-members/entities/workspace-member.entity'
+import { IntegrationConfigEntity } from '../integrations/entities/integration-config.entity'
 import { BillingService } from './billing.service'
 import { PaymeService } from './services/payme.service'
 import { BillingController } from './billing.controller'
@@ -14,7 +17,15 @@ import { SubscriptionController } from './controllers/subscription.controller'
 @Module({
   imports: [
     ConfigModule,
-    TypeOrmModule.forFeature([BillingInvoice, PaymentMethod, PaymeTransaction, User]),
+    TypeOrmModule.forFeature([
+      BillingInvoice,
+      PaymentMethod,
+      PaymeTransaction,
+      User,
+      Workspace,
+      WorkspaceMember,
+      IntegrationConfigEntity,
+    ]),
   ],
   providers: [BillingService, PaymeService],
   controllers: [BillingController, PaymeController, SubscriptionController],

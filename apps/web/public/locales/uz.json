@@ -27,9 +27,11 @@
     "send": "Yuborish",
     "view": "Ko'rish",
     "more": "Ko'proq",
-    "less": "Kamroq"
+    "less": "Kamroq",
+    "all": "Barchasi",
+    "refresh": "Yangilash",
+    "apply": "Qo'llash"
   },
-
   "navigation": {
     "home": "Asosiy sahifa",
     "marketplace": "Marketplace",
@@ -42,9 +44,30 @@
     "automation": "Avtomatsiya",
     "retargeting": "Retargeting",
     "audiences": "Auditoriyalar",
-    "settings": "Sozlamalar"
+    "settings": "Sozlamalar",
+    "marketing": "Marketing",
+    "launch": "Yoqish",
+    "reporting": "Hisobot",
+    "aiDecisions": "AI qarorlar",
+    "performance": "Performance",
+    "optimization": "Optimizatsiya",
+    "budget": "Byudjet",
+    "autoOptimization": "Auto-optimizatsiya",
+    "roi": "ROI kalkulyator",
+    "tools": "Asboblar va resurslar",
+    "creative": "Kreativ",
+    "creativeScorer": "Kreativ baholash",
+    "competitors": "Raqobatchilar",
+    "landingPage": "Landing page",
+    "aiAssistant": "AI assistant",
+    "aiActors": "AI aktyorlar",
+    "projects": "Loyihalar",
+    "brandKit": "Brand kit",
+    "products": "Mahsulotlar",
+    "mediaLibrary": "Media kutubxona",
+    "workspace": "Workspace",
+    "simulation": "Simulyatsiya"
   },
-
   "landing": {
     "hero": {
       "badge": "✨ Madgicx asosida qurilgan — Pro marketoqlar uchun",
@@ -63,7 +86,6 @@
         "growth": "Orta ROAS o'sishi"
       }
     },
-
     "capabilities": {
       "title": "Barcha markolog kerak narsasi bitta platformada",
       "subtitle": "Campaign Management, Creative Control, Analytics, Finance & Governance. Har bir feature markolog uchun o'z qiymatini beradi.",
@@ -82,13 +104,11 @@
         "insightsDesc": "Har 30 minutda yangil data"
       }
     },
-
     "funnel": {
       "title": "Budget allocation across the funnel",
       "subtitle": "Madgicx uslubidagi funnel modelini bizning platformaga moslashtirdik"
     }
   },
-
   "marketplace": {
     "title": "Marketplace",
     "subtitle": "Tekshirilgan markolog va agentliklar bilan ishlang",
@@ -104,6 +124,8 @@
     "minRating": "Minimal Reytingi",
     "minRoas": "Minimal ROAS",
     "specialties": "Mutahassisliklari",
+    "platforms": "Platformalar",
+    "loadError": "Mutaxassislarni yuklashda xatolik yuz berdi",
     "sortBy": {
       "rating": "Reytingi bo'yicha",
       "roas": "ROAS bo'yicha",
@@ -115,7 +137,6 @@
       "button": "Specialist sifatida ro'yxatdan o'tish ↗"
     }
   },
-
   "portfolio": {
     "title": "Portfolio",
     "level": "Level",
@@ -139,7 +160,6 @@
     "sendMessage": "Xabar yuborish",
     "contactButton": "Murojaat qilish"
   },
-
   "leaderboard": {
     "title": "Reytingi",
     "subtitle": "Nishon AI da eng yaxshi mutahassislar",
@@ -168,7 +188,6 @@
     "badgesReward": "Badgeler",
     "badgesDesc": "Milestones va ixtisoslashtirilganlikni ko'rsatib badgeler to'plab turing"
   },
-
   "badges": {
     "title": "Badgeler",
     "unlocked": "Unlocked",
@@ -187,7 +206,6 @@
     "achievements": "Achievement Badges",
     "industry": "Industry Badges"
   },
-
   "levels": {
     "novice": "Novice",
     "apprentice": "Apprentice",
@@ -197,7 +215,6 @@
     "pointsTo": "Balls to next level",
     "progress": "Progress"
   },
-
   "dashboard": {
     "title": "Dashboard",
     "welcome": "Xush kelibsiz",
@@ -212,10 +229,24 @@
     "activeNow": "Hozir faol",
     "totalSpend": "Jami xarajat",
     "averageRoas": "O'rtacha ROAS",
-    "campaigns": "Kampaniyalar",
-    "views": "Ko'rishlar"
+    "views": "Ko'rishlar",
+    "optimizationDone": "Optimizatsiya tugadi - natijalarni AI qarorlarda ko'ring.",
+    "optimizationFailed": "Optimizatsiya amalga oshmadi",
+    "welcomeToPerforma": "Performa'ga xush kelibsiz",
+    "completeOnboarding": "Birinchi workspace yaratish va AI boshqaruvini yoqish uchun onboardingni yakunlang.",
+    "startSetup": "Sozlashni boshlash",
+    "realtimeOverview": "Real-time overview",
+    "optimizing": "Optimallashtirilmoqda...",
+    "runOptimization": "AI optimizatsiyani ishga tushirish",
+    "metaRealtimePrefix": "Ko'rsatkichlar real vaqtda olinmoqda:",
+    "settingsLink": "sozlamalar",
+    "topCampaigns": "Eng yaxshi kampaniyalar",
+    "topCampaignsSubtitle": "So'nggi 30 kunda CTR bo'yicha top kampaniyalar",
+    "campaign": "Kampaniya",
+    "status": "Status",
+    "spend": "Xarajat",
+    "clicks": "Kliklar"
   },
-
   "automation": {
     "title": "Avtomatsiya",
     "subtitle": "Madgicx asosida qurilgan avtomatik optimizatsiya strategiyalari",
@@ -228,7 +259,6 @@
     "success": "Muvaffaqiyat",
     "failed": "Muvaffaqiyatsiz"
   },
-
   "retargeting": {
     "title": "Retargeting",
     "campaigns": "Kampaniyalar",
@@ -238,9 +268,10 @@
     "launch": "Ishga tushirish",
     "budget": "Byudjet",
     "daily": "Kunlik",
-    "total": "Jami"
+    "total": "Jami",
+    "subtitle": "Auditoriyalarni boshqaring va retargeting kampaniyalarni kuzating",
+    "newCampaign": "Yangi kampaniya"
   },
-
   "creative": {
     "title": "Creative Hub",
     "createAd": "Reklama yaratish",
@@ -251,7 +282,6 @@
     "aiActors": "AI Actorlari",
     "projects": "Loyihalar"
   },
-
   "auth": {
     "login": "Kirish",
     "signup": "Ro'yxatdan o'tish",
@@ -265,7 +295,6 @@
     "noAccount": "Akkauntingiz yo'qmi?",
     "logout": "Chiqish"
   },
-
   "errors": {
     "notFound": "Topilmadi",
     "unauthorized": "Ruxsatlanmagan",
@@ -273,5 +302,177 @@
     "serverError": "Server xatosi",
     "tryAgain": "Qayta urinib ko'ring",
     "goHome": "Asosiy sahifaga o'tish"
+  },
+  "workspaceSettings": {
+    "title": "Workspace sozlamalari",
+    "workspace": "Workspace",
+    "classicSettings": "Klassik sozlamalar",
+    "tabs": {
+      "adAccounts": "Ad accountlar",
+      "products": "Mahsulotlar va foydalanish",
+      "payments": "To'lovlar",
+      "profile": "Foydalanuvchi profili",
+      "team": "Jamoa a'zolari",
+      "mcp": "MCP integratsiya",
+      "help": "Resurs markazi"
+    },
+    "team": {
+      "invite": "Jamoaga taklif",
+      "inviteHint": "Email orqali taklif yuboring. Foydalanuvchi aynan shu email bilan ro'yxatdan o'tgan bo'lishi kerak.",
+      "pendingInvites": "Kutilayotgan takliflar",
+      "permissions": "Ruxsatlar",
+      "role": "Rol",
+      "adAccountsAccess": "A'zo ad-account ruxsatlari"
+    },
+    "payments": {
+      "loadError": "To'lov ma'lumotlarini yuklashda xatolik",
+      "addCardError": "Karta qo'shishda xatolik",
+      "saveBillingError": "Billing ma'lumotlarini saqlashda xatolik",
+      "addPaymentMethod": "To'lov usuli qo'shish",
+      "editContactDetails": "Kontakt ma'lumotlarini tahrirlash"
+    },
+    "products": {
+      "loadError": "Mahsulot ma'lumotlarini yuklashda xatolik",
+      "orderError": "Buyurtma yaratilmadi"
+    },
+    "mcp": {
+      "title": "MCP integratsiyasi",
+      "createCredentials": "Client ID / Client Secret yaratish",
+      "existingCredentials": "Mavjud credentials",
+      "noCredentials": "Hozircha credential yo'q"
+    }
+  },
+  "campaigns": {
+    "subtitle": "Performa boshqarayotgan barcha reklama kampaniyalari",
+    "total": "jami",
+    "refresh": "Yangilash",
+    "create": "Kampaniya yaratish",
+    "newCampaign": "Yangi kampaniya",
+    "noCampaigns": "Hali kampaniyalar yo'q",
+    "noCampaignsWithStatus": "Bu statusdagi kampaniyalar yo'q",
+    "noCampaignsDescription": "Birinchi kampaniyangizni wizard orqali yarating yoki sync uchun ad account ulang.",
+    "noCampaignsWithStatusDescription": "Hozirda bu statusda kampaniya mavjud emas.",
+    "connectMorePlatforms": "Ko'proq platforma ulang",
+    "connectMorePlatformsHint": "Qamrovni kengaytirish uchun Google, TikTok yoki Telegram qo'shing.",
+    "connectPlatform": "Platforma ulash",
+    "loadFailed": "Kampaniyalarni yuklashda xatolik",
+    "updateFailed": "Kampaniya statusini yangilashda xatolik"
+  },
+  "reporting": {
+    "loadError": "Hisobotni yuklashda xatolik. Meta Ads ulanishini tekshiring.",
+    "exportError": "CSV eksportda xatolik",
+    "workspaceMissing": "Workspace tanlanmagan",
+    "subtitle": "Meta Ads ko'rsatkichlari account va kampaniya kesimida",
+    "exportCsv": "CSV eksport"
+  },
+  "performance": {
+    "loadFailed": "Performance ma'lumotlarini yuklashda xatolik",
+    "subtitle": "Kampaniya natijalarini kuzating va tahlil qiling",
+    "lastDays": "So'nggi",
+    "days": "kun",
+    "startTracking": "Performance trackingni boshlang",
+    "startTrackingDescription": "Bu yerda real-time metrikalarni ko'rish uchun birinchi kampaniyani ishga tushiring.",
+    "launchWithAi": "AI bilan yoqish",
+    "createManually": "Qo'lda yaratish",
+    "name": "Nomi",
+    "account": "Account",
+    "status": "Status",
+    "spend": "Xarajat",
+    "clicks": "Kliklar"
+  },
+  "creativeScorer": {
+    "maxSizeError": "Fayl hajmi 10MB dan oshmasligi kerak",
+    "fileTypeError": "Faqat JPG, PNG, WebP, GIF yoki MP4 qo'llab-quvvatlanadi",
+    "uploadRequired": "Iltimos, fayl yuklang",
+    "goalRequired": "Iltimos, reklama maqsadini kiriting",
+    "scoreFailed": "Kreativni baholashda xatolik",
+    "subtitle": "Kreativni yuklang va AI'dan 10 parametr bo'yicha baho oling",
+    "aiScoring": "AI baholash"
+  },
+  "audiences": {
+    "subtitle": "Full-funnel auditoriyalarni tuzing va bir xil oqimda ishga tushiring",
+    "launcherTitle": "Audience Launcher",
+    "launcherSubtitle": "Performa full-funnel targeting strategiyasi maksimal ROAS uchun optimallashtirilgan workflow bilan.",
+    "selected": "tanlandi",
+    "noAudienceSelected": "Hali auditoriya tanlanmagan."
+  },
+  "autoOptimization": {
+    "runFailed": "Optimizatsiya bajarilmadi",
+    "subtitle": "AI kampaniyalarni tahlil qiladi, muammolarni topadi va ustuvor harakatlarni beradi.",
+    "analysisTab": "Tahlil",
+    "historyTab": "Tarix"
+  },
+  "budget": {
+    "subtitle": "Kanallar bo'yicha AI optimallashtirilgan byudjet taqsimoti",
+    "autoRebalanceOn": "Auto-rebalance yoqilgan",
+    "realData": "Real ma'lumot",
+    "aiRecommendation": "AI tavsiyasi",
+    "noAllocationDescription": "AI byudjet tavsiyalarini olish uchun onboardingni yakunlang.",
+    "noForecastDescription": "KPI prognozini ko'rish uchun onboardingda AI strategiya yarating.",
+    "fromAiStrategy": "AI strategiyadan",
+    "noStrategyDescription": "Birinchi AI strategiya va byudjet rejasini yaratish uchun sozlamalarga o'ting.",
+    "goToSettings": "Sozlamalarga o'tish"
+  },
+  "aiDecisions": {
+    "loadFailed": "AI qarorlarni yuklashda xatolik",
+    "approveFailed": "Qarorni tasdiqlashda xatolik",
+    "rejectFailed": "Qarorni rad etishda xatolik",
+    "subtitle": "AI harakatlari va tavsiyalari to'liq asos bilan"
+  },
+  "pages": {
+    "marketplace": {
+      "perMonth": "/oy",
+      "priceNegotiable": "Narx kelishiladi",
+      "campaigns": "Kampaniyalar",
+      "success": "Muvaffaqiyat",
+      "profile": "Profil",
+      "trending": "Trend",
+      "minimumRating": "Minimal reyting"
+    },
+    "leaderboard": {
+      "rating": "Reyting",
+      "points": "Ball"
+    },
+    "integrations": {
+      "title": "Integratsiyalar markazi",
+      "subtitle": "Barcha biznes vositalaringizni bir joyda ulang va boshqaring",
+      "connected": "Ulangan",
+      "pending": "Kutilmoqda",
+      "available": "Mavjud",
+      "syncHealth": "Sync holati",
+      "connectedIntegrations": "Ulangan integratsiyalar",
+      "pendingSetup": "Sozlanishi kutilmoqda",
+      "availableIntegrations": "Mavjud integratsiyalar"
+    }
+  },
+  "sidebar": {
+    "autopilot": {
+      "fullAuto": "To'liq avtomatik",
+      "assisted": "Yordamchi",
+      "manual": "Qo'lda",
+      "fullAutoHint": "AI kampaniyalarni avtomatik boshqaradi.",
+      "assistedHint": "AI taklif beradi, siz tasdiqlaysiz.",
+      "manualHint": "Faqat AI tahlili, qo'lda bajarish."
+    }
+  },
+  "header": {
+    "workspaceSubtitle": "akkauntlar, obuna, to'lovlar, jamoa, MCP",
+    "toggleTheme": "Mavzuni almashtirish",
+    "dashboardSubtitle": "Reklama samaradorligi ko'rinishi",
+    "campaignsSubtitle": "Performa'dagi barcha kampaniyalar",
+    "audiencesSubtitle": "To'liq hunal auditoriyasini yarating va ishga tushiring",
+    "aiDecisionsSubtitle": "AI'ning barcha harakatlari to'liq asoslash bilan",
+    "budgetSubtitle": "Platformalar bo'yicha ajratish va samaradorlik",
+    "simulationSubtitle": "Byudjet sarflashdan oldin natijalarni bashorat qiling",
+    "competitorsSubtitle": "Raqobat tahlili va SWOT mezonlari",
+    "creativeScorerSubtitle": "AI yordamida reklama kreativini baholash",
+    "roiSubtitle": "Kengaytirishdan oldin rentabellikni baholang",
+    "settingsSubtitle": "Ish maydoni va hisob sozlamalari",
+    "reportingSubtitle": "Kampaniya darajasidagi ko'rsatkichlar va trendlar",
+    "marketplaceSubtitle": "Professional marketing mutaxassislari",
+    "launchSubtitle": "Kampaniyalarni samarali yarating va ishga tushiring",
+    "autoOptimizationSubtitle": "Avtomatlashtirish sozlamalari va bajarish siyosati",
+    "landingPageSubtitle": "AI asosida landing sahifa yaratuvchisi",
+    "portfolioSubtitle": "Mutaxassis profilini boshqarish"
   }
 }

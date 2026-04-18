@@ -1,7 +1,355 @@
 'use client'
+import { useEffect, useState, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
+import { useWorkspaceStore } from '@/stores/workspace.store'
+import { useI18n } from '@/i18n/use-i18n'
+import { useRealtimeRefresh } from '@/hooks/useRealtimeRefresh'
+import { MetricCard } from '@/components/ui/MetricCard'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { Alert, Button, DataTable, PageHeader } from '@/components/ui'
+import { workspaces as workspacesApi, aiAgent, meta as metaApi } from '@/lib/api-client'
+import { formatCurrency, formatNumber } from '@/lib/utils'
+import { SpendForecastChart } from '@/components/ui/SpendForecastChart'
+import { LearningMonitor } from '@/components/dashboard/LearningMonitor'
+import { ChatWidget } from '@/components/ui/ChatWidget'
 
-export const dynamic = 'force-dynamic'
+interface SparklinePoint { day: string; spend: number; clicks: number }
 
-export default function Page() {
-  return <div className="space-y-6"><h1>Page</h1></div>
+interface PerformanceSummary {
+  totalSpend?: number
+  totalRevenue?: number
+  totalConversions?: number
+  totalClicks?: number
+  totalImpressions?: number
+  campaignCount?: number
+  activeCampaigns?: number
+  overallRoas?: number
+  avgRoas?: number
+  metaConnected?: boolean
+  changes?: { spend: number | null; clicks: number | null; impressions: number | null }
+  sparkline?: SparklinePoint[]
+}
+
+interface TopAd {
+  campaignId: string
+  name: string
+  status: string
+  spend: number
+  clicks: number
+  impressions: number
+  ctr: number
+}
+
+export default function DashboardPage() {
+  const { t } = useI18n()
+  const router = useRouter()
+  const { currentWorkspace } = useWorkspaceStore()
+  const [performance, setPerformance] = useState<PerformanceSummary | null>(null)
+  const [loadingPerf, setLoadingPerf] = useState(true)
+  const [topAds, setTopAds] = useState<TopAd[]>([])
+  const [forecast, setForecast] = useState<any>(null)
+  const [optimizing, setOptimizing] = useState(false)
+  const [optimizeMsg, setOptimizeMsg] = useState('')
+  const [error, setError] = useState('')
+
+  const loadPerformance = useCallback(() => {
+    if (!currentWorkspace?.id) return
+    workspacesApi.performance(currentWorkspace.id)
+      .then((res) => setPerformance((res.data as any) ?? {}))
+      .catch(() => setPerformance({}))
+      .finally(() => setLoadingPerf(false))
+  }, [currentWorkspace?.id])
+
+  useEffect(() => {
+    if (!currentWorkspace?.id) { setLoadingPerf(false); return }
+    setLoadingPerf(true)
+    loadPerformance()
+    metaApi.topAds(currentWorkspace.id, 5)
+      .then((res) => setTopAds((res.data as any) ?? []))
+      .catch(() => {})
+    metaApi.spendForecast(currentWorkspace.id)
+      .then((res) => setForecast(res.data))
+      .catch(() => {})
+  }, [currentWorkspace?.id])
+
+  useRealtimeRefresh(currentWorkspace?.id, ['meta_synced', 'optimization_done'], loadPerformance)
+
+  async function handleRunOptimization() {
+    if (!currentWorkspace?.id) return
+    setOptimizing(true); setOptimizeMsg(''); setError('')
+    try {
+      await aiAgent.optimize(currentWorkspace.id)
+      setOptimizeMsg(t('dashboard.optimizationDone', 'Optimization complete — check AI Decisions for results.'))
+      setTimeout(() => setOptimizeMsg(''), 4000)
+    } catch (err: any) {
+      setError(err?.message ?? t('dashboard.optimizationFailed', 'Optimization failed'))
+      setTimeout(() => setError(''), 4000)
+    } finally { setOptimizing(false) }
+  }
+
+  const ws = currentWorkspace
+  const roas = performance?.overallRoas ?? performance?.avgRoas ?? 0
+  const sparklineSpend = performance?.sparkline?.map((p) => p.spend) ?? []
+  const sparklineClicks = performance?.sparkline?.map((p) => p.clicks) ?? []
+
+  if (!ws) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="max-w-md w-full text-center p-10 bg-surface border border-border rounded-2xl shadow-xl">
+          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-violet-600 rounded-2xl flex items-center justify-center mx-auto mb-5 text-3xl shadow-lg shadow-blue-500/30">
+            🚀
+          </div>
+          <h2 className="text-text-primary text-xl font-bold mb-2">{t('dashboard.welcomeToPerforma', 'Welcome to Performa')}</h2>
+          <p className="text-text-tertiary text-sm mb-6 leading-relaxed">
+            {t('dashboard.completeOnboarding', 'Complete onboarding to create your first workspace and let AI manage your ad campaigns.')}
+          </p>
+          <Button onClick={() => router.push('/onboarding')} className="w-full">
+            {t('dashboard.startSetup', 'Start Setup')} →
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6 max-w-7xl">
+
+      <PageHeader
+        title={t('navigation.dashboard', 'Dashboard')}
+        subtitle={`${currentWorkspace?.name ?? ''} · ${t('dashboard.realtimeOverview', 'Real-time overview')}`}
+        actions={
+          <Button onClick={handleRunOptimization} disabled={optimizing}>
+            {optimizing ? t('dashboard.optimizing', 'Optimizing...') : t('dashboard.runOptimization', 'Run AI Optimization')}
+          </Button>
+        }
+      />
+
+      {/* Alerts */}
+      {error && (
+        <Alert variant="error">⚠️ {error}</Alert>
+      )}
+      {optimizeMsg && (
+        <Alert variant="success">✓ {optimizeMsg}</Alert>
+      )}
+
+      {/* Meta source badge */}
+      {performance?.metaConnected && (
+        <div className="flex items-center gap-2 text-xs text-text-tertiary">
+          <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0 animate-pulse" />
+          <span>
+            {t('dashboard.metaRealtimePrefix', 'Metrics are streamed in real-time from')} <span className="text-text-primary dark:text-text-secondary font-medium">Meta Ads</span>
+          </span>
+          <a href="/settings/meta" className="text-blue-500 hover:text-blue-600 dark:text-blue-400 hover:underline ml-1">
+            {t('dashboard.settingsLink', 'settings')} →
+          </a>
+        </div>
+      )}
+
+      {/* KPI metrics */}
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
+        <MetricCard label="Xarajat" value={formatCurrency(performance?.totalSpend ?? 0)} subtext="So'nggi 30 kun" loading={loadingPerf} icon="💰" sparkline={sparklineSpend} change={performance?.changes?.spend ?? null} />
+        <MetricCard label="Daromad" value={formatCurrency(performance?.totalRevenue ?? 0)} subtext="Jami" loading={loadingPerf} icon="💵" accent />
+        <MetricCard label="ROAS" value={roas > 0 ? `${roas.toFixed(2)}x` : '—'} subtext="Return on ad spend" loading={loadingPerf} icon="📈" />
+        <MetricCard label="Konversiyalar" value={formatNumber(performance?.totalConversions ?? 0)} subtext="Jami" loading={loadingPerf} icon="🎯" />
+        <MetricCard label="Kliklar" value={formatNumber(performance?.totalClicks ?? 0)} subtext="Jami" loading={loadingPerf} icon="👆" sparkline={sparklineClicks} change={performance?.changes?.clicks ?? null} />
+        <MetricCard label="Kampaniyalar" value={performance?.activeCampaigns ?? performance?.campaignCount ?? '—'} subtext="Aktiv" loading={loadingPerf} icon="📢" />
+      </div>
+
+      {/* Learning Monitor + Forecast */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {currentWorkspace && <LearningMonitor workspaceId={currentWorkspace.id} />}
+        {forecast && forecast.daily?.length > 0 && (
+          <div className="lg:col-span-2 bg-surface border border-border/60 rounded-xl p-6 hover:border-border dark:hover:border-border hover:shadow-lg transition-all duration-300">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h2 className="text-base font-semibold text-text-primary flex items-center gap-2">
+                  <span>📊</span> Oylik xarajat bashorati
+                </h2>
+                <p className="text-xs text-text-tertiary mt-0.5">
+                  {forecast.daysElapsed} kun o'tdi · {forecast.daysTotal} kunlik oy
+                </p>
+              </div>
+              <div className="flex items-center gap-4 text-right">
+                <div>
+                  <p className="text-xs text-text-tertiary">Hozircha</p>
+                  <p className="text-text-primary font-bold text-lg">${forecast.spendToDate?.toFixed(0)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-text-tertiary">Bashorat</p>
+                  <p className="text-text-secondary font-bold text-lg">${forecast.predictedTotal?.toFixed(0)}</p>
+                </div>
+              </div>
+            </div>
+            <SpendForecastChart daily={forecast.daily} spendToDate={forecast.spendToDate} predictedTotal={forecast.predictedTotal} />
+          </div>
+        )}
+      </div>
+
+      {/* Top Ads */}
+      {topAds.length > 0 && (
+        <div className="bg-surface border border-border/60 rounded-xl p-6 hover:border-border dark:hover:border-border hover:shadow-lg transition-all duration-300">
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <h2 className="text-base font-semibold text-text-primary">🏆 {t('dashboard.topCampaigns', 'Top campaigns')}</h2>
+              <p className="text-xs text-text-tertiary mt-0.5">{t('dashboard.topCampaignsSubtitle', `Top ${topAds.length} by CTR · last 30 days`)}</p>
+            </div>
+            <Button variant="secondary" size="sm" onClick={() => router.push('/settings/meta')}>
+              {t('common.view', 'View')} →
+            </Button>
+          </div>
+          <DataTable
+            rows={topAds}
+            rowKey={(row) => row.campaignId}
+            columns={[
+              {
+                key: 'campaign',
+                header: t('dashboard.campaign', 'Campaign'),
+                render: (row) => <span className="font-medium text-text-primary">{row.name}</span>,
+              },
+              {
+                key: 'status',
+                header: t('dashboard.status', 'Status'),
+                render: (row) => (
+                  <span className={`rounded-full px-2 py-1 text-xs ${row.status === 'ACTIVE' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-surface-2 text-text-tertiary'}`}>
+                    {row.status}
+                  </span>
+                ),
+              },
+              { key: 'ctr', header: 'CTR', render: (row) => `${row.ctr.toFixed(2)}%` },
+              { key: 'spend', header: t('dashboard.spend', 'Spend'), render: (row) => formatCurrency(row.spend) },
+              { key: 'clicks', header: t('dashboard.clicks', 'Clicks'), render: (row) => formatNumber(row.clicks) },
+            ]}
+          />
+        </div>
+      )}
+
+      {/* AI Strategy + Autopilot */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-2 bg-surface border border-border/60 rounded-xl p-6 hover:border-border dark:hover:border-border hover:shadow-lg transition-all duration-300">
+          <div className="flex items-start justify-between mb-5">
+            <div>
+              <div className="flex items-center gap-2.5 mb-1">
+                <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-blue-600 rounded-lg flex items-center justify-center text-sm">🤖</div>
+                <h2 className="font-semibold text-text-primary">AI Strategy</h2>
+                {ws.aiStrategy && (
+                  <span className="text-xs bg-emerald-500/10 dark:bg-emerald-950 text-emerald-500 dark:text-emerald-400 border border-emerald-500/20 dark:border-emerald-800 px-2 py-0.5 rounded-full font-medium">Active</span>
+                )}
+              </div>
+              <p className="text-text-tertiary text-sm">Generated by Performa based on your business profile</p>
+            </div>
+            <button
+              onClick={handleRunOptimization}
+              disabled={optimizing}
+              className="px-3 py-1.5 bg-surface-2 hover:bg-surface-2 dark:hover:bg-surface-2 border border-border text-text-secondary text-xs font-medium rounded-lg transition-all duration-200 disabled:opacity-50"
+            >
+              Run optimization
+            </button>
+          </div>
+          {ws.aiStrategy ? (
+            <div className="space-y-4">
+              <div className="bg-surface-2 rounded-xl p-4 border border-border/50">
+                <p className="text-text-secondary text-sm leading-relaxed">{ws.aiStrategy.summary}</p>
+              </div>
+              {ws.aiStrategy.budgetAllocation && (
+                <div className="space-y-3">
+                  <p className="text-text-tertiary text-xs font-semibold uppercase tracking-wider">Budget allocation</p>
+                  {Object.entries(ws.aiStrategy.budgetAllocation).map(([platform, pct]) => (
+                    <div key={platform}>
+                      <div className="flex justify-between text-sm mb-1.5">
+                        <span className="text-text-secondary capitalize">{platform}</span>
+                        <span className="text-text-primary dark:text-text-secondary font-semibold">{String(pct)}%</span>
+                      </div>
+                      <div className="h-1.5 bg-surface-2-2 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-violet-500 to-blue-500 rounded-full transition-all duration-700" style={{ width: `${pct}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <EmptyState icon="🧠" title="No strategy yet" description="Complete onboarding to generate your AI strategy." action={{ label: 'Generate Strategy', onClick: () => router.push('/onboarding') }} />
+          )}
+        </div>
+
+        {/* Autopilot */}
+        <div className="bg-surface border border-border/60 rounded-xl p-6 hover:border-border dark:hover:border-border hover:shadow-lg transition-all duration-300">
+          <div className="flex items-center gap-2.5 mb-5">
+            <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center text-sm">⚡</div>
+            <h2 className="font-semibold text-text-primary">Autopilot</h2>
+          </div>
+          <div className="space-y-2">
+            {[
+              { mode: 'manual', icon: '🖐', label: 'Manual', desc: 'You decide everything' },
+              { mode: 'assisted', icon: '🤝', label: 'Assisted', desc: 'AI suggests, you approve' },
+              { mode: 'full_auto', icon: '🚀', label: 'Full Auto', desc: 'AI runs autonomously' },
+            ].map((option) => {
+              const isActive = ws.autopilotMode === option.mode
+              return (
+                <div
+                  key={option.mode}
+                  onClick={() => router.push('/settings')}
+                  className={`p-3 rounded-xl border transition-all duration-200 cursor-pointer ${
+                    isActive
+                      ? 'border-border bg-surface-2 shadow-sm'
+                      : 'border-border hover:border-border dark:hover:border-border hover:bg-surface-2 dark:hover:bg-surface/50'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-lg">{option.icon}</span>
+                    <div className="flex-1">
+                      <p className={`text-sm font-semibold ${isActive ? 'text-text-primary' : 'text-text-tertiary'}`}>{option.label}</p>
+                      <p className="text-text-tertiary text-xs">{option.desc}</p>
+                    </div>
+                    {isActive && <span className="w-2 h-2 rounded-full bg-surface-2 shrink-0" />}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+          {ws.aiStrategy?.monthlyForecast && (
+            <div className="mt-5 pt-5 border-t border-border">
+              <p className="text-text-tertiary text-xs font-semibold uppercase tracking-wider mb-3">Monthly forecast</p>
+              <div className="space-y-2.5">
+                {[
+                  { label: 'Est. Leads', value: ws.aiStrategy.monthlyForecast.estimatedLeads },
+                  { label: 'Est. ROAS', value: ws.aiStrategy.monthlyForecast.estimatedRoas ? `${ws.aiStrategy.monthlyForecast.estimatedRoas?.toFixed(1)}x` : '—' },
+                  { label: 'Est. CPA', value: ws.aiStrategy.monthlyForecast.estimatedCpa ? `$${ws.aiStrategy.monthlyForecast.estimatedCpa?.toFixed(0)}` : '—' },
+                ].map(({ label, value }) => (
+                  <div key={label} className="flex justify-between text-sm">
+                    <span className="text-text-tertiary">{label}</span>
+                    <span className="text-text-primary dark:text-text-secondary font-semibold">{value ?? '—'}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="bg-surface border border-border/60 rounded-xl px-6 py-4 flex items-center justify-between hover:border-border dark:hover:border-border transition-all duration-200">
+        <p className="text-text-tertiary text-sm font-medium shrink-0">Tezkor amallar</p>
+        <div className="flex items-center gap-2 flex-wrap justify-end">
+          {[
+            { label: 'Kampaniyalar', href: '/campaigns', icon: '📢' },
+            { label: 'AI Qarorlar', href: '/ai-decisions', icon: '🤖' },
+            { label: 'Byudjet', href: '/budget', icon: '💰' },
+            { label: 'Qoidalar', href: '/triggersets', icon: '⚡' },
+            { label: 'Simulyatsiya', href: '/simulation', icon: '🔮' },
+          ].map((action) => (
+            <button
+              key={action.href}
+              onClick={() => router.push(action.href)}
+              className="flex items-center gap-1.5 px-3 py-2 border border-border rounded-lg text-sm text-text-secondary font-medium hover:border-border dark:hover:border-border hover:text-text-primary dark:hover:text-text-secondary hover:bg-surface-2 dark:hover:bg-surface transition-all duration-200 active:scale-95"
+            >
+              <span>{action.icon}</span> {action.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <ChatWidget />
+    </div>
+  )
 }

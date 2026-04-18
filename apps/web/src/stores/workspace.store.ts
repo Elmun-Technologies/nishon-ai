@@ -18,6 +18,8 @@ interface Workspace {
   autopilotMode: string
   isOnboardingComplete: boolean
   aiStrategy: any | null
+  targetAudience?: string | null
+  targetLocation?: string | null
 }
 
 interface WorkspaceStore {

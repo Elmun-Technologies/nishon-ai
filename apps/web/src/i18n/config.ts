@@ -1,7 +1,7 @@
 // ─── Language Configuration ───────────────────────────────────────────────────
 
 export const LANGUAGES = {
-  uz: { name: 'Uzbek', flag: '🇺🇿', dir: 'ltr' },
+  uz: { name: "O'zbek", flag: '🇺🇿', dir: 'ltr' },
   ru: { name: 'Русский', flag: '🇷🇺', dir: 'ltr' },
   en: { name: 'English', flag: '🇬🇧', dir: 'ltr' },
 } as const

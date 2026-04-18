@@ -3,63 +3,93 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useWorkspaceStore } from '@/stores/workspace.store'
+import { useI18n } from '@/i18n/use-i18n'
 import {
   LayoutGrid, Rocket, Zap, BarChart3, Brain, Wallet,
   Settings2, LogOut, Users, Sparkles, TrendingUp, ShoppingBag, ChevronDown, Palette,
-  Wand2, Users2, Folder, Palette as PaletteIcon, Package, Image, RefreshCcw, Workflow,
+  Wand2, Users2, Folder, Palette as PaletteIcon, Package, Image, RefreshCcw, Workflow, Bot,
 } from 'lucide-react'
 
-const CATEGORIES = [
+const CATEGORIES: Array<{
+  id: string
+  labelKey: string
+  fallback: string
+  icon: any
+  items: Array<{ href: string; labelKey: string; fallback: string; icon: any; badge?: boolean }>
+}> = [
   {
-    id: 'advertising', label: 'Reklama', icon: Rocket,
+    id: 'marketing',
+    labelKey: 'navigation.marketing',
+    fallback: 'Marketing',
+    icon: Rocket,
     items: [
-      { href: '/launch',      label: 'Yoqish',       icon: Rocket },
-      { href: '/campaigns',   label: 'Kampaniyalar',  icon: Zap },
-      { href: '/marketplace', label: 'Marketplace',   icon: ShoppingBag },
+      { href: '/launch', labelKey: 'navigation.launch', fallback: 'Launch', icon: Rocket },
+      { href: '/campaigns', labelKey: 'navigation.campaigns', fallback: 'Campaigns', icon: Zap },
+      { href: '/marketplace', labelKey: 'navigation.marketplace', fallback: 'Marketplace', icon: ShoppingBag },
+      { href: '/audiences', labelKey: 'navigation.audiences', fallback: 'Audiences', icon: Users },
     ],
   },
   {
-    id: 'analytics', label: 'Analytics & Reports', icon: BarChart3,
+    id: 'analytics',
+    labelKey: 'navigation.analytics',
+    fallback: 'Analytics',
+    icon: BarChart3,
     items: [
-      { href: '/reporting',    label: 'Hisobot',    icon: BarChart3 },
-      { href: '/ai-decisions', label: 'AI Qarorlar', icon: Brain, badge: true },
+      { href: '/dashboard', labelKey: 'navigation.dashboard', fallback: 'Dashboard', icon: LayoutGrid },
+      { href: '/reporting', labelKey: 'navigation.reporting', fallback: 'Reporting', icon: BarChart3 },
+      { href: '/ai-decisions', labelKey: 'navigation.aiDecisions', fallback: 'AI Decisions', icon: Brain, badge: true },
+      { href: '/performance', labelKey: 'navigation.performance', fallback: 'Performance', icon: TrendingUp },
     ],
   },
   {
-    id: 'optimization', label: 'Optimization', icon: Settings2,
+    id: 'optimization',
+    labelKey: 'navigation.optimization',
+    fallback: 'Optimization',
+    icon: Settings2,
     items: [
-      { href: '/budget',            label: 'Byudjet',           icon: Wallet },
-      { href: '/auto-optimization', label: 'Auto-Optimizatsiya', icon: Settings2 },
-      { href: '/roi-calculator',    label: 'ROI Kalkulyator',    icon: BarChart3 },
+      { href: '/budget', labelKey: 'navigation.budget', fallback: 'Budget', icon: Wallet },
+      { href: '/auto-optimization', labelKey: 'navigation.autoOptimization', fallback: 'Auto Optimization', icon: Settings2 },
+      { href: '/roi-calculator', labelKey: 'navigation.roi', fallback: 'ROI Calculator', icon: BarChart3 },
+      { href: '/automation', labelKey: 'navigation.automation', fallback: 'Automation', icon: Workflow },
     ],
   },
   {
-    id: 'tools', label: 'Tools & Resources', icon: Sparkles,
+    id: 'tools',
+    labelKey: 'navigation.tools',
+    fallback: 'Tools & Resources',
+    icon: Sparkles,
     items: [
-      { href: '/retargeting',     label: 'Retargeting',      icon: RefreshCcw },
-      { href: '/automation',      label: 'Avtomatsiya',      icon: Workflow },
-      { href: '/creative-scorer', label: 'Kreativ Baholash', icon: Sparkles },
-      { href: '/competitors',     label: 'Raqobatchilar',    icon: Users },
-      { href: '/landing-page',    label: 'Landing Page',     icon: TrendingUp },
-      { href: '/my-portfolio',    label: 'Portfolio',        icon: TrendingUp },
+      { href: '/retargeting', labelKey: 'navigation.retargeting', fallback: 'Retargeting', icon: RefreshCcw },
+      { href: '/creative-scorer', labelKey: 'navigation.creativeScorer', fallback: 'Creative Scorer', icon: Sparkles },
+      { href: '/competitors', labelKey: 'navigation.competitors', fallback: 'Competitors', icon: Users },
+      { href: '/landing-page', labelKey: 'navigation.landingPage', fallback: 'Landing Page', icon: TrendingUp },
+      { href: '/my-portfolio', labelKey: 'navigation.portfolio', fallback: 'Portfolio', icon: TrendingUp },
+      { href: '/create-agent', labelKey: 'navigation.aiAssistant', fallback: 'AI Assistant', icon: Bot },
     ],
   },
   {
-    id: 'creative', label: 'Create', icon: Wand2,
+    id: 'creative',
+    labelKey: 'navigation.creative',
+    fallback: 'Creative',
+    icon: Wand2,
     items: [
-      { href: '/creative-hub',           label: 'Creative Hub',    icon: Palette },
-      { href: '/creative-hub/ai-actors',  label: 'AI Actors',      icon: Users2 },
-      { href: '/creative-hub/projects',   label: 'Projects',       icon: Folder },
-      { href: '/creative-hub/brand-kit',  label: 'Brand Kit',      icon: PaletteIcon },
-      { href: '/creative-hub/products',   label: 'Products',       icon: Package },
-      { href: '/creative-hub/media',      label: 'Media Library',   icon: Image },
+      { href: '/creative-hub', labelKey: 'navigation.creativeHub', fallback: 'Creative Hub', icon: Palette },
+      { href: '/creative-hub/ai-actors', labelKey: 'navigation.aiActors', fallback: 'AI Actors', icon: Users2 },
+      { href: '/creative-hub/projects', labelKey: 'navigation.projects', fallback: 'Projects', icon: Folder },
+      { href: '/creative-hub/brand-kit', labelKey: 'navigation.brandKit', fallback: 'Brand Kit', icon: PaletteIcon },
+      { href: '/creative-hub/products', labelKey: 'navigation.products', fallback: 'Products', icon: Package },
+      { href: '/creative-hub/media', labelKey: 'navigation.mediaLibrary', fallback: 'Media Library', icon: Image },
     ],
   },
 ]
 
-const BOTTOM_NAV = [{ href: '/settings', label: 'Sozlamalar', icon: Settings2 }]
+const BOTTOM_NAV = [
+  { href: '/settings/workspace', labelKey: 'navigation.workspace', fallback: 'Workspace', icon: Users },
+  { href: '/settings', labelKey: 'navigation.settings', fallback: 'Settings', icon: Settings2 },
+]
 
 export default function Sidebar() {
+  const { t } = useI18n()
   const pathname = usePathname()
   const router = useRouter()
   const { currentWorkspace, user, logout } = useWorkspaceStore()
@@ -105,7 +135,7 @@ export default function Sidebar() {
           }`}
         >
           <LayoutGrid size={16} className="shrink-0" strokeWidth={1.5} />
-          Dashboard
+          {t('navigation.dashboard', 'Dashboard')}
         </Link>
 
         {/* Categories */}
@@ -119,7 +149,7 @@ export default function Sidebar() {
                 className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-surface-2 transition-colors"
               >
                 <Icon size={15} strokeWidth={1.5} className="shrink-0" />
-                <span className="flex-1 text-left">{cat.label}</span>
+                <span className="flex-1 text-left">{t(cat.labelKey, cat.fallback)}</span>
                 <ChevronDown size={13} className={`shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
               </button>
 
@@ -139,7 +169,7 @@ export default function Sidebar() {
                         }`}
                       >
                         <ItemIcon size={14} strokeWidth={1.5} className="shrink-0" />
-                        <span className="flex-1 truncate">{item.label}</span>
+                        <span className="flex-1 truncate">{t(item.labelKey, item.fallback)}</span>
                         {'badge' in item && item.badge && (
                           <div className="w-1.5 h-1.5 rounded-full bg-info shrink-0" />
                         )}
@@ -163,13 +193,19 @@ export default function Sidebar() {
                 currentWorkspace.autopilotMode === 'assisted'  ? 'bg-warning' : 'bg-text-tertiary'
               }`} />
               <p className="text-text-primary text-xs font-medium">
-                {currentWorkspace.autopilotMode === 'full_auto' ? 'To\'liq Avto' :
-                 currentWorkspace.autopilotMode === 'assisted'  ? 'Yordamlashish' : 'Qo\'lda boshqarish'}
+                {currentWorkspace.autopilotMode === 'full_auto'
+                  ? t('sidebar.autopilot.fullAuto', 'Full Auto')
+                  : currentWorkspace.autopilotMode === 'assisted'
+                  ? t('sidebar.autopilot.assisted', 'Assisted')
+                  : t('sidebar.autopilot.manual', 'Manual')}
               </p>
             </div>
             <p className="text-text-tertiary text-xs leading-relaxed">
-              {currentWorkspace.autopilotMode === 'full_auto' ? 'AI mustaqil boshqarmoqda' :
-               currentWorkspace.autopilotMode === 'assisted'  ? 'AI tavsiya beradi, siz tasdiqlaysiz' : 'AI faqat maslahat beradi'}
+              {currentWorkspace.autopilotMode === 'full_auto'
+                ? t('sidebar.autopilot.fullAutoHint', 'AI manages campaigns automatically.')
+                : currentWorkspace.autopilotMode === 'assisted'
+                ? t('sidebar.autopilot.assistedHint', 'AI suggests actions, you approve.')
+                : t('sidebar.autopilot.manualHint', 'AI insights only, manual execution.')}
             </p>
           </div>
         </div>
@@ -179,7 +215,10 @@ export default function Sidebar() {
       <div className="px-2 border-t border-border py-2">
         {BOTTOM_NAV.map((item) => {
           const Icon = item.icon
-          const isActive = pathname.startsWith(item.href)
+          const isActive =
+            item.href === '/settings/workspace'
+              ? pathname.startsWith('/settings/workspace')
+              : pathname.startsWith('/settings') && !pathname.startsWith('/settings/workspace')
           return (
             <Link key={item.href} href={item.href}
               className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -187,7 +226,7 @@ export default function Sidebar() {
               }`}
             >
               <Icon size={16} strokeWidth={1.5} className="shrink-0" />
-              {item.label}
+              {t(item.labelKey, item.fallback)}
             </Link>
           )
         })}
@@ -205,7 +244,7 @@ export default function Sidebar() {
             <p className="text-text-primary text-xs font-medium truncate">{user?.name}</p>
             <p className="text-text-tertiary text-xs truncate">{user?.email}</p>
           </div>
-          <button onClick={handleLogout} title="Sign out"
+          <button onClick={handleLogout} title={t('common.logout', 'Logout')}
             className="text-text-tertiary hover:text-text-primary transition-colors p-1.5 rounded-lg hover:bg-surface-2">
             <LogOut size={15} strokeWidth={1.5} />
           </button>

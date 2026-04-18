@@ -8,6 +8,7 @@ import {
   Request,
   Get,
   Res,
+  Patch,
 } from "@nestjs/common";
 import { Response } from "express";
 import {
@@ -24,6 +25,7 @@ import {
   LoginDto,
   RefreshTokenDto,
   AuthResponseDto,
+  UpdateMeDto,
 } from "@performa/shared";
 
 @ApiTags("Authentication")
@@ -88,6 +90,14 @@ export class AuthController {
   @ApiResponse({ status: 200, description: "Current user data" })
   async me(@Request() req: any) {
     return req.user;
+  }
+
+  @Patch("me")
+  @UseGuards(AuthGuard("jwt"))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Update current authenticated user profile" })
+  async updateMe(@Request() req: any, @Body() dto: UpdateMeDto) {
+    return this.authService.updateMe(req.user.id, dto);
   }
 
   // ─── Google OAuth ───────────────────────────────────────────────────────────

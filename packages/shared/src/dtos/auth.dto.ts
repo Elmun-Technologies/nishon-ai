@@ -1,4 +1,4 @@
-import { IsEmail, IsString, MinLength, MaxLength } from 'class-validator'
+import { IsEmail, IsString, MinLength, MaxLength, IsOptional } from 'class-validator'
 
 export class RegisterDto {
   @IsEmail({}, { message: 'Please provide a valid email address' })
@@ -26,6 +26,18 @@ export class LoginDto {
 export class RefreshTokenDto {
   @IsString()
   token: string
+}
+
+export class UpdateMeDto {
+  @IsOptional()
+  @IsString()
+  @MinLength(2)
+  @MaxLength(100)
+  name?: string
+
+  @IsOptional()
+  @IsEmail()
+  email?: string
 }
 
 export class AuthResponseDto {

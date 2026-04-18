@@ -27,9 +27,11 @@
     "send": "Отправить",
     "view": "Просмотр",
     "more": "Больше",
-    "less": "Меньше"
+    "less": "Меньше",
+    "all": "Все",
+    "refresh": "Обновить",
+    "apply": "Применить"
   },
-
   "navigation": {
     "home": "Главная",
     "marketplace": "Маркетплейс",
@@ -42,9 +44,30 @@
     "automation": "Автоматизация",
     "retargeting": "Ретаргетинг",
     "audiences": "Аудитории",
-    "settings": "Настройки"
+    "settings": "Настройки",
+    "marketing": "Маркетинг",
+    "launch": "Запуск",
+    "reporting": "Отчеты",
+    "aiDecisions": "AI решения",
+    "performance": "Производительность",
+    "optimization": "Оптимизация",
+    "budget": "Бюджет",
+    "autoOptimization": "Автооптимизация",
+    "roi": "ROI калькулятор",
+    "tools": "Инструменты и ресурсы",
+    "creative": "Креатив",
+    "creativeScorer": "Оценка креативов",
+    "competitors": "Конкуренты",
+    "landingPage": "Лендинг",
+    "aiAssistant": "AI ассистент",
+    "aiActors": "AI актеры",
+    "projects": "Проекты",
+    "brandKit": "Бренд-кит",
+    "products": "Продукты",
+    "mediaLibrary": "Медиатека",
+    "workspace": "Рабочее пространство",
+    "simulation": "Симуляция"
   },
-
   "landing": {
     "hero": {
       "badge": "✨ Создано на основе Madgicx — для профессиональных маркетологов",
@@ -63,7 +86,6 @@
         "growth": "Средний рост ROAS"
       }
     },
-
     "capabilities": {
       "title": "Все, что нужно маркетологу, в одной платформе",
       "subtitle": "Управление кампаниями, контроль креатива, аналитика, финансы и управление. Каждая функция приносит свою ценность для маркетолога.",
@@ -82,13 +104,11 @@
         "insightsDesc": "Новые данные каждые 30 минут"
       }
     },
-
     "funnel": {
       "title": "Распределение бюджета по воронке",
       "subtitle": "Мы адаптировали модель воронки в стиле Madgicx для нашей платформы"
     }
   },
-
   "marketplace": {
     "title": "Маркетплейс",
     "subtitle": "Работайте с проверенными маркетологами и агентствами",
@@ -104,6 +124,8 @@
     "minRating": "Минимальный рейтинг",
     "minRoas": "Минимальный ROAS",
     "specialties": "Специализация",
+    "platforms": "Платформы",
+    "loadError": "Не удалось загрузить специалистов",
     "sortBy": {
       "rating": "По рейтингу",
       "roas": "По ROAS",
@@ -115,7 +137,6 @@
       "button": "Зарегистрироваться как специалист ↗"
     }
   },
-
   "portfolio": {
     "title": "Портфолио",
     "level": "Уровень",
@@ -139,7 +160,6 @@
     "sendMessage": "Отправить сообщение",
     "contactButton": "Связаться"
   },
-
   "leaderboard": {
     "title": "Рейтинг",
     "subtitle": "Топ-специалисты на Nishon AI",
@@ -168,7 +188,6 @@
     "badgesReward": "Значки",
     "badgesDesc": "Собирайте значки за достижение вех и демонстрацию опыта"
   },
-
   "badges": {
     "title": "Значки",
     "unlocked": "Открыто",
@@ -187,7 +206,6 @@
     "achievements": "Значки достижений",
     "industry": "Значки отраслей"
   },
-
   "levels": {
     "novice": "Новичок",
     "apprentice": "Ученик",
@@ -197,7 +215,6 @@
     "pointsTo": "Баллов до следующего уровня",
     "progress": "Прогресс"
   },
-
   "dashboard": {
     "title": "Панель управления",
     "welcome": "Добро пожаловать",
@@ -212,10 +229,24 @@
     "activeNow": "Сейчас активно",
     "totalSpend": "Общие расходы",
     "averageRoas": "Средний ROAS",
-    "campaigns": "Кампании",
-    "views": "Просмотры"
+    "views": "Просмотры",
+    "optimizationDone": "Оптимизация завершена - смотрите результаты в AI решениях.",
+    "optimizationFailed": "Оптимизация не удалась",
+    "welcomeToPerforma": "Добро пожаловать в Performa",
+    "completeOnboarding": "Завершите онбординг, чтобы создать рабочее пространство и передать управление AI.",
+    "startSetup": "Начать настройку",
+    "realtimeOverview": "Обзор в реальном времени",
+    "optimizing": "Оптимизация...",
+    "runOptimization": "Запустить AI оптимизацию",
+    "metaRealtimePrefix": "Метрики в реальном времени поступают из",
+    "settingsLink": "настройки",
+    "topCampaigns": "Топ кампании",
+    "topCampaignsSubtitle": "Топ кампании по CTR за последние 30 дней",
+    "campaign": "Кампания",
+    "status": "Статус",
+    "spend": "Расход",
+    "clicks": "Клики"
   },
-
   "automation": {
     "title": "Автоматизация",
     "subtitle": "Стратегии автоматической оптимизации на основе Madgicx",
@@ -228,7 +259,6 @@
     "success": "Успех",
     "failed": "Ошибка"
   },
-
   "retargeting": {
     "title": "Ретаргетинг",
     "campaigns": "Кампании",
@@ -238,9 +268,10 @@
     "launch": "Запустить",
     "budget": "Бюджет",
     "daily": "Ежедневно",
-    "total": "Всего"
+    "total": "Всего",
+    "subtitle": "Управляйте аудиториями и отслеживайте ретаргетинг кампании",
+    "newCampaign": "Новая кампания"
   },
-
   "creative": {
     "title": "Creative Hub",
     "createAd": "Создать объявление",
@@ -251,7 +282,6 @@
     "aiActors": "AI Актёры",
     "projects": "Проекты"
   },
-
   "auth": {
     "login": "Вход",
     "signup": "Регистрация",
@@ -265,7 +295,6 @@
     "noAccount": "У вас нет аккаунта?",
     "logout": "Выход"
   },
-
   "errors": {
     "notFound": "Не найдено",
     "unauthorized": "Неавторизованный доступ",
@@ -273,5 +302,177 @@
     "serverError": "Ошибка сервера",
     "tryAgain": "Попробуйте снова",
     "goHome": "На главную"
+  },
+  "workspaceSettings": {
+    "title": "Настройки рабочего пространства",
+    "workspace": "Рабочее пространство",
+    "classicSettings": "Классические настройки",
+    "tabs": {
+      "adAccounts": "Рекламные аккаунты",
+      "products": "Продукты и использование",
+      "payments": "Платежи",
+      "profile": "Профиль пользователя",
+      "team": "Участники команды",
+      "mcp": "Интеграция MCP",
+      "help": "Центр ресурсов"
+    },
+    "team": {
+      "invite": "Пригласить участника",
+      "inviteHint": "Отправьте приглашение по email. Пользователь должен быть зарегистрирован с тем же email.",
+      "pendingInvites": "Ожидающие приглашения",
+      "permissions": "Права",
+      "role": "Роль",
+      "adAccountsAccess": "Права доступа к рекламным аккаунтам"
+    },
+    "payments": {
+      "loadError": "Не удалось загрузить платежные данные",
+      "addCardError": "Не удалось добавить карту",
+      "saveBillingError": "Не удалось сохранить платежные данные",
+      "addPaymentMethod": "Добавить способ оплаты",
+      "editContactDetails": "Изменить контактные данные"
+    },
+    "products": {
+      "loadError": "Не удалось загрузить информацию о продуктах",
+      "orderError": "Не удалось создать заказ"
+    },
+    "mcp": {
+      "title": "Интеграция MCP",
+      "createCredentials": "Создать Client ID / Client Secret",
+      "existingCredentials": "Существующие credentials",
+      "noCredentials": "Credentials пока нет"
+    }
+  },
+  "campaigns": {
+    "subtitle": "Все рекламные кампании, управляемые Performa",
+    "total": "всего",
+    "refresh": "Обновить",
+    "create": "Создать кампанию",
+    "newCampaign": "Новая кампания",
+    "noCampaigns": "Кампаний пока нет",
+    "noCampaignsWithStatus": "Нет кампаний с этим статусом",
+    "noCampaignsDescription": "Создайте первую кампанию через мастер или подключите рекламный аккаунт для синхронизации.",
+    "noCampaignsWithStatusDescription": "Сейчас нет кампаний с этим статусом.",
+    "connectMorePlatforms": "Подключите больше платформ",
+    "connectMorePlatformsHint": "Добавьте Google, TikTok или Telegram для расширения охвата.",
+    "connectPlatform": "Подключить платформу",
+    "loadFailed": "Не удалось загрузить кампании",
+    "updateFailed": "Не удалось обновить статус кампании"
+  },
+  "reporting": {
+    "loadError": "Не удалось загрузить отчет. Проверьте подключение Meta Ads.",
+    "exportError": "Ошибка экспорта CSV",
+    "workspaceMissing": "Рабочее пространство не выбрано",
+    "subtitle": "Разбивка эффективности Meta Ads по аккаунтам и кампаниям",
+    "exportCsv": "Экспорт CSV"
+  },
+  "performance": {
+    "loadFailed": "Не удалось загрузить данные производительности",
+    "subtitle": "Следите и анализируйте эффективность кампаний",
+    "lastDays": "Последние",
+    "days": "дней",
+    "startTracking": "Начните отслеживать производительность",
+    "startTrackingDescription": "Запустите первую кампанию, чтобы увидеть метрики в реальном времени.",
+    "launchWithAi": "Запустить с AI",
+    "createManually": "Создать вручную",
+    "name": "Название",
+    "account": "Аккаунт",
+    "status": "Статус",
+    "spend": "Расход",
+    "clicks": "Клики"
+  },
+  "creativeScorer": {
+    "maxSizeError": "Размер файла должен быть меньше 10MB",
+    "fileTypeError": "Поддерживаются только JPG, PNG, WebP, GIF или MP4",
+    "uploadRequired": "Пожалуйста, загрузите файл",
+    "goalRequired": "Пожалуйста, укажите цель кампании",
+    "scoreFailed": "Ошибка оценки креатива",
+    "subtitle": "Загрузите креатив и получите AI оценку по 10 параметрам",
+    "aiScoring": "AI оценка"
+  },
+  "audiences": {
+    "subtitle": "Создавайте full-funnel аудитории и запускайте их системно",
+    "launcherTitle": "Audience Launcher",
+    "launcherSubtitle": "Стратегия full-funnel таргетинга Performa с оптимизированным workflow для максимального ROAS.",
+    "selected": "выбрано",
+    "noAudienceSelected": "Аудитории пока не выбраны."
+  },
+  "autoOptimization": {
+    "runFailed": "Оптимизация не удалась",
+    "subtitle": "AI анализирует кампании, выявляет проблемы и приоритизирует действия.",
+    "analysisTab": "Анализ",
+    "historyTab": "История"
+  },
+  "budget": {
+    "subtitle": "AI-оптимизированное распределение бюджета по каналам",
+    "autoRebalanceOn": "Автоперераспределение включено",
+    "realData": "Реальные данные",
+    "aiRecommendation": "AI рекомендация",
+    "noAllocationDescription": "Завершите онбординг, чтобы получить рекомендации AI по бюджету.",
+    "noForecastDescription": "Сгенерируйте AI стратегию в онбординге, чтобы увидеть KPI прогноз.",
+    "fromAiStrategy": "Из AI стратегии",
+    "noStrategyDescription": "Перейдите в настройки, чтобы создать первую AI стратегию и бюджетный план.",
+    "goToSettings": "Перейти в настройки"
+  },
+  "aiDecisions": {
+    "loadFailed": "Не удалось загрузить AI решения",
+    "approveFailed": "Не удалось подтвердить решение",
+    "rejectFailed": "Не удалось отклонить решение",
+    "subtitle": "Все AI действия и рекомендации с прозрачным обоснованием"
+  },
+  "pages": {
+    "marketplace": {
+      "perMonth": "/месяц",
+      "priceNegotiable": "Цена договорная",
+      "campaigns": "Кампании",
+      "success": "Успех",
+      "profile": "Профиль",
+      "trending": "В тренде",
+      "minimumRating": "Минимальный рейтинг"
+    },
+    "leaderboard": {
+      "rating": "Рейтинг",
+      "points": "Баллы"
+    },
+    "integrations": {
+      "title": "Центр интеграций",
+      "subtitle": "Подключайте и управляйте бизнес-инструментами в одном месте",
+      "connected": "Подключено",
+      "pending": "Ожидает",
+      "available": "Доступно",
+      "syncHealth": "Качество синхронизации",
+      "connectedIntegrations": "Подключенные интеграции",
+      "pendingSetup": "Ожидает настройки",
+      "availableIntegrations": "Доступные интеграции"
+    }
+  },
+  "sidebar": {
+    "autopilot": {
+      "fullAuto": "Полный авто",
+      "assisted": "С помощью",
+      "manual": "Ручной",
+      "fullAutoHint": "ИИ управляет кампаниями автоматически.",
+      "assistedHint": "ИИ предлагает действия, вы утверждаете.",
+      "manualHint": "Только аналитика ИИ, ручное выполнение."
+    }
+  },
+  "header": {
+    "workspaceSubtitle": "аккаунты, подписка, платежи, команда, MCP",
+    "toggleTheme": "Переключить тему",
+    "dashboardSubtitle": "Обзор эффективности рекламы",
+    "campaignsSubtitle": "Все кампании в Performa",
+    "audiencesSubtitle": "Создавайте и запускайте воронки аудиторий",
+    "aiDecisionsSubtitle": "Все действия ИИ с полным обоснованием",
+    "budgetSubtitle": "Распределение и эффективность по платформам",
+    "simulationSubtitle": "Прогноз результатов перед запуском",
+    "competitorsSubtitle": "Конкурентная разведка и SWOT-анализ",
+    "creativeScorerSubtitle": "Оценка рекламных материалов с помощью ИИ",
+    "roiSubtitle": "Оцените прибыльность перед масштабированием",
+    "settingsSubtitle": "Настройки воркспейса и аккаунта",
+    "reportingSubtitle": "Метрики и тренды кампаний",
+    "marketplaceSubtitle": "Профессиональные маркетинговые специалисты",
+    "launchSubtitle": "Создавайте и запускайте кампании эффективно",
+    "autoOptimizationSubtitle": "Настройки автоматизации и политика выполнения",
+    "landingPageSubtitle": "ИИ-конструктор лендингов",
+    "portfolioSubtitle": "Управление профилем специалиста"
   }
 }

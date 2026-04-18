@@ -122,7 +122,10 @@ export class TeamInvitesService {
   async listWorkspaceMembers(workspaceId: string, actorUserId: string) {
     await this.assertWorkspaceReadAccess(workspaceId, actorUserId);
 
-    const members = await this.memberRepo.find({ where: { workspaceId } });
+    const members = await this.memberRepo.find({
+      where: { workspaceId },
+      relations: ["user"],
+    });
     const pendingInvites = await this.inviteRepo.find({
       where: { workspaceId, status: "pending" },
     });

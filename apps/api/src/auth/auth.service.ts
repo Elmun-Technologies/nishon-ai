@@ -119,6 +119,30 @@ export class AuthService {
     await this.userRepo.update(userId, { refreshToken: null });
   }
 
+  async updateMe(
+    userId: string,
+    patch: { name?: string; email?: string },
+  ): Promise<Pick<User, "id" | "email" | "name" | "plan">> {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) throw new UnauthorizedException("User not found");
+
+    if (patch.email && patch.email !== user.email) {
+      const exists = await this.userRepo.findOne({ where: { email: patch.email } });
+      if (exists && exists.id !== userId) {
+        throw new ConflictException("An account with this email already exists");
+      }
+      user.email = patch.email;
+    }
+    if (patch.name !== undefined) user.name = patch.name;
+    const updated = await this.userRepo.save(user);
+    return {
+      id: updated.id,
+      email: updated.email,
+      name: updated.name,
+      plan: updated.plan,
+    };
+  }
+
   /**
    * Find or create a user from Google OAuth profile data.
    * Looks up by googleId first, then by email (to link existing accounts),
