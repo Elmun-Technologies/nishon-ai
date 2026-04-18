@@ -57,7 +57,7 @@ export default function LoginPage() {
         router.push('/onboarding')
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Email yoki parol noto\'g\'ri')
+      setError(err.response?.data?.message || 'Invalid email or password')
     } finally {
       setLoading(false)
     }
@@ -89,20 +89,19 @@ export default function LoginPage() {
               <span className="text-text-secondary text-sm font-medium">AI Agent Active</span>
             </div>
             <h2 className="text-4xl font-bold text-text-primary leading-tight mb-4">
-              Reklamalaringiz<br />
-              <span className="text-text-secondary">o'zi ishlaydi.</span>
+              Your ads<br />
+              <span className="text-text-secondary">run themselves.</span>
             </h2>
             <p className="text-text-tertiary text-lg leading-relaxed">
-              Performa Meta, Google va TikTok kampaniyalaringizni
-              mustaqil boshqaradi — har 2 soatda optimallashtiradi, har kuni hisobot beradi.
+              Performa autonomously manages your Meta, Google, and TikTok campaigns — optimizing every 2 hours and reporting daily results.
             </p>
           </div>
 
           <div className="grid grid-cols-3 gap-4 mb-8">
             {[
-              { value: '3.2x', label: "O'rtacha ROAS" },
-              { value: '−40%', label: "Past CPA" },
-              { value: '24/7', label: "AI monitoring" },
+              { value: '3.2x', label: 'Average ROAS' },
+              { value: '−40%', label: 'Lower CPA' },
+              { value: '24/7', label: 'AI Monitoring' },
             ].map((stat) => (
               <div key={stat.label} className="bg-surface-2 rounded-xl p-4 border border-border">
                 <p className="text-2xl font-bold text-text-secondary">{stat.value}</p>
@@ -113,16 +112,15 @@ export default function LoginPage() {
 
           <div className="bg-surface-2 rounded-xl p-5 border border-border">
             <p className="text-text-secondary text-sm leading-relaxed mb-3">
-              "Performa targetologimizni almashtirdi va birinchi oyda ROAS 2.8x oshdi.
-              Endi kampaniya boshqarishga 0 soat sarflaymiz."
+              "Performa replaced our media buyer, and ROAS grew 2.8x in the first month. We now spend zero hours on campaign management."
             </p>
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-surface-2 border border-border flex items-center justify-center">
-                <span className="text-xs font-bold text-text-secondary">JT</span>
+                <span className="text-xs font-bold text-text-secondary">MC</span>
               </div>
               <div>
-                <p className="text-text-primary text-xs font-medium">Jasur Toshmatov</p>
-                <p className="text-text-tertiary text-xs">CEO, TechShop Uzbekistan</p>
+                <p className="text-text-primary text-xs font-medium">Mark Chen</p>
+                <p className="text-text-tertiary text-xs">CEO, TechShop Inc</p>
               </div>
             </div>
           </div>
@@ -143,9 +141,8 @@ export default function LoginPage() {
           </div>
 
           <div className="bg-surface-elevated border border-border rounded-xl p-6">
-            <h2 className="text-xl font-semibold text-text-primary mb-6">Xush kelibsiz</h2>
+            <h2 className="text-xl font-semibold text-text-primary mb-6">Welcome back</h2>
 
-            {/* Social login buttons */}
             <div className="flex flex-col gap-2 mb-4">
               <button
                 type="button"
@@ -153,7 +150,7 @@ export default function LoginPage() {
                 className="w-full flex items-center justify-center gap-3 bg-surface-elevated hover:bg-surface-2 text-text-secondary font-medium py-2.5 px-4 rounded-lg border border-border transition-colors text-sm"
               >
                 <GoogleIcon />
-                Google orqali kirish
+                Sign in with Google
               </button>
               <button
                 type="button"
@@ -161,13 +158,13 @@ export default function LoginPage() {
                 className="w-full flex items-center justify-center gap-3 bg-[#1877F2] hover:bg-[#166FE5] text-text-primary font-medium py-2.5 px-4 rounded-lg transition-colors text-sm"
               >
                 <FacebookIcon />
-                Facebook orqali kirish
+                Sign in with Facebook
               </button>
             </div>
 
             <div className="flex items-center gap-3 mb-4">
               <div className="flex-1 h-px bg-surface-2" />
-              <span className="text-text-tertiary text-xs">yoki email bilan</span>
+              <span className="text-text-tertiary text-xs">or continue with email</span>
               <div className="flex-1 h-px bg-surface-2" />
             </div>
 
@@ -175,7 +172,7 @@ export default function LoginPage() {
               <Input
                 label="Email"
                 type="email"
-                placeholder="siz@kompaniya.com"
+                placeholder="you@company.com"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
                 required
@@ -183,7 +180,7 @@ export default function LoginPage() {
               />
 
               <Input
-                label="Parol"
+                label="Password"
                 type="password"
                 placeholder="••••••••"
                 value={form.password}
@@ -195,14 +192,14 @@ export default function LoginPage() {
               {error && <Alert variant="error">{error}</Alert>}
 
               <Button type="submit" fullWidth loading={loading} size="lg">
-                Kirish
+                Sign in
               </Button>
             </form>
 
             <p className="text-center text-text-tertiary text-sm mt-5">
-              Hisobingiz yo'qmi?{' '}
+              Don&apos;t have an account?{' '}
               <Link href="/register" className="text-text-secondary hover:text-text-primary transition-colors font-medium">
-                Ro'yxatdan o'ting
+                Sign up
               </Link>
             </p>
           </div>

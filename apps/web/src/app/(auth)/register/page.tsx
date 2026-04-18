@@ -43,12 +43,12 @@ interface FormErrors {
 
 function getPasswordStrength(password: string) {
   if (!password) return { level: 0, label: '', color: '' }
-  if (password.length < 6) return { level: 1, label: 'Kuchsiz', color: 'bg-red-500' }
-  if (password.length < 10) return { level: 2, label: "O'rtacha", color: 'bg-amber-500' }
+  if (password.length < 6) return { level: 1, label: 'Weak', color: 'bg-red-500' }
+  if (password.length < 10) return { level: 2, label: 'Fair', color: 'bg-amber-500' }
   if (/[A-Z]/.test(password) && /[0-9]/.test(password)) {
-    return { level: 4, label: 'Kuchli', color: 'bg-emerald-500' }
+    return { level: 4, label: 'Strong', color: 'bg-emerald-500' }
   }
-  return { level: 3, label: 'Yaxshi', color: 'bg-blue-500' }
+  return { level: 3, label: 'Good', color: 'bg-blue-500' }
 }
 
 export default function RegisterPage() {
@@ -71,10 +71,10 @@ export default function RegisterPage() {
 
   function validate(): boolean {
     const e: FormErrors = {}
-    if (!form.name || form.name.trim().length < 2) e.name = "Ism kamida 2 ta harf bo'lishi kerak"
-    if (!form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = "To'g'ri email kiriting"
-    if (!form.password || form.password.length < 8) e.password = "Parol kamida 8 ta belgidan iborat bo'lishi kerak"
-    if (form.password !== form.confirmPassword) e.confirmPassword = 'Parollar mos kelmaydi'
+    if (!form.name || form.name.trim().length < 2) e.name = 'Name must be at least 2 characters'
+    if (!form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Please enter a valid email'
+    if (!form.password || form.password.length < 8) e.password = 'Password must be at least 8 characters'
+    if (form.password !== form.confirmPassword) e.confirmPassword = 'Passwords do not match'
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -99,7 +99,7 @@ export default function RegisterPage() {
       router.push('/onboarding')
     } catch (err: any) {
       setServerError(
-        err.response?.data?.message || "Ro'yxatdan o'tishda xato yuz berdi. Qayta urinib ko'ring."
+        err.response?.data?.message || 'Sign up failed. Please try again.'
       )
     } finally {
       setLoading(false)
@@ -120,22 +120,20 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-surface-2 flex items-center justify-center p-6">
       <div className="w-full max-w-md">
 
-        {/* Logo */}
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-text-primary">
             Performa <span className="text-text-secondary">AI</span>
           </h1>
           <p className="text-text-tertiary text-sm mt-1">
-            AI bilan reklama boshqarishni boshlang
+            Start managing ads with AI
           </p>
         </div>
 
         <div className="bg-surface-elevated border border-border rounded-xl p-6">
           <h2 className="text-xl font-semibold text-text-primary mb-6">
-            Hisob yaratish
+            Create an account
           </h2>
 
-          {/* Social login buttons */}
           <div className="flex flex-col gap-2 mb-4">
             <button
               type="button"
@@ -143,7 +141,7 @@ export default function RegisterPage() {
               className="w-full flex items-center justify-center gap-3 bg-surface-elevated hover:bg-surface-2 text-text-secondary font-medium py-2.5 px-4 rounded-lg border border-border transition-colors text-sm"
             >
               <GoogleIcon />
-              Google orqali ro'yxatdan o'tish
+              Sign up with Google
             </button>
             <button
               type="button"
@@ -151,21 +149,21 @@ export default function RegisterPage() {
               className="w-full flex items-center justify-center gap-3 bg-[#1877F2] hover:bg-[#166FE5] text-text-primary font-medium py-2.5 px-4 rounded-lg transition-colors text-sm"
             >
               <FacebookIcon />
-              Facebook orqali ro'yxatdan o'tish
+              Sign up with Facebook
             </button>
           </div>
 
           <div className="flex items-center gap-3 mb-4">
             <div className="flex-1 h-px bg-surface-2" />
-            <span className="text-text-tertiary text-xs">yoki email bilan</span>
+            <span className="text-text-tertiary text-xs">or sign up with email</span>
             <div className="flex-1 h-px bg-surface-2" />
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
-              label="To'liq ism"
+              label="Full Name"
               type="text"
-              placeholder="Jasur Toshmatov"
+              placeholder="John Smith"
               value={form.name}
               onChange={(e) => update('name', e.target.value)}
               error={errors.name}
@@ -176,7 +174,7 @@ export default function RegisterPage() {
             <Input
               label="Email"
               type="email"
-              placeholder="siz@kompaniya.com"
+              placeholder="you@company.com"
               value={form.email}
               onChange={(e) => update('email', e.target.value)}
               error={errors.email}
@@ -186,9 +184,9 @@ export default function RegisterPage() {
 
             <div>
               <Input
-                label="Parol"
+                label="Password"
                 type="password"
-                placeholder="Kamida 8 ta belgi"
+                placeholder="At least 8 characters"
                 value={form.password}
                 onChange={(e) => update('password', e.target.value)}
                 error={errors.password}
@@ -215,9 +213,9 @@ export default function RegisterPage() {
             </div>
 
             <Input
-              label="Parolni tasdiqlang"
+              label="Confirm Password"
               type="password"
-              placeholder="Xuddi shu parol"
+              placeholder="Repeat password"
               value={form.confirmPassword}
               onChange={(e) => update('confirmPassword', e.target.value)}
               error={errors.confirmPassword}
@@ -228,20 +226,20 @@ export default function RegisterPage() {
             {serverError && <Alert variant="error">{serverError}</Alert>}
 
             <Button type="submit" fullWidth loading={loading} size="lg" className="mt-2">
-              Bepul hisob yaratish
+              Create Free Account
             </Button>
           </form>
 
           <p className="text-center text-text-tertiary text-sm mt-5">
-            Hisobingiz bormi?{' '}
+            Already have an account?{' '}
             <Link href="/login" className="text-text-secondary hover:text-text-primary transition-colors font-medium">
-              Kirish
+              Sign in
             </Link>
           </p>
         </div>
 
         <div className="flex items-center justify-center gap-6 mt-6">
-          {["Kredit karta shart emas", "Bepul boshlash", 'Istalgan vaqt bekor qilish'].map((item) => (
+          {['No credit card required', 'Free to start', 'Cancel anytime'].map((item) => (
             <div key={item} className="flex items-center gap-1.5">
               <span className="text-emerald-400 text-xs">✓</span>
               <span className="text-text-tertiary text-xs">{item}</span>
