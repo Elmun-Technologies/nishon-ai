@@ -3,9 +3,6 @@
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useWorkspaceStore } from '@/stores/workspace.store'
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { formatCurrency } from '@/lib/format'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,6 +11,8 @@ const PLATFORM_COLORS: Record<string, string> = {
   google: '#EA4335',
   tiktok: '#000000',
 }
+
+const formatCurrencyValue = (num: number) => `$${num.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
 
 export default function SimulationPage() {
   const router = useRouter()
@@ -100,17 +99,17 @@ export default function SimulationPage() {
         </button>
       </div>
 
-      <Card>
+      <div className="bg-white rounded-lg border border-slate-200 p-6">
         <div className="space-y-6">
           <div>
             <div className="flex items-center justify-between mb-3">
               <label className="text-text-primary font-medium text-sm">Monthly budget</label>
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold text-text-secondary">{formatCurrency(budget)}</span>
+                <span className="text-2xl font-bold text-text-secondary">{formatCurrencyValue(budget)}</span>
                 {budgetDelta !== 0 && (
-                  <Badge variant={budgetDelta > 0 ? 'success' : 'danger'} size="sm">
+                  <div className={`px-2 py-1 rounded text-xs font-semibold ${budgetDelta > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                     {budgetDelta > 0 ? '+' : ''}{budgetDeltaPct}% vs current
-                  </Badge>
+                  </div>
                 )}
               </div>
             </div>
@@ -192,29 +191,27 @@ export default function SimulationPage() {
             </div>
           </div>
         </div>
-      </Card>
+      </div>
 
       {projection && (
         <>
           <div>
             <h2 className="text-text-primary font-semibold mb-3 flex items-center gap-2">
               Projected Results
-              <Badge
-                variant={
-                  scenario === 'optimistic' ? 'success'
-                  : scenario === 'pessimistic' ? 'danger'
-                  : 'purple'
-                }
-              >
+              <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                scenario === 'optimistic' ? 'bg-green-100 text-green-700'
+                : scenario === 'pessimistic' ? 'bg-red-100 text-red-700'
+                : 'bg-purple-100 text-purple-700'
+              }`}>
                 {scenario}
-              </Badge>
+              </span>
             </h2>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
                 {
                   label: 'Est. Revenue',
-                  value: formatCurrency(projection.revenue),
+                  value: formatCurrencyValue(projection.revenue),
                   sub: `${projection.roas}x ROAS`,
                   color: 'text-emerald-400',
                   icon: '💵',
@@ -235,29 +232,29 @@ export default function SimulationPage() {
                 },
                 {
                   label: 'Est. CPA',
-                  value: formatCurrency(projection.cpa),
+                  value: formatCurrencyValue(projection.cpa),
                   sub: 'cost per acquisition',
                   color: 'text-text-primary',
                   icon: '💰',
                 },
               ].map(({ label, value, sub, color, icon }) => (
-                <Card key={label}>
+                <div key={label}>
                   <div className="flex items-center gap-2 mb-3">
                     <span className="text-lg">{icon}</span>
                     <p className="text-text-tertiary text-xs font-medium uppercase tracking-wide">{label}</p>
                   </div>
                   <p className={`text-2xl font-bold ${color}`}>{value}</p>
                   <p className="text-text-tertiary text-xs mt-1">{sub}</p>
-                </Card>
+                </div>
               ))}
             </div>
           </div>
 
-          <Card>
+          <div className="bg-white rounded-lg border border-slate-200 p-6">
             <div className="flex items-center gap-2 mb-5">
               <span className="text-lg">📊</span>
               <h2 className="font-semibold text-text-primary">Platform Breakdown</h2>
-              <Badge variant="gray" size="sm">{formatCurrency(budget)} total</Badge>
+              <span className="px-2 py-1 rounded text-xs font-semibold bg-slate-100 text-slate-700">{formatCurrencyValue(budget)} total</span>
             </div>
 
             <div className="space-y-4">
@@ -272,7 +269,7 @@ export default function SimulationPage() {
                         <span className="text-text-tertiary text-xs">{percentage}%</span>
                       </div>
                       <div className="text-right">
-                        <span className="text-text-primary text-sm font-medium">{formatCurrency(spend)}</span>
+                        <span className="text-text-primary text-sm font-medium">{formatCurrencyValue(spend)}</span>
                         <span className="text-text-tertiary text-xs ml-2">~{estLeads} leads</span>
                       </div>
                     </div>
@@ -283,9 +280,9 @@ export default function SimulationPage() {
                 )
               })}
             </div>
-          </Card>
+          </div>
 
-          <Card variant="outlined" padding="sm">
+          <div className="bg-white rounded-lg border border-slate-200 p-6">
             <div className="flex items-start gap-3 px-2">
               <span className="text-lg mt-0.5">💡</span>
               <div>
@@ -295,7 +292,7 @@ export default function SimulationPage() {
                 </p>
               </div>
             </div>
-          </Card>
+          </div>
         </>
       )}
     </div>
