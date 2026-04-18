@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { Search, TrendingUp, AlertCircle, CheckCircle2, BarChart3, Share2 } from 'lucide-react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
-import { Card } from '@/components/ui/card'
 import { apiClient } from '@/lib/api-client'
 
 export const dynamic = 'force-dynamic'
@@ -299,7 +298,7 @@ export default function CompetitorsPage() {
                     style={{ width: `${result.overallScore}%` }}
                   />
                 </div>
-              </Card>
+              </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Card className="p-6">
@@ -312,7 +311,7 @@ export default function CompetitorsPage() {
                       <li key={i} className="text-sm text-slate-600">• {s}</li>
                     ))}
                   </ul>
-                </Card>
+                </div>
 
                 <Card className="p-6">
                   <h3 className="font-bold text-red-600 mb-3 flex items-center gap-2">
@@ -324,7 +323,7 @@ export default function CompetitorsPage() {
                       <li key={i} className="text-sm text-slate-600">• {w}</li>
                     ))}
                   </ul>
-                </Card>
+                </div>
               </div>
             </div>
           )}
@@ -342,7 +341,7 @@ export default function CompetitorsPage() {
                   ))}
                 </div>
                 <div className="text-right text-lg font-bold text-blue-600">${result.monthlyStrategy.budget}/month</div>
-              </Card>
+              </div>
 
               {/* Quarterly */}
               <Card className="p-6">
@@ -358,7 +357,7 @@ export default function CompetitorsPage() {
                     <p className="text-2xl font-bold text-green-600">${result.quarterlyStrategy.budgetRequired}</p>
                   </div>
                 </div>
-              </Card>
+              </div>
 
               {/* Annual */}
               {result === MOCK_RESULT && (
@@ -373,7 +372,7 @@ export default function CompetitorsPage() {
                   <p className="text-sm text-slate-700 bg-yellow-50 p-4 rounded-lg">
                     {result.annualStrategy.budgetAdvice}
                   </p>
-                </Card>
+                </div>
               )}
             </div>
           )}
