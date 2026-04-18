@@ -1,18 +1,6 @@
-'use client'
-import { useState, useMemo } from 'react'
-import { useWorkspaceStore } from '@/stores/workspace.store'
-import { Card } from '@/components/ui/Card'
-import { Badge } from '@/components/ui/Badge'
-import { useRouter } from 'next/navigation'
-import { formatCurrency } from '@/lib/utils'
-
-// Platform color config for the bars
-const PLATFORM_COLORS: Record<string, string> = {
-  meta:     '#1877F2',
-  google:   '#4285F4',
-  tiktok:   '#69C9D0',
-  youtube:  '#FF0000',
-  telegram: '#2CA5E0',
+"'use client'"
+export default function Page() {
+  return <div className="space-y-6"><h1>Page</h1></div>
 }
 
 export default function SimulationPage() {

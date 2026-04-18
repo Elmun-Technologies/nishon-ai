@@ -1,19 +1,6 @@
-'use client'
-import { useMemo, useState } from 'react'
-import { useWorkspaceStore } from '@/stores/workspace.store'
-import { Button } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
-import { Alert } from '@/components/ui/Alert'
-import { Badge } from '@/components/ui/Badge'
-import { Spinner } from '@/components/ui/Spinner'
-import apiClient from '@/lib/api-client'
-
-interface AuditSubParam {
-  name: string
-  yourStatus: 'good' | 'bad' | 'medium'
-  competitorStatus: 'good' | 'bad' | 'medium'
-  yourNote: string
-  competitorNote: string
+"'use client'"
+export default function Page() {
+  return <div className="space-y-6"><h1>Page</h1></div>
 }
 
 interface AuditCategory {

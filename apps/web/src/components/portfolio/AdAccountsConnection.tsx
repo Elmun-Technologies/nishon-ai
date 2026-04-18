@@ -86,29 +86,29 @@ export const AdAccountsConnection: React.FC<AdAccountsConnectionProps> = ({ onCo
   );
 
   // ── STEP 1: PLATFORM SELECTION ──
-  if (step === 'select') {
+  if (step === 'select") {
     return (
-      <div className="space-y-6">
+      <div className=\"space-y-6\">
         <div>
-          <h3 className="text-xl font-bold text-text-primary mb-2">Qaysi platform uchun hisobni ulaysiz?</h3>
-          <p className="text-text-secondary text-sm">
+          <h3 className=\"text-xl font-bold text-text-primary mb-2\">Qaysi platform uchun hisobni ulaysiz?</h3>
+          <p className=\"text-text-secondary text-sm\">
             Reklama hisobingizni Performa platformasiga ulang va real vaqtda ma'lumotlarni kuzating
           </p>
         </div>
 
         {/* Already Connected Accounts */}
         {connectedAccounts.length > 0 && (
-          <Card className="border-green-500/20 bg-green-500/10 p-4">
-            <h4 className="font-semibold text-green-900 mb-3 flex items-center gap-2">
+          <Card className=\"border-green-500/20 bg-green-500/10 p-4\">
+            <h4 className=\"font-semibold text-green-900 mb-3 flex items-center gap-2\">
               <Check size={18} /> Ulangan hisoblar ({connectedAccounts.length}/3)
             </h4>
-            <div className="space-y-2">
+            <div className=\"space-y-2\">
               {connectedAccounts.map((acc) => (
-                <div key={acc.platform} className="flex items-center justify-between p-3 bg-surface rounded-lg border border-green-500/20">
-                  <span className="text-sm">
+                <div key={acc.platform} className=\"flex items-center justify-between p-3 bg-surface rounded-lg border border-green-500/20\">
+                  <span className=\"text-sm\">
                     {platformInfo[acc.platform].icon} {platformInfo[acc.platform].name}
                   </span>
-                  <Badge className="bg-green-600">{acc.accountName}</Badge>
+                  <Badge className=\"bg-green-600\">{acc.accountName}</Badge>
                 </div>
               ))}
             </div>
@@ -116,8 +116,8 @@ export const AdAccountsConnection: React.FC<AdAccountsConnectionProps> = ({ onCo
         )}
 
         {/* Platform Selection Grid */}
-        <div className="grid gap-4 md:grid-cols-3">
-          {(['meta', 'google', 'yandex'] as const).map((platform) => {
+        <div className=\"grid gap-4 md:grid-cols-3\">
+          {(["meta', 'google', 'yandex'] as const).map((platform) => {
             const isConnected = connectedPlatforms.includes(platform);
             const info = platformInfo[platform];
 
@@ -134,29 +134,29 @@ export const AdAccountsConnection: React.FC<AdAccountsConnectionProps> = ({ onCo
               >
                 <Card
                   className={`p-6 h-full flex flex-col gap-4 ${
-                    isConnected ? 'border-green-500/20 bg-green-500/10' : 'border-border hover:bg-surface-2'
+                    isConnected ? 'border-green-500/20 bg-green-500/10' : 'border-border hover:bg-surface-2"
                   }`}
                 >
-                  <div className="flex items-start justify-between">
+                  <div className=\"flex items-start justify-between\">
                     <div className={`flex h-12 w-12 items-center justify-center rounded-lg bg-${info.color}-100`}>
-                      <span className="text-2xl">{info.icon}</span>
+                      <span className=\"text-2xl\">{info.icon}</span>
                     </div>
-                    {isConnected && <Check size={20} className="text-green-600" />}
+                    {isConnected && <Check size={20} className=\"text-green-600\" />}
                   </div>
 
                   <div>
-                    <h4 className="font-bold text-text-primary text-lg">{info.name}</h4>
-                    <p className="text-sm text-text-secondary mt-1">{info.description}</p>
-                    <p className="text-xs text-text-tertiary mt-2">{info.details}</p>
+                    <h4 className=\"font-bold text-text-primary text-lg\">{info.name}</h4>
+                    <p className=\"text-sm text-text-secondary mt-1\">{info.description}</p>
+                    <p className=\"text-xs text-text-tertiary mt-2\">{info.details}</p>
                   </div>
 
                   {!isConnected && (
-                    <div className="flex items-center gap-2 text-blue-600 font-semibold text-sm mt-auto pt-4 border-t border-border">
+                    <div className=\"flex items-center gap-2 text-blue-600 font-semibold text-sm mt-auto pt-4 border-t border-border\">
                       Tanlash <ArrowRight size={16} />
                     </div>
                   )}
                   {isConnected && (
-                    <div className="text-green-600 font-semibold text-sm mt-auto pt-4 border-t border-green-500/20">
+                    <div className=\"text-green-600 font-semibold text-sm mt-auto pt-4 border-t border-green-500/20\">
                       ✓ Ulangan
                     </div>
                   )}
@@ -167,15 +167,15 @@ export const AdAccountsConnection: React.FC<AdAccountsConnectionProps> = ({ onCo
         </div>
 
         {availablePlatforms.length === 0 && (
-          <Card className="border-green-500/20 bg-green-500/10 p-6 text-center">
-            <div className="flex justify-center mb-3">
-              <Check size={32} className="text-green-600" />
+          <Card className=\"border-green-500/20 bg-green-500/10 p-6 text-center\">
+            <div className=\"flex justify-center mb-3\">
+              <Check size={32} className=\"text-green-600\" />
             </div>
-            <h4 className="font-bold text-green-900 mb-2">Barcha hisoblar ulangan!</h4>
-            <p className="text-green-700 text-sm mb-4">
+            <h4 className=\"font-bold text-green-900 mb-2\">Barcha hisoblar ulangan!</h4>
+            <p className=\"text-green-700 text-sm mb-4\">
               Siz Meta, Google va Yandex reklama hisoblarini ulagan bo'lsangiz, davom etishingiz mumkin.
             </p>
-            <Button onClick={onComplete} className="w-full">
+            <Button onClick={onComplete} className=\"w-full\">
               Davom etish →
             </Button>
           </Card>
@@ -185,38 +185,38 @@ export const AdAccountsConnection: React.FC<AdAccountsConnectionProps> = ({ onCo
   }
 
   // ── STEP 2: CONNECTION FLOW ──
-  if (step === 'connect' && selectedPlatform) {
+  if (step === "connect" && selectedPlatform) {
     const info = platformInfo[selectedPlatform];
 
     return (
-      <div className="space-y-6">
+      <div className=\"space-y-6\">
         {/* Header */}
         <div>
           <Button
-            variant="ghost"
-            size="sm"
+            variant=\"ghost\"
+            size=\"sm\"
             onClick={handleBackToSelect}
-            className="mb-4 text-text-secondary hover:text-text-primary"
+            className=\"mb-4 text-text-secondary hover:text-text-primary\"
           >
             ← Orqaga
           </Button>
-          <h3 className="text-2xl font-bold text-text-primary mb-2">
+          <h3 className=\"text-2xl font-bold text-text-primary mb-2\">
             {info.icon} {info.name} ni ulash
           </h3>
-          <p className="text-text-secondary">{info.description}</p>
+          <p className=\"text-text-secondary\">{info.description}</p>
         </div>
 
         {/* Connection Card */}
-        <Card className="p-8 text-center space-y-6">
-          <div className="flex justify-center">
+        <Card className=\"p-8 text-center space-y-6\">
+          <div className=\"flex justify-center\">
             <div className={`flex h-20 w-20 items-center justify-center rounded-2xl bg-${info.color}-100`}>
-              <span className="text-4xl">{info.icon}</span>
+              <span className=\"text-4xl\">{info.icon}</span>
             </div>
           </div>
 
           <div>
-            <h4 className="text-xl font-bold text-text-primary mb-2">Tayyor?</h4>
-            <p className="text-text-secondary text-sm">
+            <h4 className=\"text-xl font-bold text-text-primary mb-2\">Tayyor?</h4>
+            <p className=\"text-text-secondary text-sm\">
               Quyidagi tugmani bosing va {info.name} hisobingizga kirish ruxsatini bering.
               <br />
               Ruxsat berilgandan so'ng avtomatik ravishda qaytasiz.
@@ -224,10 +224,10 @@ export const AdAccountsConnection: React.FC<AdAccountsConnectionProps> = ({ onCo
           </div>
 
           {error && (
-            <div className="flex gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
-              <AlertCircle size={20} className="text-red-500 flex-shrink-0 mt-0.5" />
+            <div className=\"flex gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-lg\">
+              <AlertCircle size={20} className=\"text-red-500 flex-shrink-0 mt-0.5\" />
               <div>
-                <p className="font-semibold text-red-900 text-sm">{error}</p>
+                <p className=\"font-semibold text-red-900 text-sm\">{error}</p>
               </div>
             </div>
           )}
@@ -235,12 +235,12 @@ export const AdAccountsConnection: React.FC<AdAccountsConnectionProps> = ({ onCo
           <Button
             onClick={() => handleConnect(selectedPlatform)}
             disabled={loading}
-            size="lg"
-            className="w-full"
+            size=\"lg\"
+            className=\"w-full\"
           >
             {loading ? (
               <>
-                <span className="animate-spin inline-block mr-2">⏳</span>
+                <span className=\"animate-spin inline-block mr-2\">⏳</span>
                 Yuborilmoqda...
               </>
             ) : (
@@ -250,8 +250,8 @@ export const AdAccountsConnection: React.FC<AdAccountsConnectionProps> = ({ onCo
             )}
           </Button>
 
-          <p className="text-xs text-text-tertiary">
-            🔒 Sizning ma'lumotlaringiz xavfsiz. Biz faqat reklama hisoblarini boshqarish uchun kirish kerak.
+          <p className=\"text-xs text-text-tertiary\">
+            🔒 Sizning ma"lumotlaringiz xavfsiz. Biz faqat reklama hisoblarini boshqarish uchun kirish kerak.
           </p>
         </Card>
 
@@ -260,11 +260,11 @@ export const AdAccountsConnection: React.FC<AdAccountsConnectionProps> = ({ onCo
           <div className="flex gap-4">
             <div className="text-2xl">ℹ️</div>
             <div>
-              <h4 className="font-semibold text-blue-900 mb-2">Nima bo'ladi?</h4>
-              <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
+              <h4 className="font-semibold text-blue-900 mb-2">Nima bo"ladi?</h4>
+              <ul className=\"text-sm text-blue-800 space-y-1 list-disc list-inside\">
                 <li>Sizning {info.name} hisobiga xavfli ulanish o'rnatiladi</li>
-                <li>Reklama ma'lumotlari avtomatik ravishda sinxronizasiya bo'ladi</li>
-                <li>Portfolio'da real vaqtda natijalar ko'rsatiladi</li>
+                <li>Reklama ma"lumotlari avtomatik ravishda sinxronizasiya bo"ladi</li>
+                <li>Portfolio'da real vaqtda natijalar ko"rsatiladi</li>
                 <li>Biz sizning reklama budjetini boshqarmayiz - faqat ko'rish uchun kiramiz</li>
               </ul>
             </div>

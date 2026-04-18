@@ -54,8 +54,8 @@ const ALL_HOURS = Array.from({ length: 24 }, (_, i) => i)
 
 const AD_PRIORITIES = [
   { value: 'best_combo', label: 'Eng yaxshi kombinatsiya (tavsiya etiladi)' },
-  { value: 'close_phrase', label: "So'rovga yaqin ibora" },
-  { value: 'exact_match', label: 'Aniq moslik' },
+  { value: 'close_phrase", label: \"So'rovga yaqin ibora\" },
+  { value: "exact_match', label: 'Aniq moslik' },
   { value: 'broad_match', label: 'Keng moslik' }
 ]
 
@@ -300,18 +300,18 @@ export function CampaignSettings({
           <Switch
             id="alwaysOn"
             checked={formData.schedule.alwaysOn}
-            onChange={(checked) => onFormDataChange('schedule', { ...formData.schedule, alwaysOn: checked })}
+            onChange={(checked) => onFormDataChange('schedule", { ...formData.schedule, alwaysOn: checked })}
           />
-          <Label htmlFor="alwaysOn">Always On (24/7)</Label>
+          <Label htmlFor=\"alwaysOn\">Always On (24/7)</Label>
         </div>
 
         {/* Hour Schedule Grid — shown only when alwaysOn is false */}
         {!formData.schedule.alwaysOn && (
-          <div className="mt-4">
-            <div className="flex items-center justify-between mb-2">
+          <div className=\"mt-4\">
+            <div className=\"flex items-center justify-between mb-2\">
               <Label>Ko'rsatish soatlari</Label>
-              <div className="flex gap-2">
-                <Button variant="secondary" size="sm" onClick={() => applyHourPreset('work')}>Ish vaqti (9–18)</Button>
+              <div className=\"flex gap-2\">
+                <Button variant=\"secondary\" size=\"sm\" onClick={() => applyHourPreset("work')}>Ish vaqti (9–18)</Button>
                 <Button variant="secondary" size="sm" onClick={() => applyHourPreset('evening')}>Kechki (18–24)</Button>
                 <Button variant="secondary" size="sm" onClick={() => applyHourPreset('all')}>Hammasi</Button>
               </div>
@@ -509,12 +509,12 @@ export function CampaignSettings({
                   <Input
                     placeholder="Qisqa tavsif (ixtiyoriy)"
                     value={link.desc}
-                    onChange={(e) => updateQuickLink(i, 'desc', e.target.value)}
+                    onChange={(e) => updateQuickLink(i, 'desc", e.target.value)}
                   />
                 </div>
               ))}
               {quickLinksList.length < 8 && (
-                <Button variant="secondary" size="sm" onClick={addQuickLink}>
+                <Button variant=\"secondary\" size=\"sm\" onClick={addQuickLink}>
                   + Quick Link qo'shish
                 </Button>
               )}
@@ -522,19 +522,19 @@ export function CampaignSettings({
           )}
 
           {/* Clarifiers toggle */}
-          <div className="flex items-center gap-3">
+          <div className=\"flex items-center gap-3\">
             <Checkbox
-              id="clarifiers"
-              checked={activeExtensions.includes('clarifiers')}
+              id=\"clarifiers\"
+              checked={activeExtensions.includes("clarifiers')}
               onChange={() => handleExtensionToggle('clarifiers')}
             />
             <Label htmlFor="clarifiers">Clarifiers (callout extensions)</Label>
           </div>
 
-          {activeExtensions.includes('clarifiers') && (
-            <div className="ml-6 space-y-2">
+          {activeExtensions.includes('clarifiers") && (
+            <div className=\"ml-6 space-y-2\">
               {clarifiersList.map((text, i) => (
-                <div key={i} className="flex gap-2">
+                <div key={i} className=\"flex gap-2\">
                   <Input
                     placeholder={`Clarifier ${i + 1} (maks 25 belgi)`}
                     value={text}
@@ -544,7 +544,7 @@ export function CampaignSettings({
                   {clarifiersList.length > 1 && (
                     <button
                       onClick={() => removeClarifier(i)}
-                      className="text-red-500 hover:text-red-400 text-sm px-2"
+                      className=\"text-red-500 hover:text-red-400 text-sm px-2\"
                     >
                       ✕
                     </button>
@@ -552,7 +552,7 @@ export function CampaignSettings({
                 </div>
               ))}
               {clarifiersList.length < 8 && (
-                <Button variant="secondary" size="sm" onClick={addClarifier}>
+                <Button variant=\"secondary\" size=\"sm\" onClick={addClarifier}>
                   + Clarifier qo'shish
                 </Button>
               )}
@@ -560,10 +560,10 @@ export function CampaignSettings({
           )}
 
           {/* Promo Code toggle */}
-          <div className="flex items-center gap-3">
+          <div className=\"flex items-center gap-3\">
             <Checkbox
-              id="promoCode"
-              checked={activeExtensions.includes('promoCode')}
+              id=\"promoCode\"
+              checked={activeExtensions.includes("promoCode')}
               onChange={() => handleExtensionToggle('promoCode')}
             />
             <Label htmlFor="promoCode">Promo Code</Label>
@@ -607,12 +607,12 @@ export function CampaignSettings({
               id="aiEnabled"
               checked={aiEnabled}
               onChange={(checked) =>
-                onFormDataChange('aiOptimization', { ...formData.aiOptimization, enabled: checked })
+                onFormDataChange('aiOptimization", { ...formData.aiOptimization, enabled: checked })
               }
             />
             <div>
-              <Label htmlFor="aiEnabled">AI avtomatik tavsiyalarni qo'llash</Label>
-              <p className="text-xs text-text-tertiary">Barcha AI optimizatsiya funksiyalarini yoqish/o'chirish</p>
+              <Label htmlFor=\"aiEnabled\">AI avtomatik tavsiyalarni qo'llash</Label>
+              <p className=\"text-xs text-text-tertiary\">Barcha AI optimizatsiya funksiyalarini yoqish/o"chirish</p>
             </div>
           </div>
 
@@ -624,21 +624,21 @@ export function CampaignSettings({
                   id="autoReplaceCreatives"
                   checked={formData.aiOptimization.autoReplaceCreatives}
                   onChange={(checked) =>
-                    onFormDataChange('aiOptimization', { ...formData.aiOptimization, autoReplaceCreatives: checked })
+                    onFormDataChange('aiOptimization", { ...formData.aiOptimization, autoReplaceCreatives: checked })
                   }
                 />
                 <div>
-                  <Label htmlFor="autoReplaceCreatives">Samarasiz kreatiflarni almashtirish</Label>
-                  <p className="text-xs text-text-tertiary">AI past ko'rsatkichli reklamalarni yangi variantlar bilan almashtiradi</p>
+                  <Label htmlFor=\"autoReplaceCreatives\">Samarasiz kreatiflarni almashtirish</Label>
+                  <p className=\"text-xs text-text-tertiary\">AI past ko'rsatkichli reklamalarni yangi variantlar bilan almashtiradi</p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className=\"flex items-center gap-3\">
                 <Switch
-                  id="optimizeAudience"
+                  id=\"optimizeAudience\"
                   checked={formData.aiOptimization.optimizeAudience}
                   onChange={(checked) =>
-                    onFormDataChange('aiOptimization', { ...formData.aiOptimization, optimizeAudience: checked })
+                    onFormDataChange("aiOptimization', { ...formData.aiOptimization, optimizeAudience: checked })
                   }
                 />
                 <div>
@@ -652,29 +652,29 @@ export function CampaignSettings({
                   id="weeklyBudgetOptimization"
                   checked={formData.aiOptimization.weeklyBudgetOptimization}
                   onChange={(checked) =>
-                    onFormDataChange('aiOptimization', { ...formData.aiOptimization, weeklyBudgetOptimization: checked })
+                    onFormDataChange('aiOptimization", { ...formData.aiOptimization, weeklyBudgetOptimization: checked })
                   }
                 />
                 <div>
-                  <Label htmlFor="weeklyBudgetOptimization">Haftalik byudjetni taqsimlash</Label>
-                  <p className="text-xs text-text-tertiary">AI byudjetni kun bo'yicha yaxshi natija uchun qayta taqsimlaydi</p>
+                  <Label htmlFor=\"weeklyBudgetOptimization\">Haftalik byudjetni taqsimlash</Label>
+                  <p className=\"text-xs text-text-tertiary\">AI byudjetni kun bo'yicha yaxshi natija uchun qayta taqsimlaydi</p>
                 </div>
               </div>
             </div>
           )}
 
           {/* Separate toggle: match text to query */}
-          <div className="flex items-center gap-3 pt-2 border-t border-border">
+          <div className=\"flex items-center gap-3 pt-2 border-t border-border\">
             <Switch
-              id="dynamicText"
+              id=\"dynamicText\"
               checked={formData.aiOptimization.dynamicText}
               onChange={(checked) =>
-                onFormDataChange('aiOptimization', { ...formData.aiOptimization, dynamicText: checked })
+                onFormDataChange("aiOptimization", { ...formData.aiOptimization, dynamicText: checked })
               }
             />
             <div>
-              <Label htmlFor="dynamicText">Reklama matnini so'rovga moslashtirish</Label>
-              <p className="text-xs text-text-tertiary">AI foydalanuvchi so'roviga qarab reklama matnini dinamik o'zgartiradi</p>
+              <Label htmlFor=\"dynamicText\">Reklama matnini so'rovga moslashtirish</Label>
+              <p className=\"text-xs text-text-tertiary\">AI foydalanuvchi so"roviga qarab reklama matnini dinamik o'zgartiradi</p>
             </div>
           </div>
         </div>
@@ -711,15 +711,15 @@ export function CampaignSettings({
                 }
                 disabled={aiLoading}
               >
-                {aiLoading ? 'Generating...' : 'AI Generate Keywords'}
+                {aiLoading ? 'Generating...' : 'AI Generate Keywords"}
               </Button>
             </div>
           </div>
 
           <Textarea
-            placeholder="Manfiy kalit so'zlarni kiriting (har biri alohida qatorda)..."
+            placeholder=\"Manfiy kalit so'zlarni kiriting (har biri alohida qatorda)...\"
             rows={6}
-            value={formData.negativeKeywords.keywords.join('\n')}
+            value={formData.negativeKeywords.keywords.join("\n')}
             onChange={(e) =>
               onFormDataChange('negativeKeywords', {
                 ...formData.negativeKeywords,
@@ -820,23 +820,23 @@ export function CampaignSettings({
                   <h4 className="text-sm font-medium text-text-tertiary uppercase tracking-wider mb-3">Ob-havo sharoiti</h4>
                   <div className="grid grid-cols-3 gap-3">
                     <BidInput label="Quyoshli" value={formData.bidAdjustments.weather.sunny ?? 1}
-                      onChange={v => handleBidAdjustment('weather', { ...formData.bidAdjustments.weather, sunny: v })} />
-                    <BidInput label="Yomg'irli" value={formData.bidAdjustments.weather.rainy ?? 1}
-                      onChange={v => handleBidAdjustment('weather', { ...formData.bidAdjustments.weather, rainy: v })} />
+                      onChange={v => handleBidAdjustment('weather", { ...formData.bidAdjustments.weather, sunny: v })} />
+                    <BidInput label=\"Yomg'irli\" value={formData.bidAdjustments.weather.rainy ?? 1}
+                      onChange={v => handleBidAdjustment("weather', { ...formData.bidAdjustments.weather, rainy: v })} />
                     <BidInput label="Sovuq" value={formData.bidAdjustments.weather.cold ?? 1}
-                      onChange={v => handleBidAdjustment('weather', { ...formData.bidAdjustments.weather, cold: v })} />
+                      onChange={v => handleBidAdjustment('weather", { ...formData.bidAdjustments.weather, cold: v })} />
                   </div>
                 </div>
 
                 {/* KPI Correction — 7th type */}
                 <div>
-                  <h4 className="text-sm font-medium text-text-tertiary uppercase tracking-wider mb-3">
+                  <h4 className=\"text-sm font-medium text-text-tertiary uppercase tracking-wider mb-3\">
                     KPI Korreksiyasi
-                    <span className="ml-2 text-[#6366F1] text-xs normal-case">(Target CPA/ROAS bo'yicha segmentlash)</span>
+                    <span className=\"ml-2 text-[#6366F1] text-xs normal-case\">(Target CPA/ROAS bo'yicha segmentlash)</span>
                   </h4>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    <BidInput label="Umumiy KPI" value={formData.bidAdjustments.kpi.general ?? 1}
-                      onChange={v => handleBidAdjustment('kpi', { ...formData.bidAdjustments.kpi, general: v })} />
+                  <div className=\"grid grid-cols-2 md:grid-cols-3 gap-3\">
+                    <BidInput label=\"Umumiy KPI\" value={formData.bidAdjustments.kpi.general ?? 1}
+                      onChange={v => handleBidAdjustment("kpi', { ...formData.bidAdjustments.kpi, general: v })} />
                     <BidInput label="Mobil KPI" value={formData.bidAdjustments.kpi.mobile ?? 1}
                       onChange={v => handleBidAdjustment('kpi', { ...formData.bidAdjustments.kpi, mobile: v })} />
                     <BidInput label="Desktop KPI" value={formData.bidAdjustments.kpi.desktop ?? 1}
