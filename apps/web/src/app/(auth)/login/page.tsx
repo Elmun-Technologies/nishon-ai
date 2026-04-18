@@ -27,12 +27,40 @@ function GoogleIcon() {
   )
 }
 
+const DEMO_USER = {
+  id: 'demo-user-001',
+  email: 'demo@performa.ai',
+  name: 'Demo User',
+  plan: 'pro',
+}
+
+const DEMO_WORKSPACE = {
+  id: 'demo-workspace-001',
+  name: 'Demo Workspace',
+  industry: 'ecommerce',
+  monthlyBudget: 5000,
+  goal: 'increase_roas',
+  autopilotMode: 'assisted',
+  isOnboardingComplete: true,
+  aiStrategy: null,
+  targetAudience: null,
+  targetLocation: null,
+}
+
 export default function LoginPage() {
   const router = useRouter()
   const { setUser, setAccessToken, setCurrentWorkspace } = useWorkspaceStore()
   const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  function handleDemoLogin() {
+    localStorage.setItem('performa_access_token', 'demo-token-local-preview')
+    setAccessToken('demo-token-local-preview')
+    setUser(DEMO_USER)
+    setCurrentWorkspace(DEMO_WORKSPACE)
+    router.push('/dashboard')
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -198,6 +226,17 @@ export default function LoginPage() {
                 Kirish
               </Button>
             </form>
+
+            <div className="mt-3">
+              <button
+                type="button"
+                onClick={handleDemoLogin}
+                className="w-full flex items-center justify-center gap-2 rounded-lg border border-dashed border-border bg-surface-2 py-2.5 px-4 text-sm text-text-tertiary hover:border-text-secondary hover:text-text-secondary transition-colors"
+              >
+                <span>⚡</span>
+                Demo kirish — hisob talab etilmaydi
+              </button>
+            </div>
 
             <p className="text-center text-text-tertiary text-sm mt-5">
               Hisobingiz yo'qmi?{' '}
