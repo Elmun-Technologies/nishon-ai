@@ -1,6 +1,5 @@
 {
   "buildCommand": "pnpm install --frozen-lockfile && pnpm --filter web build",
-  "outputDirectory": "apps/web/.next",
   "framework": "nextjs",
   "env": {
     "NEXT_TELEMETRY_DISABLED": "1"
