@@ -137,7 +137,7 @@ export default function WorkspacePaymentsPage() {
           <p className="mt-4 text-sm text-text-tertiary">Yuklanmoqda...</p>
         ) : methods.length === 0 ? (
           <div className="mt-4 rounded-xl border border-dashed border-border p-6 text-center text-sm text-text-tertiary">
-            Saqlangan karta yo‘q.
+            Saqlangan karta yo'q.
           </div>
         ) : (
           <div className="mt-4 space-y-2">

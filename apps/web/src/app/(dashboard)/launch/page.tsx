@@ -445,7 +445,7 @@ export default function LaunchPage() {
           <div className="bg-surface border border-border rounded-2xl p-6 space-y-5">
             <div>
               <h2 className="text-lg font-bold text-text-primary mb-2">Ko'rib chiqing</h2>
-              <p className="text-text-tertiary text-sm">Barcha ma'lumotlar to'g'rimi?</p>
+              <p className="text-text-tertiary text-sm">Barcha ma"lumotlar to'g"rimi?</p>
             </div>
             <div className="bg-surface-2 rounded-xl p-4 space-y-3 text-sm">
               <div className="flex justify-between"><span className="text-text-tertiary">Maqsad:</span> <span className="font-semibold text-text-primary">{metaData.objective}</span></div>

@@ -10,7 +10,7 @@ const SPECIALIST_DATA = {
     name: 'Dilshod Rakhimov',
     avatar: '👨‍💼',
     title: 'Meta & Google Ads Specialist',
-    bio: 'E-commerce va performance marketing'da 7 yillik tajriba. Meta va Google da sertifikatsiyalangan.',
+    bio: "E-commerce va performance marketing'da 7 yillik tajriba. Meta va Google da sertifikatsiyalangan.",
     basePrice: 250,
     roas: 4.8,
     rating: 4.9,

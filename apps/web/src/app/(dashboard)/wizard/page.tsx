@@ -691,7 +691,7 @@ export default function CampaignWizardPage() {
             ? ' creative score AI tomonidan hisoblanmoqda...'
             : creativeDiagnostics.source === 'ai'
               ? ' creative score real AI diagnostic natijasiga asoslangan.'
-              : ' creative image yo‘q yoki AI unavailable bo‘lsa fallback preview ishlatiladi.'}
+              : " creative image yo'q yoki AI unavailable bo'lsa fallback preview ishlatiladi."}
         </p>
       </div>
 

@@ -470,7 +470,7 @@ export default function LandingPageEditor() {
       {tab === 'contact' && (
         <div className="space-y-4">
           <p className="text-xs text-text-tertiary">
-            Sahifadagi "Bog'lanish" tugmasi ushbu ma'lumotlarga bog'lanadi.
+            Sahifadagi "Bog"lanish" tugmasi ushbu ma'lumotlarga bog"lanadi.
           </p>
           <Field
             label="Telefon raqami"

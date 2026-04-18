@@ -318,7 +318,7 @@ export default function ServiceSelectionPage() {
         <p className="text-xs text-amber-500 font-medium mb-1">💡 Monetizatsiya modeli</p>
         <p className="text-xs text-amber-500 leading-relaxed">
           Jonli targetologlar uchun: ular oylik to'lov oladi, Performa 15% komissiya oladi.
-          AI agentlar uchun: ba'zilari bepul (subscription bilan), ba'zilari oylik to'lov + kichik komissiya.
+          AI agentlar uchun: ba"zilari bepul (subscription bilan), ba'zilari oylik to"lov + kichik komissiya.
           O'z AI agentingizni yaratib, boshqalarga ijaraga bersangiz — siz 80% daromad olasiz.
         </p>
       </div>

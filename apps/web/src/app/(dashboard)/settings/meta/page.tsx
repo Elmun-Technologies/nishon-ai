@@ -77,7 +77,7 @@ function buildAccountRecommendations(account: MetaDashboardAccount): AccountReco
 
   if (totalCampaigns === 0) {
     tips.push({
-      title: 'Kampaniya yo‘q',
+      title: "Kampaniya yo'q",
       detail: 'Account ulangan, lekin kampaniya topilmadi. Sync qilgandan keyin structure va objective tekshiring.',
     })
     return tips
@@ -105,20 +105,20 @@ function buildAccountRecommendations(account: MetaDashboardAccount): AccountReco
   if (cpc > 1.5) {
     tips.push({
       title: 'CPC yuqori',
-      detail: `O‘rtacha CPC $${cpc.toFixed(2)}. Audience overlap va placementlarni tozalang.`,
+      detail: `O'rtacha CPC $${cpc.toFixed(2)}. Audience overlap va placementlarni tozalang.`,
     })
   }
 
   if (spend > 0 && clicks === 0) {
     tips.push({
-      title: 'Spend bor, klik yo‘q',
-      detail: 'Byudjet sarflanmoqda, lekin trafik yo‘q. Tracking va targetingni darhol tekshiring.',
+      title: "Spend bor, klik yo'q",
+      detail: "Byudjet sarflanmoqda, lekin trafik yo'q. Tracking va targetingni darhol tekshiring.",
     })
   }
 
   if (tips.length === 0) {
     tips.push({
-      title: 'Account sog‘lom',
+      title: "Account sog'lom",
       detail: 'Asosiy metrikalar yaxshi. Winning kampaniyalarni bosqichma-bosqich scale qiling.',
     })
   }

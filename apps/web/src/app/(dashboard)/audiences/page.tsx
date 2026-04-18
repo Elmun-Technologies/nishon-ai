@@ -97,22 +97,22 @@ const FULL_FUNNEL_RECOMMENDATIONS: Array<{
   {
     title: 'Strategic caveat (important)',
     intro:
-      '76 ta audience mavjud bo‘lsa ham, hammasini birdan launch qilmang. Bu “menu strategy”: bosqichma-bosqich test qiling, budgetni tarqatib yubormang.',
+      "76 ta audience mavjud bo'lsa ham, hammasini birdan launch qilmang. Bu “menu strategy”: bosqichma-bosqich test qiling, budgetni tarqatib yubormang.",
     points: [
       'Har funnel bosqichida 2-4 ta eng kuchli audience bilan boshlang.',
-      'Winner topilgach keyingi audience’larni qo‘shib boring.',
-      'Budget va frequency nazorat qilinmasa tezda ad fatigue paydo bo‘ladi.',
+      "Winner topilgach keyingi audience'larni qo'shib boring.",
+      "Budget va frequency nazorat qilinmasa tezda ad fatigue paydo bo'ladi.",
     ],
   },
   {
     title: 'Acquisition prospecting — what usually wins',
-    intro: 'Winning audience har doim 2 omilga bog‘liq: Quality + Quantity.',
+    intro: "Winning audience har doim 2 omilga bog'liq: Quality + Quantity.",
     points: [
       'Lookalike of Video Addicts (95% watchers).',
-      'Agar 95% yetarli bo‘lmasa: Video Enthusiasts (75%) yoki Video Casuals (50%).',
+      "Agar 95% yetarli bo'lmasa: Video Enthusiasts (75%) yoki Video Casuals (50%).",
       'Super lookalike (top-performing audience kombinatsiyasi).',
       'Niche prospecting from top URLs (eng muhim sahifalar visitorlari).',
-      'Interest targeting & audience mixes (studio’da tayyorlangan interest setlar).',
+      "Interest targeting & audience mixes (studio'da tayyorlangan interest setlar).",
       'Broad targeting (pixel data kuchli accountlar uchun).',
     ],
   },
@@ -121,17 +121,17 @@ const FULL_FUNNEL_RECOMMENDATIONS: Array<{
     points: [
       'Video Addicts / Enthusiasts / Casuals.',
       'Social Media Engagers (FB/IG page/ad engagement).',
-      'Ad Viewers (kamida 3 soniya video ko‘rganlar).',
+      "Ad Viewers (kamida 3 soniya video ko'rganlar).",
     ],
   },
   {
     title: 'Retargeting best practice',
     intro:
-      '72 soat “hot window”: user saytingizga kirgandan keyin 1-3 marta/kun ko‘rsatish odatda eng yaxshi natija beradi.',
+      "72 soat “hot window”: user saytingizga kirgandan keyin 1-3 marta/kun ko'rsatish odatda eng yaxshi natija beradi.",
     points: [
       'Custom recency visitors 0-3 days (aggressive retargeting).',
       'Custom recency visitors 3-30 days (frequencyni pasaytirib).',
-      '30-180 day cohort’larni alohida campaign/ad setlarda tekshirish.',
+      "30-180 day cohort'larni alohida campaign/ad setlarda tekshirish.",
     ],
   },
   {
@@ -357,7 +357,7 @@ export default function AudiencesPage() {
               <div key={n} className="rounded-lg border border-border bg-surface p-2">
                 <div className="aspect-[4/5] rounded bg-[#16133B] mb-2" />
                 <p className="text-xs text-text-tertiary">Creative #{n}</p>
-                <p className="text-[11px] text-text-tertiary mt-1">ROAS, CTR, thumb-stop va spend metrikalari bo‘yicha saralash.</p>
+                <p className="text-[11px] text-text-tertiary mt-1">ROAS, CTR, thumb-stop va spend metrikalari bo'yicha saralash.</p>
               </div>
             ))}
           </div>
@@ -433,7 +433,7 @@ export default function AudiencesPage() {
             ))}
           </div>
 
-          <h3 className="text-base font-semibold mb-3">Winning audiences playbook (to‘liq)</h3>
+          <h3 className="text-base font-semibold mb-3">Winning audiences playbook (to'liq)</h3>
           <p className="text-sm text-[#C7CAD1] mb-3">
             Asosiy prinsip: 76 ta preset bor, lekin hammasini birdan ishga tushirmang. Restaurant menyusi kabi — eng kuchli kombinatsiyalarni bosqichma-bosqich test qiling.
           </p>
@@ -454,10 +454,10 @@ export default function AudiencesPage() {
           <div className="mt-4 rounded-lg border border-border p-3">
             <p className="text-sm font-medium mb-2">Performa vs Facebook Ads Manager (nima uchun bu section kerak)</p>
             <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-[#A1A1AA]">
-              <li>• Performa’da preset audiences va exclusionlar oldindan beriladi.</li>
+              <li>• Performa'da preset audiences va exclusionlar oldindan beriladi.</li>
               <li>• AI lookalike segmentlar bilan sifat + hajm balansini yaxshilaydi.</li>
-              <li>• Funnel stage’larni kampaniyalarga alohida ajratish osonlashadi.</li>
-              <li>• Creative picker performance ma’lumotlari bilan ishlaydi.</li>
+              <li>• Funnel stage'larni kampaniyalarga alohida ajratish osonlashadi.</li>
+              <li>• Creative picker performance ma'lumotlari bilan ishlaydi.</li>
             </ul>
           </div>
 

@@ -103,7 +103,7 @@ export default function SimulationPage() {
           Simulation & Forecast
         </h1>
         <p className="text-text-tertiary text-sm">
-          Byudjetingizni o'zgartirsa qanday natijalar bo'lishini oldindan ko'ring
+          Byudjetingizni o"zgartirsa qanday natijalar bo'lishini oldindan ko"ring
         </p>
       </div>
 

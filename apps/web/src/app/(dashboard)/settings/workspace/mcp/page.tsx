@@ -92,7 +92,7 @@ export default function WorkspaceMcpPage() {
               AI agentlar (Cursor, Claude va hokazo) workspace bilan xavfsiz ulanishi uchun Client ID / Secret.
             </p>
             <p className="mt-3 text-sm text-amber-200/80">
-              Client ID / Secret yaratish endpointi ulangan. Secret faqat bir marta ko‘rinadi, keyin maskalangan holda saqlanadi.
+              Client ID / Secret yaratish endpointi ulangan. Secret faqat bir marta ko'rinadi, keyin maskalangan holda saqlanadi.
             </p>
             <Button className="mt-4" size="sm" type="button" loading={creating} onClick={() => void createCredential()} disabled={!currentWorkspace?.id}>
               + {t('workspaceSettings.mcp.createCredentials', 'Create Client ID / Client Secret')}
@@ -153,7 +153,7 @@ export default function WorkspaceMcpPage() {
 
       <Dialog open={showSecretModal} onClose={() => setShowSecretModal(false)} title="Yangi credentialslar" className="max-w-lg">
         <p className="mt-2 text-sm text-text-tertiary">
-          Secret faqat bir marta ko‘rinadi — nusxalab saqlang.
+          Secret faqat bir marta ko'rinadi — nusxalab saqlang.
         </p>
         <div className="mt-4 space-y-3">
           <div>

@@ -40,7 +40,7 @@ export default function WorkspaceSettingsLayout({
             </span>
           </div>
           <p className="mt-2 max-w-2xl text-sm text-text-tertiary">
-            Madgicx uslubidagi markaz: Meta accountlar, obuna va limitlar, to‘lov, profil, jamoa va AI agentlar uchun MCP.
+            Madgicx uslubidagi markaz: Meta accountlar, obuna va limitlar, to'lov, profil, jamoa va AI agentlar uchun MCP.
           </p>
         </div>
         <Link

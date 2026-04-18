@@ -23,18 +23,18 @@ const TOP_TABS: { id: DocTab; label: string }[] = [
 
 const DOCS: Record<DocTab, { heading: string; intro: string; sections: DocSection[] }> = {
   'getting-started': {
-    heading: 'Platformadan 100% foydalanish yo‘riqnomasi',
-    intro: 'Bu sahifa orqali foydalanuvchi Create, Launch, Insights, AI va Integrations bo‘limlarini to‘liq o‘rganadi.',
+    heading: "Platformadan 100% foydalanish yo'riqnomasi",
+    intro: "Bu sahifa orqali foydalanuvchi Create, Launch, Insights, AI va Integrations bo'limlarini to'liq o'rganadi.",
     sections: [
       {
         id: 'workflow',
         title: 'How Performa Works',
-        body: 'Platforma 2 asosiy oqimga bo‘linadi: Create (creative tayyorlash) va Launch (kampaniyani ishga tushirish).',
+        body: "Platforma 2 asosiy oqimga bo'linadi: Create (creative tayyorlash) va Launch (kampaniyani ishga tushirish).",
         steps: [
           'Workspace va platform accountni ulang (Meta/Google).',
           'Launch usulini tanlang: Manual, AI Agent yoki Marketplace Expert.',
           'Wizard orqali Campaign → Ad Sets → Ads → Review bosqichlarini tugating.',
-          'Insights bo‘limida Performance, Top Ads va AI qarorlarni kuzating.',
+          "Insights bo'limida Performance, Top Ads va AI qarorlarni kuzating.",
         ],
       },
       {
@@ -51,16 +51,16 @@ const DOCS: Record<DocTab, { heading: string; intro: string; sections: DocSectio
   },
   guides: {
     heading: 'Guides',
-    intro: 'Har bir vazifa uchun amaliy yo‘l-yo‘riq: creative, targeting, bidding, audit.',
+    intro: "Har bir vazifa uchun amaliy yo'l-yo'riq: creative, targeting, bidding, audit.",
     sections: [
-      { id: 'creative-guide', title: 'Creative Guide', body: 'Headline, primary text, CTA va visual format bo‘yicha best-practice.' },
+      { id: 'creative-guide', title: 'Creative Guide', body: "Headline, primary text, CTA va visual format bo'yicha best-practice." },
       { id: 'targeting-guide', title: 'Targeting Guide', body: 'Broad vs layered audience, exclusions, lookalike va remarketing ishlatish.' },
-      { id: 'grading-guide', title: 'Account Grading Guide', body: 'Wasted Spend, Quality Score, Impression Share, Activity score’ni qanday oshirish.' },
+      { id: 'grading-guide', title: 'Account Grading Guide', body: "Wasted Spend, Quality Score, Impression Share, Activity score'ni qanday oshirish." },
     ],
   },
   integrations: {
     heading: 'Integrations',
-    intro: 'Meta ulash, campaign import, attribution va workspace mapping bo‘yicha hujjatlar.',
+    intro: "Meta ulash, campaign import, attribution va workspace mapping bo'yicha hujjatlar.",
     sections: [
       { id: 'meta-connect', title: 'How to Connect Meta', body: 'Settings → Meta orqali OAuth ulab, ad accountlarni sync qiling.' },
       { id: 'campaign-import', title: 'Import Existing Campaigns', body: 'Import campaign tugmasi orqali tarixiy campaignlarni olib kiring.' },
@@ -69,24 +69,24 @@ const DOCS: Record<DocTab, { heading: string; intro: string; sections: DocSectio
   },
   troubleshooting: {
     heading: 'Troubleshooting',
-    intro: 'Eng ko‘p uchraydigan xatolar va ularning aniq yechimlari.',
+    intro: "Eng ko'p uchraydigan xatolar va ularning aniq yechimlari.",
     sections: [
-      { id: 'sync-failed', title: 'Sync Failed', body: 'Token eskirgan bo‘lishi mumkin — Reconnect qiling va qayta sync bosing.' },
-      { id: 'publish-errors', title: 'Publish Errors', body: 'Conversion event/objective mosligini tekshiring, required fieldlarni to‘ldiring.' },
-      { id: 'no-data', title: 'No Performance Data', body: 'Campaign spend borligini, date-range va workspace tanlangani to‘g‘ri ekanini tekshiring.' },
+      { id: 'sync-failed', title: 'Sync Failed', body: "Token eskirgan bo'lishi mumkin — Reconnect qiling va qayta sync bosing." },
+      { id: 'publish-errors', title: 'Publish Errors', body: "Conversion event/objective mosligini tekshiring, required fieldlarni to'ldiring." },
+      { id: 'no-data', title: 'No Performance Data', body: "Campaign spend borligini, date-range va workspace tanlangani to'g'ri ekanini tekshiring." },
     ],
   },
   billing: {
     heading: 'Billing',
-    intro: 'Tariflar, limitlar, qo‘shimcha account narxlari va invoicelar.',
+    intro: "Tariflar, limitlar, qo'shimcha account narxlari va invoicelar.",
     sections: [
-      { id: 'plans', title: 'Plans & Limits', body: 'Plan bo‘yicha workspace, ad account va AI usage limitlari.' },
+      { id: 'plans', title: 'Plans & Limits', body: "Plan bo'yicha workspace, ad account va AI usage limitlari." },
       { id: 'upgrade', title: 'Upgrade Guide', body: 'Upgrade bosqichlari va qanday qilib limitni oshirish.' },
     ],
   },
   changelog: {
     heading: 'Changelog',
-    intro: 'Platformadagi so‘nggi yangilanishlar va qo‘shilgan feature’lar.',
+    intro: "Platformadagi so'nggi yangilanishlar va qo'shilgan feature'lar.",
     sections: [
       { id: 'latest', title: 'Latest Updates', body: 'Launch modes, live grading, AI creative scoring, Performance va Top Ads sahifalari.' },
     ],
@@ -96,7 +96,7 @@ const DOCS: Record<DocTab, { heading: string; intro: string; sections: DocSectio
     intro: 'Yordam olish uchun aloqa va eskalatsiya kanallari.',
     sections: [
       { id: 'contact', title: 'Contact Support', body: 'Issue tafsilotlari, workspace ID va screenshot bilan supportga yozing.' },
-      { id: 'sla', title: 'Response SLA', body: 'Critical xatolar ustuvor ko‘riladi; odatiy savollar navbat asosida javoblanadi.' },
+      { id: 'sla', title: 'Response SLA', body: "Critical xatolar ustuvor ko'riladi; odatiy savollar navbat asosida javoblanadi." },
     ],
   },
 }
@@ -143,7 +143,7 @@ export default function DocsPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr_220px] gap-4">
         <div className="bg-surface border border-border rounded-xl p-4 h-fit">
-          <p className="text-sm font-semibold text-text-primary mb-2">Bo‘limlar</p>
+          <p className="text-sm font-semibold text-text-primary mb-2">Bo'limlar</p>
           <div className="space-y-1">
             {current.sections.map((s) => (
               <a key={s.id} href={`#${s.id}`} className="block text-sm text-[#4F46E5] hover:underline">

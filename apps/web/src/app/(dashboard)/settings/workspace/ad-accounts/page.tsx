@@ -203,7 +203,7 @@ export default function WorkspaceAdAccountsPage() {
           <p className="text-sm text-text-tertiary">Yuklanmoqda...</p>
         ) : accounts.length === 0 ? (
           <div className="rounded-xl border border-dashed border-border p-6 text-sm text-text-tertiary">
-            Hali ad account topilmadi. Avval Meta integratsiyani ulang, so‘ng `Re-sync` bosing.
+            Hali ad account topilmadi. Avval Meta integratsiyani ulang, so'ng `Re-sync` bosing.
           </div>
         ) : (
           <div className="space-y-3">
@@ -310,7 +310,7 @@ export default function WorkspaceAdAccountsPage() {
                   JSON.stringify(mappings),
                 )
               }
-              setSaveNote('Mappinglar lokal saqlandi. API endpoint tayyor bo‘lganda backendga yozish yoqiladi.')
+              setSaveNote("Mappinglar lokal saqlandi. API endpoint tayyor bo'lganda backendga yozish yoqiladi.")
             }}
           >
             Save mappings

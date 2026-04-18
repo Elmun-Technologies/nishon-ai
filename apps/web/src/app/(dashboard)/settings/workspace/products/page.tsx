@@ -106,7 +106,7 @@ export default function WorkspaceProductsPage() {
       <Card>
         <h2 className="text-lg font-semibold text-text-primary">Obuna va foydalanish</h2>
         <p className="mt-1 text-sm text-text-tertiary">
-          Reja, trial, keyingi to‘lov sanasi va spend limitlari (Madgicx &quot;Products &amp; Usage&quot; analogi).
+          Reja, trial, keyingi to'lov sanasi va spend limitlari (Madgicx &quot;Products &amp; Usage&quot; analogi).
         </p>
         {loading && (
           <p className="mt-4 text-sm text-text-tertiary">Yuklanmoqda…</p>
@@ -167,7 +167,7 @@ export default function WorkspaceProductsPage() {
       </Card>
 
       <Card>
-        <h3 className="text-base font-semibold text-text-primary">Tavsiya etilgan qo‘shimchalar</h3>
+        <h3 className="text-base font-semibold text-text-primary">Tavsiya etilgan qo'shimchalar</h3>
         <div className="mt-3 grid gap-2 sm:grid-cols-2">
           {plans.map((item) => (
             <div key={item.plan} className="rounded-xl border border-border bg-surface-2/20 p-3">

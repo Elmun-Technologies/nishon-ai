@@ -24,7 +24,7 @@ const capabilities = [
   },
   {
     title: 'Finance & Control',
-    desc: 'Byudjet limitlari, spend guardrail, access control va workflow approval bilan xavfsiz o‘sishni ta’minlang.',
+    desc: "Byudjet limitlari, spend guardrail, access control va workflow approval bilan xavfsiz o'sishni ta'minlang.",
     bullets: ['Budget guardrails', 'Role-based permissions', 'Approval gates'],
   },
 ]
@@ -45,7 +45,7 @@ const suites = [
 const reviews = [
   {
     quote:
-      '“Performa bilan launch muddati haftalardan kunlarga tushdi. Sotuv jamoamiz kampaniya setup o‘rniga strategiyaga vaqt ajratmoqda.”',
+      "“Performa bilan launch muddati haftalardan kunlarga tushdi. Sotuv jamoamiz kampaniya setup o'rniga strategiyaga vaqt ajratmoqda.”",
     name: 'Dilshod R.',
     role: 'Head of Growth, Retail Group',
   },
@@ -142,8 +142,8 @@ const workspaceTabs = [
     tab: 'Products & Usage',
     points: [
       'Obuna paketi va usage limitini kuzatish',
-      'Add-on larni yoqish/o‘chirish',
-      'Plan o‘zgartirish va ad account bundle boshqaruvi',
+      "Add-on larni yoqish/o'chirish",
+      "Plan o'zgartirish va ad account bundle boshqaruvi",
     ],
   },
   {
@@ -157,16 +157,16 @@ const workspaceTabs = [
   {
     tab: 'User Profile',
     points: [
-      'User ID, email va telefonni ko‘rish',
-      'Aloqa ma’lumotlarini yangilash',
+      "User ID, email va telefonni ko'rish",
+      "Aloqa ma'lumotlarini yangilash",
       'Team access uchun profil boshqaruvi',
     ],
   },
   {
     tab: 'Team Members',
     points: [
-      'Jamoa a’zolarini taklif qilish',
-      'Workspace bo‘yicha role va ruxsatlarni taqsimlash',
+      "Jamoa a'zolarini taklif qilish",
+      "Workspace bo'yicha role va ruxsatlarni taqsimlash",
       'Agentlik uchun bir nechta workspace ochish',
     ],
   },
@@ -178,16 +178,16 @@ const launchFlow = [
     what: 'Creatives menyusidan Ad Launcher → Create New Ad',
     details: [
       'Identity, format, page va ad copy bir oynada sozlanadi',
-      'Ad preview real-time ko‘rinadi',
-      'Save qilib keyingi audience bosqichiga o‘tiladi',
+      "Ad preview real-time ko'rinadi",
+      "Save qilib keyingi audience bosqichiga o'tiladi",
     ],
   },
   {
     step: '2. Audience Launcher',
-    what: 'ARR bosqichlari bo‘yicha audience preset tanlash',
+    what: "ARR bosqichlari bo'yicha audience preset tanlash",
     details: [
       'Acquisition / Re-Engagement / Retargeting / Retention filterlari',
-      'Bir vaqtning o‘zida bir nechta audience tanlab launch qilish',
+      "Bir vaqtning o'zida bir nechta audience tanlab launch qilish",
       'Audience kesimida ad biriktirish va save changes',
     ],
   },
@@ -206,27 +206,27 @@ const launchFlow = [
     details: [
       'Launch time: now / midnight / schedule',
       'Ad set naming template va yakuniy review',
-      'Launch bosilgach kampaniyalar Meta’ga yuboriladi',
+      "Launch bosilgach kampaniyalar Meta'ga yuboriladi",
     ],
   },
 ]
 
 const teamFlow = [
   'Workspace yaratish (onboarding yoki workspace switcher orqali)',
-  'Invite Team Member modalida email(lar) kiritish (ko‘p email uchun Enter)',
-  'Pending invite holatini kuzatish va kerak bo‘lsa invitation link nusxalash',
+  "Invite Team Member modalida email(lar) kiritish (ko'p email uchun Enter)",
+  "Pending invite holatini kuzatish va kerak bo'lsa invitation link nusxalash",
   'Qabul qilingandan keyin ad account access (checkbox + Add Now) berish',
   '3-dot menyudan rolni yangilash: Advertiser → Admin',
-  'Zarur bo‘lsa workspace removal jarayoni (active subscription bo‘lsa schedule)',
+  "Zarur bo'lsa workspace removal jarayoni (active subscription bo'lsa schedule)",
 ]
 
 const permissionMatrix = [
   {
     role: 'Owner',
     rights: [
-      'Workspace va subscription ustidan to‘liq nazorat',
+      "Workspace va subscription ustidan to'liq nazorat",
       'Ad account ulash/uzish, billing va team management',
-      'Admin/Advertiser rollarni tayinlash va workspace o‘chirish',
+      "Admin/Advertiser rollarni tayinlash va workspace o'chirish",
     ],
   },
   {
@@ -241,7 +241,7 @@ const permissionMatrix = [
     role: 'Advertiser',
     rights: [
       'Faqat tayinlangan ad accountlarga kirish',
-      'O‘z subscriptioni shart emas (owner planidan foydalanadi)',
+      "O'z subscriptioni shart emas (owner planidan foydalanadi)",
       'Kampaniya boshqaruvi bor, lekin workspace-level boshqaruv cheklangan',
     ],
   },
@@ -276,12 +276,12 @@ function CapabilityCard({
         onClick={() => setOpen((prev) => !prev)}
         className="mt-6 inline-flex items-center rounded-full border border-white/20 px-4 py-2 text-sm text-white hover:border-emerald-400/60"
       >
-        {open ? 'Yopish' : 'Batafsil ko‘rish'}
+        {open ? 'Yopish' : "Batafsil ko'rish"}
       </button>
 
       {open && (
         <div className="mt-4 rounded-2xl border border-emerald-400/20 bg-emerald-400/5 p-4 text-sm text-text-secondary">
-          Bu bo‘limda jamoangiz workflow, approval va natijalarni tartib bilan yuritadi. Har bir imkoniyat platforma kesimida alohida nazorat qilinadi.
+          Bu bo'limda jamoangiz workflow, approval va natijalarni tartib bilan yuritadi. Har bir imkoniyat platforma kesimida alohida nazorat qilinadi.
         </div>
       )}
     </article>
@@ -335,40 +335,40 @@ export default function SellerLandingPage() {
 
         <div className="relative mx-auto max-w-7xl">
           <div className="mb-8 inline-flex rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-300">
-            {t(‘landing.hero.badge’)}
+            {t('landing.hero.badge')}
           </div>
 
           <h1 className="max-w-5xl text-6xl font-bold leading-tight md:text-8xl">
-            {t(‘landing.hero.title1’)} <span className="bg-gradient-to-r from-emerald-300 to-cyan-300 bg-clip-text text-transparent">{t(‘landing.hero.title2’)}</span> {t(‘landing.hero.title3’)}
+            {t('landing.hero.title1')} <span className="bg-gradient-to-r from-emerald-300 to-cyan-300 bg-clip-text text-transparent">{t('landing.hero.title2')}</span> {t('landing.hero.title3')}
           </h1>
           <p className="mt-8 max-w-3xl text-xl leading-relaxed text-text-secondary">
-            {t(‘landing.hero.subtitle’)}
+            {t('landing.hero.subtitle')}
           </p>
 
           <div className="mt-12 flex flex-wrap gap-3">
             <button
-              onClick={() => router.push(‘/register’)}
+              onClick={() => router.push('/register')}
               className="group rounded-full bg-gradient-to-r from-emerald-500 to-cyan-500 px-8 py-4 text-lg font-semibold text-white shadow-lg shadow-emerald-500/25 transition hover:shadow-xl hover:shadow-emerald-500/40"
             >
-              {t(‘landing.hero.buttonStart’)}
+              {t('landing.hero.buttonStart')}
             </button>
             <button
-              onClick={() => router.push(‘/marketplace’)}
+              onClick={() => router.push('/marketplace')}
               className="rounded-full border border-emerald-500/40 bg-emerald-500/10 px-8 py-4 text-lg font-semibold text-emerald-200 transition hover:border-emerald-500/60 hover:bg-emerald-500/20"
             >
-              {t(‘landing.hero.buttonMarketplace’)}
+              {t('landing.hero.buttonMarketplace')}
             </button>
             <button
-              onClick={() => router.push(‘/leaderboard’)}
+              onClick={() => router.push('/leaderboard')}
               className="rounded-full border border-cyan-500/40 bg-cyan-500/10 px-8 py-4 text-lg font-semibold text-cyan-200 transition hover:border-cyan-500/60 hover:bg-cyan-500/20"
             >
-              {t(‘landing.hero.buttonLeaderboard’)}
+              {t('landing.hero.buttonLeaderboard')}
             </button>
             <button
-              onClick={() => router.push(‘/login’)}
+              onClick={() => router.push('/login')}
               className="rounded-full border border-white/20 bg-surface-elevated/10 px-8 py-4 text-lg text-white transition hover:bg-surface-elevated/20"
             >
-              {t(‘landing.hero.buttonDemo’)}
+              {t('landing.hero.buttonDemo')}
             </button>
           </div>
 
@@ -377,22 +377,22 @@ export default function SellerLandingPage() {
             <div className="mt-6 flex flex-wrap items-center gap-8 text-text-secondary">
               <div className="text-center">
                 <div className="text-3xl font-bold text-emerald-300">500+</div>
-                <div className="text-sm">{t(‘landing.hero.trust.marketers’)}</div>
+                <div className="text-sm">{t('landing.hero.trust.marketers')}</div>
               </div>
               <div className="h-10 w-px bg-white/10" />
               <div className="text-center">
                 <div className="text-3xl font-bold text-emerald-300">$2B+</div>
-                <div className="text-sm">{t(‘landing.hero.trust.budget’)}</div>
+                <div className="text-sm">{t('landing.hero.trust.budget')}</div>
               </div>
               <div className="h-10 w-px bg-white/10" />
               <div className="text-center">
                 <div className="text-3xl font-bold text-emerald-300">4.8★</div>
-                <div className="text-sm">{t(‘landing.hero.trust.rating’)}</div>
+                <div className="text-sm">{t('landing.hero.trust.rating')}</div>
               </div>
               <div className="h-10 w-px bg-white/10" />
               <div className="text-center">
                 <div className="text-3xl font-bold text-emerald-300">50%+</div>
-                <div className="text-sm">{t(‘landing.hero.trust.growth’)}</div>
+                <div className="text-sm">{t('landing.hero.trust.growth')}</div>
               </div>
             </div>
           </div>
@@ -415,10 +415,10 @@ export default function SellerLandingPage() {
           <div className="text-center mb-16">
             <p className="text-sm uppercase tracking-[0.24em] text-emerald-300">Features</p>
             <h2 className="mt-3 text-5xl font-bold md:text-6xl">
-              {t(‘landing.capabilities.title’)}
+              {t('landing.capabilities.title')}
             </h2>
             <p className="mt-6 max-w-3xl mx-auto text-xl text-text-secondary">
-              {t(‘landing.capabilities.subtitle’)}
+              {t('landing.capabilities.subtitle')}
             </p>
           </div>
 
@@ -433,12 +433,12 @@ export default function SellerLandingPage() {
             <h3 className="text-3xl font-bold mb-10">Results</h3>
             <div className="grid gap-8 md:grid-cols-3">
               {[
-                { icon: ‘⚡’, key: ‘speed’, titleKey: ‘benefits.speed’, descKey: ‘benefits.speedDesc’ },
-                { icon: ‘📈’, key: ‘roas’, titleKey: ‘benefits.roas’, descKey: ‘benefits.roasDesc’ },
-                { icon: ‘👥’, key: ‘productivity’, titleKey: ‘benefits.productivity’, descKey: ‘benefits.productivityDesc’ },
-                { icon: ‘💰’, key: ‘budget’, titleKey: ‘benefits.budget’, descKey: ‘benefits.budgetDesc’ },
-                { icon: ‘🎯’, key: ‘accuracy’, titleKey: ‘benefits.accuracy’, descKey: ‘benefits.accuracyDesc’ },
-                { icon: ‘📊’, key: ‘insights’, titleKey: ‘benefits.insights’, descKey: ‘benefits.insightsDesc’ },
+                { icon: '⚡', key: 'speed', titleKey: 'benefits.speed', descKey: 'benefits.speedDesc' },
+                { icon: '📈', key: 'roas', titleKey: 'benefits.roas', descKey: 'benefits.roasDesc' },
+                { icon: '👥', key: 'productivity', titleKey: 'benefits.productivity', descKey: 'benefits.productivityDesc' },
+                { icon: '💰', key: 'budget', titleKey: 'benefits.budget', descKey: 'benefits.budgetDesc' },
+                { icon: '🎯', key: 'accuracy', titleKey: 'benefits.accuracy', descKey: 'benefits.accuracyDesc' },
+                { icon: '📊', key: 'insights', titleKey: 'benefits.insights', descKey: 'benefits.insightsDesc' },
               ].map((benefit) => (
                 <div key={benefit.key} className="text-center">
                   <div className="text-5xl mb-3">{benefit.icon}</div>
@@ -454,9 +454,9 @@ export default function SellerLandingPage() {
       <section id="funnel" className="px-6 pb-20">
         <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-[#050d22] p-8 md:p-12">
           <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">ARR framework</p>
-          <h2 className="mt-3 text-4xl font-semibold md:text-5xl">{t(‘landing.funnel.title’)}</h2>
+          <h2 className="mt-3 text-4xl font-semibold md:text-5xl">{t('landing.funnel.title')}</h2>
           <p className="mt-4 max-w-4xl text-lg text-text-tertiary">
-            {t(‘landing.funnel.subtitle’)}
+            {t('landing.funnel.subtitle')}
           </p>
 
           <div className="mt-10 space-y-4">
@@ -512,8 +512,8 @@ export default function SellerLandingPage() {
           <p className="text-sm uppercase tracking-[0.24em] text-violet-300">Workspace settings</p>
           <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Professional-grade kampaniya boshqaruvni Performa ga moslashtirdik</h2>
           <p className="mt-4 max-w-4xl text-lg text-text-tertiary">
-            Profil menyusidan Workspace Settings’ga kirib, ad account, obuna, billing, user profile va team members
-            bo‘limlarini bir joydan boshqarish mumkin. Productionda bu bo‘limlar real API bilan ishlaydi.
+            Profil menyusidan Workspace Settings'ga kirib, ad account, obuna, billing, user profile va team members
+            bo'limlarini bir joydan boshqarish mumkin. Productionda bu bo'limlar real API bilan ishlaydi.
           </p>
 
           <div className="mt-8 grid gap-4 md:grid-cols-5">
@@ -570,10 +570,10 @@ export default function SellerLandingPage() {
       <section id="team-workflow" className="px-6 pb-20">
         <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-[#12102a] p-8 md:p-12">
           <p className="text-sm uppercase tracking-[0.24em] text-fuchsia-300">Team members workflow</p>
-          <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Professional team management workflow — Performa’s way</h2>
+          <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Professional team management workflow — Performa's way</h2>
           <p className="mt-4 max-w-4xl text-lg text-text-tertiary">
             Create workspace, invite, accept invite, role berish, ad-account access taqsimlash va removal jarayonini
-            Performa roadmapiga kiritdik. Bu bo‘lim agency va multi-account ishlash uchun asosiy blok.
+            Performa roadmapiga kiritdik. Bu bo'lim agency va multi-account ishlash uchun asosiy blok.
           </p>
 
           <div className="mt-8 grid gap-4 md:grid-cols-2">
@@ -619,7 +619,7 @@ export default function SellerLandingPage() {
             </h3>
             <p className="mt-6 text-xl leading-relaxed text-text-secondary">
               Mijozimiz kampaniya setup vaqtini 4 baravar qisqartirdi, approval jarayonini avtomatlashtirdi va
-              marketing jamoasi strategik ishga qaytdi. Bu landingda aynan shu biznes qiymatini ochiq ko‘rsatdik.
+              marketing jamoasi strategik ishga qaytdi. Bu landingda aynan shu biznes qiymatini ochiq ko'rsatdik.
             </p>
             <button className="mt-8 rounded-full bg-emerald-600 px-7 py-3 text-lg font-medium text-white hover:bg-emerald-500">
               Read more ↗
@@ -639,7 +639,7 @@ export default function SellerLandingPage() {
             Reviews from our <span className="text-emerald-300">clients</span>
           </h2>
           <p className="mx-auto mt-5 max-w-4xl text-center text-xl text-text-tertiary">
-            Mijoz feedbacklari loyihaning amaliy qiymatini ko‘rsatadi: tezroq ish, yaxshiroq nazorat va barqaror o‘sish.
+            Mijoz feedbacklari loyihaning amaliy qiymatini ko'rsatadi: tezroq ish, yaxshiroq nazorat va barqaror o'sish.
           </p>
 
           <div className="mt-10 grid gap-5 md:grid-cols-3">
@@ -670,7 +670,7 @@ export default function SellerLandingPage() {
 
           <div className="w-full max-w-xl rounded-3xl border border-white/10 bg-surface-elevated/[0.03] p-7">
             <h4 className="text-4xl font-semibold">Newsletter</h4>
-            <p className="mt-3 text-lg text-text-tertiary">Performa yangiliklari, case study va amaliy guide’larni oling.</p>
+            <p className="mt-3 text-lg text-text-tertiary">Performa yangiliklari, case study va amaliy guide'larni oling.</p>
             <button className="mt-6 rounded-full border border-white/25 px-6 py-3 text-lg hover:border-emerald-500/30/70">
               Sign Up ↗
             </button>

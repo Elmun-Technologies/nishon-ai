@@ -643,7 +643,7 @@ export default function RoiCalculatorPage() {
           <span className="text-lg mt-0.5 shrink-0">ℹ️</span>
           <div className="flex-1">
             <p className="text-text-tertiary text-xs leading-relaxed">
-              Bu hisob-kitob O'zbekiston va MDH bozorining real o'rtacha ko'rsatkichlariga
+              Bu hisob-kitob O"zbekiston va MDH bozorining real o'rtacha ko"rsatkichlariga
               asoslangan. Natijalar mahsulot sifati, kreativ materiallar va bozor sharoitiga
               qarab farq qilishi mumkin. Performa foydalanuvchilarining o'rtacha ROAS
               ko'rsatkichi <span className="text-text-primary">3.2x</span> ni tashkil etadi.

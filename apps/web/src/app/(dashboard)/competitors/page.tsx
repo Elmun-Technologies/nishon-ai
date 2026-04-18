@@ -161,7 +161,7 @@ const AUDIT_CATEGORIES = [
     icon: '🛒',
     title: 'Marketplace',
     description:
-      'Uzum, Express va boshqa platformalarda mavjudlik va to‘liqlik',
+      "Uzum, Express va boshqa platformalarda mavjudlik va to'liqlik",
     subParams: [
       'Platformalar mavjudligi (Uzum.uz, Express.uz, local marketplaces)',
       'Product listings (tushunarli description, quality photos)',
@@ -469,14 +469,14 @@ export default function CompetitorsPage() {
           <Badge variant="purple">🔥 Audit</Badge>
         </div>
         <p className="text-text-tertiary text-sm">
-          12 ta audit kategoriyasi bo‘yicha siz va raqobatchi solishtiriladi
+          12 ta audit kategoriyasi bo'yicha siz va raqobatchi solishtiriladi
         </p>
       </div>
 
       <Card>
         <div className="flex items-center gap-2 mb-5">
           <span className="text-xl">⚔️</span>
-          <h2 className="font-semibold text-text-primary">Raqobatchi ma’lumotlari</h2>
+          <h2 className="font-semibold text-text-primary">Raqobatchi ma'lumotlari</h2>
         </div>
 
         <div className="space-y-4">
@@ -538,7 +538,7 @@ export default function CompetitorsPage() {
           {error && <Alert variant="error">{error}</Alert>}
 
           <Button fullWidth size="lg" loading={loading} onClick={handleAnalyze}>
-            {loading ? "Tahlil qilinmoqda (AI 12 bo‘lim)..." : "🔍 Yangi tahlilni boshlash"}
+            {loading ? "Tahlil qilinmoqda (AI 12 bo'lim)..." : "🔍 Yangi tahlilni boshlash"}
           </Button>
         </div>
       </Card>
@@ -553,7 +553,7 @@ export default function CompetitorsPage() {
               Tahlil qilinmoqda...
             </h3>
             <p className="text-text-tertiary text-sm mb-5">
-              12 bo‘lim, 72 parametr tekshiriladi
+              12 bo'lim, 72 parametr tekshiriladi
             </p>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-w-sm mx-auto">
               {AUDIT_CATEGORIES.map((cat) => (
@@ -610,7 +610,7 @@ export default function CompetitorsPage() {
                       : 'Teng darajada'}
                 </h2>
                 <p className="text-text-tertiary text-sm mt-1">
-                  72 parametr bo‘yicha siz {computed?.totalYourGood ?? 0}, raqobatchi {computed?.totalCompGood ?? 0} ta “good” segmentga ega
+                  72 parametr bo'yicha siz {computed?.totalYourGood ?? 0}, raqobatchi {computed?.totalCompGood ?? 0} ta “good” segmentga ega
                 </p>
               </div>
 
@@ -681,7 +681,7 @@ export default function CompetitorsPage() {
 
           <div className="flex gap-1 bg-surface border border-border rounded-xl p-1 w-fit">
             {[
-              { key: 'audit', label: '📋 12 bo‘lim tahlili' },
+              { key: 'audit', label: "📋 12 bo'lim tahlili" },
               { key: 'strategy', label: '📅 Yillik strategiya' },
             ].map((tab) => (
               <button

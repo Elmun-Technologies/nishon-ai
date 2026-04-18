@@ -105,7 +105,7 @@ export default function WorkspaceUserProfilePage() {
             </Link>
           </div>
         </div>
-        <p className="mt-4 text-sm text-text-tertiary">Bu bo‘lim endi user profil va workspace setup modalini qo‘llaydi.</p>
+        <p className="mt-4 text-sm text-text-tertiary">Bu bo'lim endi user profil va workspace setup modalini qo'llaydi.</p>
         {note && <p className="mt-3 text-sm text-emerald-300">{note}</p>}
       </Card>
 
@@ -148,7 +148,7 @@ export default function WorkspaceUserProfilePage() {
           />
         </div>
         <p className="mt-3 text-xs text-text-tertiary">
-          Eslatma: hozir backendda business type -> `industry`, support phone -> `targetAudience` maydoniga saqlanadi.
+          Eslatma: hozir backendda business type {'->'} `industry`, support phone {'->'} `targetAudience` maydoniga saqlanadi.
         </p>
         <div className="mt-6 flex justify-end gap-2">
           <Button size="sm" variant="secondary" type="button" onClick={() => setWorkspaceModalOpen(false)}>

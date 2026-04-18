@@ -206,7 +206,7 @@ export default function WorkspaceTeamPage() {
               {!loading && members.length === 0 && !error && (
                 <tr>
                   <td colSpan={4} className="px-4 py-6 text-text-tertiary">
-                    A&apos;zo yozuvlari topilmadi (yangi workspace yoki API javobi bo‘sh).
+                    A&apos;zo yozuvlari topilmadi (yangi workspace yoki API javobi bo'sh).
                   </td>
                 </tr>
               )}

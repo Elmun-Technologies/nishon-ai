@@ -486,7 +486,7 @@ export default function PortfolioDashboardPage() {
                 <h2 className="text-lg font-bold text-text-primary">Ko'rinuvchanlikni sozlash</h2>
               </div>
               <p className="text-text-tertiary text-sm mb-6">
-                Qaysi ma'lumotlar ommaviy ko'rinishida bo'lishini tanlang.
+                Qaysi ma"lumotlar ommaviy ko'rinishida bo"lishini tanlang.
               </p>
 
               <div className="space-y-3">

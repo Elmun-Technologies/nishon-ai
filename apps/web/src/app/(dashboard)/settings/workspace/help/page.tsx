@@ -13,7 +13,7 @@ const LINKS = [
   { title: 'Meta dashboard (ad accounts)', href: '/settings/meta', keywords: 'facebook spend account' },
   { title: 'Kampaniya yoqish', href: '/launch', keywords: 'launch wizard' },
   { title: 'Hisobot', href: '/reporting', keywords: 'reporting meta' },
-  { title: 'Hujjatlar', href: '/docs', keywords: 'docs qo'llanma' },
+  { title: 'Hujjatlar', href: '/docs', keywords: "docs qo'llanma" },
 ]
 
 export default function ResourceCenterPage() {
@@ -69,7 +69,7 @@ export default function ResourceCenterPage() {
             <BookOpen className="h-10 w-10 text-violet-400" />
             <h3 className="mt-3 text-lg font-semibold text-text-primary">App guide</h3>
             <p className="mt-1 text-sm text-text-tertiary">
-              Vosita va bo‘lim bo‘yicha qo‘llanmalar — hujjatlar sahifasiga o‘tish.
+              Vosita va bo'lim bo'yicha qo'llanmalar — hujjatlar sahifasiga o'tish.
             </p>
           </Card>
         </Link>
@@ -86,12 +86,12 @@ export default function ResourceCenterPage() {
       </div>
 
       <div>
-        <p className="text-xs font-medium uppercase tracking-wider text-text-tertiary">Qo‘shimcha</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-text-tertiary">Qo'shimcha</p>
         <Card className="mt-2 flex items-center gap-4">
           <Lightbulb className="h-8 w-8 shrink-0 text-violet-400" />
           <div>
-            <p className="font-semibold text-text-primary">Feature so‘rash</p>
-            <p className="text-sm text-text-tertiary">Keyingi relizda nimani ko‘rishni xohlaysiz?</p>
+            <p className="font-semibold text-text-primary">Feature so'rash</p>
+            <p className="text-sm text-text-tertiary">Keyingi relizda nimani ko'rishni xohlaysiz?</p>
           </div>
           <ExternalLink className="ml-auto h-4 w-4 shrink-0 text-text-tertiary" />
         </Card>

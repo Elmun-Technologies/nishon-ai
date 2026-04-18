@@ -192,7 +192,7 @@ export default function TriggerSetsPage() {
             Triggersetlar endi Hisobotda mavjud
           </p>
           <p className="text-violet-600 text-xs leading-relaxed">
-            Ko'rsatkichlar bo'yicha avtomatik qoidalarni Hisobot bo'limidan drag-and-drop
+            Ko"rsatkichlar bo'yicha avtomatik qoidalarni Hisobot bo"limidan drag-and-drop
             orqali sozlashingiz mumkin. Bu yerda ham yaratish va boshqarish imkoni saqlanadi.
           </p>
         </div>

@@ -529,7 +529,7 @@ export default function PortfolioPage() {
         <div className="max-w-2xl mx-auto">
           <h2 className="text-3xl font-extrabold text-text-primary mb-4">Targetolmisiz?</h2>
           <p className="text-text-tertiary mb-8">
-            Performa ga qo'shiling — natijalaringizni real-time da ko'rsating va ko'proq mijoz toping.
+            Performa ga qo"shiling — natijalaringizni real-time da ko'rsating va ko"proq mijoz toping.
           </p>
           <button
             onClick={() => router.push('/register')}
