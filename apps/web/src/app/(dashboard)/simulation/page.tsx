@@ -1,9 +1,18 @@
 'use client'
 
+import { useState, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
+import { useWorkspaceStore } from '@/stores/workspace.store'
+import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { formatCurrency } from '@/lib/format'
+
 export const dynamic = 'force-dynamic'
 
-export default function Page() {
-  return <div className="space-y-6"><h1>Page</h1></div>
+const PLATFORM_COLORS: Record<string, string> = {
+  meta: '#1877F2',
+  google: '#EA4335',
+  tiktok: '#000000',
 }
 
 export default function SimulationPage() {
