@@ -378,7 +378,7 @@ export default function AutoOptimizationPage() {
                   : 'text-text-tertiary hover:text-text-primary'
               }`}
             >
-              {t === 'run' ? t('autoOptimization.analysisTab', 'Analysis') : t('autoOptimization.historyTab', 'History')}
+              {t === 'run' ? 'Analysis' : 'History'}
             </button>
           ))}
         </div>
