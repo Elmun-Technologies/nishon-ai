@@ -152,9 +152,9 @@ export function Marketplace() {
 
           {/* Empty */}
           {!loading && !error && specialists.length === 0 && (
-            <div className="rounded-xl p-12 text-center" style={{ background: 'var(--c-surface)', border: '1px solid var(--c-border)' }}>
-              <p className="text-text-secondary text-sm">Hech qanday mutaxassis topilmadi</p>
-              <p className="text-text-tertiary text-xs mt-1">Filtrllarni o'zgartirib ko'ring</p>
+            <div className="rounded-xl p-12 text-center" style={{ background: 'var(--c-surface)', border: '1px solid var(--c-border)" }}>
+              <p className=\"text-text-secondary text-sm\">Hech qanday mutaxassis topilmadi</p>
+              <p className=\"text-text-tertiary text-xs mt-1\">Filtrllarni o'zgartirib ko"ring</p>
             </div>
           )}
 

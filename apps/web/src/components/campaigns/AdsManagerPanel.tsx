@@ -1335,8 +1335,8 @@ export function AdsManagerPanel() {
                     ))}
                   </div>
                   <p className="text-xs text-text-tertiary mt-2">
-                    Add sources from the header icon row or the “Connect more
-                    data sources” section.
+                    Add sources from the header icon row or the "Connect more
+                    data sources" section.
                   </p>
                 </div>
               </div>

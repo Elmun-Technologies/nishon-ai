@@ -78,28 +78,28 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
 
   if (specialists.length === 0) {
     return (
-      <div className={cn('', className)}>
-        <Card padding="lg" className="text-center">
-          <div className="text-text-tertiary mb-4">
-            <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className={cn('", className)}>
+        <Card padding=\"lg\" className=\"text-center\">
+          <div className=\"text-text-tertiary mb-4\">
+            <svg className=\"w-16 h-16 mx-auto\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\">
               <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
+                strokeLinecap=\"round\"
+                strokeLinejoin=\"round\"
                 strokeWidth={2}
-                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                d=\"M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z\"
               />
             </svg>
           </div>
-          <h3 className="text-lg font-semibold text-text-primary mb-2">No specialists found</h3>
-          <p className="text-text-secondary mb-6">Try adjusting your filters to find what you're looking for</p>
-          <Button variant="secondary">Clear Filters</Button>
+          <h3 className=\"text-lg font-semibold text-text-primary mb-2\">No specialists found</h3>
+          <p className=\"text-text-secondary mb-6\">Try adjusting your filters to find what you're looking for</p>
+          <Button variant=\"secondary\">Clear Filters</Button>
         </Card>
       </div>
     )
   }
 
   return (
-    <div className={cn('space-y-6', className)}>
+    <div className={cn("space-y-6', className)}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
