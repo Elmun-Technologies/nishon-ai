@@ -67,7 +67,12 @@ const WIZARD_INITIAL: RetargetingWizardState = {
   startDate: '',
   endDate: '',
   campaignName: '',
-  platformConfigs: {},
+  platformConfigs: {
+    meta: {},
+    google: {},
+    tiktok: {},
+    yandex: {},
+  },
 }
 
 // ─── Store ────────────────────────────────────────────────────────────────────

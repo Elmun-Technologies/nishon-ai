@@ -152,9 +152,9 @@ export function Marketplace() {
 
           {/* Empty */}
           {!loading && !error && specialists.length === 0 && (
-            <div className="rounded-xl p-12 text-center" style={{ background: 'var(--c-surface)', border: '1px solid var(--c-border)" }}>
-              <p className=\"text-text-secondary text-sm\">Hech qanday mutaxassis topilmadi</p>
-              <p className=\"text-text-tertiary text-xs mt-1\">Filtrllarni o'zgartirib ko"ring</p>
+            <div className="rounded-xl p-12 text-center" style={{ background: 'var(--c-surface)', border: '1px solid var(--c-border)' }}>
+              <p className="text-text-secondary text-sm">No specialists found</p>
+              <p className="text-text-tertiary text-xs mt-1">Try changing the filters</p>
             </div>
           )}
 
@@ -233,7 +233,7 @@ export function Marketplace() {
               <table className="w-full text-sm">
                 <thead style={{ background: 'var(--c-surface-2)' }}>
                   <tr>
-                    {['Mutaxassis', 'Rating', 'ROAS', 'Muvaffaqiyat', 'Reviews', 'Narx', ''].map(h => (
+                    {['Specialist', 'Rating', 'ROAS', 'Success', 'Reviews', 'Price'].map(h => (
                       <th key={h} className="py-2.5 px-4 text-text-tertiary font-medium text-xs text-left last:text-center">{h}</th>
                     ))}
                   </tr>
