@@ -4,6 +4,7 @@ const nextConfig = {
     externalDir: true,
   },
   transpilePackages: ['@performa/shared'],
+  staticPageGenerationTimeout: 120,
 }
 
 module.exports = nextConfig

@@ -1,9 +1,15 @@
 'use client'
+
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useWorkspaceStore } from '@/stores/workspace.store'
+import dynamic from 'next/dynamic'
 import Sidebar from '@/components/layout/Sidebar'
-import Header from '@/components/layout/Header'
+
+const Header = dynamic(() => import('@/components/layout/Header'), {
+  ssr: false,
+  loading: () => <div className="h-16 bg-surface-2" />,
+})
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()

@@ -12,10 +12,10 @@ interface MonitorData {
 }
 
 const LEGEND = [
-  { key: 'active',   label: 'Aktiv',       color: '#10B981' },
-  { key: 'learning', label: "O'rganmoqda", color: '#6366F1' },
-  { key: 'limited',  label: 'Cheklangan',  color: '#F59E0B' },
-  { key: 'paused",   label: \"To'xtatilgan\", color: "#9CA3AF' },
+  { key: 'active', label: 'Active', color: '#10B981' },
+  { key: 'learning', label: 'Learning', color: '#6366F1' },
+  { key: 'limited', label: 'Limited', color: '#F59E0B' },
+  { key: 'paused', label: 'Paused', color: '#9CA3AF' },
 ] as const
 
 interface Props {
@@ -43,7 +43,7 @@ export function LearningMonitor({ workspaceId }: Props) {
     <div className="bg-surface border border-border rounded-2xl p-5">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold text-text-primary">Learning Monitor</h3>
-        <span className="text-xs text-text-tertiary">Kampaniyalar</span>
+        <span className="text-xs text-text-tertiary">Campaigns</span>
       </div>
 
       {loading ? (
