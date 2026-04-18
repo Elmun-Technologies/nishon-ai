@@ -205,17 +205,17 @@ export function AdGroupSettings({
         </div>
 
         {/* List mode — chips */}
-        {formData.geoTargeting?.mode === 'list' && (
-          <div className="space-y-3">
-            <div className="flex gap-2">
+        {formData.geoTargeting?.mode === 'list" && (
+          <div className=\"space-y-3\">
+            <div className=\"flex gap-2\">
               <Input
-                placeholder="Shahar yoki mamlakat qo'shing (Enter)"
+                placeholder=\"Shahar yoki mamlakat qo'shing (Enter)\"
                 value={geoInput}
                 onChange={(e) => setGeoInput(e.target.value)}
                 onKeyDown={handleGeoKeyDown}
               />
-              <Button variant="secondary" size="sm" onClick={addGeoLocation}>
-                Qo'shish
+              <Button variant=\"secondary\" size=\"sm\" onClick={addGeoLocation}>
+                Qo"shish
               </Button>
             </div>
 
@@ -339,21 +339,21 @@ export function AdGroupSettings({
             }
             disabled={aiLoading}
           >
-            {aiLoading ? 'Generating...' : 'AI Generate'}
+            {aiLoading ? 'Generating...' : 'AI Generate"}
           </Button>
         </div>
 
-        <div className="space-y-3">
+        <div className=\"space-y-3\">
           {(formData.keywords ?? []).map((keyword: any, index: number) => (
-            <div key={index} className="flex gap-3 items-center">
-              <div className="flex-1">
+            <div key={index} className=\"flex gap-3 items-center\">
+              <div className=\"flex-1\">
                 <Input
-                  placeholder="Kalit so'z"
+                  placeholder=\"Kalit so'z\"
                   value={keyword.phrase}
                   onChange={(e) => {
                     const updated = [...formData.keywords]
                     updated[index] = { ...updated[index], phrase: e.target.value }
-                    onFormDataChange('keywords', updated)
+                    onFormDataChange("keywords', updated)
                   }}
                 />
               </div>
@@ -397,11 +397,11 @@ export function AdGroupSettings({
             onClick={() =>
               onFormDataChange('keywords', [
                 ...(formData.keywords ?? []),
-                { phrase: '', matchType: 'broad', isNegative: false }
+                { phrase: '', matchType: 'broad", isNegative: false }
               ])
             }
           >
-            + Kalit so'z qo'shish
+            + Kalit so'z qo"shish
           </Button>
         </div>
       </Card>
@@ -423,7 +423,7 @@ export function AdGroupSettings({
               </Button>
             </div>
             <Textarea
-              placeholder="Masalan: 'sport bilan shug'ullanuvchi 25-35 yoshli erkaklar, fitness, sog'lom ovqatlanish'"
+              placeholder="Masalan: "sport bilan shug'ullanuvchi 25-35 yoshli erkaklar, fitness, sog"lom ovqatlanish'"
               rows={3}
               value={formData.interests?.custom ?? ''}
               onChange={(e) =>
@@ -571,7 +571,7 @@ export function AdGroupSettings({
                       onClick={() =>
                         onFormDataChange('customRule', {
                           ...formData.customRule,
-                          conditions: [...(formData.customRule?.conditions ?? []), { description: '', days: 30 }]
+                          conditions: [...(formData.customRule?.conditions ?? []), { description: '", days: 30 }]
                         })
                       }
                     >
@@ -583,11 +583,11 @@ export function AdGroupSettings({
             </Card>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className=\"flex items-center gap-3\">
             <Switch
-              id="offerRetargeting"
+              id=\"offerRetargeting\"
               checked={formData.offerRetargeting ?? false}
-              onChange={(checked) => onFormDataChange('offerRetargeting', checked)}
+              onChange={(checked) => onFormDataChange("offerRetargeting', checked)}
             />
             <Label htmlFor="offerRetargeting">Enable Offer Retargeting</Label>
           </div>
@@ -647,12 +647,12 @@ export function AdGroupSettings({
                   <Input
                     placeholder="Qisqa tavsif (ixtiyoriy)"
                     value={link.desc}
-                    onChange={(e) => updateGroupQuickLink(i, 'desc', e.target.value)}
+                    onChange={(e) => updateGroupQuickLink(i, 'desc", e.target.value)}
                   />
                 </div>
               ))}
               {groupQuickLinks.length < 8 && (
-                <Button variant="secondary" size="sm" onClick={addGroupQuickLink}>
+                <Button variant=\"secondary\" size=\"sm\" onClick={addGroupQuickLink}>
                   + Quick Link qo'shish
                 </Button>
               )}
@@ -660,19 +660,19 @@ export function AdGroupSettings({
           )}
 
           {/* Clarifiers */}
-          <div className="flex items-center gap-3">
+          <div className=\"flex items-center gap-3\">
             <Checkbox
-              id="groupClarifiers"
-              checked={activeGroupExtensions.includes('clarifiers')}
+              id=\"groupClarifiers\"
+              checked={activeGroupExtensions.includes("clarifiers')}
               onChange={() => toggleGroupExtension('clarifiers')}
             />
             <Label htmlFor="groupClarifiers">Clarifiers (Kampaniya ustini yozadi)</Label>
           </div>
 
-          {activeGroupExtensions.includes('clarifiers') && (
-            <div className="ml-6 space-y-2">
+          {activeGroupExtensions.includes('clarifiers") && (
+            <div className=\"ml-6 space-y-2\">
               {groupClarifiers.map((text, i) => (
-                <div key={i} className="flex gap-2">
+                <div key={i} className=\"flex gap-2\">
                   <Input
                     placeholder={`Clarifier ${i + 1} (maks 25 belgi)`}
                     value={text}
@@ -680,12 +680,12 @@ export function AdGroupSettings({
                     onChange={(e) => updateGroupClarifier(i, e.target.value)}
                   />
                   {groupClarifiers.length > 1 && (
-                    <button onClick={() => removeGroupClarifier(i)} className="text-red-500 px-2">✕</button>
+                    <button onClick={() => removeGroupClarifier(i)} className=\"text-red-500 px-2\">✕</button>
                   )}
                 </div>
               ))}
               {groupClarifiers.length < 8 && (
-                <Button variant="secondary" size="sm" onClick={addGroupClarifier}>
+                <Button variant=\"secondary\" size=\"sm\" onClick={addGroupClarifier}>
                   + Clarifier qo'shish
                 </Button>
               )}
@@ -693,10 +693,10 @@ export function AdGroupSettings({
           )}
 
           {/* Promo Code */}
-          <div className="flex items-center gap-3">
+          <div className=\"flex items-center gap-3\">
             <Checkbox
-              id="groupPromoCode"
-              checked={activeGroupExtensions.includes('promoCode')}
+              id=\"groupPromoCode\"
+              checked={activeGroupExtensions.includes("promoCode')}
               onChange={() => toggleGroupExtension('promoCode')}
             />
             <Label htmlFor="groupPromoCode">Promo Code (Kampaniya ustini yozadi)</Label>
@@ -834,9 +834,9 @@ export function AdGroupSettings({
                   <h4 className="text-xs font-medium text-text-tertiary uppercase tracking-wider mb-3">6. Ob-havo</h4>
                   <div className="grid grid-cols-3 gap-3">
                     <BidInput label="Quyoshli" value={groupBid.weather?.sunny ?? 1}
-                      onChange={v => setGroupBid('weather', { ...groupBid.weather, sunny: v })} />
-                    <BidInput label="Yomg'irli" value={groupBid.weather?.rainy ?? 1}
-                      onChange={v => setGroupBid('weather', { ...groupBid.weather, rainy: v })} />
+                      onChange={v => setGroupBid('weather", { ...groupBid.weather, sunny: v })} />
+                    <BidInput label=\"Yomg'irli\" value={groupBid.weather?.rainy ?? 1}
+                      onChange={v => setGroupBid("weather', { ...groupBid.weather, rainy: v })} />
                     <BidInput label="Sovuq" value={groupBid.weather?.cold ?? 1}
                       onChange={v => setGroupBid('weather', { ...groupBid.weather, cold: v })} />
                   </div>

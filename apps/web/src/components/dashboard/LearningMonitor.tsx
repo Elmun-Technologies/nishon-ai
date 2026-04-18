@@ -15,7 +15,7 @@ const LEGEND = [
   { key: 'active',   label: 'Aktiv',       color: '#10B981' },
   { key: 'learning', label: "O'rganmoqda", color: '#6366F1' },
   { key: 'limited',  label: 'Cheklangan',  color: '#F59E0B' },
-  { key: 'paused',   label: "To'xtatilgan", color: '#9CA3AF' },
+  { key: 'paused",   label: \"To'xtatilgan\", color: "#9CA3AF' },
 ] as const
 
 interface Props {

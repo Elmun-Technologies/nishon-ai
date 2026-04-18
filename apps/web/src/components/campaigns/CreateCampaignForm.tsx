@@ -3,15 +3,13 @@
 import { useState } from 'react'
 import { campaigns as campaignsApi } from '@/lib/api-client'
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 type Objective = 'leads' | 'traffic' | 'sales' | 'awareness'
 type BudgetType = 'daily' | 'weekly'
 type Currency = 'USD' | 'UZS'
 
 interface ScheduleState {
   always: boolean
-  hours: number[] // 0-23
+  hours: number[]
 }
 
 interface FormState {
@@ -25,23 +23,18 @@ interface FormState {
   schedule: ScheduleState
 }
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-
 const OBJECTIVES: { value: Objective; label: string; description: string; icon: string }[] = [
-  { value: 'leads',     label: 'Leads',      description: 'Kontakt va so\'rov yig\'ish',    icon: '🎯' },
-  { value: 'traffic',   label: 'Traffic',    description: 'Saytga tashrif buyuruvchilar',   icon: '🌐' },
-  { value: 'sales',     label: 'Sales',      description: 'Sotuvlar va konversiyalar',      icon: '🛒' },
-  { value: 'awareness', label: 'Awareness',  description: 'Brend tanishishini oshirish',    icon: '📣' },
+  { value: 'leads',     label: 'Leads',      description: 'Collect contacts and inquiries', icon: '🎯' },
+  { value: 'traffic',   label: 'Traffic',    description: 'Drive visitors to your site',    icon: '🌐' },
+  { value: 'sales',     label: 'Sales',      description: 'Sales and conversions',          icon: '🛒' },
+  { value: 'awareness', label: 'Awareness',  description: 'Increase brand recognition',     icon: '📣' },
 ]
 
-// Work-hours presets
 const HOUR_PRESETS = [
-  { label: 'Ish vaqti (9–18)', hours: [9,10,11,12,13,14,15,16,17,18] },
-  { label: 'Kechki (18–24)',   hours: [18,19,20,21,22,23] },
-  { label: 'Hafta kunlari',    hours: Array.from({ length: 24 }, (_, i) => i) },
+  { label: 'Work hours (9–18)', hours: [9,10,11,12,13,14,15,16,17,18] },
+  { label: 'Evening (18–24)',   hours: [18,19,20,21,22,23] },
+  { label: 'All day',           hours: Array.from({ length: 24 }, (_, i) => i) },
 ]
-
-// ─── Sub-components ───────────────────────────────────────────────────────────
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">{children}</p>
@@ -75,8 +68,6 @@ function TogglePill({
     </div>
   )
 }
-
-// ─── Main Form ─────────────────────────────────────────────────────────────────
 
 interface Props {
   workspaceId: string
@@ -140,7 +131,7 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
       })
       onSuccess((res as any).data)
     } catch (err: any) {
-      setError(err?.message ?? 'Xatolik yuz berdi')
+      setError(err?.message ?? 'An error occurred')
     } finally {
       setSaving(false)
     }
@@ -151,10 +142,10 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
 
       {/* ── 1. Campaign name ─────────────────────────────────────── */}
       <div>
-        <SectionLabel>Kampaniya nomi</SectionLabel>
+        <SectionLabel>Campaign Name</SectionLabel>
         <input
           type="text"
-          placeholder="Masalan: Yoz chegirma kampaniyasi"
+          placeholder="e.g. Summer Sale Campaign"
           value={form.name}
           onChange={(e) => set('name', e.target.value)}
           maxLength={255}
@@ -164,7 +155,7 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
 
       {/* ── 2. Objective ─────────────────────────────────────────── */}
       <div>
-        <SectionLabel>Maqsad</SectionLabel>
+        <SectionLabel>Objective</SectionLabel>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {OBJECTIVES.map((obj) => (
             <button
@@ -187,16 +178,14 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
 
       {/* ── 3. Budget ────────────────────────────────────────────── */}
       <div>
-        <SectionLabel>Byudjet</SectionLabel>
+        <SectionLabel>Budget</SectionLabel>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          {/* Daily / Weekly toggle */}
           <TogglePill
-            options={[{ value: 'daily', label: 'Kunlik' }, { value: 'weekly', label: 'Haftalik' }]}
+            options={[{ value: 'daily', label: 'Daily' }, { value: 'weekly', label: 'Weekly' }]}
             value={form.budgetType}
             onChange={(v) => set('budgetType', v as BudgetType)}
           />
 
-          {/* Amount */}
           <div className="relative flex-1">
             <input
               type="number"
@@ -206,7 +195,6 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
               onChange={(e) => set('budget', e.target.value)}
               className="w-full bg-surface border border-border rounded-xl px-4 py-3 pr-20 text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-border/50 focus:ring-1 focus:ring-border/30 transition-colors"
             />
-            {/* Currency toggle */}
             <div className="absolute right-2 top-1/2 -translate-y-1/2">
               <TogglePill
                 options={[{ value: 'USD', label: '$' }, { value: 'UZS', label: '₸' }]}
@@ -217,22 +205,21 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
           </div>
         </div>
 
-        {/* Budget hint */}
         {form.budget && Number(form.budget) > 0 && (
           <p className="mt-2 text-xs text-text-tertiary">
             {form.budgetType === 'weekly'
-              ? `≈ ${form.currency === 'USD' ? '$' : '₸'}${(Number(form.budget) / 7).toFixed(2)} kunlik`
-              : `≈ ${form.currency === 'USD' ? '$' : '₸'}${(Number(form.budget) * 7).toFixed(0)} haftalik`}
+              ? `≈ ${form.currency === 'USD' ? '$' : '₸'}${(Number(form.budget) / 7).toFixed(2)} per day`
+              : `≈ ${form.currency === 'USD' ? '$' : '₸'}${(Number(form.budget) * 7).toFixed(0)} per week`}
           </p>
         )}
       </div>
 
       {/* ── 4. Dates ─────────────────────────────────────────────── */}
       <div>
-        <SectionLabel>Sana oralig'i</SectionLabel>
+        <SectionLabel>Date Range</SectionLabel>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs text-text-tertiary mb-1">Boshlanish</label>
+            <label className="block text-xs text-text-tertiary mb-1">Start Date</label>
             <input
               type="date"
               value={form.startDate}
@@ -241,7 +228,7 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
             />
           </div>
           <div>
-            <label className="block text-xs text-text-tertiary mb-1">Tugash (ixtiyoriy)</label>
+            <label className="block text-xs text-text-tertiary mb-1">End Date (optional)</label>
             <input
               type="date"
               value={form.endDate}
@@ -255,17 +242,16 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
 
       {/* ── 5. Schedule ──────────────────────────────────────────── */}
       <div>
-        <SectionLabel>Ko'rsatish jadvali</SectionLabel>
+        <SectionLabel>Ad Schedule</SectionLabel>
 
         <TogglePill
-          options={[{ value: 'always', label: 'Har doim' }, { value: 'custom', label: 'Aniq soatlar' }]}
+          options={[{ value: 'always', label: 'Always On' }, { value: 'custom', label: 'Custom Hours' }]}
           value={form.schedule.always ? 'always' : 'custom'}
           onChange={(v) => set('schedule', { ...form.schedule, always: v === 'always' })}
         />
 
         {!form.schedule.always && (
           <div className="mt-4 space-y-3">
-            {/* Presets */}
             <div className="flex flex-wrap gap-2">
               {HOUR_PRESETS.map((preset) => (
                 <button
@@ -283,12 +269,11 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
                   onClick={() => set('schedule', { ...form.schedule, hours: [] })}
                   className="text-xs px-3 py-1.5 rounded-lg border border-border text-text-tertiary hover:text-red-400 transition-colors"
                 >
-                  Tozalash
+                  Clear
                 </button>
               )}
             </div>
 
-            {/* Hour grid */}
             <div className="grid grid-cols-8 gap-1.5">
               {Array.from({ length: 24 }, (_, h) => {
                 const selected = form.schedule.hours.includes(h)
@@ -311,11 +296,11 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
 
             {form.schedule.hours.length > 0 && (
               <p className="text-xs text-text-tertiary">
-                {form.schedule.hours.length} soat tanlandi:{' '}
+                {form.schedule.hours.length} hours selected:{' '}
                 <span className="text-text-tertiary">
-                  {form.schedule.hours[0].toString().padStart(2,'0')}:00
+                  {form.schedule.hours[0].toString().padStart(2, '0')}:00
                   {' – '}
-                  {(form.schedule.hours[form.schedule.hours.length - 1] + 1).toString().padStart(2,'0')}:00
+                  {(form.schedule.hours[form.schedule.hours.length - 1] + 1).toString().padStart(2, '0')}:00
                 </span>
               </p>
             )}
@@ -323,21 +308,19 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
         )}
       </div>
 
-      {/* ── Error ────────────────────────────────────────────────── */}
       {error && (
         <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-400">
           {error}
         </div>
       )}
 
-      {/* ── Actions ──────────────────────────────────────────────── */}
       <div className="flex items-center justify-end gap-3 pt-2 border-t border-border">
         <button
           type="button"
           onClick={onCancel}
           className="px-4 py-2 text-sm text-text-tertiary hover:text-text-primary transition-colors"
         >
-          Bekor qilish
+          Cancel
         </button>
         <button
           type="button"
@@ -349,7 +332,7 @@ export function CreateCampaignForm({ workspaceId, platform, onSuccess, onCancel 
               : 'bg-surface-2 text-text-tertiary border border-border cursor-not-allowed'
           }`}
         >
-          {saving ? 'Yaratilmoqda…' : 'Kampaniya yaratish'}
+          {saving ? 'Creating...' : 'Create Campaign'}
         </button>
       </div>
     </div>
