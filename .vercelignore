@@ -1,0 +1,23 @@
+# Dependencies and build outputs
+node_modules
+.git
+.gitignore
+.env.example
+.env.local
+.env.*.local
+
+# API package (not needed for web deployment)
+apps/api
+packages/shared
+
+# Documentation
+README.md
+docs
+.github
+
+# Development files
+.turbo
+.next
+dist
+*.log
+.DS_Store
