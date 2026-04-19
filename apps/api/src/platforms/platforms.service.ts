@@ -14,7 +14,7 @@ import { MetaConnector } from "./connectors/meta.connector";
 import { GoogleConnector } from "./connectors/google.connector";
 import { TiktokConnector } from "./connectors/tiktok.connector";
 import { YandexConnector } from "./connectors/yandex.connector";
-import { Platform } from "@performa/shared";
+import { Platform } from "@adspectr/shared";
 
 /**
  * PlatformsService manages the lifecycle of connected ad accounts.

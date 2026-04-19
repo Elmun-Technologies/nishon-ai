@@ -23,7 +23,7 @@ import {
   CreateWorkspaceDto,
   UpdateWorkspaceDto,
   UpdateAutopilotDto,
-} from "@performa/shared";
+} from "@adspectr/shared";
 
 @ApiTags("Workspaces")
 @Controller("workspaces")

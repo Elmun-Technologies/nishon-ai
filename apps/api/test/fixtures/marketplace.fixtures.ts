@@ -117,7 +117,7 @@ export class MarketplaceFixtures {
   ): Promise<TestUser> {
     const user: TestUser = {
       id: uuidv4(),
-      email: `test-${Date.now()}@performa.test`,
+      email: `test-${Date.now()}@adspectr.test`,
       firstName: "Test",
       lastName: "User",
       workspaceId,

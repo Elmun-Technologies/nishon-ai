@@ -1,7 +1,7 @@
 {
-  "name": "@performa/ai-sdk",
+  "name": "@adspectr/ai-sdk",
   "version": "0.0.1",
-  "description": "OpenAI wrapper and prompt templates for Performa",
+  "description": "OpenAI wrapper and prompt templates for AdSpectr",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

@@ -14,7 +14,7 @@ import { MarketplaceCertification } from '../entities/marketplace-certification.
 import { AgentProfile } from '../entities/agent-profile.entity';
 
 /**
- * Certification types for Performa marketplace
+ * Certification types for AdSpectr marketplace
  */
 export interface CertificationTypeConfig {
   name: string;
@@ -92,7 +92,7 @@ export interface AgentCertificationDetailDTO {
 }
 
 /**
- * CertificationService manages certification lifecycle for agents in Performa marketplace.
+ * CertificationService manages certification lifecycle for agents in AdSpectr marketplace.
  *
  * Responsibilities:
  * - Manage certification types (CRUD)
@@ -107,7 +107,7 @@ export class CertificationService {
   private readonly logger = new Logger(CertificationService.name);
 
   /**
-   * Pre-defined certification types for Performa marketplace
+   * Pre-defined certification types for AdSpectr marketplace
    */
   private readonly INITIAL_CERTIFICATIONS: CertificationTypeConfig[] = [
     {
@@ -116,7 +116,7 @@ export class CertificationService {
       description:
         'Certified Google Partner with proven expertise in Google Ads and Analytics.',
       issuer: 'Google',
-      iconUrl: 'https://cdn.performa.ai/certifications/google-partner.png',
+      iconUrl: 'https://cdn.adspectr.com/certifications/google-partner.png',
       badgeColor: '#4285F4',
     },
     {
@@ -124,7 +124,7 @@ export class CertificationService {
       slug: 'meta-blueprint-certified',
       description: 'Official Meta Blueprint certification for Meta Ads expertise.',
       issuer: 'Meta',
-      iconUrl: 'https://cdn.performa.ai/certifications/meta-blueprint.png',
+      iconUrl: 'https://cdn.adspectr.com/certifications/meta-blueprint.png',
       badgeColor: '#1877F2',
     },
     {
@@ -133,7 +133,7 @@ export class CertificationService {
       description:
         'Official Yandex Direct certification demonstrating platform expertise.',
       issuer: 'Yandex',
-      iconUrl: 'https://cdn.performa.ai/certifications/yandex-certified.png',
+      iconUrl: 'https://cdn.adspectr.com/certifications/yandex-certified.png',
       badgeColor: '#FF0000',
     },
     {
@@ -141,16 +141,16 @@ export class CertificationService {
       slug: 'performance-marketing-expert',
       description:
         'Verified expertise in performance marketing and ROI optimization.',
-      issuer: 'Performa',
-      iconUrl: 'https://cdn.performa.ai/certifications/performance-expert.png',
+      issuer: 'AdSpectr',
+      iconUrl: 'https://cdn.adspectr.com/certifications/performance-expert.png',
       badgeColor: '#8B5CF6',
     },
     {
       name: 'AI Agent Developer',
       slug: 'ai-agent-developer',
       description: 'Certified developer proficient in creating and managing AI agents.',
-      issuer: 'Performa',
-      iconUrl: 'https://cdn.performa.ai/certifications/ai-developer.png',
+      issuer: 'AdSpectr',
+      iconUrl: 'https://cdn.adspectr.com/certifications/ai-developer.png',
       badgeColor: '#06B6D4',
     },
   ];

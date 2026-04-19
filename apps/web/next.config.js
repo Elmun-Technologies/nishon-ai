@@ -5,7 +5,7 @@ const nextConfig = {
   experimental: {
     externalDir: true,
   },
-  transpilePackages: ['@performa/shared'],
+  transpilePackages: ['@adspectr/shared'],
   staticPageGenerationTimeout: 120,
   typescript: {
     ignoreBuildErrors: true,

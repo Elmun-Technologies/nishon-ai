@@ -28,7 +28,7 @@ const DOCS: Record<DocTab, { heading: string; intro: string; sections: DocSectio
     sections: [
       {
         id: 'workflow',
-        title: 'How Performa Works',
+        title: 'How AdSpectr Works',
         body: "Platforma 2 asosiy oqimga bo'linadi: Create (creative tayyorlash) va Launch (kampaniyani ishga tushirish).",
         steps: [
           'Workspace va platform accountni ulang (Meta/Google).',

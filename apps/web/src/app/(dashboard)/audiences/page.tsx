@@ -1,6 +1,8 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import Link from 'next/link'
+import { ChevronDown } from 'lucide-react'
 import { useI18n } from '@/i18n/use-i18n'
 import { PageHeader } from '@/components/ui'
 
@@ -21,6 +23,50 @@ const STAGES: Array<{ id: FunnelStage; label: string }> = [
   { id: 'retargeting', label: 'Retargeting' },
   { id: 'retention', label: 'Retention' },
 ]
+
+const ALL_STAGES_SET = new Set<FunnelStage>(STAGES.map((s) => s.id))
+
+const STAGE_SECTION: Record<
+  FunnelStage,
+  { dot: string; titleKey: string; titleFb: string; blurbKey: string; blurbFb: string }
+> = {
+  acquisition: {
+    dot: 'bg-violet-500',
+    titleKey: 'audiences.sectionAcquisitionTitle',
+    titleFb: 'Acquisition prospecting',
+    blurbKey: 'audiences.sectionAcquisitionBlurb',
+    blurbFb: 'Cold audiences and lookalikes for scale testing.',
+  },
+  reengagement: {
+    dot: 'bg-pink-500',
+    titleKey: 'audiences.sectionReengagementTitle',
+    titleFb: 'Acquisition re-engagement',
+    blurbKey: 'audiences.sectionReengagementBlurb',
+    blurbFb: 'Warm users who already had a first touch with your brand.',
+  },
+  retargeting: {
+    dot: 'bg-sky-500',
+    titleKey: 'audiences.sectionRetargetingTitle',
+    titleFb: 'Retargeting',
+    blurbKey: 'audiences.sectionRetargetingBlurb',
+    blurbFb: 'Site visitors and intent signals worth bringing back.',
+  },
+  retention: {
+    dot: 'bg-emerald-500',
+    titleKey: 'audiences.sectionRetentionTitle',
+    titleFb: 'Retention',
+    blurbKey: 'audiences.sectionRetentionBlurb',
+    blurbFb: 'Existing customers to upsell, cross-sell, or reactivate.',
+  },
+}
+
+function AudienceVisual({ tags }: { tags: string[] }) {
+  const t = tags.join(' ').toLowerCase()
+  if (t.includes('lookalike')) return <span className="text-2xl leading-none">◎</span>
+  if (t.includes('video')) return <span className="text-2xl leading-none">▶</span>
+  if (t.includes('visitor') || t.includes('retarget')) return <span className="text-2xl leading-none">↻</span>
+  return <span className="text-2xl leading-none">👥</span>
+}
 
 const AUDIENCES: AudienceCard[] = [
   { id: 'super-lookalike', name: 'Super lookalike', description: 'Top-performing audience lookalikes combination.', stage: 'acquisition', tags: ['Lookalike', 'Prospecting'], ai: true },
@@ -87,6 +133,13 @@ const PREBUILT_LIBRARY: Record<string, string[]> = {
     'Top-URL purchasers',
     'Category-specific purchasers',
   ],
+}
+
+const STAGE_LIBRARY_KEY: Record<FunnelStage, keyof typeof PREBUILT_LIBRARY> = {
+  acquisition: 'Acquisition prospecting',
+  reengagement: 'Acquisition re-engagement',
+  retargeting: 'Retargeting',
+  retention: 'Retention',
 }
 
 const FULL_FUNNEL_RECOMMENDATIONS: Array<{
@@ -186,26 +239,55 @@ const IMPLEMENTATION_CHECKLIST: Array<{ module: string; items: string[] }> = [
 
 export default function AudiencesPage() {
   const { t } = useI18n()
-  const [activeStage, setActiveStage] = useState<FunnelStage>('acquisition')
+  const [enabledStages, setEnabledStages] = useState<Set<FunnelStage>>(
+    () => new Set<FunnelStage>(['acquisition', 'reengagement', 'retargeting', 'retention']),
+  )
+  const [subMenuStage, setSubMenuStage] = useState<FunnelStage | null>(null)
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<string[]>([])
   const [splitByFunnel, setSplitByFunnel] = useState(true)
   const [budgetType, setBudgetType] = useState<'CBO' | 'ABO'>('CBO')
   const [objective, setObjective] = useState('Sales')
+  const [campaignName, setCampaignName] = useState('AdSpectr - Acquisition Prospecting - Master Campaign')
+  const [rowType, setRowType] = useState<'New' | 'Existing'>('New')
+
+  const effectiveStages = enabledStages.size === 0 ? ALL_STAGES_SET : enabledStages
 
   const filtered = useMemo(() => {
     return AUDIENCES.filter((a) => {
-      const byStage = a.stage === activeStage
+      const byStage = effectiveStages.has(a.stage)
       const byQuery =
         query.trim() === '' ||
         a.name.toLowerCase().includes(query.toLowerCase()) ||
         a.description.toLowerCase().includes(query.toLowerCase())
       return byStage && byQuery
     })
-  }, [activeStage, query])
+  }, [effectiveStages, query])
+
+  const primaryStage =
+    (STAGES.map((s) => s.id).find((id) => effectiveStages.has(id)) as FunnelStage | undefined) ?? 'acquisition'
+  const section = STAGE_SECTION[primaryStage]
+
+  function toggleStage(id: FunnelStage) {
+    setEnabledStages((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
 
   const toggleAudience = (id: string) => {
     setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
+  }
+
+  const selectAllInView = () => {
+    const ids = filtered.map((item) => item.id)
+    setSelected((prev) => {
+      const hasAll = ids.every((id) => prev.includes(id))
+      if (hasAll) return prev.filter((id) => !ids.includes(id))
+      return Array.from(new Set([...prev, ...ids]))
+    })
   }
 
   return (
@@ -213,16 +295,29 @@ export default function AudiencesPage() {
       <PageHeader
         title={t('navigation.audiences', 'Audiences')}
         subtitle={t('audiences.subtitle', 'Build full-funnel audience sets and launch them consistently')}
+        actions={
+          <Link
+            href="/audiences/studio"
+            className="inline-flex items-center justify-center rounded-xl text-sm font-medium px-4 py-2 border border-violet-500/40 text-violet-200 hover:bg-violet-500/10 transition-colors"
+          >
+            {t('audiences.openStudio', 'Audience Studio')}
+          </Link>
+        }
       />
       <div className="min-h-full rounded-2xl border border-[#1E1B4B] bg-[#08071A] text-text-secondary overflow-hidden">
-      <div className="border-b border-[#1F1B4D] px-5 py-4 flex items-center justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-semibold">{t('audiences.launcherTitle', 'Audience Launcher')}</h2>
-          <p className="text-xs text-text-tertiary mt-1">
-            {t('audiences.launcherSubtitle', 'Performa full-funnel targeting strategy with an optimized workflow for maximum ROAS.')}
+      <div className="border-b border-[#1F1B4D] px-5 py-4 flex items-start justify-between gap-4 flex-wrap">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="text-xl font-semibold">{t('audiences.launcherTitle', 'Audience Launcher')}</h2>
+            <span className="text-xs px-2.5 py-1 rounded-full bg-[#151236] border border-border text-[#C4B5FD] font-medium tabular-nums">
+              {selected.length} {t('audiences.selectedCount', 'selected')}
+            </span>
+          </div>
+          <p className="text-xs text-text-tertiary mt-1.5 max-w-2xl">
+            {t('audiences.launcherSubtitle', 'AdSpectr full-funnel targeting strategy with an optimized workflow for maximum ROAS.')}
           </p>
         </div>
-        <button className="px-4 py-2 rounded-lg bg-[#8B80F9] text-text-primary text-sm font-semibold disabled:opacity-40" disabled={selected.length === 0}>
+        <button className="px-4 py-2 rounded-lg bg-[#8B80F9] text-text-primary text-sm font-semibold disabled:opacity-40 shrink-0" disabled={selected.length === 0}>
           {t('common.next', 'Next')}
         </button>
       </div>
@@ -236,23 +331,68 @@ export default function AudiencesPage() {
               placeholder="Search for audience..."
               className="w-full md:max-w-sm rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-[#8B80F9]"
             />
-            <span className="text-xs px-2 py-1 rounded-full bg-[#151236] border border-border">{selected.length} {t('audiences.selected', 'selected')}</span>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-2">
-            {STAGES.map((stage) => (
-              <button
-                key={stage.id}
-                onClick={() => setActiveStage(stage.id)}
-                className={`text-left px-3 py-2 rounded-lg text-sm border ${
-                  stage.id === activeStage
-                    ? 'bg-[#221B5A] border-[#8B80F9] text-white'
-                    : 'bg-surface border-border text-[#A1A1AA]'
-                }`}
-              >
-                {stage.label}
-              </button>
-            ))}
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2">
+            {STAGES.map((stage) => {
+              const on = enabledStages.has(stage.id)
+              const lib = PREBUILT_LIBRARY[STAGE_LIBRARY_KEY[stage.id]] ?? []
+              return (
+                <div key={stage.id} className="relative rounded-lg border border-border bg-surface/80">
+                  <div className="flex items-center gap-2 px-3 py-2">
+                    <input
+                      type="checkbox"
+                      checked={on}
+                      onChange={() => toggleStage(stage.id)}
+                      className="rounded border-border text-[#8B80F9] focus:ring-[#8B80F9]/30"
+                    />
+                    <span className={`text-sm font-medium flex-1 ${on ? 'text-white' : 'text-[#A1A1AA]'}`}>{stage.label}</span>
+                    <button
+                      type="button"
+                      onClick={() => setSubMenuStage((s) => (s === stage.id ? null : stage.id))}
+                      className="p-1 rounded-md hover:bg-[#1D1A45] text-[#A1A1AA]"
+                      aria-expanded={subMenuStage === stage.id}
+                      aria-label={t('audiences.toggleSubtypes', 'Show template list')}
+                    >
+                      <ChevronDown className={`h-4 w-4 transition-transform ${subMenuStage === stage.id ? 'rotate-180' : ''}`} />
+                    </button>
+                  </div>
+                  {subMenuStage === stage.id && (
+                    <div className="absolute left-0 right-0 top-full z-20 mt-1 max-h-56 overflow-y-auto rounded-lg border border-[#8B80F9]/40 bg-[#0c0a22] shadow-xl p-2 space-y-1">
+                      {lib.slice(0, 10).map((line) => (
+                        <label key={line} className="flex items-start gap-2 px-2 py-1.5 rounded-md hover:bg-[#1D1A45] cursor-pointer text-left">
+                          <input type="checkbox" className="mt-0.5 rounded border-border" readOnly tabIndex={-1} />
+                          <span className="text-[11px] text-[#D4D4D8] leading-snug">{line}</span>
+                        </label>
+                      ))}
+                      {lib.length > 10 && (
+                        <p className="text-[10px] text-text-tertiary px-2 py-1">+{lib.length - 10} more…</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className={`h-2 w-2 rounded-full shrink-0 ${section.dot}`} aria-hidden />
+              <div>
+                <p className="text-sm font-semibold text-white">{t(section.titleKey, section.titleFb)}</p>
+                <p className="text-xs text-[#A1A1AA] max-w-xl">{t(section.blurbKey, section.blurbFb)}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={selectAllInView}
+              className="rounded-lg border border-[#8B80F9]/40 bg-[#1D1A45] px-3 py-1.5 text-xs font-semibold text-[#C4B5FD]"
+            >
+              Select all in this view
+            </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
@@ -262,22 +402,42 @@ export default function AudiencesPage() {
                 <button
                   key={audience.id}
                   onClick={() => toggleAudience(audience.id)}
-                  className={`text-left rounded-xl border p-4 transition ${
+                  className={`text-left rounded-xl border p-4 transition flex flex-col ${
                     active ? 'border-[#8B80F9] bg-[#14113A]' : 'border-border bg-surface hover:border-[#4C478F]'
                   }`}
                 >
-                  <div className="flex items-start justify-between gap-2">
-                    <p className="font-medium text-sm">{audience.name}</p>
-                    <span className={`w-4 h-4 rounded border ${active ? 'bg-[#8B80F9] border-[#8B80F9]' : 'border-border'}`} />
-                  </div>
-                  <p className="text-xs text-[#A1A1AA] mt-2">{audience.description}</p>
-                  <div className="flex flex-wrap gap-1.5 mt-3">
-                    {audience.tags.map((tag) => (
-                      <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full bg-[#1D1A45] text-[#93C5FD]">
-                        {tag}
+                  <div className="mb-3 flex items-center justify-between gap-2 text-[10px] text-[#A1A1AA]">
+                    <div className="flex items-center gap-2">
+                      <span className="flex items-center gap-1">
+                        <span className="h-1 w-1 rounded-full bg-border" />0 created
                       </span>
-                    ))}
-                    {audience.ai && <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#2A1C55] text-[#C4B5FD]">AI</span>}
+                      <span className="flex items-center gap-1">
+                        <span className="h-1 w-1 rounded-full bg-border" />0 live
+                      </span>
+                    </div>
+                    <span className={`w-4 h-4 rounded border shrink-0 ${active ? 'bg-[#8B80F9] border-[#8B80F9]' : 'border-border'}`} />
+                  </div>
+                  <div className="flex flex-1 flex-col items-center text-center gap-2">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#1D1A45] border border-[#8B80F9]/25 text-[#C4B5FD]">
+                      <AudienceVisual tags={audience.tags} />
+                    </div>
+                    <p className="font-semibold text-sm text-white w-full">{audience.name}</p>
+                    <p className="text-xs text-[#A1A1AA] leading-relaxed line-clamp-3">{audience.description}</p>
+                  </div>
+                  <div className="mt-auto pt-3 flex flex-wrap items-center justify-between gap-2 border-t border-border/40">
+                    <div className="flex flex-wrap gap-1.5">
+                      {audience.tags.map((tag) => (
+                        <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full bg-teal-950/40 text-teal-200 border border-teal-800/40">
+                          {tag}
+                        </span>
+                      ))}
+                      {audience.ai && (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#2A1C55] text-[#C4B5FD]">AI</span>
+                      )}
+                    </div>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="text-blue-400 shrink-0" aria-hidden>
+                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                    </svg>
                   </div>
                 </button>
               )
@@ -291,42 +451,157 @@ export default function AudiencesPage() {
             <span className="text-xs text-text-tertiary">Step 1 of 4</span>
           </div>
           <div className="p-4 space-y-4">
+            <div className="flex flex-wrap items-center gap-2 text-sm text-text-secondary">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="text-blue-400 shrink-0" aria-hidden>
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+              </svg>
+              <span className="font-medium text-text-primary">Where to launch Facebook ad sets:</span>
+            </div>
+
             <div className="inline-flex rounded-lg border border-border overflow-hidden">
               <button
-                onClick={() => setSplitByFunnel(true)}
+                type="button"
+                onClick={() => {
+                  setSplitByFunnel(true)
+                  setRowType('New')
+                }}
                 className={`px-3 py-2 text-xs ${splitByFunnel ? 'bg-[#221B5A] text-white' : 'bg-surface text-[#A1A1AA]'}`}
               >
                 Split campaigns per funnel stage
               </button>
               <button
-                onClick={() => setSplitByFunnel(false)}
+                type="button"
+                onClick={() => {
+                  setSplitByFunnel(false)
+                  setRowType('Existing')
+                }}
                 className={`px-3 py-2 text-xs ${!splitByFunnel ? 'bg-[#221B5A] text-white' : 'bg-surface text-[#A1A1AA]'}`}
               >
                 Launch all ad sets to one campaign
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-              <input
-                className="md:col-span-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm"
-                defaultValue="Performa - Acquisition Prospecting - Master Campaign"
-              />
-              <select
-                className="rounded-lg border border-border bg-surface px-3 py-2 text-sm"
-                value={objective}
-                onChange={(e) => setObjective(e.target.value)}
-              >
-                <option>Sales</option>
-                <option>Leads</option>
-                <option>Traffic</option>
-                <option>Engagement</option>
-                <option>Awareness</option>
-              </select>
-              <div className="inline-flex rounded-lg border border-border overflow-hidden h-fit">
-                <button onClick={() => setBudgetType('CBO')} className={`px-3 py-2 text-xs ${budgetType === 'CBO' ? 'bg-[#221B5A] text-white' : 'bg-surface text-[#A1A1AA]'}`}>CBO</button>
-                <button onClick={() => setBudgetType('ABO')} className={`px-3 py-2 text-xs ${budgetType === 'ABO' ? 'bg-[#221B5A] text-white' : 'bg-surface text-[#A1A1AA]'}`}>ABO</button>
-              </div>
+            <div className="overflow-x-auto rounded-xl border border-border">
+              <table className="min-w-[920px] w-full text-left text-xs">
+                <thead className="bg-[#151236] text-[#A1A1AA] uppercase tracking-wide">
+                  <tr>
+                    <th className="px-3 py-2.5 font-semibold w-14">Audiences</th>
+                    {splitByFunnel && <th className="px-3 py-2.5 font-semibold min-w-[200px]">Funnel stage</th>}
+                    <th className="px-3 py-2.5 font-semibold w-24">Type</th>
+                    <th className="px-3 py-2.5 font-semibold min-w-[240px]">Campaign name</th>
+                    <th className="px-3 py-2.5 font-semibold w-36">Campaign Objective</th>
+                    <th className="px-3 py-2.5 font-semibold w-28">Budget type</th>
+                    <th className="px-3 py-2.5 font-semibold min-w-[160px]">Campaign Budget</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-t border-border align-top">
+                    <td className="px-3 py-3">
+                      <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-[#8B80F9]/50 bg-[#1D1A45] text-[11px] font-bold text-white">
+                        {Math.max(1, selected.length)}
+                      </span>
+                    </td>
+                    {splitByFunnel && (
+                      <td className="px-3 py-3">
+                        <div className="flex items-start gap-2">
+                          <span className="mt-1 h-2 w-2 rounded-full bg-emerald-400 shrink-0" aria-hidden />
+                          <span className="text-[11px] leading-snug text-text-secondary">
+                            {STAGES.find((s) => s.id === primaryStage)?.label ?? 'Acquisition'} Lookalike Campaign
+                          </span>
+                        </div>
+                      </td>
+                    )}
+                    <td className="px-3 py-3">
+                      <div className="inline-flex rounded-md border border-border overflow-hidden">
+                        <button
+                          type="button"
+                          onClick={() => setRowType('New')}
+                          className={`px-2 py-1 text-[10px] font-semibold ${rowType === 'New' ? 'bg-[#221B5A] text-white' : 'bg-surface text-[#A1A1AA]'}`}
+                        >
+                          New
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setRowType('Existing')}
+                          className={`px-2 py-1 text-[10px] font-semibold ${rowType === 'Existing' ? 'bg-[#221B5A] text-white' : 'bg-surface text-[#A1A1AA]'}`}
+                        >
+                          Existing
+                        </button>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3">
+                      {rowType === 'Existing' ? (
+                        <select className="w-full rounded-lg border border-border bg-surface px-2 py-2 text-[11px] text-text-secondary">
+                          <option value="">Select Facebook Campaign…</option>
+                          <option>AA-Лиды-Fikr yetakchilari-09.04.2026</option>
+                          <option>Prospecting / Advantage+ shopping</option>
+                          <option>Retargeting — 30d visitors</option>
+                        </select>
+                      ) : (
+                        <div className="relative">
+                          <input
+                            value={campaignName}
+                            maxLength={128}
+                            onChange={(e) => setCampaignName(e.target.value)}
+                            className="w-full rounded-lg border border-border bg-surface px-2 py-2 pr-14 text-[11px]"
+                            placeholder="Campaign name"
+                          />
+                          <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-text-tertiary tabular-nums">
+                            {campaignName.length}/128
+                          </span>
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-3 py-3">
+                      <select
+                        className="w-full rounded-lg border border-border bg-surface px-2 py-2 text-[11px]"
+                        value={objective}
+                        onChange={(e) => setObjective(e.target.value)}
+                      >
+                        <option>Sales</option>
+                        <option>Leads</option>
+                        <option>Traffic</option>
+                        <option>Engagement</option>
+                        <option>Awareness</option>
+                      </select>
+                    </td>
+                    <td className="px-3 py-3">
+                      <div className="inline-flex rounded-md border border-border overflow-hidden">
+                        <button
+                          type="button"
+                          onClick={() => setBudgetType('CBO')}
+                          className={`px-2 py-1 text-[10px] font-semibold ${budgetType === 'CBO' ? 'bg-[#221B5A] text-white' : 'bg-surface text-[#A1A1AA]'}`}
+                        >
+                          CBO
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setBudgetType('ABO')}
+                          className={`px-2 py-1 text-[10px] font-semibold ${budgetType === 'ABO' ? 'bg-[#221B5A] text-white' : 'bg-surface text-[#A1A1AA]'}`}
+                        >
+                          ABO
+                        </button>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3 text-[11px] text-text-tertiary leading-snug">
+                      Budget is set on ad set level
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setRowType('New')
+                setCampaignName(`AdSpectr - New campaign ${new Date().toLocaleDateString()}`)
+              }}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#8B80F9]/60 bg-transparent px-3 py-2 text-xs font-semibold text-[#C4B5FD] hover:bg-[#221B5A]/40 transition-colors"
+            >
+              <span className="text-base leading-none">+</span>
+              Create New Campaign
+            </button>
           </div>
         </section>
 
@@ -452,9 +727,9 @@ export default function AudiencesPage() {
           </div>
 
           <div className="mt-4 rounded-lg border border-border p-3">
-            <p className="text-sm font-medium mb-2">Performa vs Facebook Ads Manager (nima uchun bu section kerak)</p>
+            <p className="text-sm font-medium mb-2">AdSpectr vs Facebook Ads Manager (nima uchun bu section kerak)</p>
             <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-[#A1A1AA]">
-              <li>• Performa'da preset audiences va exclusionlar oldindan beriladi.</li>
+              <li>• AdSpectr'da preset audiences va exclusionlar oldindan beriladi.</li>
               <li>• AI lookalike segmentlar bilan sifat + hajm balansini yaxshilaydi.</li>
               <li>• Funnel stage'larni kampaniyalarga alohida ajratish osonlashadi.</li>
               <li>• Creative picker performance ma'lumotlari bilan ishlaydi.</li>

@@ -10,7 +10,7 @@ import { MetaModule } from "../../meta/meta.module";
 
 /**
  * IntegrationsModule handles marketplace integrations for syncing specialist
- * performance data from external platforms (Meta, Google, etc.) into Performa.
+ * performance data from external platforms (Meta, Google, etc.) into AdSpectr.
  *
  * Services:
  * - MetaPerformanceSyncService: Syncs real campaign performance from Meta Ads API

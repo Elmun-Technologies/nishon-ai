@@ -10,6 +10,7 @@ export function useI18n() {
 
 // ─── Translation Helper ───────────────────────────────────────────────────────
 
+/** Returns translated string or empty string if missing (so callers can apply `defaultValue`). */
 export function getNestedTranslation(obj: any, path: string): string {
   const keys = path.split('.')
   let value = obj
@@ -18,9 +19,9 @@ export function getNestedTranslation(obj: any, path: string): string {
     if (value && typeof value === 'object' && key in value) {
       value = value[key]
     } else {
-      return path // Return the path if translation not found (fallback)
+      return ''
     }
   }
 
-  return typeof value === 'string' ? value : path
+  return typeof value === 'string' ? value : ''
 }

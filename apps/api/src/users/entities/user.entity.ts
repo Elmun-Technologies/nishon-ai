@@ -17,7 +17,7 @@ export enum UserPlan {
 }
 
 /**
- * Represents a registered user of the Performa platform.
+ * Represents a registered user of the AdSpectr platform.
  * A user can own multiple workspaces (one per business they manage).
  * Authentication is handled via JWT — password is always stored hashed.
  */

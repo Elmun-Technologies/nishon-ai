@@ -35,7 +35,7 @@ export interface SeoMetadata {
 export function useSeoMetadata(
   type: 'marketplace' | 'specialist' | 'search',
   data?: Record<string, any>,
-  language: string = 'en',
+  language: string = 'ru',
 ) {
   const [metadata, setMetadata] = useState<SeoMetadata | null>(null)
   const [loading, setLoading] = useState(true)
@@ -90,13 +90,13 @@ export function useSeoMetadata(
 /**
  * Get default metadata based on page type
  */
-function getDefaultMetadata(type: string, language: string = 'en'): SeoMetadata {
-  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://performa.ai'
+function getDefaultMetadata(type: string, language: string = 'ru'): SeoMetadata {
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://adspectr.com'
 
   const defaults = {
     marketplace: {
       en: {
-        title: 'Find AI Marketing Specialists | Performa Marketplace',
+        title: 'Find AI Marketing Specialists | AdSpectr Marketplace',
         description:
           'Connect with certified performance marketing experts. Browse verified specialists with proven track records managing ad campaigns.',
         keywords: [
@@ -108,7 +108,7 @@ function getDefaultMetadata(type: string, language: string = 'en'): SeoMetadata 
         ],
       },
       ru: {
-        title: 'Найдите специалистов по маркетингу | Marketplace Performa',
+        title: 'Найдите специалистов по маркетингу | Marketplace AdSpectr',
         description:
           'Найдите сертифицированных специалистов по маркетингу. Проверенные эксперты с подтвержденным опытом.',
         keywords: [
@@ -118,36 +118,61 @@ function getDefaultMetadata(type: string, language: string = 'en'): SeoMetadata 
           'сертифицированный эксперт Meta',
         ],
       },
+      uz: {
+        title: 'Marketing mutaxassislarini toping | AdSpectr marketplace',
+        description:
+          'Sertifikatlangan marketing mutaxassislarini qidiring. Reklama kampaniyalarini boshqarish bo‘yicha tasdiqlangan tajriba.',
+        keywords: [
+          'marketing mutaxassisi',
+          'performance marketing',
+          'reklama boshqaruvi',
+          'Meta sertifikati',
+          'Google Ads mutaxassisi',
+        ],
+      },
     },
     specialist: {
       en: {
-        title: 'Marketing Specialist Profile | Performa',
+        title: 'Marketing Specialist Profile | AdSpectr',
         description: 'View this marketing specialist profile with performance metrics and certifications.',
         keywords: ['marketing specialist', 'performance marketing', 'ads expert'],
       },
       ru: {
-        title: 'Профиль специалиста по маркетингу | Performa',
+        title: 'Профиль специалиста по маркетингу | AdSpectr',
         description: 'Посмотрите профиль этого специалиста по маркетингу с метриками производительности.',
         keywords: ['специалист по маркетингу', 'маркетинг производительности'],
+      },
+      uz: {
+        title: 'Marketing mutaxassisi profili | AdSpectr',
+        description:
+          'Marketing mutaxassisi profili: samaradorlik metrikalari va sertifikatlar.',
+        keywords: ['marketing mutaxassisi', 'performance marketing', 'reklama eksperti'],
       },
     },
     search: {
       en: {
-        title: 'Search Results | Performa Marketplace',
+        title: 'Search Results | AdSpectr Marketplace',
         description: 'Find marketing specialists matching your criteria. Filter by platform, experience, and ratings.',
         keywords: ['marketing specialist', 'hire expert', 'ads management'],
       },
       ru: {
-        title: 'Результаты поиска | Marketplace Performa',
+        title: 'Результаты поиска | Marketplace AdSpectr',
         description:
           'Найдите специалистов по маркетингу в соответствии с вашими критериями. Фильтруйте по платформе и опыту.',
         keywords: ['специалист по маркетингу', 'нанять эксперта'],
+      },
+      uz: {
+        title: 'Qidiruv natijalari | AdSpectr marketplace',
+        description:
+          'Mezonlaringizga mos marketing mutaxassislarini toping. Platforma, tajriba va reyting bo‘yicha filtr.',
+        keywords: ['marketing mutaxassisi', 'ekspert yollash', 'reklama boshqaruvi'],
       },
     },
   }
 
   const typeDefaults = defaults[type as keyof typeof defaults] || defaults.marketplace
-  const langDefaults = typeDefaults[language as keyof typeof typeDefaults] || typeDefaults.en
+  const langDefaults =
+    typeDefaults[language as keyof typeof typeDefaults] || typeDefaults.ru || typeDefaults.en
 
   return {
     title: langDefaults.title,

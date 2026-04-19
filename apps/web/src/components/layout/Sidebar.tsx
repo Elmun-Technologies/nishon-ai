@@ -7,7 +7,7 @@ import { useI18n } from '@/i18n/use-i18n'
 import {
   LayoutGrid, Rocket, Zap, BarChart3, Brain, Wallet,
   Settings2, LogOut, Users, Sparkles, TrendingUp, ShoppingBag, ChevronDown, Palette,
-  Wand2, Users2, Folder, Palette as PaletteIcon, Package, Image, RefreshCcw, Workflow, Bot,
+  Wand2, Users2, Folder, Palette as PaletteIcon, Package, Image, RefreshCcw, Workflow, Bot, Compass, Clapperboard,
 } from 'lucide-react'
 
 const CATEGORIES: Array<{
@@ -25,8 +25,9 @@ const CATEGORIES: Array<{
     items: [
       { href: '/launch', labelKey: 'navigation.launch', fallback: 'Launch', icon: Rocket },
       { href: '/campaigns', labelKey: 'navigation.campaigns', fallback: 'Campaigns', icon: Zap },
-      { href: '/marketplace', labelKey: 'navigation.marketplace', fallback: 'Marketplace', icon: ShoppingBag },
+      { href: '/marketplace/search', labelKey: 'navigation.marketplace', fallback: 'Marketplace', icon: ShoppingBag },
       { href: '/audiences', labelKey: 'navigation.audiences', fallback: 'Audiences', icon: Users },
+      { href: '/ad-launcher', labelKey: 'navigation.adLauncher', fallback: 'Ad Launcher', icon: Clapperboard },
     ],
   },
   {
@@ -37,6 +38,7 @@ const CATEGORIES: Array<{
     items: [
       { href: '/dashboard', labelKey: 'navigation.dashboard', fallback: 'Dashboard', icon: LayoutGrid },
       { href: '/reporting', labelKey: 'navigation.reporting', fallback: 'Reporting', icon: BarChart3 },
+      { href: '/meta-audit', labelKey: 'navigation.metaAudit', fallback: 'Meta Audit', icon: Compass },
       { href: '/ai-decisions', labelKey: 'navigation.aiDecisions', fallback: 'AI Decisions', icon: Brain, badge: true },
       { href: '/performance', labelKey: 'navigation.performance', fallback: 'Performance', icon: TrendingUp },
     ],
@@ -94,7 +96,7 @@ export default function Sidebar() {
   const router = useRouter()
   const { currentWorkspace, user, logout } = useWorkspaceStore()
   const [expanded, setExpanded] = useState<Record<string, boolean>>({
-    advertising: true, analytics: true, optimization: true, tools: true, creative: true,
+    marketing: true, analytics: true, optimization: true, tools: true, creative: true,
   })
 
   function toggle(id: string) {
@@ -107,17 +109,17 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="w-64 bg-surface border-r border-border flex flex-col shrink-0 transition-colors">
+    <aside className="w-64 bg-brand-ink text-[#c8e6a8] border-r border-brand-mid/25 flex flex-col shrink-0 transition-colors">
       {/* Logo */}
-      <div className="px-5 py-4 border-b border-border flex-shrink-0">
+      <div className="px-5 py-4 border-b border-brand-mid/20 flex-shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-text-primary flex items-center justify-center shrink-0">
-            <span className="text-surface font-bold text-sm">P</span>
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-mid to-brand-lime flex items-center justify-center shrink-0">
+            <span className="text-brand-ink font-bold text-sm">P</span>
           </div>
           <div className="flex-1 min-w-0">
-            <h1 className="text-text-primary font-semibold text-sm leading-tight">Performa</h1>
+            <h1 className="text-white font-semibold text-sm leading-tight">AdSpectr</h1>
             {currentWorkspace && (
-              <p className="text-text-tertiary text-xs truncate">{currentWorkspace.name}</p>
+              <p className="text-brand-lime/55 text-xs truncate">{currentWorkspace.name}</p>
             )}
           </div>
         </div>
@@ -125,19 +127,6 @@ export default function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 px-2 py-3 space-y-1 overflow-y-auto">
-        {/* Dashboard */}
-        <Link
-          href="/dashboard"
-          className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-            pathname === '/dashboard'
-              ? 'bg-surface-2 text-text-primary'
-              : 'text-text-secondary hover:text-text-primary hover:bg-surface-2'
-          }`}
-        >
-          <LayoutGrid size={16} className="shrink-0" strokeWidth={1.5} />
-          {t('navigation.dashboard', 'Dashboard')}
-        </Link>
-
         {/* Categories */}
         {CATEGORIES.map((cat) => {
           const isOpen = expanded[cat.id]
@@ -146,7 +135,7 @@ export default function Sidebar() {
             <div key={cat.id}>
               <button
                 onClick={() => toggle(cat.id)}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-surface-2 transition-colors"
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-brand-lime/70 hover:text-brand-white hover:bg-brand-mid/15 transition-colors"
               >
                 <Icon size={15} strokeWidth={1.5} className="shrink-0" />
                 <span className="flex-1 text-left">{t(cat.labelKey, cat.fallback)}</span>
@@ -154,7 +143,7 @@ export default function Sidebar() {
               </button>
 
               {isOpen && (
-                <div className="ml-2 pl-3 border-l border-border space-y-0.5 mt-0.5 mb-1">
+                <div className="ml-2 pl-3 border-l border-brand-mid/25 space-y-0.5 mt-0.5 mb-1">
                   {cat.items.map((item) => {
                     const ItemIcon = item.icon
                     const isActive = pathname.startsWith(item.href)
@@ -164,14 +153,14 @@ export default function Sidebar() {
                         href={item.href}
                         className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
                           isActive
-                            ? 'bg-surface-2 text-text-primary font-medium'
-                            : 'text-text-secondary hover:text-text-primary hover:bg-surface-2'
+                            ? 'bg-gradient-to-r from-brand-mid/30 to-brand-lime/15 text-brand-white font-medium border border-brand-lime/35'
+                            : 'text-brand-lime/75 hover:text-brand-white hover:bg-brand-mid/15'
                         }`}
                       >
                         <ItemIcon size={14} strokeWidth={1.5} className="shrink-0" />
                         <span className="flex-1 truncate">{t(item.labelKey, item.fallback)}</span>
                         {'badge' in item && item.badge && (
-                          <div className="w-1.5 h-1.5 rounded-full bg-info shrink-0" />
+                          <div className="w-1.5 h-1.5 rounded-full bg-brand-lime shrink-0" />
                         )}
                       </Link>
                     )
@@ -186,13 +175,13 @@ export default function Sidebar() {
       {/* Autopilot status */}
       {currentWorkspace && (
         <div className="px-3 pb-2">
-          <div className="bg-surface-2 border border-border rounded-lg px-3 py-2.5">
+          <div className="bg-brand-mid/10 border border-brand-mid/25 rounded-lg px-3 py-2.5">
             <div className="flex items-center gap-2 mb-1">
               <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${
                 currentWorkspace.autopilotMode === 'full_auto' ? 'bg-success animate-pulse' :
                 currentWorkspace.autopilotMode === 'assisted'  ? 'bg-warning' : 'bg-text-tertiary'
               }`} />
-              <p className="text-text-primary text-xs font-medium">
+              <p className="text-brand-white text-xs font-medium">
                 {currentWorkspace.autopilotMode === 'full_auto'
                   ? t('sidebar.autopilot.fullAuto', 'Full Auto')
                   : currentWorkspace.autopilotMode === 'assisted'
@@ -200,7 +189,7 @@ export default function Sidebar() {
                   : t('sidebar.autopilot.manual', 'Manual')}
               </p>
             </div>
-            <p className="text-text-tertiary text-xs leading-relaxed">
+            <p className="text-brand-lime/55 text-xs leading-relaxed">
               {currentWorkspace.autopilotMode === 'full_auto'
                 ? t('sidebar.autopilot.fullAutoHint', 'AI manages campaigns automatically.')
                 : currentWorkspace.autopilotMode === 'assisted'
@@ -212,7 +201,7 @@ export default function Sidebar() {
       )}
 
       {/* Bottom nav */}
-      <div className="px-2 border-t border-border py-2">
+      <div className="px-2 border-t border-brand-mid/20 py-2">
         {BOTTOM_NAV.map((item) => {
           const Icon = item.icon
           const isActive =
@@ -222,7 +211,7 @@ export default function Sidebar() {
           return (
             <Link key={item.href} href={item.href}
               className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                isActive ? 'bg-surface-2 text-text-primary' : 'text-text-secondary hover:text-text-primary hover:bg-surface-2'
+                isActive ? 'bg-gradient-to-r from-brand-mid/30 to-brand-lime/15 text-brand-white border border-brand-lime/35' : 'text-brand-lime/75 hover:text-brand-white hover:bg-brand-mid/15'
               }`}
             >
               <Icon size={16} strokeWidth={1.5} className="shrink-0" />
@@ -233,19 +222,19 @@ export default function Sidebar() {
       </div>
 
       {/* User */}
-      <div className="px-3 py-3 border-t border-border">
+      <div className="px-3 py-3 border-t border-brand-mid/20">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-full bg-surface-2 border border-border flex items-center justify-center shrink-0">
-            <span className="text-xs font-semibold text-text-primary">
+          <div className="w-8 h-8 rounded-full bg-brand-mid/15 border border-brand-mid/30 flex items-center justify-center shrink-0">
+            <span className="text-xs font-semibold text-brand-white">
               {user?.name?.charAt(0)?.toUpperCase() ?? 'U'}
             </span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-text-primary text-xs font-medium truncate">{user?.name}</p>
-            <p className="text-text-tertiary text-xs truncate">{user?.email}</p>
+            <p className="text-brand-white text-xs font-medium truncate">{user?.name}</p>
+            <p className="text-brand-lime/55 text-xs truncate">{user?.email}</p>
           </div>
           <button onClick={handleLogout} title={t('common.logout', 'Logout')}
-            className="text-text-tertiary hover:text-text-primary transition-colors p-1.5 rounded-lg hover:bg-surface-2">
+            className="text-brand-lime/55 hover:text-brand-white transition-colors p-1.5 rounded-lg hover:bg-brand-mid/15">
             <LogOut size={15} strokeWidth={1.5} />
           </button>
         </div>

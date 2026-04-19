@@ -30,7 +30,7 @@ interface ReportData {
  *
  * Every morning at 9 AM, each workspace owner receives a message like:
  *
- * 📊 Performa — Kunlik Hisobot
+ * 📊 AdSpectr — Kunlik Hisobot
  * 💰 Kecha sarflandi: $45.20
  * 🎯 Leadlar: 12 ta
  * 📈 ROAS: 3.2x
@@ -189,7 +189,7 @@ export class ReportProcessor {
     const revenueFormatted = `$${data.totalRevenue.toFixed(2)}`;
 
     return `
-<b>📊 Performa — Kunlik Hisobot</b>
+<b>📊 AdSpectr — Kunlik Hisobot</b>
 <b>${data.workspaceName}</b> | ${data.date}
 
 💰 <b>Sarflandi:</b> ${spendFormatted}
@@ -201,7 +201,7 @@ ${roasEmoji} <b>ROAS:</b> ${data.roas.toFixed(2)}x
 🤖 <b>AI bugun:</b> ${data.aiDecisionsToday} ta qaror qabul qildi
 ${data.topAdName ? `🔥 <b>Eng yaxshi reklama:</b> "${data.topAdName}"` : ""}
 
-<i>Batafsil: performa-ai-web.vercel.app/dashboard</i>
+<i>Batafsil: adspectr.com/dashboard</i>
     `.trim();
   }
 

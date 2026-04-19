@@ -4,7 +4,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { MetaSyncService } from "./meta-sync.service";
 import { ConnectedAccount } from "../platforms/entities/connected-account.entity";
-import { Platform } from "@performa/shared";
+import { Platform } from "@adspectr/shared";
 import { EventsGateway } from "../events/events.gateway";
 
 /**

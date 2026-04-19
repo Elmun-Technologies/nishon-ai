@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { ChevronDown, Link2 } from "lucide-react";
 import { useWorkspaceStore } from "@/stores/workspace.store";
 import { useRealtimeRefresh } from "@/hooks/useRealtimeRefresh";
 import { useI18n } from "@/i18n/use-i18n";
@@ -8,7 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { Badge, CampaignStatusBadge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { PageSpinner } from "@/components/ui/Spinner";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { Alert } from "@/components/ui/Alert";
 import { Dialog, PageHeader } from "@/components/ui";
 import { PlatformIcon } from "@/components/ui/PlatformIcon";
@@ -53,6 +54,10 @@ export default function CampaignsPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [actionError, setActionError] = useState("");
   const [showCreatePanel, setShowCreatePanel] = useState(false);
+  const [filterPreset, setFilterPreset] = useState("default");
+  const [dateRange, setDateRange] = useState("last7");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
 
   const fetchCampaigns = useCallback(async () => {
     if (!currentWorkspace?.id) return;
@@ -66,7 +71,7 @@ export default function CampaignsPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentWorkspace?.id]);
+  }, [currentWorkspace?.id, t]);
 
   useEffect(() => {
     fetchCampaigns();
@@ -106,74 +111,157 @@ export default function CampaignsPage() {
     draft: items.filter((c) => c.status === "draft").length,
   };
 
-  if (loading) return <PageSpinner />;
+  if (loading) {
+    return (
+      <div className="space-y-6 max-w-7xl">
+        <section className="rounded-2xl border border-blue-200/70 bg-gradient-to-r from-blue-50 via-indigo-50 to-violet-50 p-3 dark:border-slate-700 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
+          <PageHeader
+            className="mb-0 border-0 bg-transparent p-2 shadow-none"
+            title={t("navigation.campaigns", "Campaigns")}
+            subtitle={t("campaigns.subtitle", "All advertising campaigns managed by AdSpectr")}
+          />
+        </section>
+        <div className="space-y-3">
+          {[1, 2, 3].map((row) => (
+            <div key={row} className="rounded-2xl border border-border/70 bg-white/85 p-5 shadow-sm backdrop-blur-sm dark:bg-slate-900/70">
+              <Skeleton className="h-4 w-48" />
+              <Skeleton className="mt-3 h-3 w-72" />
+              <div className="mt-4 grid grid-cols-3 gap-2">
+                <Skeleton className="h-8" />
+                <Skeleton className="h-8" />
+                <Skeleton className="h-8" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 max-w-7xl">
-      <PageHeader
-        title={t("navigation.campaigns", "Campaigns")}
-        subtitle={t("campaigns.subtitle", "All advertising campaigns managed by Performa")}
-        actions={
-          <div className="flex items-center gap-2">
-            <Badge variant="gray">{items.length} {t("campaigns.total", "total")}</Badge>
-            <Button variant="secondary" size="sm" onClick={fetchCampaigns}>
-              {t("campaigns.refresh", "Refresh")}
-            </Button>
-            <Button onClick={() => setShowCreatePanel(true)}>
-              + {t("campaigns.create", "Create Campaign")}
-            </Button>
-          </div>
-        }
-      />
+      <section className="rounded-2xl border border-blue-200/70 bg-gradient-to-r from-blue-50 via-indigo-50 to-violet-50 p-3 dark:border-slate-700 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
+        <PageHeader
+          className="mb-0 border-0 bg-transparent p-2 shadow-none"
+          title={t("navigation.campaigns", "Campaigns")}
+          subtitle={t("campaigns.subtitle", "All advertising campaigns managed by AdSpectr")}
+          actions={
+            <div className="flex items-center gap-2">
+              <Badge variant="gray">{items.length} {t("campaigns.total", "total")}</Badge>
+              <Button variant="secondary" size="sm" onClick={fetchCampaigns}>
+                {t("campaigns.refresh", "Refresh")}
+              </Button>
+              <Button onClick={() => setShowCreatePanel(true)} className="shadow-sm">
+                + {t("campaigns.create", "Create Campaign")}
+              </Button>
+            </div>
+          }
+        />
+      </section>
 
-      {error && <Alert variant="error">{error}</Alert>}
-      {actionError && <Alert variant="error">{actionError}</Alert>}
+      <div className="rounded-2xl border border-border/70 bg-white/85 p-4 shadow-sm backdrop-blur-sm dark:bg-slate-900/70">
+        {error && <Alert variant="error">{error}</Alert>}
+        {actionError && <Alert variant="error" className="mt-2">{actionError}</Alert>}
+      </div>
 
-      <AdsManagerPanel />
+      <div className="rounded-2xl border border-border/70 bg-white/85 p-4 shadow-sm backdrop-blur-sm dark:bg-slate-900/70">
+        <AdsManagerPanel />
+      </div>
+
+      <div className="rounded-2xl border border-border/70 bg-white/85 p-4 shadow-sm backdrop-blur-sm dark:bg-slate-900/70">
+        <div className="flex flex-wrap items-center gap-2">
+          <label className="text-xs text-text-tertiary">Load filter preset</label>
+          <select
+            value={filterPreset}
+            onChange={(e) => setFilterPreset(e.target.value)}
+            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary"
+          >
+            <option value="default">Default preset</option>
+            <option value="high-roas">High ROAS</option>
+            <option value="creative-testing">Creative testing</option>
+            <option value="retargeting">Retargeting</option>
+          </select>
+          <label className="ml-2 text-xs text-text-tertiary">Range</label>
+          <select
+            value={dateRange}
+            onChange={(e) => setDateRange(e.target.value)}
+            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary"
+          >
+            <option value="today">Today</option>
+            <option value="yesterday">Yesterday</option>
+            <option value="last3">Last 3 days</option>
+            <option value="last7">Last 7 days</option>
+            <option value="last14">Last 14 days</option>
+            <option value="last30">Last 30 days</option>
+            <option value="custom">Custom</option>
+          </select>
+          {dateRange === "custom" && (
+            <>
+              <input
+                type="date"
+                value={fromDate}
+                onChange={(e) => setFromDate(e.target.value)}
+                className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary"
+              />
+              <input
+                type="date"
+                value={toDate}
+                onChange={(e) => setToDate(e.target.value)}
+                className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary"
+              />
+            </>
+          )}
+          <Button size="sm" className="ml-auto">
+            Update
+          </Button>
+        </div>
+      </div>
 
       {/* ── Filter tabs ── */}
-      <div className="flex items-center gap-1 bg-surface border border-border rounded-xl p-1 w-fit">
-        {(
-          [
-            { key: "all", label: "All" },
-            { key: "active", label: "Active" },
-            { key: "paused", label: "Paused" },
-            { key: "draft", label: "Draft" },
-          ] as const
-        ).map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setFilter(tab.key)}
-            className={`
-              flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
-              transition-all duration-200
-              ${
-                filter === tab.key
-                  ? "bg-surface text-white dark:text-text-primary"
-                  : "text-text-tertiary hover:text-text-primary hover:bg-surface-2"
-              }
-            `}
-          >
-            {tab.label}
-            <span
+      <div className="rounded-2xl border border-border/70 bg-white/85 p-2 shadow-sm backdrop-blur-sm dark:bg-slate-900/70">
+        <div className="flex items-center gap-1 rounded-xl bg-slate-900/5 p-1 dark:bg-white/5 w-fit">
+          {(
+            [
+              { key: "all", label: "All" },
+              { key: "active", label: t("campaigns.active", "Active") },
+              { key: "paused", label: t("campaigns.paused", "Paused") },
+              { key: "draft", label: t("campaigns.draft", "Draft") },
+            ] as const
+          ).map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setFilter(tab.key)}
               className={`
-                text-xs px-1.5 py-0.5 rounded-full
+                flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
+                transition-all duration-200
                 ${
                   filter === tab.key
-                    ? "bg-surface/20 text-text-primary"
-                    : "bg-surface-2 text-text-tertiary"
+                    ? "bg-gradient-to-r from-blue-500 to-violet-500 text-white shadow-sm"
+                    : "text-text-tertiary hover:text-text-primary hover:bg-white/70 dark:hover:bg-white/10"
                 }
               `}
             >
-              {counts[tab.key]}
-            </span>
-          </button>
-        ))}
+              {tab.label}
+              <span
+                className={`
+                  text-xs px-1.5 py-0.5 rounded-full
+                  ${
+                    filter === tab.key
+                      ? "bg-white/20 text-white"
+                      : "bg-surface-2 text-text-tertiary"
+                  }
+                `}
+              >
+                {counts[tab.key]}
+              </span>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* ── Campaign list ── */}
       {filtered.length === 0 ? (
-        <Card>
+        <Card className="rounded-2xl border border-border/70 bg-white/85 shadow-sm backdrop-blur-sm dark:bg-slate-900/70">
           <EmptyState
             icon="📢"
             title={
@@ -203,7 +291,7 @@ export default function CampaignsPage() {
                 <Card
                   hoverable
                   onClick={() => setSelectedId(isSelected ? null : campaign.id)}
-                  className={`transition-all duration-200 ${isSelected ? "border-border/40 dark:border-white/40 bg-surface/5/5" : ""}`}
+                  className={`rounded-2xl border border-border/70 bg-white/85 shadow-sm backdrop-blur-sm transition-all duration-200 dark:bg-slate-900/70 ${isSelected ? "border-blue-300/70 shadow-md dark:border-blue-500/40" : ""}`}
                   padding="none"
                 >
                   <div className="flex items-center gap-4 p-5">
@@ -245,25 +333,14 @@ export default function CampaignsPage() {
                       <CampaignStatusBadge status={campaign.status} />
                     </div>
 
-                    <div
-                      className={`text-text-tertiary transition-transform duration-200 shrink-0 ${isSelected ? "rotate-180" : ""}`}
-                    >
-                      <svg
-                        width="16"
-                        height="16"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                      >
-                        <path d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </div>
+                    <ChevronDown
+                      className={`h-4 w-4 text-text-tertiary transition-transform duration-200 shrink-0 ${isSelected ? "rotate-180" : ""}`}
+                    />
                   </div>
                 </Card>
 
                 {isSelected && (
-                  <div className="mt-1 bg-surface-2 border border-border border-t-0 rounded-b-xl px-5 py-4">
+                  <div className="mt-1 rounded-2xl border border-border/70 bg-white/85 px-5 py-4 shadow-sm backdrop-blur-sm dark:bg-slate-900/70">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                       {[
                         {
@@ -307,7 +384,7 @@ export default function CampaignsPage() {
                             handleStatusChange(campaign.id, "paused");
                           }}
                         >
-                          ⏸ Pause
+                          {t("campaigns.pause", "Pause")}
                         </Button>
                       ) : campaign.status === "paused" ? (
                         <Button
@@ -319,7 +396,7 @@ export default function CampaignsPage() {
                             handleStatusChange(campaign.id, "active");
                           }}
                         >
-                          ▶ Resume
+                          {t("campaigns.resume", "Resume")}
                         </Button>
                       ) : null}
 
@@ -334,7 +411,7 @@ export default function CampaignsPage() {
                               handleStatusChange(campaign.id, "stopped");
                             }}
                           >
-                            ⏹ Stop
+                            {t("campaigns.stop", "Stop")}
                           </Button>
                         )}
 
@@ -355,10 +432,10 @@ export default function CampaignsPage() {
       )}
 
       {items.length > 0 && (
-        <Card variant="outlined" padding="sm">
+        <Card variant="outlined" padding="sm" className="rounded-2xl border-border/70 bg-white/85 shadow-sm backdrop-blur-sm dark:bg-slate-900/70">
           <div className="flex items-center justify-between px-2">
             <div className="flex items-center gap-3">
-              <span className="text-xl">🔗</span>
+              <Link2 className="h-5 w-5 text-text-secondary" />
               <div>
                 <p className="text-text-primary text-sm font-medium">
                   {t("campaigns.connectMorePlatforms", "Connect more ad platforms")}
@@ -371,7 +448,7 @@ export default function CampaignsPage() {
             <Button
               variant="secondary"
               size="sm"
-              onClick={() => (window.location.href = "/settings/meta")}
+              onClick={() => router.push("/settings/meta")}
             >
               {t("campaigns.connectPlatform", "Connect platform")}
             </Button>

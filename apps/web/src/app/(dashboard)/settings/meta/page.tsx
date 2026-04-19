@@ -12,6 +12,7 @@ import {
   type MetaHealthScore,
 } from '@/lib/meta'
 import { useWorkspaceStore } from '@/stores/workspace.store'
+import { MetaTermsReviewModal } from '@/components/settings/MetaTermsReviewModal'
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
@@ -277,6 +278,7 @@ export default function MetaSettingsPage() {
   const [query, setQuery] = useState('')
   const [selectedAccounts, setSelectedAccounts] = useState<Set<string>>(new Set())
   const [showOnlySelected, setShowOnlySelected] = useState(false)
+  const [metaTermsOpen, setMetaTermsOpen] = useState(false)
 
   const loadDashboard = useCallback(async (background = false) => {
     if (!workspaceId) return
@@ -364,9 +366,9 @@ export default function MetaSettingsPage() {
   // ── Loading ────────────────────────────────────────────────────────────────
   if (pageState === 'loading') {
     return (
-      <div className="max-w-4xl mx-auto space-y-4">
+      <div className="max-w-6xl mx-auto space-y-4">
         <MetaPageHeader />
-        <div className="rounded-xl border border-border bg-surface p-12 flex items-center justify-center">
+        <div className="rounded-2xl border border-border/70 bg-white/85 p-12 shadow-sm backdrop-blur-sm flex items-center justify-center dark:bg-slate-900/70">
           <div className="flex items-center gap-3 text-text-tertiary">
             <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -382,9 +384,9 @@ export default function MetaSettingsPage() {
   // ── No workspace selected ──────────────────────────────────────────────────
   if (!workspaceId) {
     return (
-      <div className="max-w-4xl mx-auto space-y-4">
+      <div className="max-w-6xl mx-auto space-y-4">
         <MetaPageHeader />
-        <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-6">
+        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-6">
           <p className="text-sm text-amber-400">
             No workspace selected. Please select a workspace from the sidebar first.
           </p>
@@ -396,9 +398,9 @@ export default function MetaSettingsPage() {
   // ── Error ──────────────────────────────────────────────────────────────────
   if (pageState === 'error') {
     return (
-      <div className="max-w-4xl mx-auto space-y-4">
+      <div className="max-w-6xl mx-auto space-y-4">
         <MetaPageHeader />
-        <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-6 flex items-start justify-between">
+        <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-6 flex items-start justify-between">
           <div>
             <p className="text-sm font-medium text-red-400">Failed to load Meta data</p>
             <p className="text-xs text-text-tertiary mt-1">{error}</p>
@@ -418,9 +420,9 @@ export default function MetaSettingsPage() {
   // ── Not connected ──────────────────────────────────────────────────────────
   if (pageState === 'not-connected') {
     return (
-      <div className="max-w-4xl mx-auto space-y-4">
+      <div className="max-w-6xl mx-auto space-y-4">
         <MetaPageHeader />
-        <div className="rounded-xl border border-border bg-surface p-8 text-center">
+        <div className="rounded-2xl border border-border/70 bg-white/85 p-8 text-center shadow-sm backdrop-blur-sm dark:bg-slate-900/70">
           {/* Meta logo */}
           <div className="w-16 h-16 rounded-2xl bg-surface-2 border border-border flex items-center justify-center mx-auto mb-5">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" className="text-blue-400">
@@ -450,7 +452,7 @@ export default function MetaSettingsPage() {
           <button
             type="button"
             onClick={handleConnect}
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-surface hover:bg-surface text-white text-sm font-medium transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-violet-500 text-white text-sm font-medium transition-colors hover:opacity-95"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="text-text-primary">
               <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
@@ -478,7 +480,8 @@ export default function MetaSettingsPage() {
   )
 
   return (
-    <div className="max-w-4xl mx-auto space-y-5">
+    <div className="max-w-6xl mx-auto space-y-5">
+      <MetaTermsReviewModal open={metaTermsOpen} onClose={() => setMetaTermsOpen(false)} />
       <MetaPageHeader />
 
       {/* Just connected banner */}
@@ -497,7 +500,7 @@ export default function MetaSettingsPage() {
       )}
 
       {/* Status bar */}
-      <div className="rounded-xl border border-border bg-surface px-5 py-4 flex items-center justify-between flex-wrap gap-3">
+      <div className="rounded-2xl border border-border/70 bg-white/85 px-5 py-4 shadow-sm backdrop-blur-sm flex items-center justify-between flex-wrap gap-3 dark:bg-slate-900/70">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-surface-2 border border-border flex items-center justify-center shrink-0">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-blue-400">
@@ -520,7 +523,14 @@ export default function MetaSettingsPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap justify-end">
+          <button
+            type="button"
+            onClick={() => setMetaTermsOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-amber-500/30 text-sm text-amber-700 dark:text-amber-300 hover:bg-amber-500/10 transition-colors"
+          >
+            Review Meta terms
+          </button>
           {refreshing && <span className="text-xs text-text-tertiary">Refreshing…</span>}
           {syncResult && (
             <span className={`text-xs ${syncResult.includes('failed') || syncResult.includes('error') ? 'text-red-400' : 'text-emerald-400'}`}>
@@ -539,7 +549,7 @@ export default function MetaSettingsPage() {
             type="button"
             onClick={() => void handleSync()}
             disabled={syncing || refreshing}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-sm text-text-secondary hover:bg-surface-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-blue-500 to-violet-500 text-sm text-white hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <svg
               width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
@@ -553,13 +563,13 @@ export default function MetaSettingsPage() {
       </div>
 
       {/* Summary stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
           { label: 'Ad Accounts', value: totalAccounts.toString() },
           { label: 'Campaigns', value: totalCampaigns.toString() },
           { label: 'Total Spend (30d)', value: `$${totalSpend.toFixed(2)}` },
         ].map((stat) => (
-          <div key={stat.label} className="rounded-xl border border-border bg-surface px-4 py-4 text-center">
+          <div key={stat.label} className="rounded-2xl border border-border/70 bg-white/85 px-4 py-4 text-center shadow-sm backdrop-blur-sm dark:bg-slate-900/70">
             <p className="text-xl font-bold text-text-primary">{stat.value}</p>
             <p className="text-xs text-text-tertiary mt-1">{stat.label}</p>
           </div>
@@ -587,12 +597,12 @@ export default function MetaSettingsPage() {
         </div>
       ) : (
         <div className="space-y-4">
-          <div className="rounded-xl border border-border bg-surface p-3 flex items-center gap-2 flex-wrap">
+          <div className="rounded-2xl border border-border/70 bg-white/85 p-3 shadow-sm backdrop-blur-sm flex items-center gap-2 flex-wrap dark:bg-slate-900/70">
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search ad account..."
-              className="px-3 py-2 rounded-lg border border-border text-sm text-text-primary flex-1 min-w-56"
+              className="px-3 py-2 rounded-lg border border-border text-sm text-text-primary flex-1 min-w-56 bg-surface"
             />
             <button
               type="button"
@@ -611,7 +621,7 @@ export default function MetaSettingsPage() {
               type="button"
               onClick={() => setShowOnlySelected((v) => !v)}
               className={`text-xs px-3 py-2 rounded-lg border ${
-                showOnlySelected ? 'border-border bg-surface text-white' : 'border-border text-text-secondary hover:bg-surface-2'
+                showOnlySelected ? 'border-border bg-gradient-to-r from-blue-500 to-violet-500 text-white' : 'border-border text-text-secondary hover:bg-surface-2'
               }`}
             >
               {showOnlySelected ? 'Showing selected' : 'Show selected only'}
@@ -643,7 +653,7 @@ export default function MetaSettingsPage() {
       )}
 
       {/* Reconnect */}
-      <div className="rounded-xl border border-border bg-surface px-5 py-4 flex items-center justify-between">
+      <div className="rounded-2xl border border-border/70 bg-white/85 px-5 py-4 shadow-sm backdrop-blur-sm flex items-center justify-between dark:bg-slate-900/70">
         <div>
           <p className="text-sm font-medium text-text-primary">Reconnect Meta</p>
           <p className="text-xs text-text-tertiary mt-0.5">
@@ -667,8 +677,8 @@ export default function MetaSettingsPage() {
 
 function MetaPageHeader() {
   return (
-    <div>
-      <div className="flex items-center gap-2 text-xs text-text-tertiary mb-4">
+    <section className="rounded-2xl border border-blue-200/70 bg-gradient-to-r from-blue-50 via-indigo-50 to-violet-50 p-4 dark:border-slate-700 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
+      <div className="flex items-center gap-2 text-xs text-text-tertiary mb-3">
         <Link href="/settings" className="hover:text-text-primary transition-colors">Settings</Link>
         <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path d="M9 18l6-6-6-6" />
@@ -679,6 +689,6 @@ function MetaPageHeader() {
       <p className="mt-1 text-sm text-text-tertiary">
         Manage your Facebook and Instagram advertising connection.
       </p>
-    </div>
+    </section>
   )
 }

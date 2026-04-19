@@ -1,12 +1,15 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
+import { Fragment } from 'react'
+import Link from 'next/link'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { useI18n } from '@/i18n/use-i18n'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Alert } from '@/components/ui/Alert'
-import { PageHeader } from '@/components/ui'
+import { PageHeader, Dialog } from '@/components/ui'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { meta as metaApi } from '@/lib/api-client'
 import { formatCurrency, formatNumber } from '@/lib/utils'
 
@@ -73,15 +76,58 @@ function downloadCSV(csv: string, filename: string) {
 
 const DAY_OPTIONS = [7, 14, 30, 60, 90]
 
+const REPORT_TEMPLATE_CATEGORIES = [
+  { id: 'all', label: 'All templates' },
+  { id: 'meta', label: 'Facebook Ads' },
+  { id: 'ecom', label: 'Ecommerce' },
+  { id: 'shopify', label: 'Shopify' },
+  { id: 'google', label: 'Google Ads' },
+] as const
+
+const REPORT_TEMPLATES: Array<{
+  id: string
+  title: string
+  category: (typeof REPORT_TEMPLATE_CATEGORIES)[number]['id']
+  isNew?: boolean
+  sources: string[]
+}> = [
+  {
+    id: 'blank',
+    title: 'Blank report',
+    category: 'all',
+    sources: [],
+  },
+  {
+    id: 'meta-ecom',
+    title: 'E-commerce Brand | Ultimate Meta Ads Performance',
+    category: 'meta',
+    isNew: true,
+    sources: ['Meta'],
+  },
+  {
+    id: 'meta-shopify',
+    title: 'Shopify E-commerce | Meta Ads & Shopify Performance',
+    category: 'shopify',
+    isNew: true,
+    sources: ['Meta', 'Shopify'],
+  },
+  {
+    id: 'google-pmax',
+    title: 'Google Ads | PMax + Search blended view',
+    category: 'google',
+    sources: ['Google'],
+  },
+]
+
 const AVAILABLE_METRICS = [
-  { id: 'roas',        label: 'ROAS',           icon: '💰', value: '2.4x',     trend: '+0.3x',  positive: true  },
-  { id: 'cpa',         label: 'CPA',             icon: '🎯', value: '$18.50',   trend: '-$2.1',  positive: true  },
-  { id: 'ctr',         label: 'CTR',             icon: '📊', value: '2.14%',    trend: '+0.4%',  positive: true  },
-  { id: 'frequency',   label: 'Chastota',        icon: '🔁', value: '3.2x',     trend: '+0.8x',  positive: false },
-  { id: 'cpm',         label: 'CPM',             icon: '👁️', value: '$8.40',    trend: '-$1.2',  positive: true  },
-  { id: 'reach',       label: 'Reach',           icon: '📡', value: '12,400',   trend: '+2,100', positive: true  },
-  { id: 'leads',       label: 'Lidlar',          icon: '🙋', value: '84',       trend: '+12',    positive: true  },
-  { id: 'conv_rate',   label: 'Konversiya %',    icon: '✅', value: '4.8%',     trend: '+0.6%',  positive: true  },
+  { id: 'roas',      label: 'ROAS',            icon: 'R', value: '2.4x',   trend: '+0.3x',  positive: true  },
+  { id: 'cpa',       label: 'CPA',             icon: 'C', value: '$18.50', trend: '-$2.1',  positive: true  },
+  { id: 'ctr',       label: 'CTR',             icon: 'T', value: '2.14%',  trend: '+0.4%',  positive: true  },
+  { id: 'frequency', label: 'Frequency',       icon: 'F', value: '3.2x',   trend: '+0.8x',  positive: false },
+  { id: 'cpm',       label: 'CPM',             icon: 'M', value: '$8.40',  trend: '-$1.2',  positive: true  },
+  { id: 'reach',     label: 'Reach',           icon: 'A', value: '12,400', trend: '+2,100', positive: true  },
+  { id: 'leads',     label: 'Leads',           icon: 'L', value: '84',     trend: '+12',    positive: true  },
+  { id: 'conv_rate', label: 'Conversion Rate', icon: 'V', value: '4.8%',   trend: '+0.6%',  positive: true  },
 ]
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -103,6 +149,9 @@ export default function ReportingPage() {
   const [activeMetrics, setActiveMetrics] = useState<string[]>(['roas', 'cpa', 'ctr', 'frequency'])
   const [showSimulation, setShowSimulation] = useState(false)
   const [simBudget, setSimBudget] = useState(1500)
+  const [templatesOpen, setTemplatesOpen] = useState(false)
+  const [templateCategory, setTemplateCategory] = useState<(typeof REPORT_TEMPLATE_CATEGORIES)[number]['id']>('all')
+  const [templateQuery, setTemplateQuery] = useState('')
 
   const load = useCallback(() => {
     if (!currentWorkspace?.id) return
@@ -119,7 +168,7 @@ export default function ReportingPage() {
       })
       .catch(() => setError(t('reporting.loadError', 'Failed to load reporting. Check if Meta Ads is connected.')))
       .finally(() => setLoading(false))
-  }, [currentWorkspace?.id, days])
+  }, [currentWorkspace?.id, days, t])
 
   useEffect(() => { load() }, [load])
 
@@ -173,6 +222,17 @@ export default function ReportingPage() {
   }
 
   // Roll up totals across all accounts
+  const filteredTemplates = REPORT_TEMPLATES.filter((tpl) => {
+    const catOk =
+      templateCategory === 'all'
+        ? true
+        : tpl.category === templateCategory ||
+          (templateCategory === 'ecom' && (tpl.id === 'meta-ecom' || tpl.id === 'meta-shopify'))
+    const q = templateQuery.trim().toLowerCase()
+    const qOk = !q || tpl.title.toLowerCase().includes(q)
+    return catOk && qOk
+  })
+
   const totals = data?.accounts.reduce(
     (acc, a) => ({
       spend:       acc.spend + a.metrics.spend,
@@ -191,53 +251,192 @@ export default function ReportingPage() {
   }
 
   return (
-    <div className="space-y-5 max-w-6xl">
-
-      <PageHeader
-        title={t('navigation.reporting', 'Reporting')}
-        subtitle={t('reporting.subtitle', 'Meta Ads account-to-campaign performance breakdown')}
-        actions={
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 bg-surface-elevated border border-border rounded-xl p-1">
-              {DAY_OPTIONS.map((d) => (
-                <button
-                  key={d}
-                  onClick={() => setDays(d)}
-                  className={`
-                    px-3 py-1.5 rounded-lg text-xs font-medium transition-colors
-                    ${days === d
-                      ? 'bg-text-primary text-white'
-                      : 'text-text-tertiary hover:text-text-primary'
-                    }
-                  `}
+    <div className="space-y-5 max-w-7xl">
+      <Dialog
+        open={templatesOpen}
+        onClose={() => setTemplatesOpen(false)}
+        className="max-w-4xl p-0 max-h-[min(90vh,720px)] overflow-hidden flex flex-col"
+      >
+        <>
+          <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-border shrink-0">
+            <h2 className="text-lg font-semibold text-text-primary flex items-center gap-2">
+              <span className="text-violet-500" aria-hidden>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                </svg>
+              </span>
+              {t('reporting.templatesTitle', 'All templates')}
+            </h2>
+            <button
+              type="button"
+              onClick={() => setTemplatesOpen(false)}
+              className="rounded-lg p-1.5 text-text-tertiary hover:bg-surface-2 hover:text-text-primary"
+              aria-label="Close"
+            >
+              ✕
+            </button>
+          </div>
+          <div className="flex min-h-0 flex-1 overflow-hidden">
+            <aside className="w-52 shrink-0 border-r border-border bg-surface-2/40 p-3 space-y-2 dark:bg-slate-900/40 overflow-y-auto">
+              <div className="relative mb-2">
+                <svg
+                  className="absolute left-2.5 top-1/2 -translate-y-1/2 text-text-tertiary"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  aria-hidden
                 >
-                  {d}d
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="M21 21l-4.35-4.35" />
+                </svg>
+                <input
+                  value={templateQuery}
+                  onChange={(e) => setTemplateQuery(e.target.value)}
+                  placeholder={t('reporting.searchTemplate', 'Search template')}
+                  className="w-full rounded-lg border border-border bg-surface py-2 pl-8 pr-2 text-xs outline-none focus:border-violet-500/50"
+                />
+              </div>
+              {REPORT_TEMPLATE_CATEGORIES.map((c) => (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => setTemplateCategory(c.id)}
+                  className={`w-full text-left rounded-lg px-2.5 py-2 text-xs font-medium transition-colors ${
+                    templateCategory === c.id
+                      ? 'border border-violet-500/50 bg-violet-500/10 text-text-primary'
+                      : 'border border-transparent text-text-tertiary hover:bg-surface-2'
+                  }`}
+                >
+                  {c.label}
                 </button>
               ))}
+            </aside>
+            <div className="flex-1 overflow-y-auto p-4">
+              <p className="text-sm font-medium text-text-primary mb-3">
+                {REPORT_TEMPLATE_CATEGORIES.find((c) => c.id === templateCategory)?.label}
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {filteredTemplates.map((tpl) => (
+                  <div
+                    key={tpl.id}
+                    className="group relative rounded-xl border border-border bg-surface overflow-hidden hover:border-violet-500/40 transition-colors"
+                  >
+                    <div className="aspect-[16/10] bg-gradient-to-br from-slate-100 to-violet-100 dark:from-slate-800 dark:to-violet-950/50 relative">
+                      {tpl.isNew && (
+                        <span className="absolute left-2 bottom-2 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full bg-emerald-500 text-white">
+                          New
+                        </span>
+                      )}
+                      <div className="absolute inset-4 rounded-lg bg-white/80 dark:bg-slate-900/80 border border-border/50 shadow-sm flex flex-col gap-1 p-2 opacity-90">
+                        <div className="h-1.5 w-1/3 rounded bg-border" />
+                        <div className="flex gap-1 flex-1 min-h-0">
+                          <div className="w-1/3 rounded bg-border/60" />
+                          <div className="flex-1 rounded bg-border/40 flex flex-col gap-1 p-1">
+                            <div className="h-1 w-full rounded bg-emerald-400/40" />
+                            <div className="h-1 w-2/3 rounded bg-red-400/30" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-3 flex items-start justify-between gap-2">
+                      <p className="text-xs font-semibold text-text-primary leading-snug">{tpl.title}</p>
+                      <div className="flex gap-1 shrink-0 text-[10px] text-text-tertiary">
+                        {tpl.sources.map((s) => (
+                          <span key={s} className="px-1 py-0.5 rounded border border-border">
+                            {s.slice(0, 2)}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="absolute inset-0 bg-surface/0 group-hover:bg-surface/70 dark:group-hover:bg-slate-950/75 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity p-3">
+                      <button
+                        type="button"
+                        onClick={() => setTemplatesOpen(false)}
+                        className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-gradient-to-r from-blue-500 to-violet-500 hover:opacity-95"
+                      >
+                        {t('reporting.useTemplate', 'Use this template')}
+                      </button>
+                      <button
+                        type="button"
+                        className="rounded-lg border border-violet-500/50 p-2 text-violet-600 dark:text-violet-300 bg-white dark:bg-slate-900"
+                        aria-label="Preview"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                          <circle cx="12" cy="12" r="3" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {filteredTemplates.length === 0 && (
+                <p className="text-sm text-text-tertiary py-8 text-center">{t('reporting.noTemplates', 'No templates match your search.')}</p>
+              )}
             </div>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={handleExport}
-              loading={exporting}
-            >
-              {t('reporting.exportCsv', 'Export CSV')}
-            </Button>
           </div>
-        }
-      />
+        </>
+      </Dialog>
 
-      {error && <Alert variant="error">{error}</Alert>}
+      <section className="rounded-2xl border border-blue-200/70 bg-gradient-to-r from-blue-50 via-indigo-50 to-violet-50 p-3 dark:border-slate-700 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
+        <PageHeader
+          className="mb-0 border-0 bg-transparent p-2 shadow-none"
+          title={t('navigation.reporting', 'Reporting')}
+          subtitle={t('reporting.subtitle', 'Meta Ads account-to-campaign performance breakdown')}
+          actions={
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 rounded-xl bg-white/80 border border-blue-200/70 p-1 dark:border-slate-700 dark:bg-slate-900/70">
+                {DAY_OPTIONS.map((d) => (
+                  <button
+                    key={d}
+                    onClick={() => setDays(d)}
+                    className={`
+                      px-3 py-1.5 rounded-lg text-xs font-medium transition-colors
+                      ${days === d
+                        ? 'bg-gradient-to-r from-blue-500 to-violet-500 text-white'
+                        : 'text-text-tertiary hover:text-text-primary'
+                      }
+                    `}
+                  >
+                    {d}d
+                  </button>
+                ))}
+              </div>
+              <Button variant="secondary" size="sm" onClick={() => setTemplatesOpen(true)}>
+                {t('reporting.reportTemplates', 'Report templates')}
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={handleExport}
+                loading={exporting}
+              >
+                {t('reporting.exportCsv', 'Export CSV')}
+              </Button>
+            </div>
+          }
+        />
+      </section>
+
+      <div className="rounded-2xl border border-border/70 bg-white/85 p-4 shadow-sm backdrop-blur-sm dark:bg-slate-900/70">
+        {error && <Alert variant="error">{error}</Alert>}
+        <Alert variant="info" className={!error ? '' : 'mt-2'}>
+          {t('reporting.metricsHint', 'Custom KPI cards below are configurable quick-view indicators. Primary table reflects account and campaign data.')}
+        </Alert>
+      </div>
 
       {/* ── Summary cards ── */}
       {totals && !loading && (
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {[
             { label: 'Jami Xarajat', value: formatCurrency(totals.spend) },
             { label: 'Jami Kliklar', value: formatNumber(totals.clicks) },
             { label: 'Jami Ko\'rinishlar', value: formatNumber(totals.impressions) },
           ].map((item) => (
-            <div key={item.label} className="bg-surface-elevated border border-border rounded-xl p-4">
+            <div key={item.label} className="rounded-2xl border border-border/70 bg-white/85 p-4 shadow-sm backdrop-blur-sm dark:bg-slate-900/70">
               <p className="text-text-tertiary text-xs mb-1">{item.label}</p>
               <p className="text-text-primary text-lg font-bold">{item.value}</p>
             </div>
@@ -246,11 +445,11 @@ export default function ReportingPage() {
       )}
 
       {/* ── Custom Metrics Panel ── */}
-      <div>
+      <div className="rounded-2xl border border-border/70 bg-white/85 p-4 shadow-sm backdrop-blur-sm dark:bg-slate-900/70">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-semibold text-text-primary flex items-center gap-2">
-            📌 Mening Ko'rsatkichlarim
-            <span className="text-xs text-text-tertiary font-normal">— keraklisini tanlang</span>
+            {t('reporting.customMetrics', 'My Metrics')}
+            <span className="text-xs text-text-tertiary font-normal">- {t('reporting.customMetricsHint', 'choose what you want to track')}</span>
           </h2>
           <div className="flex gap-1 flex-wrap justify-end">
             {AVAILABLE_METRICS.map((m) => (
@@ -261,7 +460,7 @@ export default function ReportingPage() {
                 )}
                 className={`text-xs px-2.5 py-1 rounded-full border transition-all ${
                   activeMetrics.includes(m.id)
-                    ? 'bg-text-primary text-white border-border'
+                    ? 'bg-gradient-to-r from-blue-500 to-violet-500 text-white border-transparent'
                     : 'bg-surface-elevated text-text-tertiary border-border hover:border-border'
                 }`}
               >
@@ -279,7 +478,7 @@ export default function ReportingPage() {
                   onClick={() => setActiveMetrics((prev) => prev.filter((x) => x !== m.id))}
                   className="absolute top-2 right-2 text-text-tertiary hover:text-text-tertiary opacity-0 group-hover:opacity-100 transition-opacity text-xs leading-none"
                 >
-                  ×
+                  x
                 </button>
                 <p className="text-text-tertiary text-xs mb-1">{m.icon} {m.label}</p>
                 <p className="text-text-primary text-xl font-bold">{m.value}</p>
@@ -291,21 +490,20 @@ export default function ReportingPage() {
           </div>
         ) : (
           <div className="border border-dashed border-border rounded-xl p-6 text-center">
-            <p className="text-text-tertiary text-sm">Yuqoridan ko'rsatkichlarni tanlang</p>
+            <p className="text-text-tertiary text-sm">{t('reporting.selectMetrics', 'Select metrics from above')}</p>
           </div>
         )}
       </div>
 
       {/* ── Budget Simulation ── */}
-      <div className="bg-surface-elevated border border-border rounded-xl overflow-hidden">
+      <div className="rounded-2xl border border-border/70 bg-white/85 overflow-hidden shadow-sm backdrop-blur-sm dark:bg-slate-900/70">
         <button
           onClick={() => setShowSimulation(!showSimulation)}
           className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-surface-2 transition-colors"
         >
           <div className="flex items-center gap-2">
-            <span>🔮</span>
-            <span className="text-text-primary font-medium text-sm">Byudjet Simulyatsiyasi</span>
-            <span className="text-xs text-text-tertiary">— byudjet o'zgartirsa nima bo'ladi?</span>
+            <span className="text-text-primary font-medium text-sm">{t('reporting.budgetSimulation', 'Budget Simulation')}</span>
+            <span className="text-xs text-text-tertiary">- {t('reporting.budgetSimulationHint', 'preview impact before applying budget changes')}</span>
           </div>
           <span className={`text-text-tertiary text-sm transition-transform duration-200 ${showSimulation ? 'rotate-180' : ''}`}>▾</span>
         </button>
@@ -352,7 +550,7 @@ export default function ReportingPage() {
       </div>
 
       {/* ── Table ── */}
-      <Card padding="none">
+      <Card padding="none" className="rounded-2xl border border-border/70 bg-white/85 shadow-sm backdrop-blur-sm dark:bg-slate-900/70">
         {loading ? (
           <div className="space-y-px">
             {[1, 2, 3, 4].map((i) => (
@@ -360,20 +558,19 @@ export default function ReportingPage() {
             ))}
           </div>
         ) : !data || data.accounts.length === 0 ? (
-          <div className="text-center py-16 px-6">
-            <span className="text-4xl block mb-3">📊</span>
-            <p className="text-text-primary font-semibold mb-1">Ma'lumot yo'q</p>
-            <p className="text-text-tertiary text-sm">
-              Meta Ads ulanmagan yoki bu davr uchun ma'lumot mavjud emas.
-            </p>
-            <Button
-              variant="secondary"
-              size="sm"
-              className="mt-4"
-              onClick={() => window.location.href = '/settings/meta'}
-            >
-              Meta Ads ulash →
-            </Button>
+          <div className="px-6 py-16">
+            <EmptyState
+              icon="Report"
+              title={t('reporting.noData', 'No reporting data yet')}
+              description={t('reporting.noDataDescription', 'Meta Ads is not connected or no data is available for the selected period.')}
+            />
+            <div className="mt-4 flex justify-center">
+              <Link href="/settings/meta">
+                <Button variant="secondary" size="sm">
+                  {t('reporting.connectMeta', 'Connect Meta Ads')}
+                </Button>
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -405,11 +602,11 @@ export default function ReportingPage() {
                 </tr>
               </thead>
 
-              <tbody className="divide-y divide-[#1C1C27]">
+              <tbody className="divide-y divide-border">
                 {data.accounts.map((account) => {
                   const isOpen = expanded.has(account.id)
                   return (
-                    <>
+                    <Fragment key={account.id}>
                       {/* ── Account row ── */}
                       <tr
                         key={account.id}
@@ -513,7 +710,7 @@ export default function ReportingPage() {
                           <MetricCell value={campaign.metrics.cpc > 0 ? formatCurrency(campaign.metrics.cpc) : '—'} />
                         </tr>
                       ))}
-                    </>
+                    </Fragment>
                   )
                 })}
               </tbody>

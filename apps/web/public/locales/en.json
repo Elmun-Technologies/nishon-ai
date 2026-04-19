@@ -44,6 +44,7 @@
     "automation": "Automation",
     "retargeting": "Retargeting",
     "audiences": "Audiences",
+    "adLauncher": "Ad Launcher",
     "settings": "Settings",
     "marketing": "Marketing",
     "launch": "Launch",
@@ -66,7 +67,8 @@
     "products": "Products",
     "mediaLibrary": "Media Library",
     "workspace": "Workspace",
-    "simulation": "Simulation"
+    "simulation": "Simulation",
+    "metaAudit": "Meta Audit"
   },
   "landing": {
     "hero": {
@@ -74,7 +76,7 @@
       "title1": "Manage ads",
       "title2": "faster",
       "title3": "and smarter.",
-      "subtitle": "Performa — A marketer's platform that manages 4 platforms (Meta, Google, TikTok, Yandex) from one place, with automation and AI. Speed up campaign setup 4x, increase ROAS by 50%.",
+      "subtitle": "AdSpectr — A marketer's platform that manages 4 platforms (Meta, Google, TikTok, Yandex) from one place, with automation and AI. Speed up campaign setup 4x, increase ROAS by 50%.",
       "buttonStart": "Get Started — Try for Free ↗",
       "buttonMarketplace": "Find a Marketer or Agency",
       "buttonLeaderboard": "🏆 View Top Performers",
@@ -133,7 +135,7 @@
     },
     "cta": {
       "title": "Want to be a marketer?",
-      "subtitle": "Join the Performa marketplace and offer your services to hundreds of businesses.",
+      "subtitle": "Join the AdSpectr marketplace and offer your services to hundreds of businesses.",
       "button": "Register as a Specialist ↗"
     }
   },
@@ -162,7 +164,7 @@
   },
   "leaderboard": {
     "title": "Leaderboard",
-    "subtitle": "Top performing specialists on Nishon AI",
+    "subtitle": "Top performing specialists on AdSpectr",
     "overall": "Overall Rankings",
     "rising": "Rising Stars",
     "roasLeaders": "ROAS Leaders",
@@ -232,12 +234,14 @@
     "views": "Views",
     "optimizationDone": "Optimization complete - check AI Decisions for results.",
     "optimizationFailed": "Optimization failed",
-    "welcomeToPerforma": "Welcome to Performa",
+    "welcomeToAdSpectr": "Welcome to AdSpectr",
     "completeOnboarding": "Complete onboarding to create your first workspace and let AI manage your ad campaigns.",
     "startSetup": "Start Setup",
     "realtimeOverview": "Real-time overview",
     "optimizing": "Optimizing...",
     "runOptimization": "Run AI Optimization",
+    "monthlySpendForecast": "Monthly spend forecast",
+    "quickActions": "Quick actions",
     "metaRealtimePrefix": "Metrics are streamed in real-time from",
     "settingsLink": "settings",
     "topCampaigns": "Top campaigns",
@@ -245,7 +249,80 @@
     "campaign": "Campaign",
     "status": "Status",
     "spend": "Spend",
-    "clicks": "Clicks"
+    "clicks": "Clicks",
+    "blendedSummary": "Blended summary",
+    "blendedSummaryHint": "Cross-channel KPIs from connected sources",
+    "last30Days": "Last 30 days",
+    "connectedSources": "Connected sources",
+    "viewReporting": "Reporting",
+    "connectDataTitle": "Connect more data sources",
+    "connectDataSubtitle": "Unlock blended metrics, LTV, and cross-channel reporting.",
+    "sourceConnected": "Connected",
+    "manageSource": "Manage",
+    "connectSource": "Connect"
+  },
+  "metaAudit": {
+    "title": "360° Meta Audit",
+    "subtitle": "Deep-dive tabs for Meta performance — UI preview, wire to live data later.",
+    "tabMeta": "Meta Dashboard",
+    "tabTargeting": "Targeting Insights",
+    "tabAuction": "Auction Insights",
+    "tabGeo": "Geo & Demo Insights",
+    "tabCreative": "Creative Insights",
+    "tabAdcopy": "Ad Copy Insights",
+    "last7Days": "Last 7 days",
+    "filterData": "Filter data",
+    "loadPreset": "Load filter preset…",
+    "presetWinners": "Winning ad sets",
+    "presetLearning": "Learning limited",
+    "saveView": "Save this view",
+    "kpiLeads": "Leads (All)",
+    "kpiSpend": "Amount spent",
+    "kpiPurchases": "Purchases",
+    "gradedBy": "Graded by",
+    "minSpend": "Min. spend",
+    "maxSpend": "Max. spend",
+    "smartFilter": "Smart filter",
+    "allFilters": "All filters",
+    "filterCreativeType": "Creative type",
+    "filterFunnel": "Funnel stage",
+    "filterPlacement": "Placement",
+    "filterDevice": "Device",
+    "filtersEmptyPreview": "No rows match these filters yet. Apply to refresh the workspace view.",
+    "clearFilters": "Clear filters",
+    "applyFilters": "Apply filters",
+    "formatImage": "Image",
+    "formatShortVideo": "Short Video",
+    "formatMediumVideo": "Medium Video",
+    "formatLongVideo": "Long Video",
+    "formatCarousel": "Carousel",
+    "formatDpa": "DPA",
+    "amountSpent": "Spend",
+    "cpl": "CPL",
+    "convRate": "Conv. rate",
+    "leadsBar": "Leads",
+    "spendBar": "Spend",
+    "creativeMatrix": "Creative matrix",
+    "seeAllCreatives": "See all creatives",
+    "quadrantScalable": "SCALABLE",
+    "quadrantCore": "CORE PERFORMERS",
+    "quadrantStarted": "GETTING STARTED",
+    "quadrantOverspend": "OVERSPEND",
+    "axisLeads": "Leads (All)",
+    "axisSpend": "Spend",
+    "matrixEmpty": "Creatives (0) — connect Meta and sync to plot performance.",
+    "creativesCount": "Creatives (0)",
+    "sortLeadsHigh": "Sort: Leads (high first)",
+    "selectedCount": "0 selected",
+    "openInLauncher": "Open in Ads Launcher",
+    "piecesOfCopy": "Pieces of copy (0)",
+    "adCopyLength": "Ad copy length (0)",
+    "placeholderMetrics": "Amount · CPL · CTR",
+    "emojiPerf": "Emoji performance",
+    "linkPerf": "Link performance",
+    "with": "With",
+    "without": "Without",
+    "tabPlaceholder": "This audit view is scaffolded for layout parity. Hook charts and tables to Meta sync when endpoints are ready."
   },
   "automation": {
     "title": "Automation",
@@ -257,7 +334,65 @@
     "execute": "Execute",
     "executions": "Executions",
     "success": "Success",
-    "failed": "Failed"
+    "failed": "Failed",
+    "overviewTitle": "Automation overview",
+    "overviewSubtitle": "What your automations did for you — tactics, triggers, and last activity.",
+    "newAutomation": "New automation",
+    "summaryHeading": "What your automations did for you",
+    "metricStart": "Start",
+    "metricPause": "Pause",
+    "metricBudgetUp": "Increase budget",
+    "metricBudgetDown": "Decrease budget",
+    "actionsTriggered": "Actions triggered",
+    "totalActionsChart": "Total actions over time",
+    "searchTactic": "Search tactic",
+    "viewAllAuthors": "View: All authors",
+    "showAllStatuses": "Show: All statuses",
+    "emptyTitle": "Stop doing it manually",
+    "emptyDescription": "Create tactics that start, pause, and scale budgets from live performance. Connect Meta and enable governed automation when you are ready.",
+    "startAutomating": "Start automating",
+    "openWizard": "Rule wizard"
+  },
+  "adLauncher": {
+    "title": "Ad Launcher",
+    "subtitle": "Search, sort, and bundle creatives — launcher shell (connect Meta sync when ready).",
+    "infoHint": "Pick ads, presets, and filters before pushing to Meta.",
+    "findInspiration": "Find inspiration",
+    "selectAdSets": "Select existing ad sets",
+    "tabAds": "Ads",
+    "tabNewAds": "New Ads",
+    "tabClusters": "Creative clusters",
+    "tabInsights": "Insights",
+    "sortBy": "Sort by: Last edited",
+    "metric": "Metric",
+    "cpl": "Cost per lead (All)",
+    "minSpend": "Min. spend",
+    "filterData": "Filter data",
+    "smartFilter": "Smart filter",
+    "emptyTitle": "No data for this time frame",
+    "emptyBody": "Choose another date range or connect Meta to load ads and creatives into the launcher.",
+    "previewTitle": "Ad selection preview",
+    "creativeSet": "Creative set",
+    "newPreset": "New preset",
+    "saveSelection": "Save creative selection",
+    "manualAdd": "Manually add by",
+    "adIdPlaceholder": "Enter an ad ID to add"
+  },
+  "automationWizard": {
+    "pageTitle": "Automation wizard",
+    "setupTitle": "Set up",
+    "stepPick": "Pick",
+    "stepSettings": "Settings",
+    "stepSummary": "Summary",
+    "selectTask": "Select the task",
+    "taskPause": "Pause ad for today",
+    "addAction": "Action",
+    "dateSchedule": "Date schedule",
+    "dateHint": "Uses your ad account timezone when the rule runs.",
+    "runContinuously": "Run continuously",
+    "betweenDates": "Between specific dates",
+    "pickPlaceholder": "Pick a tactic template — connect your playbook catalog here.",
+    "summaryPlaceholder": "Summary of conditions and schedule will appear here before publish."
   },
   "retargeting": {
     "title": "Retargeting",
@@ -293,7 +428,46 @@
     "signupButton": "Sign Up",
     "haveAccount": "Have an account?",
     "noAccount": "Don't have an account?",
-    "logout": "Logout"
+    "logout": "Logout",
+    "loginPage": {
+      "welcomeBadge": "Welcome back",
+      "heroTitle": "Control campaigns from one operating layer",
+      "heroSubtitle": "Sign in to access launch workflows, AI decisions, reporting, and workspace governance.",
+      "statRoas": "Average ROAS",
+      "statCpa": "CPA reduction",
+      "statAi": "AI monitoring",
+      "panelTitle": "Sign in",
+      "panelSubtitle": "Use your account credentials or social auth.",
+      "continueGoogle": "Continue with Google",
+      "continueFacebook": "Continue with Facebook",
+      "orEmail": "or email",
+      "emailPlaceholder": "you@company.com",
+      "passwordPlaceholder": "••••••••",
+      "demoButton": "Demo sign-in — no account required",
+      "createPrompt": "Don't have an account?",
+      "createLink": "Create one",
+      "badCredentials": "Invalid email or password"
+    },
+    "registerPage": {
+      "badge": "Create account",
+      "heroTitle": "Start using AdSpectr in minutes",
+      "heroSubtitle": "Launch campaigns, track AI decisions, and manage workspace governance from one place.",
+      "statModules": "Modules",
+      "statLanguages": "Languages",
+      "statAutopilot": "Autopilot",
+      "statModulesVal": "20+",
+      "statLanguagesVal": "3",
+      "statAutopilotVal": "Built-in",
+      "panelTitle": "Register",
+      "panelSubtitle": "Use your work email to create a workspace account.",
+      "nameLabel": "Full name",
+      "namePlaceholder": "Your name",
+      "passwordHint": "At least 8 characters",
+      "createButton": "Create account",
+      "signInPrompt": "Already have an account?",
+      "signInLink": "Sign in",
+      "genericError": "Registration failed. Please try again."
+    }
   },
   "errors": {
     "notFound": "Not Found",
@@ -303,15 +477,569 @@
     "tryAgain": "Try Again",
     "goHome": "Go Home"
   },
+  "publicSite": {
+    "brand": "AdSpectr AI",
+    "nav": {
+      "features": "Features",
+      "solutions": "Solutions",
+      "marketplace": "Marketplace",
+      "leaderboard": "Leaderboard",
+      "portfolio": "Portfolio"
+    },
+    "cta": {
+      "login": "Login",
+      "startFree": "Start Free"
+    },
+    "footer": {
+      "tagline": "AdSpectr AI - Campaign Operations Platform",
+      "features": "Features",
+      "solutions": "Solutions",
+      "terms": "Terms",
+      "privacy": "Privacy"
+    },
+    "home": {
+      "hero": {
+        "bullet0": "Real feature routes — a capability map, not a demo shell",
+        "bullet1": "Product flows with EN / RU / UZ",
+        "bullet2": "Monetization architecture: subscription plus marketplace commission",
+        "secondaryCta": "View full feature map",
+        "exploreLogin": "Explore the platform"
+      },
+      "stats": {
+        "0": {
+          "value": "6+",
+          "label": "Integrated core modules"
+        },
+        "1": {
+          "value": "5 plans",
+          "label": "UZS subscription tiers"
+        },
+        "2": {
+          "value": "3-layer",
+          "label": "Monetization architecture"
+        },
+        "3": {
+          "value": "Workspace-first",
+          "label": "Roles, billing, permissions, MCP access"
+        }
+      },
+      "capabilitiesEyebrow": "Platform capability map",
+      "openModule": "Open module",
+      "modules": {
+        "campaignLaunch": {
+          "title": "Campaign launch system",
+          "desc": "Objective, audience, budget, and creative launch flow"
+        },
+        "aiDecisions": {
+          "title": "AI decisions log",
+          "desc": "See AI actions, reasons, and approval history"
+        },
+        "performance": {
+          "title": "Performance analytics",
+          "desc": "Full cuts by ROAS, CPA, CTR, and trends"
+        },
+        "creativeScorer": {
+          "title": "Creative quality scorer",
+          "desc": "AI scores creatives before launch"
+        },
+        "workspaceGov": {
+          "title": "Workspace governance",
+          "desc": "Roles, permissions, and ad account access"
+        },
+        "billing": {
+          "title": "Billing and invoices",
+          "desc": "Plans, payment methods, invoices, and order status"
+        }
+      },
+      "flow": {
+        "eyebrow": "How it works",
+        "title": "From campaign launch to governed scale",
+        "connect": {
+          "step": "01",
+          "title": "Connect workspace",
+          "text": "Ad accounts, team roles, billing contact, and access policy in one place."
+        },
+        "launch": {
+          "step": "02",
+          "title": "Launch and monitor",
+          "text": "Campaigns go live; AI decision logs and reporting update in near real time."
+        },
+        "optimize": {
+          "step": "03",
+          "title": "Optimize with controls",
+          "text": "Auto-optimization workflows run behind approval rails."
+        },
+        "scale": {
+          "step": "04",
+          "title": "Scale with governance",
+          "text": "Keep discipline across many workspaces, accounts, and teammates."
+        }
+      },
+      "pricing": {
+        "eyebrow": "Subscription and monetization",
+        "title": "Pricing aligned to real product logic",
+        "subtitle": "Pricing is not just cards: plan limits on the server, Payme checkout, and marketplace commission flow work the same way in the product."
+      },
+      "plans": {
+        "free": {
+          "name": "Free",
+          "price": "0 UZS / month",
+          "who": "For testing and first setup",
+          "points": {
+            "0": "1 workspace",
+            "1": "3 campaigns",
+            "2": "1 connected account",
+            "3": "No marketplace hire"
+          }
+        },
+        "starter": {
+          "name": "Starter",
+          "price": "199,000 UZS / month",
+          "who": "Small growth teams",
+          "points": {
+            "0": "2 workspaces",
+            "1": "10 campaigns / workspace",
+            "2": "2 connected accounts",
+            "3": "Marketplace hire included"
+          }
+        },
+        "growth": {
+          "name": "Growth",
+          "price": "499,000 UZS / month",
+          "who": "Teams running performance ops",
+          "points": {
+            "0": "5 workspaces",
+            "1": "30 campaigns / workspace",
+            "2": "5 connected accounts",
+            "3": "Agent profile creation"
+          }
+        },
+        "pro": {
+          "name": "Pro",
+          "price": "999,000 UZS / month",
+          "who": "AI-driven full-stack marketing ops",
+          "points": {
+            "0": "15 workspaces",
+            "1": "100 campaigns / workspace",
+            "2": "10 connected accounts",
+            "3": "Custom AI agent"
+          }
+        },
+        "agency": {
+          "name": "Agency",
+          "price": "2,499,000 UZS / month",
+          "who": "Agencies and multi-client scale",
+          "points": {
+            "0": "Unlimited workspaces",
+            "1": "Unlimited campaigns",
+            "2": "Unlimited accounts",
+            "3": "Enterprise-level operations"
+          }
+        }
+      },
+      "monetization": {
+        "subscription": {
+          "title": "Layer 1 — Workspace subscription",
+          "text": "Core platform value is monthly UZS subscription; plan limits are enforced on the server."
+        },
+        "billing": {
+          "title": "Layer 2 — Billing operations",
+          "text": "Payments use Payme checkout plus order status polling. Invoices and methods are managed per workspace."
+        },
+        "marketplace": {
+          "title": "Layer 3 — Marketplace commission",
+          "text": "Commission rates and specialist tiers are managed separately; rates can be configured per workspace."
+        }
+      },
+      "security": {
+        "title": "Security and governance",
+        "intro": "The workspace control layer gives clear responsibility and permission boundaries when working as a team.",
+        "bullet0": "Role-based workspace access",
+        "bullet1": "Invite and permission controls",
+        "bullet2": "Billing profile governance",
+        "bullet3": "MCP credentials isolation"
+      },
+      "revenue": {
+        "title": "Revenue-side visibility",
+        "intro": "In the dashboard, spend, results, and payment status signals sit together for practical decisions.",
+        "cell0": {
+          "k": "Plan status",
+          "v": "Live"
+        },
+        "cell1": {
+          "k": "Order flow",
+          "v": "Tracked"
+        },
+        "cell2": {
+          "k": "Invoices",
+          "v": "Workspace-level"
+        },
+        "cell3": {
+          "k": "Commission layer",
+          "v": "Configurable"
+        }
+      },
+      "faq": {
+        "title": "Frequently asked questions",
+        "subtitle": "Common questions about platform capabilities and monetization.",
+        "q0": "Is our pricing just a fixed package?",
+        "a0": "No — monetization is hybrid: platform subscription, billing operations, and marketplace commission layers.",
+        "q1": "Where does payment happen?",
+        "a1": "Subscription orders open Payme checkout; order status is tracked in the platform.",
+        "q2": "How does marketplace monetization work?",
+        "a2": "Commission rates are set by specialist tier and period; bonus logic is supported separately.",
+        "q3": "Are the capabilities on this page real?",
+        "a3": "Yes — card links go to existing internal routes and working modules."
+      },
+      "finalCta": {
+        "eyebrow": "Final CTA",
+        "title": "Build your monetization-ready growth stack",
+        "subtitle": "Start with your workspace, connect billing, and run controlled AI-assisted campaigns at scale.",
+        "register": "Start free",
+        "solutions": "View solutions"
+      },
+      "snapshot": {
+        "title": "Operations snapshot",
+        "row0": {
+          "label": "Launch",
+          "status": "Active"
+        },
+        "row1": {
+          "label": "AI decisions",
+          "status": "Monitored"
+        },
+        "row2": {
+          "label": "Billing",
+          "status": "Tracked"
+        },
+        "row3": {
+          "label": "Workspace",
+          "status": "Protected"
+        }
+      }
+    },
+    "marketing": {
+      "common": {
+        "backToLanding": "Back to landing",
+        "backToPortfolio": "Back to portfolio",
+        "backToMarketplace": "Back to marketplace",
+        "openModule": "Open module",
+        "openProfile": "Open profile",
+        "openRelatedFlow": "Open related flow",
+        "liveModuleTag": "Live module",
+        "solutionTrackTag": "Solution track",
+        "verified": "Verified",
+        "reviews": "reviews",
+        "campaignsDotBadges": "campaigns",
+        "badgesWord": "badges",
+        "dot": " • ",
+        "perHour": "/hour",
+        "spendSuffix": "spend",
+        "yearsShort": "yrs",
+        "hoursShort": "h"
+      },
+      "features": {
+        "back": "Back to landing",
+        "badge": "Product capability matrix",
+        "title": "Real modules. Real routes. Real operations.",
+        "subtitle": "This page maps existing AdSpectr capabilities in one professional view. Every card links to a live module.",
+        "groupClusterSubtitle": "Capability cluster aligned to existing product workflows.",
+        "metric0v": "21+",
+        "metric0l": "Mapped modules",
+        "metric1v": "4",
+        "metric1l": "Core capability blocks",
+        "metric2v": "100%",
+        "metric2l": "Route-linked cards",
+        "metric3v": "EN/RU/UZ",
+        "metric3l": "Localization ready",
+        "pillar0Title": "Route validity",
+        "pillar0Desc": "Cards point to existing routes, not mocked placeholders.",
+        "pillar1Title": "Product alignment",
+        "pillar1Desc": "Modules map to real internal capabilities and workflows.",
+        "pillar2Title": "Conversion ready",
+        "pillar2Desc": "Public users can inspect capabilities before sign-in.",
+        "groups": {
+          "execution": {
+            "name": "Campaign Execution",
+            "metric": "4 core flows"
+          },
+          "aiOpt": {
+            "name": "AI and Optimization",
+            "metric": "6 automation modules"
+          },
+          "analytics": {
+            "name": "Analytics and Intelligence",
+            "metric": "5 visibility modules"
+          },
+          "governance": {
+            "name": "Workspace, Team, and Finance",
+            "metric": "6 governance modules"
+          }
+        },
+        "items": {
+          "launchWizard": {
+            "title": "Launch Wizard",
+            "desc": "Step-by-step objective, audience, budget, and creative setup."
+          },
+          "campaignManager": {
+            "title": "Campaign Manager",
+            "desc": "Manage campaigns by status, platform, and spend."
+          },
+          "audienceBuilder": {
+            "title": "Audience Builder",
+            "desc": "Create and launch audiences across the funnel."
+          },
+          "retargeting": {
+            "title": "Retargeting Flow",
+            "desc": "Retargeting campaigns via funnel and wizard."
+          },
+          "aiDecisions": {
+            "title": "AI Decisions",
+            "desc": "Full log of what AI decided and why."
+          },
+          "autoOptimization": {
+            "title": "Auto Optimization",
+            "desc": "Rule-based automation and history."
+          },
+          "creativeScorer": {
+            "title": "Creative Scorer",
+            "desc": "AI scores creatives before launch."
+          },
+          "budgetOpt": {
+            "title": "Budget Optimization",
+            "desc": "Smart budget split across platforms."
+          },
+          "simulation": {
+            "title": "Simulation",
+            "desc": "Forecast budget and KPI changes before you act."
+          },
+          "roiCalculator": {
+            "title": "ROI Calculator",
+            "desc": "Estimate profitability before scaling."
+          },
+          "performance": {
+            "title": "Performance",
+            "desc": "KPIs, trends, and campaign-level views."
+          },
+          "reporting": {
+            "title": "Reporting",
+            "desc": "Export-ready reports and period comparisons."
+          },
+          "competitorIntel": {
+            "title": "Competitor Intelligence",
+            "desc": "Competitors, SWOT, and market insights."
+          },
+          "automationRules": {
+            "title": "Automation Rules",
+            "desc": "Triggers and rules for automated actions."
+          },
+          "topAds": {
+            "title": "Top Ads",
+            "desc": "Panel to quickly analyze best-performing ads."
+          },
+          "workspaceTeam": {
+            "title": "Workspace Team",
+            "desc": "Team management with roles and invites."
+          },
+          "adAccounts": {
+            "title": "Ad Accounts",
+            "desc": "Connect Meta ad accounts, sync, and reconnect."
+          },
+          "productsPlans": {
+            "title": "Products and Plans",
+            "desc": "Subscription packages, orders, and usage."
+          },
+          "paymentsInvoices": {
+            "title": "Payments and Invoices",
+            "desc": "Billing profile, methods, and invoice table."
+          },
+          "mcpCreds": {
+            "title": "MCP Credentials",
+            "desc": "Manage MCP client id/secret for agent integrations."
+          },
+          "helpCenter": {
+            "title": "Workspace Help Center",
+            "desc": "Quick help for team and workspace topics."
+          }
+        }
+      },
+      "solutions": {
+        "back": "Back to landing",
+        "badge": "Solution blueprints",
+        "title": "Pick the operating model that fits your team",
+        "subtitle": "Each track is built from real internal modules so marketing promise matches product reality.",
+        "structureTitle": "How this page is structured",
+        "structure0": "Solution track by team model",
+        "structure1": "Module stacks mapped to routes",
+        "structure2": "Governance and operational alignment",
+        "step0Label": "Step 1",
+        "step0Title": "Select track",
+        "step0Desc": "Choose growth, agency, or AI-led operation model.",
+        "step1Label": "Step 2",
+        "step1Title": "Review stack",
+        "step1Desc": "See exactly which product modules support the model.",
+        "step2Label": "Step 3",
+        "step2Title": "Enter flow",
+        "step2Desc": "Jump to the relevant route and start execution.",
+        "nextEyebrow": "Next action",
+        "nextTitle": "Need help choosing the right track?",
+        "nextSubtitle": "Explore the full feature map or go straight into the product to test your workflow setup.",
+        "openFeatureMap": "Open feature map",
+        "openProduct": "Open product",
+        "tracks": {
+          "ecommerce": {
+            "title": "E-commerce Growth Team",
+            "summary": "For teams that run full-funnel ads and need faster launch cycles with strict budget control.",
+            "stack0": "Launch Wizard",
+            "stack1": "Audience Builder",
+            "stack2": "Creative Scorer",
+            "stack3": "Performance Dashboard"
+          },
+          "agency": {
+            "title": "Agency Multi-Client Operations",
+            "summary": "For agencies managing multiple workspaces with role-based access and billing visibility.",
+            "stack0": "Workspace Team",
+            "stack1": "Ad Accounts",
+            "stack2": "Billing and Invoices",
+            "stack3": "MCP Credentials"
+          },
+          "inhouse": {
+            "title": "In-house AI Optimization",
+            "summary": "For operators who need AI-assisted decisions with approval rails and transparent logs.",
+            "stack0": "AI Decisions",
+            "stack1": "Auto Optimization",
+            "stack2": "Budget",
+            "stack3": "Reporting"
+          }
+        }
+      },
+      "marketplacePublic": {
+        "heroBadge": "Talent marketplace",
+        "heroTitle1": "Find verified specialists",
+        "heroTitle2": "for growth campaigns",
+        "heroSubtitle": "Marketplace helps teams discover operators by ROAS, review quality, and niche experience before collaboration.",
+        "stat0v": "150+",
+        "stat0l": "Specialists",
+        "stat1v": "4.8",
+        "stat1l": "Avg rating",
+        "stat2v": "3.9x",
+        "stat2l": "Avg ROAS",
+        "searchPlaceholder": "Search by specialist, niche, or platform",
+        "advancedFilters": "Advanced filters",
+        "openProfile": "Open profile"
+      },
+      "specialistProfile": {
+        "notFoundTitle": "Specialist not found",
+        "notFoundLink": "Back to marketplace",
+        "backLink": "Back to marketplace",
+        "statsTitle": "Statistics",
+        "tabOverview": "Overview",
+        "tabPortfolio": "Portfolio",
+        "tabTestimonials": "Reviews",
+        "bio": "Bio",
+        "knowledge": "Details",
+        "experienceLabel": "Experience",
+        "yearsUnit": "years",
+        "campaignsManagedLabel": "Campaigns managed",
+        "totalSpendLabel": "Total spend",
+        "responseTimeLabel": "Response time",
+        "hoursUnit": "hours",
+        "reviewsLabel": "Reviews",
+        "ratingLabel": "Rating",
+        "successRateLabel": "Success rate",
+        "languages": "Languages",
+        "certifications": "Certifications",
+        "portfolioSpend": "spend",
+        "sidebarTitle": "Get started",
+        "priceLabel": "Price",
+        "locationLabel": "Location",
+        "sendMessage": "Send message",
+        "secondaryCta": "User profile",
+        "trustNote": "Contact via marketplace to start safely. Payments are handled securely through AdSpectr."
+      },
+      "portfolioPublic": {
+        "eyebrow": "Specialist portfolio",
+        "title": "Verified media buyers with transparent performance history",
+        "description": "The portfolio directory helps brands evaluate specialists using campaign metrics, niche fit, and review context.",
+        "statSpecialists": "Specialists",
+        "statManagedSpend": "Managed spend",
+        "statAvgRoas": "Average ROAS",
+        "statCampaigns": "Campaigns",
+        "searchPlaceholder": "Search by name, title, or niche",
+        "sortRoas": "Sort by ROAS",
+        "sortRating": "Sort by rating",
+        "sortSpend": "Sort by managed spend",
+        "labelRoas": "ROAS",
+        "labelCampaigns": "Campaigns",
+        "labelSpend": "Spend"
+      },
+      "portfolioDetail": {
+        "reviewsWithCount": "reviews",
+        "responseTime": "Response time",
+        "location": "Location",
+        "specializationTitle": "Specialization niches",
+        "platformSplitTitle": "Platform split",
+        "recentCampaignsTitle": "Recent campaign samples",
+        "thNiche": "Niche",
+        "thPlatform": "Platform",
+        "thSpend": "Spend",
+        "thRoas": "ROAS",
+        "thStatus": "Status"
+      },
+      "leaderboardPublic": {
+        "eyebrow": "Performance ranking",
+        "title": "Top specialists by outcomes, consistency, and client trust",
+        "description": "Compare specialists by ROAS, ratings, campaigns, and verified delivery patterns.",
+        "tabOverall": "Overall",
+        "tabRising": "Rising",
+        "tabRoas": "ROAS leaders",
+        "tabRating": "Top rated",
+        "top3Title": "Top 3 specialists",
+        "campaignsJoin": "campaigns"
+      },
+      "onboarding": {
+        "title": "Onboarding",
+        "subtitle": "Set up your workspace, connect accounts, and invite your team. More guided steps will appear here soon.",
+        "login": "Log in",
+        "register": "Create account"
+      }
+    }
+  },
+  "legal": {
+    "layout": {
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "dataDeletion": "Data deletion"
+    },
+    "footer": {
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service",
+      "dataDeletion": "Data deletion"
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "intro": "This is a placeholder summary. The full legal text will be published here. Contact support for questions."
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "intro": "We process data in line with applicable laws. For details or deletion requests, use the data deletion page or contact support."
+    },
+    "dataDeletion": {
+      "title": "Data deletion",
+      "intro": "To request deletion of personal data, contact support from your account email. We typically respond within 30 days unless the law requires otherwise."
+    }
+  },
   "workspaceSettings": {
     "title": "Workspace settings",
     "workspace": "Workspace",
+    "shellSubtitle": "Ad accounts, subscription, payments, profile, team, and MCP — in one place.",
     "classicSettings": "Classic settings",
     "tabs": {
       "adAccounts": "Ad accounts",
       "products": "Products & Usage",
       "payments": "Payments",
       "profile": "User Profile",
+      "language": "Language",
       "team": "Team Members",
       "mcp": "MCP Integration",
       "help": "Resource Center"
@@ -322,24 +1050,117 @@
       "pendingInvites": "Pending invites",
       "permissions": "Permissions",
       "role": "Role",
-      "adAccountsAccess": "Member ad-account permissions"
+      "adAccountsAccess": "Member ad-account permissions",
+      "workspaceCardTitle": "Team",
+      "colName": "Full name",
+      "colAdAccounts": "Ad accounts connected",
+      "colEmail": "Email",
+      "colAccess": "Access",
+      "loading": "Loading team…",
+      "empty": "No members yet. Invite teammates or check your workspace API response.",
+      "you": "you",
+      "revoke": "Revoke"
+    },
+    "profile": {
+      "pageTitle": "User profile",
+      "editUserInfo": "Edit user info",
+      "setupWorkspace": "Set up workspace",
+      "classicSettings": "Classic settings",
+      "userId": "User ID",
+      "personalEmail": "Personal email",
+      "phone": "Phone number",
+      "helpText": "Update your identity and workspace basics. Changes sync to your account when you save.",
+      "languageSettingsLink": "Interface language settings →",
+      "savedProfile": "Profile saved.",
+      "savedWorkspace": "Workspace settings saved.",
+      "editModalTitle": "Edit user info",
+      "workspaceModalTitle": "Set up your workspace",
+      "workspaceModalNote": "Business type maps to industry; support phone maps to target audience in the API.",
+      "name": "Name",
+      "email": "Email",
+      "workspaceName": "Workspace name",
+      "businessType": "Business type (Brand / Agency)",
+      "supportPhone": "Support phone",
+      "supportEmail": "Support email"
+    },
+    "language": {
+      "title": "Interface language",
+      "description": "Choose Russian, English, or Uzbek for the platform. Your choice is saved in this browser and applies across the app.",
+      "active": "Current selection"
     },
     "payments": {
       "loadError": "Failed to load payment data",
       "addCardError": "Failed to add card",
       "saveBillingError": "Failed to save billing info",
       "addPaymentMethod": "Add payment method",
-      "editContactDetails": "Edit contact details"
+      "editContactDetails": "Edit contact details",
+      "paymentMethod": "Payment method",
+      "billingInformation": "Billing information",
+      "invoices": "Invoices",
+      "invoiceCountLabel": "total",
+      "loading": "Loading…",
+      "noMethods": "No saved payment methods yet.",
+      "defaultBadge": "Default",
+      "secondaryBadge": "Secondary",
+      "setDefault": "Set default",
+      "expLabel": "Exp."
     },
     "products": {
       "loadError": "Failed to load product information",
-      "orderError": "Order was not created"
+      "orderError": "Order was not created",
+      "subscriptionPackage": "Subscription package",
+      "planSubtitle": "Plan limits, billing, and usage for this workspace.",
+      "trialBadge": "Trial",
+      "seePlanDetails": "See plan details",
+      "nextPayment": "Next payment",
+      "billingPeriodStarts": "Billing period starts",
+      "spendPlanLimit": "Current ad spend plan limit",
+      "spendThisMonth": "Ad spend this month",
+      "accountsUsage": "Ad accounts usage",
+      "accountsUsageDetail": "Connected accounts from your plan and add-ons.",
+      "cancelTrial": "Cancel trial",
+      "manageSubscription": "Manage subscription",
+      "recommendedAddons": "Recommended add-ons",
+      "addonCta": "Learn more",
+      "checkoutUrl": "Checkout URL",
+      "orderLabel": "Order",
+      "checkStatus": "Check status",
+      "freePlanTitle": "Free workspace",
+      "freePlanBody": "Upgrade when you need higher spend limits, more ad accounts, and automation."
+    },
+    "adAccounts": {
+      "pageTitle": "Ad accounts",
+      "facebookSection": "Facebook ad accounts",
+      "sectionSubtitle": "Status, spend, objective, and page / pixel mapping — Madgicx-style table shell.",
+      "reauthenticate": "Reauthenticate",
+      "addFacebookAccount": "Add Facebook ad account",
+      "openMetaPanel": "Meta settings",
+      "guidedSetup": "Guided setup",
+      "resync": "Re-sync",
+      "colStatus": "Status",
+      "colAccount": "Account name",
+      "colSpend": "Last 30 days spend",
+      "colObjective": "Account type",
+      "colTimezone": "Time zone",
+      "colActions": "Actions",
+      "metricsSummary": "Connected · selection · spend",
+      "connectedLabel": "Connected ad accounts",
+      "selectionLabel": "Current selection",
+      "spendLabel": "Spend (30 days)"
     },
     "mcp": {
       "title": "MCP integration",
       "createCredentials": "Create Client ID / Client Secret",
       "existingCredentials": "Existing credentials",
-      "noCredentials": "No credentials yet"
+      "noCredentials": "No credentials yet",
+      "noCredentialsBody": "Generate a Client ID and Client Secret to connect AI agents to this workspace.",
+      "securityNote": "Secrets are shown only once when generated. Copy them immediately to a secure vault.",
+      "serverAndDocs": "Server and documentation",
+      "credentialsModalTitle": "Your new credentials",
+      "credentialsModalHint": "Copy these now and store them somewhere safe. You will not be able to see the Client Secret again.",
+      "copy": "Copy",
+      "copied": "Copied",
+      "savedCredentials": "I've saved my credentials"
     }
   },
   "pages": {
@@ -369,7 +1190,7 @@
     }
   },
   "campaigns": {
-    "subtitle": "All advertising campaigns managed by Performa",
+    "subtitle": "All advertising campaigns managed by AdSpectr",
     "total": "total",
     "refresh": "Refresh",
     "create": "Create Campaign",
@@ -382,14 +1203,34 @@
     "connectMorePlatformsHint": "Add Google, TikTok, or Telegram to expand your reach.",
     "connectPlatform": "Connect platform",
     "loadFailed": "Failed to load campaigns",
-    "updateFailed": "Failed to update campaign status"
+    "updateFailed": "Failed to update campaign status",
+    "active": "Active",
+    "paused": "Paused",
+    "draft": "Draft",
+    "pause": "Pause",
+    "resume": "Resume",
+    "stop": "Stop"
   },
   "reporting": {
     "loadError": "Failed to load reporting. Check if Meta Ads is connected.",
     "exportError": "CSV export failed",
     "workspaceMissing": "No workspace selected",
     "subtitle": "Meta Ads account-to-campaign performance breakdown",
-    "exportCsv": "Export CSV"
+    "exportCsv": "Export CSV",
+    "metricsHint": "Custom KPI cards below are configurable quick-view indicators. Primary table reflects account and campaign data.",
+    "customMetrics": "My Metrics",
+    "customMetricsHint": "choose what you want to track",
+    "selectMetrics": "Select metrics from above",
+    "budgetSimulation": "Budget Simulation",
+    "budgetSimulationHint": "preview impact before applying budget changes",
+    "noData": "No reporting data yet",
+    "noDataDescription": "Meta Ads is not connected or no data is available for the selected period.",
+    "connectMeta": "Connect Meta Ads",
+    "reportTemplates": "Report templates",
+    "templatesTitle": "All templates",
+    "searchTemplate": "Search template",
+    "useTemplate": "Use this template",
+    "noTemplates": "No templates match your search."
   },
   "performance": {
     "loadFailed": "Failed to load performance data",
@@ -418,9 +1259,40 @@
   "audiences": {
     "subtitle": "Build full-funnel audience sets and launch them consistently",
     "launcherTitle": "Audience Launcher",
-    "launcherSubtitle": "Performa full-funnel targeting strategy with an optimized workflow for maximum ROAS.",
+    "launcherSubtitle": "AdSpectr full-funnel targeting strategy with an optimized workflow for maximum ROAS.",
     "selected": "selected",
-    "noAudienceSelected": "No audience selected yet."
+    "noAudienceSelected": "No audience selected yet.",
+    "openStudio": "Audience Studio",
+    "selectedCount": "selected",
+    "toggleSubtypes": "Show template list",
+    "sectionAcquisitionTitle": "Acquisition prospecting",
+    "sectionAcquisitionBlurb": "Cold audiences and lookalikes for scale testing.",
+    "sectionReengagementTitle": "Acquisition re-engagement",
+    "sectionReengagementBlurb": "Warm users who already had a first touch with your brand.",
+    "sectionRetargetingTitle": "Retargeting",
+    "sectionRetargetingBlurb": "Site visitors and intent signals worth bringing back.",
+    "sectionRetentionTitle": "Retention",
+    "sectionRetentionBlurb": "Existing customers to upsell, cross-sell, or reactivate.",
+    "studioTitle": "Audience Studio",
+    "studioSubtitle": "Explore performance, discover interests, and build intersections before launch.",
+    "studioTabPerformance": "Explore audiences by performance",
+    "studioTabDiscover": "Discover new interests",
+    "studioSearchPlaceholder": "Search audiences…",
+    "studioLast7d": "Last 7 days",
+    "studioColAudience": "Audience",
+    "studioColType": "Type",
+    "studioColSpend": "Spend",
+    "studioNoData": "No data found — connect Meta and sync audiences to populate this table.",
+    "mixerTitle": "Audience mixer",
+    "mixerNoPresets": "No presets for this ad account",
+    "mixerSave": "Save audience selection",
+    "mixerIncluded": "Included audiences",
+    "mixerSlot0": "0 intersection",
+    "mixerSlot1": "1st intersection",
+    "mixerSlot2": "2nd intersection",
+    "mixerDropHint": "Add from table above",
+    "mixerReach": "Potential reach: unavailable until audiences are defined.",
+    "backToLauncher": "Back to Launcher"
   },
   "autoOptimization": {
     "runFailed": "Optimization failed",
@@ -459,7 +1331,7 @@
     "workspaceSubtitle": "ad accounts, subscription, payments, team, MCP",
     "toggleTheme": "Toggle theme",
     "dashboardSubtitle": "Overview of your advertising performance",
-    "campaignsSubtitle": "All campaigns managed by Performa",
+    "campaignsSubtitle": "All campaigns managed by AdSpectr",
     "audiencesSubtitle": "Build and launch full-funnel audiences",
     "aiDecisionsSubtitle": "Every action the AI has taken — with full reasoning",
     "budgetSubtitle": "Allocation and performance by platform",
@@ -469,6 +1341,11 @@
     "roiSubtitle": "Estimate profitability before scaling ads",
     "settingsSubtitle": "Workspace and account configuration",
     "reportingSubtitle": "Campaign-level metrics and trends",
+    "automationSubtitle": "Tactics, triggers, and automation health",
+    "automationWizardSubtitle": "Build rules with steps, conditions, and schedules",
+    "adLauncherSubtitle": "Select ads, presets, and creative bundles",
+    "audienceStudioSubtitle": "Performance table and audience mixer",
+    "metaAuditSubtitle": "360° creative, targeting, and auction diagnostics",
     "marketplaceSubtitle": "Professional marketing specialists",
     "launchSubtitle": "Create and launch campaigns efficiently",
     "autoOptimizationSubtitle": "Automation settings and execution policy",

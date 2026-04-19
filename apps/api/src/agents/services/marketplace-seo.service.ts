@@ -169,8 +169,8 @@ export class MarketplaceSeoService {
     })
 
     const titles = {
-      en: 'Find AI Marketing Specialists | Performa Marketplace',
-      ru: 'Найдите специалистов по маркетингу | Marketplace Performa',
+      en: 'Find AI Marketing Specialists | AdSpectr Marketplace',
+      ru: 'Найдите специалистов по маркетингу | Marketplace AdSpectr',
     }
 
     const descriptions = {
@@ -278,8 +278,8 @@ export class MarketplaceSeoService {
     const platforms = agentProfile.platforms?.slice(0, 2).join('/') || 'Marketing'
 
     const titles = {
-      en: `${baseTitle} - ${roas}x ROAS ${platforms} ${certLevel} | Performa`,
-      ru: `${baseTitle} - ${roas}x ROAS ${platforms} ${certLevel} | Performa`,
+      en: `${baseTitle} - ${roas}x ROAS ${platforms} ${certLevel} | AdSpectr`,
+      ru: `${baseTitle} - ${roas}x ROAS ${platforms} ${certLevel} | AdSpectr`,
     }
 
     return titles[language] || titles.en
@@ -318,8 +318,8 @@ export class MarketplaceSeoService {
     const filterText = parts.length > 0 ? `${parts.join(' ')} ` : ''
 
     const titles = {
-      en: `${filterText}Marketing Specialists (${totalCount} results) | Performa`,
-      ru: `${filterText}Специалисты по маркетингу (${totalCount} результатов) | Performa`,
+      en: `${filterText}Marketing Specialists (${totalCount} results) | AdSpectr`,
+      ru: `${filterText}Специалисты по маркетингу (${totalCount} результатов) | AdSpectr`,
     }
 
     return this.truncate(titles[language] || titles.en, 60)
@@ -341,8 +341,8 @@ export class MarketplaceSeoService {
     const filterText = parts.length > 0 ? parts.join('. ') : 'Verified marketing specialists'
 
     const descriptions = {
-      en: `Browse ${totalCount} ${filterText} on Performa marketplace. Find certified performance marketing experts by platform, niche, location and ratings. Compare performance metrics and hire the best.`,
-      ru: `Просмотрите ${totalCount} ${filterText} на маркетплейсе Performa. Найдите сертифицированных специалистов по платформам, нишам, местоположению и рейтингам. Сравните метрики и нанимайте лучших.`,
+      en: `Browse ${totalCount} ${filterText} on AdSpectr marketplace. Find certified performance marketing experts by platform, niche, location and ratings. Compare performance metrics and hire the best.`,
+      ru: `Просмотрите ${totalCount} ${filterText} на маркетплейсе AdSpectr. Найдите сертифицированных специалистов по платформам, нишам, местоположению и рейтингам. Сравните метрики и нанимайте лучших.`,
     }
 
     return this.truncate(descriptions[language] || descriptions.en, 160)
@@ -453,7 +453,7 @@ export class MarketplaceSeoService {
   }
 
   private getBaseUrl(): string {
-    return process.env.FRONTEND_URL || 'https://performa.ai'
+    return process.env.FRONTEND_URL || 'https://adspectr.com'
   }
 
   // ─── Structured Data Generation ───────────────────────────────────────────
@@ -504,7 +504,7 @@ export class MarketplaceSeoService {
     return {
       '@context': 'https://schema.org',
       '@type': 'WebSite',
-      name: 'Performa Marketplace',
+      name: 'AdSpectr Marketplace',
       url: `${baseUrl}/marketplace`,
       potentialAction: {
         '@type': 'SearchAction',
@@ -555,7 +555,7 @@ export class MarketplaceSeoService {
     return {
       '@context': 'https://schema.org',
       '@type': 'Organization',
-      name: data.name || 'Performa',
+      name: data.name || 'AdSpectr',
       url: baseUrl,
       logo: data.logo || `${baseUrl}/logo.png`,
     }

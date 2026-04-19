@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { PlatformId } from '@/components/platforms/PlatformSelector'
+import { clearAuthTokens, setAccessToken as persistAccessTokenToStorage } from '@/lib/auth-storage'
 
 interface User {
   id: string
@@ -55,19 +56,17 @@ export const useWorkspaceStore = create<WorkspaceStore>()(
       setWorkspaces: (workspaces) => set({ workspaces }),
       setAccessToken: (token) => {
         set({ accessToken: token })
-        if (token) localStorage.setItem('performa_access_token', token)
-        else localStorage.removeItem('performa_access_token')
+        persistAccessTokenToStorage(token)
       },
       setLoading: (isLoading) => set({ isLoading }),
       setSelectedPlatforms: (selectedPlatforms) => set({ selectedPlatforms }),
       logout: () => {
-        localStorage.removeItem('performa_access_token')
-        localStorage.removeItem('performa_refresh_token')
+        clearAuthTokens()
         set({ user: null, currentWorkspace: null, workspaces: [], accessToken: null, selectedPlatforms: [] })
       },
     }),
     {
-      name: 'performa-workspace-store',
+      name: 'adspectr-workspace-store',
       partialize: (state) => ({
         user: state.user,
         currentWorkspace: state.currentWorkspace,

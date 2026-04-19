@@ -4,7 +4,7 @@
 -- Create demo user
 INSERT INTO users (email, password, name, plan, is_email_verified, created_at, updated_at)
 VALUES (
-  'demo@performa.ai',
+  'demo@adspectr.com',
   '$2a$12$demo1234hashedpassword', -- This is a placeholder, we'll update it
   'Demo User',
   'PRO',

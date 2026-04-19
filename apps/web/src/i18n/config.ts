@@ -1,13 +1,14 @@
 // ─── Language Configuration ───────────────────────────────────────────────────
 
+/** UI languages. Russian is the canonical copy source for the product (default). */
 export const LANGUAGES = {
-  uz: { name: "O'zbek", flag: '🇺🇿', dir: 'ltr' },
   ru: { name: 'Русский', flag: '🇷🇺', dir: 'ltr' },
   en: { name: 'English', flag: '🇬🇧', dir: 'ltr' },
+  uz: { name: "O'zbek", flag: '🇺🇿', dir: 'ltr' },
 } as const
 
 export type Language = keyof typeof LANGUAGES
-export const DEFAULT_LANGUAGE: Language = 'en'
+export const DEFAULT_LANGUAGE: Language = 'ru'
 export const LANGUAGES_LIST = Object.entries(LANGUAGES).map(([code, config]) => ({
   code: code as Language,
   ...config,
@@ -32,10 +33,16 @@ export interface Translations {
   automation: Record<string, string>
   retargeting: Record<string, string>
   creative: Record<string, string>
-  auth: Record<string, string>
+  auth: Record<string, any>
   errors: Record<string, string>
+  /** Marketing / public shell copy (navbar, footer, CTAs) */
+  publicSite: Record<string, any>
+  /** Terms, privacy, data deletion (public legal) */
+  legal: Record<string, any>
 }
 
 // ─── Storage Keys ─────────────────────────────────────────────────────────────
 
-export const LANGUAGE_STORAGE_KEY = 'nishon-language'
+/** Current UI language (ru | en | uz). Legacy `nishon-language` is read once for migration. */
+export const LANGUAGE_STORAGE_KEY = 'adspectr-ui-language'
+export const LEGACY_LANGUAGE_STORAGE_KEY = 'nishon-language'

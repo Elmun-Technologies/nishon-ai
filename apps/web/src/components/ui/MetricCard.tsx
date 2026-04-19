@@ -24,17 +24,22 @@ const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
       <div
         ref={ref}
         className={cn(
-          'relative bg-surface border border-border rounded-xl p-5 flex flex-col justify-between',
-          'hover:shadow-md transition-all duration-200',
-          accent && 'ring-1 ring-text-primary/10',
+          'relative overflow-hidden rounded-2xl border border-border/70 bg-white/85 p-5 shadow-sm backdrop-blur-sm flex flex-col justify-between',
+          'hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200 dark:bg-slate-900/70',
+          accent && 'ring-1 ring-primary/30',
           className
         )}
         {...props}
       >
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-10 bg-gradient-to-r from-blue-500/8 via-violet-500/8 to-transparent" />
         {/* Top row */}
         <div className="flex items-center justify-between mb-4">
           <p className="text-text-secondary text-xs font-semibold uppercase tracking-wider">{label}</p>
-          {icon && <span className="text-xl opacity-70">{icon}</span>}
+          {icon && (
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-900/5 text-sm dark:bg-white/10">
+              {icon}
+            </span>
+          )}
         </div>
 
         {/* Value */}

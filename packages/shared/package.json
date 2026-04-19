@@ -1,7 +1,7 @@
 {
-  "name": "@performa/shared",
+  "name": "@adspectr/shared",
   "version": "0.0.1",
-  "description": "Shared types, DTOs, and utilities for Performa",
+  "description": "Shared types, DTOs, and utilities for AdSpectr",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

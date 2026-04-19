@@ -1,4 +1,4 @@
-export { PerformaAiClient } from './openai-client'
+export { AdSpectrAiClient } from './openai-client'
 export type { CompleteOptions, CompleteResult, AiProvider } from './openai-client'
 export {
   getModelByTask,

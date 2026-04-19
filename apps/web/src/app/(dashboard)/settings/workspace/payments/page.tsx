@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { Alert, DataTable, Dialog, PageHeader } from '@/components/ui'
+import { Alert, DataTable, Dialog } from '@/components/ui'
+import { CreditCard, FileText } from 'lucide-react'
 import { billing } from '@/lib/api-client'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { useI18n } from '@/i18n/use-i18n'
@@ -121,37 +122,56 @@ export default function WorkspacePaymentsPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={t('workspaceSettings.tabs.payments', 'Payments')}
-        subtitle={currentWorkspace?.name ?? t('workspaceSettings.title', 'Workspace settings')}
-      />
-      <Card>
+      <Card className="rounded-2xl border border-border/70 bg-white/95 p-5 shadow-sm backdrop-blur-sm dark:bg-slate-900/70 sm:p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="text-lg font-semibold text-text-primary">Payment method</h2>
-          <Button size="sm" type="button" onClick={() => setAddOpen(true)} disabled={!currentWorkspace?.id}>
-            + Add payment method
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/10 text-violet-600 dark:text-violet-300">
+              <CreditCard className="h-5 w-5" />
+            </div>
+            <h2 className="text-lg font-semibold text-text-primary">
+              {t('workspaceSettings.payments.paymentMethod', 'Payment method')}
+            </h2>
+          </div>
+          <Button size="sm" type="button" variant="secondary" className="shrink-0 border-violet-500/30" onClick={() => setAddOpen(true)} disabled={!currentWorkspace?.id}>
+            + {t('workspaceSettings.payments.addPaymentMethod', 'Add payment method')}
           </Button>
         </div>
         {error && <Alert className="mt-3" variant="error">{error}</Alert>}
         {loading ? (
-          <p className="mt-4 text-sm text-text-tertiary">Yuklanmoqda...</p>
+          <p className="mt-4 text-sm text-text-tertiary">{t('workspaceSettings.payments.loading', 'Loading…')}</p>
         ) : methods.length === 0 ? (
-          <div className="mt-4 rounded-xl border border-dashed border-border p-6 text-center text-sm text-text-tertiary">
-            Saqlangan karta yo'q.
+          <div className="mt-4 rounded-xl border border-dashed border-border bg-surface-2/30 p-8 text-center text-sm text-text-tertiary">
+            {t('workspaceSettings.payments.noMethods', 'No saved payment methods yet.')}
           </div>
         ) : (
-          <div className="mt-4 space-y-2">
+          <div className="mt-4 space-y-3">
             {methods.map((m) => (
-              <div key={m.id} className="flex items-center justify-between rounded-xl border border-border bg-surface-2/20 px-4 py-3">
-                <div>
-                  <p className="text-sm font-semibold text-text-primary uppercase">
-                    {m.brand ?? 'card'} •••• {m.last4}
-                  </p>
-                  <p className="text-xs text-text-tertiary">{m.isDefault ? 'Default' : 'Secondary'}</p>
+              <div
+                key={m.id}
+                className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/80 bg-surface-2/25 px-4 py-3 dark:bg-slate-950/40"
+              >
+                <div className="flex min-w-0 flex-1 items-center gap-3">
+                  <input type="radio" checked={m.isDefault} readOnly className="text-violet-600" aria-label="default" />
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold capitalize text-text-primary">
+                      {(m.brand ?? 'card').toLowerCase()} •••• {m.last4}
+                    </p>
+                    <div className="mt-1 flex flex-wrap items-center gap-2">
+                      {m.isDefault ? (
+                        <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-400">
+                          {t('workspaceSettings.payments.defaultBadge', 'Default')}
+                        </span>
+                      ) : (
+                        <span className="text-label text-text-tertiary">
+                          {t('workspaceSettings.payments.secondaryBadge', 'Secondary')}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
                 {!m.isDefault && (
                   <Button size="sm" variant="secondary" type="button" onClick={() => void setDefault(m.id)}>
-                    Set default
+                    {t('workspaceSettings.payments.setDefault', 'Set default')}
                   </Button>
                 )}
               </div>
@@ -160,10 +180,40 @@ export default function WorkspacePaymentsPage() {
         )}
       </Card>
 
-      <Card>
+      <Card className="rounded-2xl border border-border/70 bg-white/95 p-5 shadow-sm backdrop-blur-sm dark:bg-slate-900/70 sm:p-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-300">
+              <FileText className="h-5 w-5" />
+            </div>
+            <h2 className="text-lg font-semibold text-text-primary">
+              {t('workspaceSettings.payments.billingInformation', 'Billing information')}
+            </h2>
+          </div>
+          <Button variant="secondary" size="sm" type="button" className="shrink-0 border-violet-500/30" onClick={() => setEditOpen(true)}>
+            Edit
+          </Button>
+        </div>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <Info label="Your name" value={contact.yourName} />
+          <Info label="Company" value={contact.companyName} />
+          <Info label="Work email" value={contact.workEmail} />
+          <Info label="Phone" value={contact.phoneNumber} />
+          <Info label="Country" value={contact.country} />
+          <Info label="Region" value={contact.region} />
+          <Info label="City" value={contact.city} />
+          <Info label="Address" value={contact.address} />
+          <Info label="Postal/Zip" value={contact.postalCode} />
+          <Info label="Tax ID" value={contact.taxId} />
+        </div>
+      </Card>
+
+      <Card className="rounded-2xl border border-border/70 bg-white/95 p-5 shadow-sm backdrop-blur-sm dark:bg-slate-900/70 sm:p-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-text-primary">Invoices</h2>
-          <p className="text-xs text-text-tertiary">{invoices.length} total</p>
+          <h2 className="text-lg font-semibold text-text-primary">{t('workspaceSettings.payments.invoices', 'Invoices')}</h2>
+          <p className="text-label text-text-tertiary">
+            {invoices.length} {t('workspaceSettings.payments.invoiceCountLabel', 'total')}
+          </p>
         </div>
         <div className="mt-3">
           <DataTable
@@ -188,7 +238,7 @@ export default function WorkspacePaymentsPage() {
                 header: 'PDF',
                 render: (row) =>
                   row.pdfUrl ? (
-                    <a className="text-violet-400 hover:underline" href={row.pdfUrl} target="_blank" rel="noreferrer">
+                    <a className="text-violet-600 hover:underline dark:text-violet-400" href={row.pdfUrl} target="_blank" rel="noreferrer">
                       Open
                     </a>
                   ) : (
@@ -197,27 +247,6 @@ export default function WorkspacePaymentsPage() {
               },
             ]}
           />
-        </div>
-      </Card>
-
-      <Card>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="text-lg font-semibold text-text-primary">Billing information</h2>
-          <Button variant="secondary" size="sm" type="button" onClick={() => setEditOpen(true)}>
-            Edit
-          </Button>
-        </div>
-        <div className="mt-3 grid gap-3 sm:grid-cols-2">
-          <Info label="Your name" value={contact.yourName} />
-          <Info label="Company" value={contact.companyName} />
-          <Info label="Work email" value={contact.workEmail} />
-          <Info label="Phone" value={contact.phoneNumber} />
-          <Info label="Country" value={contact.country} />
-          <Info label="Region" value={contact.region} />
-          <Info label="City" value={contact.city} />
-          <Info label="Address" value={contact.address} />
-          <Info label="Postal/Zip" value={contact.postalCode} />
-          <Info label="Tax ID" value={contact.taxId} />
         </div>
       </Card>
 
@@ -270,8 +299,8 @@ export default function WorkspacePaymentsPage() {
 function Info({ label, value }: { label: string; value?: string }) {
   return (
     <div className="rounded-lg border border-border bg-surface-2/20 px-3 py-2">
-      <p className="text-xs text-text-tertiary">{label}</p>
-      <p className="mt-1 text-sm text-text-primary">{value?.trim() ? value : '—'}</p>
+      <p className="text-label text-text-tertiary">{label}</p>
+      <p className="mt-1 text-body-sm text-text-primary">{value?.trim() ? value : '—'}</p>
     </div>
   )
 }

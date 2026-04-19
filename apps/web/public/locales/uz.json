@@ -44,6 +44,7 @@
     "automation": "Avtomatsiya",
     "retargeting": "Retargeting",
     "audiences": "Auditoriyalar",
+    "adLauncher": "Reklama ishga tushiruvchi",
     "settings": "Sozlamalar",
     "marketing": "Marketing",
     "launch": "Yoqish",
@@ -66,7 +67,8 @@
     "products": "Mahsulotlar",
     "mediaLibrary": "Media kutubxona",
     "workspace": "Workspace",
-    "simulation": "Simulyatsiya"
+    "simulation": "Simulyatsiya",
+    "metaAudit": "Meta Audit"
   },
   "landing": {
     "hero": {
@@ -74,7 +76,7 @@
       "title1": "Reklamani",
       "title2": "yanada tez",
       "title3": "boshqaring.",
-      "subtitle": "Performa — 4 ta platformani (Meta, Google, TikTok, Yandex) bitta joydan boshqaradigan, avtomatsiya va AI bilan ishlayotgan markolog platforma. Kampaniya setup 4 baravar tezlashtiring, ROAS 50% ga oshiring.",
+      "subtitle": "AdSpectr — 4 ta platformani (Meta, Google, TikTok, Yandex) bitta joydan boshqaradigan, avtomatsiya va AI bilan ishlayotgan markolog platforma. Kampaniya setup 4 baravar tezlashtiring, ROAS 50% ga oshiring.",
       "buttonStart": "Boshlang — Bepul sinab ko'ring ↗",
       "buttonMarketplace": "Markolog yoki agentni topish",
       "buttonLeaderboard": "🏆 Top Performers ko'rish",
@@ -133,7 +135,7 @@
     },
     "cta": {
       "title": "O'zingiz markolog bo'lishni xohlaysizmi?",
-      "subtitle": "Performa marketplace'ga qo'shiling va yuzlab biznesga shuning reklama xizmatlarini taqdim eting.",
+      "subtitle": "AdSpectr marketplace'ga qo'shiling va yuzlab biznesga shuning reklama xizmatlarini taqdim eting.",
       "button": "Specialist sifatida ro'yxatdan o'tish ↗"
     }
   },
@@ -162,7 +164,7 @@
   },
   "leaderboard": {
     "title": "Reytingi",
-    "subtitle": "Nishon AI da eng yaxshi mutahassislar",
+    "subtitle": "AdSpectr da eng yaxshi mutahassislar",
     "overall": "Umumiy reytingi",
     "rising": "Kotarilayotgan yulduzlar",
     "roasLeaders": "ROAS liderlar",
@@ -232,12 +234,14 @@
     "views": "Ko'rishlar",
     "optimizationDone": "Optimizatsiya tugadi - natijalarni AI qarorlarda ko'ring.",
     "optimizationFailed": "Optimizatsiya amalga oshmadi",
-    "welcomeToPerforma": "Performa'ga xush kelibsiz",
+    "welcomeToAdSpectr": "AdSpectr'ga xush kelibsiz",
     "completeOnboarding": "Birinchi workspace yaratish va AI boshqaruvini yoqish uchun onboardingni yakunlang.",
     "startSetup": "Sozlashni boshlash",
     "realtimeOverview": "Real-time overview",
     "optimizing": "Optimallashtirilmoqda...",
     "runOptimization": "AI optimizatsiyani ishga tushirish",
+    "monthlySpendForecast": "Oylik xarajat bashorati",
+    "quickActions": "Tezkor amallar",
     "metaRealtimePrefix": "Ko'rsatkichlar real vaqtda olinmoqda:",
     "settingsLink": "sozlamalar",
     "topCampaigns": "Eng yaxshi kampaniyalar",
@@ -245,7 +249,80 @@
     "campaign": "Kampaniya",
     "status": "Status",
     "spend": "Xarajat",
-    "clicks": "Kliklar"
+    "clicks": "Kliklar",
+    "blendedSummary": "Birlashtirilgan summary",
+    "blendedSummaryHint": "Ulangan manbalardan cross-channel KPI",
+    "last30Days": "So'nggi 30 kun",
+    "connectedSources": "Ulangan manbalar",
+    "viewReporting": "Hisobotlar",
+    "connectDataTitle": "Ko'proq ma'lumot manbalarini ulang",
+    "connectDataSubtitle": "Blended metrikalar, LTV va cross-channel reportingni oching.",
+    "sourceConnected": "Ulangan",
+    "manageSource": "Boshqarish",
+    "connectSource": "Ulash"
+  },
+  "metaAudit": {
+    "title": "360° Meta Audit",
+    "subtitle": "Meta chuqur tahlil tablari — UI ko‘rinishi, ma’lumot keyinroq ulanadi.",
+    "tabMeta": "Meta Dashboard",
+    "tabTargeting": "Targeting Insights",
+    "tabAuction": "Auction Insights",
+    "tabGeo": "Geo & Demo Insights",
+    "tabCreative": "Creative Insights",
+    "tabAdcopy": "Ad Copy Insights",
+    "last7Days": "So‘nggi 7 kun",
+    "filterData": "Filtrlash",
+    "loadPreset": "Filtr presetini yuklash…",
+    "presetWinners": "G‘olib ad setlar",
+    "presetLearning": "Learning limited",
+    "saveView": "Ko‘rinishni saqlash",
+    "kpiLeads": "Lidlar (hammasi)",
+    "kpiSpend": "Xarajat",
+    "kpiPurchases": "Xaridlar",
+    "gradedBy": "Baholash",
+    "minSpend": "Min. xarajat",
+    "maxSpend": "Maks. xarajat",
+    "smartFilter": "Smart filter",
+    "allFilters": "Barcha filtrlar",
+    "filterCreativeType": "Kreativ turi",
+    "filterFunnel": "Funel bosqichi",
+    "filterPlacement": "Placements",
+    "filterDevice": "Qurilma",
+    "filtersEmptyPreview": "Filtr bo‘yicha qatorlar hali yo‘q. Qo‘llang va ko‘rinishni yangilang.",
+    "clearFilters": "Filtrlarni tozalash",
+    "applyFilters": "Qo‘llash",
+    "formatImage": "Rasm",
+    "formatShortVideo": "Qisqa video",
+    "formatMediumVideo": "O‘rta video",
+    "formatLongVideo": "Uzun video",
+    "formatCarousel": "Karusel",
+    "formatDpa": "DPA",
+    "amountSpent": "Xarajat",
+    "cpl": "CPL",
+    "convRate": "Konversiya",
+    "leadsBar": "Lidlar",
+    "spendBar": "Xarajat",
+    "creativeMatrix": "Creative matrix",
+    "seeAllCreatives": "Barcha kreativlar",
+    "quadrantScalable": "MASSHTAB",
+    "quadrantCore": "ASOSIY",
+    "quadrantStarted": "BOSHLANGICH",
+    "quadrantOverspend": "ORTIQCHA",
+    "axisLeads": "Lidlar (hammasi)",
+    "axisSpend": "Xarajat",
+    "matrixEmpty": "Kreativlar (0) — Meta ulanishi va sync kerak.",
+    "creativesCount": "Kreativlar (0)",
+    "sortLeadsHigh": "Saralash: lidlar (avval ko‘p)",
+    "selectedCount": "0 tanlangan",
+    "openInLauncher": "Ads Launcherda ochish",
+    "piecesOfCopy": "Matnlar (0)",
+    "adCopyLength": "Matn uzunligi (0)",
+    "placeholderMetrics": "Xarajat · CPL · CTR",
+    "emojiPerf": "Emoji samarasi",
+    "linkPerf": "Havola samarasi",
+    "with": "Bilan",
+    "without": "Yo‘q",
+    "tabPlaceholder": "Tab maketi. Grafiklarni Meta sync bilan keyin ulang."
   },
   "automation": {
     "title": "Avtomatsiya",
@@ -257,7 +334,65 @@
     "execute": "Ijro qilish",
     "executions": "Ijrolar",
     "success": "Muvaffaqiyat",
-    "failed": "Muvaffaqiyatsiz"
+    "failed": "Muvaffaqiyatsiz",
+    "overviewTitle": "Avtomatlashtirish overview",
+    "overviewSubtitle": "Avtomatizatsiyalar nima qildi — taktikalar, triggerlar, faollik.",
+    "newAutomation": "Yangi avtomatlashtirish",
+    "summaryHeading": "Avtomatizatsiyalar siz uchun nima qildi",
+    "metricStart": "Ishga tushirish",
+    "metricPause": "Pauza",
+    "metricBudgetUp": "Byudjetni oshirish",
+    "metricBudgetDown": "Byudjetni kamaytirish",
+    "actionsTriggered": "Ishga tushgan harakatlar",
+    "totalActionsChart": "Vaqt bo'yicha jami harakatlar",
+    "searchTactic": "Taktika qidirish",
+    "viewAllAuthors": "Ko'rinish: barcha mualliflar",
+    "showAllStatuses": "Ko'rsatish: barcha statuslar",
+    "emptyTitle": "Qo'lda qilmang",
+    "emptyDescription": "Metrikalar bo'yicha start, pause va byudjetni masshtablash taktikalarini yarating. Meta va nazoratli avtomatlashtirishni ulang.",
+    "startAutomating": "Avtomatlashtirishni boshlash",
+    "openWizard": "Qoidalar ustasi"
+  },
+  "adLauncher": {
+    "title": "Reklama ishga tushiruvchi",
+    "subtitle": "Qidiruv, saralash va kreativlar to'plami — launcher qobig'i (Meta sinxronini keyin ulang).",
+    "infoHint": "Meta ga yuborishdan oldin reklamalar, presetlar va filtrlarni tanlang.",
+    "findInspiration": "Ilhom topish",
+    "selectAdSets": "Mavjud reklama to'plamlarini tanlash",
+    "tabAds": "Reklamalar",
+    "tabNewAds": "Yangi reklamalar",
+    "tabClusters": "Kreativ klasterlari",
+    "tabInsights": "Tahlillar",
+    "sortBy": "Saralash: oxirgi tahrir",
+    "metric": "Metrika",
+    "cpl": "Bitta lid narxi (hammasi)",
+    "minSpend": "Min. xarajat",
+    "filterData": "Ma'lumot filtri",
+    "smartFilter": "Aqlli filtr",
+    "emptyTitle": "Bu vaqt oralig'ida ma'lumot yo'q",
+    "emptyBody": "Boshqa sana oralig'ini tanlang yoki reklamalarni yuklash uchun Meta ni ulang.",
+    "previewTitle": "Tanlangan reklama ko'rinishi",
+    "creativeSet": "Kreativ to'plami",
+    "newPreset": "Yangi preset",
+    "saveSelection": "Kreativ tanlovini saqlash",
+    "manualAdd": "Qo'lda qo'shish",
+    "adIdPlaceholder": "Reklama ID sini kiriting"
+  },
+  "automationWizard": {
+    "pageTitle": "Avtomatlashtirish ustasi",
+    "setupTitle": "Sozlash",
+    "stepPick": "Tanlash",
+    "stepSettings": "Parametrlar",
+    "stepSummary": "Xulosa",
+    "selectTask": "Vazifani tanlang",
+    "taskPause": "Bugun uchun reklamani pauza",
+    "addAction": "Harakat",
+    "dateSchedule": "Sana jadvali",
+    "dateHint": "Qoida ishga tushganda reklama hisobi vaqt zonasi ishlatiladi.",
+    "runContinuously": "Doimiy ishga tushirish",
+    "betweenDates": "Muayyan sanalar oralig'ida",
+    "pickPlaceholder": "Taktika shablonini tanlang — playbook katalogini shu yerga ulash mumkin.",
+    "summaryPlaceholder": "Nashr qilishdan oldin shartlar va jadval xulosasi shu yerda chiqadi."
   },
   "retargeting": {
     "title": "Retargeting",
@@ -293,7 +428,46 @@
     "signupButton": "Ro'yxatdan o'tish",
     "haveAccount": "Akkauntingiz bormi?",
     "noAccount": "Akkauntingiz yo'qmi?",
-    "logout": "Chiqish"
+    "logout": "Chiqish",
+    "loginPage": {
+      "welcomeBadge": "Xush kelibsiz",
+      "heroTitle": "Barcha kampaniyalarni bitta boshqaruv qatlamidan boshqaring",
+      "heroSubtitle": "Launch jarayonlari, AI qarorlar, hisobotlar va workspace boshqaruviga kirish uchun tizimga kiring.",
+      "statRoas": "O'rtacha ROAS",
+      "statCpa": "CPA kamayishi",
+      "statAi": "AI monitoring",
+      "panelTitle": "Tizimga kirish",
+      "panelSubtitle": "Email va parol yoki ijtimoiy tarmoq orqali kiring.",
+      "continueGoogle": "Google bilan davom etish",
+      "continueFacebook": "Facebook bilan davom etish",
+      "orEmail": "yoki email",
+      "emailPlaceholder": "you@company.com",
+      "passwordPlaceholder": "••••••••",
+      "demoButton": "Demo kirish — akkaunt talab etilmaydi",
+      "createPrompt": "Hisob yo'qmi?",
+      "createLink": "Yaratish",
+      "badCredentials": "Email yoki parol noto'g'ri"
+    },
+    "registerPage": {
+      "badge": "Hisob yaratish",
+      "heroTitle": "Bir necha daqiqada AdSpectr dan foydalaning",
+      "heroSubtitle": "Kampaniyalarni ishga tushiring, AI qarorlarni kuzating va workspace ni bitta joydan boshqaring.",
+      "statModules": "Modullar",
+      "statLanguages": "Tillar",
+      "statAutopilot": "Autopilot",
+      "statModulesVal": "20+",
+      "statLanguagesVal": "3",
+      "statAutopilotVal": "O'rnatilgan",
+      "panelTitle": "Ro'yxatdan o'tish",
+      "panelSubtitle": "Workspace uchun ish emailidan foydalaning.",
+      "nameLabel": "To'liq ism",
+      "namePlaceholder": "Ismingiz",
+      "passwordHint": "Kamida 8 belgi",
+      "createButton": "Hisob yaratish",
+      "signInPrompt": "Akkauntingiz bormi?",
+      "signInLink": "Kirish",
+      "genericError": "Ro'yxatdan o'tishda xatolik. Qayta urinib ko'ring."
+    }
   },
   "errors": {
     "notFound": "Topilmadi",
@@ -303,15 +477,569 @@
     "tryAgain": "Qayta urinib ko'ring",
     "goHome": "Asosiy sahifaga o'tish"
   },
+  "publicSite": {
+    "brand": "AdSpectr AI",
+    "nav": {
+      "features": "Imkoniyatlar",
+      "solutions": "Yechimlar",
+      "marketplace": "Marketplace",
+      "leaderboard": "Liderlar jadvali",
+      "portfolio": "Portfolio"
+    },
+    "cta": {
+      "login": "Kirish",
+      "startFree": "Bepul boshlash"
+    },
+    "footer": {
+      "tagline": "AdSpectr AI — reklama kampaniyalarini boshqarish platformasi",
+      "features": "Imkoniyatlar",
+      "solutions": "Yechimlar",
+      "terms": "Shartlar",
+      "privacy": "Maxfiylik"
+    },
+    "home": {
+      "hero": {
+        "bullet0": "Haqiqiy feature route'lar — demo emas, imkoniyat xaritasi",
+        "bullet1": "EN / RU / UZ bilan ishlaydigan product flow",
+        "bullet2": "Monetizatsiya: obuna + marketplace komissiyasi",
+        "secondaryCta": "To'liq feature xaritasi",
+        "exploreLogin": "Platformani ko'rish"
+      },
+      "stats": {
+        "0": {
+          "value": "6+",
+          "label": "Integratsiyalangan asosiy modullar"
+        },
+        "1": {
+          "value": "5 ta reja",
+          "label": "UZS obuna darajalari"
+        },
+        "2": {
+          "value": "3 qavat",
+          "label": "Monetizatsiya arxitekturasi"
+        },
+        "3": {
+          "value": "Workspace-first",
+          "label": "Rollar, billing, ruxsatlar, MCP kirish"
+        }
+      },
+      "capabilitiesEyebrow": "Platforma imkoniyatlari xaritasi",
+      "openModule": "Modulni ochish",
+      "modules": {
+        "campaignLaunch": {
+          "title": "Kampaniya launch tizimi",
+          "desc": "Maqsad, auditoriya, byudjet va kreativ launch oqimi"
+        },
+        "aiDecisions": {
+          "title": "AI qarorlar jurnali",
+          "desc": "AI harakatlari, sabablar va approval tarixi"
+        },
+        "performance": {
+          "title": "Performance analitikasi",
+          "desc": "ROAS, CPA, CTR va trendlar bo'yicha kesimlar"
+        },
+        "creativeScorer": {
+          "title": "Kreativ sifat baholagichi",
+          "desc": "Launchdan oldin kreativlarni AI baholaydi"
+        },
+        "workspaceGov": {
+          "title": "Workspace boshqaruvi",
+          "desc": "Rollar, ruxsatlar va ad account kirish"
+        },
+        "billing": {
+          "title": "Billing va hisob-fakturalar",
+          "desc": "Rejalar, to'lov usullari, invoice va buyurtma holati"
+        }
+      },
+      "flow": {
+        "eyebrow": "Qanday ishlaydi",
+        "title": "Kampaniya launchidan boshqariladigan masshtabgacha",
+        "connect": {
+          "step": "01",
+          "title": "Workspaceni ulang",
+          "text": "Ad accountlar, jamoa rollari, billing kontakt va access policy bitta joyda."
+        },
+        "launch": {
+          "step": "02",
+          "title": "Launch va monitoring",
+          "text": "Kampaniyalar ishga tushadi; AI qarorlar jurnali va reporting deyarli real vaqtda yangilanadi."
+        },
+        "optimize": {
+          "step": "03",
+          "title": "Nazorat bilan optimallashtirish",
+          "text": "Avto-optimallashtirish approval rail ichida ishlaydi."
+        },
+        "scale": {
+          "step": "04",
+          "title": "Boshqaruv bilan masshtab",
+          "text": "Ko'p workspace, ko'p account va jamoa bilan intizomni saqlang."
+        }
+      },
+      "pricing": {
+        "eyebrow": "Obuna va monetizatsiya",
+        "title": "Haqiqiy product logikasiga mos narxlar",
+        "subtitle": "Narxlar faqat kartochka emas: serverdagi plan limitlari, Payme checkout va marketplace komissiya oqimi mahsulot bilan bir xil."
+      },
+      "plans": {
+        "free": {
+          "name": "Free",
+          "price": "0 UZS / oy",
+          "who": "Test va ilk setup uchun",
+          "points": {
+            "0": "1 workspace",
+            "1": "3 ta kampaniya",
+            "2": "1 ulangan account",
+            "3": "Marketplace hire yo'q"
+          }
+        },
+        "starter": {
+          "name": "Starter",
+          "price": "199 000 UZS / oy",
+          "who": "Kichik growth jamoalar",
+          "points": {
+            "0": "2 workspace",
+            "1": "10 kampaniya / workspace",
+            "2": "2 ulangan account",
+            "3": "Marketplace hire bor"
+          }
+        },
+        "growth": {
+          "name": "Growth",
+          "price": "499 000 UZS / oy",
+          "who": "Performance operatsiyasi yuradigan jamoalar",
+          "points": {
+            "0": "5 workspace",
+            "1": "30 kampaniya / workspace",
+            "2": "5 ulangan account",
+            "3": "Agent profil yaratish"
+          }
+        },
+        "pro": {
+          "name": "Pro",
+          "price": "999 000 UZS / oy",
+          "who": "AI-driven to'liq marketing ops",
+          "points": {
+            "0": "15 workspace",
+            "1": "100 kampaniya / workspace",
+            "2": "10 ulangan account",
+            "3": "Custom AI agent"
+          }
+        },
+        "agency": {
+          "name": "Agency",
+          "price": "2 499 000 UZS / oy",
+          "who": "Agentlik va multi-client scale",
+          "points": {
+            "0": "Cheksiz workspace",
+            "1": "Cheksiz kampaniya",
+            "2": "Cheksiz account",
+            "3": "Enterprise darajadagi ops"
+          }
+        }
+      },
+      "monetization": {
+        "subscription": {
+          "title": "Qavat 1 — Workspace obunasi",
+          "text": "Asosiy qiymat oylik UZS obuna orqali; plan limitlari serverda tekshiriladi."
+        },
+        "billing": {
+          "title": "Qavat 2 — Billing operatsiyalari",
+          "text": "To'lov Payme checkout + buyurtma status polling. Invoice va usullar workspace kesimida."
+        },
+        "marketplace": {
+          "title": "Qavat 3 — Marketplace komissiya modeli",
+          "text": "Komissiya stavkalari va specialist tierlar alohida; stavkalar workspace bo'yicha sozlanishi mumkin."
+        }
+      },
+      "security": {
+        "title": "Xavfsizlik va boshqaruv",
+        "intro": "Workspace control qatlami jamoa bilan ishlashda aniq mas'uliyat va ruxsat chegaralarini beradi.",
+        "bullet0": "Rol asosida workspace kirish",
+        "bullet1": "Taklif va ruxsat boshqaruvi",
+        "bullet2": "Billing profil boshqaruvi",
+        "bullet3": "MCP credential izolyatsiyasi"
+      },
+      "revenue": {
+        "title": "Daromad tomondan ko'rinish",
+        "intro": "Dashboardda xarajat, natija va to'lov holati bir joyda — amaliy qarorlar uchun.",
+        "cell0": {
+          "k": "Reja holati",
+          "v": "Faol"
+        },
+        "cell1": {
+          "k": "Buyurtma oqimi",
+          "v": "Kuzatiladi"
+        },
+        "cell2": {
+          "k": "Invoicelar",
+          "v": "Workspace darajasi"
+        },
+        "cell3": {
+          "k": "Komissiya qatlami",
+          "v": "Sozlanadi"
+        }
+      },
+      "faq": {
+        "title": "Tez-tez beriladigan savollar",
+        "subtitle": "Platform imkoniyatlari va monetizatsiya haqida.",
+        "q0": "Narxlarimiz oddiy fixed package emasmi?",
+        "a0": "Yo'q — gibrid: platforma obunasi, billing operatsiyasi va marketplace komissiya qatlamlari.",
+        "q1": "To'lov qayerda amalga oshadi?",
+        "a1": "Obuna buyurtmalari Payme checkout orqali ochiladi; status platformada kuzatiladi.",
+        "q2": "Marketplace monetizatsiyasi qanday?",
+        "a2": "Komissiya stavkalari specialist tier va davr bo'yicha; bonus logikasi alohida.",
+        "q3": "Bu sahifadagi imkoniyatlar realmi?",
+        "a3": "Ha — kartochkalar mavjud ichki route va ishlayotgan modullarga ulangan."
+      },
+      "finalCta": {
+        "eyebrow": "Yakuniy CTA",
+        "title": "Monetizatsiyaga tayyor growth stack qurish",
+        "subtitle": "Workspacedan boshlang, billingni ulang va nazorat ostida AI yordamidagi kampaniyalarni masshtabda ishga tushiring.",
+        "register": "Bepul boshlash",
+        "solutions": "Yechimlarni ko'rish"
+      },
+      "snapshot": {
+        "title": "Operatsiya qisqacha ko'rinishi",
+        "row0": {
+          "label": "Launch",
+          "status": "Faol"
+        },
+        "row1": {
+          "label": "AI qarorlar",
+          "status": "Monitoring"
+        },
+        "row2": {
+          "label": "Billing",
+          "status": "Kuzatiladi"
+        },
+        "row3": {
+          "label": "Workspace",
+          "status": "Himoyalangan"
+        }
+      }
+    },
+    "marketing": {
+      "common": {
+        "backToLanding": "Landingga qaytish",
+        "backToPortfolio": "Portfolioga qaytish",
+        "backToMarketplace": "Marketplacega qaytish",
+        "openModule": "Modulni ochish",
+        "openProfile": "Profilni ochish",
+        "openRelatedFlow": "Bog‘liq oqimni ochish",
+        "liveModuleTag": "Jonli modul",
+        "solutionTrackTag": "Solution track",
+        "verified": "Tasdiqlangan",
+        "reviews": "sharh",
+        "campaignsDotBadges": "kampaniya",
+        "badgesWord": "badge",
+        "dot": " • ",
+        "perHour": "/soat",
+        "spendSuffix": "xarajat",
+        "yearsShort": "yil",
+        "hoursShort": "soat"
+      },
+      "features": {
+        "back": "Landingga qaytish",
+        "badge": "Product imkoniyatlari matritsasi",
+        "title": "Haqiqiy modullar. Haqiqiy route’lar. Haqiqiy operatsiyalar.",
+        "subtitle": "AdSpectr ichidagi mavjud funksiyalar bitta professional xaritada. Har bir karta jonli modulga ulangan.",
+        "groupClusterSubtitle": "Mavjud product workflow’lariga mos imkoniyat klasteri.",
+        "metric0v": "21+",
+        "metric0l": "Xaritalangan modullar",
+        "metric1v": "4",
+        "metric1l": "Asosiy imkoniyat bloklari",
+        "metric2v": "100%",
+        "metric2l": "Route bilan bog‘langan kartalar",
+        "metric3v": "EN/RU/UZ",
+        "metric3l": "Lokalizatsiyaga tayyor",
+        "pillar0Title": "Route haqiqiyligi",
+        "pillar0Desc": "Kartalar mavjud route’larga boradi, mock emas.",
+        "pillar1Title": "Product mosligi",
+        "pillar1Desc": "Modullar ichki imkoniyatlarga mos.",
+        "pillar2Title": "Konversiyaga tayyor",
+        "pillar2Desc": "Foydalanuvchilar kirishdan oldin imkoniyatlarni ko‘radi.",
+        "groups": {
+          "execution": {
+            "name": "Campaign Execution",
+            "metric": "4 ta asosiy oqim"
+          },
+          "aiOpt": {
+            "name": "AI va optimallashtirish",
+            "metric": "6 ta avtomatlashtirish moduli"
+          },
+          "analytics": {
+            "name": "Analytics va Intelligence",
+            "metric": "5 ta visibility moduli"
+          },
+          "governance": {
+            "name": "Workspace, jamoa va moliya",
+            "metric": "6 ta boshqaruv moduli"
+          }
+        },
+        "items": {
+          "launchWizard": {
+            "title": "Launch Wizard",
+            "desc": "Maqsad, auditoriya, byudjet va kreativni bosqichma-bosqich sozlash."
+          },
+          "campaignManager": {
+            "title": "Campaign Manager",
+            "desc": "Kampaniyalarni status, platforma va spend bo‘yicha boshqarish."
+          },
+          "audienceBuilder": {
+            "title": "Audience Builder",
+            "desc": "ARR funnel kesimida auditoriyalarni yaratish va ishga tushirish."
+          },
+          "retargeting": {
+            "title": "Retargeting Flow",
+            "desc": "Retargeting funnel va wizard orqali qayta jalb qilish kampaniyalari."
+          },
+          "aiDecisions": {
+            "title": "AI Decisions",
+            "desc": "AI nima qaror qildi va nima sababdan — to‘liq log."
+          },
+          "autoOptimization": {
+            "title": "Auto Optimization",
+            "desc": "Qoidalar asosida avtomatik optimizatsiya va tarix."
+          },
+          "creativeScorer": {
+            "title": "Creative Scorer",
+            "desc": "Kreativlarni launchdan oldin AI orqali baholash."
+          },
+          "budgetOpt": {
+            "title": "Budget Optimization",
+            "desc": "Byudjetni platformalar bo‘yicha smart taqsimlash."
+          },
+          "simulation": {
+            "title": "Simulation",
+            "desc": "Byudjet va KPI o‘zgarishlari uchun oldindan prognoz."
+          },
+          "roiCalculator": {
+            "title": "ROI Calculator",
+            "desc": "Scale qilishdan oldin rentabellikni hisoblash."
+          },
+          "performance": {
+            "title": "Performance",
+            "desc": "KPI, trend va campaign-level kesimlar bilan ishlash."
+          },
+          "reporting": {
+            "title": "Reporting",
+            "desc": "Export-ready hisobotlar va period taqqoslash."
+          },
+          "competitorIntel": {
+            "title": "Competitor Intelligence",
+            "desc": "Raqobatchilar, SWOT va bozor insightlari."
+          },
+          "automationRules": {
+            "title": "Automation Rules",
+            "desc": "Trigger set va qoidalar bilan avtomatik aksiyalar."
+          },
+          "topAds": {
+            "title": "Top Ads",
+            "desc": "Eng samarali e‘lonlarni tez tahlil qilish paneli."
+          },
+          "workspaceTeam": {
+            "title": "Workspace Team",
+            "desc": "Role-based access va invite flow bilan jamoa boshqaruvi."
+          },
+          "adAccounts": {
+            "title": "Ad Accounts",
+            "desc": "Meta ad accountlar ulash, sync va reconnect holatlari."
+          },
+          "productsPlans": {
+            "title": "Products and Plans",
+            "desc": "Obuna paketlari, order holati va usage nazorati."
+          },
+          "paymentsInvoices": {
+            "title": "Payments and Invoices",
+            "desc": "Billing profile, to‘lov usullari va invoice jadvali."
+          },
+          "mcpCreds": {
+            "title": "MCP Credentials",
+            "desc": "Agent integratsiyasi uchun MCP client id/secret boshqaruvi."
+          },
+          "helpCenter": {
+            "title": "Workspace Help Center",
+            "desc": "Jamoa va workspace bo‘yicha tezkor yordam markazi."
+          }
+        }
+      },
+      "solutions": {
+        "back": "Landingga qaytish",
+        "badge": "Solution blueprintlar",
+        "title": "Jamoaingizga mos operatsion modelni tanlang",
+        "subtitle": "Har bir track haqiqiy ichki modullardan yig‘ilgan — va’dalar mahsulot bilan mos.",
+        "structureTitle": "Sahifa tuzilishi",
+        "structure0": "Jamo modeli bo‘yicha track",
+        "structure1": "Route bilan bog‘langan modul stack",
+        "structure2": "Boshqaruv va operatsion moslashuv",
+        "step0Label": "1-qadam",
+        "step0Title": "Track tanlash",
+        "step0Desc": "Growth, agentlik yoki AI-led model.",
+        "step1Label": "2-qadam",
+        "step1Title": "Stackni ko‘rish",
+        "step1Desc": "Qaysi modullar modelni qo‘llab-quvvatlaydi.",
+        "step2Label": "3-qadam",
+        "step2Title": "Oqimga kirish",
+        "step2Desc": "Kerakli route’ga o‘ting va bajaring.",
+        "nextEyebrow": "Keyingi qadam",
+        "nextTitle": "Track tanlashda yordam kerakmi?",
+        "nextSubtitle": "To‘liq feature xaritasini oching yoki workflow uchun to‘g‘ridan-to‘g‘ri productga kiring.",
+        "openFeatureMap": "Feature xaritasini ochish",
+        "openProduct": "Productni ochish",
+        "tracks": {
+          "ecommerce": {
+            "title": "E-commerce growth jamoasi",
+            "summary": "Full-funnel reklama va qat’iy byudjet nazorati bilan tez launch sikllari kerak bo‘lgan jamoalar uchun.",
+            "stack0": "Launch Wizard",
+            "stack1": "Audience Builder",
+            "stack2": "Creative Scorer",
+            "stack3": "Performance Dashboard"
+          },
+          "agency": {
+            "title": "Agentlik: ko‘p mijoz",
+            "summary": "Bir nechta workspace, rol asosida kirish va billing ko‘rinishi bilan agentliklar uchun.",
+            "stack0": "Workspace Team",
+            "stack1": "Ad Accounts",
+            "stack2": "Billing and Invoices",
+            "stack3": "MCP Credentials"
+          },
+          "inhouse": {
+            "title": "In-house AI optimallashtirish",
+            "summary": "Approval rail va shaffof loglar bilan AI yordamida qarorlar kerak bo‘lgan operatorlar uchun.",
+            "stack0": "AI Decisions",
+            "stack1": "Auto Optimization",
+            "stack2": "Budget",
+            "stack3": "Reporting"
+          }
+        }
+      },
+      "marketplacePublic": {
+        "heroBadge": "Talent marketplace",
+        "heroTitle1": "Tasdiqlangan mutaxassis topish",
+        "heroTitle2": "growth kampaniyalari uchun",
+        "heroSubtitle": "Marketplace jamoalarga hamkorlikdan oldin ROAS, sharh sifati va tajriba bo‘yicha operatorlarni topishda yordam beradi.",
+        "stat0v": "150+",
+        "stat0l": "Mutaxassis",
+        "stat1v": "4.8",
+        "stat1l": "O‘rtacha reyting",
+        "stat2v": "3.9x",
+        "stat2l": "O‘rtacha ROAS",
+        "searchPlaceholder": "Mutaxassis, nisha yoki platforma bo‘yicha qidiruv",
+        "advancedFilters": "Kengaytirilgan filtrlar",
+        "openProfile": "Profilni ochish"
+      },
+      "specialistProfile": {
+        "notFoundTitle": "Mutaxassis topilmadi",
+        "notFoundLink": "Marketplacega qaytish",
+        "backLink": "Marketplacega qaytish",
+        "statsTitle": "Statistika",
+        "tabOverview": "Haqida",
+        "tabPortfolio": "Portfolio",
+        "tabTestimonials": "Sharhlar",
+        "bio": "Bio",
+        "knowledge": "Batafsil",
+        "experienceLabel": "Tajriba",
+        "yearsUnit": "yil",
+        "campaignsManagedLabel": "Boshqarilgan kampaniyalar",
+        "totalSpendLabel": "Jami xarajat",
+        "responseTimeLabel": "Javob vaqti",
+        "hoursUnit": "soat",
+        "reviewsLabel": "Sharhlar",
+        "ratingLabel": "Reyting",
+        "successRateLabel": "Muvaffaqiyat",
+        "languages": "Tillar",
+        "certifications": "Sertifikatlar",
+        "portfolioSpend": "xarajat",
+        "sidebarTitle": "Boshlash",
+        "priceLabel": "Narx",
+        "locationLabel": "Joylashuv",
+        "sendMessage": "Xabar yuborish",
+        "secondaryCta": "Foydalanuvchi profili",
+        "trustNote": "Marketplace orqali bog‘laning. To‘lovlar AdSpectr orqali xavfsiz."
+      },
+      "portfolioPublic": {
+        "eyebrow": "Mutaxassis portfoliosi",
+        "title": "Shaffof tarixli tasdiqlangan media buyerlar",
+        "description": "Katalog brendlarga kampaniya metrikalari, nisha va sharh konteksti bo‘yicha baholashda yordam beradi.",
+        "statSpecialists": "Mutaxassislar",
+        "statManagedSpend": "Boshqarilgan xarajat",
+        "statAvgRoas": "O‘rtacha ROAS",
+        "statCampaigns": "Kampaniyalar",
+        "searchPlaceholder": "Ism, lavozim yoki nisha bo‘yicha qidiruv",
+        "sortRoas": "ROAS bo‘yicha",
+        "sortRating": "Reyting bo‘yicha",
+        "sortSpend": "Boshqarilgan xarajat bo‘yicha",
+        "labelRoas": "ROAS",
+        "labelCampaigns": "Kampaniyalar",
+        "labelSpend": "Xarajat"
+      },
+      "portfolioDetail": {
+        "reviewsWithCount": "sharh",
+        "responseTime": "Javob vaqti",
+        "location": "Joylashuv",
+        "specializationTitle": "Ixtisoslashgan nishalar",
+        "platformSplitTitle": "Platforma taqsimoti",
+        "recentCampaignsTitle": "So‘nggi kampaniya namunalari",
+        "thNiche": "Nisha",
+        "thPlatform": "Platforma",
+        "thSpend": "Xarajat",
+        "thRoas": "ROAS",
+        "thStatus": "Holat"
+      },
+      "leaderboardPublic": {
+        "eyebrow": "Performance reytingi",
+        "title": "Natija, barqarorlik va ishonch bo‘yicha top mutaxassislar",
+        "description": "ROAS, reyting, kampaniyalar va tasdiqlangan yetkazish naqshlari bo‘yicha solishtiring.",
+        "tabOverall": "Umumiy",
+        "tabRising": "O‘sish",
+        "tabRoas": "ROAS yetakchilari",
+        "tabRating": "Reyting bo‘yicha",
+        "top3Title": "Top 3 mutaxassis",
+        "campaignsJoin": "kampaniya"
+      },
+      "onboarding": {
+        "title": "Onboarding",
+        "subtitle": "Workspace sozlang, accountlarni ulang va jamoani taklif qiling. Batafsil qadamlar tez orada.",
+        "login": "Kirish",
+        "register": "Akkaunt yaratish"
+      }
+    }
+  },
+  "legal": {
+    "layout": {
+      "privacy": "Maxfiylik",
+      "terms": "Shartlar",
+      "dataDeletion": "Ma'lumotlarni o'chirish"
+    },
+    "footer": {
+      "privacyPolicy": "Maxfiylik siyosati",
+      "termsOfService": "Foydalanish shartlari",
+      "dataDeletion": "Ma'lumotlarni o'chirish"
+    },
+    "terms": {
+      "title": "Foydalanish shartlari",
+      "intro": "Quyida qisqa ma'lumot. To'liq huquqiy matn keyinroq joylashtiriladi. Savollar uchun qo'llab-quvvatlashga murojaat qiling."
+    },
+    "privacy": {
+      "title": "Maxfiylik siyosati",
+      "intro": "Ma'lumotlarni qo'llaniladigan qonunlar doirasida qayta ishlaymiz. Batafsil yoki o'chirish so'rovi uchun maxfiylik/o'chirish sahifasi yoki qo'llab-quvvatlash."
+    },
+    "dataDeletion": {
+      "title": "Ma'lumotlarni o'chirish",
+      "intro": "Shaxsiy ma'lumotlarni o'chirish uchun akkaunt emailingizdan qo'llab-quvvatlashga yozing. Qonunda boshqacha ko'rsatilmagan bo'lsa, javob muddati — 30 kun ichida."
+    }
+  },
   "workspaceSettings": {
     "title": "Workspace sozlamalari",
     "workspace": "Workspace",
+    "shellSubtitle": "Ad accountlar, obuna, to'lovlar, profil, jamoa va MCP — bitta joyda.",
     "classicSettings": "Klassik sozlamalar",
     "tabs": {
       "adAccounts": "Ad accountlar",
       "products": "Mahsulotlar va foydalanish",
       "payments": "To'lovlar",
       "profile": "Foydalanuvchi profili",
+      "language": "Til",
       "team": "Jamoa a'zolari",
       "mcp": "MCP integratsiya",
       "help": "Resurs markazi"
@@ -322,28 +1050,121 @@
       "pendingInvites": "Kutilayotgan takliflar",
       "permissions": "Ruxsatlar",
       "role": "Rol",
-      "adAccountsAccess": "A'zo ad-account ruxsatlari"
+      "adAccountsAccess": "A'zo ad-account ruxsatlari",
+      "workspaceCardTitle": "Jamoa",
+      "colName": "To'liq ism",
+      "colAdAccounts": "Ulangan ad accountlar",
+      "colEmail": "Email",
+      "colAccess": "Kirish",
+      "loading": "Jamoa yuklanmoqda…",
+      "empty": "A'zolar yo'q. Taklif yuboring yoki API javobini tekshiring.",
+      "you": "siz",
+      "revoke": "Bekor qilish"
+    },
+    "profile": {
+      "pageTitle": "Foydalanuvchi profili",
+      "editUserInfo": "Ma'lumotlarni tahrirlash",
+      "setupWorkspace": "Workspaceni sozlash",
+      "classicSettings": "Klassik sozlamalar",
+      "userId": "User ID",
+      "personalEmail": "Shaxsiy email",
+      "phone": "Telefon raqami",
+      "helpText": "Shaxsiy ma'lumotlar va workspace asoslarini yangilang. Saqlash akkaunt bilan sinxronlanadi.",
+      "languageSettingsLink": "Interfeys tili sozlamalari →",
+      "savedProfile": "Profil saqlandi.",
+      "savedWorkspace": "Workspace sozlamalari saqlandi.",
+      "editModalTitle": "Foydalanuvchi ma'lumotlari",
+      "workspaceModalTitle": "Workspaceni sozlash",
+      "workspaceModalNote": "Biznes turi API da industry; qo'llab-quvvatlash telefoni targetAudience maydoniga yoziladi.",
+      "name": "Ism",
+      "email": "Email",
+      "workspaceName": "Workspace nomi",
+      "businessType": "Biznes turi (Brand / Agency)",
+      "supportPhone": "Qo'llab-quvvatlash telefoni",
+      "supportEmail": "Qo'llab-quvvatlash emaili"
+    },
+    "language": {
+      "title": "Interfeys tili",
+      "description": "Platforma tilini tanlang (rus, ingliz yoki o‘zbek). Tanlov shu brauzerda saqlanadi va barcha bo‘limlarga qo‘llanadi.",
+      "active": "Hozirgi tanlov"
     },
     "payments": {
       "loadError": "To'lov ma'lumotlarini yuklashda xatolik",
       "addCardError": "Karta qo'shishda xatolik",
       "saveBillingError": "Billing ma'lumotlarini saqlashda xatolik",
       "addPaymentMethod": "To'lov usuli qo'shish",
-      "editContactDetails": "Kontakt ma'lumotlarini tahrirlash"
+      "editContactDetails": "Kontakt ma'lumotlarini tahrirlash",
+      "paymentMethod": "To'lov usuli",
+      "billingInformation": "Billing ma'lumotlari",
+      "invoices": "Hisob-fakturalar",
+      "invoiceCountLabel": "jami",
+      "loading": "Yuklanmoqda…",
+      "noMethods": "Saqlangan to'lov usuli yo'q.",
+      "defaultBadge": "Asosiy",
+      "secondaryBadge": "Qo'llanma",
+      "setDefault": "Asosiy qilish",
+      "expLabel": "Amal qilish"
     },
     "products": {
       "loadError": "Mahsulot ma'lumotlarini yuklashda xatolik",
-      "orderError": "Buyurtma yaratilmadi"
+      "orderError": "Buyurtma yaratilmadi",
+      "subscriptionPackage": "Obuna paketi",
+      "planSubtitle": "Plan limitlari, billing va ushbu workspace uchun foydalanish.",
+      "trialBadge": "Sinov",
+      "seePlanDetails": "Plan tafsilotlari",
+      "nextPayment": "Keyingi to'lov",
+      "billingPeriodStarts": "Hisob davri boshlanishi",
+      "spendPlanLimit": "Reklama xarajati limiti (plan)",
+      "spendThisMonth": "Shu oygi reklama xarajati",
+      "accountsUsage": "Ad accountlar foydalanishi",
+      "accountsUsageDetail": "Ulangan akkauntlar — plan va qo'shimcha slotlar bo'yicha.",
+      "cancelTrial": "Sinovni bekor qilish",
+      "manageSubscription": "Obunani boshqarish",
+      "recommendedAddons": "Tavsiya etilgan qo'shimchalar",
+      "addonCta": "Batafsil",
+      "checkoutUrl": "To'lov havolasi",
+      "orderLabel": "Buyurtma",
+      "checkStatus": "Statusni tekshirish",
+      "freePlanTitle": "Bepul workspace",
+      "freePlanBody": "Kattaroq xarajat limiti, ko'proq ad account va avtomatlashtirish uchun rejani yangilang."
+    },
+    "adAccounts": {
+      "pageTitle": "Ad accountlar",
+      "facebookSection": "Facebook ad accountlar",
+      "sectionSubtitle": "Status, xarajat, maqsad va sahifa / piksel — Madgicx uslubidagi jadval.",
+      "reauthenticate": "Qayta autentifikatsiya",
+      "addFacebookAccount": "Facebook ad account qo'shish",
+      "openMetaPanel": "Meta sozlamalari",
+      "guidedSetup": "Qo'llanma sozlash",
+      "resync": "Qayta sinxron",
+      "colStatus": "Status",
+      "colAccount": "Account nomi",
+      "colSpend": "So'nggi 30 kun xarajat",
+      "colObjective": "Account turi",
+      "colTimezone": "Vaqt zonasi",
+      "colActions": "Harakatlar",
+      "metricsSummary": "Ulangan · tanlov · xarajat",
+      "connectedLabel": "Ulangan ad accountlar",
+      "selectionLabel": "Joriy tanlov",
+      "spendLabel": "Xarajat (30 kun)"
     },
     "mcp": {
       "title": "MCP integratsiyasi",
       "createCredentials": "Client ID / Client Secret yaratish",
       "existingCredentials": "Mavjud credentials",
-      "noCredentials": "Hozircha credential yo'q"
+      "noCredentials": "Hozircha credential yo'q",
+      "noCredentialsBody": "AI agentlarni workspace ga ulash uchun Client ID va Client Secret yarating.",
+      "securityNote": "Maxfiy kalit faqat yaratilganda bir marta ko'rinadi. Darhol xavfsiz joyga nusxalang.",
+      "serverAndDocs": "Server va hujjatlar",
+      "credentialsModalTitle": "Yangi credentialingiz",
+      "credentialsModalHint": "Hozir nusxalang va saqlang. Client Secret qayta ko'rsatilmaydi.",
+      "copy": "Nusxa",
+      "copied": "Nusxalandi",
+      "savedCredentials": "Credentialingizni saqladim"
     }
   },
   "campaigns": {
-    "subtitle": "Performa boshqarayotgan barcha reklama kampaniyalari",
+    "subtitle": "AdSpectr boshqarayotgan barcha reklama kampaniyalari",
     "total": "jami",
     "refresh": "Yangilash",
     "create": "Kampaniya yaratish",
@@ -356,14 +1177,34 @@
     "connectMorePlatformsHint": "Qamrovni kengaytirish uchun Google, TikTok yoki Telegram qo'shing.",
     "connectPlatform": "Platforma ulash",
     "loadFailed": "Kampaniyalarni yuklashda xatolik",
-    "updateFailed": "Kampaniya statusini yangilashda xatolik"
+    "updateFailed": "Kampaniya statusini yangilashda xatolik",
+    "active": "Faol",
+    "paused": "To'xtatilgan",
+    "draft": "Qoralama",
+    "pause": "Pauza",
+    "resume": "Davom ettirish",
+    "stop": "To'xtatish"
   },
   "reporting": {
     "loadError": "Hisobotni yuklashda xatolik. Meta Ads ulanishini tekshiring.",
     "exportError": "CSV eksportda xatolik",
     "workspaceMissing": "Workspace tanlanmagan",
     "subtitle": "Meta Ads ko'rsatkichlari account va kampaniya kesimida",
-    "exportCsv": "CSV eksport"
+    "exportCsv": "CSV eksport",
+    "metricsHint": "Quyidagi KPI kartalar sozlanadigan tezkor indikatorlar. Asosiy jadval account va kampaniya real ma'lumotlarini ko'rsatadi.",
+    "customMetrics": "Mening ko'rsatkichlarim",
+    "customMetricsHint": "kuzatmoqchi bo'lganlarini tanlang",
+    "selectMetrics": "Yuqoridan ko'rsatkichlarni tanlang",
+    "budgetSimulation": "Byudjet simulyatsiyasi",
+    "budgetSimulationHint": "byudjetni qo'llashdan oldin ta'sirini ko'ring",
+    "noData": "Hisobot ma'lumotlari hali yo'q",
+    "noDataDescription": "Meta Ads ulanmagan yoki tanlangan davr uchun ma'lumot topilmadi.",
+    "connectMeta": "Meta Ads ulash",
+    "reportTemplates": "Hisobot shablonlari",
+    "templatesTitle": "Barcha shablonlar",
+    "searchTemplate": "Shablon qidirish",
+    "useTemplate": "Ushbu shablondan foydalanish",
+    "noTemplates": "Qidiruvingizga mos shablon topilmadi."
   },
   "performance": {
     "loadFailed": "Performance ma'lumotlarini yuklashda xatolik",
@@ -392,9 +1233,40 @@
   "audiences": {
     "subtitle": "Full-funnel auditoriyalarni tuzing va bir xil oqimda ishga tushiring",
     "launcherTitle": "Audience Launcher",
-    "launcherSubtitle": "Performa full-funnel targeting strategiyasi maksimal ROAS uchun optimallashtirilgan workflow bilan.",
+    "launcherSubtitle": "AdSpectr full-funnel targeting strategiyasi maksimal ROAS uchun optimallashtirilgan workflow bilan.",
     "selected": "tanlandi",
-    "noAudienceSelected": "Hali auditoriya tanlanmagan."
+    "noAudienceSelected": "Hali auditoriya tanlanmagan.",
+    "openStudio": "Audience Studio",
+    "selectedCount": "tanlangan",
+    "toggleSubtypes": "Shablonlar ro'yxati",
+    "sectionAcquisitionTitle": "Acquisition prospecting",
+    "sectionAcquisitionBlurb": "Sovuq auditoriyalar va masshtab testlari uchun lookalike.",
+    "sectionReengagementTitle": "Acquisition re-engagement",
+    "sectionReengagementBlurb": "Brend bilan birinchi kontakt qilgan issiq foydalanuvchilar.",
+    "sectionRetargetingTitle": "Retargeting",
+    "sectionRetargetingBlurb": "Sayt tashrifchilari va niyat signallari.",
+    "sectionRetentionTitle": "Retention",
+    "sectionRetentionBlurb": "Mavjud mijozlar — upsell, cross-sell, reaktivatsiya.",
+    "studioTitle": "Audience Studio",
+    "studioSubtitle": "Samaradorlik, qiziqishlar va launchdan oldin kesishmalar.",
+    "studioTabPerformance": "Samaradorlik bo'yicha",
+    "studioTabDiscover": "Yangi qiziqishlar",
+    "studioSearchPlaceholder": "Auditoriyalarni qidirish…",
+    "studioLast7d": "So'nggi 7 kun",
+    "studioColAudience": "Auditoriya",
+    "studioColType": "Turi",
+    "studioColSpend": "Xarajat",
+    "studioNoData": "Ma'lumot yo'q — Meta va syncni ulang.",
+    "mixerTitle": "Audience mixer",
+    "mixerNoPresets": "Bu ad account uchun preset yo'q",
+    "mixerSave": "Tanlovni saqlash",
+    "mixerIncluded": "Kiritilgan auditoriyalar",
+    "mixerSlot0": "0-kesishma",
+    "mixerSlot1": "1-kesishma",
+    "mixerSlot2": "2-kesishma",
+    "mixerDropHint": "Yuqoridagi jadvaldan qo'shing",
+    "mixerReach": "Potentsial reach: auditoriyalar aniqlanmaguncha mavjud emas.",
+    "backToLauncher": "Launcherga qaytish"
   },
   "autoOptimization": {
     "runFailed": "Optimizatsiya bajarilmadi",
@@ -459,7 +1331,7 @@
     "workspaceSubtitle": "akkauntlar, obuna, to'lovlar, jamoa, MCP",
     "toggleTheme": "Mavzuni almashtirish",
     "dashboardSubtitle": "Reklama samaradorligi ko'rinishi",
-    "campaignsSubtitle": "Performa'dagi barcha kampaniyalar",
+    "campaignsSubtitle": "AdSpectr'dagi barcha kampaniyalar",
     "audiencesSubtitle": "To'liq hunal auditoriyasini yarating va ishga tushiring",
     "aiDecisionsSubtitle": "AI'ning barcha harakatlari to'liq asoslash bilan",
     "budgetSubtitle": "Platformalar bo'yicha ajratish va samaradorlik",
@@ -469,6 +1341,11 @@
     "roiSubtitle": "Kengaytirishdan oldin rentabellikni baholang",
     "settingsSubtitle": "Ish maydoni va hisob sozlamalari",
     "reportingSubtitle": "Kampaniya darajasidagi ko'rsatkichlar va trendlar",
+    "automationSubtitle": "Taktikalar, triggerlar va avtomatlashtirish holati",
+    "automationWizardSubtitle": "Qadamlar, shartlar va jadval bilan qoidalar tuzish",
+    "adLauncherSubtitle": "Reklamalar, presetlar va kreativ to'plamlarini tanlash",
+    "audienceStudioSubtitle": "Samaradorlik jadvali va audience mixer",
+    "metaAuditSubtitle": "360° kreativ, targeting va auksion diagnostikasi",
     "marketplaceSubtitle": "Professional marketing mutaxassislari",
     "launchSubtitle": "Kampaniyalarni samarali yarating va ishga tushiring",
     "autoOptimizationSubtitle": "Avtomatlashtirish sozlamalari va bajarish siyosati",

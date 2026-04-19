@@ -46,14 +46,14 @@ export function SeoHead({ metadata, additionalMeta }: SeoHeadProps) {
       <meta property="og:image" content={metadata.ogImage} />
       <meta property="og:url" content={metadata.ogUrl} />
       <meta property="og:type" content="website" />
-      <meta property="og:site_name" content="Performa" />
+      <meta property="og:site_name" content="AdSpectr" />
 
       {/* Twitter Card Tags */}
       <meta name="twitter:card" content={metadata.twitterCard} />
       <meta name="twitter:title" content={metadata.twitterTitle} />
       <meta name="twitter:description" content={metadata.twitterDescription} />
       <meta name="twitter:image" content={metadata.twitterImage} />
-      <meta name="twitter:site" content="@performa" />
+      <meta name="twitter:site" content="@adspectr" />
 
       {/* Additional Meta Tags */}
       {additionalMeta?.map((tag, idx) => (
@@ -102,14 +102,14 @@ export function generateMetadata(metadata: SeoMetadata): Metadata {
         },
       ],
       type: 'website',
-      siteName: 'Performa',
+      siteName: 'AdSpectr',
     },
     twitter: {
       card: metadata.twitterCard,
       title: metadata.twitterTitle,
       description: metadata.twitterDescription,
       images: [metadata.twitterImage],
-      creator: '@performa',
+      creator: '@adspectr',
     },
     robots: {
       index: true,
@@ -125,7 +125,7 @@ export function generateMetadata(metadata: SeoMetadata): Metadata {
     },
     other: {
       'og:type': 'website',
-      'og:site_name': 'Performa',
+      'og:site_name': 'AdSpectr',
     },
   }
 }

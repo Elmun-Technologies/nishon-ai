@@ -3,13 +3,14 @@ import './globals.css'
 import { Providers } from '@/components/providers/ThemeProvider'
 
 export const metadata: Metadata = {
-  title: 'Performa — Autonomous Advertising Agent',
-  description: 'AI-powered platform that manages your ads better than a human targetolog',
+  title: 'AdSpectr — автономный рекламный агент',
+  description:
+    'Платформа с ИИ для управления рекламой: быстрее настройка кампаний, отчёты и автоматизация в одном месте.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="ru" suppressHydrationWarning>
       <body className="font-sans antialiased">
         <Providers>{children}</Providers>
       </body>

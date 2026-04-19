@@ -27,7 +27,7 @@ interface SitemapIndexUrl {
 @Injectable()
 export class SitemapService {
   private readonly logger = new Logger(SitemapService.name)
-  private readonly baseUrl = process.env.FRONTEND_URL || 'https://performa.ai'
+  private readonly baseUrl = process.env.FRONTEND_URL || 'https://adspectr.com'
   private readonly publicDir = path.join(process.cwd(), 'public')
   private readonly sitemapDir = path.join(this.publicDir, 'sitemaps')
   private readonly maxUrlsPerSitemap = 50000

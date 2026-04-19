@@ -16,7 +16,7 @@ import { AgentPlatformMetrics } from "../entities/agent-platform-metrics.entity"
 import { ServiceEngagement } from "../entities/service-engagement.entity";
 import { Workspace } from "../../workspaces/entities/workspace.entity";
 import { ConnectedAccount } from "../../platforms/entities/connected-account.entity";
-import { Platform } from "@performa/shared";
+import { Platform } from "@adspectr/shared";
 import { decrypt, encrypt } from "../../common/crypto.util";
 
 /**

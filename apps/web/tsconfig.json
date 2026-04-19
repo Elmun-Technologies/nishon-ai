@@ -21,8 +21,8 @@
     "baseUrl": "src",
     "paths": {
       "@/*": ["./*"],
-      "@performa/shared": ["../../packages/shared/src"],
-      "@performa/shared/*": ["../../packages/shared/src/*"]
+      "@adspectr/shared": ["../../packages/shared/src"],
+      "@adspectr/shared/*": ["../../packages/shared/src/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

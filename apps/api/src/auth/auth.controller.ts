@@ -26,7 +26,7 @@ import {
   RefreshTokenDto,
   AuthResponseDto,
   UpdateMeDto,
-} from "@performa/shared";
+} from "@adspectr/shared";
 
 @ApiTags("Authentication")
 @Controller("auth")

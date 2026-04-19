@@ -317,7 +317,7 @@ export default function ServiceSelectionPage() {
       <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3">
         <p className="text-xs text-amber-500 font-medium mb-1">💡 Monetizatsiya modeli</p>
         <p className="text-xs text-amber-500 leading-relaxed">
-          Jonli targetologlar uchun: ular oylik to'lov oladi, Performa 15% komissiya oladi.
+          Jonli targetologlar uchun: ular oylik to'lov oladi, AdSpectr 15% komissiya oladi.
           AI agentlar uchun: ba"zilari bepul (subscription bilan), ba'zilari oylik to"lov + kichik komissiya.
           O'z AI agentingizni yaratib, boshqalarga ijaraga bersangiz — siz 80% daromad olasiz.
         </p>
@@ -379,7 +379,7 @@ export default function ServiceSelectionPage() {
       <div className="border border-border rounded-2xl p-5 text-center">
         <p className="text-lg font-bold text-text-primary mb-1">Targetolsiz yoki AI agent qurasizmi?</p>
         <p className="text-text-tertiary text-sm mb-4">
-          O'z profilingizni yarating va Performa orqali qo'shimcha daromad qiling.
+          O'z profilingizni yarating va AdSpectr orqali qo'shimcha daromad qiling.
           Kuchli targetologlar 80% ga yaqin daromad oladi.
         </p>
         <Button

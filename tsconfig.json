@@ -17,10 +17,10 @@
         "sourceMap": true,
         "baseUrl": ".",
         "paths": {
-            "@performa/shared": [
+            "@adspectr/shared": [
                 "packages/shared/src"
             ],
-            "@performa/ai-sdk": [
+            "@adspectr/ai-sdk": [
                 "packages/ai-sdk/src"
             ]
         }

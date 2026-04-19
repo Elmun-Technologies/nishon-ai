@@ -1,7 +1,7 @@
 import { UserPlan } from "../users/entities/user.entity";
 
 /**
- * Per-plan limits for Performa subscription tiers.
+ * Per-plan limits for AdSpectr subscription tiers.
  * These are enforced server-side — never trust the frontend.
  */
 export interface PlanLimits {

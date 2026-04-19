@@ -106,18 +106,18 @@ export default function IntegrationsPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-white flex items-center gap-2">
-          <Zap className="text-yellow-400" size={32} />
+      <section className="rounded-2xl border border-blue-200/70 bg-gradient-to-r from-blue-50 via-indigo-50 to-violet-50 p-4 dark:border-slate-700 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
+        <h1 className="text-3xl font-bold text-text-primary flex items-center gap-2">
+          <Zap className="text-primary" size={32} />
           {t('pages.integrations.title')}
         </h1>
         <p className="text-text-secondary mt-2">
           {t('pages.integrations.subtitle')}
         </p>
-      </div>
+      </section>
 
       {/* Status Summary */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
         <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -161,7 +161,7 @@ export default function IntegrationsPage() {
 
       {/* Connected Section */}
       <section className="space-y-4">
-        <h2 className="text-2xl font-bold text-white">{t('pages.integrations.connectedIntegrations')}</h2>
+        <h2 className="text-2xl font-bold text-text-primary">{t('pages.integrations.connectedIntegrations')}</h2>
         <div className="space-y-3">
           {CONNECTED_INTEGRATIONS.map((integration) => (
             <IntegrationCard
@@ -179,7 +179,7 @@ export default function IntegrationsPage() {
 
       {/* Pending Section */}
       <section className="space-y-4">
-        <h2 className="text-2xl font-bold text-white">{t('pages.integrations.pendingSetup')}</h2>
+        <h2 className="text-2xl font-bold text-text-primary">{t('pages.integrations.pendingSetup')}</h2>
         <div className="space-y-3">
           {PENDING_INTEGRATIONS.map((integration) => (
             <PendingIntegrationCard
@@ -193,8 +193,8 @@ export default function IntegrationsPage() {
 
       {/* Available Section */}
       <section className="space-y-4">
-        <h2 className="text-2xl font-bold text-white">{t('pages.integrations.availableIntegrations')}</h2>
-        <div className="grid grid-cols-3 gap-4">
+        <h2 className="text-2xl font-bold text-text-primary">{t('pages.integrations.availableIntegrations')}</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {AVAILABLE_INTEGRATIONS.map((integration) => (
             <AvailableIntegrationCard
               key={integration.id}
@@ -241,14 +241,14 @@ function IntegrationCard({ integration, onConfigure, onTest }: IntegrationCardPr
   const [isExpanded, setIsExpanded] = useState(false)
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-surface-2/50 p-6 hover:border-emerald-500/50 transition-all">
+    <div className="rounded-2xl border border-border/70 bg-white/85 p-6 shadow-sm backdrop-blur-sm hover:border-emerald-500/50 transition-all dark:bg-slate-900/70">
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-start gap-4">
           <div className="text-4xl">{integration.icon}</div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-xl font-semibold text-white">{integration.name}</h3>
+              <h3 className="text-xl font-semibold text-text-primary">{integration.name}</h3>
               <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-medium">
                 <Check size={14} /> ACTIVE
               </span>
@@ -284,7 +284,7 @@ function IntegrationCard({ integration, onConfigure, onTest }: IntegrationCardPr
 
           {/* Activity */}
           <div className="space-y-2">
-            <p className="text-sm font-semibold text-white">Recent Activity</p>
+            <p className="text-sm font-semibold text-text-primary">Recent Activity</p>
             <ul className="text-xs text-text-tertiary space-y-1">
               <li>✓ 2 min ago: Synced 3 new conversions</li>
               <li>✓ 15 min ago: Pulled deal data (12 records)</li>
@@ -315,12 +315,12 @@ function PendingIntegrationCard({
   onSetup,
 }: PendingIntegrationCardProps) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-surface-2/50 p-6">
+    <div className="rounded-2xl border border-border/70 bg-white/85 p-6 shadow-sm backdrop-blur-sm dark:bg-slate-900/70">
       <div className="flex items-start justify-between">
         <div className="flex items-start gap-4">
           <div className="text-4xl">{integration.icon}</div>
           <div>
-            <h3 className="text-xl font-semibold text-white">{integration.name}</h3>
+            <h3 className="text-xl font-semibold text-text-primary">{integration.name}</h3>
             <p className="text-sm text-text-tertiary">
               {integration.description}
             </p>
@@ -347,9 +347,9 @@ function AvailableIntegrationCard({
   onConnect,
 }: AvailableIntegrationCardProps) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-surface-2/50 p-6 hover:border-cyan-500/50 transition-all">
+    <div className="rounded-2xl border border-border/70 bg-white/85 p-6 shadow-sm backdrop-blur-sm hover:border-cyan-500/50 transition-all dark:bg-slate-900/70">
       <div className="text-4xl mb-4">{integration.icon}</div>
-      <h3 className="text-lg font-semibold text-white">{integration.name}</h3>
+      <h3 className="text-lg font-semibold text-text-primary">{integration.name}</h3>
       <p className="text-sm text-text-tertiary mt-2">{integration.description}</p>
       <button
         onClick={onConnect}

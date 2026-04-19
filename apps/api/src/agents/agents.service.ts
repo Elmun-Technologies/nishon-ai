@@ -20,11 +20,11 @@ function slugify(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
-/** Default Performa-owned AI agents seeded on startup */
-const NISHON_AI_AGENTS = [
+/** Default AdSpectr-owned AI agents seeded on startup */
+const ADSPECTR_BUILTIN_AI_AGENTS = [
   {
     slug: "performa-full-auto-ai",
-    displayName: "Performa Full-Auto AI",
+    displayName: "AdSpectr Full-Auto AI",
     title: "Barcha platformalar uchun to'liq avtomatik AI agent",
     bio: "Meta, Google, Yandex, TikTok va Telegram — barcha kanallarda ishlaydi. Kampaniyani o'zi yaratadi, optimallaydi va ROAS ni maksimallaydi. Avtomatik byudjet taqsimoti va kreativ rotatsiya bilan.",
     avatar: "🤖",
@@ -135,23 +135,23 @@ export class AgentsService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    await this.seedPerformaAgents();
+    await this.seedAdSpectrAgents();
   }
 
-  /** Create Performa's default AI agents if they don't exist */
-  private async seedPerformaAgents() {
+  /** Create AdSpectr's default AI agents if they don't exist */
+  private async seedAdSpectrAgents() {
     const existing = await this.agentRepo.count({ where: { ownerId: null, agentType: "ai" } });
-    if (existing >= NISHON_AI_AGENTS.length) return;
+    if (existing >= ADSPECTR_BUILTIN_AI_AGENTS.length) return;
 
-    this.logger.log("Seeding Performa default AI agents...");
-    for (const data of NISHON_AI_AGENTS) {
+    this.logger.log("Seeding AdSpectr default AI agents...");
+    for (const data of ADSPECTR_BUILTIN_AI_AGENTS) {
       const exists = await this.agentRepo.findOne({ where: { slug: data.slug } });
       if (!exists) {
         const agent = this.agentRepo.create({ ...(data as any), agentType: "ai", ownerId: null });
         await this.agentRepo.save(agent);
       }
     }
-    this.logger.log("Performa agents seeded.");
+    this.logger.log("AdSpectr agents seeded.");
   }
 
   // ─── PUBLIC MARKETPLACE ──────────────────────────────────────────────────

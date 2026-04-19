@@ -8,8 +8,10 @@ import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Alert } from '@/components/ui/Alert'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { connectMeta, fetchMetaDashboard } from '@/lib/meta'
 import { workspaces as workspacesApi } from '@/lib/api-client'
+import { getAccessToken } from '@/lib/auth-storage'
 
 type Tab = 'general' | 'integrations' | 'notifications' | 'policy' | 'danger'
 
@@ -259,7 +261,7 @@ export default function SettingsPage() {
       setAutopilotMode(currentWorkspace.autopilotMode ?? 'assisted')
       setTelegramChatId((currentWorkspace as any).telegramChatId ?? '')
     }
-  }, [currentWorkspace?.id])
+  }, [currentWorkspace?.id, currentWorkspace])
 
   useEffect(() => {
     if (activeTab !== 'policy' || !currentWorkspace?.id) return
@@ -326,7 +328,7 @@ export default function SettingsPage() {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/workspaces/${currentWorkspace.id}`, {
         method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('performa_access_token') ?? ''}`,
+          Authorization: `Bearer ${getAccessToken() ?? ''}`,
         },
       })
       if (res.ok || res.status === 204) {
@@ -345,24 +347,26 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto">
-      {/* Page header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-text-primary">Settings</h1>
-        <p className="mt-1 text-sm text-text-tertiary">
-          Manage your workspace preferences, integrations, and account.
-        </p>
-        <Link
-          href="/settings/workspace"
-          className="mt-4 inline-flex items-center gap-2 rounded-xl border border-violet-500/30 bg-violet-500/10 px-4 py-2 text-sm font-medium text-violet-200 transition-colors hover:bg-violet-500/15"
-        >
-          Workspace hub → Ad accounts, obuna, to'lov, jamoa, MCP (yangi tuzilma)
-        </Link>
-      </div>
+    <div className="max-w-7xl mx-auto">
+      <section className="rounded-2xl border border-blue-200/70 bg-gradient-to-r from-blue-50 via-indigo-50 to-violet-50 p-3 dark:border-slate-700 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
+        <PageHeader
+          className="mb-0 border-0 bg-transparent p-2 shadow-none"
+          title="Settings"
+          subtitle="Manage your workspace preferences, integrations, and account."
+          actions={(
+            <Link
+              href="/settings/workspace"
+              className="inline-flex items-center gap-2 rounded-xl border border-border bg-white/80 px-4 py-2 text-sm font-medium text-text-secondary transition-colors hover:bg-white dark:bg-slate-900/70"
+            >
+              Open workspace hub
+            </Link>
+          )}
+        />
+      </section>
 
-      <div className="flex gap-6">
+      <div className="mt-5 flex gap-6">
         {/* Left tab nav */}
-        <nav className="w-52 shrink-0 space-y-0.5">
+        <nav className="w-56 shrink-0 space-y-1 rounded-2xl border border-slate-800/90 bg-[#0b1220] p-2 shadow-xl">
           {TABS.map((tab) => (
             <button
               key={tab.id}
@@ -373,15 +377,15 @@ export default function SettingsPage() {
                 transition-all duration-150 text-left
                 ${activeTab === tab.id
                   ? tab.danger
-                    ? 'bg-red-500/10 text-red-400 border border-red-500/20'
-                    : 'bg-surface-2 text-text-primary border border-border'
+                    ? 'bg-red-500/15 text-red-300 border border-red-500/30'
+                    : 'bg-gradient-to-r from-blue-500/25 to-violet-500/25 text-white border border-blue-400/30'
                   : tab.danger
-                  ? 'text-red-400/60 hover:text-red-400 hover:bg-red-500/5 border border-transparent'
-                  : 'text-text-tertiary hover:text-text-primary hover:bg-surface-2 border border-transparent'
+                  ? 'text-red-300/70 hover:text-red-200 hover:bg-red-500/10 border border-transparent'
+                  : 'text-slate-300 hover:text-white hover:bg-white/10 border border-transparent'
                 }
               `}
             >
-              <span className={activeTab === tab.id ? (tab.danger ? 'text-red-400' : 'text-text-secondary') : ''}>
+              <span className={activeTab === tab.id ? (tab.danger ? 'text-red-300' : 'text-white') : ''}>
                 {tab.icon}
               </span>
               {tab.label}
@@ -776,7 +780,7 @@ export default function SettingsPage() {
 
               <div className="bg-surface-2 border border-border rounded-lg p-4 mb-4 text-xs text-text-tertiary space-y-1.5">
                 <p className="font-medium text-text-secondary">Qanday ulash:</p>
-                <p>1. Telegramda <span className="text-text-secondary font-mono">@PerformaAIBot</span> ga yozing</p>
+                <p>1. Telegramda <span className="text-text-secondary font-mono">@AdSpectrBot</span> ga yozing</p>
                 <p>2. <span className="font-mono text-text-primary">/start</span> buyrug'ini yuboring</p>
                 <p>3. Bot sizga Chat ID ni ko'rsatadi — uni quyida kiriting</p>
               </div>

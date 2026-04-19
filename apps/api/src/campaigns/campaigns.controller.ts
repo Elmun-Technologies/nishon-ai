@@ -19,7 +19,7 @@ import {
 } from "@nestjs/swagger";
 import { AuthGuard } from "@nestjs/passport";
 import { CampaignsService } from "./campaigns.service";
-import { CreateCampaignDto } from "@performa/shared";
+import { CreateCampaignDto } from "@adspectr/shared";
 
 @ApiTags("Campaigns")
 @Controller("campaigns")

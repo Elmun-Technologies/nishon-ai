@@ -1,17 +1,18 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { Alert, Dialog, PageHeader } from '@/components/ui'
+import { Alert, Dialog } from '@/components/ui'
 import { env } from '@/lib/env'
 import { mcpCredentials } from '@/lib/api-client'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { useI18n } from '@/i18n/use-i18n'
+import { KeyRound, Link2, Lock, Copy, Check } from 'lucide-react'
 
 /** Keyinchalik env orqali; hozircha placeholder */
-const DOCS_URL = 'https://performa.ai/docs'
+const DOCS_URL = 'https://adspectr.com/docs'
 
 type Credential = {
   id: string
@@ -31,8 +32,9 @@ export default function WorkspaceMcpPage() {
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState('')
+  const [copiedField, setCopiedField] = useState<'id' | 'secret' | null>(null)
 
-  async function loadCredentials() {
+  const loadCredentials = useCallback(async () => {
     if (!currentWorkspace?.id) {
       setLoading(false)
       return
@@ -46,11 +48,11 @@ export default function WorkspaceMcpPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [currentWorkspace?.id])
 
   useEffect(() => {
     void loadCredentials()
-  }, [currentWorkspace?.id])
+  }, [loadCredentials])
 
   async function createCredential() {
     if (!currentWorkspace?.id) return
@@ -75,97 +77,182 @@ export default function WorkspaceMcpPage() {
     await loadCredentials()
   }
 
+  async function copyField(value: string, field: 'id' | 'secret') {
+    try {
+      await navigator.clipboard.writeText(value)
+      setCopiedField(field)
+      window.setTimeout(() => setCopiedField(null), 2000)
+    } catch {
+      /* clipboard blocked */
+    }
+  }
+
+  const hasCredentials = credentials.length > 0
+
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={t('workspaceSettings.tabs.mcp', 'MCP')}
-        subtitle={currentWorkspace?.name ?? t('workspaceSettings.title', 'Workspace settings')}
-      />
-      <Card>
-        <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-500/15 text-violet-300">
-            🔐
-          </div>
-          <div className="min-w-0 flex-1">
-            <h2 className="text-lg font-semibold text-text-primary">{t('workspaceSettings.mcp.title', 'MCP integration')}</h2>
-            <p className="mt-1 text-sm text-text-tertiary">
-              AI agentlar (Cursor, Claude va hokazo) workspace bilan xavfsiz ulanishi uchun Client ID / Secret.
+      <Card className="rounded-2xl border border-border/70 bg-white/95 p-6 shadow-sm backdrop-blur-sm dark:bg-slate-900/70 sm:p-8">
+        {loading ? (
+          <p className="py-10 text-center text-sm text-text-tertiary">…</p>
+        ) : !hasCredentials ? (
+          <div className="mx-auto max-w-md text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-500/10 text-violet-600 dark:text-violet-300">
+              <Lock className="h-8 w-8" />
+            </div>
+            <h2 className="mt-5 text-lg font-bold text-text-primary">{t('workspaceSettings.mcp.noCredentials', 'No credentials yet')}</h2>
+            <p className="mt-2 text-sm leading-relaxed text-text-tertiary">
+              {t(
+                'workspaceSettings.mcp.noCredentialsBody',
+                'Generate a Client ID and Client Secret to connect AI agents to this workspace.',
+              )}
             </p>
-            <p className="mt-3 text-sm text-amber-200/80">
-              Client ID / Secret yaratish endpointi ulangan. Secret faqat bir marta ko'rinadi, keyin maskalangan holda saqlanadi.
+            <p className="mt-4 rounded-xl border border-amber-500/20 bg-amber-500/10 px-3 py-2 text-left text-xs text-amber-800 dark:text-amber-200">
+              {t(
+                'workspaceSettings.mcp.securityNote',
+                'Secrets are shown only once when generated. Copy them immediately to your secure vault.',
+              )}
             </p>
-            <Button className="mt-4" size="sm" type="button" loading={creating} onClick={() => void createCredential()} disabled={!currentWorkspace?.id}>
+            <Button
+              className="mt-6"
+              size="sm"
+              type="button"
+              loading={creating}
+              onClick={() => void createCredential()}
+              disabled={!currentWorkspace?.id}
+            >
               + {t('workspaceSettings.mcp.createCredentials', 'Create Client ID / Client Secret')}
             </Button>
-            {error && <Alert className="mt-2" variant="error">{error}</Alert>}
+            {error && (
+              <Alert className="mt-4 text-left" variant="error">
+                {error}
+              </Alert>
+            )}
           </div>
-        </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-text-primary">{t('workspaceSettings.mcp.title', 'MCP integration')}</h2>
+                <p className="mt-1 max-w-2xl text-sm text-text-tertiary">
+                  {t(
+                    'workspaceSettings.mcp.securityNote',
+                    'Secrets are shown only once when generated. Copy them immediately to your secure vault.',
+                  )}
+                </p>
+              </div>
+              <Button size="sm" type="button" loading={creating} onClick={() => void createCredential()} disabled={!currentWorkspace?.id}>
+                + {t('workspaceSettings.mcp.createCredentials', 'Create Client ID / Client Secret')}
+              </Button>
+            </div>
+            {error && <Alert variant="error">{error}</Alert>}
+            <div className="space-y-2">
+              <h3 className="text-sm font-semibold text-text-secondary">{t('workspaceSettings.mcp.existingCredentials', 'Existing credentials')}</h3>
+              {credentials.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border bg-surface-2/40 px-3 py-2.5 dark:bg-slate-950/50"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate font-mono text-sm font-semibold text-text-primary">{item.clientId}</p>
+                    <p className="text-label text-text-tertiary">
+                      {item.secretMasked} · {new Date(item.createdAt).toLocaleString()}
+                    </p>
+                  </div>
+                  <Button size="sm" variant="secondary" type="button" onClick={() => void revokeCredential(item.id)}>
+                    Revoke
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </Card>
 
-      <Card>
-        <h3 className="text-base font-semibold text-text-primary">Server va hujjatlar</h3>
-        <div className="mt-4 space-y-3 text-sm">
-          <div>
-            <p className="text-xs text-text-tertiary">MCP Server URL</p>
-            <p className="mt-1 break-all font-mono text-text-secondary">
-              {env.apiBaseUrl?.replace(/\/$/, '') ?? '(NEXT_PUBLIC_API_BASE_URL)'}/mcp{' '}
-              <span className="text-text-tertiary">— rejalashtirilmoqda</span>
+      <Card className="rounded-2xl border border-border/70 bg-white/95 p-5 shadow-sm backdrop-blur-sm dark:bg-slate-900/70 sm:p-6">
+        <h3 className="text-lg font-semibold text-text-primary">{t('workspaceSettings.mcp.serverAndDocs', 'Server and documentation')}</h3>
+        <p className="mt-1 text-sm text-text-tertiary">
+          Use this MCP server URL and documentation to connect AI agents to your workspace.
+        </p>
+        <div className="mt-4 grid gap-3 md:grid-cols-2 text-sm">
+          <div className="rounded-xl border border-border bg-surface-2/40 p-3 dark:bg-slate-950/40">
+            <p className="flex items-center gap-2 text-label text-text-tertiary">
+              <Link2 className="h-3.5 w-3.5" />
+              MCP Server URL
+            </p>
+            <p className="mt-2 break-all font-mono text-text-secondary">
+              {env.apiBaseUrl?.replace(/\/$/, '') ?? '(NEXT_PUBLIC_API_BASE_URL)'}/mcp
             </p>
           </div>
-          <div>
-            <p className="text-xs text-text-tertiary">Documentation</p>
-            <a href={DOCS_URL} className="mt-1 inline-block text-violet-400 underline" target="_blank" rel="noreferrer">
+          <div className="rounded-xl border border-border bg-surface-2/40 p-3 dark:bg-slate-950/40">
+            <p className="flex items-center gap-2 text-label text-text-tertiary">
+              <KeyRound className="h-3.5 w-3.5" />
+              Documentation
+            </p>
+            <a href={DOCS_URL} className="mt-2 inline-block font-medium text-violet-600 underline dark:text-violet-400" target="_blank" rel="noreferrer">
               {DOCS_URL}
             </a>
           </div>
         </div>
       </Card>
 
-      <Card>
-        <h3 className="text-base font-semibold text-text-primary">{t('workspaceSettings.mcp.existingCredentials', 'Existing credentials')}</h3>
-        {loading ? (
-          <p className="mt-3 text-sm text-text-tertiary">Yuklanmoqda...</p>
-        ) : credentials.length === 0 ? (
-          <p className="mt-3 text-sm text-text-tertiary">{t('workspaceSettings.mcp.noCredentials', 'No credentials yet')}</p>
-        ) : (
-          <div className="mt-3 space-y-2">
-            {credentials.map((item) => (
-              <div key={item.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border px-3 py-2">
-                <div>
-                  <p className="text-sm font-semibold text-text-primary">{item.clientId}</p>
-                  <p className="text-xs text-text-tertiary">
-                    {item.secretMasked} · {new Date(item.createdAt).toLocaleString()}
-                  </p>
-                </div>
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  type="button"
-                  onClick={() => void revokeCredential(item.id)}
-                >
-                  Revoke
-                </Button>
-              </div>
-            ))}
-          </div>
-        )}
-      </Card>
-
-      <Dialog open={showSecretModal} onClose={() => setShowSecretModal(false)} title="Yangi credentialslar" className="max-w-lg">
+      <Dialog
+        open={showSecretModal}
+        onClose={() => setShowSecretModal(false)}
+        title={t('workspaceSettings.mcp.credentialsModalTitle', 'Your new credentials')}
+        className="max-w-lg"
+      >
         <p className="mt-2 text-sm text-text-tertiary">
-          Secret faqat bir marta ko'rinadi — nusxalab saqlang.
+          {t(
+            'workspaceSettings.mcp.credentialsModalHint',
+            'Copy these now and store them somewhere safe. You will not be able to see the Client Secret again.',
+          )}
         </p>
-        <div className="mt-4 space-y-3">
+        <div className="mt-4 space-y-4">
           <div>
-            <label className="text-xs text-text-tertiary">Client ID</label>
-            <Input readOnly value={newClientId} className="mt-1 font-mono text-xs" />
+            <label className="text-label text-text-tertiary">Client ID</label>
+            <div className="mt-1 flex gap-2">
+              <Input readOnly value={newClientId} className="font-mono text-xs" />
+              <Button
+                type="button"
+                size="sm"
+                variant="secondary"
+                className="shrink-0 px-3"
+                onClick={() => void copyField(newClientId, 'id')}
+                disabled={!newClientId}
+              >
+                {copiedField === 'id' ? <Check className="h-4 w-4 text-emerald-500" /> : <Copy className="h-4 w-4" />}
+              </Button>
+            </div>
           </div>
           <div>
-            <label className="text-xs text-text-tertiary">Client Secret</label>
-            <Input readOnly value={newClientSecret} className="mt-1 font-mono text-xs" />
+            <label className="text-label text-text-tertiary">Client Secret</label>
+            <div className="mt-1 flex gap-2">
+              <Input readOnly value={newClientSecret} className="font-mono text-xs" />
+              <Button
+                type="button"
+                size="sm"
+                variant="secondary"
+                className="shrink-0 px-3"
+                onClick={() => void copyField(newClientSecret, 'secret')}
+                disabled={!newClientSecret}
+              >
+                {copiedField === 'secret' ? <Check className="h-4 w-4 text-emerald-500" /> : <Copy className="h-4 w-4" />}
+              </Button>
+            </div>
           </div>
         </div>
-        <div className="mt-6 flex justify-end">
+        <div className="mt-6 flex flex-wrap justify-end gap-2">
+          <Button
+            size="sm"
+            type="button"
+            variant="secondary"
+            onClick={() => {
+              setShowSecretModal(false)
+              setNewClientSecret('')
+            }}
+          >
+            Cancel
+          </Button>
           <Button
             size="sm"
             type="button"
@@ -174,7 +261,7 @@ export default function WorkspaceMcpPage() {
               setNewClientSecret('')
             }}
           >
-            Saqladim
+            {t('workspaceSettings.mcp.savedCredentials', "I've saved my credentials")}
           </Button>
         </div>
       </Dialog>

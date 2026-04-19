@@ -46,7 +46,7 @@ export interface CompleteResult {
 export type AiProvider = 'openai' | 'anthropic'
 
 /**
- * PerformaAI client powered by Agent Router.
+ * AdSpectr AI client powered by Agent Router.
  *
  * All AI calls in the platform go through this single client so model
  * selection, retries, token limits, and observability are centralised.
@@ -57,7 +57,7 @@ export type AiProvider = 'openai' | 'anthropic'
  *     agentName: 'StrategyEngine',
  *   })
  */
-export class PerformaAiClient {
+export class AdSpectrAiClient {
   private readonly openai?: OpenAI
   private readonly provider: AiProvider
   private readonly apiKey: string
@@ -227,7 +227,7 @@ export class PerformaAiClient {
     options: CompleteOptions,
     unwrapContent = false,
   ): Promise<CompleteResult> {
-    const label = options.agentName ?? 'PerformaAI'
+    const label = options.agentName ?? 'AdSpectrAI'
     const task  = options.taskType  ?? 'unknown'
     let lastError: Error | null = null
 
@@ -239,7 +239,7 @@ export class PerformaAiClient {
 
         // Structured observability log — one line per successful AI call
         console.log(
-          `[PerformaAI] agent=${label} task=${task} model=${raw.model}` +
+          `[AdSpectrAI] agent=${label} task=${task} model=${raw.model}` +
           ` tokens=${raw.tokensUsed} duration=${durationMs}ms`,
         )
 
@@ -262,14 +262,14 @@ export class PerformaAiClient {
             ? 'AI provider is temporarily unavailable (network block). Please try again in a few minutes.'
             : rawDetail
           const msg = `Agent Router error [${label}/${task}] status=${error?.status ?? 'unknown'} attempt=${attempt}: ${detail}`
-          console.error(`[PerformaAI] ${msg} duration=${durationMs}ms`)
+          console.error(`[AdSpectrAI] ${msg} duration=${durationMs}ms`)
           throw new Error(msg)
         }
 
         // Exponential backoff: 1s, 2s, 4s
         const waitMs = Math.pow(2, attempt - 1) * 1000
         console.warn(
-          `[PerformaAI] agent=${label} task=${task} attempt=${attempt}/${this.maxRetries} failed —` +
+          `[AdSpectrAI] agent=${label} task=${task} attempt=${attempt}/${this.maxRetries} failed —` +
           ` retrying in ${waitMs}ms (status=${error?.status})`,
         )
         await this.sleep(waitMs)

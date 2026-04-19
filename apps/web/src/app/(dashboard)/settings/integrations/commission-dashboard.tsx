@@ -172,7 +172,7 @@ export function CommissionDashboard({
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h2 className="text-3xl font-bold text-white flex items-center gap-2">
+        <h2 className="text-3xl font-bold text-text-primary flex items-center gap-2">
           <DollarSign className="text-emerald-400" size={32} />
           Specialist Commissions
         </h2>
@@ -241,29 +241,29 @@ export function CommissionDashboard({
       </div>
 
       {/* Commissions Table */}
-      <div className="rounded-2xl border border-white/10 bg-surface-2/50 overflow-hidden">
+      <div className="rounded-2xl border border-border/70 bg-white/85 shadow-sm backdrop-blur-sm overflow-hidden dark:bg-slate-900/70">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-white/10 bg-surface-3">
-              <th className="px-6 py-4 text-left font-semibold text-white">
+            <tr className="border-b border-border bg-surface-3">
+              <th className="px-6 py-4 text-left font-semibold text-text-primary">
                 Specialist
               </th>
-              <th className="px-6 py-4 text-left font-semibold text-white">
+              <th className="px-6 py-4 text-left font-semibold text-text-primary">
                 Deal
               </th>
-              <th className="px-6 py-4 text-right font-semibold text-white">
+              <th className="px-6 py-4 text-right font-semibold text-text-primary">
                 Deal Value
               </th>
-              <th className="px-6 py-4 text-right font-semibold text-white">
+              <th className="px-6 py-4 text-right font-semibold text-text-primary">
                 Commission
               </th>
-              <th className="px-6 py-4 text-right font-semibold text-white">
+              <th className="px-6 py-4 text-right font-semibold text-text-primary">
                 Rate
               </th>
-              <th className="px-6 py-4 text-left font-semibold text-white">
+              <th className="px-6 py-4 text-left font-semibold text-text-primary">
                 Status
               </th>
-              <th className="px-6 py-4 text-right font-semibold text-white">
+              <th className="px-6 py-4 text-right font-semibold text-text-primary">
                 Actions
               </th>
             </tr>
@@ -279,11 +279,11 @@ export function CommissionDashboard({
               commissions.map((commission) => (
                 <tr
                   key={commission.id}
-                  className="border-b border-white/10 hover:bg-surface-3/50 transition-colors"
+                  className="border-b border-border hover:bg-surface-3/50 transition-colors"
                 >
                   <td className="px-6 py-4">
                     <div>
-                      <div className="font-medium text-white">
+                      <div className="font-medium text-text-primary">
                         {commission.specialistName}
                       </div>
                       <div className="text-sm text-text-secondary capitalize">
@@ -292,13 +292,13 @@ export function CommissionDashboard({
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-white text-sm">{commission.dealName}</div>
+                    <div className="text-text-primary text-sm">{commission.dealName}</div>
                     <div className="text-text-secondary text-xs">
                       {new Date(commission.dealClosedAt).toLocaleDateString()}
                     </div>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <div className="text-white font-medium">
+                    <div className="text-text-primary font-medium">
                       ${commission.dealValue.toLocaleString('en-US', {
                         maximumFractionDigits: 0,
                       })}
@@ -364,21 +364,21 @@ export function CommissionDashboard({
       {/* Specialist Breakdown */}
       {summary && summary.bySpecialist.length > 0 && (
         <div className="space-y-4">
-          <h3 className="text-xl font-bold text-white">Commission by Specialist</h3>
-          <div className="rounded-2xl border border-white/10 bg-surface-2/50 overflow-hidden">
+          <h3 className="text-xl font-bold text-text-primary">Commission by Specialist</h3>
+          <div className="rounded-2xl border border-border/70 bg-white/85 shadow-sm backdrop-blur-sm overflow-hidden dark:bg-slate-900/70">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-white/10 bg-surface-3">
-                  <th className="px-6 py-4 text-left font-semibold text-white">
+                <tr className="border-b border-border bg-surface-3">
+                  <th className="px-6 py-4 text-left font-semibold text-text-primary">
                     Specialist
                   </th>
-                  <th className="px-6 py-4 text-right font-semibold text-white">
+                  <th className="px-6 py-4 text-right font-semibold text-text-primary">
                     Deals
                   </th>
-                  <th className="px-6 py-4 text-right font-semibold text-white">
+                  <th className="px-6 py-4 text-right font-semibold text-text-primary">
                     Total Commission
                   </th>
-                  <th className="px-6 py-4 text-right font-semibold text-white">
+                  <th className="px-6 py-4 text-right font-semibold text-text-primary">
                     Average
                   </th>
                 </tr>
@@ -387,9 +387,9 @@ export function CommissionDashboard({
                 {summary.bySpecialist.map((specialist) => (
                   <tr
                     key={specialist.specialistId}
-                    className="border-b border-white/10 hover:bg-surface-3/50 transition-colors"
+                    className="border-b border-border hover:bg-surface-3/50 transition-colors"
                   >
-                    <td className="px-6 py-4 font-medium text-white">
+                    <td className="px-6 py-4 font-medium text-text-primary">
                       {specialist.specialistName}
                     </td>
                     <td className="px-6 py-4 text-right text-text-secondary">
@@ -426,11 +426,11 @@ interface SummaryCardProps {
 
 function SummaryCard({ label, value, subtext, icon }: SummaryCardProps) {
   return (
-    <div className="rounded-xl border border-white/10 bg-surface-2 p-4">
+    <div className="rounded-xl border border-border/70 bg-white/85 p-4 shadow-sm backdrop-blur-sm dark:bg-slate-900/70">
       <div className="flex items-start justify-between">
         <div>
           <p className="text-text-secondary text-sm font-medium">{label}</p>
-          <p className="text-white text-2xl font-bold mt-1">{value}</p>
+          <p className="text-text-primary text-2xl font-bold mt-1">{value}</p>
           <p className="text-text-secondary text-xs mt-1">{subtext}</p>
         </div>
         <div className="p-2 bg-surface-3 rounded-lg">{icon}</div>

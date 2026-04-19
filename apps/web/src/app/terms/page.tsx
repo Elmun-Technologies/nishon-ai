@@ -1,4 +1,19 @@
 'use client'
-export default function Page() {
-  return <div className="space-y-6"><h1>Page</h1></div>
+
+import LegalPageLayout from '@/components/layout/LegalPageLayout'
+import { useI18n } from '@/i18n/use-i18n'
+
+export default function TermsPage() {
+  const { t } = useI18n()
+
+  return (
+    <LegalPageLayout>
+      <article className="prose prose-neutral max-w-none dark:prose-invert">
+        <h1 className="text-3xl font-semibold tracking-tight text-text-primary">
+          {t('legal.terms.title', 'Terms of Service')}
+        </h1>
+        <p className="mt-4 text-body text-text-secondary">{t('legal.terms.intro', '')}</p>
+      </article>
+    </LegalPageLayout>
+  )
 }

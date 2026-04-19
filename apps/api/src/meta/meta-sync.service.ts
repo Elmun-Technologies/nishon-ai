@@ -7,7 +7,7 @@ import { MetaAdAccount } from "./entities/meta-ad-account.entity";
 import { MetaCampaignSync } from "./entities/meta-campaign-sync.entity";
 import { MetaInsight } from "./entities/meta-insight.entity";
 import { ConnectedAccount } from "../platforms/entities/connected-account.entity";
-import { Platform } from "@performa/shared";
+import { Platform } from "@adspectr/shared";
 import { decrypt } from "../common/crypto.util";
 
 export type SyncResult = {

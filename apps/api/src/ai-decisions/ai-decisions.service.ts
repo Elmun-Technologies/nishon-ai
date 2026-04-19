@@ -7,7 +7,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { AiDecision } from "./entities/ai-decision.entity";
 import { Workspace } from "../workspaces/entities/workspace.entity";
-import { AiDecisionAction } from "@performa/shared";
+import { AiDecisionAction } from "@adspectr/shared";
 
 @Injectable()
 export class AiDecisionsService {

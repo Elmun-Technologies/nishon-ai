@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Star, MapPin, DollarSign, Clock, Check, Mail, MessageSquare } from 'lucide-react'
 import { PublicContainer, PublicFooter, PublicNavbar } from '@/components/public/PublicLayout'
+import { useI18n } from '@/i18n/use-i18n'
 
 const SPECIALIST_DATA = {
   spec_1: {
@@ -55,7 +56,7 @@ const SPECIALIST_DATA = {
         rating: 5,
       },
       {
-        text: "Admin ish juda ko'p edi, ammo Dilshod buni Performa bilan avtomatizatsiya qildi. Ajoyib!",
+        text: "Admin ish juda ko'p edi, ammo Dilshod buni AdSpectr bilan avtomatizatsiya qildi. Ajoyib!",
         author: 'Rustam K., Store Owner',
         rating: 5,
       },
@@ -133,6 +134,8 @@ const SPECIALIST_DATA = {
 }
 
 export default function SpecialistProfilePage({ params }: { params: { slug: string } }) {
+  const { t } = useI18n()
+  const sp = (k: string, fb = '') => t(`publicSite.marketing.specialistProfile.${k}`, fb)
   const specialist = SPECIALIST_DATA[params.slug as keyof typeof SPECIALIST_DATA]
   const [activeTab, setActiveTab] = useState<'overview' | 'portfolio' | 'testimonials'>('overview')
 
@@ -140,9 +143,9 @@ export default function SpecialistProfilePage({ params }: { params: { slug: stri
     return (
       <div className="flex min-h-screen items-center justify-center bg-surface-2 text-text-primary">
         <div className="text-center">
-          <h1 className="mb-4 text-3xl font-bold">Specialist topilmadi</h1>
+          <h1 className="mb-4 text-3xl font-bold">{sp('notFoundTitle')}</h1>
           <Link href="/marketplace" className="text-primary hover:underline">
-            ← Marketplace'ga qaytish
+            {sp('notFoundLink')}
           </Link>
         </div>
       </div>
@@ -156,7 +159,7 @@ export default function SpecialistProfilePage({ params }: { params: { slug: stri
       <section className="border-b border-border bg-surface py-8">
         <PublicContainer>
           <Link href="/marketplace" className="mb-4 inline-block text-primary hover:underline">
-            ← Marketplace'ga qaytish
+            {sp('backLink')}
           </Link>
           <div className="flex items-center gap-4">
             <div className="text-5xl">{specialist.avatar}</div>
@@ -178,25 +181,25 @@ export default function SpecialistProfilePage({ params }: { params: { slug: stri
           <div className="md:col-span-2">
             {/* Quick Stats */}
             <div className="mb-8 rounded-2xl border border-border bg-surface p-8">
-              <h2 className="mb-6 text-2xl font-bold">Statistika</h2>
+              <h2 className="mb-6 text-2xl font-bold">{sp('statsTitle')}</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 <div>
-                  <p className="mb-2 text-sm text-text-tertiary">ROAS</p>
+                  <p className="mb-2 text-sm text-text-tertiary">{t('leaderboard.roas', '')}</p>
                   <p className="text-3xl font-bold text-emerald-600">{specialist.roas}x</p>
                 </div>
                 <div>
-                  <p className="mb-2 text-sm text-text-tertiary">Reytingi</p>
+                  <p className="mb-2 text-sm text-text-tertiary">{sp('ratingLabel')}</p>
                   <div className="flex items-center gap-2">
                     <span className="text-3xl font-bold">{specialist.rating}</span>
                     <Star size={20} className="text-yellow-400 fill-yellow-400" />
                   </div>
                 </div>
                 <div>
-                  <p className="mb-2 text-sm text-text-tertiary">Success Rate</p>
+                  <p className="mb-2 text-sm text-text-tertiary">{sp('successRateLabel')}</p>
                   <p className="text-3xl font-bold text-primary">{specialist.successRate}%</p>
                 </div>
                 <div>
-                  <p className="mb-2 text-sm text-text-tertiary">Omonatlari</p>
+                  <p className="mb-2 text-sm text-text-tertiary">{sp('reviewsLabel')}</p>
                   <p className="text-3xl font-bold">{specialist.reviewCount}</p>
                 </div>
               </div>
@@ -215,9 +218,9 @@ export default function SpecialistProfilePage({ params }: { params: { slug: stri
                         : 'border-transparent text-text-secondary hover:text-text-primary'
                     }`}
                   >
-                    {tab === 'overview' && 'Haqida'}
-                    {tab === 'portfolio' && 'Portfolio'}
-                    {tab === 'testimonials' && 'Omonatlari'}
+                    {tab === 'overview' && sp('tabOverview')}
+                    {tab === 'portfolio' && sp('tabPortfolio')}
+                    {tab === 'testimonials' && sp('tabTestimonials')}
                   </button>
                 ))}
               </div>
@@ -225,46 +228,50 @@ export default function SpecialistProfilePage({ params }: { params: { slug: stri
               {activeTab === 'overview' && (
                 <div className="space-y-6">
                   <div>
-                    <h3 className="mb-3 text-xl font-semibold">Bio</h3>
+                    <h3 className="mb-3 text-xl font-semibold">{sp('bio')}</h3>
                     <p className="text-text-secondary whitespace-pre-line">{specialist.description}</p>
                   </div>
 
                   <div className="border-t border-border pt-6">
-                    <h3 className="mb-4 text-xl font-semibold">Bilgisi</h3>
+                    <h3 className="mb-4 text-xl font-semibold">{sp('knowledge')}</h3>
                     <div className="grid gap-4 md:grid-cols-2">
                       <div className="flex items-start gap-3">
                         <div className="text-2xl">📚</div>
                         <div>
-                          <p className="text-text-tertiary text-sm">Tajribasi</p>
-                          <p className="text-lg font-semibold">{specialist.experience} yil</p>
+                          <p className="text-text-tertiary text-sm">{sp('experienceLabel')}</p>
+                          <p className="text-lg font-semibold">
+                            {specialist.experience} {sp('yearsUnit')}
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
                         <div className="text-2xl">📊</div>
                         <div>
-                          <p className="text-text-tertiary text-sm">Boshqariladigan Kampaniyalar</p>
+                          <p className="text-text-tertiary text-sm">{sp('campaignsManagedLabel')}</p>
                           <p className="text-lg font-semibold">{specialist.campaignsManaged}</p>
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
                         <div className="text-2xl">💰</div>
                         <div>
-                          <p className="text-text-tertiary text-sm">Total Spend</p>
+                          <p className="text-text-tertiary text-sm">{sp('totalSpendLabel')}</p>
                           <p className="text-lg font-semibold">${specialist.totalSpend}M</p>
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
                         <div className="text-2xl">⚡</div>
                         <div>
-                          <p className="text-text-tertiary text-sm">Response Time</p>
-                          <p className="text-lg font-semibold">{specialist.responseTime} soat</p>
+                          <p className="text-text-tertiary text-sm">{sp('responseTimeLabel')}</p>
+                          <p className="text-lg font-semibold">
+                            {specialist.responseTime} {sp('hoursUnit')}
+                          </p>
                         </div>
                       </div>
                     </div>
                   </div>
 
                   <div className="border-t border-border pt-6">
-                    <h3 className="mb-4 text-xl font-semibold">Tillar</h3>
+                    <h3 className="mb-4 text-xl font-semibold">{sp('languages')}</h3>
                     <div className="flex flex-wrap gap-2">
                       {specialist.languages.map((lang) => (
                         <span
@@ -278,7 +285,7 @@ export default function SpecialistProfilePage({ params }: { params: { slug: stri
                   </div>
 
                   <div className="border-t border-border pt-6">
-                    <h3 className="mb-4 text-xl font-semibold">Sertifikatsiyalar</h3>
+                    <h3 className="mb-4 text-xl font-semibold">{sp('certifications')}</h3>
                     <div className="flex flex-wrap gap-2">
                       {specialist.certifications.map((cert) => (
                         <span
@@ -307,11 +314,13 @@ export default function SpecialistProfilePage({ params }: { params: { slug: stri
                         </div>
                         <div className="text-right">
                           <p className="text-2xl font-bold text-emerald-600">{project.roas}x</p>
-                          <p className="text-xs text-text-tertiary">ROAS</p>
+                          <p className="text-xs text-text-tertiary">{t('leaderboard.roas', '')}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3 text-sm text-text-secondary">
-                        <span>💰 ${(project.spend / 1000).toFixed(0)}K spend</span>
+                        <span>
+                          💰 ${(project.spend / 1000).toFixed(0)}K {sp('portfolioSpend')}
+                        </span>
                       </div>
                     </div>
                   ))}
@@ -339,47 +348,47 @@ export default function SpecialistProfilePage({ params }: { params: { slug: stri
           {/* Sidebar - CTA */}
           <div className="md:col-span-1">
             <div className="sticky top-24 rounded-2xl border border-border bg-surface p-8">
-              <h2 className="mb-6 text-2xl font-bold">Ishga olib boshlang</h2>
+              <h2 className="mb-6 text-2xl font-bold">{sp('sidebarTitle')}</h2>
 
               <div className="mb-8 space-y-4 border-b border-border pb-8">
                 <div className="flex items-center gap-3">
                   <DollarSign size={20} className="text-emerald-400" />
                   <div>
-                    <p className="text-text-tertiary text-sm">Narxi</p>
+                    <p className="text-text-tertiary text-sm">{sp('priceLabel')}</p>
                     <p className="text-2xl font-bold">${specialist.basePrice}</p>
-                    <p className="text-xs text-text-tertiary">/soat</p>
+                    <p className="text-xs text-text-tertiary">{sp('perHour')}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
                   <Clock size={20} className="text-primary" />
                   <div>
-                    <p className="text-text-tertiary text-sm">Javob vaqti</p>
-                    <p className="text-lg font-semibold">{specialist.responseTime} soat</p>
+                    <p className="text-text-tertiary text-sm">{sp('responseTimeLabel')}</p>
+                    <p className="text-lg font-semibold">
+                      {specialist.responseTime} {sp('hoursUnit')}
+                    </p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
                   <MapPin size={20} className="text-primary" />
                   <div>
-                    <p className="text-text-tertiary text-sm">Joylashuvi</p>
+                    <p className="text-text-tertiary text-sm">{sp('locationLabel')}</p>
                     <p className="text-sm font-semibold">{specialist.location}</p>
                   </div>
                 </div>
               </div>
 
               <button className="mb-3 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 font-semibold text-white hover:opacity-95">
-                <Mail size={18} /> Xabar yuborish
+                <Mail size={18} /> {sp('sendMessage')}
               </button>
 
               <button className="flex w-full items-center justify-center gap-2 rounded-full border border-border bg-surface-2 px-6 py-3 font-semibold text-text-primary hover:bg-surface">
-                <MessageSquare size={18} /> Foydalanuvchi profili
+                <MessageSquare size={18} /> {sp('secondaryCta')}
               </button>
 
               <div className="mt-8 rounded-xl border border-border bg-surface-2 p-4">
-                <p className="text-xs text-text-tertiary mb-3">
-                  ℹ️ Marketplace orqali aloqa qilib, hozirdan ishona boshlang. Barcha to'lovlar Performa orqali xavfsiz.
-                </p>
+                <p className="mb-3 text-xs text-text-tertiary">ℹ️ {sp('trustNote')}</p>
               </div>
             </div>
           </div>

@@ -64,7 +64,7 @@ export interface MetricsData {
 
 /**
  * FraudDetectionService provides comprehensive fraud detection and metric validation
- * for Performa marketplace agents. It validates performance data against platform-specific
+ * for AdSpectr marketplace agents. It validates performance data against platform-specific
  * rules, detects anomalies, and calculates an overall fraud risk score.
  *
  * Key responsibilities:

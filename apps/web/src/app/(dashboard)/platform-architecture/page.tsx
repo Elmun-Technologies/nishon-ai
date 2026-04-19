@@ -95,9 +95,9 @@ export default function PlatformArchitecturePage() {
   return (
     <div className="space-y-6">
       <section className="rounded-2xl border border-border bg-surface p-6">
-        <h2 className="text-2xl font-semibold text-text-primary">Performa Multi-Network Blueprint</h2>
+        <h2 className="text-2xl font-semibold text-text-primary">AdSpectr Multi-Network Blueprint</h2>
         <p className="text-sm text-text-tertiary mt-2">
-          Bu bo'limda Performa'ga moslashtirilgan full platform architecture frontend ichiga kiritildi:
+          Bu bo'limda AdSpectr'ga moslashtirilgan full platform architecture frontend ichiga kiritildi:
           modullar, roadmap, checklist va execution scope.
         </p>
       </section>

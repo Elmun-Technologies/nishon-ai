@@ -3,56 +3,82 @@
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight, BarChart3, Brain, CreditCard, Crown, GitBranch, Layers3, Rocket, Search, Settings2, Shield, Sparkles, Target, Users, Wallet } from 'lucide-react'
 import { PublicContainer, PublicFooter, PublicNavbar } from '@/components/public/PublicLayout'
+import { useI18n } from '@/i18n/use-i18n'
 
-const featureGroups = [
-  {
-    name: 'Campaign Execution',
-    metric: '4 core flows',
-    items: [
-      { title: 'Launch Wizard', desc: 'Campaign objective, audience, budget va creative ni bosqichma-bosqich sozlash.', href: '/launch', icon: Rocket },
-      { title: 'Campaign Manager', desc: 'Kampaniyalarni status, platforma va spend bo`yicha boshqarish.', href: '/campaigns', icon: Layers3 },
-      { title: 'Audience Builder', desc: 'ARR funnel kesimida auditoriyalarni yaratish va ishga tushirish.', href: '/audiences', icon: Users },
-      { title: 'Retargeting Flow', desc: 'Retargeting funnel va wizard orqali qayta jalb qilish kampaniyalari.', href: '/retargeting', icon: Target },
-    ],
-  },
-  {
-    name: 'AI and Optimization',
-    metric: '6 automation modules',
-    items: [
-      { title: 'AI Decisions', desc: 'AI nima qaror qildi va nima sababdan qildi - to`liq log.', href: '/ai-decisions', icon: Brain },
-      { title: 'Auto Optimization', desc: 'Qoidalar asosida avtomatik optimizatsiya va history.', href: '/auto-optimization', icon: Settings2 },
-      { title: 'Creative Scorer', desc: 'Kreativlarni launchdan oldin AI orqali baholash.', href: '/creative-scorer', icon: Sparkles },
-      { title: 'Budget Optimization', desc: 'Byudjetni platformalar bo`yicha smart taqsimlash.', href: '/budget', icon: Wallet },
-      { title: 'Simulation', desc: 'Byudjet va KPI o`zgarishlari uchun oldindan prognoz.', href: '/simulation', icon: GitBranch },
-      { title: 'ROI Calculator', desc: 'Scale qilishdan oldin rentabellikni hisoblash.', href: '/roi-calculator', icon: BarChart3 },
-    ],
-  },
-  {
-    name: 'Analytics and Intelligence',
-    metric: '5 visibility modules',
-    items: [
-      { title: 'Performance', desc: 'KPI, trend va campaign-level kesimlar bilan ishlash.', href: '/performance', icon: BarChart3 },
-      { title: 'Reporting', desc: 'Export-ready hisobotlar va period taqqoslash.', href: '/reporting', icon: Layers3 },
-      { title: 'Competitor Intelligence', desc: 'Raqobatchilar, SWOT va bozor insightlari.', href: '/competitors', icon: Search },
-      { title: 'Automation Rules', desc: 'Trigger set va qoidalar bilan avtomatik aksiyalar.', href: '/automation', icon: Settings2 },
-      { title: 'Top Ads', desc: 'Eng samarali e`lonlarni tez tahlil qilish paneli.', href: '/top-ads', icon: Crown },
-    ],
-  },
-  {
-    name: 'Workspace, Team, and Finance',
-    metric: '6 governance modules',
-    items: [
-      { title: 'Workspace Team', desc: 'Role-based access va invite flow bilan jamoa boshqaruvi.', href: '/settings/workspace/team', icon: Users },
-      { title: 'Ad Accounts', desc: 'Meta ad accountlar ulash, sync va reconnect holatlari.', href: '/settings/workspace/ad-accounts', icon: Shield },
-      { title: 'Products and Plans', desc: 'Obuna paketlari, order holati va usage nazorati.', href: '/settings/workspace/products', icon: Crown },
-      { title: 'Payments and Invoices', desc: 'Billing profile, to`lov usullari va invoice jadvali.', href: '/settings/workspace/payments', icon: CreditCard },
-      { title: 'MCP Credentials', desc: 'Agent integratsiyasi uchun MCP client id/secret boshqaruvi.', href: '/settings/workspace/mcp', icon: Settings2 },
-      { title: 'Workspace Help Center', desc: 'Jamoa va workspace bo`yicha tezkor yordam markazi.', href: '/settings/workspace/help', icon: Layers3 },
-    ],
-  },
-]
+const GROUP_ORDER = ['execution', 'aiOpt', 'analytics', 'governance'] as const
+
+const ITEM_ICONS: Record<string, typeof Rocket> = {
+  launchWizard: Rocket,
+  campaignManager: Layers3,
+  audienceBuilder: Users,
+  retargeting: Target,
+  aiDecisions: Brain,
+  autoOptimization: Settings2,
+  creativeScorer: Sparkles,
+  budgetOpt: Wallet,
+  simulation: GitBranch,
+  roiCalculator: BarChart3,
+  performance: BarChart3,
+  reporting: Layers3,
+  competitorIntel: Search,
+  automationRules: Settings2,
+  topAds: Crown,
+  workspaceTeam: Users,
+  adAccounts: Shield,
+  productsPlans: Crown,
+  paymentsInvoices: CreditCard,
+  mcpCreds: Settings2,
+  helpCenter: Layers3,
+}
+
+const ITEM_HREFS: Record<string, string> = {
+  launchWizard: '/launch',
+  campaignManager: '/campaigns',
+  audienceBuilder: '/audiences',
+  retargeting: '/retargeting',
+  aiDecisions: '/ai-decisions',
+  autoOptimization: '/auto-optimization',
+  creativeScorer: '/creative-scorer',
+  budgetOpt: '/budget',
+  simulation: '/simulation',
+  roiCalculator: '/roi-calculator',
+  performance: '/performance',
+  reporting: '/reporting',
+  competitorIntel: '/competitors',
+  automationRules: '/automation',
+  topAds: '/top-ads',
+  workspaceTeam: '/settings/workspace/team',
+  adAccounts: '/settings/workspace/ad-accounts',
+  productsPlans: '/settings/workspace/products',
+  paymentsInvoices: '/settings/workspace/payments',
+  mcpCreds: '/settings/workspace/mcp',
+  helpCenter: '/settings/workspace/help',
+}
+
+const GROUP_ITEMS: Record<(typeof GROUP_ORDER)[number], (keyof typeof ITEM_HREFS)[]> = {
+  execution: ['launchWizard', 'campaignManager', 'audienceBuilder', 'retargeting'],
+  aiOpt: ['aiDecisions', 'autoOptimization', 'creativeScorer', 'budgetOpt', 'simulation', 'roiCalculator'],
+  analytics: ['performance', 'reporting', 'competitorIntel', 'automationRules', 'topAds'],
+  governance: ['workspaceTeam', 'adAccounts', 'productsPlans', 'paymentsInvoices', 'mcpCreds', 'helpCenter'],
+}
 
 export default function FeaturesPage() {
+  const { t } = useI18n()
+  const m = (k: string, fb = '') => t(`publicSite.marketing.features.${k}`, fb)
+
+  const metrics = [
+    [m('metric0v'), m('metric0l')],
+    [m('metric1v'), m('metric1l')],
+    [m('metric2v'), m('metric2l')],
+    [m('metric3v'), m('metric3l')],
+  ]
+
+  const pillars = [
+    [m('pillar0Title'), m('pillar0Desc')],
+    [m('pillar1Title'), m('pillar1Desc')],
+    [m('pillar2Title'), m('pillar2Desc')],
+  ]
+
   return (
     <main className="min-h-screen bg-surface text-text-primary">
       <PublicNavbar />
@@ -61,25 +87,16 @@ export default function FeaturesPage() {
         <PublicContainer className="py-12 md:py-16">
           <Link href="/" className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary">
             <ArrowLeft className="h-4 w-4" />
-            Back to landing
+            {t('publicSite.marketing.common.backToLanding', '')}
           </Link>
           <div className="mt-4 grid gap-8 md:grid-cols-[1.2fr_1fr] md:items-end">
             <div>
-              <p className="inline-flex rounded-full border border-[#b5d98f] bg-[#ebf8d9] px-3 py-1 text-xs font-medium text-[#3f6212]">
-                Product Capability Matrix
-              </p>
-              <h1 className="mt-4 text-4xl font-semibold leading-tight md:text-6xl">Real modules. Real routes. Real operations.</h1>
-              <p className="mt-4 max-w-2xl text-lg text-text-secondary">
-                Bu sahifa Performa ichidagi mavjud funksiyalarni bitta professional map ko`rinishida beradi. Har bir karta live modulga ulangan.
-              </p>
+              <p className="inline-flex rounded-full border border-[#b5d98f] bg-[#ebf8d9] px-3 py-1 text-xs font-medium text-[#3f6212]">{m('badge')}</p>
+              <h1 className="mt-4 text-4xl font-semibold leading-tight md:text-6xl">{m('title')}</h1>
+              <p className="mt-4 max-w-2xl text-lg text-text-secondary">{m('subtitle')}</p>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              {[
-                ['21+', 'Mapped modules'],
-                ['4', 'Core capability blocks'],
-                ['100%', 'Route-linked cards'],
-                ['EN/RU/UZ', 'Localization ready'],
-              ].map(([value, label]) => (
+              {metrics.map(([value, label]) => (
                 <article key={label} className="rounded-2xl border border-border bg-white p-4">
                   <p className="text-xl font-semibold">{value}</p>
                   <p className="text-sm text-text-secondary">{label}</p>
@@ -92,49 +109,54 @@ export default function FeaturesPage() {
 
       <section className="bg-surface py-12">
         <PublicContainer className="space-y-8">
-          {featureGroups.map((group) => (
-            <section key={group.name} className="rounded-3xl border border-border bg-white p-6 md:p-8">
-              <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <h2 className="text-2xl font-semibold md:text-3xl">{group.name}</h2>
-                  <p className="mt-1 text-sm text-text-secondary">Capability cluster aligned to existing product workflows.</p>
+          {GROUP_ORDER.map((groupId) => {
+            const g = t(`publicSite.marketing.features.groups.${groupId}.name`, '')
+            const metric = t(`publicSite.marketing.features.groups.${groupId}.metric`, '')
+            return (
+              <section key={groupId} className="rounded-3xl border border-border bg-white p-6 md:p-8">
+                <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <h2 className="text-2xl font-semibold md:text-3xl">{g}</h2>
+                    <p className="mt-1 text-sm text-text-secondary">{m('groupClusterSubtitle')}</p>
+                  </div>
+                  <span className="rounded-full border border-[#cfe8a8] bg-[#f4f9ea] px-3 py-1 text-xs font-medium text-[#4d7c0f]">{metric}</span>
                 </div>
-                <span className="rounded-full border border-[#cfe8a8] bg-[#f4f9ea] px-3 py-1 text-xs font-medium text-[#4d7c0f]">
-                  {group.metric}
-                </span>
-              </div>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {group.items.map((item) => {
-                  const Icon = item.icon
-                  return (
-                    <Link key={item.title} href={item.href} className="group rounded-2xl border border-border bg-[#fafcf6] p-5 transition hover:border-[#84cc16]/60 hover:bg-white">
-                      <div className="mb-3 inline-flex rounded-xl border border-border bg-white p-2 text-[#65a30d]">
-                        <Icon className="h-4 w-4" />
-                      </div>
-                      <p className="mb-2 inline-flex rounded-full border border-border px-2 py-0.5 text-[11px] text-text-tertiary">Live Module</p>
-                      <h3 className="text-base font-semibold">{item.title}</h3>
-                      <p className="mt-2 text-sm text-text-secondary">{item.desc}</p>
-                      <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-[#65a30d]">
-                        Open module
-                        <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-                      </span>
-                    </Link>
-                  )
-                })}
-              </div>
-            </section>
-          ))}
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {GROUP_ITEMS[groupId].map((itemId) => {
+                    const Icon = ITEM_ICONS[itemId] ?? Layers3
+                    const href = ITEM_HREFS[itemId] ?? '/'
+                    return (
+                      <Link
+                        key={itemId}
+                        href={href}
+                        className="group rounded-2xl border border-border bg-[#fafcf6] p-5 transition hover:border-[#84cc16]/60 hover:bg-white"
+                      >
+                        <div className="mb-3 inline-flex rounded-xl border border-border bg-white p-2 text-[#65a30d]">
+                          <Icon className="h-4 w-4" />
+                        </div>
+                        <p className="mb-2 inline-flex rounded-full border border-border px-2 py-0.5 text-[11px] text-text-tertiary">
+                          {t('publicSite.marketing.common.liveModuleTag', '')}
+                        </p>
+                        <h3 className="text-base font-semibold">{t(`publicSite.marketing.features.items.${itemId}.title`, '')}</h3>
+                        <p className="mt-2 text-sm text-text-secondary">{t(`publicSite.marketing.features.items.${itemId}.desc`, '')}</p>
+                        <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-[#65a30d]">
+                          {t('publicSite.marketing.common.openModule', '')}
+                          <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+                        </span>
+                      </Link>
+                    )
+                  })}
+                </div>
+              </section>
+            )
+          })}
         </PublicContainer>
       </section>
 
       <section className="border-t border-border bg-[#f8fbf2] py-14">
         <PublicContainer>
           <div className="grid gap-4 md:grid-cols-3">
-            {[
-              ['Route Validity', 'Cards point to existing routes, not mocked placeholders.'],
-              ['Product Alignment', 'Modules map to real internal capabilities and workflows.'],
-              ['Conversion Ready', 'Public users can inspect capabilities before sign-in.'],
-            ].map(([title, desc]) => (
+            {pillars.map(([title, desc]) => (
               <article key={title} className="rounded-2xl border border-border bg-white p-5">
                 <h3 className="font-semibold">{title}</h3>
                 <p className="mt-2 text-sm text-text-secondary">{desc}</p>

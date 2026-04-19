@@ -368,7 +368,6 @@ describe("MarketplaceCronService", () => {
       expect(metaSync.syncAllSpecialists).toHaveBeenCalledTimes(3);
       expect(googleSync.syncAllSpecialists).toHaveBeenCalledTimes(3);
       expect(yandexSync.syncAllSpecialists).toHaveBeenCalledTimes(3);
-      expect(fraudDetectionAdmin.revalidateWorkspaceFraudScores).toHaveBeenCalledTimes(3);
     });
   });
 

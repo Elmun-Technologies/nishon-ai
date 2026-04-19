@@ -136,7 +136,7 @@ export interface SpecialistPerformance {
 
 /**
  * MarketplaceSearchService
- * Handles advanced search and filtering for Performa marketplace specialists
+ * Handles advanced search and filtering for AdSpectr marketplace specialists
  */
 @Injectable()
 export class MarketplaceSearchService {

@@ -1,7 +1,14 @@
 'use client'
 
 import { createContext, ReactNode, useCallback, useEffect, useState } from 'react'
-import { Language, DEFAULT_LANGUAGE, LANGUAGE_STORAGE_KEY, Translations } from './config'
+import {
+  Language,
+  DEFAULT_LANGUAGE,
+  LANGUAGE_STORAGE_KEY,
+  LEGACY_LANGUAGE_STORAGE_KEY,
+  Translations,
+} from './config'
+import ruLocaleCanonical from '../../public/locales/ru.json'
 import { getNestedTranslation } from './use-i18n'
 
 // ─── Context Type ─────────────────────────────────────────────────────────────
@@ -54,48 +61,54 @@ export function I18nProvider({
   defaultLanguage = DEFAULT_LANGUAGE,
 }: I18nProviderProps) {
   const [language, setLanguageState] = useState<Language>(defaultLanguage)
-  const [translations, setTranslations] = useState<Translations>(EMPTY_TRANSLATIONS)
-  const [fallbackEn, setFallbackEn] = useState<Translations>(EMPTY_TRANSLATIONS)
+  const canonicalRu = ruLocaleCanonical as unknown as Record<string, unknown>
+  const [translations, setTranslations] = useState<Translations>(
+    () => canonicalRu as unknown as Translations,
+  )
 
-  // Initialize from localStorage only. If absent, keep English default.
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    const savedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY) as Language | null
-    if (savedLanguage) {
-      setLanguageState(savedLanguage)
-    }
-  }, [])
+  function readStoredLanguage(): Language | null {
+    if (typeof window === 'undefined') return null
+    const raw =
+      localStorage.getItem(LANGUAGE_STORAGE_KEY) ??
+      localStorage.getItem(LEGACY_LANGUAGE_STORAGE_KEY)
+    if (raw === 'ru' || raw === 'en' || raw === 'uz') return raw
+    return null
+  }
 
-  // Load translations when language changes
+  // Restore saved UI language (new key first, then legacy).
   useEffect(() => {
-    const loadFallbackEnglish = async () => {
-      try {
-        const enResponse = await fetch('/locales/en.json')
-        const enData = await enResponse.json()
-        setFallbackEn(enData)
-      } catch (error) {
-        console.error('Failed to load English fallback translations:', error)
+    const saved = readStoredLanguage()
+    if (saved) {
+      setLanguageState(saved)
+      if (!localStorage.getItem(LANGUAGE_STORAGE_KEY)) {
+        localStorage.setItem(LANGUAGE_STORAGE_KEY, saved)
       }
     }
-
-    void loadFallbackEnglish()
   }, [])
 
+  // Load active locale and merge on top of Russian canonical strings (missing keys fall back to ru).
   useEffect(() => {
+    let cancelled = false
+
     const loadTranslations = async () => {
       try {
         const response = await fetch(`/locales/${language}.json`)
-        const data = await response.json()
-        setTranslations(mergeDeep(fallbackEn, data))
+        const data = (await response.json()) as Record<string, unknown>
+        if (cancelled) return
+        setTranslations(mergeDeep(canonicalRu, data) as unknown as Translations)
         localStorage.setItem(LANGUAGE_STORAGE_KEY, language)
         document.documentElement.lang = language
       } catch (error) {
         console.error(`Failed to load ${language} translations:`, error)
+        if (!cancelled) setTranslations(canonicalRu as unknown as Translations)
       }
     }
 
-    loadTranslations()
-  }, [language, fallbackEn])
+    void loadTranslations()
+    return () => {
+      cancelled = true
+    }
+  }, [language])
 
   const setLanguage = useCallback((lang: Language) => {
     setLanguageState(lang)

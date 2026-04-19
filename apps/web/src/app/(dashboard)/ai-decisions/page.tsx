@@ -397,7 +397,7 @@ export default function AiDecisionsPage() {
           <span className="text-lg mt-0.5">🔍</span>
           <div>
             <p className="text-text-primary text-sm font-medium mb-0.5">
-              Performa nima uchun bu jurnalni ko'rsatadi?
+              AdSpectr nima uchun bu jurnalni ko'rsatadi?
             </p>
             <p className="text-text-tertiary text-xs leading-relaxed">
               Shaffoflik bizning asosiy tamoyilimiz. AI qilgan har bir optimizatsiya

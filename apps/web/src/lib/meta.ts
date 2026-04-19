@@ -56,7 +56,7 @@ export type SyncResult = {
  */
 export function buildMetaConnectUrl(workspaceId: string, redirectTo?: string): string | null {
   if (!workspaceId) {
-    console.error('[Performa] connectMeta: workspaceId is required')
+    console.error('[AdSpectr] connectMeta: workspaceId is required')
     return null
   }
 

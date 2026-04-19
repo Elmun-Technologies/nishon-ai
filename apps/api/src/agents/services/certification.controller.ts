@@ -28,7 +28,7 @@ import { AdminGuard } from '../../common/guards/admin.guard';
 
 /**
  * CertificationController handles all certification-related HTTP endpoints
- * for the Performa marketplace.
+ * for the AdSpectr marketplace.
  *
  * Endpoints:
  * - GET /certifications - List all active certifications

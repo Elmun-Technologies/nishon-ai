@@ -65,7 +65,7 @@ async function seed() {
 
   // Check if demo user already exists
   const existing = await userRepo.findOne({
-    where: { email: "demo@performa.ai" },
+    where: { email: "demo@adspectr.com" },
   });
   if (existing) {
     console.log("✅ Demo user already exists — skipping seed");
@@ -83,7 +83,7 @@ async function seed() {
   const hashedPassword = await bcrypt.hash(demoPassword, 12);
   const user = await userRepo.save(
     userRepo.create({
-      email: "demo@performa.ai",
+      email: "demo@adspectr.com",
       password: hashedPassword,
       name: "Demo User",
       plan: UserPlan.PRO,
@@ -261,7 +261,7 @@ async function seed() {
 
   console.log("");
   console.log("🎉 Seed complete! Demo credentials:");
-  console.log("   Email:    demo@performa.ai");
+  console.log("   Email:    demo@adspectr.com");
   console.log("   Password: demo1234");
   console.log("");
 

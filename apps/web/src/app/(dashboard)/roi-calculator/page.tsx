@@ -125,8 +125,8 @@ const INDUSTRY_DATA: Record<string, {
   },
 }
 
-// Performa improvement multipliers based on platform data
-const NISHON_IMPROVEMENT = {
+// AdSpectr improvement multipliers based on platform data
+const ADSPECTR_PLATFORM_IMPROVEMENT = {
   conversionRateBoost: 1.85,   // 85% better conversion rate
   ctrBoost: 1.60,              // 60% better CTR
   wasteReduction: 0.15,        // reduces waste to 15% (from 30-45%)
@@ -139,21 +139,21 @@ const NISHON_IMPROVEMENT = {
 function CompareRow({
   label,
   without,
-  withPerforma,
+  withAdSpectr,
   unit = '',
   higherIsBetter = true,
   highlight = false,
 }: {
   label: string
   without: string | number
-  withPerforma: string | number
+  withAdSpectr: string | number
   unit?: string
   higherIsBetter?: boolean
   highlight?: boolean
 }) {
   const withoutNum = typeof without === 'number' ? without : 0
-  const withNum = typeof withPerforma === 'number' ? withPerforma : 0
-  const performaWins = higherIsBetter ? withNum > withoutNum : withNum < withoutNum
+  const withNum = typeof withAdSpectr === 'number' ? withAdSpectr : 0
+  const platformWins = higherIsBetter ? withNum > withoutNum : withNum < withoutNum
 
   return (
     <div className={`grid grid-cols-3 gap-4 px-5 py-3.5 border-b border-border last:border-0 ${
@@ -161,21 +161,21 @@ function CompareRow({
     }`}>
       <p className="text-text-tertiary text-sm">{label}</p>
 
-      {/* Without Performa */}
+      {/* Without AdSpectr */}
       <div className="text-center">
-        <p className={`text-sm font-semibold ${!performaWins ? 'text-emerald-400' : 'text-text-tertiary'}`}>
+        <p className={`text-sm font-semibold ${!platformWins ? 'text-emerald-400' : 'text-text-tertiary'}`}>
           {typeof without === 'number' ? without.toLocaleString() : without}
           {unit && <span className="text-xs font-normal ml-0.5">{unit}</span>}
         </p>
       </div>
 
-      {/* With Performa */}
+      {/* With AdSpectr */}
       <div className="text-center">
-        <p className={`text-sm font-semibold ${performaWins ? 'text-emerald-400' : 'text-text-tertiary'}`}>
-          {typeof withPerforma === 'number' ? withPerforma.toLocaleString() : withPerforma}
+        <p className={`text-sm font-semibold ${platformWins ? 'text-emerald-400' : 'text-text-tertiary'}`}>
+          {typeof withAdSpectr === 'number' ? withAdSpectr.toLocaleString() : withAdSpectr}
           {unit && <span className="text-xs font-normal ml-0.5">{unit}</span>}
         </p>
-        {performaWins && typeof without === 'number' && typeof withPerforma === 'number' && withoutNum > 0 && (
+        {platformWins && typeof without === 'number' && typeof withAdSpectr === 'number' && withoutNum > 0 && (
           <p className="text-emerald-400 text-xs mt-0.5">
             +{Math.round(((withNum - withoutNum) / withoutNum) * 100)}%
           </p>
@@ -238,7 +238,7 @@ export default function RoiCalculatorPage() {
 
   const results = useMemo(() => {
 
-    // ── WITHOUT NISHON AI ────────────────────────────────────────────
+    // ── WITHOUT ADSPECTR ────────────────────────────────────────────
     const clicks = Math.round(budget * industryData.avgCtr * 100)
     const leads  = Math.round(clicks * industryData.avgConversionRate)
     const sales  = Math.round(leads * 0.3) // 30% lead-to-sale rate typical
@@ -259,31 +259,31 @@ export default function RoiCalculatorPage() {
       targetologistCost: industryData.targetologistCost,
     }
 
-    // ── WITH NISHON AI ────────────────────────────────────────────────
-    const nClicks  = Math.round(clicks * NISHON_IMPROVEMENT.ctrBoost)
+    // ── WITH ADSPECTR ────────────────────────────────────────────────
+    const nClicks  = Math.round(clicks * ADSPECTR_PLATFORM_IMPROVEMENT.ctrBoost)
     const nLeads   = Math.round(
-      nClicks * industryData.avgConversionRate * NISHON_IMPROVEMENT.conversionRateBoost
+      nClicks * industryData.avgConversionRate * ADSPECTR_PLATFORM_IMPROVEMENT.conversionRateBoost
     )
     const nSales   = Math.round(nLeads * 0.35) // slightly better lead quality
     const nRevenue = nSales * industryData.avgOrderValue
     const nRoas    = nRevenue / budget
-    const nWasted  = Math.round(budget * NISHON_IMPROVEMENT.wasteReduction)
+    const nWasted  = Math.round(budget * ADSPECTR_PLATFORM_IMPROVEMENT.wasteReduction)
 
-    const withPerforma: ScenarioResult = {
+    const withAdSpectr: ScenarioResult = {
       monthlyLeads: nLeads,
       monthlySales: nSales,
       monthlyRevenue: nRevenue,
       roas: Math.round(nRoas * 10) / 10,
       cpa: Math.round(budget / Math.max(nLeads, 1)),
-      ctr: Math.round(industryData.avgCtr * NISHON_IMPROVEMENT.ctrBoost * 1000) / 10,
+      ctr: Math.round(industryData.avgCtr * ADSPECTR_PLATFORM_IMPROVEMENT.ctrBoost * 1000) / 10,
       wastedBudget: nWasted,
       optimizationTime: 0,
       targetologistCost: 0, // no need for targetologist
     }
 
-    // ── NISHON AI COST (platform fee) ────────────────────────────────
+    // ── ADSPECTR COST (platform fee) ────────────────────────────────
     // 6% of ad spend + $29 base (Growth plan)
-    const performaFee = Math.round(budget * 0.06) + 79
+    const platformFee = Math.round(budget * 0.06) + 79
 
     // ── DIFFERENCES ──────────────────────────────────────────────────
     const extraLeads   = nLeads - leads
@@ -292,19 +292,19 @@ export default function RoiCalculatorPage() {
     const savedTargetologist = industryData.targetologistCost
     const savedTime    = optHours // hours saved per month
     const totalSaved   = savedWaste + savedTargetologist
-    const netBenefit   = extraRevenue + totalSaved - performaFee
+    const netBenefit   = extraRevenue + totalSaved - platformFee
 
     // Monthly and period totals
     const periodExtraRevenue = extraRevenue * months
     const periodNetBenefit   = netBenefit * months
-    const paybackDays = performaFee > 0
-      ? Math.round((performaFee / (extraRevenue / 30)))
+    const paybackDays = platformFee > 0
+      ? Math.round((platformFee / (extraRevenue / 30)))
       : 0
 
     return {
       without,
-      withPerforma,
-      performaFee,
+      withAdSpectr,
+      platformFee,
       extraLeads,
       extraRevenue,
       savedWaste,
@@ -330,7 +330,7 @@ export default function RoiCalculatorPage() {
           <Badge variant="purple">📊 Real hisob-kitob</Badge>
         </div>
         <p className="text-text-tertiary text-sm">
-          Reklama byudjetingiz Performa bilan va usiz qancha qaytishini ko'ring —
+          Reklama byudjetingiz AdSpectr bilan va usiz qancha qaytishini ko'ring —
           real CIS bozori ma'lumotlariga asoslangan
         </p>
       </div>
@@ -440,7 +440,7 @@ export default function RoiCalculatorPage() {
       {/* KEY DIFFERENCES — Big numbers */}
       <div>
         <p className="text-text-tertiary text-xs font-medium uppercase tracking-wide mb-3">
-          Performa bilan {months} oyda qo'shimcha foyda
+          AdSpectr bilan {months} oyda qo'shimcha foyda
         </p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <BigDiffCard
@@ -481,7 +481,7 @@ export default function RoiCalculatorPage() {
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
             <p className="text-text-tertiary text-sm mb-1">
-              Oylik sof foyda (daromad + tejamkorlik − Performa to'lovi)
+              Oylik sof foyda (daromad + tejamkorlik − AdSpectr to'lovi)
             </p>
             <p className={`text-4xl font-black ${
               results.netBenefit > 0 ? 'text-emerald-400' : 'text-red-400'
@@ -501,7 +501,7 @@ export default function RoiCalculatorPage() {
             </div>
             <div className="flex items-center gap-2 text-text-tertiary">
               <span className="text-red-400">−</span>
-              Performa to'lovi: {formatCurrency(results.performaFee)}/oy
+              AdSpectr to'lovi: {formatCurrency(results.platformFee)}/oy
             </div>
           </div>
           <div className="text-center">
@@ -524,7 +524,7 @@ export default function RoiCalculatorPage() {
             ❌ Usiz (oddiy targetolog)
           </p>
           <p className="text-text-secondary text-xs font-medium text-center">
-            ✅ Performa bilan
+            ✅ AdSpectr bilan
           </p>
         </div>
 
@@ -532,62 +532,62 @@ export default function RoiCalculatorPage() {
         <CompareRow
           label="Oylik leadlar"
           without={results.without.monthlyLeads}
-          withPerforma={results.withPerforma.monthlyLeads}
+          withAdSpectr={results.withAdSpectr.monthlyLeads}
           unit=" ta"
         />
         <CompareRow
           label="Oylik sotuvlar"
           without={results.without.monthlySales}
-          withPerforma={results.withPerforma.monthlySales}
+          withAdSpectr={results.withAdSpectr.monthlySales}
           unit=" ta"
           highlight
         />
         <CompareRow
           label="Oylik daromad"
           without={formatCurrency(results.without.monthlyRevenue)}
-          withPerforma={formatCurrency(results.withPerforma.monthlyRevenue)}
+          withAdSpectr={formatCurrency(results.withAdSpectr.monthlyRevenue)}
         />
         <CompareRow
           label="ROAS"
           without={`${results.without.roas}x`}
-          withPerforma={`${results.withPerforma.roas}x`}
+          withAdSpectr={`${results.withAdSpectr.roas}x`}
           highlight
         />
         <CompareRow
           label="CPA (1 lead narxi)"
           without={formatCurrency(results.without.cpa)}
-          withPerforma={formatCurrency(results.withPerforma.cpa)}
+          withAdSpectr={formatCurrency(results.withAdSpectr.cpa)}
           higherIsBetter={false}
         />
         <CompareRow
           label="CTR"
           without={`${results.without.ctr}%`}
-          withPerforma={`${results.withPerforma.ctr}%`}
+          withAdSpectr={`${results.withAdSpectr.ctr}%`}
           highlight
         />
         <CompareRow
           label="Isrof qilinadigan byudjet"
           without={formatCurrency(results.without.wastedBudget)}
-          withPerforma={formatCurrency(results.withPerforma.wastedBudget)}
+          withAdSpectr={formatCurrency(results.withAdSpectr.wastedBudget)}
           higherIsBetter={false}
         />
         <CompareRow
           label="Optimizatsiya vaqti"
           without={`${results.without.optimizationTime} soat/oy`}
-          withPerforma="0 soat/oy"
+          withAdSpectr="0 soat/oy"
           higherIsBetter={false}
           highlight
         />
         <CompareRow
           label="Targetolog xarajati"
           without={formatCurrency(results.without.targetologistCost)}
-          withPerforma="$0 (AI bajaradi)"
+          withAdSpectr="$0 (AI bajaradi)"
           higherIsBetter={false}
         />
         <CompareRow
-          label="Performa to'lovi"
+          label="AdSpectr to'lovi"
           without="$0"
-          withPerforma={formatCurrency(results.performaFee)}
+          withAdSpectr={formatCurrency(results.platformFee)}
           higherIsBetter={false}
           highlight
         />
@@ -610,14 +610,14 @@ export default function RoiCalculatorPage() {
 
         <Card className="border-border bg-text-primary/5">
           <p className="text-text-secondary text-xs uppercase tracking-wide mb-2">
-            {months} oyda Performa bilan
+            {months} oyda AdSpectr bilan
           </p>
           <p className="text-2xl font-bold text-emerald-400 mb-1">
-            {formatCurrency(results.withPerforma.monthlyRevenue * months)}
+            {formatCurrency(results.withAdSpectr.monthlyRevenue * months)}
           </p>
           <p className="text-text-tertiary text-xs">
-            {(results.withPerforma.monthlyLeads * months).toLocaleString()} lead ·{' '}
-            {(results.withPerforma.monthlySales * months).toLocaleString()} sotuv
+            {(results.withAdSpectr.monthlyLeads * months).toLocaleString()} lead ·{' '}
+            {(results.withAdSpectr.monthlySales * months).toLocaleString()} sotuv
           </p>
         </Card>
 
@@ -645,7 +645,7 @@ export default function RoiCalculatorPage() {
             <p className="text-text-tertiary text-xs leading-relaxed">
               Bu hisob-kitob O"zbekiston va MDH bozorining real o'rtacha ko"rsatkichlariga
               asoslangan. Natijalar mahsulot sifati, kreativ materiallar va bozor sharoitiga
-              qarab farq qilishi mumkin. Performa foydalanuvchilarining o'rtacha ROAS
+              qarab farq qilishi mumkin. AdSpectr foydalanuvchilarining o'rtacha ROAS
               ko'rsatkichi <span className="text-text-primary">3.2x</span> ni tashkil etadi.
             </p>
           </div>

@@ -22,7 +22,7 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
       error: 'bg-red-500/10 border border-red-500/20 text-red-500',
       warning: 'bg-amber-500/10 border border-amber-500/20 text-amber-500',
       success: 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-500',
-      info: 'bg-blue-500/10 border border-blue-500/20 text-blue-700'
+      info: 'bg-blue-500/10 border border-blue-500/20 text-blue-700 dark:text-blue-300'
     }
 
     return (
@@ -31,7 +31,7 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
         role="alert"
         aria-live={variant === 'error' ? 'assertive' : 'polite'}
         className={cn(
-          'rounded-lg px-4 py-3 text-sm',
+          'rounded-xl px-4 py-3 text-sm',
           variants[variant],
           className
         )}

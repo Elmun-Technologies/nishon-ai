@@ -193,7 +193,7 @@ export default function PortfolioDashboardPage() {
         {error && <Alert variant="error" className="mb-4">{error}</Alert>}
         <div className="bg-surface-elevated border border-border rounded-xl p-4 mb-8 flex items-center gap-3">
           <span className="text-text-secondary text-sm flex-1 truncate">
-            performa.ai/portfolio/{existingProfile.slug}
+            adspectr.com/portfolio/{existingProfile.slug}
           </span>
           <button
             onClick={() => router.push(`/portfolio/${existingProfile.slug}`)}

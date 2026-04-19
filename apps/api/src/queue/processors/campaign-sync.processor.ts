@@ -11,7 +11,7 @@ import { MetaConnector } from "../../platforms/connectors/meta.connector";
 import { GoogleConnector } from "../../platforms/connectors/google.connector";
 import { TiktokConnector } from "../../platforms/connectors/tiktok.connector";
 import { YandexConnector } from "../../platforms/connectors/yandex.connector";
-import { Platform, CampaignStatus } from "@performa/shared";
+import { Platform, CampaignStatus } from "@adspectr/shared";
 import * as crypto from "crypto";
 import { ConfigService } from "@nestjs/config";
 

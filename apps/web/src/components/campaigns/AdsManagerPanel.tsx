@@ -200,6 +200,12 @@ export function AdsManagerPanel() {
   const [showSetBudget, setShowSetBudget] = useState(false);
   const [showDecreaseBid, setShowDecreaseBid] = useState(false);
   const [showAiSettings, setShowAiSettings] = useState(false);
+  const [assetScope, setAssetScope] = useState<
+    "campaigns" | "ad_sets" | "ads" | "all_assets"
+  >("campaigns");
+  const [preset, setPreset] = useState("default");
+  const [dateRange, setDateRange] = useState("last7");
+  const [hoveredAction, setHoveredAction] = useState<string | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
   const [audienceView, setAudienceView] = useState<
     "Audience Size" | "Potential Reach"
@@ -214,6 +220,16 @@ export function AdsManagerPanel() {
   );
 
   const allSelected = selected.length === SAMPLE_ROWS.length;
+  const visibleRows = useMemo(() => {
+    if (assetScope === "campaigns") return SAMPLE_ROWS;
+    if (assetScope === "ad_sets") {
+      return SAMPLE_ROWS.map((row) => ({ ...row, name: `${row.name} / Ad set` }));
+    }
+    if (assetScope === "ads") {
+      return SAMPLE_ROWS.map((row) => ({ ...row, name: `${row.name} / Creative` }));
+    }
+    return SAMPLE_ROWS;
+  }, [assetScope]);
 
   return (
     <Card className="border-border">
@@ -262,6 +278,60 @@ export function AdsManagerPanel() {
 
         {activeTab === "Meta Dashboard" && (
           <>
+            <div className="rounded-xl border border-border p-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <button className="rounded-lg border border-border px-3 py-1.5 text-sm">
+                  Filters
+                </button>
+                <input
+                  placeholder="Search..."
+                  className="min-w-[220px] rounded-lg border border-border bg-surface px-3 py-1.5 text-sm"
+                />
+                <select
+                  value={preset}
+                  onChange={(e) => setPreset(e.target.value)}
+                  className="rounded-lg border border-border bg-surface px-3 py-1.5 text-sm"
+                >
+                  <option value="default">Load filter preset</option>
+                  <option value="only-acquisition">Only Acquisition</option>
+                  <option value="only-retargeting">Only Retargeting & Retention</option>
+                  <option value="active-adsets">Active Ad Sets</option>
+                </select>
+                <select
+                  value={dateRange}
+                  onChange={(e) => setDateRange(e.target.value)}
+                  className="rounded-lg border border-border bg-surface px-3 py-1.5 text-sm"
+                >
+                  <option value="today">Today</option>
+                  <option value="last3">Last 3 Days</option>
+                  <option value="last7">Last 7 Days</option>
+                  <option value="last14">Last 14 Days</option>
+                  <option value="last30">Last 30 Days</option>
+                </select>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {([
+                  ["campaigns", "Campaigns"],
+                  ["ad_sets", "Ad sets"],
+                  ["ads", "Ads"],
+                  ["all_assets", "All assets"],
+                ] as const).map(([key, label]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setAssetScope(key)}
+                    className={`rounded-lg px-3 py-1.5 text-sm ${
+                      assetScope === key
+                        ? "bg-indigo-500/10 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400"
+                        : "border border-border text-text-tertiary"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="overflow-x-auto border border-border rounded-xl">
               <table className="w-full min-w-[900px] text-sm">
                 <thead className="bg-surface-2 text-text-secondary">
@@ -277,15 +347,25 @@ export function AdsManagerPanel() {
                         }
                       />
                     </th>
-                    <th className="p-3 text-left">Asset name</th>
+                    <th className="p-3 text-left">
+                      {assetScope === "campaigns"
+                        ? "Campaign name"
+                        : assetScope === "ad_sets"
+                          ? "Ad set name"
+                          : assetScope === "ads"
+                            ? "Ad name"
+                            : "Asset name"}
+                    </th>
                     <th className="p-3 text-left">AI Bidding</th>
+                    <th className="p-3 text-left">Latest actions</th>
+                    <th className="p-3 text-left">Performance overtime</th>
                     <th className="p-3 text-left">Amount Spent</th>
                     <th className="p-3 text-left">ROAS</th>
                     <th className="p-3 text-left">Cost per Purchase</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {SAMPLE_ROWS.map((row) => (
+                  {visibleRows.map((row) => (
                     <tr key={row.id} className="border-t border-border">
                       <td className="p-3">
                         <input
@@ -309,11 +389,41 @@ export function AdsManagerPanel() {
                           AI Bidding
                         </button>
                       </td>
+                      <td className="p-3 relative">
+                        <button
+                          type="button"
+                          onMouseEnter={() => setHoveredAction(row.id)}
+                          onMouseLeave={() => setHoveredAction(null)}
+                          className="rounded-md border border-border px-2 py-1 text-xs text-text-secondary"
+                        >
+                          View
+                        </button>
+                        {hoveredAction === row.id && (
+                          <div className="absolute z-10 mt-2 w-64 rounded-lg border border-border bg-surface p-3 shadow-xl">
+                            <p className="text-xs text-text-secondary">
+                              Abbosxon turned on campaign.
+                            </p>
+                            <p className="mt-1 text-xs text-text-tertiary">
+                              10:33 | 03/24/2026 | Asia/Tashkent
+                            </p>
+                          </div>
+                        )}
+                      </td>
+                      <td className="p-3">
+                        <div className="h-6 w-24 rounded bg-gradient-to-r from-indigo-500/20 to-transparent" />
+                      </td>
                       <td className="p-3">${row.amountSpent}</td>
                       <td className="p-3">{row.roas}</td>
                       <td className="p-3">£{row.cpc}</td>
                     </tr>
                   ))}
+                  {visibleRows.length === 0 && (
+                    <tr>
+                      <td colSpan={8} className="p-8 text-center text-text-tertiary">
+                        No data found
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
@@ -1130,7 +1240,7 @@ export function AdsManagerPanel() {
                     <tr>
                       <th className="text-left p-2">Facebook Ads Manager</th>
                       <th className="text-left p-2">
-                        Performa Audience Manager
+                        AdSpectr Audience Manager
                       </th>
                     </tr>
                   </thead>
@@ -1362,7 +1472,7 @@ export function AdsManagerPanel() {
                     <tr>
                       <th className="p-2 text-left">Facebook Ads Manager</th>
                       <th className="p-2 text-left">
-                        Performa Business Dashboard
+                        AdSpectr Business Dashboard
                       </th>
                     </tr>
                   </thead>
@@ -1523,9 +1633,18 @@ export function AdsManagerPanel() {
           title="AI bidding settings"
           onClose={() => setShowAiSettings(false)}
         >
-          <p className="mb-3">
-            Optimization KPIs and suggested allocation updates.
-          </p>
+          <p className="mb-3">Optimization KPIs</p>
+          <div className="rounded-lg border border-border p-3 text-sm">
+            <p className="font-medium">fikr yetakchilari ads-1</p>
+            <div className="mt-3">
+              <p className="text-text-tertiary">Primary KPI</p>
+              <p className="font-medium">Cost per Lead (All)</p>
+            </div>
+            <div className="mt-3">
+              <p className="text-text-tertiary">Target value</p>
+              <p className="font-medium">Recommended by AI</p>
+            </div>
+          </div>
           <div className="mt-6 flex justify-end gap-2">
             <Button
               variant="secondary"

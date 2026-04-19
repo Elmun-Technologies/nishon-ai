@@ -8,8 +8,8 @@ import { Workspace } from "../workspaces/entities/workspace.entity";
 
 const mockCompleteJsonOpt = jest.fn();
 
-jest.mock("@performa/ai-sdk", () => ({
-  PerformaAiClient: jest.fn().mockImplementation(() => ({
+jest.mock("@adspectr/ai-sdk", () => ({
+  AdSpectrAiClient: jest.fn().mockImplementation(() => ({
     completeJson: mockCompleteJsonOpt,
   })),
 }));

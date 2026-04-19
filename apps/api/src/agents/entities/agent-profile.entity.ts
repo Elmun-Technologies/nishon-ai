@@ -14,13 +14,13 @@ import { User } from "../../users/entities/user.entity";
  * AgentProfile — represents either a human targetologist OR an AI agent.
  *
  * agentType = 'human': Real person, approved targetologist with verified ad accounts.
- * agentType = 'ai':    AI agent — either Performa's built-in (ownerId=null) or
+ * agentType = 'ai':    AI agent — either AdSpectr's built-in (ownerId=null) or
  *                      a custom agent created/rented by a user (ownerId set).
  *
  * Monetization:
- *   Human: client pays monthlyRate → Performa takes platformCommissionPct (15-20%).
- *   Performa: client pays monthlyRate to Performa directly.
- *   User AI: client pays monthlyRate → owner gets (1 - platformCommissionPct), Performa gets the rest.
+ *   Human: client pays monthlyRate → AdSpectr takes platformCommissionPct (15-20%).
+ *   AdSpectr: client pays monthlyRate to AdSpectr directly.
+ *   User AI: client pays monthlyRate → owner gets (1 - platformCommissionPct), AdSpectr gets the rest.
  */
 export type AgentType = "human" | "ai";
 export type PricingModel = "fixed" | "commission" | "hybrid";
@@ -56,7 +56,7 @@ export class AgentProfile {
   @Column({ type: "varchar", length: 10, default: "human", name: "agent_type" })
   agentType: AgentType;
 
-  /** null = Performa's own agent */
+  /** null = AdSpectr's own agent */
   @Column({ type: "varchar", nullable: true, name: "owner_id" })
   ownerId: string | null;
 
@@ -105,7 +105,7 @@ export class AgentProfile {
   currency: string;
 
   /**
-   * Performa platform commission (% of what client pays that goes to Performa).
+   * AdSpectr platform commission (% of what client pays that goes to AdSpectr).
    * For human agents: default 15%. For owned AI agents: default 20%.
    */
   @Column({ type: "decimal", precision: 5, scale: 2, default: 15, name: "platform_commission_pct" })

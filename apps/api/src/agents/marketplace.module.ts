@@ -33,7 +33,7 @@ import { AgentProfile } from "./entities/agent-profile.entity";
  * - Admin features
  *
  * This module integrates with the Agents module and provides marketplace-specific
- * endpoints for the Performa platform.
+ * endpoints for the AdSpectr platform.
  *
  * TODO: Complete service implementations below
  */

@@ -8,8 +8,8 @@ import { Workspace } from "../workspaces/entities/workspace.entity";
 // Shared mock for completeJson so tests can change its behavior
 const mockCompleteJson = jest.fn();
 
-jest.mock("@performa/ai-sdk", () => ({
-  PerformaAiClient: jest.fn().mockImplementation(() => ({
+jest.mock("@adspectr/ai-sdk", () => ({
+  AdSpectrAiClient: jest.fn().mockImplementation(() => ({
     completeJson: mockCompleteJson,
   })),
   buildStrategyPrompt: jest.fn().mockReturnValue("mock prompt"),

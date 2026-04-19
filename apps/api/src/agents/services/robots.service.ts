@@ -20,7 +20,7 @@ interface RobotsRule {
 @Injectable()
 export class RobotsService {
   private readonly logger = new Logger(RobotsService.name)
-  private readonly baseUrl = process.env.FRONTEND_URL || 'https://performa.ai'
+  private readonly baseUrl = process.env.FRONTEND_URL || 'https://adspectr.com'
   private readonly publicDir = path.join(process.cwd(), 'public')
 
   /**
@@ -57,7 +57,7 @@ export class RobotsService {
   private buildRobotsTxt(): string {
     const rules = this.getRobotRules()
 
-    let content = `# Performa Marketplace robots.txt
+    let content = `# AdSpectr Marketplace robots.txt
 # Generated: ${new Date().toISOString()}
 # For more information, visit https://www.robotstxt.org/
 

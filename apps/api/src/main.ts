@@ -76,8 +76,8 @@ async function bootstrap() {
 
   // Swagger setup
   const config = new DocumentBuilder()
-    .setTitle("Performa API")
-    .setDescription("API for Performa autonomous advertising platform")
+    .setTitle("AdSpectr API")
+    .setDescription("API for AdSpectr autonomous advertising platform")
     .setVersion("1.0")
     .addBearerAuth()
     .build();

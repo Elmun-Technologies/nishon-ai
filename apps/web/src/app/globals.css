@@ -27,31 +27,39 @@
   font-display: swap;
 }
 
-/* ─── MINIMAL 2-TONE COLOR SYSTEM ─────────────────────────────────────────── */
-/* Light mode — clean whites + grays                                           */
+/* ─── BRAND PALETTE ───────────────────────────────────────────────────────── */
+/* #1b2e06 ink · #b0ed6f lime · #ffffff white · #93c75b mid green               */
 :root {
-  --c-surface:          #ffffff;
-  --c-surface-2:        #F7F8FA;
-  --c-surface-elevated: #ffffff;
-  --c-border:           #E5E7EB;
-  --c-text-primary:     #111827;
-  --c-text-secondary:   #6B7280;
-  --c-text-tertiary:    #9CA3AF;
-  --c-primary:          #2563EB;
-  --button-ripple-color: rgba(17, 24, 39, 0.15);
+  --brand-ink: #1b2e06;
+  --brand-lime: #b0ed6f;
+  --brand-white: #ffffff;
+  --brand-mid: #93c75b;
 }
 
-/* Dark mode — dark slate palette                                               */
+/* Light mode                                                                  */
+:root {
+  --c-surface:          var(--brand-white);
+  --c-surface-2:        #f4faf0;
+  --c-surface-elevated: var(--brand-white);
+  --c-border:           #cfe8c0;
+  --c-text-primary:     var(--brand-ink);
+  --c-text-secondary:   #3d5626;
+  --c-text-tertiary:    #5c7248;
+  --c-primary:          var(--brand-mid);
+  --button-ripple-color: rgba(27, 46, 6, 0.12);
+}
+
+/* Dark mode — ink surfaces, lime accents                                      */
 .dark {
-  --c-surface:          #0F172A;
-  --c-surface-2:        #1E293B;
-  --c-surface-elevated: #1E293B;
-  --c-border:           #334155;
-  --c-text-primary:     #F1F5F9;
-  --c-text-secondary:   #94A3B8;
-  --c-text-tertiary:    #64748B;
-  --c-primary:          #3B82F6;
-  --button-ripple-color: rgba(241, 245, 249, 0.2);
+  --c-surface:          var(--brand-ink);
+  --c-surface-2:        #243a12;
+  --c-surface-elevated: #2a4515;
+  --c-border:           rgba(147, 199, 91, 0.28);
+  --c-text-primary:     var(--brand-white);
+  --c-text-secondary:   #c8e6a8;
+  --c-text-tertiary:    #93c75b;
+  --c-primary:          var(--brand-lime);
+  --button-ripple-color: rgba(176, 237, 111, 0.18);
 }
 
 /* ─── BASE ─────────────────────────────────────────────────────────────────── */
@@ -140,13 +148,13 @@
   }
   .input:focus {
     outline: none;
-    border-color: var(--c-text-primary);
+    border-color: var(--brand-mid);
   }
 
   /* Typography helpers */
-  .heading-xl  { color: var(--c-text-primary); font-size: 1.25rem; font-weight: 600; line-height: 1.4; }
-  .heading-lg  { color: var(--c-text-primary); font-size: 1.125rem; font-weight: 600; line-height: 1.5; }
-  .heading     { color: var(--c-text-primary); font-size: 1rem; font-weight: 600; line-height: 1.5; }
+  .heading-xl  { color: var(--c-text-primary); font-size: 1.5rem; font-weight: 700; line-height: 1.3; letter-spacing: -0.01em; }
+  .heading-lg  { color: var(--c-text-primary); font-size: 1.25rem; font-weight: 650; line-height: 1.4; }
+  .heading     { color: var(--c-text-primary); font-size: 1.0625rem; font-weight: 600; line-height: 1.45; }
   .body-text   { color: var(--c-text-primary); font-size: 0.875rem; }
   .body-secondary { color: var(--c-text-secondary); font-size: 0.875rem; }
   .label       { color: var(--c-text-secondary); font-size: 0.75rem; font-weight: 500; }

@@ -13,7 +13,7 @@ import { decrypt, resolveEncryptionKey } from "../common/crypto.util";
 import { ConfigService } from "@nestjs/config";
 import { MetaConnector } from "../platforms/connectors/meta.connector";
 import { GoogleConnector } from "../platforms/connectors/google.connector";
-import { Platform } from "@performa/shared";
+import { Platform } from "@adspectr/shared";
 import { WorkspaceMember } from "../workspace-members/entities/workspace-member.entity";
 import { Workspace } from "../workspaces/entities/workspace.entity";
 

@@ -44,6 +44,7 @@
     "automation": "Автоматизация",
     "retargeting": "Ретаргетинг",
     "audiences": "Аудитории",
+    "adLauncher": "Ad Launcher",
     "settings": "Настройки",
     "marketing": "Маркетинг",
     "launch": "Запуск",
@@ -66,7 +67,8 @@
     "products": "Продукты",
     "mediaLibrary": "Медиатека",
     "workspace": "Рабочее пространство",
-    "simulation": "Симуляция"
+    "simulation": "Симуляция",
+    "metaAudit": "Meta Audit"
   },
   "landing": {
     "hero": {
@@ -74,7 +76,7 @@
       "title1": "Управляйте рекламой",
       "title2": "быстрее",
       "title3": "и эффективнее.",
-      "subtitle": "Performa — платформа для маркетологов, управляющая 4 платформами (Meta, Google, TikTok, Yandex) из одного места, с автоматизацией и AI. Ускорьте настройку кампаний в 4 раза, увеличьте ROAS на 50%.",
+      "subtitle": "AdSpectr — платформа для маркетологов, управляющая 4 платформами (Meta, Google, TikTok, Yandex) из одного места, с автоматизацией и AI. Ускорьте настройку кампаний в 4 раза, увеличьте ROAS на 50%.",
       "buttonStart": "Начните — Попробуйте бесплатно ↗",
       "buttonMarketplace": "Найти маркетолога или агентство",
       "buttonLeaderboard": "🏆 Посмотреть топ-специалистов",
@@ -133,7 +135,7 @@
     },
     "cta": {
       "title": "Хотите быть маркетологом?",
-      "subtitle": "Присоединитесь к маркетплейсу Performa и предоставляйте услуги сотням компаний.",
+      "subtitle": "Присоединитесь к маркетплейсу AdSpectr и предоставляйте услуги сотням компаний.",
       "button": "Зарегистрироваться как специалист ↗"
     }
   },
@@ -162,7 +164,7 @@
   },
   "leaderboard": {
     "title": "Рейтинг",
-    "subtitle": "Топ-специалисты на Nishon AI",
+    "subtitle": "Топ-специалисты на AdSpectr",
     "overall": "Общий рейтинг",
     "rising": "Восходящие звезды",
     "roasLeaders": "Лидеры по ROAS",
@@ -232,12 +234,14 @@
     "views": "Просмотры",
     "optimizationDone": "Оптимизация завершена - смотрите результаты в AI решениях.",
     "optimizationFailed": "Оптимизация не удалась",
-    "welcomeToPerforma": "Добро пожаловать в Performa",
+    "welcomeToAdSpectr": "Добро пожаловать в AdSpectr",
     "completeOnboarding": "Завершите онбординг, чтобы создать рабочее пространство и передать управление AI.",
     "startSetup": "Начать настройку",
     "realtimeOverview": "Обзор в реальном времени",
     "optimizing": "Оптимизация...",
     "runOptimization": "Запустить AI оптимизацию",
+    "monthlySpendForecast": "Прогноз месячных расходов",
+    "quickActions": "Быстрые действия",
     "metaRealtimePrefix": "Метрики в реальном времени поступают из",
     "settingsLink": "настройки",
     "topCampaigns": "Топ кампании",
@@ -245,7 +249,80 @@
     "campaign": "Кампания",
     "status": "Статус",
     "spend": "Расход",
-    "clicks": "Клики"
+    "clicks": "Клики",
+    "blendedSummary": "Сводная аналитика",
+    "blendedSummaryHint": "KPI по всем подключенным источникам",
+    "last30Days": "Последние 30 дней",
+    "connectedSources": "Подключенные источники",
+    "viewReporting": "Отчеты",
+    "connectDataTitle": "Подключите больше источников данных",
+    "connectDataSubtitle": "Смешанные метрики, LTV и сквозная отчетность.",
+    "sourceConnected": "Подключено",
+    "manageSource": "Управление",
+    "connectSource": "Подключить"
+  },
+  "metaAudit": {
+    "title": "360° Meta Audit",
+    "subtitle": "Вкладки для глубокого анализа Meta — превью UI, данные позже.",
+    "tabMeta": "Meta Dashboard",
+    "tabTargeting": "Targeting Insights",
+    "tabAuction": "Auction Insights",
+    "tabGeo": "Geo & Demo Insights",
+    "tabCreative": "Creative Insights",
+    "tabAdcopy": "Ad Copy Insights",
+    "last7Days": "Последние 7 дней",
+    "filterData": "Фильтр данных",
+    "loadPreset": "Загрузить пресет…",
+    "presetWinners": "Выигрышные ad set",
+    "presetLearning": "Learning limited",
+    "saveView": "Сохранить вид",
+    "kpiLeads": "Лиды (все)",
+    "kpiSpend": "Расход",
+    "kpiPurchases": "Покупки",
+    "gradedBy": "Оценка по",
+    "minSpend": "Мин. расход",
+    "maxSpend": "Макс. расход",
+    "smartFilter": "Умный фильтр",
+    "allFilters": "Все фильтры",
+    "filterCreativeType": "Тип креатива",
+    "filterFunnel": "Этап воронки",
+    "filterPlacement": "Плейсмент",
+    "filterDevice": "Устройство",
+    "filtersEmptyPreview": "Пока нет строк по фильтрам. Примените для обновления вида.",
+    "clearFilters": "Сбросить фильтры",
+    "applyFilters": "Применить",
+    "formatImage": "Изображение",
+    "formatShortVideo": "Короткое видео",
+    "formatMediumVideo": "Среднее видео",
+    "formatLongVideo": "Длинное видео",
+    "formatCarousel": "Карусель",
+    "formatDpa": "DPA",
+    "amountSpent": "Расход",
+    "cpl": "CPL",
+    "convRate": "Конверсия",
+    "leadsBar": "Лиды",
+    "spendBar": "Расход",
+    "creativeMatrix": "Creative Matrix",
+    "seeAllCreatives": "Все креативы",
+    "quadrantScalable": "МАСШТАБ",
+    "quadrantCore": "ЯДРО",
+    "quadrantStarted": "СТАРТ",
+    "quadrantOverspend": "ПЕРЕРАСХОД",
+    "axisLeads": "Лиды (все)",
+    "axisSpend": "Расход",
+    "matrixEmpty": "Креативы (0) — подключите Meta и синхронизацию.",
+    "creativesCount": "Креативы (0)",
+    "sortLeadsHigh": "Сортировка: лиды (сначала больше)",
+    "selectedCount": "0 выбрано",
+    "openInLauncher": "Открыть в Ads Launcher",
+    "piecesOfCopy": "Тексты объявлений (0)",
+    "adCopyLength": "Длина текста (0)",
+    "placeholderMetrics": "Расход · CPL · CTR",
+    "emojiPerf": "Эмодзи",
+    "linkPerf": "Ссылки",
+    "with": "С",
+    "without": "Без",
+    "tabPlaceholder": "Макет вкладки. Подключите графики к Meta sync позже."
   },
   "automation": {
     "title": "Автоматизация",
@@ -257,7 +334,65 @@
     "execute": "Выполнить",
     "executions": "Исполнения",
     "success": "Успех",
-    "failed": "Ошибка"
+    "failed": "Ошибка",
+    "overviewTitle": "Обзор автоматизаций",
+    "overviewSubtitle": "Что сделали автоматизации — тактики, триггеры и активность.",
+    "newAutomation": "Новая автоматизация",
+    "summaryHeading": "Что автоматизации сделали для вас",
+    "metricStart": "Старт",
+    "metricPause": "Пауза",
+    "metricBudgetUp": "Увеличение бюджета",
+    "metricBudgetDown": "Снижение бюджета",
+    "actionsTriggered": "Сработавших действий",
+    "totalActionsChart": "Всего действий по времени",
+    "searchTactic": "Поиск тактики",
+    "viewAllAuthors": "Все авторы",
+    "showAllStatuses": "Все статусы",
+    "emptyTitle": "Хватит делать вручную",
+    "emptyDescription": "Создайте тактики старта, паузы и масштабирования бюджета по метрикам. Подключите Meta и управляемую автоматизацию.",
+    "startAutomating": "Начать автоматизацию",
+    "openWizard": "Мастер правил"
+  },
+  "adLauncher": {
+    "title": "Ad Launcher",
+    "subtitle": "Поиск, сортировка и пакеты креативов — оболочка лаунчера (подключите синхронизацию Meta позже).",
+    "infoHint": "Выберите объявления, пресеты и фильтры перед отправкой в Meta.",
+    "findInspiration": "Найти вдохновение",
+    "selectAdSets": "Выбрать существующие группы объявлений",
+    "tabAds": "Объявления",
+    "tabNewAds": "Новые объявления",
+    "tabClusters": "Кластеры креативов",
+    "tabInsights": "Инсайты",
+    "sortBy": "Сортировка: последнее изменение",
+    "metric": "Метрика",
+    "cpl": "Стоимость лида (все)",
+    "minSpend": "Мин. расход",
+    "filterData": "Фильтр данных",
+    "smartFilter": "Умный фильтр",
+    "emptyTitle": "Нет данных за этот период",
+    "emptyBody": "Выберите другой диапазон дат или подключите Meta, чтобы загрузить объявления в лаунчер.",
+    "previewTitle": "Предпросмотр выбора объявлений",
+    "creativeSet": "Набор креативов",
+    "newPreset": "Новый пресет",
+    "saveSelection": "Сохранить выбор креативов",
+    "manualAdd": "Добавить вручную по",
+    "adIdPlaceholder": "Введите ID объявления"
+  },
+  "automationWizard": {
+    "pageTitle": "Мастер автоматизации",
+    "setupTitle": "Настройка",
+    "stepPick": "Выбор",
+    "stepSettings": "Параметры",
+    "stepSummary": "Итог",
+    "selectTask": "Выберите задачу",
+    "taskPause": "Пауза объявления на сегодня",
+    "addAction": "Действие",
+    "dateSchedule": "Расписание дат",
+    "dateHint": "Используется часовой пояс рекламного аккаунта при запуске правила.",
+    "runContinuously": "Запускать постоянно",
+    "betweenDates": "Между конкретными датами",
+    "pickPlaceholder": "Выберите шаблон тактики — сюда можно подключить каталог сценариев.",
+    "summaryPlaceholder": "Здесь появится сводка условий и расписания перед публикацией."
   },
   "retargeting": {
     "title": "Ретаргетинг",
@@ -293,7 +428,46 @@
     "signupButton": "Регистрация",
     "haveAccount": "У вас есть аккаунт?",
     "noAccount": "У вас нет аккаунта?",
-    "logout": "Выход"
+    "logout": "Выход",
+    "loginPage": {
+      "welcomeBadge": "С возвращением",
+      "heroTitle": "Управляйте кампаниями из одного слоя",
+      "heroSubtitle": "Войдите, чтобы получить доступ к запуску, решениям ИИ, отчётам и управлению workspace.",
+      "statRoas": "Средний ROAS",
+      "statCpa": "Снижение CPA",
+      "statAi": "Мониторинг ИИ",
+      "panelTitle": "Вход",
+      "panelSubtitle": "Используйте email и пароль или соцсети.",
+      "continueGoogle": "Продолжить с Google",
+      "continueFacebook": "Продолжить с Facebook",
+      "orEmail": "или email",
+      "emailPlaceholder": "you@company.com",
+      "passwordPlaceholder": "••••••••",
+      "demoButton": "Демо-вход — аккаунт не нужен",
+      "createPrompt": "Нет аккаунта?",
+      "createLink": "Создать",
+      "badCredentials": "Неверный email или пароль"
+    },
+    "registerPage": {
+      "badge": "Создать аккаунт",
+      "heroTitle": "Начните использовать AdSpectr за несколько минут",
+      "heroSubtitle": "Запускайте кампании, отслеживайте решения ИИ и управляйте workspace в одном месте.",
+      "statModules": "Модули",
+      "statLanguages": "Языки",
+      "statAutopilot": "Автопилот",
+      "statModulesVal": "20+",
+      "statLanguagesVal": "3",
+      "statAutopilotVal": "Встроен",
+      "panelTitle": "Регистрация",
+      "panelSubtitle": "Используйте рабочий email для аккаунта workspace.",
+      "nameLabel": "Полное имя",
+      "namePlaceholder": "Ваше имя",
+      "passwordHint": "Не менее 8 символов",
+      "createButton": "Создать аккаунт",
+      "signInPrompt": "Уже есть аккаунт?",
+      "signInLink": "Войти",
+      "genericError": "Ошибка регистрации. Попробуйте снова."
+    }
   },
   "errors": {
     "notFound": "Не найдено",
@@ -303,15 +477,569 @@
     "tryAgain": "Попробуйте снова",
     "goHome": "На главную"
   },
+  "publicSite": {
+    "brand": "AdSpectr AI",
+    "nav": {
+      "features": "Функции",
+      "solutions": "Решения",
+      "marketplace": "Маркетплейс",
+      "leaderboard": "Лидерборд",
+      "portfolio": "Портфолио"
+    },
+    "cta": {
+      "login": "Вход",
+      "startFree": "Начать бесплатно"
+    },
+    "footer": {
+      "tagline": "AdSpectr AI — платформа для управления рекламными кампаниями",
+      "features": "Функции",
+      "solutions": "Решения",
+      "terms": "Условия",
+      "privacy": "Конфиденциальность"
+    },
+    "home": {
+      "hero": {
+        "bullet0": "Реальные маршруты функций — карта возможностей, а не демо-оболочка",
+        "bullet1": "Продуктовые сценарии на EN / RU / UZ",
+        "bullet2": "Монетизация: подписка плюс комиссия маркетплейса",
+        "secondaryCta": "Полная карта функций",
+        "exploreLogin": "Изучить платформу"
+      },
+      "stats": {
+        "0": {
+          "value": "6+",
+          "label": "Интегрированных ключевых модулей"
+        },
+        "1": {
+          "value": "5 тарифов",
+          "label": "Уровни подписки в UZS"
+        },
+        "2": {
+          "value": "3 слоя",
+          "label": "Архитектура монетизации"
+        },
+        "3": {
+          "value": "Workspace-first",
+          "label": "Роли, биллинг, права, доступ к MCP"
+        }
+      },
+      "capabilitiesEyebrow": "Карта возможностей платформы",
+      "openModule": "Открыть модуль",
+      "modules": {
+        "campaignLaunch": {
+          "title": "Система запуска кампаний",
+          "desc": "Цель, аудитория, бюджет и поток запуска креативов"
+        },
+        "aiDecisions": {
+          "title": "Лог решений AI",
+          "desc": "Действия AI, причины и история согласований"
+        },
+        "performance": {
+          "title": "Аналитика эффективности",
+          "desc": "Срезы по ROAS, CPA, CTR и трендам"
+        },
+        "creativeScorer": {
+          "title": "Оценка качества креативов",
+          "desc": "AI оценивает креативы до запуска"
+        },
+        "workspaceGov": {
+          "title": "Управление workspace",
+          "desc": "Роли, права и доступ к рекламным аккаунтам"
+        },
+        "billing": {
+          "title": "Биллинг и счета",
+          "desc": "Тарифы, способы оплаты, счета и статус заказов"
+        }
+      },
+      "flow": {
+        "eyebrow": "Как это работает",
+        "title": "От запуска кампании до масштаба с контролем",
+        "connect": {
+          "step": "01",
+          "title": "Подключите workspace",
+          "text": "Рекламные аккаунты, роли команды, биллинг-контакт и политика доступа в одном месте."
+        },
+        "launch": {
+          "step": "02",
+          "title": "Запуск и мониторинг",
+          "text": "Кампании выходят в эфир; лог решений AI и отчётность обновляются почти в реальном времени."
+        },
+        "optimize": {
+          "step": "03",
+          "title": "Оптимизация с контролем",
+          "text": "Автооптимизация работает в рамках согласований и ограничений."
+        },
+        "scale": {
+          "step": "04",
+          "title": "Масштаб с управлением",
+          "text": "Сохраняйте дисциплину при многих workspace, аккаунтах и участниках команды."
+        }
+      },
+      "pricing": {
+        "eyebrow": "Подписка и монетизация",
+        "title": "Цены привязаны к реальной логике продукта",
+        "subtitle": "Это не просто карточки: лимиты тарифов на сервере, Payme checkout и поток комиссии маркетплейса совпадают с продуктом."
+      },
+      "plans": {
+        "free": {
+          "name": "Free",
+          "price": "0 UZS / мес",
+          "who": "Для теста и первого внедрения",
+          "points": {
+            "0": "1 workspace",
+            "1": "3 кампании",
+            "2": "1 подключённый аккаунт",
+            "3": "Найм на маркетплейсе нет"
+          }
+        },
+        "starter": {
+          "name": "Starter",
+          "price": "199 000 UZS / мес",
+          "who": "Небольшие growth-команды",
+          "points": {
+            "0": "2 workspace",
+            "1": "10 кампаний / workspace",
+            "2": "2 подключённых аккаунта",
+            "3": "Найм на маркетплейсе есть"
+          }
+        },
+        "growth": {
+          "name": "Growth",
+          "price": "499 000 UZS / мес",
+          "who": "Команды performance-операций",
+          "points": {
+            "0": "5 workspace",
+            "1": "30 кампаний / workspace",
+            "2": "5 подключённых аккаунтов",
+            "3": "Создание профиля агента"
+          }
+        },
+        "pro": {
+          "name": "Pro",
+          "price": "999 000 UZS / мес",
+          "who": "Полный маркетинг-ops на AI",
+          "points": {
+            "0": "15 workspace",
+            "1": "100 кампаний / workspace",
+            "2": "10 подключённых аккаунтов",
+            "3": "Кастомный AI-агент"
+          }
+        },
+        "agency": {
+          "name": "Agency",
+          "price": "2 499 000 UZS / мес",
+          "who": "Агентства и мультиклиентский масштаб",
+          "points": {
+            "0": "Неограниченно workspace",
+            "1": "Неограниченно кампаний",
+            "2": "Неограниченно аккаунтов",
+            "3": "Enterprise-уровень операций"
+          }
+        }
+      },
+      "monetization": {
+        "subscription": {
+          "title": "Слой 1 — Подписка на workspace",
+          "text": "Базовая ценность — ежемесячная подписка в UZS; лимиты тарифов проверяются на сервере."
+        },
+        "billing": {
+          "title": "Слой 2 — Биллинг-операции",
+          "text": "Оплаты через Payme checkout и опрос статуса заказа. Счета и методы — в разрезе workspace."
+        },
+        "marketplace": {
+          "title": "Слой 3 — Комиссия маркетплейса",
+          "text": "Ставки комиссии и уровни специалистов настраиваются отдельно; ставки можно задавать по workspace."
+        }
+      },
+      "security": {
+        "title": "Безопасность и управление",
+        "intro": "Слой контроля workspace задаёт зоны ответственности и границы прав при совместной работе.",
+        "bullet0": "Доступ к workspace по ролям",
+        "bullet1": "Инвайты и управление правами",
+        "bullet2": "Управление биллинг-профилем",
+        "bullet3": "Изоляция учётных данных MCP"
+      },
+      "revenue": {
+        "title": "Видимость со стороны выручки",
+        "intro": "В дашборде расходы, результаты и статус платежей собраны для практических решений.",
+        "cell0": {
+          "k": "Статус тарифа",
+          "v": "Активен"
+        },
+        "cell1": {
+          "k": "Поток заказов",
+          "v": "Отслеживается"
+        },
+        "cell2": {
+          "k": "Счета",
+          "v": "На уровне workspace"
+        },
+        "cell3": {
+          "k": "Слой комиссии",
+          "v": "Настраивается"
+        }
+      },
+      "faq": {
+        "title": "Частые вопросы",
+        "subtitle": "О возможностях платформы и монетизации.",
+        "q0": "У нас только фиксированный пакет?",
+        "a0": "Нет — гибрид: подписка на платформу, биллинг-операции и комиссия маркетплейса.",
+        "q1": "Где проходит оплата?",
+        "a1": "Заказы подписки открывают Payme checkout; статус заказа виден в платформе.",
+        "q2": "Как устроена монетизация маркетплейса?",
+        "a2": "Ставки комиссии по уровню специалиста и периоду; бонусы поддерживаются отдельно.",
+        "q3": "Реальны ли возможности на этой странице?",
+        "a3": "Да — ссылки ведут на существующие внутренние маршруты и рабочие модули."
+      },
+      "finalCta": {
+        "eyebrow": "Финальный призыв",
+        "title": "Соберите growth-стек готовый к монетизации",
+        "subtitle": "Начните с workspace, подключите биллинг и запускайте контролируемые AI-кампании в масштабе.",
+        "register": "Начать бесплатно",
+        "solutions": "Смотреть решения"
+      },
+      "snapshot": {
+        "title": "Снимок операций",
+        "row0": {
+          "label": "Запуск",
+          "status": "Активен"
+        },
+        "row1": {
+          "label": "Решения AI",
+          "status": "Под контролем"
+        },
+        "row2": {
+          "label": "Биллинг",
+          "status": "Отслеживается"
+        },
+        "row3": {
+          "label": "Workspace",
+          "status": "Защищён"
+        }
+      }
+    },
+    "marketing": {
+      "common": {
+        "backToLanding": "На главную",
+        "backToPortfolio": "Назад в портфолио",
+        "backToMarketplace": "Назад в маркетплейс",
+        "openModule": "Открыть модуль",
+        "openProfile": "Открыть профиль",
+        "openRelatedFlow": "Открыть связанный поток",
+        "liveModuleTag": "Живой модуль",
+        "solutionTrackTag": "Трек решения",
+        "verified": "Проверен",
+        "reviews": "отзывов",
+        "campaignsDotBadges": "кампаний",
+        "badgesWord": "бейджей",
+        "dot": " • ",
+        "perHour": "/час",
+        "spendSuffix": "расход",
+        "yearsShort": "лет",
+        "hoursShort": "ч"
+      },
+      "features": {
+        "back": "На главную",
+        "badge": "Матрица возможностей продукта",
+        "title": "Реальные модули. Реальные маршруты. Реальные операции.",
+        "subtitle": "Карта существующих возможностей AdSpectr. Каждая карточка ведёт в рабочий модуль.",
+        "groupClusterSubtitle": "Кластер возможностей, привязанный к продуктовым процессам.",
+        "metric0v": "21+",
+        "metric0l": "Сопоставленных модулей",
+        "metric1v": "4",
+        "metric1l": "Блоков возможностей",
+        "metric2v": "100%",
+        "metric2l": "Карточки с маршрутами",
+        "metric3v": "EN/RU/UZ",
+        "metric3l": "Готовность к локализации",
+        "pillar0Title": "Валидность маршрутов",
+        "pillar0Desc": "Ссылки ведут на существующие маршруты, а не на заглушки.",
+        "pillar1Title": "Соответствие продукту",
+        "pillar1Desc": "Модули отражают реальные внутренние возможности.",
+        "pillar2Title": "Готовность к конверсии",
+        "pillar2Desc": "Публичные пользователи могут изучить возможности до входа.",
+        "groups": {
+          "execution": {
+            "name": "Запуск кампаний",
+            "metric": "4 ключевых потока"
+          },
+          "aiOpt": {
+            "name": "AI и оптимизация",
+            "metric": "6 модулей автоматизации"
+          },
+          "analytics": {
+            "name": "Аналитика и интеллект",
+            "metric": "5 модулей видимости"
+          },
+          "governance": {
+            "name": "Workspace, команда и финансы",
+            "metric": "6 модулей управления"
+          }
+        },
+        "items": {
+          "launchWizard": {
+            "title": "Мастер запуска",
+            "desc": "Пошаговая настройка цели, аудитории, бюджета и креативов."
+          },
+          "campaignManager": {
+            "title": "Менеджер кампаний",
+            "desc": "Управление кампаниями по статусу, платформе и расходам."
+          },
+          "audienceBuilder": {
+            "title": "Конструктор аудиторий",
+            "desc": "Создание и запуск аудиторий по воронке."
+          },
+          "retargeting": {
+            "title": "Ретаргетинг",
+            "desc": "Ретаргетинг через воронку и мастер."
+          },
+          "aiDecisions": {
+            "title": "Решения AI",
+            "desc": "Полный журнал решений AI и причин."
+          },
+          "autoOptimization": {
+            "title": "Автооптимизация",
+            "desc": "Автоматизация по правилам и история."
+          },
+          "creativeScorer": {
+            "title": "Оценка креативов",
+            "desc": "AI оценивает креативы до запуска."
+          },
+          "budgetOpt": {
+            "title": "Оптимизация бюджета",
+            "desc": "Умное распределение бюджета по платформам."
+          },
+          "simulation": {
+            "title": "Симуляция",
+            "desc": "Прогноз изменений бюджета и KPI до действий."
+          },
+          "roiCalculator": {
+            "title": "Калькулятор ROI",
+            "desc": "Оценка рентабельности до масштабирования."
+          },
+          "performance": {
+            "title": "Performance",
+            "desc": "KPI, тренды и срезы по кампаниям."
+          },
+          "reporting": {
+            "title": "Отчётность",
+            "desc": "Отчёты для экспорта и сравнение периодов."
+          },
+          "competitorIntel": {
+            "title": "Конкурентная аналитика",
+            "desc": "Конкуренты, SWOT и инсайты рынка."
+          },
+          "automationRules": {
+            "title": "Правила автоматизации",
+            "desc": "Триггеры и правила для авто-действий."
+          },
+          "topAds": {
+            "title": "Top Ads",
+            "desc": "Панель для быстрого анализа лучших объявлений."
+          },
+          "workspaceTeam": {
+            "title": "Команда workspace",
+            "desc": "Управление командой с ролями и приглашениями."
+          },
+          "adAccounts": {
+            "title": "Рекламные аккаунты",
+            "desc": "Подключение Meta, синхронизация и reconnect."
+          },
+          "productsPlans": {
+            "title": "Продукты и тарифы",
+            "desc": "Подписки, заказы и контроль использования."
+          },
+          "paymentsInvoices": {
+            "title": "Платежи и счета",
+            "desc": "Профиль биллинга, способы оплаты и счета."
+          },
+          "mcpCreds": {
+            "title": "MCP credentials",
+            "desc": "Управление MCP client id/secret для агентов."
+          },
+          "helpCenter": {
+            "title": "Справочный центр",
+            "desc": "Быстрая помощь по workspace и команде."
+          }
+        }
+      },
+      "solutions": {
+        "back": "На главную",
+        "badge": "Шаблоны решений",
+        "title": "Выберите модель работы для вашей команды",
+        "subtitle": "Каждый трек собран из реальных модулей — обещания совпадают с продуктом.",
+        "structureTitle": "Структура страницы",
+        "structure0": "Трек по модели команды",
+        "structure1": "Стек модулей с маршрутами",
+        "structure2": "Управление и операционное выравнивание",
+        "step0Label": "Шаг 1",
+        "step0Title": "Выберите трек",
+        "step0Desc": "Growth, агентство или AI-led модель.",
+        "step1Label": "Шаг 2",
+        "step1Title": "Изучите стек",
+        "step1Desc": "Какие модули поддерживают модель.",
+        "step2Label": "Шаг 3",
+        "step2Title": "Перейдите в поток",
+        "step2Desc": "Откройте нужный маршрут и начните работу.",
+        "nextEyebrow": "Дальше",
+        "nextTitle": "Нужна помощь с выбором?",
+        "nextSubtitle": "Откройте карту функций или сразу продукт для проверки настроек.",
+        "openFeatureMap": "Карта функций",
+        "openProduct": "Открыть продукт",
+        "tracks": {
+          "ecommerce": {
+            "title": "E-commerce growth-команда",
+            "summary": "Для команд полного воронки с быстрым запуском и жёстким контролем бюджета.",
+            "stack0": "Launch Wizard",
+            "stack1": "Audience Builder",
+            "stack2": "Creative Scorer",
+            "stack3": "Performance Dashboard"
+          },
+          "agency": {
+            "title": "Агентство: мульти-клиент",
+            "summary": "Для агентств с несколькими workspace, ролями и видимостью биллинга.",
+            "stack0": "Workspace Team",
+            "stack1": "Ad Accounts",
+            "stack2": "Billing and Invoices",
+            "stack3": "MCP Credentials"
+          },
+          "inhouse": {
+            "title": "In-house AI-оптимизация",
+            "summary": "Для операторов с AI-решениями, согласованиями и прозрачными логами.",
+            "stack0": "AI Decisions",
+            "stack1": "Auto Optimization",
+            "stack2": "Budget",
+            "stack3": "Reporting"
+          }
+        }
+      },
+      "marketplacePublic": {
+        "heroBadge": "Маркетплейс талантов",
+        "heroTitle1": "Найдите проверенных специалистов",
+        "heroTitle2": "для growth-кампаний",
+        "heroSubtitle": "Помогает командам находить операторов по ROAS, отзывам и нише до старта сотрудничества.",
+        "stat0v": "150+",
+        "stat0l": "Специалистов",
+        "stat1v": "4.8",
+        "stat1l": "Средний рейтинг",
+        "stat2v": "3.9x",
+        "stat2l": "Средний ROAS",
+        "searchPlaceholder": "Поиск по специалисту, нише или платформе",
+        "advancedFilters": "Расширенные фильтры",
+        "openProfile": "Открыть профиль"
+      },
+      "specialistProfile": {
+        "notFoundTitle": "Специалист не найден",
+        "notFoundLink": "В маркетплейс",
+        "backLink": "В маркетплейс",
+        "statsTitle": "Статистика",
+        "tabOverview": "Обзор",
+        "tabPortfolio": "Портфолио",
+        "tabTestimonials": "Отзывы",
+        "bio": "Био",
+        "knowledge": "Детали",
+        "experienceLabel": "Опыт",
+        "yearsUnit": "лет",
+        "campaignsManagedLabel": "Кампаний",
+        "totalSpendLabel": "Расход",
+        "responseTimeLabel": "Время ответа",
+        "hoursUnit": "часов",
+        "reviewsLabel": "Отзывы",
+        "ratingLabel": "Рейтинг",
+        "successRateLabel": "Успешность",
+        "languages": "Языки",
+        "certifications": "Сертификаты",
+        "portfolioSpend": "расход",
+        "sidebarTitle": "Начать",
+        "priceLabel": "Цена",
+        "locationLabel": "Локация",
+        "sendMessage": "Написать",
+        "secondaryCta": "Профиль",
+        "trustNote": "Свяжитесь через маркетплейс. Платежи безопасно через AdSpectr."
+      },
+      "portfolioPublic": {
+        "eyebrow": "Портфолио специалистов",
+        "title": "Проверенные байеры с прозрачной историей",
+        "description": "Каталог помогает оценить специалистов по метрикам кампаний, нише и отзывам.",
+        "statSpecialists": "Специалистов",
+        "statManagedSpend": "Управляемый расход",
+        "statAvgRoas": "Средний ROAS",
+        "statCampaigns": "Кампаний",
+        "searchPlaceholder": "Поиск по имени, должности или нише",
+        "sortRoas": "По ROAS",
+        "sortRating": "По рейтингу",
+        "sortSpend": "По расходу",
+        "labelRoas": "ROAS",
+        "labelCampaigns": "Кампании",
+        "labelSpend": "Расход"
+      },
+      "portfolioDetail": {
+        "reviewsWithCount": "отзывов",
+        "responseTime": "Время ответа",
+        "location": "Локация",
+        "specializationTitle": "Ниши",
+        "platformSplitTitle": "Платформы",
+        "recentCampaignsTitle": "Примеры кампаний",
+        "thNiche": "Ниша",
+        "thPlatform": "Платформа",
+        "thSpend": "Расход",
+        "thRoas": "ROAS",
+        "thStatus": "Статус"
+      },
+      "leaderboardPublic": {
+        "eyebrow": "Рейтинг эффективности",
+        "title": "Топ специалистов по результатам и доверию",
+        "description": "Сравнение по ROAS, рейтингам, кампаниям и проверенной доставке.",
+        "tabOverall": "Общий",
+        "tabRising": "Рост",
+        "tabRoas": "Лидеры ROAS",
+        "tabRating": "По рейтингу",
+        "top3Title": "Топ-3 специалистов",
+        "campaignsJoin": "кампаний"
+      },
+      "onboarding": {
+        "title": "Онбординг",
+        "subtitle": "Настройте workspace, подключите аккаунты и пригласите команду. Подробные шаги скоро.",
+        "login": "Войти",
+        "register": "Создать аккаунт"
+      }
+    }
+  },
+  "legal": {
+    "layout": {
+      "privacy": "Конфиденциальность",
+      "terms": "Условия",
+      "dataDeletion": "Удаление данных"
+    },
+    "footer": {
+      "privacyPolicy": "Политика конфиденциальности",
+      "termsOfService": "Условия использования",
+      "dataDeletion": "Удаление данных"
+    },
+    "terms": {
+      "title": "Условия использования",
+      "intro": "Ниже приведена базовая информация. Полный текст политики будет опубликован позже. По вопросам обращайтесь в поддержку."
+    },
+    "privacy": {
+      "title": "Политика конфиденциальности",
+      "intro": "Мы обрабатываем данные в соответствии с применимым законодательством. Подробности и запросы на удаление — через страницу удаления данных или поддержку."
+    },
+    "dataDeletion": {
+      "title": "Удаление данных",
+      "intro": "Чтобы запросить удаление персональных данных, напишите в поддержку с адреса вашего аккаунта. Срок обработки — до 30 дней, если иное не предусмотрено законом."
+    }
+  },
   "workspaceSettings": {
     "title": "Настройки рабочего пространства",
     "workspace": "Рабочее пространство",
+    "shellSubtitle": "Рекламные аккаунты, подписка, платежи, профиль, команда и MCP — в одном месте.",
     "classicSettings": "Классические настройки",
     "tabs": {
       "adAccounts": "Рекламные аккаунты",
       "products": "Продукты и использование",
       "payments": "Платежи",
       "profile": "Профиль пользователя",
+      "language": "Язык",
       "team": "Участники команды",
       "mcp": "Интеграция MCP",
       "help": "Центр ресурсов"
@@ -322,28 +1050,121 @@
       "pendingInvites": "Ожидающие приглашения",
       "permissions": "Права",
       "role": "Роль",
-      "adAccountsAccess": "Права доступа к рекламным аккаунтам"
+      "adAccountsAccess": "Права доступа к рекламным аккаунтам",
+      "workspaceCardTitle": "Команда",
+      "colName": "ФИО",
+      "colAdAccounts": "Подключённые ad accounts",
+      "colEmail": "Email",
+      "colAccess": "Доступ",
+      "loading": "Загрузка команды…",
+      "empty": "Участников пока нет. Пригласите коллег или проверьте ответ API.",
+      "you": "вы",
+      "revoke": "Отозвать"
+    },
+    "profile": {
+      "pageTitle": "Профиль пользователя",
+      "editUserInfo": "Изменить данные",
+      "setupWorkspace": "Настроить workspace",
+      "classicSettings": "Классические настройки",
+      "userId": "ID пользователя",
+      "personalEmail": "Личный email",
+      "phone": "Телефон",
+      "helpText": "Обновите личные данные и базовые настройки workspace. Сохранение синхронизируется с аккаунтом.",
+      "languageSettingsLink": "Настройки языка интерфейса →",
+      "savedProfile": "Профиль сохранён.",
+      "savedWorkspace": "Настройки workspace сохранены.",
+      "editModalTitle": "Изменить данные пользователя",
+      "workspaceModalTitle": "Настройка workspace",
+      "workspaceModalNote": "Тип бизнеса сохраняется как industry; телефон поддержки — как targetAudience в API.",
+      "name": "Имя",
+      "email": "Email",
+      "workspaceName": "Название workspace",
+      "businessType": "Тип бизнеса (Brand / Agency)",
+      "supportPhone": "Телефон поддержки",
+      "supportEmail": "Email поддержки"
+    },
+    "language": {
+      "title": "Язык интерфейса",
+      "description": "Выберите язык платформы (русский, English или o‘zbek). Настройка сохраняется в этом браузере и действует во всех разделах.",
+      "active": "Сейчас выбрано"
     },
     "payments": {
       "loadError": "Не удалось загрузить платежные данные",
       "addCardError": "Не удалось добавить карту",
       "saveBillingError": "Не удалось сохранить платежные данные",
       "addPaymentMethod": "Добавить способ оплаты",
-      "editContactDetails": "Изменить контактные данные"
+      "editContactDetails": "Изменить контактные данные",
+      "paymentMethod": "Способ оплаты",
+      "billingInformation": "Платёжные реквизиты",
+      "invoices": "Счета",
+      "invoiceCountLabel": "всего",
+      "loading": "Загрузка…",
+      "noMethods": "Сохранённых способов оплаты пока нет.",
+      "defaultBadge": "По умолчанию",
+      "secondaryBadge": "Дополнительный",
+      "setDefault": "Сделать основным",
+      "expLabel": "Действует до"
     },
     "products": {
       "loadError": "Не удалось загрузить информацию о продуктах",
-      "orderError": "Не удалось создать заказ"
+      "orderError": "Не удалось создать заказ",
+      "subscriptionPackage": "Подписка",
+      "planSubtitle": "Лимиты плана, биллинг и использование для этого workspace.",
+      "trialBadge": "Пробный период",
+      "seePlanDetails": "Подробнее о плане",
+      "nextPayment": "Следующий платёж",
+      "billingPeriodStarts": "Начало расчётного периода",
+      "spendPlanLimit": "Лимит расходов по плану",
+      "spendThisMonth": "Расходы за месяц",
+      "accountsUsage": "Использование ad accounts",
+      "accountsUsageDetail": "Подключённые аккаунты по плану и доп. слотам.",
+      "cancelTrial": "Отменить пробный период",
+      "manageSubscription": "Управлять подпиской",
+      "recommendedAddons": "Рекомендуемые дополнения",
+      "addonCta": "Подробнее",
+      "checkoutUrl": "Ссылка на оплату",
+      "orderLabel": "Заказ",
+      "checkStatus": "Проверить статус",
+      "freePlanTitle": "Бесплатный workspace",
+      "freePlanBody": "Обновите план для больших лимитов расходов, ad accounts и автоматизации."
+    },
+    "adAccounts": {
+      "pageTitle": "Рекламные аккаунты",
+      "facebookSection": "Facebook ad accounts",
+      "sectionSubtitle": "Статус, расход, тип и привязки страницы / пикселя — таблица в стиле Madgicx.",
+      "reauthenticate": "Повторная авторизация",
+      "addFacebookAccount": "Добавить Facebook ad account",
+      "openMetaPanel": "Настройки Meta",
+      "guidedSetup": "Пошаговая настройка",
+      "resync": "Повторная синхронизация",
+      "colStatus": "Статус",
+      "colAccount": "Аккаунт",
+      "colSpend": "Расход за 30 дней",
+      "colObjective": "Тип",
+      "colTimezone": "Часовой пояс",
+      "colActions": "Действия",
+      "metricsSummary": "Подключено · выбор · расход",
+      "connectedLabel": "Подключённые ad accounts",
+      "selectionLabel": "Текущий выбор",
+      "spendLabel": "Расход (30 дней)"
     },
     "mcp": {
       "title": "Интеграция MCP",
       "createCredentials": "Создать Client ID / Client Secret",
       "existingCredentials": "Существующие credentials",
-      "noCredentials": "Credentials пока нет"
+      "noCredentials": "Credentials пока нет",
+      "noCredentialsBody": "Создайте Client ID и Client Secret, чтобы подключить AI-агентов к workspace.",
+      "securityNote": "Секрет показывается только один раз при создании. Сразу скопируйте его в надёжное хранилище.",
+      "serverAndDocs": "Сервер и документация",
+      "credentialsModalTitle": "Ваши новые credentials",
+      "credentialsModalHint": "Скопируйте и сохраните сейчас. Client Secret больше не будет показан.",
+      "copy": "Копировать",
+      "copied": "Скопировано",
+      "savedCredentials": "Я сохранил credentials"
     }
   },
   "campaigns": {
-    "subtitle": "Все рекламные кампании, управляемые Performa",
+    "subtitle": "Все рекламные кампании, управляемые AdSpectr",
     "total": "всего",
     "refresh": "Обновить",
     "create": "Создать кампанию",
@@ -356,14 +1177,34 @@
     "connectMorePlatformsHint": "Добавьте Google, TikTok или Telegram для расширения охвата.",
     "connectPlatform": "Подключить платформу",
     "loadFailed": "Не удалось загрузить кампании",
-    "updateFailed": "Не удалось обновить статус кампании"
+    "updateFailed": "Не удалось обновить статус кампании",
+    "active": "Активные",
+    "paused": "Приостановленные",
+    "draft": "Черновики",
+    "pause": "Пауза",
+    "resume": "Возобновить",
+    "stop": "Остановить"
   },
   "reporting": {
     "loadError": "Не удалось загрузить отчет. Проверьте подключение Meta Ads.",
     "exportError": "Ошибка экспорта CSV",
     "workspaceMissing": "Рабочее пространство не выбрано",
     "subtitle": "Разбивка эффективности Meta Ads по аккаунтам и кампаниям",
-    "exportCsv": "Экспорт CSV"
+    "exportCsv": "Экспорт CSV",
+    "metricsHint": "Ниже показаны настраиваемые KPI-карточки. Основная таблица отражает реальные данные аккаунтов и кампаний.",
+    "customMetrics": "Мои метрики",
+    "customMetricsHint": "выберите, что отслеживать",
+    "selectMetrics": "Выберите метрики выше",
+    "budgetSimulation": "Симуляция бюджета",
+    "budgetSimulationHint": "оцените эффект перед изменением бюджета",
+    "noData": "Данных отчетности пока нет",
+    "noDataDescription": "Meta Ads не подключен или за выбранный период нет данных.",
+    "connectMeta": "Подключить Meta Ads",
+    "reportTemplates": "Шаблоны отчетов",
+    "templatesTitle": "Все шаблоны",
+    "searchTemplate": "Поиск шаблона",
+    "useTemplate": "Использовать шаблон",
+    "noTemplates": "Нет шаблонов по вашему запросу."
   },
   "performance": {
     "loadFailed": "Не удалось загрузить данные производительности",
@@ -392,9 +1233,40 @@
   "audiences": {
     "subtitle": "Создавайте full-funnel аудитории и запускайте их системно",
     "launcherTitle": "Audience Launcher",
-    "launcherSubtitle": "Стратегия full-funnel таргетинга Performa с оптимизированным workflow для максимального ROAS.",
+    "launcherSubtitle": "Стратегия full-funnel таргетинга AdSpectr с оптимизированным workflow для максимального ROAS.",
     "selected": "выбрано",
-    "noAudienceSelected": "Аудитории пока не выбраны."
+    "noAudienceSelected": "Аудитории пока не выбраны.",
+    "openStudio": "Audience Studio",
+    "selectedCount": "выбрано",
+    "toggleSubtypes": "Список шаблонов",
+    "sectionAcquisitionTitle": "Acquisition prospecting",
+    "sectionAcquisitionBlurb": "Холодные аудитории и lookalike для масштабных тестов.",
+    "sectionReengagementTitle": "Acquisition re-engagement",
+    "sectionReengagementBlurb": "Тёплые пользователи с первым контактом с брендом.",
+    "sectionRetargetingTitle": "Ретаргетинг",
+    "sectionRetargetingBlurb": "Посетители сайта и сигналы намерения.",
+    "sectionRetentionTitle": "Удержание",
+    "sectionRetentionBlurb": "Существующие клиенты для upsell и реактивации.",
+    "studioTitle": "Audience Studio",
+    "studioSubtitle": "Анализ эффективности, интересы и пересечения перед запуском.",
+    "studioTabPerformance": "По эффективности",
+    "studioTabDiscover": "Новые интересы",
+    "studioSearchPlaceholder": "Поиск аудиторий…",
+    "studioLast7d": "Последние 7 дней",
+    "studioColAudience": "Аудитория",
+    "studioColType": "Тип",
+    "studioColSpend": "Расход",
+    "studioNoData": "Нет данных — подключите Meta и синхронизацию.",
+    "mixerTitle": "Audience mixer",
+    "mixerNoPresets": "Нет пресетов для аккаунта",
+    "mixerSave": "Сохранить выбор",
+    "mixerIncluded": "Включённые аудитории",
+    "mixerSlot0": "0 пересечение",
+    "mixerSlot1": "1-е пересечение",
+    "mixerSlot2": "2-е пересечение",
+    "mixerDropHint": "Добавьте из таблицы выше",
+    "mixerReach": "Потенциальный охват: недоступен, пока не заданы аудитории.",
+    "backToLauncher": "К Audience Launcher"
   },
   "autoOptimization": {
     "runFailed": "Оптимизация не удалась",
@@ -459,7 +1331,7 @@
     "workspaceSubtitle": "аккаунты, подписка, платежи, команда, MCP",
     "toggleTheme": "Переключить тему",
     "dashboardSubtitle": "Обзор эффективности рекламы",
-    "campaignsSubtitle": "Все кампании в Performa",
+    "campaignsSubtitle": "Все кампании в AdSpectr",
     "audiencesSubtitle": "Создавайте и запускайте воронки аудиторий",
     "aiDecisionsSubtitle": "Все действия ИИ с полным обоснованием",
     "budgetSubtitle": "Распределение и эффективность по платформам",
@@ -469,6 +1341,11 @@
     "roiSubtitle": "Оцените прибыльность перед масштабированием",
     "settingsSubtitle": "Настройки воркспейса и аккаунта",
     "reportingSubtitle": "Метрики и тренды кампаний",
+    "automationSubtitle": "Тактики, триггеры и состояние автоматизаций",
+    "automationWizardSubtitle": "Создание правил по шагам, условиям и расписанию",
+    "adLauncherSubtitle": "Выбор объявлений, пресетов и пакетов креативов",
+    "audienceStudioSubtitle": "Таблица эффективности и audience mixer",
+    "metaAuditSubtitle": "360° креативы, таргетинг и аукцион",
     "marketplaceSubtitle": "Профессиональные маркетинговые специалисты",
     "launchSubtitle": "Создавайте и запускайте кампании эффективно",
     "autoOptimizationSubtitle": "Настройки автоматизации и политика выполнения",

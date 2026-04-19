@@ -7,7 +7,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Campaign } from "./entities/campaign.entity";
 import { Workspace } from "../workspaces/entities/workspace.entity";
-import { CreateCampaignDto, CampaignStatus } from "@performa/shared";
+import { CreateCampaignDto, CampaignStatus } from "@adspectr/shared";
 
 @Injectable()
 export class CampaignsService {

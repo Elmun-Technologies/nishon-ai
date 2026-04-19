@@ -9,12 +9,12 @@ import { ConnectedAccount } from "../platforms/entities/connected-account.entity
 import { MetaConnector } from "../platforms/connectors/meta.connector";
 import { GoogleConnector } from "../platforms/connectors/google.connector";
 import { TiktokConnector } from "../platforms/connectors/tiktok.connector";
-import { AutopilotMode, AiDecisionAction, Platform, CampaignStatus } from "@performa/shared";
+import { AutopilotMode, AiDecisionAction, Platform, CampaignStatus } from "@adspectr/shared";
 
 const mockCompleteJson = jest.fn();
 
-jest.mock("@performa/ai-sdk", () => ({
-  PerformaAiClient: jest.fn().mockImplementation(() => ({
+jest.mock("@adspectr/ai-sdk", () => ({
+  AdSpectrAiClient: jest.fn().mockImplementation(() => ({
     completeJson: mockCompleteJson,
   })),
   OPTIMIZATION_SYSTEM_PROMPT: "mock prompt",

@@ -1,4 +1,10 @@
 import { env } from './env'
+import {
+  clearAuthTokens,
+  getAccessToken,
+  getRefreshToken,
+  setAccessToken,
+} from './auth-storage'
 
 const API_BASE_URL = env.apiBaseUrl
 
@@ -37,7 +43,7 @@ async function apiRequest<T>(
   }
 
   if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('performa_access_token')
+    const token = getAccessToken()
     if (token) headers.Authorization = `Bearer ${token}`
   }
 
@@ -49,7 +55,7 @@ async function apiRequest<T>(
   })
 
   if (res.status === 401 && retry && typeof window !== 'undefined') {
-    const refreshToken = localStorage.getItem('performa_refresh_token')
+    const refreshToken = getRefreshToken()
     if (refreshToken) {
       try {
         const refreshRes = await fetch(toUrl('/auth/refresh'), {
@@ -63,12 +69,11 @@ async function apiRequest<T>(
 
         const refreshJson = await refreshRes.json()
         const newToken = refreshJson.accessToken
-        if (newToken) localStorage.setItem('performa_access_token', newToken)
+        if (newToken) setAccessToken(newToken)
 
         return apiRequest<T>(method, pathOrUrl, body, false)
       } catch {
-        localStorage.removeItem('performa_access_token')
-        localStorage.removeItem('performa_refresh_token')
+        clearAuthTokens()
         window.location.href = '/login'
       }
     } else {

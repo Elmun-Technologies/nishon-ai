@@ -17,7 +17,7 @@ async function seed() {
     // Check if demo user already exists
     const existing = await pool.query(
       'SELECT id FROM users WHERE email = $1',
-      ['demo@performa.ai']
+      ['demo@adspectr.com']
     )
 
     if (existing.rows.length > 0) {
@@ -34,10 +34,10 @@ async function seed() {
     const hashedPassword = await bcrypt.hash(demoPassword, 12)
     const userResult = await pool.query(
       'INSERT INTO users (email, password, name, plan, is_email_verified, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, NOW(), NOW()) RETURNING id',
-      ['demo@performa.ai', hashedPassword, 'Demo User', 'PRO', true]
+      ['demo@adspectr.com', hashedPassword, 'Demo User', 'PRO', true]
     )
     const userId = userResult.rows[0].id
-    console.log('✅ Demo user created:', 'demo@performa.ai')
+    console.log('✅ Demo user created:', 'demo@adspectr.com')
 
     // Create demo workspace
     const workspaceResult = await pool.query(
@@ -229,7 +229,7 @@ async function seed() {
 
     console.log('')
     console.log('🎉 Seed complete! Demo credentials:')
-    console.log('   Email:    demo@performa.ai')
+    console.log('   Email:    demo@adspectr.com')
     console.log('   Password: demo1234')
     console.log('')
 

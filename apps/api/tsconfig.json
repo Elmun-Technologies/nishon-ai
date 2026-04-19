@@ -18,8 +18,8 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@performa/shared": ["../../packages/shared/src"],
-      "@performa/ai-sdk": ["../../packages/ai-sdk/src"]
+      "@adspectr/shared": ["../../packages/shared/src"],
+      "@adspectr/ai-sdk": ["../../packages/ai-sdk/src"]
     }
   }
 }

@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { ArrowRight, CheckCircle2, Search, SlidersHorizontal, Star, TrendingUp, Users } from 'lucide-react'
 import { PublicContainer, PublicFooter, PublicNavbar } from '@/components/public/PublicLayout'
+import { useI18n } from '@/i18n/use-i18n'
 
 const specialists = [
   {
@@ -40,13 +41,16 @@ const specialists = [
   },
 ]
 
-const marketplaceStats: Array<{ value: string; label: string; icon: typeof Users }> = [
-  { value: '150+', label: 'Specialists', icon: Users },
-  { value: '4.8', label: 'Avg rating', icon: Star },
-  { value: '3.9x', label: 'Avg ROAS', icon: TrendingUp },
-]
-
 export default function MarketplacePage() {
+  const { t } = useI18n()
+  const mp = (k: string, fb = '') => t(`publicSite.marketing.marketplacePublic.${k}`, fb)
+
+  const marketplaceStats: Array<{ value: string; label: string; icon: typeof Users }> = [
+    { value: mp('stat0v'), label: mp('stat0l'), icon: Users },
+    { value: mp('stat1v'), label: mp('stat1l'), icon: Star },
+    { value: mp('stat2v'), label: mp('stat2l'), icon: TrendingUp },
+  ]
+
   return (
     <main className="min-h-screen bg-surface text-text-primary">
       <PublicNavbar />
@@ -55,17 +59,13 @@ export default function MarketplacePage() {
         <PublicContainer className="py-14 md:py-20">
           <div className="grid gap-8 md:grid-cols-[1.2fr_1fr] md:items-end">
             <div>
-              <p className="inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-slate-200">
-                Talent Marketplace
-              </p>
+              <p className="inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-slate-200">{mp('heroBadge')}</p>
               <h1 className="mt-4 text-4xl font-semibold leading-tight md:text-6xl">
-                Find verified specialists
+                {mp('heroTitle1')}
                 <br />
-                for growth campaigns
+                {mp('heroTitle2')}
               </h1>
-              <p className="mt-4 max-w-2xl text-lg text-slate-300">
-                Marketplace helps teams discover operators by ROAS, review quality, and niche experience before starting collaboration.
-              </p>
+              <p className="mt-4 max-w-2xl text-lg text-slate-300">{mp('heroSubtitle')}</p>
             </div>
             <div className="grid grid-cols-3 gap-3">
               {marketplaceStats.map(({ value, label, icon: StatIcon }) => {
@@ -89,18 +89,18 @@ export default function MarketplacePage() {
               <div className="relative w-full">
                 <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-tertiary" />
                 <input
-                  placeholder="Search by specialist, niche, or platform"
+                  placeholder={mp('searchPlaceholder')}
                   className="w-full rounded-xl border border-border bg-surface py-2.5 pl-9 pr-3 text-sm outline-none focus:border-[#84cc16]/60"
                 />
               </div>
               <select className="rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-text-secondary">
-                <option>Sort by rating</option>
-                <option>Sort by ROAS</option>
-                <option>Sort by reviews</option>
+                <option value="rating">{t('marketplace.sortBy.rating', '')}</option>
+                <option value="roas">{t('marketplace.sortBy.roas', '')}</option>
+                <option value="price">{t('marketplace.sortBy.price', '')}</option>
               </select>
               <button className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-text-secondary hover:bg-surface-2">
                 <SlidersHorizontal className="h-4 w-4" />
-                Advanced filters
+                {mp('advancedFilters')}
               </button>
             </div>
           </div>
@@ -121,7 +121,7 @@ export default function MarketplacePage() {
                   {spec.verified && (
                     <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] text-emerald-700">
                       <CheckCircle2 className="h-3 w-3" />
-                      Verified
+                      {t('publicSite.marketing.common.verified', '')}
                     </span>
                   )}
                 </div>
@@ -130,15 +130,15 @@ export default function MarketplacePage() {
 
                 <div className="mt-4 grid grid-cols-3 gap-2">
                   <div className="rounded-xl border border-border bg-surface-2 p-2.5 text-center">
-                    <p className="text-xs text-text-tertiary">Rating</p>
+                    <p className="text-xs text-text-tertiary">{t('leaderboard.rating', '')}</p>
                     <p className="text-sm font-semibold">{spec.rating}</p>
                   </div>
                   <div className="rounded-xl border border-border bg-surface-2 p-2.5 text-center">
-                    <p className="text-xs text-text-tertiary">ROAS</p>
+                    <p className="text-xs text-text-tertiary">{t('leaderboard.roas', '')}</p>
                     <p className="text-sm font-semibold">{spec.roas}</p>
                   </div>
                   <div className="rounded-xl border border-border bg-surface-2 p-2.5 text-center">
-                    <p className="text-xs text-text-tertiary">Reviews</p>
+                    <p className="text-xs text-text-tertiary">{t('publicSite.marketing.specialistProfile.reviewsLabel', '')}</p>
                     <p className="text-sm font-semibold">{spec.reviews}</p>
                   </div>
                 </div>
@@ -154,7 +154,7 @@ export default function MarketplacePage() {
                 <div className="mt-4 flex items-center justify-between">
                   <p className="text-sm text-text-secondary">{spec.monthlyRate}</p>
                   <span className="inline-flex items-center gap-1 text-sm font-medium text-[#65a30d]">
-                    Open profile
+                    {mp('openProfile')}
                     <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
                   </span>
                 </div>

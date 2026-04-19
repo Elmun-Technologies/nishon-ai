@@ -51,7 +51,7 @@ export function validateEnv(config: EnvRecord): EnvRecord {
 
   if (warned.length > 0) {
     console.warn(
-      `[Performa] Missing recommended environment variables: ${warned.join(", ")}. ` +
+      `[AdSpectr] Missing recommended environment variables: ${warned.join(", ")}. ` +
         "Some features may not work correctly.",
     );
   }

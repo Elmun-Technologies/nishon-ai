@@ -14,10 +14,10 @@ import { Campaign } from "../../campaigns/entities/campaign.entity";
 import { ConnectedAccount } from "../../platforms/entities/connected-account.entity";
 import { AiDecision } from "../../ai-decisions/entities/ai-decision.entity";
 import { Budget } from "../../budget/entities/budget.entity";
-import { AutopilotMode, CampaignObjective } from "@performa/shared";
+import { AutopilotMode, CampaignObjective } from "@adspectr/shared";
 
 /**
- * A Workspace represents one business managed inside Performa.
+ * A Workspace represents one business managed inside AdSpectr.
  * One user can have multiple workspaces (e.g. they manage 3 different businesses).
  * All campaigns, budgets, and AI decisions belong to a workspace, not directly to a user.
  * This design allows agency accounts to manage multiple clients under one login.
@@ -85,7 +85,7 @@ export class Workspace {
 
   /**
    * Telegram chat ID for daily report delivery.
-   * User gets this by messaging @PerformaAIBot and running /start.
+   * User gets this by messaging @AdSpectrBot and running /start.
    * If null, daily reports are skipped for this workspace.
    */
   @Column({ type: 'varchar', length: 64, nullable: true })
@@ -95,7 +95,7 @@ export class Workspace {
    * How the workspace is managed:
    *   'self'        — user manages campaigns themselves
    *   'human_agent' — a real targetologist from marketplace manages it
-   *   'ai_agent'    — an AI agent (Performa or custom) manages it
+   *   'ai_agent'    — an AI agent (AdSpectr or custom) manages it
    */
   @Column({ type: 'varchar', length: 20, default: 'self', name: 'service_type' })
   serviceType: 'self' | 'human_agent' | 'ai_agent';

@@ -278,7 +278,7 @@ export class YandexConnector {
           "Conversions",
           "Ctr",
         ],
-        ReportName: `PerformaAI_Report_${Date.now()}`,
+        ReportName: `AdSpectrAI_Report_${Date.now()}`,
         ReportType: "CAMPAIGN_PERFORMANCE_REPORT",
         DateRangeType: "CUSTOM_DATE",
         Format: "TSV",

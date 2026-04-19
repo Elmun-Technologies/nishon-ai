@@ -1,13 +1,13 @@
 services:
   - type: web
-    name: performa-ai-api
+    name: adspectr-api
     env: node
     plan: free
     rootDir: .
     buildCommand: >
       NODE_ENV=development pnpm install --frozen-lockfile &&
-      pnpm --filter @performa/shared build &&
-      pnpm --filter @performa/ai-sdk build &&
+      pnpm --filter @adspectr/shared build &&
+      pnpm --filter @adspectr/ai-sdk build &&
       NODE_OPTIONS='--max-old-space-size=400' pnpm --filter api build
     startCommand: pnpm --filter api start:prod
     healthCheckPath: /health
@@ -20,13 +20,9 @@ services:
       # ── Public URLs ────────────────────────────────────────────────────────
       # Set these to YOUR actual Render service URL and Vercel URL
       - key: API_BASE_URL
-        value: https://performa-ai-api.onrender.com   # ← change to your Render URL
+        value: https://adspectr-api.onrender.com   # ← set to your Render URL
       - key: FRONTEND_URL
-<<<<<<< HEAD
-        value: https://performa-ai.vercel.app          # ← change to your Vercel URL
-=======
-        value: https://performa-ai.vercel.app,*.vercel.app
->>>>>>> codex/continue-implementation-nqisfu
+        value: https://adspectr.com               # ← set to your production web URL
 
       # ── Database ───────────────────────────────────────────────────────────
       - key: DATABASE_URL
@@ -67,7 +63,7 @@ services:
       - key: META_APP_SECRET
         sync: false
       - key: META_CALLBACK_URL
-        value: https://performa-ai-api.onrender.com/platforms/meta/callback
+        value: https://adspectr-api.onrender.com/platforms/meta/callback
 
       # ── TikTok ─────────────────────────────────────────────────────────────
       - key: TIKTOK_APP_ID
