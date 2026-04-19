@@ -1,5 +1,6 @@
 {
-  "buildCommand": "pnpm install --frozen-lockfile && pnpm --filter web build && rm -rf .next && cp -R apps/web/.next .next",
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "pnpm install --frozen-lockfile",
   "framework": "nextjs",
   "env": {
     "NEXT_TELEMETRY_DISABLED": "1"
