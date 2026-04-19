@@ -63,7 +63,7 @@ export default function HomePage() {
             </div>
             <div className="mt-7 flex flex-wrap gap-3">
               <Link
-                href="/register"
+                href="/onboarding"
                 className="rounded-xl bg-[#84cc16] px-5 py-3 text-sm font-semibold text-[#1a2e05] hover:opacity-90"
               >
                 {t('landing.hero.buttonStart', '')}
@@ -255,7 +255,7 @@ export default function HomePage() {
               <h2 className="mt-1 text-5xl font-semibold">{t('publicSite.home.finalCta.title', '')}</h2>
               <p className="mt-3 text-lg text-text-secondary">{t('publicSite.home.finalCta.subtitle', '')}</p>
               <div className="mt-6 flex flex-wrap gap-3">
-                <Link href="/register" className="rounded-xl bg-[#84cc16] px-5 py-3 text-sm font-semibold text-[#1a2e05]">
+                <Link href="/onboarding" className="rounded-xl bg-[#84cc16] px-5 py-3 text-sm font-semibold text-[#1a2e05]">
                   {t('publicSite.cta.startFree', '')}
                 </Link>
                 <Link href="/solutions" className="rounded-xl border border-border bg-white px-5 py-3 text-sm font-medium">

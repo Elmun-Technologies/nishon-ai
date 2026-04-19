@@ -25,12 +25,6 @@ export function PublicNavbar() {
           <Link href="/marketplace" className="hover:text-text-primary">
             {t('publicSite.nav.marketplace', 'Marketplace')}
           </Link>
-          <Link href="/leaderboard" className="hover:text-text-primary">
-            {t('publicSite.nav.leaderboard', 'Leaderboard')}
-          </Link>
-          <Link href="/portfolio" className="hover:text-text-primary">
-            {t('publicSite.nav.portfolio', 'Portfolio')}
-          </Link>
         </nav>
 
         <div className="flex shrink-0 items-center gap-2">
@@ -44,7 +38,7 @@ export function PublicNavbar() {
             {t('publicSite.cta.login', 'Login')}
           </Link>
           <Link
-            href="/register"
+            href="/onboarding"
             className="rounded-lg bg-primary px-3 py-2 text-sm font-medium text-white hover:opacity-95"
           >
             {t('publicSite.cta.startFree', 'Start Free')}

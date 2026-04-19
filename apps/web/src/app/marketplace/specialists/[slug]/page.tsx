@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Star, MapPin, DollarSign, Clock, Check, Mail, MessageSquare } from 'lucide-react'
-import { PublicContainer, PublicFooter, PublicNavbar } from '@/components/public/PublicLayout'
+import { PublicContainer, PublicFooter } from '@/components/public/PublicLayout'
 import { useI18n } from '@/i18n/use-i18n'
 
 const SPECIALIST_DATA = {
@@ -154,8 +154,6 @@ export default function SpecialistProfilePage({ params }: { params: { slug: stri
 
   return (
     <main className="min-h-screen bg-surface-2 text-text-primary">
-      <PublicNavbar />
-
       <section className="border-b border-border bg-surface py-8">
         <PublicContainer>
           <Link href="/marketplace" className="mb-4 inline-block text-primary hover:underline">

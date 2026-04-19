@@ -1,9 +1,27 @@
 'use client'
-import { useState } from 'react'
+
+import { useCallback, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import {
+  ChevronLeft,
+  ChevronRight,
+  Facebook,
+  Globe,
+  Megaphone,
+  Search,
+  ShoppingCart,
+  Target,
+} from 'lucide-react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { campaigns as campaignsApi } from '@/lib/api-client'
-import { Alert } from '@/components/ui/Alert'
+import { Alert, Button, Input, Textarea } from '@/components/ui'
+import { useI18n } from '@/i18n/use-i18n'
+import {
+  WizardAsideHint,
+  WizardChoiceRow,
+  WizardProgressBar,
+  WizardStepCard,
+} from '@/components/launch/wizard-shell'
 
 type Platform = 'meta' | 'google' | 'yandex'
 type LaunchMode = 'self' | 'ai' | 'expert'
@@ -11,13 +29,19 @@ type MetaStep = 1 | 2 | 3 | 4 | 5
 type GoogleStep = 1 | 2 | 3 | 4 | 5
 type YandexStep = 1 | 2 | 3 | 4
 
-const PLATFORMS = [
-  { id: 'meta', name: '📘 Meta (Facebook/Instagram)', desc: 'Reklama qo\'yish Facebookda, Instagramda', color: 'from-blue-400 to-blue-600' },
-  { id: 'google', name: '🔍 Google Ads', desc: 'Qidiruv, Display, Smart kampaniyalar', color: 'from-red-400 to-blue-500' },
-  { id: 'yandex', name: '🟡 Yandex Direct', desc: 'Yandex-da qidiruv va reklama', color: 'from-yellow-400 to-orange-500' },
-]
+type MetaObjective = 'leads' | 'traffic' | 'sales' | 'awareness'
+
+function parsePositiveNumber(v: string) {
+  const n = Number(String(v).replace(',', '.'))
+  return Number.isFinite(n) && n > 0 ? n : null
+}
+
+function formatMoneyUsd(n: number) {
+  return new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n)
+}
 
 export default function LaunchPage() {
+  const { t } = useI18n()
   const router = useRouter()
   const { currentWorkspace } = useWorkspaceStore()
   const [platform, setPlatform] = useState<Platform | null>(null)
@@ -28,10 +52,31 @@ export default function LaunchPage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
+  const lt = useCallback(
+    (path: string, fallback: string) => t(`launchWizard.${path}`, fallback),
+    [t],
+  )
+
   const handlePlatformPick = (nextPlatform: Platform) => {
     setPlatform(nextPlatform)
     setLaunchModeConfirmed(false)
     setLaunchMode('self')
+    setMetaStep(1)
+    setGoogleStep(1)
+    setYandexStep(1)
+    setMetaData({
+      name: '',
+      objective: '',
+      minAge: 18,
+      maxAge: 65,
+      location: 'UZ',
+      dailyBudget: '',
+      campaignDuration: 7,
+      creativeName: '',
+      creativeUrl: '',
+      creativeText: '',
+      ctaButton: 'learn_more',
+    })
   }
 
   const handleLaunchModeConfirm = () => {
@@ -47,11 +92,18 @@ export default function LaunchPage() {
     setLaunchModeConfirmed(true)
   }
 
-  // Meta form state
+  const exitToMode = () => {
+    setLaunchModeConfirmed(false)
+    setMetaStep(1)
+    setGoogleStep(1)
+    setYandexStep(1)
+    setError('')
+  }
+
   const [metaStep, setMetaStep] = useState<MetaStep>(1)
   const [metaData, setMetaData] = useState({
     name: '',
-    objective: 'leads',
+    objective: '' as '' | MetaObjective,
     minAge: 18,
     maxAge: 65,
     location: 'UZ',
@@ -63,7 +115,6 @@ export default function LaunchPage() {
     ctaButton: 'learn_more',
   })
 
-  // Google form state
   const [googleStep, setGoogleStep] = useState<GoogleStep>(1)
   const [googleData, setGoogleData] = useState({
     name: '',
@@ -80,7 +131,6 @@ export default function LaunchPage() {
     biddingStrategy: 'target_cpa',
   })
 
-  // Yandex form state
   const [yandexStep, setYandexStep] = useState<YandexStep>(1)
   const [yandexData, setYandexData] = useState({
     name: '',
@@ -94,20 +144,60 @@ export default function LaunchPage() {
     strategy: 'average_cpc',
   })
 
+  const metaObjectives = useMemo(
+    () =>
+      [
+        {
+          id: 'leads' as const,
+          icon: <Target className="h-5 w-5" aria-hidden />,
+        },
+        {
+          id: 'traffic' as const,
+          icon: <Globe className="h-5 w-5" aria-hidden />,
+        },
+        {
+          id: 'sales' as const,
+          icon: <ShoppingCart className="h-5 w-5" aria-hidden />,
+        },
+        {
+          id: 'awareness' as const,
+          icon: <Megaphone className="h-5 w-5" aria-hidden />,
+        },
+      ] as const,
+    [],
+  )
+
   const handleMetaLaunch = async () => {
     setSaving(true)
     setError('')
+    const nameTrim = metaData.name.trim()
+    if (!nameTrim) {
+      setError(lt('meta.errorName', 'Enter a campaign name.'))
+      setSaving(false)
+      return
+    }
+    const daily = parsePositiveNumber(metaData.dailyBudget)
+    if (!daily) {
+      setError(lt('meta.errorBudget', 'Enter a valid daily budget.'))
+      setSaving(false)
+      return
+    }
+    if (metaData.minAge >= metaData.maxAge) {
+      setError(lt('meta.errorAge', 'Invalid age range.'))
+      setSaving(false)
+      return
+    }
     try {
-      const campaign = await campaignsApi.create(currentWorkspace?.id ?? '', {
-        name: metaData.name,
+      await campaignsApi.create(currentWorkspace?.id ?? '', {
+        name: nameTrim,
         platform: 'meta',
-        objective: metaData.objective,
-        dailyBudget: Number(metaData.dailyBudget),
-        totalBudget: Number(metaData.dailyBudget) * metaData.campaignDuration,
+        objective: metaData.objective || 'leads',
+        dailyBudget: daily,
+        totalBudget: daily * metaData.campaignDuration,
       })
       router.push(`/campaigns`)
     } catch (err: any) {
-      setError(err?.message || 'Kampaniya yaratishda xatolik')
+      setError(err?.message || 'Error creating campaign')
     } finally {
       setSaving(false)
     }
@@ -116,17 +206,23 @@ export default function LaunchPage() {
   const handleGoogleLaunch = async () => {
     setSaving(true)
     setError('')
+    const daily = parsePositiveNumber(googleData.dailyBudget)
+    if (!daily) {
+      setError(lt('meta.errorBudget', 'Enter a valid daily budget.'))
+      setSaving(false)
+      return
+    }
     try {
-      const campaign = await campaignsApi.create(currentWorkspace?.id ?? '', {
-        name: googleData.name,
+      await campaignsApi.create(currentWorkspace?.id ?? '', {
+        name: googleData.name || 'Google campaign',
         platform: 'google',
         objective: googleData.objective,
-        dailyBudget: Number(googleData.dailyBudget),
-        totalBudget: Number(googleData.dailyBudget) * 30,
+        dailyBudget: daily,
+        totalBudget: daily * 30,
       })
       router.push(`/campaigns`)
     } catch (err: any) {
-      setError(err?.message || 'Kampaniya yaratishda xatolik')
+      setError(err?.message || 'Error creating campaign')
     } finally {
       setSaving(false)
     }
@@ -135,50 +231,97 @@ export default function LaunchPage() {
   const handleYandexLaunch = async () => {
     setSaving(true)
     setError('')
+    const daily = parsePositiveNumber(yandexData.dailyBudget)
+    if (!daily) {
+      setError(lt('meta.errorBudget', 'Enter a valid daily budget.'))
+      setSaving(false)
+      return
+    }
     try {
-      const campaign = await campaignsApi.create(currentWorkspace?.id ?? '', {
-        name: yandexData.name,
+      await campaignsApi.create(currentWorkspace?.id ?? '', {
+        name: yandexData.name || 'Yandex campaign',
         platform: 'yandex',
         objective: 'leads',
-        dailyBudget: Number(yandexData.dailyBudget),
-        totalBudget: Number(yandexData.dailyBudget) * 30,
+        dailyBudget: daily,
+        totalBudget: daily * 30,
       })
       router.push(`/campaigns`)
     } catch (err: any) {
-      setError(err?.message || 'Kampaniya yaratishda xatolik')
+      setError(err?.message || 'Error creating campaign')
     } finally {
       setSaving(false)
     }
   }
 
+  const metaStepValid = useMemo(() => {
+    if (metaStep === 1) return !!metaData.objective
+    if (metaStep === 2)
+      return metaData.name.trim().length >= 2 && metaData.minAge < metaData.maxAge && metaData.minAge >= 13
+    if (metaStep === 3) return parsePositiveNumber(metaData.dailyBudget) !== null
+    return true
+  }, [metaStep, metaData])
+
+  const tabs = useMemo(
+    () =>
+      [
+        { id: 'drafts' as const, label: lt('hub.tabDrafts', 'Drafts') },
+        { id: 'ai_drafts' as const, label: lt('hub.tabAiDrafts', 'AI drafts') },
+        { id: 'templates' as const, label: lt('hub.tabTemplates', 'Templates') },
+        { id: 'launches' as const, label: lt('hub.tabLaunches', 'Launches') },
+      ],
+    [lt],
+  )
+
+  const platformCards = useMemo(
+    () =>
+      [
+        {
+          id: 'meta' as const,
+          title: lt('platforms.metaName', 'Meta'),
+          desc: lt('platforms.metaDesc', ''),
+          icon: <Facebook className="h-6 w-6 text-[#0866FF]" aria-hidden />,
+        },
+        {
+          id: 'google' as const,
+          title: lt('platforms.googleName', 'Google Ads'),
+          desc: lt('platforms.googleDesc', ''),
+          icon: <Search className="h-6 w-6 text-[#4285F4]" aria-hidden />,
+        },
+        {
+          id: 'yandex' as const,
+          title: lt('platforms.yandexName', 'Yandex Direct'),
+          desc: lt('platforms.yandexDesc', ''),
+          icon: <span className="text-lg font-bold text-[#FC3F1D]" aria-hidden>Y</span>,
+        },
+      ],
+    [lt],
+  )
+
   if (!platform) {
     return (
-      <div className="max-w-5xl mx-auto space-y-5 py-6">
-        <div className="flex items-center justify-between">
+      <div className="mx-auto max-w-5xl space-y-6 py-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-text-primary mb-1">Campaigns</h1>
-            <p className="text-text-tertiary text-sm">Create and launch campaigns at scale</p>
+            <h1 className="mb-1 text-2xl font-semibold tracking-tight text-text-primary">
+              {lt('hub.title', 'Launch')}
+            </h1>
+            <p className="text-sm text-text-secondary">{lt('hub.subtitle', '')}</p>
           </div>
-          <button
-            onClick={() => setPlatform('meta')}
-            className="px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold"
-          >
-            + New campaign
-          </button>
+          <Button type="button" size="md" className="shrink-0" onClick={() => handlePlatformPick('meta')}>
+            {lt('hub.newCampaign', '+ New campaign')}
+          </Button>
         </div>
 
-        <div className="flex gap-6 border-b border-border">
-          {[
-            { id: 'drafts', label: 'Drafts' },
-            { id: 'ai_drafts', label: 'AI Drafts' },
-            { id: 'templates', label: 'Templates' },
-            { id: 'launches', label: 'Launches' },
-          ].map((tab) => (
+        <div className="flex gap-1 overflow-x-auto border-b border-border pb-px">
+          {tabs.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as typeof activeTab)}
-              className={`pb-3 text-sm font-medium border-b-2 ${
-                activeTab === tab.id ? 'border-text-primary text-text-primary' : 'border-transparent text-text-tertiary hover:text-text-primary'
+              type="button"
+              onClick={() => setActiveTab(tab.id)}
+              className={`whitespace-nowrap border-b-2 px-3 py-3 text-sm font-medium transition-colors ${
+                activeTab === tab.id
+                  ? 'border-primary text-text-primary'
+                  : 'border-transparent text-text-tertiary hover:text-text-primary'
               }`}
             >
               {tab.label}
@@ -189,497 +332,791 @@ export default function LaunchPage() {
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search drafts..."
-          className="w-full md:w-[420px] border border-border bg-surface rounded-xl px-4 py-2.5 text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-border"
+          placeholder={lt('hub.searchPlaceholder', 'Search…')}
+          className="w-full rounded-xl border border-border bg-surface px-4 py-2.5 text-sm text-text-primary placeholder:text-text-tertiary focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/15 md:max-w-md"
         />
 
-        {/* ── Platform Selection FIRST ── */}
         <div>
-          <p className="text-xs text-text-tertiary mb-3 uppercase tracking-wider font-medium">Platforma tanlang</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {PLATFORMS.map(p => (
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-text-tertiary">
+            {lt('hub.platformEyebrow', 'Platform')}
+          </p>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            {platformCards.map((p) => (
               <button
                 key={p.id}
-                onClick={() => handlePlatformPick(p.id as Platform)}
-                className="group relative overflow-hidden rounded-2xl border-2 border-border bg-surface p-6 text-left transition-all hover:border-violet-500/50 hover:shadow-lg"
+                type="button"
+                onClick={() => handlePlatformPick(p.id)}
+                className="group rounded-2xl border border-border bg-surface p-6 text-left shadow-sm transition-all hover:border-primary/35 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25"
               >
-                <div className="relative space-y-3">
-                  <h3 className="text-lg font-bold text-text-primary">{p.name}</h3>
-                  <p className="text-sm text-text-tertiary">{p.desc}</p>
-                  <div className="pt-3">
-                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-violet-500">
-                      Tanlash →
-                    </span>
-                  </div>
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-surface-2">
+                  {p.icon}
                 </div>
+                <h3 className="text-base font-semibold text-text-primary">{p.title}</h3>
+                <p className="mt-2 text-sm text-text-secondary">{p.desc}</p>
+                <span className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-primary">
+                  {lt('hub.platformPick', 'Choose')}
+                  <ChevronRight className="h-3.5 w-3.5" aria-hidden />
+                </span>
               </button>
             ))}
           </div>
         </div>
 
-        <div className="rounded-2xl border border-dashed border-border bg-surface p-10 text-center">
-          <p className="text-xl font-bold text-text-primary mb-2">Hali kampaniya qoralama yo&apos;q</p>
-          <p className="text-sm text-text-tertiary mb-5">
-            Avval platforma tanlang, keyin ishga tushirish usulini belgilang.
-          </p>
-          <div className="flex items-center justify-center gap-2 flex-wrap">
-            <button onClick={() => setPlatform('meta')} className="px-4 py-2 rounded-xl bg-violet-600 text-white text-sm font-medium">+ Yangi kampaniya</button>
-            <button onClick={() => setPlatform('google')} className="px-4 py-2 rounded-xl border border-border text-sm text-text-secondary hover:bg-surface-2 transition-colors">🔍 Google Ads</button>
+        <div className="rounded-2xl border border-dashed border-border bg-surface-2/40 px-6 py-12 text-center">
+          <p className="mb-2 text-lg font-semibold text-text-primary">{lt('hub.emptyTitle', '')}</p>
+          <p className="mx-auto mb-6 max-w-md text-sm text-text-secondary">{lt('hub.emptyBody', '')}</p>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <Button type="button" onClick={() => handlePlatformPick('meta')}>
+              {lt('hub.newCampaign', '+ New campaign')}
+            </Button>
+            <Button type="button" variant="secondary" onClick={() => handlePlatformPick('google')}>
+              {lt('hub.ctaGoogleAlt', 'Google Ads')}
+            </Button>
           </div>
         </div>
       </div>
     )
   }
 
-  // ── LAUNCH MODE SELECTION (after platform pick, before wizard) ──
   if (platform && !launchModeConfirmed) {
-    const platformInfo = PLATFORMS.find(p => p.id === platform)
+    const platformTitle =
+      platform === 'meta'
+        ? lt('platforms.metaName', 'Meta')
+        : platform === 'google'
+          ? lt('platforms.googleName', 'Google Ads')
+          : lt('platforms.yandexName', 'Yandex Direct')
+
     return (
-      <div className="max-w-3xl mx-auto space-y-6 py-6">
+      <div className="mx-auto max-w-3xl space-y-8 py-6">
         <div>
-          <button onClick={() => setPlatform(null)} className="text-text-tertiary hover:text-text-primary text-sm mb-3 flex items-center gap-1">
-            ← Platformaga qaytish
+          <button
+            type="button"
+            onClick={() => setPlatform(null)}
+            className="mb-3 flex items-center gap-1 text-sm text-text-tertiary transition-colors hover:text-text-primary"
+          >
+            <ChevronLeft className="h-4 w-4" aria-hidden />
+            {lt('mode.back', 'Back')}
           </button>
-          <h1 className="text-2xl font-bold text-text-primary mb-1">{platformInfo?.name}</h1>
-          <p className="text-text-tertiary text-sm">Launch usulini tanlang</p>
+          <h1 className="mb-1 text-2xl font-semibold text-text-primary">{platformTitle}</h1>
+          <p className="text-sm font-medium text-text-primary">{lt('mode.howTitle', '')}</p>
+          <p className="mt-1 text-sm text-text-secondary">{lt('mode.howSubtitle', '')}</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[
-            { id: 'self', icon: '🎯', title: "O'zim launch qilaman", desc: "Wizard orqali qo'lda sozlab ishga tushirish. To'liq nazorat sizda." },
-            { id: 'ai', icon: '🤖', title: 'AI agent launch qilsin', desc: "AI draft yaratadi va avtomatik optimizatsiya qiladi. Siz faqat tasdiqlaysiz." },
-            { id: 'expert', icon: '👨‍💼', title: 'Marketplace mutaxassis', desc: "Jonli ekspert natijalarini ko'ring va xizmat buyurtma bering." },
-          ].map((mode) => (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          {(
+            [
+              { id: 'self' as const, title: lt('mode.selfTitle', ''), desc: lt('mode.selfDesc', '') },
+              { id: 'ai' as const, title: lt('mode.aiTitle', ''), desc: lt('mode.aiDesc', '') },
+              { id: 'expert' as const, title: lt('mode.expertTitle', ''), desc: lt('mode.expertDesc', '') },
+            ] as const
+          ).map((mode) => (
             <button
               key={mode.id}
-              onClick={() => setLaunchMode(mode.id as LaunchMode)}
-              className={`text-left rounded-2xl border-2 p-5 transition-all ${
+              type="button"
+              onClick={() => setLaunchMode(mode.id)}
+              className={`rounded-2xl border-2 p-5 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25 ${
                 launchMode === mode.id
-                  ? 'border-violet-500 bg-violet-500/5'
-                  : 'border-border hover:border-text-tertiary'
+                  ? 'border-primary bg-primary/[0.06] shadow-sm'
+                  : 'border-border hover:border-text-tertiary/40'
               }`}
             >
-              <div className="text-3xl mb-3">{mode.icon}</div>
-              <p className="text-sm font-bold text-text-primary mb-1">{mode.title}</p>
-              <p className="text-xs text-text-tertiary leading-relaxed">{mode.desc}</p>
+              <p className="mb-2 text-sm font-semibold text-text-primary">{mode.title}</p>
+              <p className="text-xs leading-relaxed text-text-secondary">{mode.desc}</p>
             </button>
           ))}
         </div>
 
-        <button
-          onClick={handleLaunchModeConfirm}
-          className="w-full bg-violet-600 hover:bg-violet-700 text-white py-3.5 rounded-xl font-semibold text-sm transition-colors"
-        >
-          {launchMode === 'self' ? 'Wizardni boshlash →' : launchMode === 'ai' ? 'AI agentga yuborish →' : 'Ekspertga yuborish →'}
-        </button>
+        <Button type="button" size="lg" fullWidth onClick={handleLaunchModeConfirm}>
+          {launchMode === 'self'
+            ? lt('mode.confirmSelf', '')
+            : launchMode === 'ai'
+              ? lt('mode.confirmAi', '')
+              : lt('mode.confirmExpert', '')}
+          <ChevronRight className="h-4 w-4" aria-hidden />
+        </Button>
       </div>
     )
   }
 
-  // ── META FORM ──────────────────────────────────────────────────────────
+  const wizardHeader = (title: string, step: number, total: number) => (
+    <div className="space-y-4">
+      <div>
+        <button
+          type="button"
+          onClick={exitToMode}
+          className="mb-2 flex items-center gap-1 text-sm text-text-tertiary hover:text-text-primary"
+        >
+          <ChevronLeft className="h-4 w-4" aria-hidden />
+          {lt('common.back', 'Back')}
+        </button>
+        <h1 className="text-2xl font-semibold tracking-tight text-text-primary">{title}</h1>
+        <p className="mt-1 text-sm text-text-secondary">
+          {lt('common.step', 'Step')} {step} {lt('common.of', 'of')} {total}
+        </p>
+      </div>
+      <WizardProgressBar step={step} total={total} />
+    </div>
+  )
 
   if (platform === 'meta') {
+    const objectiveLabel = (id: MetaObjective) => {
+      const map: Record<MetaObjective, string> = {
+        leads: lt('meta.objLeads', 'Leads'),
+        traffic: lt('meta.objTraffic', 'Traffic'),
+        sales: lt('meta.objSales', 'Sales'),
+        awareness: lt('meta.objAwareness', 'Awareness'),
+      }
+      return map[id]
+    }
+
+    const objectiveDesc = (id: MetaObjective) => {
+      const map: Record<MetaObjective, string> = {
+        leads: lt('meta.objLeadsDesc', ''),
+        traffic: lt('meta.objTrafficDesc', ''),
+        sales: lt('meta.objSalesDesc', ''),
+        awareness: lt('meta.objAwarenessDesc', ''),
+      }
+      return map[id]
+    }
+
     return (
-      <div className="max-w-2xl mx-auto space-y-6 py-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <button onClick={() => setLaunchModeConfirmed(false)} className="text-text-tertiary hover:text-text-primary text-sm mb-2 flex items-center gap-1">
-              ← Orqaga
-            </button>
-            <h1 className="text-2xl font-bold text-text-primary">📘 Meta Kampaniyasi</h1>
-            <p className="text-text-tertiary text-sm mt-1">Qadam {metaStep}/5</p>
-          </div>
-        </div>
+      <div className="mx-auto max-w-3xl space-y-6 py-6">
+        {wizardHeader(lt('meta.pageTitle', 'Meta campaign'), metaStep, 5)}
+        {error ? <Alert variant="error">{error}</Alert> : null}
 
-        {error && <Alert variant="error">{error}</Alert>}
-
-        {/* Progress bar */}
-        <div className="bg-surface-2 rounded-full h-2">
-          <div className="bg-surface h-2 rounded-full transition-all" style={{ width: `${(metaStep / 5) * 100}%` }} />
-        </div>
-
-        {/* Step 1: Objective */}
         {metaStep === 1 && (
-          <div className="bg-surface border border-border rounded-2xl p-6 space-y-5">
-            <div>
-              <h2 className="text-lg font-bold text-text-primary mb-2">Maqsad tanlang</h2>
-              <p className="text-text-tertiary text-sm">Reklama orqali nima erishmoqchisiz?</p>
+          <WizardStepCard>
+            <div className="grid gap-8 p-6 md:grid-cols-[minmax(0,1fr)_minmax(0,280px)] md:p-8">
+              <div className="space-y-8">
+                <div>
+                  <label className="text-label font-medium text-text-secondary" htmlFor="meta-buying-type">
+                    {lt('meta.buyingType', 'Buying type')}
+                  </label>
+                  <select
+                    id="meta-buying-type"
+                    disabled
+                    className="mt-2 w-full cursor-not-allowed rounded-xl border border-border bg-surface-2/80 px-4 py-3 text-sm text-text-secondary"
+                  >
+                    <option>{lt('meta.buyingAuction', 'Auction')}</option>
+                  </select>
+                  <p className="mt-2 text-xs text-text-tertiary">{lt('meta.buyingHint', '')}</p>
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-text-primary">{lt('meta.objectiveTitle', '')}</h2>
+                  <p className="mt-1 text-sm text-text-secondary">{lt('meta.objectiveSubtitle', '')}</p>
+                  <div className="mt-5 space-y-2">
+                    {metaObjectives.map((o) => (
+                      <WizardChoiceRow
+                        key={o.id}
+                        tone="meta"
+                        selected={metaData.objective === o.id}
+                        onClick={() => setMetaData((d) => ({ ...d, objective: o.id }))}
+                        icon={o.icon}
+                        title={objectiveLabel(o.id)}
+                        description={objectiveDesc(o.id)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <WizardAsideHint>{lt('meta.objectiveHint', '')}</WizardAsideHint>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                { value: 'leads', label: 'Lead yig\'ish', icon: '🎯' },
-                { value: 'traffic', label: 'Sayt trafigi', icon: '🌐' },
-                { value: 'sales', label: 'Sotuvlar', icon: '🛒' },
-                { value: 'awareness', label: 'Xabardorlik', icon: '📣' },
-              ].map(opt => (
-                <button
-                  key={opt.value}
-                  onClick={() => setMetaData(d => ({ ...d, objective: opt.value }))}
-                  className={`p-4 rounded-xl border-2 transition-all text-left ${
-                    metaData.objective === opt.value
-                      ? 'border-border dark:border-white bg-surface-2'
-                      : 'border-border hover:border-border'
-                  }`}
-                >
-                  <span className="text-2xl block mb-1">{opt.icon}</span>
-                  <span className="font-semibold text-sm text-text-primary">{opt.label}</span>
-                </button>
-              ))}
+            <div className="flex flex-col-reverse gap-2 border-t border-border px-6 py-4 md:flex-row md:items-center md:justify-between md:px-8">
+              <Button type="button" variant="ghost" size="md" onClick={exitToMode}>
+                {lt('common.exitWizard', 'Exit')}
+              </Button>
+              <Button
+                type="button"
+                size="md"
+                disabled={!metaData.objective}
+                onClick={() => setMetaStep(2)}
+                className="md:min-w-[160px]"
+              >
+                {lt('common.continue', 'Continue')}
+                <ChevronRight className="h-4 w-4" aria-hidden />
+              </Button>
             </div>
-            <button onClick={() => setMetaStep(2)} className="w-full bg-surface hover:bg-surface dark:hover:bg-surface-2 text-white dark:text-text-primary py-3 rounded-xl font-semibold">
-              Davom etish →
-            </button>
-          </div>
+          </WizardStepCard>
         )}
 
-        {/* Step 2: Audience */}
         {metaStep === 2 && (
-          <div className="bg-surface border border-border rounded-2xl p-6 space-y-5">
-            <div>
-              <h2 className="text-lg font-bold text-text-primary mb-2">Auditoriya</h2>
-              <p className="text-text-tertiary text-sm">Kim sizning reklama ko'radi?</p>
-            </div>
-            <div className="space-y-4">
+          <WizardStepCard>
+            <div className="space-y-6 p-6 md:p-8">
               <div>
-                <label className="block text-sm font-semibold text-text-tertiary mb-2">Yosh: {metaData.minAge}–{metaData.maxAge}</label>
-                <div className="flex gap-2">
-                  <input type="number" value={metaData.minAge} onChange={e => setMetaData(d => ({ ...d, minAge: Number(e.target.value) }))} className="w-20 border border-border rounded-lg px-3 py-2" />
-                  <span className="flex items-center">–</span>
-                  <input type="number" value={metaData.maxAge} onChange={e => setMetaData(d => ({ ...d, maxAge: Number(e.target.value) }))} className="w-20 border border-border rounded-lg px-3 py-2" />
+                <h2 className="text-lg font-semibold text-text-primary">{lt('meta.audienceTitle', '')}</h2>
+                <p className="mt-1 text-sm text-text-secondary">{lt('meta.audienceSubtitle', '')}</p>
+              </div>
+              <Input
+                label={lt('meta.campaignName', 'Campaign name')}
+                value={metaData.name}
+                onChange={(e) => setMetaData((d) => ({ ...d, name: e.target.value }))}
+                placeholder={lt('meta.campaignNamePh', '')}
+              />
+              <div>
+                <p className="text-label mb-2 font-medium text-text-secondary">{lt('meta.ageLabel', 'Age')}</p>
+                <div className="flex flex-wrap items-center gap-3">
+                  <input
+                    type="number"
+                    min={13}
+                    max={75}
+                    value={metaData.minAge}
+                    onChange={(e) => setMetaData((d) => ({ ...d, minAge: Number(e.target.value) }))}
+                    className="w-24 rounded-lg border border-border bg-surface px-3 py-2 text-sm focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/15"
+                  />
+                  <span className="text-text-tertiary">—</span>
+                  <input
+                    type="number"
+                    min={13}
+                    max={75}
+                    value={metaData.maxAge}
+                    onChange={(e) => setMetaData((d) => ({ ...d, maxAge: Number(e.target.value) }))}
+                    className="w-24 rounded-lg border border-border bg-surface px-3 py-2 text-sm focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/15"
+                  />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-text-tertiary mb-2">Joylashuv</label>
-                <select value={metaData.location} onChange={e => setMetaData(d => ({ ...d, location: e.target.value }))} className="w-full border border-border rounded-lg px-4 py-2">
-                  <option value="UZ">O'zbekiston</option>
-                  <option value="KZ">Qozog'iston</option>
-                  <option value="TJ">Tojikiston</option>
-                  <option value="TM">Turkmaniston</option>
+                <label className="text-label mb-2 block font-medium text-text-secondary" htmlFor="meta-loc">
+                  {lt('meta.locationLabel', 'Location')}
+                </label>
+                <select
+                  id="meta-loc"
+                  value={metaData.location}
+                  onChange={(e) => setMetaData((d) => ({ ...d, location: e.target.value }))}
+                  className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/15"
+                >
+                  <option value="UZ">{lt('meta.locUZ', '')}</option>
+                  <option value="KZ">{lt('meta.locKZ', '')}</option>
+                  <option value="TJ">{lt('meta.locTJ', '')}</option>
+                  <option value="TM">{lt('meta.locTM', '')}</option>
                 </select>
               </div>
             </div>
-            <div className="flex gap-2">
-              <button onClick={() => setMetaStep(1)} className="flex-1 bg-surface-2 hover:bg-surface-2 dark:hover:bg-surface-2 text-text-primary py-3 rounded-xl font-semibold">
-                ← Orqaga
-              </button>
-              <button onClick={() => setMetaStep(3)} className="flex-1 bg-surface hover:bg-surface dark:hover:bg-surface-2 text-white dark:text-text-primary py-3 rounded-xl font-semibold">
-                Davom etish →
-              </button>
+            <div className="flex flex-col-reverse gap-2 border-t border-border px-6 py-4 md:flex-row md:justify-between md:px-8">
+              <Button type="button" variant="secondary" onClick={() => setMetaStep(1)}>
+                <ChevronLeft className="h-4 w-4" aria-hidden />
+                {lt('common.back', 'Back')}
+              </Button>
+              <Button type="button" disabled={!metaStepValid} onClick={() => setMetaStep(3)}>
+                {lt('common.continue', 'Continue')}
+                <ChevronRight className="h-4 w-4" aria-hidden />
+              </Button>
             </div>
-          </div>
+          </WizardStepCard>
         )}
 
-        {/* Step 3: Budget */}
         {metaStep === 3 && (
-          <div className="bg-surface border border-border rounded-2xl p-6 space-y-5">
-            <div>
-              <h2 className="text-lg font-bold text-text-primary mb-2">Byudjet</h2>
-              <p className="text-text-tertiary text-sm">Reklama uchun qancha pul sarflaysiz?</p>
-            </div>
-            <div className="space-y-4">
+          <WizardStepCard>
+            <div className="space-y-6 p-6 md:p-8">
               <div>
-                <label className="block text-sm font-semibold text-text-tertiary mb-2">Kunlik byudjet (USD)</label>
+                <h2 className="text-lg font-semibold text-text-primary">{lt('meta.budgetTitle', '')}</h2>
+                <p className="mt-1 text-sm text-text-secondary">{lt('meta.budgetSubtitle', '')}</p>
+              </div>
+              <div>
+                <label className="text-label mb-2 block font-medium text-text-secondary" htmlFor="meta-daily">
+                  {lt('meta.dailyUsd', 'Daily budget')}
+                </label>
                 <div className="flex items-center gap-2">
                   <span className="text-text-tertiary">$</span>
-                  <input type="number" value={metaData.dailyBudget} onChange={e => setMetaData(d => ({ ...d, dailyBudget: e.target.value }))} placeholder="100" className="flex-1 border border-border rounded-lg px-4 py-2" />
-                  <span className="text-text-tertiary text-sm">/kun</span>
+                  <input
+                    id="meta-daily"
+                    type="number"
+                    min={1}
+                    step={1}
+                    value={metaData.dailyBudget}
+                    onChange={(e) => setMetaData((d) => ({ ...d, dailyBudget: e.target.value }))}
+                    placeholder="50"
+                    className="min-w-0 flex-1 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/15"
+                  />
+                  <span className="text-xs text-text-tertiary">{lt('meta.perDay', '/ day')}</span>
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-text-tertiary mb-2">Kampaniya davomiyligi: {metaData.campaignDuration} kun</label>
-                <input type="range" min="1" max="90" value={metaData.campaignDuration} onChange={e => setMetaData(d => ({ ...d, campaignDuration: Number(e.target.value) }))} className="w-full" />
-                <p className="text-xs text-text-tertiary mt-2">Jami: ${(Number(metaData.dailyBudget) * metaData.campaignDuration || 0).toLocaleString()}</p>
+                <label className="text-label mb-2 block font-medium text-text-secondary" htmlFor="meta-dur">
+                  {lt('meta.duration', 'Duration')}:{' '}
+                  {lt('meta.durationDays', '{{n}} days').replace('{{n}}', String(metaData.campaignDuration))}
+                </label>
+                <input
+                  id="meta-dur"
+                  type="range"
+                  min={1}
+                  max={90}
+                  value={metaData.campaignDuration}
+                  onChange={(e) => setMetaData((d) => ({ ...d, campaignDuration: Number(e.target.value) }))}
+                  className="mt-2 w-full accent-primary"
+                />
+                <p className="mt-2 text-xs text-text-tertiary">
+                  {lt('meta.totalSpend', '').replace(
+                    '{{amount}}',
+                    formatMoneyUsd(
+                      (parsePositiveNumber(metaData.dailyBudget) ?? 0) * metaData.campaignDuration,
+                    ),
+                  )}
+                </p>
               </div>
             </div>
-            <div className="flex gap-2">
-              <button onClick={() => setMetaStep(2)} className="flex-1 bg-surface-2 hover:bg-surface-2 dark:hover:bg-surface-2 text-text-primary py-3 rounded-xl font-semibold">
-                ← Orqaga
-              </button>
-              <button onClick={() => setMetaStep(4)} className="flex-1 bg-surface hover:bg-surface dark:hover:bg-surface-2 text-white dark:text-text-primary py-3 rounded-xl font-semibold">
-                Davom etish →
-              </button>
+            <div className="flex flex-col-reverse gap-2 border-t border-border px-6 py-4 md:flex-row md:justify-between md:px-8">
+              <Button type="button" variant="secondary" onClick={() => setMetaStep(2)}>
+                <ChevronLeft className="h-4 w-4" aria-hidden />
+                {lt('common.back', 'Back')}
+              </Button>
+              <Button type="button" disabled={!metaStepValid} onClick={() => setMetaStep(4)}>
+                {lt('common.continue', 'Continue')}
+                <ChevronRight className="h-4 w-4" aria-hidden />
+              </Button>
             </div>
-          </div>
+          </WizardStepCard>
         )}
 
-        {/* Step 4: Creative */}
         {metaStep === 4 && (
-          <div className="bg-surface border border-border rounded-2xl p-6 space-y-5">
-            <div>
-              <h2 className="text-lg font-bold text-text-primary mb-2">Kreativ</h2>
-              <p className="text-text-tertiary text-sm">Reklama tasviri va matni</p>
-            </div>
-            <div className="space-y-4">
+          <WizardStepCard>
+            <div className="space-y-6 p-6 md:p-8">
               <div>
-                <label className="block text-sm font-semibold text-text-tertiary mb-2">Rasm/Video URL</label>
-                <input type="text" value={metaData.creativeUrl} onChange={e => setMetaData(d => ({ ...d, creativeUrl: e.target.value }))} placeholder="https://..." className="w-full border border-border rounded-lg px-4 py-2" />
+                <h2 className="text-lg font-semibold text-text-primary">{lt('meta.creativeTitle', '')}</h2>
+                <p className="mt-1 text-sm text-text-secondary">{lt('meta.creativeSubtitle', '')}</p>
+              </div>
+              <Input
+                label={lt('meta.creativeUrl', 'URL')}
+                value={metaData.creativeUrl}
+                onChange={(e) => setMetaData((d) => ({ ...d, creativeUrl: e.target.value }))}
+                placeholder="https://"
+              />
+              <div className="space-y-2">
+                <label className="text-label font-medium text-text-secondary">{lt('meta.creativeText', '')}</label>
+                <Textarea
+                  value={metaData.creativeText}
+                  onChange={(e) => setMetaData((d) => ({ ...d, creativeText: e.target.value }))}
+                  placeholder="…"
+                  rows={4}
+                />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-text-tertiary mb-2">Tekst</label>
-                <textarea value={metaData.creativeText} onChange={e => setMetaData(d => ({ ...d, creativeText: e.target.value }))} placeholder="Reklama matni..." rows={3} className="w-full border border-border rounded-lg px-4 py-2" />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-text-tertiary mb-2">CTA tugmasi</label>
-                <select value={metaData.ctaButton} onChange={e => setMetaData(d => ({ ...d, ctaButton: e.target.value }))} className="w-full border border-border rounded-lg px-4 py-2">
-                  <option value="learn_more">Batafsil</option>
-                  <option value="contact_us">Bog'lanish</option>
-                  <option value="shop_now">Sotib olish</option>
-                  <option value="sign_up">Ro'yxatdan o'tish</option>
+                <label className="text-label mb-2 block font-medium text-text-secondary" htmlFor="meta-cta">
+                  {lt('meta.ctaLabel', 'CTA')}
+                </label>
+                <select
+                  id="meta-cta"
+                  value={metaData.ctaButton}
+                  onChange={(e) => setMetaData((d) => ({ ...d, ctaButton: e.target.value }))}
+                  className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/15"
+                >
+                  <option value="learn_more">{lt('meta.cta_learn_more', '')}</option>
+                  <option value="contact_us">{lt('meta.cta_contact', '')}</option>
+                  <option value="shop_now">{lt('meta.cta_shop', '')}</option>
+                  <option value="sign_up">{lt('meta.cta_signup', '')}</option>
                 </select>
               </div>
             </div>
-            <div className="flex gap-2">
-              <button onClick={() => setMetaStep(3)} className="flex-1 bg-surface-2 hover:bg-surface-2 dark:hover:bg-surface-2 text-text-primary py-3 rounded-xl font-semibold">
-                ← Orqaga
-              </button>
-              <button onClick={() => setMetaStep(5)} className="flex-1 bg-surface hover:bg-surface dark:hover:bg-surface-2 text-white dark:text-text-primary py-3 rounded-xl font-semibold">
-                Ko'rib chiqish →
-              </button>
+            <div className="flex flex-col-reverse gap-2 border-t border-border px-6 py-4 md:flex-row md:justify-between md:px-8">
+              <Button type="button" variant="secondary" onClick={() => setMetaStep(3)}>
+                <ChevronLeft className="h-4 w-4" aria-hidden />
+                {lt('common.back', 'Back')}
+              </Button>
+              <Button type="button" onClick={() => setMetaStep(5)}>
+                {lt('common.review', 'Review')}
+                <ChevronRight className="h-4 w-4" aria-hidden />
+              </Button>
             </div>
-          </div>
+          </WizardStepCard>
         )}
 
-        {/* Step 5: Review */}
         {metaStep === 5 && (
-          <div className="bg-surface border border-border rounded-2xl p-6 space-y-5">
-            <div>
-              <h2 className="text-lg font-bold text-text-primary mb-2">Ko'rib chiqing</h2>
-              <p className="text-text-tertiary text-sm">Barcha ma"lumotlar to'g"rimi?</p>
+          <WizardStepCard>
+            <div className="space-y-6 p-6 md:p-8">
+              <div>
+                <h2 className="text-lg font-semibold text-text-primary">{lt('meta.reviewTitle', '')}</h2>
+                <p className="mt-1 text-sm text-text-secondary">{lt('meta.reviewSubtitle', '')}</p>
+              </div>
+              <dl className="space-y-3 rounded-xl border border-border bg-surface-2/50 p-4 text-sm">
+                <div className="flex justify-between gap-4">
+                  <dt className="text-text-tertiary">{lt('meta.revName', '')}</dt>
+                  <dd className="max-w-[60%] text-right font-medium text-text-primary">{metaData.name || '—'}</dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-text-tertiary">{lt('meta.revObjective', '')}</dt>
+                  <dd className="font-medium text-text-primary">
+                    {metaData.objective ? objectiveLabel(metaData.objective) : '—'}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-text-tertiary">{lt('meta.revAudience', '')}</dt>
+                  <dd className="font-medium text-text-primary">
+                    {metaData.minAge}–{metaData.maxAge},{' '}
+                    {
+                      {
+                        UZ: lt('meta.locUZ', ''),
+                        KZ: lt('meta.locKZ', ''),
+                        TJ: lt('meta.locTJ', ''),
+                        TM: lt('meta.locTM', ''),
+                      }[metaData.location]
+                    }
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-text-tertiary">{lt('meta.revBudget', '')}</dt>
+                  <dd className="font-medium text-text-primary">${metaData.dailyBudget || '—'}</dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-text-tertiary">{lt('meta.revDuration', '')}</dt>
+                  <dd className="font-medium text-text-primary">
+                    {lt('meta.durationDays', '').replace('{{n}}', String(metaData.campaignDuration))}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-4 border-t border-border pt-3">
+                  <dt className="text-text-tertiary">{lt('meta.revTotal', '')}</dt>
+                  <dd className="text-base font-semibold text-text-primary">
+                    {formatMoneyUsd(
+                      (parsePositiveNumber(metaData.dailyBudget) ?? 0) * metaData.campaignDuration,
+                    )}
+                  </dd>
+                </div>
+              </dl>
             </div>
-            <div className="bg-surface-2 rounded-xl p-4 space-y-3 text-sm">
-              <div className="flex justify-between"><span className="text-text-tertiary">Maqsad:</span> <span className="font-semibold text-text-primary">{metaData.objective}</span></div>
-              <div className="flex justify-between"><span className="text-text-tertiary">Yosh:</span> <span className="font-semibold text-text-primary">{metaData.minAge}–{metaData.maxAge}</span></div>
-              <div className="flex justify-between"><span className="text-text-tertiary">Kunlik byudjet:</span> <span className="font-semibold text-text-primary">${metaData.dailyBudget}</span></div>
-              <div className="flex justify-between"><span className="text-text-tertiary">Davom:</span> <span className="font-semibold text-text-primary">{metaData.campaignDuration} kun</span></div>
-              <div className="flex justify-between"><span className="text-text-tertiary">Jami:</span> <span className="font-semibold text-text-primary text-base">${(Number(metaData.dailyBudget) * metaData.campaignDuration)}</span></div>
+            <div className="flex flex-col-reverse gap-2 border-t border-border px-6 py-4 md:flex-row md:justify-between md:px-8">
+              <Button type="button" variant="secondary" onClick={() => setMetaStep(4)}>
+                <ChevronLeft className="h-4 w-4" aria-hidden />
+                {lt('meta.edit', 'Edit')}
+              </Button>
+              <Button type="button" loading={saving} onClick={handleMetaLaunch} className="md:min-w-[200px]">
+                {lt('common.launch', 'Publish')}
+              </Button>
             </div>
-            <div className="flex gap-2">
-              <button onClick={() => setMetaStep(4)} className="flex-1 bg-surface-2 hover:bg-surface-2 dark:hover:bg-surface-2 text-text-primary py-3 rounded-xl font-semibold">
-                ← Tahrir qilish
-              </button>
-              <button onClick={handleMetaLaunch} disabled={saving} className="flex-1 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white py-3 rounded-xl font-semibold">
-                {saving ? '⏳' : '🚀'} Ishga tushirish
-              </button>
-            </div>
-          </div>
+          </WizardStepCard>
         )}
       </div>
     )
   }
-
-  // ── GOOGLE FORM ────────────────────────────────────────────────────────
 
   if (platform === 'google') {
     return (
-      <div className="max-w-2xl mx-auto space-y-6 py-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <button onClick={() => setLaunchModeConfirmed(false)} className="text-text-tertiary hover:text-text-primary text-sm mb-2 flex items-center gap-1">
-              ← Orqaga
-            </button>
-            <h1 className="text-2xl font-bold text-text-primary">🔍 Google Ads Kampaniyasi</h1>
-            <p className="text-text-tertiary text-sm mt-1">Qadam {googleStep}/5</p>
-          </div>
-        </div>
-
-        {error && <Alert variant="error">{error}</Alert>}
-
-        <div className="bg-surface-2 rounded-full h-2">
-          <div className="bg-surface h-2 rounded-full transition-all" style={{ width: `${(googleStep / 5) * 100}%` }} />
-        </div>
+      <div className="mx-auto max-w-3xl space-y-6 py-6">
+        {wizardHeader(lt('google.pageTitle', 'Google Ads'), googleStep, 5)}
+        {error ? <Alert variant="error">{error}</Alert> : null}
 
         {googleStep === 1 && (
-          <div className="bg-surface border border-border rounded-2xl p-6 space-y-5">
-            <h2 className="text-lg font-bold text-text-primary">Kampaniya turi</h2>
-            <div className="grid grid-cols-1 gap-3">
-              {[
-                { value: 'search', label: 'Qidiruv', desc: 'Google qidiruv natijalarida' },
-                { value: 'display', label: 'Displey', desc: 'Veb-saytlar va applarida' },
-                { value: 'smart', label: 'Smart', desc: 'AI avtomatik optimallashtirish' },
-              ].map(opt => (
-                <button key={opt.value} onClick={() => setGoogleData(d => ({ ...d, campaignType: opt.value }))} className={`p-4 rounded-xl border-2 text-left transition-all ${googleData.campaignType === opt.value ? 'border-border dark:border-white bg-surface-2' : 'border-border'}`}>
-                  <div className="font-semibold text-text-primary">{opt.label}</div>
-                  <div className="text-sm text-text-tertiary">{opt.desc}</div>
-                </button>
-              ))}
+          <WizardStepCard>
+            <div className="space-y-5 p-6 md:p-8">
+              <h2 className="text-lg font-semibold text-text-primary">{lt('google.s1Title', '')}</h2>
+              <div className="space-y-2">
+                {(
+                  [
+                    { value: 'search' as const, title: lt('google.s1Search', ''), desc: lt('google.s1SearchDesc', '') },
+                    { value: 'display' as const, title: lt('google.s1Display', ''), desc: lt('google.s1DisplayDesc', '') },
+                    { value: 'smart' as const, title: lt('google.s1Smart', ''), desc: lt('google.s1SmartDesc', '') },
+                  ] as const
+                ).map((opt) => (
+                  <WizardChoiceRow
+                    key={opt.value}
+                    selected={googleData.campaignType === opt.value}
+                    onClick={() => setGoogleData((d) => ({ ...d, campaignType: opt.value }))}
+                    icon={<Search className="h-5 w-5" aria-hidden />}
+                    title={opt.title}
+                    description={opt.desc}
+                  />
+                ))}
+              </div>
             </div>
-            <div className="flex gap-2">
-              <button onClick={() => setLaunchModeConfirmed(false)} className="flex-1 bg-surface-2 hover:bg-surface-2 text-text-primary py-3 rounded-xl font-semibold">
-                ← Orqaga
-              </button>
-              <button onClick={() => setGoogleStep(2)} className="flex-1 bg-surface hover:bg-surface dark:hover:bg-surface-2 text-white dark:text-text-primary py-3 rounded-xl font-semibold">
-                Davom →
-              </button>
+            <div className="flex flex-col-reverse gap-2 border-t border-border px-6 py-4 md:flex-row md:justify-between md:px-8">
+              <Button type="button" variant="secondary" onClick={exitToMode}>
+                {lt('common.back', 'Back')}
+              </Button>
+              <Button type="button" onClick={() => setGoogleStep(2)}>
+                {lt('common.continue', 'Continue')}
+                <ChevronRight className="h-4 w-4" aria-hidden />
+              </Button>
             </div>
-          </div>
+          </WizardStepCard>
         )}
 
         {googleStep === 2 && (
-          <div className="bg-surface border border-border rounded-2xl p-6 space-y-5">
-            <h2 className="text-lg font-bold text-text-primary">Kalit so'zlar</h2>
-            <textarea value={googleData.keywords} onChange={e => setGoogleData(d => ({ ...d, keywords: e.target.value }))} placeholder="Har bir kalit so'zni yangi qatorga yozing..." rows={4} className="w-full border border-border rounded-lg px-4 py-2" />
-            <div className="flex gap-2">
-              <button onClick={() => setGoogleStep(1)} className="flex-1 bg-surface-2 hover:bg-surface-2 dark:hover:bg-surface-2 text-text-primary py-3 rounded-xl font-semibold">←</button>
-              <button onClick={() => setGoogleStep(3)} className="flex-1 bg-surface hover:bg-surface dark:hover:bg-surface-2 text-white dark:text-text-primary py-3 rounded-xl font-semibold">→</button>
+          <WizardStepCard>
+            <div className="space-y-4 p-6 md:p-8">
+              <h2 className="text-lg font-semibold text-text-primary">{lt('google.s2Title', '')}</h2>
+              <Textarea
+                value={googleData.keywords}
+                onChange={(e) => setGoogleData((d) => ({ ...d, keywords: e.target.value }))}
+                placeholder={lt('google.s2Ph', '')}
+                rows={5}
+              />
             </div>
-          </div>
+            <div className="flex flex-col-reverse gap-2 border-t border-border px-6 py-4 md:flex-row md:justify-between md:px-8">
+              <Button type="button" variant="secondary" onClick={() => setGoogleStep(1)}>
+                <ChevronLeft className="h-4 w-4" aria-hidden />
+                {lt('common.back', 'Back')}
+              </Button>
+              <Button type="button" onClick={() => setGoogleStep(3)}>
+                {lt('common.continue', 'Continue')}
+                <ChevronRight className="h-4 w-4" aria-hidden />
+              </Button>
+            </div>
+          </WizardStepCard>
         )}
 
         {googleStep === 3 && (
-          <div className="bg-surface border border-border rounded-2xl p-6 space-y-5">
-            <h2 className="text-lg font-bold text-text-primary">Reklama matni</h2>
-            <div className="space-y-3">
-              <input type="text" value={googleData.headline1} onChange={e => setGoogleData(d => ({ ...d, headline1: e.target.value }))} placeholder="Sarlavha 1" className="w-full border border-border rounded-lg px-4 py-2" />
-              <input type="text" value={googleData.headline2} onChange={e => setGoogleData(d => ({ ...d, headline2: e.target.value }))} placeholder="Sarlavha 2" className="w-full border border-border rounded-lg px-4 py-2" />
-              <input type="text" value={googleData.headline3} onChange={e => setGoogleData(d => ({ ...d, headline3: e.target.value }))} placeholder="Sarlavha 3" className="w-full border border-border rounded-lg px-4 py-2" />
-              <textarea value={googleData.description1} onChange={e => setGoogleData(d => ({ ...d, description1: e.target.value }))} placeholder="Tavsif 1" rows={2} className="w-full border border-border rounded-lg px-4 py-2" />
-              <textarea value={googleData.description2} onChange={e => setGoogleData(d => ({ ...d, description2: e.target.value }))} placeholder="Tavsif 2" rows={2} className="w-full border border-border rounded-lg px-4 py-2" />
+          <WizardStepCard>
+            <div className="space-y-4 p-6 md:p-8">
+              <h2 className="text-lg font-semibold text-text-primary">{lt('google.s3Title', '')}</h2>
+              <Input
+                value={googleData.headline1}
+                onChange={(e) => setGoogleData((d) => ({ ...d, headline1: e.target.value }))}
+                placeholder={lt('google.h1', '')}
+              />
+              <Input
+                value={googleData.headline2}
+                onChange={(e) => setGoogleData((d) => ({ ...d, headline2: e.target.value }))}
+                placeholder={lt('google.h2', '')}
+              />
+              <Input
+                value={googleData.headline3}
+                onChange={(e) => setGoogleData((d) => ({ ...d, headline3: e.target.value }))}
+                placeholder={lt('google.h3', '')}
+              />
+              <Textarea
+                value={googleData.description1}
+                onChange={(e) => setGoogleData((d) => ({ ...d, description1: e.target.value }))}
+                placeholder={lt('google.d1', '')}
+                rows={2}
+              />
+              <Textarea
+                value={googleData.description2}
+                onChange={(e) => setGoogleData((d) => ({ ...d, description2: e.target.value }))}
+                placeholder={lt('google.d2', '')}
+                rows={2}
+              />
             </div>
-            <div className="flex gap-2">
-              <button onClick={() => setGoogleStep(2)} className="flex-1 bg-surface-2 hover:bg-surface-2 dark:hover:bg-surface-2 text-text-primary py-3 rounded-xl font-semibold">←</button>
-              <button onClick={() => setGoogleStep(4)} className="flex-1 bg-surface hover:bg-surface dark:hover:bg-surface-2 text-white dark:text-text-primary py-3 rounded-xl font-semibold">→</button>
+            <div className="flex flex-col-reverse gap-2 border-t border-border px-6 py-4 md:flex-row md:justify-between md:px-8">
+              <Button type="button" variant="secondary" onClick={() => setGoogleStep(2)}>
+                <ChevronLeft className="h-4 w-4" aria-hidden />
+                {lt('common.back', 'Back')}
+              </Button>
+              <Button type="button" onClick={() => setGoogleStep(4)}>
+                {lt('common.continue', 'Continue')}
+                <ChevronRight className="h-4 w-4" aria-hidden />
+              </Button>
             </div>
-          </div>
+          </WizardStepCard>
         )}
 
         {googleStep === 4 && (
-          <div className="bg-surface border border-border rounded-2xl p-6 space-y-5">
-            <h2 className="text-lg font-bold text-text-primary">Byudjet va taklif</h2>
-            <div className="space-y-3">
+          <WizardStepCard>
+            <div className="space-y-4 p-6 md:p-8">
+              <h2 className="text-lg font-semibold text-text-primary">{lt('google.s4Title', '')}</h2>
+              <Input
+                type="number"
+                min={1}
+                label={lt('google.daily', '')}
+                value={googleData.dailyBudget}
+                onChange={(e) => setGoogleData((d) => ({ ...d, dailyBudget: e.target.value }))}
+                placeholder="50"
+              />
               <div>
-                <label className="block text-sm font-semibold text-text-tertiary mb-2">Kunlik byudjet ($)</label>
-                <input type="number" value={googleData.dailyBudget} onChange={e => setGoogleData(d => ({ ...d, dailyBudget: e.target.value }))} placeholder="50" className="w-full border border-border rounded-lg px-4 py-2" />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-text-tertiary mb-2">Taklif strategiyasi</label>
-                <select value={googleData.biddingStrategy} onChange={e => setGoogleData(d => ({ ...d, biddingStrategy: e.target.value }))} className="w-full border border-border rounded-lg px-4 py-2">
-                  <option value="target_cpa">Target CPA</option>
-                  <option value="maximize">Maksimal konversiyalar</option>
-                  <option value="manual">Qo'lda</option>
+                <label className="text-label mb-2 block font-medium text-text-secondary" htmlFor="g-bid">
+                  {lt('google.bid', '')}
+                </label>
+                <select
+                  id="g-bid"
+                  value={googleData.biddingStrategy}
+                  onChange={(e) => setGoogleData((d) => ({ ...d, biddingStrategy: e.target.value }))}
+                  className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/15"
+                >
+                  <option value="target_cpa">{lt('google.bidTcpa', '')}</option>
+                  <option value="maximize">{lt('google.bidMax', '')}</option>
+                  <option value="manual">{lt('google.bidManual', '')}</option>
                 </select>
               </div>
             </div>
-            <div className="flex gap-2">
-              <button onClick={() => setGoogleStep(3)} className="flex-1 bg-surface-2 hover:bg-surface-2 dark:hover:bg-surface-2 text-text-primary py-3 rounded-xl font-semibold">←</button>
-              <button onClick={() => setGoogleStep(5)} className="flex-1 bg-surface hover:bg-surface dark:hover:bg-surface-2 text-white dark:text-text-primary py-3 rounded-xl font-semibold">Ko'rib chiqing →</button>
+            <div className="flex flex-col-reverse gap-2 border-t border-border px-6 py-4 md:flex-row md:justify-between md:px-8">
+              <Button type="button" variant="secondary" onClick={() => setGoogleStep(3)}>
+                <ChevronLeft className="h-4 w-4" aria-hidden />
+                {lt('common.back', 'Back')}
+              </Button>
+              <Button type="button" onClick={() => setGoogleStep(5)}>
+                {lt('common.review', 'Review')}
+                <ChevronRight className="h-4 w-4" aria-hidden />
+              </Button>
             </div>
-          </div>
+          </WizardStepCard>
         )}
 
         {googleStep === 5 && (
-          <div className="bg-surface border border-border rounded-2xl p-6 space-y-5">
-            <h2 className="text-lg font-bold text-text-primary">Ko'rib chiqing</h2>
-            <div className="bg-surface-2 rounded-xl p-4 space-y-2 text-sm">
-              <div className="flex justify-between"><span className="text-text-tertiary">Turi:</span> <span className="font-semibold">{googleData.campaignType}</span></div>
-              <div className="flex justify-between"><span className="text-text-tertiary">Byudjet:</span> <span className="font-semibold">${googleData.dailyBudget}/kun</span></div>
-              <div className="flex justify-between"><span className="text-text-tertiary">Reklama soni:</span> <span className="font-semibold">3 sarlavha, 2 tavsif</span></div>
+          <WizardStepCard>
+            <div className="space-y-5 p-6 md:p-8">
+              <h2 className="text-lg font-semibold text-text-primary">{lt('google.s5Title', '')}</h2>
+              <dl className="space-y-2 rounded-xl border border-border bg-surface-2/50 p-4 text-sm">
+                <div className="flex justify-between gap-4">
+                  <dt className="text-text-tertiary">{lt('google.revType', '')}</dt>
+                  <dd className="font-medium">{googleData.campaignType}</dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-text-tertiary">{lt('google.revBudget', '')}</dt>
+                  <dd className="font-medium">${googleData.dailyBudget || '—'}/day</dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-text-tertiary">{lt('google.revAds', '')}</dt>
+                  <dd className="max-w-[55%] text-right font-medium">{lt('google.revAdsVal', '')}</dd>
+                </div>
+              </dl>
             </div>
-            <div className="flex gap-2">
-              <button onClick={() => setGoogleStep(4)} className="flex-1 bg-surface-2 hover:bg-surface-2 dark:hover:bg-surface-2 text-text-primary py-3 rounded-xl font-semibold">← Tahrir</button>
-              <button onClick={handleGoogleLaunch} disabled={saving} className="flex-1 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white py-3 rounded-xl font-semibold">
-                {saving ? '⏳' : '🚀'} Ishga tushirish
-              </button>
+            <div className="flex flex-col-reverse gap-2 border-t border-border px-6 py-4 md:flex-row md:justify-between md:px-8">
+              <Button type="button" variant="secondary" onClick={() => setGoogleStep(4)}>
+                <ChevronLeft className="h-4 w-4" aria-hidden />
+                {lt('meta.edit', 'Edit')}
+              </Button>
+              <Button type="button" loading={saving} onClick={handleGoogleLaunch}>
+                {lt('common.launch', 'Publish')}
+              </Button>
             </div>
-          </div>
+          </WizardStepCard>
         )}
       </div>
     )
   }
-
-  // ── YANDEX FORM ────────────────────────────────────────────────────────
 
   if (platform === 'yandex') {
     return (
-      <div className="max-w-2xl mx-auto space-y-6 py-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <button onClick={() => setLaunchModeConfirmed(false)} className="text-text-tertiary hover:text-text-primary text-sm mb-2">
-              ← Orqaga
-            </button>
-            <h1 className="text-2xl font-bold text-text-primary">🟡 Yandex Direct Kampaniyasi</h1>
-            <p className="text-text-tertiary text-sm mt-1">Qadam {yandexStep}/4</p>
-          </div>
-        </div>
-
-        {error && <Alert variant="error">{error}</Alert>}
-
-        <div className="bg-surface-2 rounded-full h-2">
-          <div className="bg-surface h-2 rounded-full transition-all" style={{ width: `${(yandexStep / 4) * 100}%` }} />
-        </div>
+      <div className="mx-auto max-w-3xl space-y-6 py-6">
+        {wizardHeader(lt('yandex.pageTitle', 'Yandex'), yandexStep, 4)}
+        {error ? <Alert variant="error">{error}</Alert> : null}
 
         {yandexStep === 1 && (
-          <div className="bg-surface border border-border rounded-2xl p-6 space-y-5">
-            <h2 className="text-lg font-bold text-text-primary">Kampaniya turi</h2>
-            <div className="space-y-3">
-              {[
-                { value: 'search', label: 'Qidiruv', desc: 'Yandex qidiruv natijalarida' },
-                { value: 'smart', label: 'Smart bannerlar', desc: 'Avtomatik reklama joylarida' },
-              ].map(opt => (
-                <button key={opt.value} onClick={() => setYandexData(d => ({ ...d, campaignType: opt.value }))} className={`p-4 rounded-xl border-2 text-left ${yandexData.campaignType === opt.value ? 'border-border dark:border-white bg-surface-2' : 'border-border'}`}>
-                  <div className="font-semibold">{opt.label}</div>
-                  <div className="text-sm text-text-tertiary">{opt.desc}</div>
-                </button>
-              ))}
+          <WizardStepCard>
+            <div className="space-y-4 p-6 md:p-8">
+              <h2 className="text-lg font-semibold text-text-primary">{lt('yandex.s1Title', '')}</h2>
+              <div className="space-y-2">
+                {(
+                  [
+                    { value: 'search' as const, title: lt('yandex.s1Search', ''), desc: lt('yandex.s1SearchDesc', '') },
+                    { value: 'smart' as const, title: lt('yandex.s1Smart', ''), desc: lt('yandex.s1SmartDesc', '') },
+                  ] as const
+                ).map((opt) => (
+                  <WizardChoiceRow
+                    key={opt.value}
+                    selected={yandexData.campaignType === opt.value}
+                    onClick={() => setYandexData((d) => ({ ...d, campaignType: opt.value }))}
+                    icon={<span className="text-sm font-bold text-[#FC3F1D]">Y</span>}
+                    title={opt.title}
+                    description={opt.desc}
+                  />
+                ))}
+              </div>
             </div>
-            <div className="flex gap-2">
-              <button onClick={() => setLaunchModeConfirmed(false)} className="flex-1 bg-surface-2 py-3 rounded-xl font-semibold">← Orqaga</button>
-              <button onClick={() => setYandexStep(2)} className="flex-1 bg-surface text-white dark:text-text-primary py-3 rounded-xl font-semibold">Davom →</button>
+            <div className="flex flex-col-reverse gap-2 border-t border-border px-6 py-4 md:flex-row md:justify-between md:px-8">
+              <Button type="button" variant="secondary" onClick={exitToMode}>
+                {lt('common.back', 'Back')}
+              </Button>
+              <Button type="button" onClick={() => setYandexStep(2)}>
+                {lt('common.continue', 'Continue')}
+                <ChevronRight className="h-4 w-4" aria-hidden />
+              </Button>
             </div>
-          </div>
+          </WizardStepCard>
         )}
 
         {yandexStep === 2 && (
-          <div className="bg-surface border border-border rounded-2xl p-6 space-y-5">
-            <h2 className="text-lg font-bold text-text-primary">Kalit so'zlar</h2>
-            <textarea value={yandexData.keywords} onChange={e => setYandexData(d => ({ ...d, keywords: e.target.value }))} placeholder="Kalit so'zlar..." rows={4} className="w-full border border-border rounded-lg px-4 py-2" />
-            <textarea value={yandexData.negativeKeywords} onChange={e => setYandexData(d => ({ ...d, negativeKeywords: e.target.value }))} placeholder="Salbiy kalit so'zlar (ixtiyoriy)..." rows={2} className="w-full border border-border rounded-lg px-4 py-2" />
-            <div className="flex gap-2">
-              <button onClick={() => setYandexStep(1)} className="flex-1 bg-surface-2 py-3 rounded-xl">←</button>
-              <button onClick={() => setYandexStep(3)} className="flex-1 bg-surface text-white dark:text-text-primary py-3 rounded-xl">→</button>
+          <WizardStepCard>
+            <div className="space-y-4 p-6 md:p-8">
+              <h2 className="text-lg font-semibold text-text-primary">{lt('yandex.s2Title', '')}</h2>
+              <Textarea
+                value={yandexData.keywords}
+                onChange={(e) => setYandexData((d) => ({ ...d, keywords: e.target.value }))}
+                placeholder={lt('yandex.s2Ph', '')}
+                rows={4}
+              />
+              <Textarea
+                value={yandexData.negativeKeywords}
+                onChange={(e) => setYandexData((d) => ({ ...d, negativeKeywords: e.target.value }))}
+                placeholder={lt('yandex.s2NegPh', '')}
+                rows={2}
+              />
             </div>
-          </div>
+            <div className="flex flex-col-reverse gap-2 border-t border-border px-6 py-4 md:flex-row md:justify-between md:px-8">
+              <Button type="button" variant="secondary" onClick={() => setYandexStep(1)}>
+                <ChevronLeft className="h-4 w-4" aria-hidden />
+                {lt('common.back', 'Back')}
+              </Button>
+              <Button type="button" onClick={() => setYandexStep(3)}>
+                {lt('common.continue', 'Continue')}
+                <ChevronRight className="h-4 w-4" aria-hidden />
+              </Button>
+            </div>
+          </WizardStepCard>
         )}
 
         {yandexStep === 3 && (
-          <div className="bg-surface border border-border rounded-2xl p-6 space-y-5">
-            <h2 className="text-lg font-bold text-text-primary">Reklama matni</h2>
-            <input type="text" value={yandexData.headline} onChange={e => setYandexData(d => ({ ...d, headline: e.target.value }))} placeholder="Sarlavha" className="w-full border border-border rounded-lg px-4 py-2" />
-            <textarea value={yandexData.description} onChange={e => setYandexData(d => ({ ...d, description: e.target.value }))} placeholder="Tavsif" rows={3} className="w-full border border-border rounded-lg px-4 py-2" />
-            <input type="text" value={yandexData.url} onChange={e => setYandexData(d => ({ ...d, url: e.target.value }))} placeholder="Sayt manzili" className="w-full border border-border rounded-lg px-4 py-2" />
-            <div className="flex gap-2">
-              <button onClick={() => setYandexStep(2)} className="flex-1 bg-surface-2 py-3 rounded-xl">←</button>
-              <button onClick={() => setYandexStep(4)} className="flex-1 bg-surface text-white dark:text-text-primary py-3 rounded-xl">Ko'rib chiqing →</button>
+          <WizardStepCard>
+            <div className="space-y-4 p-6 md:p-8">
+              <h2 className="text-lg font-semibold text-text-primary">{lt('yandex.s3Title', '')}</h2>
+              <Input
+                value={yandexData.headline}
+                onChange={(e) => setYandexData((d) => ({ ...d, headline: e.target.value }))}
+                placeholder={lt('yandex.headline', '')}
+              />
+              <Textarea
+                value={yandexData.description}
+                onChange={(e) => setYandexData((d) => ({ ...d, description: e.target.value }))}
+                placeholder={lt('yandex.desc', '')}
+                rows={3}
+              />
+              <Input
+                value={yandexData.url}
+                onChange={(e) => setYandexData((d) => ({ ...d, url: e.target.value }))}
+                placeholder={lt('yandex.url', '')}
+              />
             </div>
-          </div>
+            <div className="flex flex-col-reverse gap-2 border-t border-border px-6 py-4 md:flex-row md:justify-between md:px-8">
+              <Button type="button" variant="secondary" onClick={() => setYandexStep(2)}>
+                <ChevronLeft className="h-4 w-4" aria-hidden />
+                {lt('common.back', 'Back')}
+              </Button>
+              <Button type="button" onClick={() => setYandexStep(4)}>
+                {lt('common.review', 'Review')}
+                <ChevronRight className="h-4 w-4" aria-hidden />
+              </Button>
+            </div>
+          </WizardStepCard>
         )}
 
         {yandexStep === 4 && (
-          <div className="bg-surface border border-border rounded-2xl p-6 space-y-5">
-            <h2 className="text-lg font-bold text-text-primary">Byudjet va strategiya</h2>
-            <div className="space-y-3">
+          <WizardStepCard>
+            <div className="space-y-4 p-6 md:p-8">
+              <h2 className="text-lg font-semibold text-text-primary">{lt('yandex.s4Title', '')}</h2>
+              <Input
+                type="number"
+                min={1}
+                label={lt('yandex.daily', '')}
+                value={yandexData.dailyBudget}
+                onChange={(e) => setYandexData((d) => ({ ...d, dailyBudget: e.target.value }))}
+                placeholder="50"
+              />
               <div>
-                <label className="block text-sm font-semibold text-text-tertiary mb-2">Kunlik chegaralash ($)</label>
-                <input type="number" value={yandexData.dailyBudget} onChange={e => setYandexData(d => ({ ...d, dailyBudget: e.target.value }))} placeholder="50" className="w-full border border-border rounded-lg px-4 py-2" />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-text-tertiary mb-2">Taklif strategiyasi</label>
-                <select value={yandexData.strategy} onChange={e => setYandexData(d => ({ ...d, strategy: e.target.value }))} className="w-full border border-border rounded-lg px-4 py-2">
-                  <option value="average_cpc">O'rtacha CPC</option>
-                  <option value="highest_position">Eng yuqori pozitsiya</option>
-                  <option value="weekly_budget">Haftada bir</option>
+                <label className="text-label mb-2 block font-medium text-text-secondary" htmlFor="y-str">
+                  {lt('yandex.bid', '')}
+                </label>
+                <select
+                  id="y-str"
+                  value={yandexData.strategy}
+                  onChange={(e) => setYandexData((d) => ({ ...d, strategy: e.target.value }))}
+                  className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/15"
+                >
+                  <option value="average_cpc">{lt('yandex.bidCpc', '')}</option>
+                  <option value="highest_position">{lt('yandex.bidPos', '')}</option>
+                  <option value="weekly_budget">{lt('yandex.bidWeek', '')}</option>
                 </select>
               </div>
             </div>
-            <div className="flex gap-2">
-              <button onClick={() => setYandexStep(3)} className="flex-1 bg-surface-2 py-3 rounded-xl">← Tahrir</button>
-              <button onClick={handleYandexLaunch} disabled={saving} className="flex-1 bg-emerald-600 text-white py-3 rounded-xl font-semibold">
-                {saving ? '⏳' : '🚀'} Ishga tushirish
-              </button>
+            <div className="flex flex-col-reverse gap-2 border-t border-border px-6 py-4 md:flex-row md:justify-between md:px-8">
+              <Button type="button" variant="secondary" onClick={() => setYandexStep(3)}>
+                <ChevronLeft className="h-4 w-4" aria-hidden />
+                {lt('meta.edit', 'Edit')}
+              </Button>
+              <Button type="button" loading={saving} onClick={handleYandexLaunch}>
+                {lt('common.launch', 'Publish')}
+              </Button>
             </div>
-          </div>
+          </WizardStepCard>
         )}
       </div>
     )
   }
+
+  return null
 }

@@ -6,7 +6,7 @@ import type { RetargetingCampaign, RetargetingWizardState, Platform, BudgetType 
 const MOCK_CAMPAIGNS: RetargetingCampaign[] = [
   {
     id: 'camp_1',
-    name: 'Savatga qo\'shgan — Meta',
+    name: 'retargeting.demoCampaign1',
     audienceId: 'aud_6',
     funnelStage: 'retargeting',
     platform: 'meta',
@@ -32,7 +32,7 @@ const MOCK_CAMPAIGNS: RetargetingCampaign[] = [
   },
   {
     id: 'camp_3',
-    name: 'VIP mijozlar — Retention',
+    name: 'retargeting.demoCampaign3',
     audienceId: 'aud_9',
     funnelStage: 'retention',
     platform: 'meta',
@@ -45,7 +45,7 @@ const MOCK_CAMPAIGNS: RetargetingCampaign[] = [
   },
   {
     id: 'camp_4',
-    name: 'Bir necha marta kirganlar',
+    name: 'retargeting.demoCampaign4',
     audienceId: 'aud_7',
     funnelStage: 'retargeting',
     platform: 'tiktok',

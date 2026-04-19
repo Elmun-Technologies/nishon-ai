@@ -17,7 +17,7 @@ const PAGE_TITLES: Record<string, { titleKey: string; titleFallback: string; sub
   '/simulation':           { titleKey: 'navigation.simulation', titleFallback: 'Simulation', subtitleKey: 'header.simulationSubtitle', subtitleFallback: 'Forecast results before committing budget' },
   '/competitors':          { titleKey: 'navigation.competitors', titleFallback: 'Competitors', subtitleKey: 'header.competitorsSubtitle', subtitleFallback: 'Competitive intelligence and SWOT benchmarking' },
   '/creative-scorer':      { titleKey: 'navigation.creativeScorer', titleFallback: 'Creative Scorer', subtitleKey: 'header.creativeScorerSubtitle', subtitleFallback: 'AI-powered ad creative evaluation' },
-  '/roi-calculator':       { titleKey: 'navigation.roi', titleFallback: 'ROI Calculator', subtitleKey: 'header.roiSubtitle', subtitleFallback: 'Estimate profitability before scaling ads' },
+  '/roi-calculator':       { titleKey: 'navigation.roi', titleFallback: 'ROI & outcomes', subtitleKey: 'header.roiSubtitle', subtitleFallback: 'We learn from real outcomes first; the ROI calculator launches when benchmark data is ready.' },
   '/settings':             { titleKey: 'navigation.settings', titleFallback: 'Settings', subtitleKey: 'header.settingsSubtitle', subtitleFallback: 'Workspace and account configuration' },
   '/reporting':            { titleKey: 'navigation.reporting', titleFallback: 'Reporting', subtitleKey: 'header.reportingSubtitle', subtitleFallback: 'Campaign-level metrics and trends' },
   '/meta-audit':           { titleKey: 'navigation.metaAudit', titleFallback: 'Meta Audit', subtitleKey: 'header.metaAuditSubtitle', subtitleFallback: '360° creative, targeting, and auction diagnostics' },
@@ -47,7 +47,13 @@ export default function Header() {
     pathname === '/ad-launcher' ||
     pathname === '/audiences/studio' ||
     pathname === '/settings' ||
-    pathname.startsWith('/settings/workspace')
+    pathname.startsWith('/settings/workspace') ||
+    pathname === '/create-agent' ||
+    pathname === '/creative-hub/ai-actors' ||
+    pathname === '/creative-hub/projects' ||
+    pathname === '/creative-hub/brand-kit' ||
+    pathname === '/creative-hub/products' ||
+    pathname === '/creative-hub/media'
   const pageConfig =
     pathname.startsWith('/settings/workspace')
       ? {

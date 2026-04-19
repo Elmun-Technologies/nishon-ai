@@ -1,19 +1,30 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Alert, Button, Input } from '@/components/ui'
+import { PageSpinner } from '@/components/ui/Spinner'
 import { auth } from '@/lib/api-client'
 import { useI18n } from '@/i18n/use-i18n'
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher'
+import { clearPreAuthOnboarding, isPreAuthOnboardingComplete } from '@/lib/pre-auth-onboarding'
 
 export default function RegisterPage() {
   const { t } = useI18n()
   const router = useRouter()
+  const [gateChecked, setGateChecked] = useState(false)
   const [form, setForm] = useState({ name: '', email: '', password: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (!isPreAuthOnboardingComplete()) {
+      router.replace('/onboarding')
+      return
+    }
+    setGateChecked(true)
+  }, [router])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -21,6 +32,7 @@ export default function RegisterPage() {
     setError('')
     try {
       await auth.register(form)
+      clearPreAuthOnboarding()
       router.push('/login')
     } catch (err: any) {
       setError(err?.response?.data?.message || t('auth.registerPage.genericError', 'Registration failed. Please try again.'))
@@ -34,6 +46,17 @@ export default function RegisterPage() {
     { label: t('auth.registerPage.statLanguages', 'Languages'), value: t('auth.registerPage.statLanguagesVal', '3') },
     { label: t('auth.registerPage.statAutopilot', 'Autopilot'), value: t('auth.registerPage.statAutopilotVal', 'Built-in') },
   ]
+
+  if (!gateChecked) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-surface-2 text-text-secondary">
+        <div className="flex flex-col items-center gap-3">
+          <PageSpinner />
+          <p className="text-sm">{t('preAuthOnboarding.registerGateLoading', 'Checking onboarding…')}</p>
+        </div>
+      </main>
+    )
+  }
 
   return (
     <main className="min-h-screen bg-surface-2 px-4 py-10 text-text-primary">
@@ -62,6 +85,10 @@ export default function RegisterPage() {
         <section className="rounded-2xl border border-border bg-surface p-8">
           <h2 className="text-xl font-semibold">{t('auth.registerPage.panelTitle', 'Register')}</h2>
           <p className="mt-1 text-sm text-text-secondary">{t('auth.registerPage.panelSubtitle', 'Use your work email to create a workspace account.')}</p>
+
+          <Alert variant="success" className="mt-4">
+            {t('preAuthOnboarding.registerReady', 'Onboarding complete — create your account below.')}
+          </Alert>
 
           <form onSubmit={handleSubmit} className="mt-5 space-y-4">
             <Input

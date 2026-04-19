@@ -16,6 +16,13 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  async redirects() {
+    return [
+      { source: '/leaderboard', destination: '/marketplace/leaderboard', permanent: true },
+      { source: '/portfolio', destination: '/marketplace/portfolio', permanent: true },
+      { source: '/portfolio/:slug', destination: '/marketplace/portfolio/:slug', permanent: true },
+    ]
+  },
 }
 
 module.exports = nextConfig

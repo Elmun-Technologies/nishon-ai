@@ -366,7 +366,7 @@ export default function ServiceSelectionPage() {
 
           <div className="text-center mt-4">
             <button
-              onClick={() => router.push('/portfolio')}
+              onClick={() => router.push('/marketplace/portfolio')}
               className="text-sm text-text-tertiary hover:text-text-primary underline"
             >
               Batafsil profil ko'rish →

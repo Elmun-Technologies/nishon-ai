@@ -253,6 +253,11 @@ export const aiAgent = {
     goal: string
     workspaceContext: any
   }) => apiClient.post('/ai-agent/score-creative', data),
+  chat: (body: {
+    workspaceId: string
+    message: string
+    history?: { role: 'user' | 'assistant'; content: string }[]
+  }) => apiClient.post<{ reply: string }>('/ai-agent/chat', body),
 }
 
 export const campaigns = {

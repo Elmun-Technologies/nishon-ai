@@ -4,10 +4,10 @@ import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Search, Star } from 'lucide-react'
 import { MOCK_TARGETOLOGISTS, formatSpend } from '@/lib/portfolio-data'
-import { PublicContainer, PublicFooter, PublicNavbar, PublicSectionHeader } from '@/components/public/PublicLayout'
+import { PublicContainer, PublicFooter, PublicSectionHeader } from '@/components/public/PublicLayout'
 import { useI18n } from '@/i18n/use-i18n'
 
-export default function PortfolioPage() {
+export default function MarketplacePortfolioPage() {
   const { t } = useI18n()
   const [search, setSearch] = useState('')
   const [sortBy, setSortBy] = useState<'roas' | 'rating' | 'spend'>('roas')
@@ -35,8 +35,6 @@ export default function PortfolioPage() {
 
   return (
     <main className="min-h-screen bg-surface-2 text-text-primary">
-      <PublicNavbar />
-
       <section className="border-b border-border bg-surface py-10">
         <PublicContainer>
           <PublicSectionHeader eyebrow={pp('eyebrow')} title={pp('title')} description={pp('description')} />
@@ -95,7 +93,7 @@ export default function PortfolioPage() {
             {filtered.map((person) => (
               <Link
                 key={person.id}
-                href={`/portfolio/${person.slug}`}
+                href={`/marketplace/portfolio/${person.slug}`}
                 className="group rounded-xl border border-border bg-surface p-5 transition hover:border-primary/40 hover:bg-surface-2"
               >
                 <div className="mb-3 flex items-start justify-between">

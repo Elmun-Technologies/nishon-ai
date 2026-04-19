@@ -196,7 +196,7 @@ export default function LoginPage() {
 
           <p className="mt-5 text-center text-sm text-text-secondary">
             {t('auth.loginPage.createPrompt', "Don't have an account?")}{' '}
-            <Link href="/register" className="font-medium text-primary hover:underline">
+            <Link href="/onboarding" className="font-medium text-primary hover:underline">
               {t('auth.loginPage.createLink', 'Create one')}
             </Link>
           </p>

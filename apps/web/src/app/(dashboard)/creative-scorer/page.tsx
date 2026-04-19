@@ -66,21 +66,50 @@ const CREATIVE_TYPES = [
 
 // ─── GRADE CONFIG ────────────────────────────────────────────────────────────
 
+/* Real chroma — app Tailwind "blue/emerald" map to brand green, so use explicit values for readable grades */
 const GRADE_CONFIG = {
-  A: { color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', label: 'Mukammal' },
-  B: { color: 'text-blue-400',    bg: 'bg-blue-500/10',    border: 'border-blue-500/30',    label: 'Yaxshi' },
-  C: { color: 'text-amber-400',   bg: 'bg-amber-500/10',   border: 'border-amber-500/30',   label: 'O\'rtacha' },
-  D: { color: 'text-orange-400',  bg: 'bg-orange-500/10',  border: 'border-orange-500/30',  label: 'Zaif' },
-  F: { color: 'text-red-400',     bg: 'bg-red-500/10',     border: 'border-red-500/30',     label: 'Yaroqsiz' },
+  A: {
+    color: 'text-[#065f46] dark:text-[#6ee7b7]',
+    bg: 'bg-[#ecfdf5] dark:bg-[#064e3b]/45',
+    border: 'border-[#6ee7b7] dark:border-[#34d399]/45',
+    ring: '#10b981',
+    label: 'Mukammal',
+  },
+  B: {
+    color: 'text-[#1e40af] dark:text-[#93c5fd]',
+    bg: 'bg-[#eff6ff] dark:bg-[#172554]/55',
+    border: 'border-[#93c5fd] dark:border-[#3b82f6]/45',
+    ring: '#2563eb',
+    label: 'Yaxshi',
+  },
+  C: {
+    color: 'text-[#b45309] dark:text-[#fcd34d]',
+    bg: 'bg-[#fffbeb] dark:bg-[#422006]/50',
+    border: 'border-[#fcd34d] dark:border-[#f59e0b]/45',
+    ring: '#d97706',
+    label: "O'rtacha",
+  },
+  D: {
+    color: 'text-[#c2410c] dark:text-[#fdba74]',
+    bg: 'bg-[#fff7ed] dark:bg-[#431407]/45',
+    border: 'border-[#fdba74] dark:border-[#fb923c]/45',
+    ring: '#ea580c',
+    label: 'Zaif',
+  },
+  F: {
+    color: 'text-[#b91c1c] dark:text-[#fca5a5]',
+    bg: 'bg-[#fef2f2] dark:bg-[#450a0a]/45',
+    border: 'border-[#fca5a5] dark:border-[#f87171]/45',
+    ring: '#dc2626',
+    label: 'Yaroqsiz',
+  },
 }
 
 // ─── SCORE BAR ────────────────────────────────────────────────────────────────
 
 function ScoreBar({ score, max = 10 }: { score: number; max?: number }) {
   const pct = (score / max) * 100
-  const color =
-    pct >= 70 ? '#10B981' :
-    pct >= 40 ? '#F59E0B' : '#EF4444'
+  const color = pct >= 70 ? '#059669' : pct >= 40 ? '#d97706' : '#dc2626'
   return (
     <div className="flex items-center gap-2">
       <div className="flex-1 h-1.5 bg-surface-2 rounded-full overflow-hidden">
@@ -100,10 +129,12 @@ function ScoreBar({ score, max = 10 }: { score: number; max?: number }) {
 
 function StatusDot({ status }: { status: 'good' | 'medium' | 'bad' }) {
   return (
-    <div className={`w-2 h-2 rounded-full shrink-0 mt-1.5 ${
-      status === 'good' ? 'bg-emerald-400' :
-      status === 'medium' ? 'bg-amber-400' : 'bg-red-400'
-    }`} />
+    <div
+      className="mt-1.5 h-2 w-2 shrink-0 rounded-full"
+      style={{
+        backgroundColor: status === 'good' ? '#059669' : status === 'medium' ? '#d97706' : '#dc2626',
+      }}
+    />
   )
 }
 
@@ -117,16 +148,13 @@ function CircularScore({ score, grade }: { score: number; grade: keyof typeof GR
   return (
     <div className="relative inline-flex items-center justify-center">
       <svg width="120" height="120" viewBox="0 0 120 120">
-        {/* Background circle */}
-        <circle cx="60" cy="60" r="45" fill="none" stroke="#E5E7EB" strokeWidth="8"/>
-        {/* Score arc */}
+        {/* Background — follows theme border (light/dark) */}
+        <circle cx="60" cy="60" r="45" fill="none" stroke="var(--c-border)" strokeWidth="8" />
+        {/* Arc color matches letter grade (not remapped brand green) */}
         <circle
           cx="60" cy="60" r="45"
           fill="none"
-          stroke={
-            score >= 70 ? '#10B981' :
-            score >= 50 ? '#F59E0B' : '#EF4444'
-          }
+          stroke={cfg.ring}
           strokeWidth="8"
           strokeLinecap="round"
           strokeDasharray={circumference}
@@ -302,10 +330,14 @@ export default function CreativeScorerPage() {
       <PageHeader
         title={t('navigation.creativeScorer', 'Creative Scorer')}
         subtitle={t('creativeScorer.subtitle', 'Upload your ad creative and get AI scoring across 10 quality dimensions')}
-        actions={<Badge variant="purple">🎨 {t('creativeScorer.aiScoring', 'AI scoring')}</Badge>}
+        actions={
+          <Badge variant="secondary" className="border-border bg-surface text-text-secondary">
+            🎨 {t('creativeScorer.aiScoring', 'AI scoring')}
+          </Badge>
+        }
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 rounded-2xl border border-border bg-surface p-4 shadow-sm lg:grid-cols-2 lg:p-6 dark:bg-surface-elevated">
 
         {/* LEFT: Upload + Settings */}
         <div className="space-y-4">
@@ -402,18 +434,21 @@ export default function CreativeScorerPage() {
                       key={p.value}
                       onClick={() => setPlatform(p.value)}
                       className={`
-                        flex items-center gap-2.5 px-3 py-2.5 rounded-xl border text-sm transition-all text-left
-                        ${platform === p.value
-                          ? 'border-border bg-surface-2 text-text-primary'
-                          : 'border-border text-text-tertiary hover:border-border'
+                        flex items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left text-sm transition-all
+                        ${
+                          platform === p.value
+                            ? 'border-[#2563eb]/35 bg-[#eff6ff] text-text-primary dark:border-[#60a5fa]/40 dark:bg-[#172554]/40'
+                            : 'border-border text-text-tertiary hover:border-[#93c5fd]/40 hover:bg-surface-2'
                         }
                       `}
                     >
-                      <span className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
-                        platform === p.value ? 'border-border' : 'border-border'
-                      }`}>
+                      <span
+                        className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
+                          platform === p.value ? 'border-[#2563eb] dark:border-[#60a5fa]' : 'border-border'
+                        }`}
+                      >
                         {platform === p.value && (
-                          <span className="w-2 h-2 rounded-full bg-surface-2 block" />
+                          <span className="block h-2 w-2 rounded-full bg-[#2563eb] dark:bg-[#60a5fa]" />
                         )}
                       </span>
                       {p.label}
@@ -433,10 +468,11 @@ export default function CreativeScorerPage() {
                       key={ct.value}
                       onClick={() => setCreativeType(ct.value)}
                       className={`
-                        px-3 py-2 rounded-lg border text-xs font-medium transition-all
-                        ${creativeType === ct.value
-                          ? 'border-border bg-surface-2 text-text-secondary'
-                          : 'border-border text-text-tertiary hover:border-border'
+                        rounded-lg border px-3 py-2 text-xs font-medium transition-all
+                        ${
+                          creativeType === ct.value
+                            ? 'border-[#2563eb]/35 bg-[#eff6ff] text-text-primary dark:border-[#60a5fa]/40 dark:bg-[#172554]/40'
+                            : 'border-border text-text-tertiary hover:border-[#93c5fd]/40 hover:bg-surface-2'
                         }
                       `}
                     >
@@ -534,7 +570,7 @@ export default function CreativeScorerPage() {
             <div className="space-y-4">
 
               {/* Overall score */}
-              <Card className={`border-2 ${GRADE_CONFIG[result.grade].border}`}>
+              <Card className={`border-2 bg-surface shadow-sm dark:bg-surface-elevated ${GRADE_CONFIG[result.grade].border}`}>
                 <div className="flex items-center gap-5">
                   <CircularScore score={result.overallScore} grade={result.grade} />
                   <div className="flex-1">
@@ -558,7 +594,7 @@ export default function CreativeScorerPage() {
                 </div>
                 {!file && (
                   <div className="mt-3 pt-3 border-t border-border">
-                    <p className="text-xs text-amber-500 bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2">
+                    <p className="rounded-lg border border-[#fcd34d] bg-[#fffbeb] px-3 py-2 text-xs text-[#92400e] dark:border-[#b45309]/50 dark:bg-[#422006]/50 dark:text-[#fde68a]">
                       📌 Demo natija ko'rsatilmoqda — chap tarafdan o'z kreativingizni yuklang
                     </p>
                   </div>
@@ -581,16 +617,21 @@ export default function CreativeScorerPage() {
                         <div key={p}>
                           <div className="flex justify-between text-xs mb-1">
                             <span className="text-text-tertiary">{labels[p] || p}</span>
-                            <span className={`font-medium ${score >= 70 ? 'text-emerald-400' : score >= 50 ? 'text-amber-400' : 'text-red-400'}`}>
+                            <span
+                              className="font-medium"
+                              style={{
+                                color: score >= 70 ? '#1d4ed8' : score >= 50 ? '#b45309' : '#b91c1c',
+                              }}
+                            >
                               {score}%
                             </span>
                           </div>
-                          <div className="h-1.5 bg-surface-2-2 rounded-full overflow-hidden">
+                          <div className="h-1.5 overflow-hidden rounded-full bg-surface-2 dark:bg-surface-2/80">
                             <div
                               className="h-full rounded-full transition-all duration-700"
                               style={{
                                 width: `${score}%`,
-                                backgroundColor: score >= 70 ? '#10B981' : score >= 50 ? '#F59E0B' : '#EF4444',
+                                backgroundColor: score >= 70 ? '#2563eb' : score >= 50 ? '#d97706' : '#dc2626',
                               }}
                             />
                           </div>
@@ -636,14 +677,14 @@ export default function CreativeScorerPage() {
 
               {/* Improvements */}
               {result.improvements.length > 0 && (
-                <Card className="border-amber-500/30 bg-amber-500/5">
-                  <p className="text-amber-400 font-semibold text-sm mb-3">
+                <Card className="border border-[#fcd34d] bg-[#fffbeb] dark:border-[#b45309]/40 dark:bg-[#422006]/35">
+                  <p className="mb-3 text-sm font-semibold text-[#b45309] dark:text-[#fcd34d]">
                     ⚡ Darhol o'zgartirish kerak
                   </p>
                   <div className="space-y-2">
                     {result.improvements.map((imp, i) => (
                       <div key={i} className="flex items-start gap-2.5 text-sm">
-                        <span className="text-amber-400 font-bold shrink-0">{i + 1}.</span>
+                        <span className="shrink-0 font-bold text-[#d97706] dark:text-[#fcd34d]">{i + 1}.</span>
                         <p className="text-text-secondary">{imp}</p>
                       </div>
                     ))}

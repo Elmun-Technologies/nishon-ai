@@ -31,28 +31,28 @@ const STAGE_SECTION: Record<
   { dot: string; titleKey: string; titleFb: string; blurbKey: string; blurbFb: string }
 > = {
   acquisition: {
-    dot: 'bg-violet-500',
+    dot: 'bg-primary',
     titleKey: 'audiences.sectionAcquisitionTitle',
     titleFb: 'Acquisition prospecting',
     blurbKey: 'audiences.sectionAcquisitionBlurb',
     blurbFb: 'Cold audiences and lookalikes for scale testing.',
   },
   reengagement: {
-    dot: 'bg-pink-500',
+    dot: 'bg-brand-mid',
     titleKey: 'audiences.sectionReengagementTitle',
     titleFb: 'Acquisition re-engagement',
     blurbKey: 'audiences.sectionReengagementBlurb',
     blurbFb: 'Warm users who already had a first touch with your brand.',
   },
   retargeting: {
-    dot: 'bg-sky-500',
+    dot: 'bg-text-tertiary',
     titleKey: 'audiences.sectionRetargetingTitle',
     titleFb: 'Retargeting',
     blurbKey: 'audiences.sectionRetargetingBlurb',
     blurbFb: 'Site visitors and intent signals worth bringing back.',
   },
   retention: {
-    dot: 'bg-emerald-500',
+    dot: 'bg-brand-lime',
     titleKey: 'audiences.sectionRetentionTitle',
     titleFb: 'Retention',
     blurbKey: 'audiences.sectionRetentionBlurb',
@@ -298,26 +298,30 @@ export default function AudiencesPage() {
         actions={
           <Link
             href="/audiences/studio"
-            className="inline-flex items-center justify-center rounded-xl text-sm font-medium px-4 py-2 border border-violet-500/40 text-violet-200 hover:bg-violet-500/10 transition-colors"
+            className="inline-flex items-center justify-center rounded-xl border border-primary/35 bg-surface px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/10"
           >
             {t('audiences.openStudio', 'Audience Studio')}
           </Link>
         }
       />
-      <div className="min-h-full rounded-2xl border border-[#1E1B4B] bg-[#08071A] text-text-secondary overflow-hidden">
-      <div className="border-b border-[#1F1B4D] px-5 py-4 flex items-start justify-between gap-4 flex-wrap">
+      <div className="min-h-full overflow-hidden rounded-2xl border border-border bg-surface text-text-secondary shadow-sm dark:bg-surface-elevated">
+      <div className="flex flex-wrap items-start justify-between gap-4 border-b border-border px-5 py-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-xl font-semibold">{t('audiences.launcherTitle', 'Audience Launcher')}</h2>
-            <span className="text-xs px-2.5 py-1 rounded-full bg-[#151236] border border-border text-[#C4B5FD] font-medium tabular-nums">
+            <h2 className="text-xl font-semibold text-text-primary">{t('audiences.launcherTitle', 'Audience Launcher')}</h2>
+            <span className="rounded-full border border-border bg-surface-2 px-2.5 py-1 text-xs font-medium tabular-nums text-text-secondary">
               {selected.length} {t('audiences.selectedCount', 'selected')}
             </span>
           </div>
-          <p className="text-xs text-text-tertiary mt-1.5 max-w-2xl">
+          <p className="mt-1.5 max-w-2xl text-xs text-text-tertiary">
             {t('audiences.launcherSubtitle', 'AdSpectr full-funnel targeting strategy with an optimized workflow for maximum ROAS.')}
           </p>
         </div>
-        <button className="px-4 py-2 rounded-lg bg-[#8B80F9] text-text-primary text-sm font-semibold disabled:opacity-40 shrink-0" disabled={selected.length === 0}>
+        <button
+          type="button"
+          className="shrink-0 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-brand-ink disabled:opacity-40 dark:text-brand-ink"
+          disabled={selected.length === 0}
+        >
           {t('common.next', 'Next')}
         </button>
       </div>
@@ -329,7 +333,7 @@ export default function AudiencesPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search for audience..."
-              className="w-full md:max-w-sm rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-[#8B80F9]"
+              className="w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm outline-none focus:border-primary md:max-w-sm dark:bg-surface"
             />
           </div>
 
@@ -338,19 +342,19 @@ export default function AudiencesPage() {
               const on = enabledStages.has(stage.id)
               const lib = PREBUILT_LIBRARY[STAGE_LIBRARY_KEY[stage.id]] ?? []
               return (
-                <div key={stage.id} className="relative rounded-lg border border-border bg-surface/80">
+                <div key={stage.id} className="relative rounded-lg border border-border bg-surface-2 dark:bg-surface">
                   <div className="flex items-center gap-2 px-3 py-2">
                     <input
                       type="checkbox"
                       checked={on}
                       onChange={() => toggleStage(stage.id)}
-                      className="rounded border-border text-[#8B80F9] focus:ring-[#8B80F9]/30"
+                      className="rounded border-border text-primary focus:ring-primary/30"
                     />
-                    <span className={`text-sm font-medium flex-1 ${on ? 'text-white' : 'text-[#A1A1AA]'}`}>{stage.label}</span>
+                    <span className={`flex-1 text-sm font-medium ${on ? 'text-text-primary' : 'text-text-tertiary'}`}>{stage.label}</span>
                     <button
                       type="button"
                       onClick={() => setSubMenuStage((s) => (s === stage.id ? null : stage.id))}
-                      className="p-1 rounded-md hover:bg-[#1D1A45] text-[#A1A1AA]"
+                      className="rounded-md p-1 text-text-tertiary transition-colors hover:bg-surface hover:text-text-primary dark:hover:bg-surface-2"
                       aria-expanded={subMenuStage === stage.id}
                       aria-label={t('audiences.toggleSubtypes', 'Show template list')}
                     >
@@ -358,11 +362,14 @@ export default function AudiencesPage() {
                     </button>
                   </div>
                   {subMenuStage === stage.id && (
-                    <div className="absolute left-0 right-0 top-full z-20 mt-1 max-h-56 overflow-y-auto rounded-lg border border-[#8B80F9]/40 bg-[#0c0a22] shadow-xl p-2 space-y-1">
+                    <div className="absolute left-0 right-0 top-full z-20 mt-1 max-h-56 space-y-1 overflow-y-auto rounded-lg border border-primary/25 bg-surface p-2 shadow-lg dark:border-border dark:bg-surface-elevated">
                       {lib.slice(0, 10).map((line) => (
-                        <label key={line} className="flex items-start gap-2 px-2 py-1.5 rounded-md hover:bg-[#1D1A45] cursor-pointer text-left">
+                        <label
+                          key={line}
+                          className="flex cursor-pointer items-start gap-2 rounded-md px-2 py-1.5 text-left hover:bg-surface-2 dark:hover:bg-surface-2"
+                        >
                           <input type="checkbox" className="mt-0.5 rounded border-border" readOnly tabIndex={-1} />
-                          <span className="text-[11px] text-[#D4D4D8] leading-snug">{line}</span>
+                          <span className="text-[11px] leading-snug text-text-secondary">{line}</span>
                         </label>
                       ))}
                       {lib.length > 10 && (
@@ -379,8 +386,8 @@ export default function AudiencesPage() {
             <div className="flex items-center gap-2 min-w-0">
               <span className={`h-2 w-2 rounded-full shrink-0 ${section.dot}`} aria-hidden />
               <div>
-                <p className="text-sm font-semibold text-white">{t(section.titleKey, section.titleFb)}</p>
-                <p className="text-xs text-[#A1A1AA] max-w-xl">{t(section.blurbKey, section.blurbFb)}</p>
+                <p className="text-sm font-semibold text-text-primary">{t(section.titleKey, section.titleFb)}</p>
+                <p className="max-w-xl text-xs text-text-secondary">{t(section.blurbKey, section.blurbFb)}</p>
               </div>
             </div>
           </div>
@@ -389,7 +396,7 @@ export default function AudiencesPage() {
             <button
               type="button"
               onClick={selectAllInView}
-              className="rounded-lg border border-[#8B80F9]/40 bg-[#1D1A45] px-3 py-1.5 text-xs font-semibold text-[#C4B5FD]"
+              className="rounded-lg border border-primary/35 bg-surface-2 px-3 py-1.5 text-xs font-semibold text-primary dark:bg-surface"
             >
               Select all in this view
             </button>
@@ -402,11 +409,13 @@ export default function AudiencesPage() {
                 <button
                   key={audience.id}
                   onClick={() => toggleAudience(audience.id)}
-                  className={`text-left rounded-xl border p-4 transition flex flex-col ${
-                    active ? 'border-[#8B80F9] bg-[#14113A]' : 'border-border bg-surface hover:border-[#4C478F]'
+                  className={`flex flex-col rounded-xl border p-4 text-left transition ${
+                    active
+                      ? 'border-primary bg-surface-2 ring-1 ring-primary/20 dark:bg-surface'
+                      : 'border-border bg-surface hover:border-primary/35 dark:bg-surface-2'
                   }`}
                 >
-                  <div className="mb-3 flex items-center justify-between gap-2 text-[10px] text-[#A1A1AA]">
+                  <div className="mb-3 flex items-center justify-between gap-2 text-[10px] text-text-tertiary">
                     <div className="flex items-center gap-2">
                       <span className="flex items-center gap-1">
                         <span className="h-1 w-1 rounded-full bg-border" />0 created
@@ -415,27 +424,34 @@ export default function AudiencesPage() {
                         <span className="h-1 w-1 rounded-full bg-border" />0 live
                       </span>
                     </div>
-                    <span className={`w-4 h-4 rounded border shrink-0 ${active ? 'bg-[#8B80F9] border-[#8B80F9]' : 'border-border'}`} />
+                    <span
+                      className={`h-4 w-4 shrink-0 rounded border ${active ? 'border-primary bg-primary' : 'border-border'}`}
+                    />
                   </div>
-                  <div className="flex flex-1 flex-col items-center text-center gap-2">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#1D1A45] border border-[#8B80F9]/25 text-[#C4B5FD]">
+                  <div className="flex flex-1 flex-col items-center gap-2 text-center">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full border border-primary/25 bg-surface-2 text-primary dark:bg-surface">
                       <AudienceVisual tags={audience.tags} />
                     </div>
-                    <p className="font-semibold text-sm text-white w-full">{audience.name}</p>
-                    <p className="text-xs text-[#A1A1AA] leading-relaxed line-clamp-3">{audience.description}</p>
+                    <p className="w-full text-sm font-semibold text-text-primary">{audience.name}</p>
+                    <p className="line-clamp-3 text-xs leading-relaxed text-text-secondary">{audience.description}</p>
                   </div>
-                  <div className="mt-auto pt-3 flex flex-wrap items-center justify-between gap-2 border-t border-border/40">
+                  <div className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-border/60 pt-3">
                     <div className="flex flex-wrap gap-1.5">
                       {audience.tags.map((tag) => (
-                        <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full bg-teal-950/40 text-teal-200 border border-teal-800/40">
+                        <span
+                          key={tag}
+                          className="rounded-full border border-border bg-surface-2 px-2 py-0.5 text-[10px] text-text-secondary dark:bg-surface"
+                        >
                           {tag}
                         </span>
                       ))}
                       {audience.ai && (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#2A1C55] text-[#C4B5FD]">AI</span>
+                        <span className="rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
+                          AI
+                        </span>
                       )}
                     </div>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="text-blue-400 shrink-0" aria-hidden>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="shrink-0 text-text-tertiary" aria-hidden>
                       <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                     </svg>
                   </div>
@@ -445,14 +461,14 @@ export default function AudiencesPage() {
           </div>
         </section>
 
-        <section className="rounded-xl border border-border bg-surface">
-          <div className="px-4 py-3 border-b border-[#1F1B4D] flex items-center justify-between">
-            <p className="font-medium">Campaign Set Up</p>
+        <section className="rounded-xl border border-border bg-surface-2 dark:bg-surface">
+          <div className="flex items-center justify-between border-b border-border px-4 py-3">
+            <p className="font-medium text-text-primary">Campaign Set Up</p>
             <span className="text-xs text-text-tertiary">Step 1 of 4</span>
           </div>
           <div className="p-4 space-y-4">
             <div className="flex flex-wrap items-center gap-2 text-sm text-text-secondary">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="text-blue-400 shrink-0" aria-hidden>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="shrink-0 text-text-tertiary" aria-hidden>
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
               </svg>
               <span className="font-medium text-text-primary">Where to launch Facebook ad sets:</span>
@@ -465,7 +481,7 @@ export default function AudiencesPage() {
                   setSplitByFunnel(true)
                   setRowType('New')
                 }}
-                className={`px-3 py-2 text-xs ${splitByFunnel ? 'bg-[#221B5A] text-white' : 'bg-surface text-[#A1A1AA]'}`}
+                className={`px-3 py-2 text-xs ${splitByFunnel ? 'bg-primary/15 font-medium text-text-primary' : 'bg-surface text-text-tertiary'}`}
               >
                 Split campaigns per funnel stage
               </button>
@@ -475,7 +491,7 @@ export default function AudiencesPage() {
                   setSplitByFunnel(false)
                   setRowType('Existing')
                 }}
-                className={`px-3 py-2 text-xs ${!splitByFunnel ? 'bg-[#221B5A] text-white' : 'bg-surface text-[#A1A1AA]'}`}
+                className={`px-3 py-2 text-xs ${!splitByFunnel ? 'bg-primary/15 font-medium text-text-primary' : 'bg-surface text-text-tertiary'}`}
               >
                 Launch all ad sets to one campaign
               </button>
@@ -483,7 +499,7 @@ export default function AudiencesPage() {
 
             <div className="overflow-x-auto rounded-xl border border-border">
               <table className="min-w-[920px] w-full text-left text-xs">
-                <thead className="bg-[#151236] text-[#A1A1AA] uppercase tracking-wide">
+                <thead className="bg-surface-2 text-[11px] uppercase tracking-wide text-text-tertiary dark:bg-surface">
                   <tr>
                     <th className="px-3 py-2.5 font-semibold w-14">Audiences</th>
                     {splitByFunnel && <th className="px-3 py-2.5 font-semibold min-w-[200px]">Funnel stage</th>}
@@ -497,14 +513,14 @@ export default function AudiencesPage() {
                 <tbody>
                   <tr className="border-t border-border align-top">
                     <td className="px-3 py-3">
-                      <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-[#8B80F9]/50 bg-[#1D1A45] text-[11px] font-bold text-white">
+                      <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-primary/40 bg-surface-2 text-[11px] font-bold text-text-primary dark:bg-surface">
                         {Math.max(1, selected.length)}
                       </span>
                     </td>
                     {splitByFunnel && (
                       <td className="px-3 py-3">
                         <div className="flex items-start gap-2">
-                          <span className="mt-1 h-2 w-2 rounded-full bg-emerald-400 shrink-0" aria-hidden />
+                          <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-primary" aria-hidden />
                           <span className="text-[11px] leading-snug text-text-secondary">
                             {STAGES.find((s) => s.id === primaryStage)?.label ?? 'Acquisition'} Lookalike Campaign
                           </span>
@@ -516,14 +532,14 @@ export default function AudiencesPage() {
                         <button
                           type="button"
                           onClick={() => setRowType('New')}
-                          className={`px-2 py-1 text-[10px] font-semibold ${rowType === 'New' ? 'bg-[#221B5A] text-white' : 'bg-surface text-[#A1A1AA]'}`}
+                          className={`px-2 py-1 text-[10px] font-semibold ${rowType === 'New' ? 'bg-primary/15 text-text-primary' : 'bg-surface text-text-tertiary'}`}
                         >
                           New
                         </button>
                         <button
                           type="button"
                           onClick={() => setRowType('Existing')}
-                          className={`px-2 py-1 text-[10px] font-semibold ${rowType === 'Existing' ? 'bg-[#221B5A] text-white' : 'bg-surface text-[#A1A1AA]'}`}
+                          className={`px-2 py-1 text-[10px] font-semibold ${rowType === 'Existing' ? 'bg-primary/15 text-text-primary' : 'bg-surface text-text-tertiary'}`}
                         >
                           Existing
                         </button>
@@ -570,14 +586,14 @@ export default function AudiencesPage() {
                         <button
                           type="button"
                           onClick={() => setBudgetType('CBO')}
-                          className={`px-2 py-1 text-[10px] font-semibold ${budgetType === 'CBO' ? 'bg-[#221B5A] text-white' : 'bg-surface text-[#A1A1AA]'}`}
+                          className={`px-2 py-1 text-[10px] font-semibold ${budgetType === 'CBO' ? 'bg-primary/15 text-text-primary' : 'bg-surface text-text-tertiary'}`}
                         >
                           CBO
                         </button>
                         <button
                           type="button"
                           onClick={() => setBudgetType('ABO')}
-                          className={`px-2 py-1 text-[10px] font-semibold ${budgetType === 'ABO' ? 'bg-[#221B5A] text-white' : 'bg-surface text-[#A1A1AA]'}`}
+                          className={`px-2 py-1 text-[10px] font-semibold ${budgetType === 'ABO' ? 'bg-primary/15 text-text-primary' : 'bg-surface text-text-tertiary'}`}
                         >
                           ABO
                         </button>
@@ -597,7 +613,7 @@ export default function AudiencesPage() {
                 setRowType('New')
                 setCampaignName(`AdSpectr - New campaign ${new Date().toLocaleDateString()}`)
               }}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#8B80F9]/60 bg-transparent px-3 py-2 text-xs font-semibold text-[#C4B5FD] hover:bg-[#221B5A]/40 transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-primary/40 bg-transparent px-3 py-2 text-xs font-semibold text-primary transition-colors hover:bg-primary/10"
             >
               <span className="text-base leading-none">+</span>
               Create New Campaign
@@ -605,10 +621,12 @@ export default function AudiencesPage() {
           </div>
         </section>
 
-        <section className="rounded-xl border border-border bg-surface p-4 space-y-4">
+        <section className="space-y-4 rounded-xl border border-border bg-surface-2 p-4 dark:bg-surface">
           <div className="flex items-center justify-between">
-            <p className="font-medium">Select the Ad Creatives</p>
-            <button className="px-3 py-1.5 rounded-lg bg-[#8B80F9] text-text-primary text-xs font-semibold">Save Changes</button>
+            <p className="font-medium text-text-primary">Select the Ad Creatives</p>
+            <button type="button" className="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-brand-ink">
+              Save Changes
+            </button>
           </div>
           <div className="rounded-lg border border-border p-3">
             <p className="text-xs text-text-tertiary mb-2">Your selected audiences</p>
@@ -619,7 +637,7 @@ export default function AudiencesPage() {
                 selected.map((id) => {
                   const item = AUDIENCES.find((a) => a.id === id)
                   return (
-                    <span key={id} className="text-xs px-2 py-1 rounded bg-[#17143D] border border-border">
+                    <span key={id} className="rounded border border-border bg-surface-2 px-2 py-1 text-xs text-text-secondary dark:bg-surface">
                       {item?.name}
                     </span>
                   )
@@ -630,7 +648,7 @@ export default function AudiencesPage() {
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
             {[1, 2, 3, 4].map((n) => (
               <div key={n} className="rounded-lg border border-border bg-surface p-2">
-                <div className="aspect-[4/5] rounded bg-[#16133B] mb-2" />
+                <div className="mb-2 aspect-[4/5] rounded bg-surface-2 dark:bg-surface" />
                 <p className="text-xs text-text-tertiary">Creative #{n}</p>
                 <p className="text-[11px] text-text-tertiary mt-1">ROAS, CTR, thumb-stop va spend metrikalari bo'yicha saralash.</p>
               </div>
@@ -638,10 +656,12 @@ export default function AudiencesPage() {
           </div>
         </section>
 
-        <section className="rounded-xl border border-border bg-surface p-4 space-y-4">
+        <section className="space-y-4 rounded-xl border border-border bg-surface-2 p-4 dark:bg-surface">
           <div className="flex items-center justify-between">
-            <p className="font-medium">Set Up the Audiences</p>
-            <button className="px-3 py-1.5 rounded-lg bg-[#8B80F9] text-text-primary text-xs font-semibold">Save Changes</button>
+            <p className="font-medium text-text-primary">Set Up the Audiences</p>
+            <button type="button" className="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-brand-ink">
+              Save Changes
+            </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div className="rounded-lg border border-border p-3 space-y-3">
@@ -681,10 +701,12 @@ export default function AudiencesPage() {
           </div>
         </section>
 
-        <section className="rounded-xl border border-border bg-surface p-4 space-y-4">
+        <section className="space-y-4 rounded-xl border border-border bg-surface-2 p-4 dark:bg-surface">
           <div className="flex items-center justify-between">
-            <p className="font-medium">Summary & Launch</p>
-            <button className="px-4 py-2 rounded-lg bg-[#8B80F9] text-text-primary text-sm font-semibold">Launch</button>
+            <p className="font-medium text-text-primary">Summary & Launch</p>
+            <button type="button" className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-brand-ink">
+              Launch
+            </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
             <div className="rounded-lg border border-border p-3">
@@ -698,18 +720,21 @@ export default function AudiencesPage() {
           </div>
         </section>
 
-        <section className="rounded-xl border border-border bg-surface p-4">
-          <h3 className="text-base font-semibold mb-3">Target multi-network scope</h3>
+        <section className="rounded-xl border border-border bg-surface-2 p-4 dark:bg-surface">
+          <h3 className="mb-3 text-base font-semibold text-text-primary">Target multi-network scope</h3>
           <div className="flex flex-wrap gap-2 mb-4">
             {TARGET_NETWORKS.map((network) => (
-              <span key={network} className="text-xs px-2.5 py-1 rounded-full bg-[#17143D] border border-border text-[#C7D2FE]">
+              <span
+                key={network}
+                className="rounded-full border border-border bg-surface-2 px-2.5 py-1 text-xs text-text-secondary dark:bg-surface"
+              >
                 {network}
               </span>
             ))}
           </div>
 
-          <h3 className="text-base font-semibold mb-3">Winning audiences playbook (to'liq)</h3>
-          <p className="text-sm text-[#C7CAD1] mb-3">
+          <h3 className="mb-3 text-base font-semibold text-text-primary">Winning audiences playbook (to'liq)</h3>
+          <p className="mb-3 text-sm text-text-secondary">
             Asosiy prinsip: 76 ta preset bor, lekin hammasini birdan ishga tushirmang. Restaurant menyusi kabi — eng kuchli kombinatsiyalarni bosqichma-bosqich test qiling.
           </p>
 
@@ -717,7 +742,7 @@ export default function AudiencesPage() {
             {Object.entries(PREBUILT_LIBRARY).map(([title, items]) => (
               <div key={title} className="rounded-lg border border-border p-3">
                 <p className="font-medium text-sm mb-2">{title}</p>
-                <ul className="space-y-1.5 list-disc list-inside text-xs text-[#A1A1AA]">
+                <ul className="list-inside list-disc space-y-1.5 text-xs text-text-tertiary">
                   {items.map((item) => (
                     <li key={item}>{item}</li>
                   ))}
@@ -728,7 +753,7 @@ export default function AudiencesPage() {
 
           <div className="mt-4 rounded-lg border border-border p-3">
             <p className="text-sm font-medium mb-2">AdSpectr vs Facebook Ads Manager (nima uchun bu section kerak)</p>
-            <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-[#A1A1AA]">
+            <ul className="grid grid-cols-1 gap-2 text-xs text-text-tertiary md:grid-cols-2">
               <li>• AdSpectr'da preset audiences va exclusionlar oldindan beriladi.</li>
               <li>• AI lookalike segmentlar bilan sifat + hajm balansini yaxshilaydi.</li>
               <li>• Funnel stage'larni kampaniyalarga alohida ajratish osonlashadi.</li>
@@ -738,7 +763,7 @@ export default function AudiencesPage() {
 
           <div className="mt-4 rounded-lg border border-border p-3">
             <p className="text-sm font-medium mb-2">eRFM model (detal)</p>
-            <ul className="space-y-1.5 list-disc list-inside text-xs text-[#A1A1AA]">
+            <ul className="list-inside list-disc space-y-1.5 text-xs text-text-tertiary">
               {ERFM_EXPLAINER.map((item) => (
                 <li key={item}>{item}</li>
               ))}
@@ -749,8 +774,8 @@ export default function AudiencesPage() {
             {FULL_FUNNEL_RECOMMENDATIONS.map((section) => (
               <div key={section.title} className="rounded-lg border border-border p-3">
                 <p className="text-sm font-medium">{section.title}</p>
-                {section.intro && <p className="text-xs text-[#C7CAD1] mt-1">{section.intro}</p>}
-                <ul className="mt-2 space-y-1.5 list-disc list-inside text-xs text-[#A1A1AA]">
+                {section.intro && <p className="mt-1 text-xs text-text-secondary">{section.intro}</p>}
+                <ul className="mt-2 list-inside list-disc space-y-1.5 text-xs text-text-tertiary">
                   {section.points.map((point) => (
                     <li key={point}>{point}</li>
                   ))}
@@ -765,7 +790,7 @@ export default function AudiencesPage() {
               {IMPLEMENTATION_CHECKLIST.map((group) => (
                 <div key={group.module} className="rounded-lg border border-border p-3">
                   <p className="text-sm font-medium mb-2">{group.module}</p>
-                  <ul className="space-y-1 list-disc list-inside text-xs text-[#A1A1AA]">
+                  <ul className="list-inside list-disc space-y-1 text-xs text-text-tertiary">
                     {group.items.map((item) => (
                       <li key={item}>{item}</li>
                     ))}

@@ -1,17 +1,13 @@
 'use client'
 
-import { useMemo, useState } from 'react'
-import { Compass, Filter, RefreshCw, Search } from 'lucide-react'
+import Link from 'next/link'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Compass, Filter, RefreshCw, Search, X } from 'lucide-react'
 import { useI18n } from '@/i18n/use-i18n'
-import { PageHeader, Button, Dialog } from '@/components/ui'
+import { PageHeader, Button, Dialog, Alert } from '@/components/ui'
+import { cn } from '@/lib/utils'
 
-type AuditTab =
-  | 'meta'
-  | 'targeting'
-  | 'auction'
-  | 'geo'
-  | 'creative'
-  | 'adcopy'
+type AuditTab = 'meta' | 'targeting' | 'auction' | 'geo' | 'creative' | 'adcopy'
 
 const TAB_IDS: AuditTab[] = ['meta', 'targeting', 'auction', 'geo', 'creative', 'adcopy']
 
@@ -24,6 +20,49 @@ const CREATIVE_FORMATS = [
   { id: 'dpa', labelKey: 'metaAudit.formatDpa', fallback: 'DPA', icon: '⊞' },
 ] as const
 
+const FORMAT_STATS: Record<string, { spend: number; cpl: number; ctr: number; conv: number }> = {
+  image: { spend: 1240, cpl: 4.2, ctr: 1.85, conv: 2.1 },
+  short: { spend: 980, cpl: 5.1, ctr: 2.4, conv: 1.6 },
+  medium: { spend: 720, cpl: 6.3, ctr: 1.9, conv: 1.2 },
+  long: { spend: 540, cpl: 7.8, ctr: 1.4, conv: 0.9 },
+  carousel: { spend: 1580, cpl: 3.6, ctr: 2.1, conv: 2.8 },
+  dpa: { spend: 2100, cpl: 3.1, ctr: 2.6, conv: 3.2 },
+}
+
+const MOCK_CAMPAIGNS = [
+  { id: 'c1', name: 'Prospecting — Catalog sales', spend: 4200, roas: 2.4, status: 'Active' },
+  { id: 'c2', name: 'Retargeting — 30d visitors', spend: 1890, roas: 3.8, status: 'Active' },
+  { id: 'c3', name: 'Lead gen — Instant form', spend: 960, roas: 1.2, status: 'Limited' },
+  { id: 'c4', name: 'ASC — Advantage+ shopping', spend: 6120, roas: 2.9, status: 'Active' },
+]
+
+const MOCK_TARGETING = [
+  { id: 't1', segment: 'Broad + Advantage+', health: 88, note: 'Stable CPM' },
+  { id: 't2', segment: 'Lookalike 1% purchasers', health: 76, note: 'Watch frequency' },
+  { id: 't3', segment: 'Engaged shoppers 30d', health: 64, note: 'Overlap with retargeting' },
+]
+
+const MOCK_AUCTION = [
+  { key: 'overlap', labelKey: 'metaAudit.overlap', fb: 'Audience overlap', value: 62 },
+  { key: 'delivery', labelKey: 'metaAudit.delivery', fb: 'Delivery stability', value: 78 },
+  { key: 'competition', labelKey: 'metaAudit.competition', fb: 'Competition index', value: 54 },
+]
+
+const MOCK_GEO = [
+  { region: 'Tashkent city', share: 34, spend: 1280 },
+  { region: 'Regions', share: 41, spend: 1540 },
+  { region: 'Samarkand', share: 12, spend: 450 },
+  { region: 'Other', share: 13, spend: 490 },
+]
+
+const MOCK_COPY = [
+  { id: 'cp1', headline: 'Free shipping today', body: 'Order before midnight…', ctr: 2.1, leads: 48 },
+  { id: 'cp2', headline: 'Last units in stock', body: 'Tap to see sizes…', ctr: 1.7, leads: 31 },
+  { id: 'cp3', headline: 'New collection drop', body: 'Video + carousel bundle…', ctr: 2.4, leads: 56 },
+]
+
+const VIEW_STORAGE = 'meta-audit-saved-view-v1'
+
 function MetaGlyph({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden>
@@ -34,11 +73,29 @@ function MetaGlyph({ className }: { className?: string }) {
 
 export default function MetaAuditPage() {
   const { t } = useI18n()
+  const searchRef = useRef<HTMLInputElement>(null)
+
   const [tab, setTab] = useState<AuditTab>('meta')
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [minSpend, setMinSpend] = useState('0')
   const [maxSpend, setMaxSpend] = useState('0')
   const [gradedBy, setGradedBy] = useState('leads')
+  const [dateRange, setDateRange] = useState<'7' | '30' | 'month'>('7')
+  const [kpi, setKpi] = useState<'roas' | 'leads' | 'spend'>('roas')
+  const [preset, setPreset] = useState('')
+  const [search, setSearch] = useState('')
+  const [showSearch, setShowSearch] = useState(false)
+  const [introOpen, setIntroOpen] = useState(true)
+  const [feedback, setFeedback] = useState<string | null>(null)
+  const [lastRefresh, setLastRefresh] = useState<Date | null>(null)
+  const [selectedFormats, setSelectedFormats] = useState<Record<string, boolean>>({})
+  const [selectedCopy, setSelectedCopy] = useState<Record<string, boolean>>({})
+
+  useEffect(() => {
+    if (!feedback) return
+    const id = window.setTimeout(() => setFeedback(null), 4000)
+    return () => window.clearTimeout(id)
+  }, [feedback])
 
   const tabLabels = useMemo(
     () =>
@@ -53,131 +110,259 @@ export default function MetaAuditPage() {
     [t],
   )
 
+  const tabHelp: Record<AuditTab, string> = useMemo(
+    () => ({
+      meta: t('metaAudit.metaHelp', 'Account snapshot: spend, ROAS, and top campaigns (sample).'),
+      targeting: t('metaAudit.targetingHelp', 'Audience breadth vs. performance — spot overlap or fatigue risk (sample).'),
+      auction: t('metaAudit.auctionHelp', 'Auction pressure and delivery — why costs move (sample).'),
+      geo: t('metaAudit.geoHelp', 'Budget split by region — where results come from (sample).'),
+      creative: t('metaAudit.creativeHelp', 'Formats and a simple performance map — pick winners for Ad Launcher (sample).'),
+      adcopy: t('metaAudit.adcopyHelp', 'Headline and body patterns vs. metrics (sample).'),
+    }),
+    [t],
+  )
+
+  const dateLabel = useMemo(() => {
+    if (dateRange === '7') return t('metaAudit.date7', 'Last 7 days')
+    if (dateRange === '30') return t('metaAudit.date30', 'Last 30 days')
+    return t('metaAudit.dateMonth', 'This month')
+  }, [dateRange, t])
+
+  const filteredCampaigns = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    if (!q) return MOCK_CAMPAIGNS
+    return MOCK_CAMPAIGNS.filter((c) => c.name.toLowerCase().includes(q) || c.id.includes(q))
+  }, [search])
+
   const showCreativeChrome = tab === 'creative' || tab === 'adcopy'
 
+  const selectedFormatCount = Object.values(selectedFormats).filter(Boolean).length
+  const selectedCopyCount = Object.values(selectedCopy).filter(Boolean).length
+
+  const toggleFormat = useCallback((id: string) => {
+    setSelectedFormats((p) => ({ ...p, [id]: !p[id] }))
+  }, [])
+
+  const toggleCopy = useCallback((id: string) => {
+    setSelectedCopy((p) => ({ ...p, [id]: !p[id] }))
+  }, [])
+
+  const onRefresh = () => {
+    setLastRefresh(new Date())
+    setFeedback(t('metaAudit.refreshed', 'Preview refreshed (demo). Connect Meta for live sync.'))
+  }
+
+  const onSaveView = () => {
+    try {
+      sessionStorage.setItem(
+        VIEW_STORAGE,
+        JSON.stringify({ tab, kpi, preset, dateRange, at: Date.now() }),
+      )
+    } catch {
+      /* ignore */
+    }
+    setFeedback(t('metaAudit.savedViewOk', 'View saved in this browser.'))
+  }
+
+  const onApplyFilters = () => {
+    setFiltersOpen(false)
+    setFeedback(t('metaAudit.filtersApplied', 'Filters applied to the preview.'))
+  }
+
+  const onClearFilters = () => {
+    setFeedback(t('metaAudit.filtersCleared', 'Filters cleared.'))
+  }
+
+  const maxSpendFormat = Math.max(...Object.values(FORMAT_STATS).map((s) => s.spend), 1)
+
   return (
-    <div className="space-y-4 max-w-7xl pb-8">
+    <div className="mx-auto max-w-7xl space-y-4 pb-8">
       <Dialog
         open={filtersOpen}
         onClose={() => setFiltersOpen(false)}
         title={t('metaAudit.allFilters', 'All filters')}
-        className="max-w-3xl max-h-[min(90vh,640px)] overflow-y-auto"
+        className="max-h-[min(90vh,640px)] max-w-3xl overflow-y-auto"
       >
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
+        <div className="grid grid-cols-1 gap-6 text-sm sm:grid-cols-2">
           <div>
-            <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wide mb-2">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-tertiary">
               {t('metaAudit.filterCreativeType', 'Creative type')}
             </p>
             <ul className="space-y-2">
               {CREATIVE_FORMATS.map((f) => (
-                <label key={f.id} className="flex items-center gap-2 text-text-secondary cursor-pointer">
-                  <input type="checkbox" defaultChecked className="rounded border-border" />
+                <label key={f.id} className="flex cursor-pointer items-center gap-2 text-text-secondary">
+                  <input type="checkbox" defaultChecked className="rounded border-border text-primary" />
                   <span>{t(f.labelKey, f.fallback)}</span>
                 </label>
               ))}
             </ul>
           </div>
           <div>
-            <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wide mb-2">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-tertiary">
               {t('metaAudit.filterFunnel', 'Funnel stage')}
             </p>
             <ul className="space-y-2">
               {['Acquisition', 'Retargeting', 'Retention'].map((x) => (
-                <label key={x} className="flex items-center gap-2 text-text-secondary cursor-pointer">
-                  <input type="checkbox" className="rounded border-border" />
+                <label key={x} className="flex cursor-pointer items-center gap-2 text-text-secondary">
+                  <input type="checkbox" className="rounded border-border text-primary" />
                   {x}
                 </label>
               ))}
             </ul>
           </div>
           <div>
-            <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wide mb-2">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-tertiary">
               {t('metaAudit.filterPlacement', 'Placement')}
             </p>
             <ul className="space-y-2">
               {['Facebook Feed', 'Instagram Feed', 'Stories', 'Audience Network'].map((x) => (
-                <label key={x} className="flex items-center gap-2 text-text-secondary cursor-pointer">
-                  <input type="checkbox" className="rounded border-border" />
+                <label key={x} className="flex cursor-pointer items-center gap-2 text-text-secondary">
+                  <input type="checkbox" className="rounded border-border text-primary" />
                   {x}
                 </label>
               ))}
             </ul>
           </div>
           <div>
-            <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wide mb-2">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-tertiary">
               {t('metaAudit.filterDevice', 'Device')}
             </p>
             <ul className="space-y-2">
               {['Desktop', 'Mobile app', 'Mobile web'].map((x) => (
-                <label key={x} className="flex items-center gap-2 text-text-secondary cursor-pointer">
-                  <input type="checkbox" className="rounded border-border" />
+                <label key={x} className="flex cursor-pointer items-center gap-2 text-text-secondary">
+                  <input type="checkbox" className="rounded border-border text-primary" />
                   {x}
                 </label>
               ))}
             </ul>
           </div>
         </div>
-        <div className="mt-6 rounded-xl border border-border bg-surface-2/40 p-4 text-center text-sm text-text-tertiary">
+        <div className="mt-6 rounded-xl border border-border bg-surface-2/50 p-4 text-center text-sm text-text-tertiary">
           {t('metaAudit.filtersEmptyPreview', 'No rows match these filters yet. Apply to refresh the workspace view.')}
         </div>
         <div className="mt-6 flex flex-wrap items-center justify-between gap-2 border-t border-border pt-4">
-          <button type="button" className="text-sm font-medium text-violet-600 dark:text-violet-300 hover:underline">
+          <button
+            type="button"
+            className="text-sm font-medium text-primary hover:underline"
+            onClick={onClearFilters}
+          >
             {t('metaAudit.clearFilters', 'Clear filters')}
           </button>
           <div className="flex gap-2">
-            <Button variant="secondary" size="sm" onClick={() => setFiltersOpen(false)}>
+            <Button variant="secondary" size="sm" type="button" onClick={() => setFiltersOpen(false)}>
               {t('common.cancel', 'Cancel')}
             </Button>
-            <Button size="sm" onClick={() => setFiltersOpen(false)}>
+            <Button size="sm" type="button" onClick={onApplyFilters}>
               {t('metaAudit.applyFilters', 'Apply filters')}
             </Button>
           </div>
         </div>
       </Dialog>
 
-      <section className="rounded-2xl border border-blue-200/70 bg-gradient-to-r from-blue-50 via-indigo-50 to-violet-50 p-3 dark:border-slate-700 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
+      {introOpen && (
+        <Alert variant="info" className="border-primary/20 bg-primary/5">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="font-semibold text-text-primary">{t('metaAudit.introTitle', 'How to use Meta Audit')}</p>
+              <p className="mt-1 text-sm text-text-secondary">
+                {t(
+                  'metaAudit.introBody',
+                  'Each tab answers one question about your Meta ads. Figures here are samples so you can learn the layout before connecting Meta.',
+                )}
+              </p>
+              <ol className="mt-3 list-decimal space-y-1 pl-5 text-sm text-text-secondary">
+                <li>{t('metaAudit.introStep1', 'Choose a date range and KPI (top right).')}</li>
+                <li>
+                  {t(
+                    'metaAudit.introStep2',
+                    'Switch tabs: dashboard, targeting, auction, geo, creatives, and ad copy.',
+                  )}
+                </li>
+                <li>{t('metaAudit.introStep3', 'Use presets and filters, then save a view you open every week.')}</li>
+              </ol>
+            </div>
+            <button
+              type="button"
+              className="shrink-0 rounded-lg p-1 text-text-tertiary hover:bg-surface-2 hover:text-text-primary"
+              onClick={() => setIntroOpen(false)}
+              aria-label={t('metaAudit.dismissIntro', 'Got it, hide this')}
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          <div className="mt-3">
+            <Button type="button" variant="secondary" size="sm" onClick={() => setIntroOpen(false)}>
+              {t('metaAudit.dismissIntro', 'Got it, hide this')}
+            </Button>
+          </div>
+        </Alert>
+      )}
+
+      {feedback && (
+        <Alert variant="success" className="flex items-center justify-between gap-3">
+          <span>{feedback}</span>
+          <button type="button" className="text-sm underline" onClick={() => setFeedback(null)}>
+            OK
+          </button>
+        </Alert>
+      )}
+
+      <section className="rounded-2xl border border-border bg-surface-2/90 p-3 dark:bg-surface-elevated/90">
         <PageHeader
           className="mb-0 border-0 bg-transparent p-2 shadow-none"
           title={
             <span className="inline-flex items-center gap-2">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-blue-600 text-white shadow-sm">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/15 text-primary">
                 <Compass className="h-4 w-4" />
               </span>
               {t('metaAudit.title', '360° Meta Audit')}
             </span>
           }
-          subtitle={t('metaAudit.subtitle', 'Deep-dive tabs for Meta performance — UI preview, wire to live data later.')}
+          subtitle={t(
+            'metaAudit.subtitle',
+            'Six views to diagnose Meta performance. Below is sample data until your ad account is connected.',
+          )}
           actions={
             <div className="flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-white/90 px-3 py-2 text-xs font-medium text-text-secondary shadow-sm hover:bg-white dark:border-slate-600 dark:bg-slate-900/80"
-              >
+              <Button variant="secondary" size="sm" type="button" className="gap-1.5" onClick={onRefresh}>
                 <RefreshCw className="h-3.5 w-3.5" />
                 {t('common.refresh', 'Refresh')}
-              </button>
-              <div className="rounded-xl border border-border bg-white/90 px-3 py-2 text-xs font-medium text-text-primary shadow-sm dark:border-slate-600 dark:bg-slate-900/80">
-                {t('metaAudit.last7Days', 'Last 7 days')}
-                <span className="text-text-tertiary font-normal ml-1">· Apr 12 – Apr 19</span>
-              </div>
+              </Button>
+              <select
+                value={dateRange}
+                onChange={(e) => setDateRange(e.target.value as typeof dateRange)}
+                className="rounded-xl border border-border bg-surface px-3 py-2 text-xs font-medium text-text-primary shadow-sm"
+              >
+                <option value="7">{t('metaAudit.date7', 'Last 7 days')}</option>
+                <option value="30">{t('metaAudit.date30', 'Last 30 days')}</option>
+                <option value="month">{t('metaAudit.dateMonth', 'This month')}</option>
+              </select>
+              <span className="hidden text-xs text-text-tertiary sm:inline">
+                {dateLabel}
+                {lastRefresh && (
+                  <span className="ml-1">
+                    · {lastRefresh.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                )}
+              </span>
             </div>
           }
         />
       </section>
 
-      {/* Primary tabs */}
-      <div className="border-b border-border/80 overflow-x-auto">
-        <nav className="flex gap-1 min-w-max pb-px" aria-label="Meta audit sections">
+      <div className="overflow-x-auto border-b border-border/80">
+        <nav className="flex min-w-max gap-1 pb-px" aria-label="Meta audit sections">
           {TAB_IDS.map((id) => (
             <button
               key={id}
               type="button"
               onClick={() => setTab(id)}
-              className={`px-3 py-2.5 text-xs sm:text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
+              className={cn(
+                'whitespace-nowrap border-b-2 px-3 py-2.5 text-xs font-medium transition-colors sm:text-sm',
                 tab === id
-                  ? 'border-violet-500 text-violet-600 dark:text-violet-300'
-                  : 'border-transparent text-text-tertiary hover:text-text-secondary'
-              }`}
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-text-tertiary hover:text-text-secondary',
+              )}
             >
               {tabLabels[id]}
             </button>
@@ -185,46 +370,184 @@ export default function MetaAuditPage() {
         </nav>
       </div>
 
-      {/* Control bar */}
-      <div className="rounded-xl border border-border/70 bg-white/90 p-3 shadow-sm flex flex-wrap items-center gap-2 dark:bg-slate-900/70">
+      <p className="text-sm text-text-secondary">{tabHelp[tab]}</p>
+
+      <div className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-surface p-3 shadow-sm">
         <button
           type="button"
-          className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium text-text-secondary hover:bg-surface-2"
+          onClick={() => {
+            if (tab !== 'meta') setTab('meta')
+            setShowSearch(true)
+            queueMicrotask(() => searchRef.current?.focus())
+          }}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium text-text-secondary transition-colors hover:bg-surface-2"
         >
           <Search className="h-3.5 w-3.5" />
           {t('metaAudit.filterData', 'Filter data')}
         </button>
-        <select className="rounded-lg border border-border bg-surface px-2 py-2 text-xs text-text-secondary min-w-[140px]">
-          <option>{t('metaAudit.loadPreset', 'Load filter preset…')}</option>
-          <option>{t('metaAudit.presetWinners', 'Winning ad sets')}</option>
-          <option>{t('metaAudit.presetLearning', 'Learning limited')}</option>
-        </select>
-        <button
-          type="button"
-          disabled
-          className="rounded-lg border border-dashed border-border px-3 py-2 text-xs text-text-tertiary cursor-not-allowed"
+        {showSearch && (
+          <input
+            ref={searchRef}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={t('metaAudit.searchPlaceholder', 'Search campaigns…')}
+            className="min-w-[180px] flex-1 rounded-lg border border-border bg-surface-2 px-3 py-2 text-xs outline-none focus:border-primary md:max-w-xs dark:bg-surface"
+          />
+        )}
+        <select
+          value={preset}
+          onChange={(e) => setPreset(e.target.value)}
+          className="min-w-[140px] rounded-lg border border-border bg-surface-2 px-2 py-2 text-xs text-text-secondary dark:bg-surface"
         >
+          <option value="">{t('metaAudit.loadPreset', 'Load filter preset…')}</option>
+          <option value="winners">{t('metaAudit.presetWinners', 'Winning ad sets')}</option>
+          <option value="learning">{t('metaAudit.presetLearning', 'Learning limited')}</option>
+        </select>
+        <Button type="button" variant="secondary" size="sm" onClick={onSaveView}>
           {t('metaAudit.saveView', 'Save this view')}
-        </button>
-        <div className="flex-1 min-w-[120px]" />
-        <div className="flex items-center gap-1.5 rounded-lg border border-border bg-surface px-2 py-1.5">
-          <MetaGlyph className="h-4 w-4 text-blue-500 shrink-0" />
-          <select className="bg-transparent text-xs font-medium text-text-primary outline-none min-w-[100px]">
-            <option>ROAS (All)</option>
-            <option>{t('metaAudit.kpiLeads', 'Leads (All)')}</option>
-            <option>{t('metaAudit.kpiSpend', 'Amount spent')}</option>
+        </Button>
+        <div className="min-w-[120px] flex-1" />
+        <div className="flex items-center gap-1.5 rounded-lg border border-border bg-surface-2 px-2 py-1.5 dark:bg-surface">
+          <MetaGlyph className="h-4 w-4 shrink-0 text-text-tertiary" />
+          <select
+            value={kpi}
+            onChange={(e) => setKpi(e.target.value as typeof kpi)}
+            className="min-w-[110px] bg-transparent text-xs font-medium text-text-primary outline-none"
+          >
+            <option value="roas">{t('metaAudit.metricRoas', 'ROAS (All)')}</option>
+            <option value="leads">{t('metaAudit.metricLeads', 'Leads (All)')}</option>
+            <option value="spend">{t('metaAudit.metricSpend', 'Amount spent')}</option>
           </select>
         </div>
       </div>
 
-      {/* Tab: Creative / Ad copy */}
+      {tab === 'meta' && (
+        <div className="space-y-4">
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="rounded-xl border border-border bg-surface p-4">
+              <p className="text-xs text-text-tertiary">{t('metaAudit.kpiSpend', 'Amount spent')}</p>
+              <p className="mt-1 text-2xl font-semibold tabular-nums text-text-primary">
+                ${(13270 * (dateRange === '7' ? 1 : dateRange === '30' ? 3.2 : 4.5)).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+              </p>
+              <p className="mt-1 text-[11px] text-text-tertiary">{dateLabel}</p>
+            </div>
+            <div className="rounded-xl border border-border bg-surface p-4">
+              <p className="text-xs text-text-tertiary">{t('metaAudit.metricRoas', 'ROAS (All)')}</p>
+              <p className="mt-1 text-2xl font-semibold tabular-nums text-text-primary">
+                {kpi === 'roas' ? '2.6' : kpi === 'leads' ? '—' : '—'}
+              </p>
+            </div>
+            <div className="rounded-xl border border-border bg-surface p-4">
+              <p className="text-xs text-text-tertiary">{t('metaAudit.kpiLeads', 'Leads (All)')}</p>
+              <p className="mt-1 text-2xl font-semibold tabular-nums text-text-primary">{kpi === 'leads' ? '184' : '142'}</p>
+            </div>
+          </div>
+          <div className="overflow-x-auto rounded-2xl border border-border bg-surface shadow-sm">
+            <table className="w-full min-w-[560px] border-collapse text-left text-sm">
+              <thead className="border-b border-border bg-surface-2 text-xs uppercase tracking-wide text-text-tertiary dark:bg-surface-elevated">
+                <tr>
+                  <th className="px-4 py-3">{t('metaAudit.campaignColumn', 'Campaign')}</th>
+                  <th className="px-4 py-3">{t('metaAudit.spendColumn', 'Spend')}</th>
+                  <th className="px-4 py-3">{t('metaAudit.roasColumn', 'ROAS')}</th>
+                  <th className="px-4 py-3">{t('metaAudit.statusColumn', 'Status')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredCampaigns.map((row) => (
+                  <tr key={row.id} className="border-b border-border/70 last:border-0">
+                    <td className="px-4 py-3 font-medium text-text-primary">{row.name}</td>
+                    <td className="px-4 py-3 tabular-nums text-text-secondary">${row.spend.toLocaleString()}</td>
+                    <td className="px-4 py-3 tabular-nums text-text-secondary">{row.roas.toFixed(1)}×</td>
+                    <td className="px-4 py-3 text-text-secondary">{row.status}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-center text-xs text-text-tertiary">
+            <span className="rounded-full border border-border bg-surface-2 px-2 py-0.5">{t('metaAudit.sampleNote', 'Sample data')}</span>
+          </p>
+        </div>
+      )}
+
+      {tab === 'targeting' && (
+        <div className="overflow-x-auto rounded-2xl border border-border bg-surface shadow-sm">
+          <table className="w-full min-w-[480px] text-left text-sm">
+            <thead className="border-b border-border bg-surface-2 text-xs uppercase tracking-wide text-text-tertiary">
+              <tr>
+                <th className="px-4 py-3">{t('metaAudit.segmentColumn', 'Audience / placement')}</th>
+                <th className="px-4 py-3">{t('metaAudit.healthColumn', 'Health')}</th>
+                <th className="px-4 py-3">{t('metaAudit.noteColumn', 'Note')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {MOCK_TARGETING.map((row) => (
+                <tr key={row.id} className="border-b border-border/60 last:border-0">
+                  <td className="px-4 py-3 font-medium text-text-primary">{row.segment}</td>
+                  <td className="px-4 py-3">
+                    <span className="tabular-nums font-semibold text-primary">{row.health}</span>
+                    <span className="text-text-tertiary">/100</span>
+                  </td>
+                  <td className="px-4 py-3 text-text-secondary">{row.note}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {tab === 'auction' && (
+        <div className="space-y-3 rounded-2xl border border-border bg-surface p-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
+            {t('metaAudit.auctionSignal', 'Signal')}
+          </p>
+          <ul className="space-y-4">
+            {MOCK_AUCTION.map((row) => (
+              <li key={row.key}>
+                <div className="mb-1 flex justify-between text-sm">
+                  <span className="text-text-primary">{t(row.labelKey, row.fb)}</span>
+                  <span className="tabular-nums font-medium text-text-secondary">{row.value}%</span>
+                </div>
+                <div className="h-2 overflow-hidden rounded-full bg-surface-2">
+                  <div className="h-full rounded-full bg-primary/80" style={{ width: `${row.value}%` }} />
+                </div>
+              </li>
+            ))}
+          </ul>
+          <p className="text-xs text-text-tertiary">{t('metaAudit.auctionValue', 'Value (sample)')}</p>
+        </div>
+      )}
+
+      {tab === 'geo' && (
+        <div className="overflow-x-auto rounded-2xl border border-border bg-surface shadow-sm">
+          <table className="w-full min-w-[400px] text-left text-sm">
+            <thead className="border-b border-border bg-surface-2 text-xs uppercase tracking-wide text-text-tertiary">
+              <tr>
+                <th className="px-4 py-3">{t('metaAudit.regionColumn', 'Region')}</th>
+                <th className="px-4 py-3">{t('metaAudit.shareColumn', 'Spend share')}</th>
+                <th className="px-4 py-3">{t('metaAudit.spendColumn', 'Spend')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {MOCK_GEO.map((row) => (
+                <tr key={row.region} className="border-b border-border/60 last:border-0">
+                  <td className="px-4 py-3 font-medium text-text-primary">{row.region}</td>
+                  <td className="px-4 py-3 tabular-nums text-text-secondary">{row.share}%</td>
+                  <td className="px-4 py-3 tabular-nums text-text-secondary">${row.spend.toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
       {showCreativeChrome && (
         <>
-          <div className="rounded-xl border border-border/70 bg-violet-500/5 dark:bg-violet-950/20 px-3 py-2 flex flex-wrap items-center gap-3 text-xs">
+          <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-surface-2/50 px-3 py-2 text-xs dark:bg-surface-2/30">
             <div className="flex items-center gap-2">
               <span className="text-text-tertiary">{t('metaAudit.gradedBy', 'Graded by')}</span>
               <div className="flex items-center gap-1 rounded-lg border border-border bg-surface px-2 py-1">
-                <MetaGlyph className="h-3.5 w-3.5 text-blue-500" />
+                <MetaGlyph className="h-3.5 w-3.5 text-text-tertiary" />
                 <select
                   value={gradedBy}
                   onChange={(e) => setGradedBy(e.target.value)}
@@ -256,7 +579,7 @@ export default function MetaAuditPage() {
             <button
               type="button"
               onClick={() => setFiltersOpen(true)}
-              className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-violet-500/50 bg-violet-500/10 px-3 py-1.5 text-xs font-semibold text-violet-700 dark:text-violet-200 hover:bg-violet-500/15"
+              className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-primary/35 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/15"
             >
               <Filter className="h-3.5 w-3.5" />
               {t('metaAudit.smartFilter', 'Smart filter')}
@@ -265,66 +588,76 @@ export default function MetaAuditPage() {
 
           {tab === 'creative' && (
             <>
-              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-2">
-                {CREATIVE_FORMATS.map((f) => (
-                  <div
-                    key={f.id}
-                    className="rounded-xl border border-border/80 bg-white/95 p-3 shadow-sm dark:bg-slate-900/80 flex flex-col gap-2 min-h-[160px]"
-                  >
-                    <div className="flex items-center justify-between gap-1">
-                      <span className="text-lg" aria-hidden>
-                        {f.icon}
-                      </span>
-                      <span className="text-[11px] font-semibold text-text-primary truncate">{t(f.labelKey, f.fallback)}</span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-[10px] flex-1">
-                      <span className="text-text-tertiary">{t('metaAudit.amountSpent', 'Spend')}</span>
-                      <span className="text-right font-medium tabular-nums">$0</span>
-                      <span className="text-text-tertiary">{t('metaAudit.cpl', 'CPL')}</span>
-                      <span className="text-right font-medium tabular-nums">—</span>
-                      <span className="text-text-tertiary">CTR</span>
-                      <span className="text-right font-medium tabular-nums">0%</span>
-                      <span className="text-text-tertiary">{t('metaAudit.convRate', 'Conv. rate')}</span>
-                      <span className="text-right font-medium tabular-nums">—</span>
-                    </div>
-                    <div className="space-y-1 pt-1 border-t border-border/60">
-                      <div className="h-1 rounded-full bg-surface-2 overflow-hidden">
-                        <div className="h-full w-0 bg-violet-500 rounded-full" />
+              <div className="grid grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-6">
+                {CREATIVE_FORMATS.map((f) => {
+                  const st = FORMAT_STATS[f.id]
+                  const spendPct = Math.round((st.spend / maxSpendFormat) * 100)
+                  const on = Boolean(selectedFormats[f.id])
+                  return (
+                    <button
+                      key={f.id}
+                      type="button"
+                      onClick={() => toggleFormat(f.id)}
+                      className={cn(
+                        'flex min-h-[168px] flex-col gap-2 rounded-xl border p-3 text-left shadow-sm transition-colors',
+                        on ? 'border-primary bg-primary/5 ring-1 ring-primary/25' : 'border-border bg-surface hover:border-primary/30',
+                      )}
+                    >
+                      <div className="flex items-center justify-between gap-1">
+                        <span className="text-lg" aria-hidden>
+                          {f.icon}
+                        </span>
+                        <span className="truncate text-[11px] font-semibold text-text-primary">{t(f.labelKey, f.fallback)}</span>
                       </div>
-                      <div className="h-1 rounded-full bg-surface-2 overflow-hidden">
-                        <div className="h-full w-0 bg-blue-500 rounded-full" />
+                      <div className="grid flex-1 grid-cols-2 gap-x-2 gap-y-1 text-[10px]">
+                        <span className="text-text-tertiary">{t('metaAudit.amountSpent', 'Spend')}</span>
+                        <span className="text-right font-medium tabular-nums">${st.spend.toLocaleString()}</span>
+                        <span className="text-text-tertiary">{t('metaAudit.cpl', 'CPL')}</span>
+                        <span className="text-right font-medium tabular-nums">${st.cpl.toFixed(2)}</span>
+                        <span className="text-text-tertiary">CTR</span>
+                        <span className="text-right font-medium tabular-nums">{st.ctr.toFixed(1)}%</span>
+                        <span className="text-text-tertiary">{t('metaAudit.convRate', 'Conv. rate')}</span>
+                        <span className="text-right font-medium tabular-nums">{st.conv.toFixed(1)}%</span>
                       </div>
-                      <div className="flex justify-between text-[9px] text-text-tertiary">
-                        <span>{t('metaAudit.leadsBar', 'Leads')}</span>
-                        <span>{t('metaAudit.spendBar', 'Spend')}</span>
+                      <div className="space-y-1 border-t border-border/60 pt-1">
+                        <div className="h-1 overflow-hidden rounded-full bg-surface-2">
+                          <div className="h-full rounded-full bg-primary" style={{ width: `${spendPct}%` }} />
+                        </div>
+                        <div className="flex justify-between text-[9px] text-text-tertiary">
+                          <span>{t('metaAudit.leadsBar', 'Leads')}</span>
+                          <span>{t('metaAudit.spendBar', 'Spend')}</span>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                ))}
+                    </button>
+                  )
+                })}
               </div>
 
-              <section className="rounded-2xl border border-border/70 bg-white/95 shadow-sm overflow-hidden dark:bg-slate-900/80">
-                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/70 px-4 py-3">
+              <section className="overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3">
                   <h2 className="text-sm font-semibold text-text-primary">{t('metaAudit.creativeMatrix', 'Creative matrix')}</h2>
-                  <button
-                    type="button"
-                    className="text-xs font-semibold text-violet-600 dark:text-violet-300 px-3 py-1.5 rounded-lg border border-violet-500/40 hover:bg-violet-500/10"
-                  >
+                  <Button type="button" variant="secondary" size="sm">
                     {t('metaAudit.seeAllCreatives', 'See all creatives')}
-                  </button>
+                  </Button>
                 </div>
                 <div className="p-4">
-                  <div className="relative mx-auto max-w-lg aspect-square rounded-2xl border border-border/60 bg-gradient-to-br from-cyan-100/90 via-white to-rose-100/95 dark:from-cyan-950/50 dark:via-slate-900 dark:to-rose-950/40 shadow-inner">
-                    <span className="absolute left-1 top-4 text-[10px] font-bold text-blue-600 dark:text-blue-400 [writing-mode:vertical-rl] rotate-180">
+                  <p className="mb-3 text-xs text-text-secondary">
+                    {t(
+                      'metaAudit.matrixBlurb',
+                      'Strong results + controlled spend sit toward the top-right. Early tests sit bottom-left (illustrative).',
+                    )}
+                  </p>
+                  <div className="relative mx-auto aspect-square max-w-lg rounded-2xl border border-border bg-gradient-to-br from-surface-2 via-surface to-surface-2 shadow-inner dark:from-surface-2 dark:via-surface dark:to-brand-ink/20">
+                    <span className="absolute left-1 top-4 rotate-180 text-[10px] font-bold text-primary [writing-mode:vertical-rl]">
                       {t('metaAudit.quadrantScalable', 'SCALABLE')}
                     </span>
-                    <span className="absolute right-1 top-4 text-[10px] font-bold text-indigo-800 dark:text-indigo-200 [writing-mode:vertical-rl]">
+                    <span className="absolute right-1 top-4 text-[10px] font-bold text-text-secondary [writing-mode:vertical-rl]">
                       {t('metaAudit.quadrantCore', 'CORE PERFORMERS')}
                     </span>
-                    <span className="absolute left-1 bottom-4 text-[10px] font-bold text-rose-500 [writing-mode:vertical-rl] rotate-180">
+                    <span className="absolute bottom-4 left-1 rotate-180 text-[10px] font-bold text-text-tertiary [writing-mode:vertical-rl]">
                       {t('metaAudit.quadrantStarted', 'GETTING STARTED')}
                     </span>
-                    <span className="absolute right-1 bottom-4 text-[10px] font-bold text-pink-600 [writing-mode:vertical-rl]">
+                    <span className="absolute bottom-4 right-1 text-[10px] font-bold text-amber-600 [writing-mode:vertical-rl] dark:text-amber-400">
                       {t('metaAudit.quadrantOverspend', 'OVERSPEND')}
                     </span>
                     <span className="absolute left-1/2 top-2 -translate-x-1/2 text-[10px] font-semibold text-text-tertiary">
@@ -333,27 +666,34 @@ export default function MetaAuditPage() {
                     <span className="absolute bottom-2 right-3 text-[10px] font-semibold text-text-tertiary">
                       {t('metaAudit.axisSpend', 'Spend')}
                     </span>
-                    <div className="absolute inset-8 flex items-center justify-center pointer-events-none">
-                      <p className="text-xs text-text-tertiary text-center px-4">
-                        {t('metaAudit.matrixEmpty', 'Creatives (0) — connect Meta and sync to plot performance.')}
+                    <div className="pointer-events-none absolute inset-10 flex flex-col items-center justify-center gap-3">
+                      <div className="h-3 w-3 rounded-full bg-primary/90 shadow" style={{ marginLeft: '38%', marginBottom: '12%' }} title="Sample" />
+                      <div className="h-3 w-3 rounded-full bg-primary/50" style={{ marginLeft: '22%', marginTop: '8%' }} />
+                      <div className="h-3 w-3 rounded-full bg-text-tertiary/60" style={{ marginLeft: '-18%', marginTop: '14%' }} />
+                      <p className="max-w-xs px-4 text-center text-xs text-text-tertiary">
+                        {t('metaAudit.matrixSampleCaption', 'Illustrative dots — connect Meta to plot your real creatives here.')}
                       </p>
                     </div>
                   </div>
                 </div>
-                <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border/70 px-4 py-3 bg-surface-2/30 dark:bg-slate-900/90 text-xs">
-                  <span className="text-text-secondary">{t('metaAudit.creativesCount', 'Creatives (0)')}</span>
-                  <select className="rounded-lg border border-border bg-surface px-2 py-1.5 text-xs">
-                    <option>{t('metaAudit.sortLeadsHigh', 'Sort: Leads (high first)')}</option>
-                  </select>
-                  <div className="flex items-center gap-2 ml-auto">
-                    <span className="text-text-tertiary">{t('metaAudit.selectedCount', '0 selected')}</span>
-                    <button
-                      type="button"
-                      disabled
-                      className="rounded-lg bg-violet-500/30 text-white/80 px-3 py-1.5 text-xs font-semibold cursor-not-allowed"
-                    >
-                      {t('metaAudit.openInLauncher', 'Open in Ads Launcher')}
-                    </button>
+                <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border bg-surface-2/40 px-4 py-3 text-xs dark:bg-surface-2/20">
+                  <span className="text-text-secondary">
+                    {CREATIVE_FORMATS.length} {t('metaAudit.formatTypes', 'format types')} · {selectedFormatCount}{' '}
+                    {t('metaAudit.selectedWord', 'selected')}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    {selectedFormatCount > 0 ? (
+                      <Link
+                        href="/ad-launcher"
+                        className="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-brand-ink hover:opacity-95"
+                      >
+                        {t('metaAudit.openAdLauncher', 'Open in Ad Launcher')}
+                      </Link>
+                    ) : (
+                      <span className="cursor-not-allowed rounded-lg bg-surface-2 px-3 py-1.5 text-xs font-semibold text-text-tertiary opacity-70">
+                        {t('metaAudit.openAdLauncher', 'Open in Ad Launcher')}
+                      </span>
+                    )}
                   </div>
                 </div>
               </section>
@@ -361,67 +701,76 @@ export default function MetaAuditPage() {
           )}
 
           {tab === 'adcopy' && (
-            <section className="rounded-2xl border border-border/70 bg-white/95 p-6 shadow-sm dark:bg-slate-900/80">
-              <div className="flex flex-wrap items-center justify-between gap-3 mb-4 text-xs">
-                <span className="text-text-secondary">{t('metaAudit.piecesOfCopy', 'Pieces of copy (0)')}</span>
-                <select className="rounded-lg border border-border bg-surface px-2 py-1.5">
-                  <option>{t('metaAudit.sortLeadsHigh', 'Sort: Leads (high first)')}</option>
-                </select>
-                <span className="text-text-tertiary">{t('metaAudit.selectedCount', '0 selected')}</span>
-                <button type="button" disabled className="rounded-lg border border-violet-500/40 px-3 py-1.5 text-violet-400 cursor-not-allowed text-xs font-semibold">
-                  {t('metaAudit.openInLauncher', 'Open in Ads Launcher')}
-                </button>
+            <section className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+              <p className="mb-4 text-xs text-text-secondary">
+                {t('metaAudit.copySelectHint', 'Select rows, then send them to Ad Launcher.')}
+              </p>
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <span className="text-text-secondary">
+                  {MOCK_COPY.length} {t('metaAudit.copyVariants', 'copy variants')}
+                </span>
+                <span className="text-text-tertiary">
+                  {selectedCopyCount} {t('metaAudit.selectedWord', 'selected')}
+                </span>
               </div>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <div className="lg:col-span-2 rounded-xl border border-border p-4">
-                  <h3 className="text-sm font-semibold mb-3">{t('metaAudit.adCopyLength', 'Ad copy length (0)')}</h3>
-                  <div className="grid grid-cols-3 gap-2">
-                    {(['Short', 'Medium', 'Long'] as const).map((len) => (
-                      <div key={len} className="rounded-lg border border-border/80 bg-surface-2/40 p-3 text-center">
-                        <p className="text-xs font-bold text-text-primary mb-2">{len}</p>
-                        <p className="text-[10px] text-text-tertiary">{t('metaAudit.placeholderMetrics', 'Amount · CPL · CTR')}</p>
-                        <p className="text-lg font-semibold text-text-tertiary mt-2">—</p>
-                      </div>
-                    ))}
-                  </div>
+              <div className="grid gap-3 lg:grid-cols-3">
+                <div className="space-y-2 lg:col-span-2">
+                  {MOCK_COPY.map((row) => {
+                    const on = Boolean(selectedCopy[row.id])
+                    return (
+                      <button
+                        key={row.id}
+                        type="button"
+                        onClick={() => toggleCopy(row.id)}
+                        className={cn(
+                          'w-full rounded-xl border p-4 text-left transition-colors',
+                          on ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/25',
+                        )}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <p className="font-semibold text-text-primary">{row.headline}</p>
+                            <p className="mt-1 text-xs text-text-secondary">{row.body}</p>
+                          </div>
+                          <input type="checkbox" checked={on} readOnly className="mt-1 rounded border-border text-primary" />
+                        </div>
+                        <p className="mt-2 text-[11px] text-text-tertiary">
+                          CTR {row.ctr}% · {row.leads} {t('metaAudit.kpiLeads', 'Leads').split(' ')[0]}
+                        </p>
+                      </button>
+                    )
+                  })}
                 </div>
                 <div className="space-y-3">
-                  {[
-                    { title: t('metaAudit.emojiPerf', 'Emoji performance'), with: '😀', without: t('metaAudit.without', 'Without') },
-                    { title: t('metaAudit.linkPerf', 'Link performance'), with: '🔗', without: t('metaAudit.without', 'Without') },
-                  ].map((c) => (
-                    <div key={c.title} className="rounded-xl border border-border p-3">
-                      <p className="text-xs font-semibold mb-2">{c.title}</p>
-                      <div className="grid grid-cols-2 gap-2 text-[10px]">
-                        <div className="rounded-lg bg-surface-2/50 p-2">
-                          <span className="text-text-tertiary">{t('metaAudit.with', 'With')} {c.with}</span>
-                          <p className="font-semibold text-text-primary mt-1">—</p>
+                  <div className="rounded-xl border border-border p-3">
+                    <p className="mb-2 text-xs font-semibold">{t('metaAudit.adCopyLength', 'Ad copy length (0)')}</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {(['Short', 'Medium', 'Long'] as const).map((len) => (
+                        <div key={len} className="rounded-lg border border-border bg-surface-2/50 p-3 text-center dark:bg-surface-2/30">
+                          <p className="mb-2 text-xs font-bold text-text-primary">{len}</p>
+                          <p className="text-[10px] text-text-tertiary">{t('metaAudit.placeholderMetrics', '')}</p>
+                          <p className="mt-2 text-lg font-semibold text-text-secondary">—</p>
                         </div>
-                        <div className="rounded-lg bg-surface-2/50 p-2">
-                          <span className="text-text-tertiary">{c.without}</span>
-                          <p className="font-semibold text-text-primary mt-1">—</p>
-                        </div>
-                      </div>
+                      ))}
                     </div>
-                  ))}
+                  </div>
+                  {selectedCopyCount > 0 ? (
+                    <Link
+                      href="/ad-launcher"
+                      className="block rounded-lg border border-primary bg-primary py-2 text-center text-xs font-semibold text-brand-ink hover:opacity-95"
+                    >
+                      {t('metaAudit.openAdLauncher', 'Open in Ad Launcher')}
+                    </Link>
+                  ) : (
+                    <span className="block cursor-not-allowed rounded-lg border border-dashed border-border py-2 text-center text-xs font-semibold text-text-tertiary opacity-60">
+                      {t('metaAudit.openAdLauncher', 'Open in Ad Launcher')}
+                    </span>
+                  )}
                 </div>
               </div>
             </section>
           )}
         </>
-      )}
-
-      {/* Other tabs: placeholder audit surface */}
-      {!showCreativeChrome && (
-        <section className="rounded-2xl border border-border/70 bg-white/95 p-8 text-center shadow-sm dark:bg-slate-900/80">
-          <p className="text-sm font-medium text-text-primary mb-1">{tabLabels[tab]}</p>
-          <p className="text-xs text-text-tertiary max-w-md mx-auto">
-            {t(
-              'metaAudit.tabPlaceholder',
-              'This audit view is scaffolded for layout parity. Hook charts and tables to Meta sync when endpoints are ready.',
-            )}
-          </p>
-        </section>
       )}
     </div>
   )

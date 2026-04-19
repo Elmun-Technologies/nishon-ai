@@ -4,10 +4,10 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ArrowLeft, Star } from 'lucide-react'
 import { MOCK_TARGETOLOGISTS, formatSpend } from '@/lib/portfolio-data'
-import { PublicContainer, PublicFooter, PublicNavbar } from '@/components/public/PublicLayout'
+import { PublicContainer, PublicFooter } from '@/components/public/PublicLayout'
 import { useI18n } from '@/i18n/use-i18n'
 
-export default function PortfolioDetailPage({ params }: { params: { slug: string } }) {
+export default function MarketplacePortfolioDetailPage({ params }: { params: { slug: string } }) {
   const { t } = useI18n()
   const person = MOCK_TARGETOLOGISTS.find((item) => item.slug === params.slug)
   if (!person) notFound()
@@ -16,11 +16,12 @@ export default function PortfolioDetailPage({ params }: { params: { slug: string
 
   return (
     <main className="min-h-screen bg-surface-2 text-text-primary">
-      <PublicNavbar />
-
       <section className="border-b border-border bg-surface py-8">
         <PublicContainer>
-          <Link href="/portfolio" className="mb-4 inline-flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary">
+          <Link
+            href="/marketplace/portfolio"
+            className="mb-4 inline-flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary"
+          >
             <ArrowLeft className="h-4 w-4" />
             {t('publicSite.marketing.common.backToPortfolio', '')}
           </Link>

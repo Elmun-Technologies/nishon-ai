@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { ArrowRight, CheckCircle2, Search, SlidersHorizontal, Star, TrendingUp, Users } from 'lucide-react'
-import { PublicContainer, PublicFooter, PublicNavbar } from '@/components/public/PublicLayout'
+import { PublicContainer, PublicFooter } from '@/components/public/PublicLayout'
 import { useI18n } from '@/i18n/use-i18n'
 
 const specialists = [
@@ -53,8 +53,6 @@ export default function MarketplacePage() {
 
   return (
     <main className="min-h-screen bg-surface text-text-primary">
-      <PublicNavbar />
-
       <section className="border-b border-border bg-[#111827] text-white">
         <PublicContainer className="py-14 md:py-20">
           <div className="grid gap-8 md:grid-cols-[1.2fr_1fr] md:items-end">

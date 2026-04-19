@@ -113,6 +113,7 @@ export class AiAgentService {
   }): Promise<{ reply: string }> {
     const systemPrompt = `You are AdSpectr — a helpful advertising assistant for the AdSpectr platform.
 You help users understand their Meta ad campaign performance, troubleshoot errors, and optimize their strategy.
+You also help them think through marketing workflows, automation ideas, team handoffs, and day-to-day processes — not only metrics.
 You have knowledge about Meta Ads (Facebook/Instagram), campaign budgets, CTR, ROAS, CPM, CPC metrics.
 Answer in the same language the user writes in (Uzbek, Russian, or English).
 Be concise, practical, and friendly. When giving advice, use concrete numbers from context if available.
@@ -131,8 +132,8 @@ Workspace ID for this conversation: ${dto.workspaceId}`;
     const result = await this.aiClient.complete(userPrompt, systemPrompt, {
       taskType: "chat",
       agentName: "ChatWidget",
-      temperature: 0.7,
-      maxTokens: 500,
+      temperature: 0.65,
+      maxTokens: 900,
     });
 
     return { reply: result.content };

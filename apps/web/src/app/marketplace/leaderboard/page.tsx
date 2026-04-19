@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Award, Star } from 'lucide-react'
-import { PublicContainer, PublicFooter, PublicNavbar, PublicSectionHeader } from '@/components/public/PublicLayout'
+import { PublicContainer, PublicFooter, PublicSectionHeader } from '@/components/public/PublicLayout'
 import { useI18n } from '@/i18n/use-i18n'
 
 const LEADERBOARD_DATA = [
@@ -111,7 +111,7 @@ const LEADERBOARD_DATA = [
   },
 ]
 
-export default function LeaderboardPage() {
+export default function MarketplaceLeaderboardPage() {
   const { t } = useI18n()
   const [activeTab, setActiveTab] = useState('overall')
 
@@ -146,8 +146,6 @@ export default function LeaderboardPage() {
 
   return (
     <main className="min-h-screen bg-surface-2 text-text-primary">
-      <PublicNavbar />
-
       <section className="border-b border-border bg-surface py-10">
         <PublicContainer>
           <PublicSectionHeader eyebrow={lp('eyebrow')} title={lp('title')} description={lp('description')} />
@@ -179,7 +177,7 @@ export default function LeaderboardPage() {
                 {displayData.slice(0, 3).map((specialist, idx) => (
                   <Link
                     key={specialist.rank}
-                    href={`/portfolio/${specialist.username}`}
+                    href={`/marketplace/portfolio/${specialist.username}`}
                     className={`group rounded-2xl border transition-all hover:scale-[1.02] ${
                       idx === 0
                         ? 'border-yellow-300 bg-yellow-50 ring-2 ring-yellow-200'
@@ -258,7 +256,7 @@ export default function LeaderboardPage() {
                         <div className="text-lg font-bold text-yellow-500">#{specialist.rank}</div>
                       </td>
                       <td className="px-6 py-4">
-                        <Link href={`/portfolio/${specialist.username}`} className="flex items-center gap-3">
+                        <Link href={`/marketplace/portfolio/${specialist.username}`} className="flex items-center gap-3">
                           <div className="text-2xl">{specialist.avatar}</div>
                           <div>
                             <p className="font-semibold text-text-primary group-hover:text-primary">{specialist.username}</p>

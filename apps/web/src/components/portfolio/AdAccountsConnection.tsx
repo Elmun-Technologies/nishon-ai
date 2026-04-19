@@ -1,45 +1,59 @@
 'use client'
 
 import { useState } from 'react'
+import { useI18n } from '@/i18n/use-i18n'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { Badge } from '@/components/ui/Badge'
 
 interface AdAccountsConnectionProps {
   onConnectionComplete?: () => void
 }
 
-const PLATFORMS = [
-  { id: 'meta', name: 'Meta (Facebook/Instagram)', icon: '📘' },
-  { id: 'google', name: 'Google Ads', icon: '🔍' },
-  { id: 'yandex', name: 'Yandex', icon: '🟡' },
-]
+const PLATFORM_IDS = ['meta', 'google', 'yandex'] as const
+
+function platformLabel(id: (typeof PLATFORM_IDS)[number], t: (k: string, d?: string) => string) {
+  const key = `portfolioSetup.adAccounts.${id}Name` as const
+  return t(key, id)
+}
+
+function interpolate(template: string, platform: string) {
+  return template.replace(/\{\{platform\}\}/g, platform)
+}
 
 export function AdAccountsConnection({ onConnectionComplete }: AdAccountsConnectionProps) {
+  const { t } = useI18n()
   const [step, setStep] = useState<'select' | 'connect' | 'confirm'>('select')
-  const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null)
+  const [selectedPlatform, setSelectedPlatform] = useState<(typeof PLATFORM_IDS)[number] | null>(null)
+
+  const icons: Record<string, string> = { meta: '📘', google: '🔍', yandex: '🟡' }
 
   return (
     <div className="space-y-6">
       {step === 'select' && (
         <Card className="p-6">
-          <h3 className="text-xl font-bold text-text-primary mb-2">Connect Your Ad Account</h3>
-          <p className="text-text-secondary text-sm mb-6">
-            Connect your advertising accounts to track performance and manage campaigns
+          <h3 className="mb-2 text-xl font-bold text-text-primary">
+            {t('portfolioSetup.adAccounts.title', 'Connect an ad account')}
+          </h3>
+          <p className="mb-6 text-sm text-text-secondary">
+            {t(
+              'portfolioSetup.adAccounts.subtitle',
+              'Link accounts you use so performance can be verified.',
+            )}
           </p>
 
           <div className="grid gap-4 md:grid-cols-3">
-            {PLATFORMS.map((platform) => (
+            {PLATFORM_IDS.map((platform) => (
               <button
-                key={platform.id}
+                key={platform}
+                type="button"
                 onClick={() => {
-                  setSelectedPlatform(platform.id)
+                  setSelectedPlatform(platform)
                   setStep('connect')
                 }}
-                className="p-4 border border-border rounded-lg hover:border-blue-500 hover:shadow-md transition-all text-left"
+                className="rounded-xl border border-border bg-surface p-4 text-left transition-all hover:border-[#2563eb]/35 hover:shadow-md dark:hover:border-[#60a5fa]/40"
               >
-                <div className="text-2xl mb-2">{platform.icon}</div>
-                <h4 className="font-semibold text-text-primary">{platform.name}</h4>
+                <div className="mb-2 text-2xl">{icons[platform]}</div>
+                <h4 className="font-semibold text-text-primary">{platformLabel(platform, t)}</h4>
               </button>
             ))}
           </div>
@@ -48,28 +62,45 @@ export function AdAccountsConnection({ onConnectionComplete }: AdAccountsConnect
 
       {step === 'connect' && selectedPlatform && (
         <Card className="p-6">
-          <h3 className="text-lg font-semibold text-text-primary mb-4">Connect {selectedPlatform}</h3>
-          <p className="text-text-secondary mb-6">You will be redirected to {selectedPlatform} to authorize the connection.</p>
-          <div className="flex gap-2">
+          <h3 className="mb-4 text-lg font-semibold text-text-primary">
+            {interpolate(
+              t('portfolioSetup.adAccounts.connectTitle', 'Connect {{platform}}'),
+              platformLabel(selectedPlatform, t),
+            )}
+          </h3>
+          <p className="mb-6 text-text-secondary">
+            {t('portfolioSetup.adAccounts.connectBody', 'You will be redirected to authorize access.')}
+          </p>
+          <div className="flex flex-wrap gap-2">
             <Button
+              type="button"
               onClick={() => {
                 setStep('confirm')
               }}
             >
-              Continue to {selectedPlatform}
+              {interpolate(
+                t('portfolioSetup.adAccounts.continue', 'Continue to {{platform}}'),
+                platformLabel(selectedPlatform, t),
+              )}
             </Button>
-            <Button variant="secondary" onClick={() => setStep('select')}>
-              Cancel
+            <Button type="button" variant="secondary" onClick={() => setStep('select')}>
+              {t('portfolioSetup.adAccounts.cancel', 'Back')}
             </Button>
           </div>
         </Card>
       )}
 
       {step === 'confirm' && (
-        <Card className="p-6 border border-green-500/20 bg-green-500/10">
-          <h3 className="text-lg font-semibold text-green-900 mb-4">Connection Successful</h3>
-          <p className="text-green-900 mb-6">Your account has been connected successfully.</p>
-          <Button onClick={() => onConnectionComplete?.()}>Done</Button>
+        <Card className="border border-[#6ee7b7]/40 bg-[#ecfdf5] p-6 dark:border-[#059669]/35 dark:bg-[#064e3b]/35">
+          <h3 className="mb-4 text-lg font-semibold text-[#065f46] dark:text-[#a7f3d0]">
+            {t('portfolioSetup.adAccounts.successTitle', 'Connection complete')}
+          </h3>
+          <p className="mb-6 text-sm text-[#047857] dark:text-[#d1fae5]">
+            {t('portfolioSetup.adAccounts.successBody', 'Account linked for this workspace.')}
+          </p>
+          <Button type="button" onClick={() => onConnectionComplete?.()}>
+            {t('portfolioSetup.adAccounts.done', 'Done')}
+          </Button>
         </Card>
       )}
     </div>
