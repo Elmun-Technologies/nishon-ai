@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight, CheckCircle2 } from 'lucide-react'
+import { PublicCard, PublicContainer, PublicFooter, PublicNavbar, PublicSectionHeader } from '@/components/public/PublicLayout'
 
 const solutionTracks = [
   {
@@ -27,25 +28,30 @@ const solutionTracks = [
 export default function SolutionsPage() {
   return (
     <main className="min-h-screen bg-surface-2 text-text-primary">
+      <PublicNavbar />
+
       <section className="border-b border-border bg-surface">
-        <div className="mx-auto w-full max-w-7xl px-4 py-10 md:px-6">
+        <PublicContainer className="py-10">
           <Link href="/" className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary">
             <ArrowLeft className="h-4 w-4" />
             Back to landing
           </Link>
-          <p className="mt-4 text-sm font-medium text-primary">Solution Blueprints</p>
-          <h1 className="mt-1 text-3xl font-semibold md:text-4xl">Ready-to-use frontend scenarios from platform capabilities</h1>
-          <p className="mt-3 max-w-3xl text-body text-text-secondary">
-            These solution tracks are built from existing product modules. They help align marketing message, UI structure,
-            and actual in-product workflows without gap.
-          </p>
-        </div>
+          <PublicSectionHeader
+            eyebrow="Solution Blueprints"
+            title="Ready-to-use frontend scenarios from platform capabilities"
+            description="These solution tracks are built from existing product modules. They align marketing message, UI structure, and real in-product workflows."
+          />
+        </PublicContainer>
       </section>
 
-      <section className="mx-auto w-full max-w-7xl px-4 py-10 md:px-6">
+      <section className="py-10">
+        <PublicContainer>
         <div className="grid gap-5 md:grid-cols-3">
           {solutionTracks.map((track) => (
-            <article key={track.title} className="rounded-xl border border-border bg-surface p-5">
+            <PublicCard key={track.title}>
+              <div className="mb-2 inline-flex rounded-full border border-border px-2 py-0.5 text-[11px] text-text-tertiary">
+                Solution Track
+              </div>
               <h2 className="text-heading-lg font-semibold">{track.title}</h2>
               <p className="mt-2 text-body-sm text-text-secondary">{track.summary}</p>
               <ul className="mt-4 space-y-2 text-sm text-text-secondary">
@@ -60,10 +66,13 @@ export default function SolutionsPage() {
                 Open related flow
                 <ArrowRight className="h-4 w-4" />
               </Link>
-            </article>
+            </PublicCard>
           ))}
         </div>
+        </PublicContainer>
       </section>
+
+      <PublicFooter />
     </main>
   )
 }

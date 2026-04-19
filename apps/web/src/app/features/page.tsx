@@ -19,6 +19,7 @@ import {
   Users,
   Wallet,
 } from 'lucide-react'
+import { PublicCard, PublicContainer, PublicFooter, PublicNavbar, PublicSectionHeader } from '@/components/public/PublicLayout'
 
 const featureGroups = [
   {
@@ -75,22 +76,24 @@ const featureGroups = [
 export default function FeaturesPage() {
   return (
     <main className="min-h-screen bg-surface-2 text-text-primary">
+      <PublicNavbar />
+
       <section className="border-b border-border bg-surface">
-        <div className="mx-auto w-full max-w-7xl px-4 py-10 md:px-6">
+        <PublicContainer className="py-10">
           <Link href="/" className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary">
             <ArrowLeft className="h-4 w-4" />
             Back to landing
           </Link>
-          <p className="mt-4 text-sm font-medium text-primary">Feature Architecture</p>
-          <h1 className="mt-1 text-3xl font-semibold md:text-4xl">Bizda mavjud real featurelar xaritasi</h1>
-          <p className="mt-3 max-w-3xl text-body text-text-secondary">
-            Har bir kartadagi link platformadagi mavjud sahifaga olib boradi. Bu orqali product capability va frontend
-            UX holatini to‘g‘ridan-to‘g‘ri tekshirish mumkin.
-          </p>
-        </div>
+          <PublicSectionHeader
+            eyebrow="Feature Architecture"
+            title="Bizda mavjud real featurelar xaritasi"
+            description="Har bir kartadagi link platformadagi mavjud sahifaga olib boradi. Bu orqali product capability va frontend UX holatini to‘g‘ridan-to‘g‘ri tekshirish mumkin."
+          />
+        </PublicContainer>
       </section>
 
-      <section className="mx-auto w-full max-w-7xl px-4 py-10 md:px-6">
+      <section className="py-10">
+        <PublicContainer>
         <div className="space-y-8">
           {featureGroups.map((group) => (
             <div key={group.name}>
@@ -102,16 +105,19 @@ export default function FeaturesPage() {
                     <Link
                       key={item.title}
                       href={item.href}
-                      className="rounded-xl border border-border bg-surface p-5 transition hover:border-primary/40 hover:bg-surface-2"
+                      className="group rounded-xl border border-border bg-surface p-5 transition hover:border-primary/40 hover:bg-surface-2"
                     >
                       <div className="mb-3 inline-flex rounded-lg border border-border p-2 text-primary">
                         <Icon className="h-4 w-4" />
+                      </div>
+                      <div className="mb-2 inline-flex rounded-full border border-border px-2 py-0.5 text-[11px] text-text-tertiary">
+                        Live Module
                       </div>
                       <h3 className="text-heading font-semibold">{item.title}</h3>
                       <p className="mt-2 text-body-sm text-text-secondary">{item.desc}</p>
                       <div className="mt-4 inline-flex items-center gap-1 text-sm text-primary">
                         Open module
-                        <ArrowRight className="h-4 w-4" />
+                        <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
                       </div>
                     </Link>
                   )
@@ -120,7 +126,29 @@ export default function FeaturesPage() {
             </div>
           ))}
         </div>
+        </PublicContainer>
       </section>
+
+      <section className="border-t border-border bg-surface py-12">
+        <PublicContainer>
+          <div className="grid gap-4 md:grid-cols-3">
+            <PublicCard className="bg-surface-2">
+              <h3 className="font-semibold">Route Validity</h3>
+              <p className="mt-2 text-sm text-text-secondary">Cards point to existing routes, not mocked placeholders.</p>
+            </PublicCard>
+            <PublicCard className="bg-surface-2">
+              <h3 className="font-semibold">Product Alignment</h3>
+              <p className="mt-2 text-sm text-text-secondary">Modules map to real internal capabilities and workflows.</p>
+            </PublicCard>
+            <PublicCard className="bg-surface-2">
+              <h3 className="font-semibold">Conversion Ready</h3>
+              <p className="mt-2 text-sm text-text-secondary">Public users can inspect capabilities before sign-in.</p>
+            </PublicCard>
+          </div>
+        </PublicContainer>
+      </section>
+
+      <PublicFooter />
     </main>
   )
 }

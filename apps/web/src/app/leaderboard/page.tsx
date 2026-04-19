@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import Link from 'next/link'
-import { Star, TrendingUp, Award, Crown, Target } from 'lucide-react'
-import { useI18n } from '@/i18n/use-i18n'
+import { Award, Crown, Star, TrendingUp } from 'lucide-react'
+import { PublicContainer, PublicFooter, PublicNavbar, PublicSectionHeader } from '@/components/public/PublicLayout'
 
 const LEADERBOARD_DATA = [
   {
@@ -111,77 +111,71 @@ const LEADERBOARD_DATA = [
 ]
 
 export default function LeaderboardPage() {
-  const { t } = useI18n()
   const [activeTab, setActiveTab] = useState('overall')
 
   const TABS = [
-    { id: 'overall', label: t('leaderboard.overall'), icon: '🏆' },
-    { id: 'rising', label: t('leaderboard.rising'), icon: '🌟' },
-    { id: 'roas', label: t('leaderboard.roasLeaders'), icon: '📈' },
-    { id: 'rating', label: t('leaderboard.topRated'), icon: '⭐' },
+    { id: 'overall', label: 'Overall', icon: '🏆' },
+    { id: 'rising', label: 'Rising', icon: '🌟' },
+    { id: 'roas', label: 'ROAS leaders', icon: '📈' },
+    { id: 'rating', label: 'Top rated', icon: '⭐' },
   ]
 
-  const sortedByTab = {
+  const sortedByTab = useMemo(() => ({
     overall: LEADERBOARD_DATA,
     rising: [...LEADERBOARD_DATA].sort((a, b) => parseInt(b.trend) - parseInt(a.trend)),
     roas: [...LEADERBOARD_DATA].sort((a, b) => b.roas - a.roas),
     rating: [...LEADERBOARD_DATA].sort((a, b) => b.rating - a.rating),
-  }
+  }), [])
 
   const displayData = sortedByTab[activeTab as keyof typeof sortedByTab]
 
   return (
-    <div className="min-h-screen bg-[#031314] text-white">
-      {/* Header */}
-      <div className="border-b border-white/10 bg-[#071c1e]/95 backdrop-blur-xl sticky top-0 z-40">
-        <div className="mx-auto max-w-7xl px-6 py-8">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-4xl font-bold flex items-center gap-2">
-                <Crown size={32} className="text-yellow-400" /> {t('leaderboard.title')}
-              </h1>
-              <p className="text-text-secondary mt-2">{t('leaderboard.subtitle')}</p>
-            </div>
-            <Link href="/" className="text-emerald-300 hover:text-emerald-200 transition-colors">
-              ← {t('common.home')}
-            </Link>
-          </div>
+    <main className="min-h-screen bg-surface-2 text-text-primary">
+      <PublicNavbar />
 
-          {/* Tabs */}
-          <div className="flex gap-2 overflow-x-auto">
+      <section className="border-b border-border bg-surface py-10">
+        <PublicContainer>
+          <PublicSectionHeader
+            eyebrow="Performance Ranking"
+            title="Top specialists by outcomes, consistency, and client trust"
+            description="Leaderboard helps brands compare specialists by ROAS, ratings, campaigns, and verified delivery patterns."
+          />
+
+          <div className="flex flex-wrap gap-2">
             {TABS.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap ${
+                className={`rounded-lg border px-3 py-2 text-sm transition ${
                   activeTab === tab.id
-                    ? 'bg-emerald-500 text-white'
-                    : 'bg-white/10 text-text-secondary hover:bg-white/20'
+                    ? 'border-primary/30 bg-primary/10 text-primary'
+                    : 'border-border bg-surface text-text-secondary hover:bg-surface-2'
                 }`}
               >
                 {tab.icon} {tab.label}
               </button>
             ))}
           </div>
-        </div>
-      </div>
+        </PublicContainer>
+      </section>
 
-      <div className="mx-auto max-w-7xl px-6 py-12">
+      <section className="py-10">
+        <PublicContainer>
         {/* Featured Section - Top 3 */}
         {activeTab === 'overall' && (
           <div className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-text-primary">{t('leaderboard.top3')}</h2>
+            <h2 className="mb-6 text-2xl font-bold text-text-primary">Top 3 specialists</h2>
             <div className="grid gap-6 md:grid-cols-3">
               {displayData.slice(0, 3).map((specialist, idx) => (
                 <Link
                   key={specialist.rank}
                   href={`/portfolio/${specialist.username}`}
-                  className={`group rounded-2xl border transition-all hover:scale-105 cursor-pointer ${
+                  className={`group rounded-2xl border transition-all hover:scale-[1.02] ${
                     idx === 0
-                      ? 'border-yellow-500/40 bg-gradient-to-br from-yellow-500/10 to-orange-500/10 ring-2 ring-yellow-500/20'
+                      ? 'border-yellow-300 bg-yellow-50 ring-2 ring-yellow-200'
                       : idx === 1
-                        ? 'border-gray-400/40 bg-gradient-to-br from-gray-400/10 to-slate-500/10'
-                        : 'border-orange-600/40 bg-gradient-to-br from-orange-600/10 to-red-600/10'
+                        ? 'border-slate-300 bg-slate-50'
+                        : 'border-orange-300 bg-orange-50'
                   } p-8`}
                 >
                   <div className="text-center">
@@ -191,15 +185,15 @@ export default function LeaderboardPage() {
 
                     <div className="text-5xl mb-4">{specialist.avatar}</div>
 
-                    <h3 className="text-2xl font-bold text-white mb-1">{specialist.username}</h3>
-                    <p className="flex items-center justify-center gap-1 text-lg font-semibold text-emerald-300 mb-4">
+                    <h3 className="mb-1 text-2xl font-bold text-text-primary">{specialist.username}</h3>
+                    <p className="mb-4 flex items-center justify-center gap-1 text-lg font-semibold text-primary">
                       <span>{specialist.levelIcon}</span>
                       {specialist.level}
                     </p>
 
-                    <div className="space-y-3 py-4 border-y border-white/10">
+                    <div className="space-y-3 border-y border-border py-4">
                       <div className="flex items-center justify-between">
-                        <span className="text-text-tertiary">{t('pages.leaderboard.rating')}</span>
+                        <span className="text-text-tertiary">Rating</span>
                         <span className="flex items-center gap-1">
                           {specialist.rating}
                           <Star size={16} className="text-yellow-400 fill-yellow-400" />
@@ -210,8 +204,8 @@ export default function LeaderboardPage() {
                         <span className="text-emerald-400 font-semibold">{specialist.roas}x</span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-text-tertiary">{t('pages.leaderboard.points')}</span>
-                        <span className="font-bold text-white">{specialist.points}</span>
+                        <span className="text-text-tertiary">Points</span>
+                        <span className="font-bold text-text-primary">{specialist.points}</span>
                       </div>
                     </div>
 
@@ -232,36 +226,36 @@ export default function LeaderboardPage() {
         )}
 
         {/* Full Rankings Table */}
-        <div className="rounded-2xl border border-white/10 bg-surface-2/50 overflow-hidden">
+        <div className="overflow-hidden rounded-2xl border border-border bg-surface">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-surface-elevated/[0.04] border-b border-white/10">
+              <thead className="border-b border-border bg-surface-2">
                 <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">{t('leaderboard.rank')}</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">{t('leaderboard.specialist')}</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">{t('leaderboard.level')}</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">{t('leaderboard.rating')}</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">{t('leaderboard.roas')}</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">{t('leaderboard.campaigns')}</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">{t('leaderboard.specialty')}</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">{t('leaderboard.badges')}</th>
-                  <th className="px-6 py-4 text-right text-sm font-semibold text-text-secondary">{t('leaderboard.points')}</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">Rank</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">Specialist</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">Level</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">Rating</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">ROAS</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">Campaigns</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">Specialty</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">Badges</th>
+                  <th className="px-6 py-4 text-right text-sm font-semibold text-text-secondary">Points</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/10">
+              <tbody className="divide-y divide-border">
                 {displayData.map((specialist) => (
                   <tr
                     key={specialist.username}
-                    className="hover:bg-white/5 transition-colors group cursor-pointer"
+                    className="group cursor-pointer transition-colors hover:bg-surface-2"
                   >
                     <td className="px-6 py-4">
-                      <div className="text-lg font-bold text-yellow-400">#{specialist.rank}</div>
+                      <div className="text-lg font-bold text-yellow-500">#{specialist.rank}</div>
                     </td>
                     <td className="px-6 py-4">
                       <Link href={`/portfolio/${specialist.username}`} className="flex items-center gap-3">
                         <div className="text-2xl">{specialist.avatar}</div>
                         <div>
-                          <p className="font-semibold text-white group-hover:text-emerald-300">
+                          <p className="font-semibold text-text-primary group-hover:text-primary">
                             {specialist.username}
                           </p>
                           <p className="text-xs text-text-tertiary">{specialist.reviews} reviews</p>
@@ -280,10 +274,10 @@ export default function LeaderboardPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-emerald-400 font-bold">{specialist.roas}x</span>
+                      <span className="font-bold text-emerald-600">{specialist.roas}x</span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-sm text-white">{specialist.campaigns}</span>
+                      <span className="text-sm text-text-primary">{specialist.campaigns}</span>
                     </td>
                     <td className="px-6 py-4">
                       <span className="text-sm">
@@ -296,7 +290,7 @@ export default function LeaderboardPage() {
                         <span className="text-sm font-medium">{specialist.badges}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-right font-bold text-white">
+                    <td className="px-6 py-4 text-right font-bold text-text-primary">
                       {specialist.points}
                     </td>
                   </tr>
@@ -307,35 +301,38 @@ export default function LeaderboardPage() {
         </div>
 
         {/* Info Section */}
-        <div className="mt-12 rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 p-8">
-          <h3 className="text-2xl font-bold text-white mb-4">{t('leaderboard.howWorks')}</h3>
+        <div className="mt-12 rounded-2xl border border-border bg-surface p-8">
+          <h3 className="mb-4 text-2xl font-bold text-text-primary">How leaderboard works</h3>
           <div className="grid md:grid-cols-3 gap-6">
             {[
               {
                 icon: '🎯',
-                titleKey: 'leaderboard.pointsSystem',
-                descKey: 'leaderboard.pointsDesc',
+                title: 'Points system',
+                desc: 'Points combine campaign quality, consistency, and verified delivery over time.',
               },
               {
                 icon: '🏆',
-                titleKey: 'leaderboard.levels',
-                descKey: 'leaderboard.levelsDesc',
+                title: 'Level progression',
+                desc: 'Specialists move from intermediate to master tiers based on sustained outcomes.',
               },
               {
                 icon: '🎖️',
-                titleKey: 'leaderboard.badgesReward',
-                descKey: 'leaderboard.badgesDesc',
+                title: 'Badge rewards',
+                desc: 'Badges reflect domain strengths such as ROAS leadership, speed, and retention.',
               },
             ].map((item) => (
-              <div key={item.titleKey}>
+              <div key={item.title}>
                 <div className="text-4xl mb-3">{item.icon}</div>
-                <h4 className="font-semibold text-white mb-2">{t(item.titleKey)}</h4>
-                <p className="text-sm text-text-tertiary">{t(item.descKey)}</p>
+                <h4 className="mb-2 font-semibold text-text-primary">{item.title}</h4>
+                <p className="text-sm text-text-tertiary">{item.desc}</p>
               </div>
             ))}
           </div>
         </div>
-      </div>
-    </div>
+        </PublicContainer>
+      </section>
+
+      <PublicFooter />
+    </main>
   )
 }

@@ -2,9 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Input'
-import { Alert } from '@/components/ui/Alert'
+import { Alert, Button, Input } from '@/components/ui'
 import { auth, workspaces as workspacesApi } from '@/lib/api-client'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 
@@ -100,153 +98,100 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-surface-2 flex">
+    <main className="min-h-screen bg-surface-2 px-4 py-10 text-text-primary">
+      <div className="mx-auto grid w-full max-w-6xl gap-6 lg:grid-cols-2">
+        <section className="rounded-2xl border border-border bg-surface p-8">
+          <p className="text-sm font-medium text-primary">Welcome back</p>
+          <h1 className="mt-2 text-3xl font-semibold">Control campaigns from one operating layer</h1>
+          <p className="mt-3 text-text-secondary">
+            Sign in to access launch workflows, AI decisions, reporting, and workspace governance.
+          </p>
 
-      {/* Left panel */}
-      <div className="hidden lg:flex lg:w-1/2 bg-surface-elevated border-r border-border flex-col justify-between p-12">
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary">
-            Performa <span className="text-text-secondary">AI</span>
-          </h1>
-        </div>
-
-        <div>
-          <div className="mb-8">
-            <div className="inline-flex items-center gap-2 bg-surface-2 border border-border rounded-full px-4 py-2 mb-6">
-              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-text-secondary text-sm font-medium">AI Agent Active</span>
-            </div>
-            <h2 className="text-4xl font-bold text-text-primary leading-tight mb-4">
-              Reklamalaringiz<br />
-              <span className="text-text-secondary">o'zi ishlaydi.</span>
-            </h2>
-            <p className="text-text-tertiary text-lg leading-relaxed">
-              Performa Meta, Google va TikTok kampaniyalaringizni
-              mustaqil boshqaradi — har 2 soatda optimallashtiradi, har kuni hisobot beradi.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-3 gap-4 mb-8">
+          <div className="mt-6 grid gap-3 sm:grid-cols-3">
             {[
-              { value: '3.2x', label: "O'rtacha ROAS" },
-              { value: '−40%', label: "Past CPA" },
-              { value: '24/7', label: "AI monitoring" },
-            ].map((stat) => (
-              <div key={stat.label} className="bg-surface-2 rounded-xl p-4 border border-border">
-                <p className="text-2xl font-bold text-text-secondary">{stat.value}</p>
-                <p className="text-text-tertiary text-xs mt-1">{stat.label}</p>
+              { value: '3.2x', label: 'Average ROAS' },
+              { value: '-40%', label: 'CPA reduction' },
+              { value: '24/7', label: 'AI monitoring' },
+            ].map((item) => (
+              <div key={item.label} className="rounded-xl border border-border bg-surface-2 p-4">
+                <p className="text-lg font-semibold">{item.value}</p>
+                <p className="text-xs text-text-secondary">{item.label}</p>
               </div>
             ))}
           </div>
+        </section>
 
-          <div className="bg-surface-2 rounded-xl p-5 border border-border">
-            <p className="text-text-secondary text-sm leading-relaxed mb-3">
-              "Performa targetologimizni almashtirdi va birinchi oyda ROAS 2.8x oshdi.
-              Endi kampaniya boshqarishga 0 soat sarflaymiz."
-            </p>
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-surface-2 border border-border flex items-center justify-center">
-                <span className="text-xs font-bold text-text-secondary">JT</span>
-              </div>
-              <div>
-                <p className="text-text-primary text-xs font-medium">Jasur Toshmatov</p>
-                <p className="text-text-tertiary text-xs">CEO, TechShop Uzbekistan</p>
-              </div>
-            </div>
+        <section className="rounded-2xl border border-border bg-surface p-8">
+          <h2 className="text-xl font-semibold">Sign in</h2>
+          <p className="mt-1 text-sm text-text-secondary">Use your account credentials or social auth.</p>
+
+          <div className="mt-4 flex flex-col gap-2">
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              className="flex w-full items-center justify-center gap-3 rounded-lg border border-border bg-surface-2 px-4 py-2.5 text-sm text-text-secondary hover:bg-surface"
+            >
+              <GoogleIcon />
+              Continue with Google
+            </button>
+            <button
+              type="button"
+              onClick={handleFacebookLogin}
+              className="flex w-full items-center justify-center gap-3 rounded-lg bg-[#1877F2] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#166FE5]"
+            >
+              <FacebookIcon />
+              Continue with Facebook
+            </button>
           </div>
-        </div>
 
-        <p className="text-text-tertiary text-xs">© 2025 Performa. All rights reserved.</p>
+          <div className="my-4 flex items-center gap-3">
+            <div className="h-px flex-1 bg-border" />
+            <span className="text-xs text-text-tertiary">or email</span>
+            <div className="h-px flex-1 bg-border" />
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Input
+              label="Email"
+              type="email"
+              placeholder="you@company.com"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              required
+            />
+
+            <Input
+              label="Password"
+              type="password"
+              placeholder="••••••••"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+              required
+            />
+
+            {error && <Alert variant="error">{error}</Alert>}
+
+            <Button type="submit" fullWidth loading={loading} size="lg">
+              Sign in
+            </Button>
+          </form>
+
+          <button
+            type="button"
+            onClick={handleDemoLogin}
+            className="mt-3 w-full rounded-lg border border-dashed border-border bg-surface-2 px-4 py-2.5 text-sm text-text-tertiary hover:border-text-secondary hover:text-text-secondary"
+          >
+            ⚡ Demo kirish — hisob talab etilmaydi
+          </button>
+
+          <p className="mt-5 text-center text-sm text-text-secondary">
+            Don&apos;t have an account?{' '}
+            <Link href="/register" className="font-medium text-primary hover:underline">
+              Create one
+            </Link>
+          </p>
+        </section>
       </div>
-
-      {/* Right panel — form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6">
-        <div className="w-full max-w-md">
-
-          {/* Mobile logo */}
-          <div className="lg:hidden text-center mb-8">
-            <h1 className="text-2xl font-bold text-text-primary">
-              Performa <span className="text-text-secondary">AI</span>
-            </h1>
-          </div>
-
-          <div className="bg-surface-elevated border border-border rounded-xl p-6">
-            <h2 className="text-xl font-semibold text-text-primary mb-6">Xush kelibsiz</h2>
-
-            {/* Social login buttons */}
-            <div className="flex flex-col gap-2 mb-4">
-              <button
-                type="button"
-                onClick={handleGoogleLogin}
-                className="w-full flex items-center justify-center gap-3 bg-surface-elevated hover:bg-surface-2 text-text-secondary font-medium py-2.5 px-4 rounded-lg border border-border transition-colors text-sm"
-              >
-                <GoogleIcon />
-                Google orqali kirish
-              </button>
-              <button
-                type="button"
-                onClick={handleFacebookLogin}
-                className="w-full flex items-center justify-center gap-3 bg-[#1877F2] hover:bg-[#166FE5] text-text-primary font-medium py-2.5 px-4 rounded-lg transition-colors text-sm"
-              >
-                <FacebookIcon />
-                Facebook orqali kirish
-              </button>
-            </div>
-
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex-1 h-px bg-surface-2" />
-              <span className="text-text-tertiary text-xs">yoki email bilan</span>
-              <div className="flex-1 h-px bg-surface-2" />
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <Input
-                label="Email"
-                type="email"
-                placeholder="siz@kompaniya.com"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                required
-                leftIcon={<span className="text-sm">✉</span>}
-              />
-
-              <Input
-                label="Parol"
-                type="password"
-                placeholder="••••••••"
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                required
-                leftIcon={<span className="text-sm">🔒</span>}
-              />
-
-              {error && <Alert variant="error">{error}</Alert>}
-
-              <Button type="submit" fullWidth loading={loading} size="lg">
-                Kirish
-              </Button>
-            </form>
-
-            <div className="mt-3">
-              <button
-                type="button"
-                onClick={handleDemoLogin}
-                className="w-full flex items-center justify-center gap-2 rounded-lg border border-dashed border-border bg-surface-2 py-2.5 px-4 text-sm text-text-tertiary hover:border-text-secondary hover:text-text-secondary transition-colors"
-              >
-                <span>⚡</span>
-                Demo kirish — hisob talab etilmaydi
-              </button>
-            </div>
-
-            <p className="text-center text-text-tertiary text-sm mt-5">
-              Hisobingiz yo'qmi?{' '}
-              <Link href="/register" className="text-text-secondary hover:text-text-primary transition-colors font-medium">
-                Ro'yxatdan o'ting
-              </Link>
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
+    </main>
   )
 }

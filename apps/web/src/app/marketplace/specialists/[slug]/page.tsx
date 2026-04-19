@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Star, MapPin, Award, TrendingUp, Users, DollarSign, Clock, Check, Mail, MessageSquare } from 'lucide-react'
+import { Star, MapPin, DollarSign, Clock, Check, Mail, MessageSquare } from 'lucide-react'
+import { PublicContainer, PublicFooter, PublicNavbar } from '@/components/public/PublicLayout'
 
 const SPECIALIST_DATA = {
   spec_1: {
@@ -67,16 +68,16 @@ const SPECIALIST_DATA = {
   },
 }
 
-export default function SpecialistProfilePage({ params }: { params: { id: string } }) {
-  const specialist = SPECIALIST_DATA[params.id as keyof typeof SPECIALIST_DATA]
+export default function SpecialistProfilePage({ params }: { params: { slug: string } }) {
+  const specialist = SPECIALIST_DATA[params.slug as keyof typeof SPECIALIST_DATA]
   const [activeTab, setActiveTab] = useState<'overview' | 'portfolio' | 'testimonials'>('overview')
 
   if (!specialist) {
     return (
-      <div className="min-h-screen bg-[#031314] text-white flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-surface-2 text-text-primary">
         <div className="text-center">
-          <h1 className="text-3xl font-bold mb-4">Specialist topilmadi</h1>
-          <Link href="/marketplace" className="text-emerald-300 hover:text-emerald-200">
+          <h1 className="mb-4 text-3xl font-bold">Specialist topilmadi</h1>
+          <Link href="/marketplace" className="text-primary hover:underline">
             ← Marketplace'ga qaytish
           </Link>
         </div>
@@ -85,11 +86,12 @@ export default function SpecialistProfilePage({ params }: { params: { id: string
   }
 
   return (
-    <div className="min-h-screen bg-[#031314] text-white">
-      {/* Header */}
-      <div className="border-b border-white/10 bg-[#071c1e]/95 backdrop-blur-xl sticky top-0 z-40">
-        <div className="mx-auto max-w-7xl px-6 py-6">
-          <Link href="/marketplace" className="text-emerald-300 hover:text-emerald-200 transition-colors inline-block mb-4">
+    <main className="min-h-screen bg-surface-2 text-text-primary">
+      <PublicNavbar />
+
+      <section className="border-b border-border bg-surface py-8">
+        <PublicContainer>
+          <Link href="/marketplace" className="mb-4 inline-block text-primary hover:underline">
             ← Marketplace'ga qaytish
           </Link>
           <div className="flex items-center gap-4">
@@ -97,55 +99,56 @@ export default function SpecialistProfilePage({ params }: { params: { id: string
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-3xl font-bold">{specialist.name}</h1>
-                {specialist.verified && <Check size={20} className="text-emerald-400" />}
+                {specialist.verified && <Check size={20} className="text-emerald-500" />}
               </div>
-              <p className="text-text-secondary text-lg">{specialist.title}</p>
+              <p className="text-lg text-text-secondary">{specialist.title}</p>
             </div>
           </div>
-        </div>
-      </div>
+        </PublicContainer>
+      </section>
 
-      <div className="mx-auto max-w-7xl px-6 py-12">
+      <section className="py-10">
+        <PublicContainer>
         <div className="grid gap-8 md:grid-cols-3">
           {/* Main Content */}
           <div className="md:col-span-2">
             {/* Quick Stats */}
-            <div className="rounded-2xl border border-white/10 bg-surface-2/50 p-8 mb-8">
-              <h2 className="text-2xl font-bold mb-6">Statistika</h2>
+            <div className="mb-8 rounded-2xl border border-border bg-surface p-8">
+              <h2 className="mb-6 text-2xl font-bold">Statistika</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 <div>
-                  <p className="text-text-tertiary text-sm mb-2">ROAS</p>
-                  <p className="text-3xl font-bold text-emerald-400">{specialist.roas}x</p>
+                  <p className="mb-2 text-sm text-text-tertiary">ROAS</p>
+                  <p className="text-3xl font-bold text-emerald-600">{specialist.roas}x</p>
                 </div>
                 <div>
-                  <p className="text-text-tertiary text-sm mb-2">Reytingi</p>
+                  <p className="mb-2 text-sm text-text-tertiary">Reytingi</p>
                   <div className="flex items-center gap-2">
                     <span className="text-3xl font-bold">{specialist.rating}</span>
                     <Star size={20} className="text-yellow-400 fill-yellow-400" />
                   </div>
                 </div>
                 <div>
-                  <p className="text-text-tertiary text-sm mb-2">Success Rate</p>
-                  <p className="text-3xl font-bold text-cyan-400">{specialist.successRate}%</p>
+                  <p className="mb-2 text-sm text-text-tertiary">Success Rate</p>
+                  <p className="text-3xl font-bold text-primary">{specialist.successRate}%</p>
                 </div>
                 <div>
-                  <p className="text-text-tertiary text-sm mb-2">Omonatlari</p>
+                  <p className="mb-2 text-sm text-text-tertiary">Omonatlari</p>
                   <p className="text-3xl font-bold">{specialist.reviewCount}</p>
                 </div>
               </div>
             </div>
 
             {/* Tabs */}
-            <div className="rounded-2xl border border-white/10 bg-surface-2/50 p-8 mb-8">
-              <div className="flex gap-4 mb-8 border-b border-white/10">
+            <div className="mb-8 rounded-2xl border border-border bg-surface p-8">
+              <div className="mb-8 flex gap-4 border-b border-border">
                 {(['overview', 'portfolio', 'testimonials'] as const).map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
                     className={`px-4 py-2 font-semibold transition-colors border-b-2 ${
                       activeTab === tab
-                        ? 'border-emerald-400 text-emerald-300'
-                        : 'border-transparent text-text-secondary hover:text-white'
+                        ? 'border-primary text-primary'
+                        : 'border-transparent text-text-secondary hover:text-text-primary'
                     }`}
                   >
                     {tab === 'overview' && 'Haqida'}
@@ -158,12 +161,12 @@ export default function SpecialistProfilePage({ params }: { params: { id: string
               {activeTab === 'overview' && (
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-xl font-semibold mb-3">Bio</h3>
+                    <h3 className="mb-3 text-xl font-semibold">Bio</h3>
                     <p className="text-text-secondary whitespace-pre-line">{specialist.description}</p>
                   </div>
 
-                  <div className="border-t border-white/10 pt-6">
-                    <h3 className="text-xl font-semibold mb-4">Bilgisi</h3>
+                  <div className="border-t border-border pt-6">
+                    <h3 className="mb-4 text-xl font-semibold">Bilgisi</h3>
                     <div className="grid gap-4 md:grid-cols-2">
                       <div className="flex items-start gap-3">
                         <div className="text-2xl">📚</div>
@@ -196,13 +199,13 @@ export default function SpecialistProfilePage({ params }: { params: { id: string
                     </div>
                   </div>
 
-                  <div className="border-t border-white/10 pt-6">
-                    <h3 className="text-xl font-semibold mb-4">Tillar</h3>
+                  <div className="border-t border-border pt-6">
+                    <h3 className="mb-4 text-xl font-semibold">Tillar</h3>
                     <div className="flex flex-wrap gap-2">
                       {specialist.languages.map((lang) => (
                         <span
                           key={lang}
-                          className="px-3 py-1.5 rounded-full bg-cyan-500/15 text-cyan-300 text-sm border border-cyan-500/30"
+                          className="rounded-full border border-border bg-surface-2 px-3 py-1.5 text-sm text-text-secondary"
                         >
                           {lang}
                         </span>
@@ -210,13 +213,13 @@ export default function SpecialistProfilePage({ params }: { params: { id: string
                     </div>
                   </div>
 
-                  <div className="border-t border-white/10 pt-6">
-                    <h3 className="text-xl font-semibold mb-4">Sertifikatsiyalar</h3>
+                  <div className="border-t border-border pt-6">
+                    <h3 className="mb-4 text-xl font-semibold">Sertifikatsiyalar</h3>
                     <div className="flex flex-wrap gap-2">
                       {specialist.certifications.map((cert) => (
                         <span
                           key={cert}
-                          className="px-3 py-1.5 rounded-full bg-emerald-500/15 text-emerald-300 text-sm border border-emerald-500/30"
+                          className="rounded-full border border-border bg-surface-2 px-3 py-1.5 text-sm text-text-secondary"
                         >
                           {cert === 'meta' && '📘 Meta'}
                           {cert === 'google' && '🔵 Google'}
@@ -232,14 +235,14 @@ export default function SpecialistProfilePage({ params }: { params: { id: string
               {activeTab === 'portfolio' && (
                 <div className="space-y-4">
                   {specialist.portfolio.map((project, idx) => (
-                    <div key={idx} className="p-4 rounded-xl border border-white/10 bg-black/20">
-                      <div className="flex items-start justify-between mb-3">
+                    <div key={idx} className="rounded-xl border border-border bg-surface-2 p-4">
+                      <div className="mb-3 flex items-start justify-between">
                         <div>
-                          <h4 className="font-semibold text-white">{project.title}</h4>
+                          <h4 className="font-semibold text-text-primary">{project.title}</h4>
                           <p className="text-sm text-text-tertiary">{project.industry}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-2xl font-bold text-emerald-400">{project.roas}x</p>
+                          <p className="text-2xl font-bold text-emerald-600">{project.roas}x</p>
                           <p className="text-xs text-text-tertiary">ROAS</p>
                         </div>
                       </div>
@@ -254,13 +257,13 @@ export default function SpecialistProfilePage({ params }: { params: { id: string
               {activeTab === 'testimonials' && (
                 <div className="space-y-4">
                   {specialist.testimonials.map((testimonial, idx) => (
-                    <div key={idx} className="p-5 rounded-xl border border-white/10 bg-black/20">
-                      <div className="flex items-center gap-1 mb-3">
+                    <div key={idx} className="rounded-xl border border-border bg-surface-2 p-5">
+                      <div className="mb-3 flex items-center gap-1">
                         {Array.from({ length: testimonial.rating }).map((_, i) => (
                           <Star key={i} size={16} className="text-yellow-400 fill-yellow-400" />
                         ))}
                       </div>
-                      <p className="text-white mb-4 leading-relaxed">"{testimonial.text}"</p>
+                      <p className="mb-4 leading-relaxed text-text-primary">"{testimonial.text}"</p>
                       <p className="text-sm text-text-tertiary">— {testimonial.author}</p>
                     </div>
                   ))}
@@ -271,10 +274,10 @@ export default function SpecialistProfilePage({ params }: { params: { id: string
 
           {/* Sidebar - CTA */}
           <div className="md:col-span-1">
-            <div className="rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 p-8 sticky top-24">
-              <h2 className="text-2xl font-bold mb-6">Ishga olib boshlang</h2>
+            <div className="sticky top-24 rounded-2xl border border-border bg-surface p-8">
+              <h2 className="mb-6 text-2xl font-bold">Ishga olib boshlang</h2>
 
-              <div className="space-y-4 mb-8 pb-8 border-b border-white/10">
+              <div className="mb-8 space-y-4 border-b border-border pb-8">
                 <div className="flex items-center gap-3">
                   <DollarSign size={20} className="text-emerald-400" />
                   <div>
@@ -285,7 +288,7 @@ export default function SpecialistProfilePage({ params }: { params: { id: string
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <Clock size={20} className="text-cyan-400" />
+                  <Clock size={20} className="text-primary" />
                   <div>
                     <p className="text-text-tertiary text-sm">Javob vaqti</p>
                     <p className="text-lg font-semibold">{specialist.responseTime} soat</p>
@@ -293,7 +296,7 @@ export default function SpecialistProfilePage({ params }: { params: { id: string
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <MapPin size={20} className="text-sky-400" />
+                  <MapPin size={20} className="text-primary" />
                   <div>
                     <p className="text-text-tertiary text-sm">Joylashuvi</p>
                     <p className="text-sm font-semibold">{specialist.location}</p>
@@ -301,15 +304,15 @@ export default function SpecialistProfilePage({ params }: { params: { id: string
                 </div>
               </div>
 
-              <button className="w-full px-6 py-3 bg-emerald-500 text-white font-semibold rounded-full hover:bg-emerald-400 transition-colors mb-3 flex items-center justify-center gap-2">
+              <button className="mb-3 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 font-semibold text-white hover:opacity-95">
                 <Mail size={18} /> Xabar yuborish
               </button>
 
-              <button className="w-full px-6 py-3 border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 font-semibold rounded-full hover:border-emerald-500/60 hover:bg-emerald-500/20 transition-colors flex items-center justify-center gap-2">
+              <button className="flex w-full items-center justify-center gap-2 rounded-full border border-border bg-surface-2 px-6 py-3 font-semibold text-text-primary hover:bg-surface">
                 <MessageSquare size={18} /> Foydalanuvchi profili
               </button>
 
-              <div className="mt-8 p-4 rounded-xl bg-black/40 border border-white/10">
+              <div className="mt-8 rounded-xl border border-border bg-surface-2 p-4">
                 <p className="text-xs text-text-tertiary mb-3">
                   ℹ️ Marketplace orqali aloqa qilib, hozirdan ishona boshlang. Barcha to'lovlar Performa orqali xavfsiz.
                 </p>
@@ -317,7 +320,10 @@ export default function SpecialistProfilePage({ params }: { params: { id: string
             </div>
           </div>
         </div>
-      </div>
-    </div>
+        </PublicContainer>
+      </section>
+
+      <PublicFooter />
+    </main>
   )
 }
