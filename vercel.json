@@ -1,5 +1,5 @@
 {
-  "buildCommand": "pnpm install --frozen-lockfile && pnpm --filter web build",
+  "buildCommand": "pnpm install --frozen-lockfile && pnpm --filter web build && rm -rf .next && cp -R apps/web/.next .next",
   "framework": "nextjs",
   "env": {
     "NEXT_TELEMETRY_DISABLED": "1"
