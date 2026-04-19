@@ -49,7 +49,7 @@ const CONNECTED_INTEGRATIONS = [
       success: '100%',
     },
   },
-]
+] as const satisfies readonly Integration[]
 
 const PENDING_INTEGRATIONS = [
   {
@@ -93,7 +93,7 @@ interface Integration {
   account?: string
   lastSync?: number
   nextSync?: number
-  stats?: Record<string, any>
+  stats?: Record<string, string | number>
 }
 
 export default function IntegrationsPage() {
@@ -274,7 +274,7 @@ function IntegrationCard({ integration, onConfigure, onTest }: IntegrationCardPr
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            {Object.entries(integration.stats).map(([key, value]) => (
+            {Object.entries((integration.stats ?? {}) as Record<string, string | number>).map(([key, value]) => (
               <div key={key}>
                 <p className="text-xs text-text-tertiary capitalize">{key}</p>
                 <p className="text-lg font-semibold text-emerald-400">{value}</p>

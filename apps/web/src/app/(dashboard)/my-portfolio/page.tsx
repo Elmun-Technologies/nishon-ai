@@ -293,7 +293,7 @@ export default function PortfolioDashboardPage() {
           {activeStep === 0 && (
             <div className="bg-surface-elevated border border-border rounded-2xl p-6">
               <AdAccountsConnection
-                onComplete={() => completeStep(0)}
+                onConnectionComplete={() => completeStep(0)}
               />
             </div>
           )}

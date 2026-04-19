@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { useI18n } from '@/i18n/use-i18n'
@@ -139,9 +140,9 @@ export default function DashboardPage() {
           <span>
             {t('dashboard.metaRealtimePrefix', 'Metrics are streamed in real-time from')} <span className="text-text-primary dark:text-text-secondary font-medium">Meta Ads</span>
           </span>
-          <a href="/settings/meta" className="text-blue-500 hover:text-blue-600 dark:text-blue-400 hover:underline ml-1">
+          <Link href="/settings/meta" className="text-blue-500 hover:text-blue-600 dark:text-blue-400 hover:underline ml-1">
             {t('dashboard.settingsLink', 'settings')} →
-          </a>
+          </Link>
         </div>
       )}
 

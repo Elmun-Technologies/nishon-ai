@@ -2,7 +2,10 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "rootDir": "src",
-    "paths": {}
+    "paths": {
+      "@performa/shared": ["../../packages/shared/dist"],
+      "@performa/ai-sdk": ["../../packages/ai-sdk/dist"]
+    }
   },
   "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]
 }

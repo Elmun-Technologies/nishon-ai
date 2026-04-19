@@ -40,6 +40,12 @@ const specialists = [
   },
 ]
 
+const marketplaceStats: Array<{ value: string; label: string; icon: typeof Users }> = [
+  { value: '150+', label: 'Specialists', icon: Users },
+  { value: '4.8', label: 'Avg rating', icon: Star },
+  { value: '3.9x', label: 'Avg ROAS', icon: TrendingUp },
+]
+
 export default function MarketplacePage() {
   return (
     <main className="min-h-screen bg-surface text-text-primary">
@@ -62,12 +68,7 @@ export default function MarketplacePage() {
               </p>
             </div>
             <div className="grid grid-cols-3 gap-3">
-              {[
-                ['150+', 'Specialists', Users],
-                ['4.8', 'Avg rating', Star],
-                ['3.9x', 'Avg ROAS', TrendingUp],
-              ].map(([value, label, Icon]) => {
-                const StatIcon = Icon as typeof Users
+              {marketplaceStats.map(({ value, label, icon: StatIcon }) => {
                 return (
                   <article key={label} className="rounded-2xl border border-white/10 bg-white/5 p-4">
                     <StatIcon className="mb-2 h-4 w-4 text-[#a3e635]" />

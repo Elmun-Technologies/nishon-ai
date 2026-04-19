@@ -117,7 +117,7 @@ export class PerformanceSyncService {
       // Create sync log
       const syncLog = this.syncLogRepo.create({
         agentProfileId: agentId,
-        syncType: 'full',
+        syncType: 'manual',
         status: 'in_progress',
         startedAt: new Date(),
       });

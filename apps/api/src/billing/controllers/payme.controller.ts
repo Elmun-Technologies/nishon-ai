@@ -29,7 +29,7 @@ export class PaymeController {
   async handleWebhook(
     @Body() body: any,
     @Headers('authorization') authHeader: string,
-  ) {
+  ): Promise<Record<string, any>> {
     // Verify Payme Basic Auth
     if (!this.paymeService.verifyAuth(authHeader)) {
       this.logger.warn(`Payme auth failed from webhook`)

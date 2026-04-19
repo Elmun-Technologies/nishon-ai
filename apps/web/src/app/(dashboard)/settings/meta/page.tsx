@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import Link from 'next/link'
 import {
   connectMeta,
   fetchMetaDashboard,
@@ -668,7 +669,7 @@ function MetaPageHeader() {
   return (
     <div>
       <div className="flex items-center gap-2 text-xs text-text-tertiary mb-4">
-        <a href="/settings" className="hover:text-text-primary transition-colors">Settings</a>
+        <Link href="/settings" className="hover:text-text-primary transition-colors">Settings</Link>
         <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path d="M9 18l6-6-6-6" />
         </svg>
