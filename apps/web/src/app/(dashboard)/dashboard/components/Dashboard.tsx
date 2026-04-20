@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import { DateRangeFilter } from '@/components/filters/DateRangeFilter'
 import { LineChart, BarChart } from '@/components/ui/Charts'
 
 const MOCK_CAMPAIGNS = [
@@ -31,6 +32,17 @@ export function Dashboard() {
     timeRange: '7d',
     platform: 'all',
   })
+  const [customFromDate, setCustomFromDate] = useState('')
+  const [customToDate, setCustomToDate] = useState('')
+
+  const dashboardTimePresets = useMemo(
+    () => [
+      { id: '7d', label: '7 days' },
+      { id: '30d', label: '30 days' },
+      { id: '90d', label: '90 days' },
+    ],
+    [],
+  )
 
   const filteredCampaigns = useMemo(() => {
     if (filters.platform === 'all') return MOCK_CAMPAIGNS
@@ -56,18 +68,17 @@ export function Dashboard() {
       </div>
 
       {/* Time Range Filter */}
-      <div className="flex gap-2">
-        {['7d', '30d', '90d'].map(range => (
-          <Button
-            key={range}
-            onClick={() => setFilters(prev => ({ ...prev, timeRange: range }))}
-            variant={filters.timeRange === range ? 'primary' : 'secondary'}
-            size="sm"
-          >
-            {range === '7d' ? '7 days' : range === '30d' ? '30 days' : '90 days'}
-          </Button>
-        ))}
-      </div>
+      <DateRangeFilter
+        variant="pills"
+        value={filters.timeRange}
+        onValueChange={(id) => setFilters((prev) => ({ ...prev, timeRange: id }))}
+        presets={dashboardTimePresets}
+        fromDate={customFromDate}
+        toDate={customToDate}
+        onFromDateChange={setCustomFromDate}
+        onToDateChange={setCustomToDate}
+        dateInputClassName="rounded-lg border border-border bg-surface px-3 py-1.5 text-sm text-text-primary"
+      />
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

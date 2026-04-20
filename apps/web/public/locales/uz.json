@@ -31,7 +31,9 @@
     "less": "Kamroq",
     "all": "Barchasi",
     "refresh": "Yangilash",
-    "apply": "Qo'llash"
+    "apply": "Qo'llash",
+    "customRange": "Maxsus davr",
+    "customRangeShort": "Dan — gacha"
   },
   "navigation": {
     "home": "Asosiy sahifa",

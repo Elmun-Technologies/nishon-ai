@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { DateRangeFilter } from "@/components/filters/DateRangeFilter";
 
 interface AssetRow {
   id: string;
@@ -205,6 +206,18 @@ export function AdsManagerPanel() {
   >("campaigns");
   const [preset, setPreset] = useState("default");
   const [dateRange, setDateRange] = useState("last7");
+  const [customFromDate, setCustomFromDate] = useState("");
+  const [customToDate, setCustomToDate] = useState("");
+  const adsManagerDatePresets = useMemo(
+    () => [
+      { id: "today", label: "Today" },
+      { id: "last3", label: "Last 3 Days" },
+      { id: "last7", label: "Last 7 Days" },
+      { id: "last14", label: "Last 14 Days" },
+      { id: "last30", label: "Last 30 Days" },
+    ],
+    [],
+  );
   const [hoveredAction, setHoveredAction] = useState<string | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
   const [audienceView, setAudienceView] = useState<
@@ -297,17 +310,18 @@ export function AdsManagerPanel() {
                   <option value="only-retargeting">Only Retargeting & Retention</option>
                   <option value="active-adsets">Active Ad Sets</option>
                 </select>
-                <select
+                <DateRangeFilter
+                  variant="select"
                   value={dateRange}
-                  onChange={(e) => setDateRange(e.target.value)}
-                  className="rounded-lg border border-border bg-surface px-3 py-1.5 text-sm"
-                >
-                  <option value="today">Today</option>
-                  <option value="last3">Last 3 Days</option>
-                  <option value="last7">Last 7 Days</option>
-                  <option value="last14">Last 14 Days</option>
-                  <option value="last30">Last 30 Days</option>
-                </select>
+                  onValueChange={setDateRange}
+                  presets={adsManagerDatePresets}
+                  fromDate={customFromDate}
+                  toDate={customToDate}
+                  onFromDateChange={setCustomFromDate}
+                  onToDateChange={setCustomToDate}
+                  selectClassName="rounded-lg border border-border bg-surface px-3 py-1.5 text-sm"
+                  dateInputClassName="rounded-lg border border-border bg-surface px-3 py-1.5 text-sm"
+                />
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
                 {([

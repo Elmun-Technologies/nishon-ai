@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import { DateRangeFilter } from '@/components/filters/DateRangeFilter'
 import { Users } from 'lucide-react'
 import Link from 'next/link'
 import { useI18n } from '@/i18n/use-i18n'
@@ -10,6 +11,17 @@ import { PageHeader } from '@/components/ui'
 export default function AudienceStudioPage() {
   const { t } = useI18n()
   const [tab, setTab] = useState<'performance' | 'discover'>('performance')
+  const [range, setRange] = useState('last7')
+  const [customFromDate, setCustomFromDate] = useState('')
+  const [customToDate, setCustomToDate] = useState('')
+
+  const studioRangePresets = useMemo(
+    () => [
+      { id: 'last7', label: t('audiences.studioLast7d', 'Last 7 days') },
+      { id: 'last30', label: t('audiences.studioLast30d', 'Last 30 days') },
+    ],
+    [t],
+  )
 
   return (
     <div className="space-y-5 max-w-7xl pb-8">
@@ -57,9 +69,18 @@ export default function AudienceStudioPage() {
             placeholder={t('audiences.studioSearchPlaceholder', 'Search audiences…')}
             className="flex-1 min-w-[200px] rounded-xl border border-border bg-surface px-4 py-2.5 text-sm outline-none focus:border-violet-500/50"
           />
-          <select className="rounded-xl border border-border bg-surface px-3 py-2.5 text-sm">
-            <option>{t('audiences.studioLast7d', 'Last 7 days')}</option>
-          </select>
+          <DateRangeFilter
+            variant="select"
+            value={range}
+            onValueChange={setRange}
+            presets={studioRangePresets}
+            fromDate={customFromDate}
+            toDate={customToDate}
+            onFromDateChange={setCustomFromDate}
+            onToDateChange={setCustomToDate}
+            selectClassName="rounded-xl border border-border bg-surface px-3 py-2.5 text-sm"
+            dateInputClassName="rounded-xl border border-border bg-surface px-3 py-2.5 text-sm"
+          />
         </div>
         <div className="rounded-xl border border-border overflow-hidden">
           <table className="w-full text-sm text-left">

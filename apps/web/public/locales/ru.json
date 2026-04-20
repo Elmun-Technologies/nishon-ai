@@ -31,7 +31,9 @@
     "less": "Меньше",
     "all": "Все",
     "refresh": "Обновить",
-    "apply": "Применить"
+    "apply": "Применить",
+    "customRange": "Произвольный период",
+    "customRangeShort": "С — по"
   },
   "navigation": {
     "home": "Главная",

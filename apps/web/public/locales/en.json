@@ -31,7 +31,9 @@
     "less": "Less",
     "all": "All",
     "refresh": "Refresh",
-    "apply": "Apply"
+    "apply": "Apply",
+    "customRange": "Custom range",
+    "customRangeShort": "From - To"
   },
   "navigation": {
     "home": "Home",

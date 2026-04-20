@@ -1,6 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
+import { daysBetweenInclusive } from '@/lib/date-range'
+import { DateRangeFilter } from '@/components/filters/DateRangeFilter'
 import { TrendingUp, DollarSign, Target, Zap } from 'lucide-react'
 
 interface RevenueDashboardProps {
@@ -34,10 +36,18 @@ interface Trend {
 
 export function RevenueDashboard({ connectionId, integrationName }: RevenueDashboardProps) {
   const [timeRange, setTimeRange] = useState('30')
+  const [customFromDate, setCustomFromDate] = useState('')
+  const [customToDate, setCustomToDate] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [attribution, setAttribution] = useState<Attribution | null>(null)
   const [trends, setTrends] = useState<Trend[]>([])
+
+  const effectiveDays = useMemo(() => {
+    if (timeRange !== 'custom') return timeRange
+    const d = daysBetweenInclusive(customFromDate, customToDate)
+    return d != null ? String(d) : '30'
+  }, [timeRange, customFromDate, customToDate])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -75,7 +85,7 @@ export function RevenueDashboard({ connectionId, integrationName }: RevenueDashb
 
         // Fetch trends data
         const trendsRes = await fetch(
-          `/api/integrations/${connectionId}/revenue/trends?days=${timeRange}`,
+          `/api/integrations/${connectionId}/revenue/trends?days=${effectiveDays}`,
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -130,7 +140,7 @@ export function RevenueDashboard({ connectionId, integrationName }: RevenueDashb
     if (connectionId) {
       fetchData()
     }
-  }, [connectionId, timeRange])
+  }, [connectionId, effectiveDays])
 
   if (loading) {
     return (
@@ -178,19 +188,24 @@ export function RevenueDashboard({ connectionId, integrationName }: RevenueDashb
           </h2>
           <p className="text-text-secondary mt-2">Track ROAS from ad spend to closed deals</p>
         </div>
-        <div className="flex items-center gap-2">
-          <select
-            value={timeRange}
-            onChange={(e) => setTimeRange(e.target.value)}
-            className="px-4 py-2 rounded-lg bg-surface-2 border border-white/10 text-text-primary"
-            disabled={loading}
-          >
-            <option value="7">Last 7 days</option>
-            <option value="30">Last 30 days</option>
-            <option value="90">Last 90 days</option>
-            <option value="all">All time</option>
-          </select>
-        </div>
+        <DateRangeFilter
+          variant="select"
+          value={timeRange}
+          onValueChange={setTimeRange}
+          presets={[
+            { id: '7', label: 'Last 7 days' },
+            { id: '30', label: 'Last 30 days' },
+            { id: '90', label: 'Last 90 days' },
+            { id: 'all', label: 'All time' },
+          ]}
+          fromDate={customFromDate}
+          toDate={customToDate}
+          onFromDateChange={setCustomFromDate}
+          onToDateChange={setCustomToDate}
+          disabled={loading}
+          selectClassName="px-4 py-2 rounded-lg bg-surface-2 border border-white/10 text-text-primary"
+          dateInputClassName="px-3 py-2 rounded-lg bg-surface-2 border border-white/10 text-text-primary text-sm"
+        />
       </div>
 
       {/* Summary Cards */}

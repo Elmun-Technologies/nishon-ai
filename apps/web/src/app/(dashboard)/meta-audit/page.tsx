@@ -6,6 +6,8 @@ import { Compass, Filter, RefreshCw, Search, X } from 'lucide-react'
 import { useI18n } from '@/i18n/use-i18n'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { meta as metaApi } from '@/lib/api-client'
+import { daysBetweenInclusive } from '@/lib/date-range'
+import { DateRangeFilter } from '@/components/filters/DateRangeFilter'
 import { PageHeader, Button, Dialog, Alert } from '@/components/ui'
 import { cn, formatCurrency, formatNumber } from '@/lib/utils'
 
@@ -116,9 +118,17 @@ const STATUS_BADGE: Record<string, string> = {
   ARCHIVED: 'text-text-tertiary bg-surface-2',
 }
 
-function daysForDateRange(range: '7' | '30' | 'month'): number {
+function daysForDateRange(
+  range: '7' | '30' | 'month' | 'custom',
+  fromDate?: string,
+  toDate?: string,
+): number {
   if (range === '7') return 7
   if (range === '30') return 30
+  if (range === 'custom') {
+    const d = daysBetweenInclusive(fromDate ?? '', toDate ?? '')
+    return d ?? 7
+  }
   const d = new Date()
   return Math.max(1, d.getDate())
 }
@@ -285,7 +295,9 @@ export default function MetaAuditPage() {
   const [minSpend, setMinSpend] = useState('0')
   const [maxSpend, setMaxSpend] = useState('0')
   const [gradedBy, setGradedBy] = useState('leads')
-  const [dateRange, setDateRange] = useState<'7' | '30' | 'month'>('7')
+  const [dateRange, setDateRange] = useState<'7' | '30' | 'month' | 'custom'>('7')
+  const [customFromDate, setCustomFromDate] = useState('')
+  const [customToDate, setCustomToDate] = useState('')
   const [kpi, setKpi] = useState<KpiMode>('roas')
   const [persona, setPersona] = useState<'owner' | 'specialist'>('owner')
   const [preset, setPreset] = useState('')
@@ -300,7 +312,19 @@ export default function MetaAuditPage() {
   const [liveLoading, setLiveLoading] = useState(false)
   const [liveError, setLiveError] = useState('')
 
-  const reportingDays = useMemo(() => daysForDateRange(dateRange), [dateRange])
+  const reportingDays = useMemo(
+    () => daysForDateRange(dateRange, customFromDate, customToDate),
+    [dateRange, customFromDate, customToDate],
+  )
+
+  const metaAuditDatePresets = useMemo(
+    () => [
+      { id: '7', label: t('metaAudit.date7', 'Last 7 days') },
+      { id: '30', label: t('metaAudit.date30', 'Last 30 days') },
+      { id: 'month', label: t('metaAudit.dateMonth', 'This month') },
+    ],
+    [t],
+  )
 
   const loadReporting = useCallback(() => {
     if (!currentWorkspace?.id) {
@@ -402,8 +426,21 @@ export default function MetaAuditPage() {
   const dateLabel = useMemo(() => {
     if (dateRange === '7') return t('metaAudit.date7', 'Last 7 days')
     if (dateRange === '30') return t('metaAudit.date30', 'Last 30 days')
+    if (dateRange === 'custom') {
+      if (customFromDate && customToDate) return `${customFromDate} → ${customToDate}`
+      return t('metaAudit.dateCustom', 'Custom range')
+    }
     return t('metaAudit.dateMonth', 'This month')
-  }, [dateRange, t])
+  }, [dateRange, customFromDate, customToDate, t])
+
+  const sampleSpendMultiplier =
+    dateRange === '7'
+      ? 1
+      : dateRange === '30'
+        ? 3.2
+        : dateRange === 'custom'
+          ? Math.max(reportingDays / 7, 1)
+          : 4.5
 
   const filteredLiveRows = useMemo(() => {
     let list = liveRows
@@ -685,15 +722,18 @@ export default function MetaAuditPage() {
                 <RefreshCw className={cn('h-3.5 w-3.5', liveLoading && 'animate-spin')} />
                 {t('common.refresh', 'Refresh')}
               </Button>
-              <select
+              <DateRangeFilter
+                variant="select"
                 value={dateRange}
-                onChange={(e) => setDateRange(e.target.value as typeof dateRange)}
-                className="rounded-xl border border-brand-mid/20 bg-surface px-3 py-2 text-xs font-medium text-text-primary shadow-sm focus:border-brand-mid focus:outline-none focus:ring-2 focus:ring-brand-lime/40"
-              >
-                <option value="7">{t('metaAudit.date7', 'Last 7 days')}</option>
-                <option value="30">{t('metaAudit.date30', 'Last 30 days')}</option>
-                <option value="month">{t('metaAudit.dateMonth', 'This month')}</option>
-              </select>
+                onValueChange={(id) => setDateRange(id as typeof dateRange)}
+                presets={metaAuditDatePresets}
+                fromDate={customFromDate}
+                toDate={customToDate}
+                onFromDateChange={setCustomFromDate}
+                onToDateChange={setCustomToDate}
+                selectClassName="rounded-xl border border-brand-mid/20 bg-surface px-3 py-2 text-xs font-medium text-text-primary shadow-sm focus:border-brand-mid focus:outline-none focus:ring-2 focus:ring-brand-lime/40"
+                dateInputClassName="rounded-xl border border-brand-mid/20 bg-surface px-3 py-2 text-xs font-medium text-text-primary shadow-sm focus:border-brand-mid focus:outline-none focus:ring-2 focus:ring-brand-lime/40"
+              />
               <span className="hidden text-xs text-text-tertiary sm:inline">
                 {dateLabel}
                 {lastRefresh && (
@@ -934,7 +974,7 @@ export default function MetaAuditPage() {
                 <div className="rounded-xl border border-border bg-surface p-4 shadow-sm">
                   <p className="text-xs font-medium text-text-tertiary">{t('metaAudit.kpiSpend', 'Amount spent')}</p>
                   <p className="mt-1 text-2xl font-bold tabular-nums text-text-primary">
-                    ${(13270 * (dateRange === '7' ? 1 : dateRange === '30' ? 3.2 : 4.5)).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                    ${(13270 * sampleSpendMultiplier).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                   </p>
                   <p className="mt-1 text-[11px] text-text-tertiary">{dateLabel}</p>
                 </div>

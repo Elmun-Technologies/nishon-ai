@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronDown, Link2 } from "lucide-react";
 import { useWorkspaceStore } from "@/stores/workspace.store";
@@ -17,6 +17,7 @@ import { campaigns as campaignsApi } from "@/lib/api-client";
 import { formatCurrency, timeAgo } from "@/lib/utils";
 import { CreateCampaignForm } from "@/components/campaigns/CreateCampaignForm";
 import { AdsManagerPanel } from "@/components/campaigns/AdsManagerPanel";
+import { DateRangeFilter } from "@/components/filters/DateRangeFilter";
 
 interface Campaign {
   id: string;
@@ -58,6 +59,18 @@ export default function CampaignsPage() {
   const [dateRange, setDateRange] = useState("last7");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
+
+  const campaignLoadRangePresets = useMemo(
+    () => [
+      { id: "today", label: "Today" },
+      { id: "yesterday", label: "Yesterday" },
+      { id: "last3", label: "Last 3 days" },
+      { id: "last7", label: "Last 7 days" },
+      { id: "last14", label: "Last 14 days" },
+      { id: "last30", label: "Last 30 days" },
+    ],
+    [],
+  );
 
   const fetchCampaigns = useCallback(async () => {
     if (!currentWorkspace?.id) return;
@@ -182,35 +195,18 @@ export default function CampaignsPage() {
             <option value="retargeting">Retargeting</option>
           </select>
           <label className="ml-2 text-xs text-text-tertiary">Range</label>
-          <select
+          <DateRangeFilter
+            variant="select"
             value={dateRange}
-            onChange={(e) => setDateRange(e.target.value)}
-            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary"
-          >
-            <option value="today">Today</option>
-            <option value="yesterday">Yesterday</option>
-            <option value="last3">Last 3 days</option>
-            <option value="last7">Last 7 days</option>
-            <option value="last14">Last 14 days</option>
-            <option value="last30">Last 30 days</option>
-            <option value="custom">Custom</option>
-          </select>
-          {dateRange === "custom" && (
-            <>
-              <input
-                type="date"
-                value={fromDate}
-                onChange={(e) => setFromDate(e.target.value)}
-                className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary"
-              />
-              <input
-                type="date"
-                value={toDate}
-                onChange={(e) => setToDate(e.target.value)}
-                className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary"
-              />
-            </>
-          )}
+            onValueChange={setDateRange}
+            presets={campaignLoadRangePresets}
+            fromDate={fromDate}
+            toDate={toDate}
+            onFromDateChange={setFromDate}
+            onToDateChange={setToDate}
+            selectClassName="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary"
+            dateInputClassName="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary"
+          />
           <Button size="sm" className="ml-auto">
             Update
           </Button>
