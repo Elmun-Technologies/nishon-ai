@@ -22,7 +22,7 @@ export type AgentTask =
   | 'landing-page'  // Full HTML landing page generation — large output needed
   | 'chat'          // Conversational assistant — fast, friendly, concise
 
-/** Model assigned per task type */
+/** Model assigned per task type (OpenAI) */
 export const TASK_MODELS: Record<AgentTask, string> = {
   strategy:      'gpt-4o',       // Strongest reasoning for complex planning
   competitor:    'gpt-4o',       // Deep multi-category analysis (72 sub-params)
@@ -32,6 +32,33 @@ export const TASK_MODELS: Record<AgentTask, string> = {
   optimization:  'gpt-4o-mini',  // Data-driven decisions, needs low variance
   'landing-page':'gpt-4o',       // Full HTML page — needs quality & large output
   chat:          'gpt-4o-mini',  // Fast conversational responses
+}
+
+/** Anthropic model IDs per task (when `AI_PROVIDER=anthropic`). */
+export const TASK_MODELS_ANTHROPIC: Record<AgentTask, string> = {
+  strategy:       'claude-3-7-sonnet-20250219',
+  competitor:     'claude-3-7-sonnet-20250219',
+  creative:       'claude-3-5-sonnet-20241022',
+  analytics:      'claude-3-5-sonnet-20241022',
+  vision:         'claude-3-5-sonnet-20241022',
+  optimization:   'claude-3-5-sonnet-20241022',
+  'landing-page': 'claude-3-7-sonnet-20250219',
+  chat:           'claude-3-5-sonnet-20241022',
+}
+
+/**
+ * Meta Llama (OpenAI-compatible) model IDs per task when `AI_PROVIDER=meta`.
+ * Override host-specific names with `META_AI_MODEL` (single model for all tasks).
+ */
+export const TASK_MODELS_META: Record<AgentTask, string> = {
+  strategy:       'Llama-3.3-70B-Instruct',
+  competitor:     'Llama-3.3-70B-Instruct',
+  creative:       'Llama-3.3-8B-Instruct',
+  analytics:      'Llama-3.3-8B-Instruct',
+  vision:         'Llama-3.3-70B-Instruct',
+  optimization:   'Llama-3.3-8B-Instruct',
+  'landing-page': 'Llama-3.3-70B-Instruct',
+  chat:           'Llama-3.3-8B-Instruct',
 }
 
 /** Max output tokens per task — hard ceiling to prevent cost overruns */
@@ -46,8 +73,17 @@ export const TASK_TOKEN_LIMITS: Record<AgentTask, number> = {
   chat:          600,   // Short conversational replies
 }
 
-/** Returns the recommended model for the given task type */
-export function getModelByTask(task: AgentTask): string {
+/** LLM vendor configured via `AI_PROVIDER` */
+export type ModelRouterProvider = 'openai' | 'anthropic' | 'meta'
+
+/** Returns the recommended model for the given task type and LLM provider */
+export function getModelByTask(task: AgentTask, provider: ModelRouterProvider = 'openai'): string {
+  if (provider === 'anthropic') {
+    return TASK_MODELS_ANTHROPIC[task] ?? 'claude-3-5-sonnet-20241022'
+  }
+  if (provider === 'meta') {
+    return TASK_MODELS_META[task] ?? 'Llama-3.3-70B-Instruct'
+  }
   return TASK_MODELS[task] ?? 'gpt-4o-mini'
 }
 

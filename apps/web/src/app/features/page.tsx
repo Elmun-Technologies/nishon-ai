@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight, BarChart3, Brain, CreditCard, Crown, GitBranch, Layers3, Rocket, Search, Settings2, Shield, Sparkles, Target, Users, Wallet } from 'lucide-react'
 import { PublicContainer, PublicFooter, PublicNavbar } from '@/components/public/PublicLayout'
+import { ContentMediaSlot } from '@/components/media/ContentMediaSlot'
 import { useI18n } from '@/i18n/use-i18n'
 
 const GROUP_ORDER = ['execution', 'aiOpt', 'analytics', 'governance'] as const
@@ -104,6 +105,14 @@ export default function FeaturesPage() {
               ))}
             </div>
           </div>
+          <div className="mt-6">
+            <ContentMediaSlot
+              slotId="public-features-hero-media"
+              ratio="21:9"
+              imageSrc="/stock/features-demo.svg"
+              caption={t('preAuthOnboarding.mediaSlotCaption', 'Illustration / motion')}
+            />
+          </div>
         </PublicContainer>
       </section>
 
@@ -155,6 +164,13 @@ export default function FeaturesPage() {
 
       <section className="border-t border-border bg-[#f8fbf2] py-14">
         <PublicContainer>
+          <ContentMediaSlot
+            slotId="public-features-pillar-media"
+            ratio="16:9"
+            imageSrc="/stock/features-demo.svg"
+            caption={t('preAuthOnboarding.mediaSlotCaption', 'Illustration / motion')}
+            className="mb-6"
+          />
           <div className="grid gap-4 md:grid-cols-3">
             {pillars.map(([title, desc]) => (
               <article key={title} className="rounded-2xl border border-border bg-white p-5">

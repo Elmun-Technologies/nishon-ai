@@ -4,10 +4,12 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Workspace } from "../workspaces/entities/workspace.entity";
 import {
-  AdSpectrAiClient,
+  createAdSpectrAiClientFromEnv,
+  isAiClientConfigured,
   buildStrategyPrompt,
   STRATEGY_SYSTEM_PROMPT,
 } from "@adspectr/ai-sdk";
+import type { AdSpectrAiClient } from "@adspectr/ai-sdk";
 
 export interface StrategyInput {
   businessName: string;
@@ -97,24 +99,22 @@ export interface StrategyResult {
 @Injectable()
 export class StrategyEngineService {
   private readonly logger = new Logger(StrategyEngineService.name);
-  private readonly aiClient: AdSpectrAiClient;
+  private readonly aiClient?: AdSpectrAiClient;
 
   constructor(
     private readonly config: ConfigService,
     @InjectRepository(Workspace)
     private readonly workspaceRepo: Repository<Workspace>,
   ) {
-    const provider = this.config.get<string>("AI_PROVIDER", "openai").toLowerCase() === "anthropic"
-      ? "anthropic"
-      : "openai";
-    const apiKey = provider === "anthropic"
-      ? this.config.get<string>("ANTHROPIC_API_KEY", "")
-      : this.config.get<string>("OPENAI_API_KEY", "");
-    const baseURL = provider === "anthropic"
-      ? this.config.get<string>("ANTHROPIC_BASE_URL", "")
-      : this.config.get<string>("OPENAI_BASE_URL", "");
-    if (apiKey) {
-      this.aiClient = new AdSpectrAiClient(apiKey, baseURL || undefined, provider);
+    const get = (k: string) => this.config.get<string>(k);
+    if (isAiClientConfigured(get)) {
+      try {
+        this.aiClient = createAdSpectrAiClientFromEnv(get);
+      } catch (e: any) {
+        this.logger.warn(
+          `AI client init failed — strategy generation unavailable: ${e?.message ?? e}`,
+        );
+      }
     } else {
       this.logger.warn("AI provider API key is not configured — AI strategy generation will be unavailable");
     }

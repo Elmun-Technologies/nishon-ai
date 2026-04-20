@@ -11,11 +11,13 @@ import { ConfigService } from "@nestjs/config";
 import { LandingPage } from "./entities/landing-page.entity";
 import { Workspace } from "../workspaces/entities/workspace.entity";
 import {
-  AdSpectrAiClient,
+  createAdSpectrAiClientFromEnv,
+  isAiClientConfigured,
   LANDING_PAGE_SYSTEM_PROMPT,
   buildLandingPagePrompt,
   type LandingPageTemplateId,
 } from "@adspectr/ai-sdk";
+import type { AdSpectrAiClient } from "@adspectr/ai-sdk";
 import type { GenerateLandingPageDto } from "./dto/generate-landing-page.dto";
 
 const LP_IMAGE_SUMMARY_SYSTEM = `You summarize images for an Uzbek-language landing page.
@@ -56,7 +58,7 @@ function generateSlug(name: string): string {
 @Injectable()
 export class LandingPagesService {
   private readonly logger = new Logger(LandingPagesService.name);
-  private readonly aiClient: AdSpectrAiClient;
+  private readonly aiClient?: AdSpectrAiClient;
 
   constructor(
     @InjectRepository(LandingPage)
@@ -65,17 +67,13 @@ export class LandingPagesService {
     private readonly workspaceRepo: Repository<Workspace>,
     private readonly config: ConfigService,
   ) {
-    const provider = this.config.get<string>("AI_PROVIDER", "openai").toLowerCase() === "anthropic"
-      ? "anthropic"
-      : "openai";
-    const apiKey = provider === "anthropic"
-      ? this.config.get<string>("ANTHROPIC_API_KEY", "")
-      : this.config.get<string>("OPENAI_API_KEY", "");
-    const baseURL = provider === "anthropic"
-      ? this.config.get<string>("ANTHROPIC_BASE_URL", "")
-      : this.config.get<string>("OPENAI_BASE_URL", "");
-    if (apiKey) {
-      this.aiClient = new AdSpectrAiClient(apiKey, baseURL || undefined, provider);
+    const get = (k: string) => this.config.get<string>(k);
+    if (isAiClientConfigured(get)) {
+      try {
+        this.aiClient = createAdSpectrAiClientFromEnv(get);
+      } catch (e: any) {
+        this.logger.warn(`AI client init failed — landing page AI disabled: ${e?.message ?? e}`);
+      }
     }
   }
 

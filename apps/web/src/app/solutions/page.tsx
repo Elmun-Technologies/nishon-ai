@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight, CheckCircle2, LineChart, ShieldCheck, Workflow } from 'lucide-react'
 import { PublicContainer, PublicFooter, PublicNavbar } from '@/components/public/PublicLayout'
+import { ContentMediaSlot } from '@/components/media/ContentMediaSlot'
 import { useI18n } from '@/i18n/use-i18n'
 
 const TRACK_ORDER = ['ecommerce', 'agency', 'inhouse'] as const
@@ -59,6 +60,14 @@ export default function SolutionsPage() {
               </ul>
             </div>
           </div>
+          <div className="mt-6">
+            <ContentMediaSlot
+              slotId="public-solutions-hero-media"
+              ratio="21:9"
+              imageSrc="/stock/solutions-demo.svg"
+              caption={t('preAuthOnboarding.mediaSlotCaption', 'Illustration / motion')}
+            />
+          </div>
         </PublicContainer>
       </section>
 
@@ -97,6 +106,13 @@ export default function SolutionsPage() {
 
       <section className="border-y border-border bg-[#f8fbf2] py-14">
         <PublicContainer>
+          <ContentMediaSlot
+            slotId="public-solutions-steps-media"
+            ratio="16:9"
+            imageSrc="/stock/solutions-demo.svg"
+            caption={t('preAuthOnboarding.mediaSlotCaption', 'Illustration / motion')}
+            className="mb-6"
+          />
           <div className="grid gap-4 md:grid-cols-3">
             {steps.map(([step, title, desc]) => (
               <article key={title} className="rounded-2xl border border-border bg-white p-6">

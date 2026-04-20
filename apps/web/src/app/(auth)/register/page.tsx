@@ -9,7 +9,13 @@ import { PageSpinner } from '@/components/ui/Spinner'
 import { auth } from '@/lib/api-client'
 import { useI18n } from '@/i18n/use-i18n'
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher'
-import { clearPreAuthOnboarding, isPreAuthOnboardingComplete, loadPreAuthOnboardingDraft } from '@/lib/pre-auth-onboarding'
+import {
+  CHANNEL_COLORS,
+  CHANNEL_KEYS,
+  clearPreAuthOnboarding,
+  isPreAuthOnboardingComplete,
+  loadPreAuthOnboardingDraft,
+} from '@/lib/pre-auth-onboarding'
 
 export default function RegisterPage() {
   const { t } = useI18n()
@@ -127,15 +133,21 @@ export default function RegisterPage() {
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-text-tertiary">{p('summarySplit', 'Platform mix')}</dt>
+                  <dt className="text-text-tertiary">{p('summarySplit', 'Channel mix')}</dt>
                   <dd className="mt-2">
-                    <div className="flex h-2 overflow-hidden rounded-full bg-border/50">
-                      <div className="bg-[#1877F2]" style={{ width: `${draft.platformSplit.meta}%` }} />
-                      <div className="bg-[#4285F4]" style={{ width: `${draft.platformSplit.google}%` }} />
-                      <div className="bg-[#FC3F1D]" style={{ width: `${draft.platformSplit.yandex}%` }} />
+                    <div className="flex h-2 min-h-[8px] overflow-hidden rounded-full bg-border/50">
+                      {CHANNEL_KEYS.map((k) => (
+                        <div
+                          key={k}
+                          className="min-w-0"
+                          style={{ width: `${draft.channelSplit[k]}%`, backgroundColor: CHANNEL_COLORS[k] }}
+                        />
+                      ))}
                     </div>
-                    <p className="mt-1.5 text-xs text-text-secondary">
-                      Meta {draft.platformSplit.meta}% · Google {draft.platformSplit.google}% · Yandex {draft.platformSplit.yandex}%
+                    <p className="mt-1.5 text-xs leading-relaxed text-text-secondary">
+                      {CHANNEL_KEYS.filter((k) => draft.channelSplit[k] > 0)
+                        .map((k) => `${p(`splitChannel.${k}`, k)} ${draft.channelSplit[k]}%`)
+                        .join(' · ') || '—'}
                     </p>
                   </dd>
                 </div>

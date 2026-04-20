@@ -10,7 +10,12 @@ import { ConnectedAccount } from "../platforms/entities/connected-account.entity
 import { MetaConnector } from "../platforms/connectors/meta.connector";
 import { GoogleConnector } from "../platforms/connectors/google.connector";
 import { TiktokConnector } from "../platforms/connectors/tiktok.connector";
-import { AdSpectrAiClient, OPTIMIZATION_SYSTEM_PROMPT } from "@adspectr/ai-sdk";
+import {
+  createAdSpectrAiClientFromEnv,
+  isAiClientConfigured,
+  OPTIMIZATION_SYSTEM_PROMPT,
+} from "@adspectr/ai-sdk";
+import type { AdSpectrAiClient } from "@adspectr/ai-sdk";
 import {
   AiDecisionAction,
   AutopilotMode,
@@ -44,7 +49,7 @@ interface OptimizationDecision {
 @Injectable()
 export class DecisionLoopService {
   private readonly logger = new Logger(DecisionLoopService.name);
-  private readonly aiClient: AdSpectrAiClient;
+  private readonly aiClient?: AdSpectrAiClient;
 
   constructor(
     private readonly config: ConfigService,
@@ -60,17 +65,15 @@ export class DecisionLoopService {
     private readonly googleConnector: GoogleConnector,
     private readonly tiktokConnector: TiktokConnector,
   ) {
-    const provider = this.config.get<string>("AI_PROVIDER", "openai").toLowerCase() === "anthropic"
-      ? "anthropic"
-      : "openai";
-    const apiKey = provider === "anthropic"
-      ? this.config.get<string>("ANTHROPIC_API_KEY", "")
-      : this.config.get<string>("OPENAI_API_KEY", "");
-    const baseURL = provider === "anthropic"
-      ? this.config.get<string>("ANTHROPIC_BASE_URL", "")
-      : this.config.get<string>("OPENAI_BASE_URL", "");
-    if (apiKey) {
-      this.aiClient = new AdSpectrAiClient(apiKey, baseURL || undefined, provider);
+    const get = (k: string) => this.config.get<string>(k);
+    if (isAiClientConfigured(get)) {
+      try {
+        this.aiClient = createAdSpectrAiClientFromEnv(get);
+      } catch (e: any) {
+        this.logger.warn(
+          `AI client init failed — decision loop unavailable: ${e?.message ?? e}`,
+        );
+      }
     } else {
       this.logger.warn("AI provider API key is not configured — AI decision loop will be unavailable");
     }

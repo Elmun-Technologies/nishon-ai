@@ -1,12 +1,21 @@
 export { AdSpectrAiClient } from './openai-client'
-export type { CompleteOptions, CompleteResult, AiProvider } from './openai-client'
+export type {
+  CompleteOptions,
+  CompleteResult,
+  AiProvider,
+  AdSpectrAiClientOptions,
+} from './openai-client'
+export { createAdSpectrAiClientFromEnv, isAiClientConfigured } from './create-ai-client'
+export type { AiEnvGetter } from './create-ai-client'
 export {
   getModelByTask,
   getTokenLimitByTask,
   TASK_MODELS,
+  TASK_MODELS_ANTHROPIC,
+  TASK_MODELS_META,
   TASK_TOKEN_LIMITS,
 } from './model-router'
-export type { AgentTask } from './model-router'
+export type { AgentTask, ModelRouterProvider } from './model-router'
 export { STRATEGY_SYSTEM_PROMPT, buildStrategyPrompt } from './prompts/strategy.prompt'
 export { COMPETITOR_ANALYSIS_SYSTEM_PROMPT } from './prompts/competitor.prompt'
 export { SCRIPT_SYSTEM_PROMPT } from './prompts/script.prompt'

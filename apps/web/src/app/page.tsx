@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { ArrowRight, BarChart3, Brain, CheckCircle2, CreditCard, Layers3, Lock, Rocket, ShieldCheck, Sparkles, Users, Wallet } from 'lucide-react'
 import { PublicContainer, PublicFooter, PublicNavbar } from '@/components/public/PublicLayout'
+import { ContentMediaSlot } from '@/components/media/ContentMediaSlot'
 import { useI18n } from '@/i18n/use-i18n'
 
 const CORE_MODULES = [
@@ -78,13 +79,21 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
-            {stats.map((item) => (
-              <article key={item.l} className="rounded-2xl border border-border bg-white p-5">
-                <p className="text-2xl font-semibold">{item.v}</p>
-                <p className="mt-1 text-sm text-text-secondary">{item.l}</p>
-              </article>
-            ))}
+          <div className="space-y-3">
+            <ContentMediaSlot
+              slotId="public-home-hero-media"
+              ratio="16:9"
+              imageSrc="/stock/home-hero-demo.svg"
+              caption={t('preAuthOnboarding.mediaSlotCaption', 'Illustration / motion')}
+            />
+            <div className="grid gap-3 sm:grid-cols-2">
+              {stats.map((item) => (
+                <article key={item.l} className="rounded-2xl border border-border bg-white p-5">
+                  <p className="text-2xl font-semibold">{item.v}</p>
+                  <p className="mt-1 text-sm text-text-secondary">{item.l}</p>
+                </article>
+              ))}
+            </div>
           </div>
         </PublicContainer>
       </section>
@@ -227,6 +236,14 @@ export default function HomePage() {
               </div>
             </article>
           </div>
+          <div className="mt-6">
+            <ContentMediaSlot
+              slotId="public-home-security-media"
+              ratio="21:9"
+              imageSrc="/stock/security-demo.svg"
+              caption={t('preAuthOnboarding.mediaSlotCaption', 'Illustration / motion')}
+            />
+          </div>
         </PublicContainer>
       </section>
 
@@ -280,6 +297,14 @@ export default function HomePage() {
                 ))}
               </div>
             </div>
+          </div>
+          <div className="mt-6">
+            <ContentMediaSlot
+              slotId="public-home-final-cta-media"
+              ratio="16:9"
+              imageSrc="/stock/home-hero-demo.svg"
+              caption={t('preAuthOnboarding.mediaSlotCaption', 'Illustration / motion')}
+            />
           </div>
         </PublicContainer>
       </section>

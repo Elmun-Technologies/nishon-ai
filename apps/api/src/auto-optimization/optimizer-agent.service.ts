@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AdSpectrAiClient } from '@adspectr/ai-sdk';
+import { createAdSpectrAiClientFromEnv } from '@adspectr/ai-sdk';
+import type { AdSpectrAiClient } from '@adspectr/ai-sdk';
 import {
   CampaignPerformance,
   OptimizationGoal,
@@ -35,16 +36,7 @@ export class OptimizerAgentService {
   private readonly aiClient: AdSpectrAiClient;
 
   constructor(private readonly config: ConfigService) {
-    const provider = config.get<string>('AI_PROVIDER', 'openai').toLowerCase() === 'anthropic'
-      ? 'anthropic'
-      : 'openai';
-    const apiKey = provider === 'anthropic'
-      ? config.get<string>('ANTHROPIC_API_KEY', '')
-      : config.get<string>('OPENAI_API_KEY', '');
-    const baseURL = provider === 'anthropic'
-      ? config.get<string>('ANTHROPIC_BASE_URL', '')
-      : config.get<string>('OPENAI_BASE_URL', '');
-    this.aiClient = new AdSpectrAiClient(apiKey, baseURL || undefined, provider);
+    this.aiClient = createAdSpectrAiClientFromEnv((k) => config.get<string>(k));
   }
 
   // ─── Main optimization analysis ─────────────────────────────────────────────

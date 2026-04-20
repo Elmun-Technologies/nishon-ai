@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { ArrowRight, CheckCircle2, Search, SlidersHorizontal, Star, TrendingUp, Users } from 'lucide-react'
 import { PublicContainer, PublicFooter } from '@/components/public/PublicLayout'
+import { ContentMediaSlot } from '@/components/media/ContentMediaSlot'
 import { useI18n } from '@/i18n/use-i18n'
 
 const specialists = [
@@ -77,6 +78,14 @@ export default function MarketplacePage() {
               })}
             </div>
           </div>
+          <div className="mt-6">
+            <ContentMediaSlot
+              slotId="public-marketplace-hero-media"
+              ratio="21:9"
+              imageSrc="/stock/marketplace-demo.svg"
+              caption={t('preAuthOnboarding.mediaSlotCaption', 'Illustration / motion')}
+            />
+          </div>
         </PublicContainer>
       </section>
 
@@ -107,6 +116,13 @@ export default function MarketplacePage() {
 
       <section className="bg-surface py-4 pb-14">
         <PublicContainer>
+          <ContentMediaSlot
+            slotId="public-marketplace-catalog-media"
+            ratio="16:9"
+            imageSrc="/stock/marketplace-demo.svg"
+            caption={t('preAuthOnboarding.mediaSlotCaption', 'Illustration / motion')}
+            className="mb-6"
+          />
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {specialists.map((spec) => (
               <Link

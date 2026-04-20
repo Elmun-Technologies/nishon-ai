@@ -12,6 +12,21 @@ export type DashboardContentGateMode =
   | 'ad_account'
   | 'loading'
 
+function isDemoSession(params: {
+  accessToken?: string | null
+  email?: string | null
+  workspaceId?: string | null
+}): boolean {
+  const token = (params.accessToken || '').toLowerCase()
+  const email = (params.email || '').toLowerCase()
+  const workspaceId = (params.workspaceId || '').toLowerCase()
+  return (
+    token.startsWith('demo-token') ||
+    email === 'demo@adspectr.com' ||
+    workspaceId.includes('demo-workspace')
+  )
+}
+
 function isActiveAdAccountRow(a: {
   isActive?: boolean
   externalAccountId?: string | null
@@ -53,10 +68,15 @@ export function useDashboardContentGate(): {
 
   const workspaceId = currentWorkspace?.id
   const onboardingComplete = currentWorkspace?.isOnboardingComplete !== false
+  const demoBypass = isDemoSession({
+    accessToken,
+    email: user?.email,
+    workspaceId,
+  })
 
   /** Keep plan / trial / admin in sync after Payme or clock crossing trial end. */
   useEffect(() => {
-    if (!accessToken || accessToken.startsWith('demo-token')) return
+    if (!accessToken || demoBypass) return
 
     let cancelled = false
 
@@ -83,10 +103,10 @@ export function useDashboardContentGate(): {
       cancelled = true
       clearInterval(interval)
     }
-  }, [accessToken, patchUser])
+  }, [accessToken, demoBypass, patchUser])
 
   useEffect(() => {
-    if (!workspaceId || !accessToken || !onboardingComplete) {
+    if (!workspaceId || !accessToken || !onboardingComplete || demoBypass) {
       setHasAdAccount(null)
       setAccountsLoading(false)
       return
@@ -119,10 +139,14 @@ export function useDashboardContentGate(): {
     return () => {
       cancelled = true
     }
-  }, [workspaceId, onboardingComplete, accessToken, user?.plan, user?.trialEndsAt, user?.isAdmin])
+  }, [workspaceId, onboardingComplete, accessToken, user?.plan, user?.trialEndsAt, user?.isAdmin, demoBypass])
 
   return useMemo(() => {
     if (!workspaceId) {
+      return { mode: 'none' as const, showBlur: false }
+    }
+
+    if (demoBypass) {
       return { mode: 'none' as const, showBlur: false }
     }
 
@@ -153,6 +177,7 @@ export function useDashboardContentGate(): {
     return { mode: 'none' as const, showBlur: false }
   }, [
     workspaceId,
+    demoBypass,
     pathname,
     user,
     onboardingComplete,

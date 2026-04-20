@@ -13,10 +13,12 @@ import { AutopilotMode, AiDecisionAction, Platform, CampaignStatus } from "@adsp
 
 const mockCompleteJson = jest.fn();
 
+const mockDecisionAiClient = { completeJson: mockCompleteJson };
+
 jest.mock("@adspectr/ai-sdk", () => ({
-  AdSpectrAiClient: jest.fn().mockImplementation(() => ({
-    completeJson: mockCompleteJson,
-  })),
+  AdSpectrAiClient: jest.fn().mockImplementation(() => mockDecisionAiClient),
+  createAdSpectrAiClientFromEnv: jest.fn(() => mockDecisionAiClient),
+  isAiClientConfigured: jest.fn(() => true),
   OPTIMIZATION_SYSTEM_PROMPT: "mock prompt",
 }));
 

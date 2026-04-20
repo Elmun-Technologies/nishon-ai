@@ -8,13 +8,18 @@ import { ContentMediaSlot } from '@/components/media/ContentMediaSlot'
 import { PublicContainer, PublicFooter, PublicNavbar } from '@/components/public/PublicLayout'
 import { useI18n } from '@/i18n/use-i18n'
 import { Button } from '@/components/ui/Button'
+import { Textarea } from '@/components/ui'
 import { cn } from '@/lib/utils'
 import {
-  adjustPlatformSplit,
+  adjustChannelSplit,
+  CHANNEL_COLORS,
+  CHANNEL_KEYS,
   clearPreAuthOnboarding,
+  emptyPreAuthOnboardingDraft,
   loadPreAuthOnboardingDraft,
   markPreAuthOnboardingComplete,
   savePreAuthOnboardingDraft,
+  type ChannelKey,
   type PreAuthOnboardingDraft,
 } from '@/lib/pre-auth-onboarding'
 
@@ -30,6 +35,12 @@ const INDUSTRIES = ['ecommerce', 'saas', 'local', 'agency', 'other'] as const
 type GoalId = (typeof GOALS)[number]
 type BudgetId = (typeof BUDGETS)[number]
 type IndustryId = (typeof INDUSTRIES)[number]
+
+function textSnippet(s: string, max = 140) {
+  const t = s.trim()
+  if (!t) return ''
+  return t.length <= max ? t : `${t.slice(0, max)}…`
+}
 
 function ChoiceTile({
   selected,
@@ -110,16 +121,7 @@ export default function OnboardingPage() {
 
   const [step, setStep] = useState(0)
   const [draft, setDraft] = useState<PreAuthOnboardingDraft>(() =>
-    typeof window === 'undefined'
-      ? {
-          v: 2,
-          goal: '',
-          budgetBand: '',
-          industry: '',
-          platformSplit: { meta: 45, google: 35, yandex: 20 },
-          geoFocus: '',
-        }
-      : loadPreAuthOnboardingDraft(),
+    typeof window === 'undefined' ? emptyPreAuthOnboardingDraft() : loadPreAuthOnboardingDraft(),
   )
 
   useEffect(() => {
@@ -152,9 +154,9 @@ export default function OnboardingPage() {
     setStep(0)
   }
 
-  const updateSplit = (key: keyof PreAuthOnboardingDraft['platformSplit'], value: number) => {
-    const next = adjustPlatformSplit(draft.platformSplit, key, value)
-    savePreAuthOnboardingDraft({ platformSplit: next })
+  const updateSplit = (key: ChannelKey, value: number) => {
+    const next = adjustChannelSplit(draft.channelSplit, key, value)
+    savePreAuthOnboardingDraft({ channelSplit: next })
     setDraft(loadPreAuthOnboardingDraft())
   }
 
@@ -293,36 +295,94 @@ export default function OnboardingPage() {
 
           {step === 4 && (
             <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(240px,360px)] lg:items-start">
-              <div>
+              <div className="min-w-0">
                 <h1 className="text-balance text-2xl font-semibold tracking-tight text-text-primary md:text-3xl">
-                  {p('splitTitle', 'Split budget across platforms')}
+                  {p('splitTitle', 'Channels & budget mix')}
                 </h1>
                 <p className="mt-3 max-w-xl text-sm leading-relaxed text-text-secondary md:text-base">{p('splitSubtitle', '')}</p>
-                <div className="mt-4 flex h-3 overflow-hidden rounded-full bg-border/50 dark:bg-border/30">
-                  <div className="bg-[#1877F2] transition-all duration-300" style={{ width: `${draft.platformSplit.meta}%` }} />
-                  <div className="bg-[#4285F4] transition-all duration-300" style={{ width: `${draft.platformSplit.google}%` }} />
-                  <div className="bg-[#FC3F1D] transition-all duration-300" style={{ width: `${draft.platformSplit.yandex}%` }} />
+
+                <div className="mt-8 space-y-6">
+                  <div>
+                    <label className="text-sm font-medium text-text-primary" htmlFor="onb-touchpoints">
+                      {p('splitTouchpointsLabel', 'Where are your customers?')}
+                    </label>
+                    <p className="mt-1 text-xs leading-relaxed text-text-tertiary">{p('splitTouchpointsHelp', '')}</p>
+                    <Textarea
+                      id="onb-touchpoints"
+                      value={draft.customerTouchpoints}
+                      onChange={(e) => syncDraft({ customerTouchpoints: e.target.value })}
+                      placeholder={p('splitTouchpointsPh', '')}
+                      rows={3}
+                      className="mt-2"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-text-primary" htmlFor="onb-ig-avatars">
+                      {p('splitInstagramAvatarsLabel', 'Instagram customer avatars')}
+                    </label>
+                    <p className="mt-1 text-xs leading-relaxed text-text-tertiary">{p('splitInstagramAvatarsHelp', '')}</p>
+                    <Textarea
+                      id="onb-ig-avatars"
+                      value={draft.instagramAvatars}
+                      onChange={(e) => syncDraft({ instagramAvatars: e.target.value })}
+                      placeholder={p('splitInstagramAvatarsPh', '')}
+                      rows={3}
+                      className="mt-2"
+                    />
+                  </div>
+                  <div className="grid gap-6 sm:grid-cols-2">
+                    <div>
+                      <label className="text-sm font-medium text-text-primary" htmlFor="onb-tg-ch">
+                        {p('splitTelegramChannelsLabel', 'Telegram channels / groups')}
+                      </label>
+                      <p className="mt-1 text-xs leading-relaxed text-text-tertiary">{p('splitTelegramChannelsHelp', '')}</p>
+                      <Textarea
+                        id="onb-tg-ch"
+                        value={draft.telegramChannels}
+                        onChange={(e) => syncDraft({ telegramChannels: e.target.value })}
+                        placeholder={p('splitTelegramChannelsPh', '')}
+                        rows={3}
+                        className="mt-2"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-text-primary" htmlFor="onb-tg-aud">
+                        {p('splitTelegramAudiencesLabel', 'Telegram audiences')}
+                      </label>
+                      <p className="mt-1 text-xs leading-relaxed text-text-tertiary">{p('splitTelegramAudiencesHelp', '')}</p>
+                      <Textarea
+                        id="onb-tg-aud"
+                        value={draft.telegramAudiences}
+                        onChange={(e) => syncDraft({ telegramAudiences: e.target.value })}
+                        placeholder={p('splitTelegramAudiencesPh', '')}
+                        rows={3}
+                        className="mt-2"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-8 flex h-3 min-h-[12px] overflow-hidden rounded-full bg-border/50 dark:bg-border/30">
+                  {CHANNEL_KEYS.map((k) => (
+                    <div
+                      key={k}
+                      className="min-w-0 transition-all duration-300"
+                      style={{ width: `${draft.channelSplit[k]}%`, backgroundColor: CHANNEL_COLORS[k] }}
+                    />
+                  ))}
                 </div>
                 <p className="mt-2 text-xs text-text-tertiary">{p('splitTotal', 'Total')}: 100%</p>
-                <div className="mt-8 max-w-lg space-y-6">
-                  <SplitSlider
-                    label={p('splitMeta', 'Meta')}
-                    value={draft.platformSplit.meta}
-                    accent="#1877F2"
-                    onChange={(n) => updateSplit('meta', n)}
-                  />
-                  <SplitSlider
-                    label={p('splitGoogle', 'Google Ads')}
-                    value={draft.platformSplit.google}
-                    accent="#4285F4"
-                    onChange={(n) => updateSplit('google', n)}
-                  />
-                  <SplitSlider
-                    label={p('splitYandex', 'Yandex Direct')}
-                    value={draft.platformSplit.yandex}
-                    accent="#FC3F1D"
-                    onChange={(n) => updateSplit('yandex', n)}
-                  />
+
+                <div className="mt-8 max-h-[min(52vh,28rem)] space-y-5 overflow-y-auto pr-1 sm:max-h-none sm:overflow-visible">
+                  {CHANNEL_KEYS.map((k) => (
+                    <SplitSlider
+                      key={k}
+                      label={p(`splitChannel.${k}`, k)}
+                      value={draft.channelSplit[k]}
+                      accent={CHANNEL_COLORS[k]}
+                      onChange={(n) => updateSplit(k, n)}
+                    />
+                  ))}
                 </div>
                 <p className="mt-6 text-xs leading-relaxed text-text-tertiary">{p('splitHint', '')}</p>
               </div>
@@ -392,16 +452,53 @@ export default function OnboardingPage() {
                     {draft.industry ? p(`industry.${draft.industry as IndustryId}`, draft.industry) : '—'}
                   </dd>
                 </div>
+                {draft.customerTouchpoints.trim() ? (
+                  <div className="px-4 py-3 text-sm">
+                    <dt className="text-text-tertiary">{p('summaryTouchpoints', 'Customer touchpoints')}</dt>
+                    <dd className="mt-1.5 text-xs leading-relaxed text-text-secondary">{textSnippet(draft.customerTouchpoints, 220)}</dd>
+                  </div>
+                ) : null}
+                {draft.instagramAvatars.trim() ? (
+                  <div className="px-4 py-3 text-sm">
+                    <dt className="text-text-tertiary">{p('summaryInstagramAvatars', 'Instagram avatars')}</dt>
+                    <dd className="mt-1.5 text-xs leading-relaxed text-text-secondary">{textSnippet(draft.instagramAvatars, 220)}</dd>
+                  </div>
+                ) : null}
+                {(draft.telegramChannels.trim() || draft.telegramAudiences.trim()) ? (
+                  <div className="px-4 py-3 text-sm">
+                    <dt className="text-text-tertiary">{p('summaryTelegram', 'Telegram')}</dt>
+                    <dd className="mt-1.5 space-y-1 text-xs leading-relaxed text-text-secondary">
+                      {draft.telegramChannels.trim() ? (
+                        <p>
+                          <span className="font-medium text-text-tertiary">{p('summaryTelegramChannels', 'Channels')}: </span>
+                          {textSnippet(draft.telegramChannels, 160)}
+                        </p>
+                      ) : null}
+                      {draft.telegramAudiences.trim() ? (
+                        <p>
+                          <span className="font-medium text-text-tertiary">{p('summaryTelegramAudiences', 'Audiences')}: </span>
+                          {textSnippet(draft.telegramAudiences, 160)}
+                        </p>
+                      ) : null}
+                    </dd>
+                  </div>
+                ) : null}
                 <div className="px-4 py-3 text-sm">
-                  <dt className="text-text-tertiary">{p('summarySplit', 'Platform mix')}</dt>
+                  <dt className="text-text-tertiary">{p('summarySplit', 'Channel mix')}</dt>
                   <dd className="mt-2">
-                    <div className="flex h-2.5 overflow-hidden rounded-full bg-border/50">
-                      <div className="bg-[#1877F2]" style={{ width: `${draft.platformSplit.meta}%` }} />
-                      <div className="bg-[#4285F4]" style={{ width: `${draft.platformSplit.google}%` }} />
-                      <div className="bg-[#FC3F1D]" style={{ width: `${draft.platformSplit.yandex}%` }} />
+                    <div className="flex h-2.5 min-h-[10px] overflow-hidden rounded-full bg-border/50">
+                      {CHANNEL_KEYS.map((k) => (
+                        <div
+                          key={k}
+                          className="min-w-0"
+                          style={{ width: `${draft.channelSplit[k]}%`, backgroundColor: CHANNEL_COLORS[k] }}
+                        />
+                      ))}
                     </div>
-                    <p className="mt-2 text-xs text-text-secondary">
-                      Meta {draft.platformSplit.meta}% · Google {draft.platformSplit.google}% · Yandex {draft.platformSplit.yandex}%
+                    <p className="mt-2 text-xs leading-relaxed text-text-secondary">
+                      {CHANNEL_KEYS.filter((k) => draft.channelSplit[k] > 0)
+                        .map((k) => `${p(`splitChannel.${k}`, k)} ${draft.channelSplit[k]}%`)
+                        .join(' · ') || '—'}
                     </p>
                   </dd>
                 </div>

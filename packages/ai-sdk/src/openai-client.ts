@@ -43,7 +43,7 @@ export interface CompleteResult {
   durationMs: number
 }
 
-export type AiProvider = 'openai' | 'anthropic'
+export type AiProvider = 'openai' | 'anthropic' | 'meta'
 
 /**
  * AdSpectr AI client powered by Agent Router.
@@ -57,25 +57,40 @@ export type AiProvider = 'openai' | 'anthropic'
  *     agentName: 'StrategyEngine',
  *   })
  */
+export type AdSpectrAiClientOptions = {
+  /**
+   * When `AI_PROVIDER=meta`, if set, this model id is used for every task
+   * (host-specific names). Otherwise {@link TASK_MODELS_META} applies per task.
+   */
+  modelOverride?: string
+}
+
 export class AdSpectrAiClient {
   private readonly openai?: OpenAI
   private readonly provider: AiProvider
   private readonly apiKey: string
   private readonly anthropicBaseUrl: string
+  private readonly modelOverride?: string
   private readonly fallbackModel = 'gpt-4o-mini'
   private readonly maxRetries = 3
 
   /**
-   * @param apiKey   Provider API key (OPENAI_API_KEY or ANTHROPIC_API_KEY)
-   * @param baseURL  Optional — override the API base URL (e.g. for Azure, local proxy).
+   * @param apiKey   Provider API key (`OPENAI_*`, `ANTHROPIC_*`, or `META_AI_API_KEY`)
+   * @param baseURL  Optional — override the API base URL (required for `meta` — Meta Llama endpoint).
    *                 Defaults to provider's official endpoint.
    */
-  constructor(apiKey: string, baseURL?: string, provider: AiProvider = 'openai') {
+  constructor(
+    apiKey: string,
+    baseURL?: string,
+    provider: AiProvider = 'openai',
+    opts?: AdSpectrAiClientOptions,
+  ) {
     this.provider = provider
     this.apiKey = apiKey
     this.anthropicBaseUrl = baseURL || 'https://api.anthropic.com/v1'
+    this.modelOverride = opts?.modelOverride
 
-    if (this.provider === 'openai') {
+    if (this.provider === 'openai' || this.provider === 'meta') {
       const config: ConstructorParameters<typeof OpenAI>[0] = {
         apiKey,
         timeout: 120_000, // 120 s — complex tasks (strategy/competitor) need more time
@@ -83,6 +98,11 @@ export class AdSpectrAiClient {
       }
       if (baseURL) {
         config.baseURL = baseURL
+      }
+      if (this.provider === 'meta' && !baseURL?.trim()) {
+        throw new Error(
+          'Meta AI (Llama) provider requires META_AI_BASE_URL (OpenAI-compatible base URL from Meta Llama API).',
+        )
       }
       this.openai = new OpenAI(config)
     }
@@ -104,6 +124,9 @@ export class AdSpectrAiClient {
       async () => {
         if (this.provider === 'anthropic') {
           return this.completeAnthropic(prompt, systemPrompt, model, maxTokens, temperature)
+        }
+        if (!this.openai) {
+          throw new Error('OpenAI-compatible client is not initialized.')
         }
         return this.completeOpenAi(prompt, systemPrompt, model, maxTokens, temperature, options.jsonMode)
       },
@@ -158,7 +181,7 @@ export class AdSpectrAiClient {
     return this.executeWithRetry(
       async () => {
         if (!this.openai) {
-          throw new Error('Vision completion is currently supported with OpenAI provider.')
+          throw new Error('Vision completion requires an OpenAI-compatible client (openai or meta provider).')
         }
         const response = await this.openai.chat.completions.create({
           model,
@@ -201,9 +224,17 @@ export class AdSpectrAiClient {
    * Priority: explicit option value > task-type default > hard-coded fallback.
    */
   private resolveOptions(options: CompleteOptions) {
-    const providerDefaultModel = this.provider === 'anthropic' ? 'claude-3-7-sonnet-20250219' : this.fallbackModel
-    const model = options.model
-      ?? (options.taskType ? getModelByTask(options.taskType) : providerDefaultModel)
+    const providerDefaultModel =
+      this.provider === 'anthropic'
+        ? 'claude-3-7-sonnet-20250219'
+        : this.provider === 'meta'
+          ? 'Llama-3.3-70B-Instruct'
+          : this.fallbackModel
+    const model =
+      options.model
+      ?? (this.provider === 'meta' && this.modelOverride ? this.modelOverride : undefined)
+      ?? (options.taskType ? getModelByTask(options.taskType, this.provider) : undefined)
+      ?? providerDefaultModel
 
     const maxTokens = options.maxTokens
       ?? (options.taskType ? getTokenLimitByTask(options.taskType) : 2000)

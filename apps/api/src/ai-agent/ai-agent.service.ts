@@ -14,7 +14,8 @@ import {
 import { DecisionLoopService } from "./decision-loop.service";
 import { AiDecision } from "../ai-decisions/entities/ai-decision.entity";
 import { ConfigService } from "@nestjs/config";
-import { AdSpectrAiClient } from "@adspectr/ai-sdk";
+import { createAdSpectrAiClientFromEnv } from "@adspectr/ai-sdk";
+import type { AdSpectrAiClient } from "@adspectr/ai-sdk";
 import { MetaConnector } from "../platforms/connectors/meta.connector";
 
 /**
@@ -40,16 +41,7 @@ export class AiAgentService {
     @InjectRepository(AiDecision)
     private readonly decisionRepo: Repository<AiDecision>,
   ) {
-    const provider = this.config.get<string>("AI_PROVIDER", "openai").toLowerCase() === "anthropic"
-      ? "anthropic"
-      : "openai";
-    const apiKey = provider === "anthropic"
-      ? this.config.get<string>("ANTHROPIC_API_KEY", "")
-      : this.config.get<string>("OPENAI_API_KEY", "");
-    const baseURL = provider === "anthropic"
-      ? this.config.get<string>("ANTHROPIC_BASE_URL", "")
-      : this.config.get<string>("OPENAI_BASE_URL", "");
-    this.aiClient = new AdSpectrAiClient(apiKey, baseURL || undefined, provider);
+    this.aiClient = createAdSpectrAiClientFromEnv((k) => this.config.get<string>(k));
   }
 
   /**

@@ -17,7 +17,11 @@ const WARN_ENV_VARS = [
 export function validateEnv(config: EnvRecord): EnvRecord {
   const provider = (config["AI_PROVIDER"] || "openai").toLowerCase();
   const providerKey =
-    provider === "anthropic" ? "ANTHROPIC_API_KEY" : "OPENAI_API_KEY";
+    provider === "anthropic"
+      ? "ANTHROPIC_API_KEY"
+      : provider === "meta"
+        ? "META_AI_API_KEY"
+        : "OPENAI_API_KEY";
 
   const missing = REQUIRED_ENV_VARS.filter((key) => {
     const value = config[key];
@@ -26,6 +30,13 @@ export function validateEnv(config: EnvRecord): EnvRecord {
   const providerApiKey = config[providerKey];
   if (!providerApiKey || providerApiKey.trim().length === 0) {
     missing.push(providerKey as any);
+  }
+
+  if (provider === "meta") {
+    const base = config["META_AI_BASE_URL"];
+    if (!base || base.trim().length === 0) {
+      missing.push("META_AI_BASE_URL" as any);
+    }
   }
 
   if (missing.length > 0) {
