@@ -1,8 +1,16 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { Fragment } from 'react'
 import Link from 'next/link'
+import {
+  FileDown,
+  FileSpreadsheet,
+  FileText,
+  GripVertical,
+  Image as ImageIcon,
+  Printer,
+} from 'lucide-react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { useI18n } from '@/i18n/use-i18n'
 import { Card } from '@/components/ui/Card'
@@ -12,6 +20,15 @@ import { PageHeader, Dialog } from '@/components/ui'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { meta as metaApi } from '@/lib/api-client'
 import { formatCurrency, formatNumber } from '@/lib/utils'
+import {
+  buildCsvFromData,
+  buildFlatRows,
+  downloadCsvString,
+  downloadPngFromElement,
+  downloadXlsHtmlTable,
+  openPrintableReport,
+  type ReportDataShape,
+} from '@/lib/reporting-export'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -62,16 +79,6 @@ function MetricCell({ value, className = '' }: { value: string; className?: stri
       {value}
     </td>
   )
-}
-
-function downloadCSV(csv: string, filename: string) {
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = filename
-  a.click()
-  URL.revokeObjectURL(url)
 }
 
 const DAY_OPTIONS = [7, 14, 30, 60, 90]
@@ -130,6 +137,68 @@ const AVAILABLE_METRICS = [
   { id: 'conv_rate', label: 'Conversion Rate', icon: 'V', value: '4.8%',   trend: '+0.6%',  positive: true  },
 ]
 
+const METRIC_ORDER_STORAGE = (workspaceId: string) => `adspectr:reporting:metric-order:${workspaceId}`
+
+function metricDisplayForId(
+  id: string,
+  totals: { spend: number; clicks: number; impressions: number } | undefined,
+): { value: string; trend: string; positive: boolean; label: string; icon: string } {
+  const def = AVAILABLE_METRICS.find((m) => m.id === id)
+  if (!def) return { value: '—', trend: '', positive: true, label: id, icon: '?' }
+  if (!totals || (totals.impressions === 0 && totals.clicks === 0)) {
+    return { value: def.value, trend: def.trend, positive: def.positive, label: def.label, icon: def.icon }
+  }
+  const ctrPct = totals.impressions > 0 ? (totals.clicks / totals.impressions) * 100 : 0
+  const cpm = totals.impressions > 0 ? totals.spend / (totals.impressions / 1000) : 0
+  const cpa = totals.clicks > 0 ? totals.spend / totals.clicks : 0
+  switch (id) {
+    case 'ctr':
+      return {
+        value: `${ctrPct.toFixed(2)}%`,
+        trend: def.trend,
+        positive: def.positive,
+        label: def.label,
+        icon: def.icon,
+      }
+    case 'cpm':
+      return {
+        value: formatCurrency(cpm),
+        trend: def.trend,
+        positive: def.positive,
+        label: def.label,
+        icon: def.icon,
+      }
+    case 'reach':
+      return {
+        value: formatNumber(totals.impressions),
+        trend: def.trend,
+        positive: def.positive,
+        label: def.label,
+        icon: def.icon,
+      }
+    case 'cpa':
+      return {
+        value: cpa > 0 ? formatCurrency(cpa) : def.value,
+        trend: def.trend,
+        positive: def.positive,
+        label: def.label,
+        icon: def.icon,
+      }
+    default:
+      return { value: def.value, trend: def.trend, positive: def.positive, label: def.label, icon: def.icon }
+  }
+}
+
+function reorderIds(list: string[], fromId: string, toId: string): string[] {
+  const i = list.indexOf(fromId)
+  const j = list.indexOf(toId)
+  if (i < 0 || j < 0 || i === j) return list
+  const next = [...list]
+  const [moved] = next.splice(i, 1)
+  next.splice(j, 0, moved)
+  return next
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ReportingPage() {
@@ -140,13 +209,18 @@ export default function ReportingPage() {
   const [error, setError] = useState('')
   const [days, setDays] = useState(30)
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
-  const [exporting, setExporting] = useState(false)
+  const [exporting, setExporting] = useState<string | null>(null)
+  const [exportMenuOpen, setExportMenuOpen] = useState(false)
+  const exportMenuRef = useRef<HTMLDivElement>(null)
+  const reportCaptureRef = useRef<HTMLDivElement>(null)
+  const [detailReportOpen, setDetailReportOpen] = useState(false)
+  const [dragMetricId, setDragMetricId] = useState<string | null>(null)
   // Tags: map of campaignId → current tags
   const [campaignTags, setCampaignTags] = useState<Record<string, string[]>>({})
   const [editingTagId, setEditingTagId] = useState<string | null>(null)
   const [tagInput, setTagInput] = useState('')
-  // Custom metrics panel
-  const [activeMetrics, setActiveMetrics] = useState<string[]>(['roas', 'cpa', 'ctr', 'frequency'])
+  /** Ordered list of visible KPI card metric ids (drag to reorder; persisted per workspace). */
+  const [orderedActiveMetrics, setOrderedActiveMetrics] = useState<string[]>(['roas', 'cpa', 'ctr', 'frequency'])
   const [showSimulation, setShowSimulation] = useState(false)
   const [simBudget, setSimBudget] = useState(1500)
   const [templatesOpen, setTemplatesOpen] = useState(false)
@@ -172,17 +246,116 @@ export default function ReportingPage() {
 
   useEffect(() => { load() }, [load])
 
-  async function handleExport() {
+  useEffect(() => {
     if (!currentWorkspace?.id) return
-    setExporting(true)
     try {
+      const raw = localStorage.getItem(METRIC_ORDER_STORAGE(currentWorkspace.id))
+      if (raw) {
+        const arr = JSON.parse(raw) as string[]
+        const valid = arr.filter((id) => AVAILABLE_METRICS.some((m) => m.id === id))
+        if (valid.length) setOrderedActiveMetrics(valid)
+      }
+    } catch {
+      /* ignore */
+    }
+  }, [currentWorkspace?.id])
+
+  useEffect(() => {
+    if (!currentWorkspace?.id) return
+    try {
+      localStorage.setItem(METRIC_ORDER_STORAGE(currentWorkspace.id), JSON.stringify(orderedActiveMetrics))
+    } catch {
+      /* ignore */
+    }
+  }, [currentWorkspace?.id, orderedActiveMetrics])
+
+  useEffect(() => {
+    if (!exportMenuOpen) return
+    function onDocMouseDown(e: MouseEvent) {
+      if (!exportMenuRef.current?.contains(e.target as Node)) setExportMenuOpen(false)
+    }
+    document.addEventListener('mousedown', onDocMouseDown)
+    return () => document.removeEventListener('mousedown', onDocMouseDown)
+  }, [exportMenuOpen])
+
+  function toggleMetric(id: string) {
+    setOrderedActiveMetrics((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    )
+  }
+
+  async function runExportCsv() {
+    if (!currentWorkspace?.id) return
+    setExporting('csv')
+    setExportMenuOpen(false)
+    setError('')
+    try {
+      if (data && data.accounts.length > 0) {
+        const csv = buildCsvFromData(data as unknown as ReportDataShape)
+        downloadCsvString(csv, `adspectr-report-${days}d-${new Date().toISOString().slice(0, 10)}.csv`)
+        return
+      }
       const res = await metaApi.exportReporting(currentWorkspace.id, days)
       const { csv, filename } = res.data as { csv: string; filename: string }
-      downloadCSV(csv, filename)
+      downloadCsvString(csv, filename)
     } catch {
       setError(t('reporting.exportError', 'CSV export failed'))
     } finally {
-      setExporting(false)
+      setExporting(null)
+    }
+  }
+
+  function runExportXls() {
+    if (!data || data.accounts.length === 0) {
+      setError(t('reporting.exportNeedsData', 'Load reporting data to export XLS, PDF, or PNG.'))
+      setExportMenuOpen(false)
+      return
+    }
+    setExporting('xls')
+    setExportMenuOpen(false)
+    try {
+      downloadXlsHtmlTable(
+        data as unknown as ReportDataShape,
+        `adspectr-report-${days}d-${new Date().toISOString().slice(0, 10)}.xls`,
+      )
+    } catch {
+      setError(t('reporting.exportError', 'Export failed'))
+    } finally {
+      setExporting(null)
+    }
+  }
+
+  function runExportPdf() {
+    if (!data || data.accounts.length === 0) {
+      setError(t('reporting.exportNeedsData', 'Load reporting data to export XLS, PDF, or PNG.'))
+      setExportMenuOpen(false)
+      return
+    }
+    setExportMenuOpen(false)
+    openPrintableReport({
+      title: t('reporting.detailedReportTitle', 'AdSpectr — detailed report'),
+      subtitle: `${currentWorkspace?.name ?? ''} · ${days}d · ${new Date().toLocaleString()}`,
+      data: data as unknown as ReportDataShape,
+    })
+  }
+
+  async function runExportPng() {
+    const el = reportCaptureRef.current
+    if (!el) return
+    if (!data || data.accounts.length === 0) {
+      setError(t('reporting.exportNeedsData', 'Load reporting data to export XLS, PDF, or PNG.'))
+      setExportMenuOpen(false)
+      return
+    }
+    setExporting('png')
+    setExportMenuOpen(false)
+    setError('')
+    try {
+      await downloadPngFromElement(el, `adspectr-report-${days}d-${new Date().toISOString().slice(0, 10)}.png`)
+    } catch {
+      setError(t('reporting.exportPngError', 'PNG export failed. Try a shorter page or disable browser extensions.'))
+    } finally {
+      setExporting(null)
     }
   }
 
@@ -381,13 +554,76 @@ export default function ReportingPage() {
         </>
       </Dialog>
 
+      <Dialog
+        open={detailReportOpen}
+        onClose={() => setDetailReportOpen(false)}
+        title={t('reporting.detailedReportTitle', 'Detailed report')}
+        className="max-h-[min(90vh,820px)] min-h-0 max-w-5xl flex flex-col overflow-hidden p-0"
+      >
+        <div className="flex min-h-0 flex-1 flex-col px-5 pb-5 pt-0">
+          <p className="text-sm text-text-secondary mb-3">
+            {currentWorkspace?.name} · {days}d · {t('reporting.detailedReportHint', 'Full campaign-level rows. Use Export for downloadable files.')}
+          </p>
+          {!data || data.accounts.length === 0 ? (
+            <p className="text-sm text-text-tertiary">{t('reporting.noData', 'No reporting data yet')}</p>
+          ) : (
+            <>
+              <div className="min-h-0 flex-1 overflow-auto rounded-xl border border-border">
+                <table className="w-full text-xs">
+                  <thead className="sticky top-0 z-[1] bg-surface-2">
+                    <tr>
+                      {buildFlatRows(data as unknown as ReportDataShape)[0].map((h) => (
+                        <th key={h} className="border-b border-border px-2 py-2 text-left font-semibold text-text-tertiary whitespace-nowrap">
+                          {h}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {buildFlatRows(data as unknown as ReportDataShape)
+                      .slice(1)
+                      .map((row, ri) => (
+                        <tr key={ri} className="border-b border-border/60 hover:bg-surface-2/50">
+                          {row.map((cell, ci) => (
+                            <td key={ci} className="px-2 py-1.5 text-text-primary tabular-nums whitespace-nowrap">
+                              {cell}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="mt-4 flex flex-wrap gap-2 border-t border-border pt-4" data-no-export="true">
+                <Button type="button" size="sm" variant="secondary" onClick={() => void runExportCsv()} loading={exporting === 'csv'}>
+                  <FileText className="mr-1.5 inline h-3.5 w-3.5" aria-hidden />
+                  CSV
+                </Button>
+                <Button type="button" size="sm" variant="secondary" onClick={runExportXls} loading={exporting === 'xls'}>
+                  <FileSpreadsheet className="mr-1.5 inline h-3.5 w-3.5" aria-hidden />
+                  XLS
+                </Button>
+                <Button type="button" size="sm" variant="secondary" onClick={runExportPdf}>
+                  <Printer className="mr-1.5 inline h-3.5 w-3.5" aria-hidden />
+                  PDF
+                </Button>
+                <Button type="button" size="sm" variant="secondary" onClick={() => void runExportPng()} loading={exporting === 'png'}>
+                  <ImageIcon className="mr-1.5 inline h-3.5 w-3.5" aria-hidden />
+                  PNG
+                </Button>
+              </div>
+            </>
+          )}
+        </div>
+      </Dialog>
+
       <section className="rounded-2xl border border-blue-200/70 bg-gradient-to-r from-blue-50 via-indigo-50 to-violet-50 p-3 dark:border-slate-700 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
         <PageHeader
           className="mb-0 border-0 bg-transparent p-2 shadow-none"
           title={t('navigation.reporting', 'Reporting')}
           subtitle={t('reporting.subtitle', 'Meta Ads account-to-campaign performance breakdown')}
           actions={
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <div className="flex items-center gap-1 rounded-xl bg-white/80 border border-blue-200/70 p-1 dark:border-slate-700 dark:bg-slate-900/70">
                 {DAY_OPTIONS.map((d) => (
                   <button
@@ -408,19 +644,66 @@ export default function ReportingPage() {
               <Button variant="secondary" size="sm" onClick={() => setTemplatesOpen(true)}>
                 {t('reporting.reportTemplates', 'Report templates')}
               </Button>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={handleExport}
-                loading={exporting}
-              >
-                {t('reporting.exportCsv', 'Export CSV')}
+              <Button variant="secondary" size="sm" onClick={() => setDetailReportOpen(true)}>
+                {t('reporting.detailedReport', 'Detailed report')}
               </Button>
+              <div className="relative" ref={exportMenuRef}>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setExportMenuOpen((o) => !o)}
+                  data-no-export="true"
+                >
+                  <FileDown className="mr-1.5 inline h-3.5 w-3.5" aria-hidden />
+                  {t('reporting.exportMenu', 'Export')}
+                  <span className="ml-1 opacity-60">▾</span>
+                </Button>
+                {exportMenuOpen ? (
+                  <div
+                    className="absolute right-0 top-full z-50 mt-1 w-52 rounded-xl border border-border bg-surface py-1 shadow-lg dark:border-brand-mid/25 dark:bg-brand-ink"
+                    data-no-export="true"
+                  >
+                    <button
+                      type="button"
+                      className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-text-primary hover:bg-surface-2"
+                      onClick={() => void runExportCsv()}
+                    >
+                      <FileText className="h-4 w-4 shrink-0 opacity-70" aria-hidden />
+                      {t('reporting.exportCsv', 'CSV')}
+                    </button>
+                    <button
+                      type="button"
+                      className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-text-primary hover:bg-surface-2"
+                      onClick={runExportXls}
+                    >
+                      <FileSpreadsheet className="h-4 w-4 shrink-0 opacity-70" aria-hidden />
+                      {t('reporting.exportXls', 'Excel (.xls)')}
+                    </button>
+                    <button
+                      type="button"
+                      className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-text-primary hover:bg-surface-2"
+                      onClick={runExportPdf}
+                    >
+                      <Printer className="h-4 w-4 shrink-0 opacity-70" aria-hidden />
+                      {t('reporting.exportPdf', 'PDF (print)')}
+                    </button>
+                    <button
+                      type="button"
+                      className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-text-primary hover:bg-surface-2"
+                      onClick={() => void runExportPng()}
+                    >
+                      <ImageIcon className="h-4 w-4 shrink-0 opacity-70" aria-hidden />
+                      {t('reporting.exportPng', 'PNG snapshot')}
+                    </button>
+                  </div>
+                ) : null}
+              </div>
             </div>
           }
         />
       </section>
 
+      <div ref={reportCaptureRef} className="space-y-5">
       <div className="rounded-2xl border border-border/70 bg-white/85 p-4 shadow-sm backdrop-blur-sm dark:bg-slate-900/70">
         {error && <Alert variant="error">{error}</Alert>}
         <Alert variant="info" className={!error ? '' : 'mt-2'}>
@@ -444,24 +727,28 @@ export default function ReportingPage() {
         </div>
       )}
 
-      {/* ── Custom Metrics Panel ── */}
+      {/* ── Custom Metrics Panel (drag to reorder) ── */}
       <div className="rounded-2xl border border-border/70 bg-white/85 p-4 shadow-sm backdrop-blur-sm dark:bg-slate-900/70">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-text-primary flex items-center gap-2">
-            {t('reporting.customMetrics', 'My Metrics')}
-            <span className="text-xs text-text-tertiary font-normal">- {t('reporting.customMetricsHint', 'choose what you want to track')}</span>
-          </h2>
-          <div className="flex gap-1 flex-wrap justify-end">
+        <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h2 className="flex items-center gap-2 text-sm font-semibold text-text-primary">
+              {t('reporting.customMetrics', 'My Metrics')}
+              <span className="text-xs font-normal text-text-tertiary">
+                — {t('reporting.customMetricsHint', 'choose what you want to track')}
+              </span>
+            </h2>
+            <p className="mt-1 text-xs text-text-tertiary">{t('reporting.metricsDragHint', 'Drag cards to reorder. Layout is saved for this workspace.')}</p>
+          </div>
+          <div className="flex flex-wrap justify-end gap-1">
             {AVAILABLE_METRICS.map((m) => (
               <button
                 key={m.id}
-                onClick={() => setActiveMetrics((prev) =>
-                  prev.includes(m.id) ? prev.filter((x) => x !== m.id) : [...prev, m.id]
-                )}
-                className={`text-xs px-2.5 py-1 rounded-full border transition-all ${
-                  activeMetrics.includes(m.id)
-                    ? 'bg-gradient-to-r from-blue-500 to-violet-500 text-white border-transparent'
-                    : 'bg-surface-elevated text-text-tertiary border-border hover:border-border'
+                type="button"
+                onClick={() => toggleMetric(m.id)}
+                className={`rounded-full border px-2.5 py-1 text-xs transition-all ${
+                  orderedActiveMetrics.includes(m.id)
+                    ? 'border-transparent bg-gradient-to-r from-blue-500 to-violet-500 text-white'
+                    : 'border-border bg-surface-elevated text-text-tertiary hover:border-border'
                 }`}
               >
                 {m.icon} {m.label}
@@ -470,27 +757,59 @@ export default function ReportingPage() {
           </div>
         </div>
 
-        {activeMetrics.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            {AVAILABLE_METRICS.filter((m) => activeMetrics.includes(m.id)).map((m) => (
-              <div key={m.id} className="bg-surface-elevated border border-border rounded-xl p-4 relative group">
-                <button
-                  onClick={() => setActiveMetrics((prev) => prev.filter((x) => x !== m.id))}
-                  className="absolute top-2 right-2 text-text-tertiary hover:text-text-tertiary opacity-0 group-hover:opacity-100 transition-opacity text-xs leading-none"
+        {orderedActiveMetrics.length > 0 ? (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+            {orderedActiveMetrics.map((id) => {
+              const disp = metricDisplayForId(id, totals)
+              return (
+                <div
+                  key={id}
+                  draggable
+                  onDragStart={(e) => {
+                    setDragMetricId(id)
+                    e.dataTransfer.setData('text/plain', id)
+                    e.dataTransfer.effectAllowed = 'move'
+                  }}
+                  onDragEnd={() => setDragMetricId(null)}
+                  onDragOver={(e) => {
+                    e.preventDefault()
+                    e.dataTransfer.dropEffect = 'move'
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault()
+                    const from = e.dataTransfer.getData('text/plain') || dragMetricId
+                    if (from) setOrderedActiveMetrics((prev) => reorderIds(prev, from, id))
+                    setDragMetricId(null)
+                  }}
+                  className={`group relative cursor-grab rounded-xl border border-border bg-surface-elevated p-4 active:cursor-grabbing ${
+                    dragMetricId === id ? 'ring-2 ring-blue-400/50' : ''
+                  }`}
                 >
-                  x
-                </button>
-                <p className="text-text-tertiary text-xs mb-1">{m.icon} {m.label}</p>
-                <p className="text-text-primary text-xl font-bold">{m.value}</p>
-                <p className={`text-xs mt-0.5 ${m.positive ? 'text-emerald-500' : 'text-red-400'}`}>
-                  {m.trend} vs oldingi davr
-                </p>
-              </div>
-            ))}
+                  <div className="absolute left-2 top-2 text-text-tertiary opacity-60" title={t('reporting.dragHandle', 'Drag')}>
+                    <GripVertical className="h-4 w-4" aria-hidden />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => toggleMetric(id)}
+                    className="absolute right-2 top-2 text-xs leading-none text-text-tertiary opacity-0 transition-opacity hover:text-text-primary group-hover:opacity-100"
+                    aria-label={t('common.close', 'Close')}
+                  >
+                    ×
+                  </button>
+                  <p className="mb-1 mt-4 text-xs text-text-tertiary">
+                    {disp.icon} {disp.label}
+                  </p>
+                  <p className="text-xl font-bold text-text-primary">{disp.value}</p>
+                  <p className={`mt-0.5 text-xs ${disp.positive ? 'text-emerald-500' : 'text-red-400'}`}>
+                    {disp.trend} vs oldingi davr
+                  </p>
+                </div>
+              )
+            })}
           </div>
         ) : (
-          <div className="border border-dashed border-border rounded-xl p-6 text-center">
-            <p className="text-text-tertiary text-sm">{t('reporting.selectMetrics', 'Select metrics from above')}</p>
+          <div className="rounded-xl border border-dashed border-border p-6 text-center">
+            <p className="text-sm text-text-tertiary">{t('reporting.selectMetrics', 'Select metrics from above')}</p>
           </div>
         )}
       </div>
@@ -718,6 +1037,7 @@ export default function ReportingPage() {
           </div>
         )}
       </Card>
+      </div>
     </div>
   )
 }

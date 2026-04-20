@@ -8,6 +8,9 @@ interface User {
   email: string
   name: string
   plan: string
+  /** ISO end of FREE trial from API; missing on very old persisted sessions */
+  trialEndsAt?: string | null
+  isAdmin?: boolean
 }
 
 interface Workspace {
@@ -33,6 +36,8 @@ interface WorkspaceStore {
   selectedPlatforms: PlatformId[]
 
   setUser: (user: User | null) => void
+  /** Merge fields from /auth/me or billing without dropping other user fields */
+  patchUser: (patch: Partial<User>) => void
   setCurrentWorkspace: (workspace: Workspace | null) => void
   setWorkspaces: (workspaces: Workspace[]) => void
   setAccessToken: (token: string | null) => void
@@ -52,6 +57,10 @@ export const useWorkspaceStore = create<WorkspaceStore>()(
       selectedPlatforms: [],
 
       setUser: (user) => set({ user }),
+      patchUser: (patch) =>
+        set((state) => ({
+          user: state.user ? { ...state.user, ...patch } : state.user,
+        })),
       setCurrentWorkspace: (workspace) => set({ currentWorkspace: workspace }),
       setWorkspaces: (workspaces) => set({ workspaces }),
       setAccessToken: (token) => {

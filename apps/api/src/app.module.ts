@@ -25,6 +25,7 @@ import { LaunchOrchestratorModule } from "./launch-orchestrator/launch-orchestra
 import { WorkspaceServiceModule } from "./workspace-service/workspace-service.module";
 import { IntegrationsModule } from "./integrations/integrations.module";
 import { McpModule } from "./mcp/mcp.module";
+import { HeygenModule } from "./heygen/heygen.module";
 import { validateEnv } from "./config/env.validation";
 import { HealthController } from "./health/health.controller";
 import { HealthService } from "./health/health.service";
@@ -89,6 +90,7 @@ import { RequestLoggingInterceptor } from "./common/interceptors/request-logging
     WorkspaceServiceModule,
     IntegrationsModule,
     McpModule,
+    HeygenModule,
   ],
   controllers: [HealthController],
   providers: [

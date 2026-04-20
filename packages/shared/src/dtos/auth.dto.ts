@@ -48,5 +48,8 @@ export class AuthResponseDto {
     email: string
     name: string
     plan: string
+    /** ISO 8601 end of FREE trial; null if not on trial clock */
+    trialEndsAt?: string | null
+    isAdmin?: boolean
   }
 }

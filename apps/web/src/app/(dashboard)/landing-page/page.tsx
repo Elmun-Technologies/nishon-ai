@@ -1,10 +1,21 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import Link from 'next/link'
+import {
+  CheckCircle2,
+  CreditCard,
+  ImagePlus,
+  LayoutTemplate,
+  Sparkles,
+} from 'lucide-react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
+import { useI18n } from '@/i18n/use-i18n'
 import { Button } from '@/components/ui/Button'
 import { Spinner } from '@/components/ui/Spinner'
 import { Alert } from '@/components/ui/Alert'
+import { Card } from '@/components/ui/Card'
 import { landingPages } from '@/lib/api-client'
+import { cn } from '@/lib/utils'
 
 // ─── TYPES ────────────────────────────────────────────────────────────────────
 
@@ -30,6 +41,14 @@ const ALL_SECTIONS = [
   { key: 'faq', label: 'Savollar (FAQ)', icon: '❓' },
   { key: 'contact', label: 'Bog\'lanish & CTA', icon: '📞', required: true },
 ]
+
+const LP_DRAFT_KEY = (workspaceId: string) => `adspectr-lp-draft:${workspaceId}`
+
+const LP_TEMPLATE_IDS = ['local_service', 'product_store', 'saas_b2b', 'promo_event'] as const
+type LpTemplateId = (typeof LP_TEMPLATE_IDS)[number]
+
+const MAX_LP_IMAGE_BYTES = 4 * 1024 * 1024
+const MAX_LP_IMAGES = 4
 
 const COLOR_OPTIONS = [
   { key: 'blue', label: 'Ko\'k', bg: '#2563EB' },
@@ -84,6 +103,7 @@ function Field({
 // ─── MAIN PAGE ────────────────────────────────────────────────────────────────
 
 export default function LandingPageEditor() {
+  const { t } = useI18n()
   const { currentWorkspace } = useWorkspaceStore()
   const [page, setPage] = useState<LandingPage | null>(null)
   const [loading, setLoading] = useState(true)
@@ -94,7 +114,83 @@ export default function LandingPageEditor() {
   const [success, setSuccess] = useState('')
   const [tab, setTab] = useState<'content' | 'design' | 'pixels' | 'contact'>('content')
 
+  const [templateId, setTemplateId] = useState<LpTemplateId | null>(null)
+  const [creativeBrief, setCreativeBrief] = useState('')
+  const [imageItems, setImageItems] = useState<
+    { id: string; base64: string; mime: string; name: string; preview: string }[]
+  >([])
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
   const workspaceId = currentWorkspace?.id
+
+  const readFilesAsPayload = useCallback(
+    async (files: FileList | null) => {
+      if (!files?.length) return
+      const allowed = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
+      const additions: { id: string; base64: string; mime: string; name: string; preview: string }[] = []
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i]
+        if (!allowed.has(file.type)) {
+          setError(t('landingPageBuilder.photoType'))
+          continue
+        }
+        if (file.size > MAX_LP_IMAGE_BYTES) {
+          setError(t('landingPageBuilder.photoTooBig'))
+          continue
+        }
+        try {
+          const b64 = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader()
+            reader.onload = () => {
+              const result = String(reader.result || '')
+              const payload = result.includes(',') ? result.split(',')[1] : result
+              resolve(payload)
+            }
+            reader.onerror = () => reject(new Error('read'))
+            reader.readAsDataURL(file)
+          })
+          const preview = URL.createObjectURL(file)
+          additions.push({
+            id: `${Date.now()}-${i}-${file.name}`,
+            base64: b64,
+            mime: file.type,
+            name: file.name,
+            preview,
+          })
+        } catch {
+          setError(t('landingPageBuilder.photoType'))
+        }
+      }
+      if (!additions.length) return
+      setImageItems((prev) => {
+        const merged = [...prev, ...additions]
+        return merged.slice(0, MAX_LP_IMAGES)
+      })
+      setError('')
+    },
+    [t],
+  )
+
+  const removeImage = useCallback((id: string) => {
+    setImageItems((prev) => {
+      const it = prev.find((x) => x.id === id)
+      if (it?.preview.startsWith('blob:')) URL.revokeObjectURL(it.preview)
+      return prev.filter((x) => x.id !== id)
+    })
+  }, [])
+
+  useEffect(() => {
+    if (!workspaceId || page) return
+    try {
+      const raw = sessionStorage.getItem(LP_DRAFT_KEY(workspaceId))
+      if (!raw) return
+      const d = JSON.parse(raw) as { templateId?: LpTemplateId; creativeBrief?: string }
+      if (d.templateId && LP_TEMPLATE_IDS.includes(d.templateId)) setTemplateId(d.templateId)
+      if (typeof d.creativeBrief === 'string') setCreativeBrief(d.creativeBrief)
+    } catch {
+      /* ignore */
+    }
+  }, [workspaceId, page])
 
   useEffect(() => {
     if (!workspaceId) { setLoading(false); return }
@@ -104,13 +200,49 @@ export default function LandingPageEditor() {
       .finally(() => setLoading(false))
   }, [workspaceId])
 
-  async function handleGenerate() {
+  async function handleGenerate(mode: 'initial' | 'regenerate' = 'initial') {
     if (!workspaceId) return
+    if (mode === 'initial' && !templateId) {
+      setError(t('landingPageBuilder.selectTemplate'))
+      return
+    }
     setGenerating(true)
     setError('')
     try {
-      const r = await landingPages.generate(workspaceId)
+      let body: Record<string, unknown> = {}
+      if (mode === 'regenerate') {
+        try {
+          const raw = sessionStorage.getItem(LP_DRAFT_KEY(workspaceId))
+          if (raw) body = JSON.parse(raw) as Record<string, unknown>
+        } catch {
+          body = {}
+        }
+      } else {
+        body = {
+          templateId,
+          creativeBrief: creativeBrief.trim() || undefined,
+          images:
+            imageItems.length > 0
+              ? imageItems.map(({ base64, mime }) => ({ base64, mimeType: mime }))
+              : undefined,
+        }
+      }
+      const r = await landingPages.generate(workspaceId, body)
       setPage(r.data)
+      if (mode === 'initial') {
+        setImageItems((prev) => {
+          prev.forEach((i) => {
+            if (i.preview.startsWith('blob:')) URL.revokeObjectURL(i.preview)
+          })
+          return []
+        })
+      }
+      if (mode === 'initial' && templateId) {
+        sessionStorage.setItem(
+          LP_DRAFT_KEY(workspaceId),
+          JSON.stringify({ templateId, creativeBrief: creativeBrief.trim() }),
+        )
+      }
       setSuccess('Landing page muvaffaqiyatli yaratildi!')
       setTimeout(() => setSuccess(''), 3000)
     } catch (e: any) {
@@ -242,31 +374,215 @@ export default function LandingPageEditor() {
 
   if (!page) {
     return (
-      <div className="max-w-lg mx-auto px-4 py-12 text-center">
-        <div className="text-6xl mb-4">🚀</div>
-        <h1 className="text-2xl font-bold text-text-primary mb-2">Landing Page yaratish</h1>
-        <p className="text-text-tertiary mb-2 text-sm leading-relaxed">
-          AI sizning biznesingiz ma'lumotlaridan kelib chiqib professional sotuvchi
-          landing sahifani avtomatik yaratadi.
-        </p>
-        <ul className="text-sm text-text-tertiary mb-8 space-y-1">
-          <li>✅ Uzb tilida matnlar</li>
-          <li>✅ Meta Pixel + Google Analytics ulash</li>
-          <li>✅ Qo'ng'iroq va WhatsApp tugmalar</li>
-          <li>✅ Mobil qurilmalar uchun optimallashtirilgan</li>
-        </ul>
-        {error && <Alert variant="error" className="mb-4">{error}</Alert>}
-        <Button
-          onClick={handleGenerate}
-          disabled={generating}
-          size="lg"
-          className="w-full"
+      <div className="mx-auto max-w-4xl space-y-6 px-4 py-8 pb-16">
+        <section
+          className={cn(
+            'relative overflow-hidden rounded-3xl border border-border/80 px-5 py-6 shadow-sm md:px-8 md:py-8',
+            'bg-gradient-to-br from-white via-surface to-surface-2/90',
+            'dark:from-[#1a2d0d] dark:via-brand-ink dark:to-[#152508]',
+          )}
         >
-          {generating ? (
-            <><Spinner size="sm" /> AI Landing Page yaratmoqda...</>
-          ) : '🤖 AI bilan yaratish'}
+          <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-brand-lime/15 blur-3xl dark:bg-brand-lime/10" />
+          <div className="relative flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+            <div className="flex min-w-0 items-start gap-4">
+              <div
+                className={cn(
+                  'flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl shadow-md ring-1',
+                  'bg-gradient-to-br from-brand-mid to-brand-lime ring-brand-ink/10',
+                )}
+              >
+                <LayoutTemplate className="h-7 w-7 text-brand-ink" aria-hidden />
+              </div>
+              <div className="min-w-0 text-left">
+                <p className="text-caption font-semibold uppercase tracking-wider text-brand-mid dark:text-brand-lime">
+                  {t('landingPageBuilder.heroEyebrow')}
+                </p>
+                <h1 className="mt-1 text-2xl font-bold tracking-tight text-text-primary md:text-3xl">
+                  {t('landingPageBuilder.title')}
+                </h1>
+                <p className="mt-2 max-w-2xl text-body-sm leading-relaxed text-text-secondary md:text-body">
+                  {t('landingPageBuilder.subtitle')}
+                </p>
+              </div>
+            </div>
+            <div className="flex shrink-0 flex-col gap-2 rounded-2xl border border-brand-mid/25 bg-brand-mid/10 px-3 py-2 text-caption text-brand-ink dark:border-brand-lime/30 dark:bg-brand-lime/10 dark:text-brand-lime md:max-w-xs">
+              <span className="flex items-center gap-2 font-semibold">
+                <Sparkles className="h-4 w-4 shrink-0" aria-hidden />
+                {t('landingPageBuilder.manusLine')}
+              </span>
+            </div>
+          </div>
+        </section>
+
+        <Alert variant="warning" className="border-amber-500/35 bg-amber-500/10 text-amber-950 dark:text-amber-50">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-caption font-bold uppercase tracking-wide text-amber-900 dark:text-amber-200">
+                {t('landingPageBuilder.addonBadge')} — {t('landingPageBuilder.addonTitle')}
+              </p>
+              <p className="mt-1 text-sm leading-relaxed text-amber-950/90 dark:text-amber-50/95">
+                {t('landingPageBuilder.addonBody')}
+              </p>
+            </div>
+            <Link
+              href="/settings/workspace/payments"
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-amber-600/40 bg-white/80 px-4 py-2 text-sm font-semibold text-amber-950 transition-colors hover:bg-white dark:border-amber-400/40 dark:bg-brand-ink/40 dark:text-amber-100 dark:hover:bg-brand-ink/60"
+            >
+              <CreditCard className="h-4 w-4" aria-hidden />
+              {t('landingPageBuilder.addonCta')}
+            </Link>
+          </div>
+        </Alert>
+
+        <div className="grid gap-6 lg:grid-cols-5">
+          <Card className="border-border/80 p-5 shadow-md dark:border-brand-mid/15 lg:col-span-3">
+            <p className="text-caption font-bold uppercase tracking-wide text-text-tertiary">
+              {t('landingPageBuilder.step1')}
+            </p>
+            <p className="mt-1 text-sm text-text-secondary">{t('landingPageBuilder.templatesHelp')}</p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              {LP_TEMPLATE_IDS.map((tid) => {
+                const selected = templateId === tid
+                const title =
+                  tid === 'local_service'
+                    ? t('landingPageBuilder.tpl_local_title')
+                    : tid === 'product_store'
+                      ? t('landingPageBuilder.tpl_product_title')
+                      : tid === 'saas_b2b'
+                        ? t('landingPageBuilder.tpl_saas_title')
+                        : t('landingPageBuilder.tpl_promo_title')
+                const body =
+                  tid === 'local_service'
+                    ? t('landingPageBuilder.tpl_local_body')
+                    : tid === 'product_store'
+                      ? t('landingPageBuilder.tpl_product_body')
+                      : tid === 'saas_b2b'
+                        ? t('landingPageBuilder.tpl_saas_body')
+                        : t('landingPageBuilder.tpl_promo_body')
+                return (
+                  <button
+                    key={tid}
+                    type="button"
+                    onClick={() => setTemplateId(tid)}
+                    className={cn(
+                      'rounded-2xl border p-4 text-left text-sm transition-all',
+                      selected
+                        ? 'border-brand-mid bg-brand-mid/10 shadow-sm ring-2 ring-brand-mid/25 dark:border-brand-lime dark:bg-brand-lime/10 dark:ring-brand-lime/30'
+                        : 'border-border/80 bg-surface-2/40 hover:border-brand-mid/30 dark:bg-brand-ink/30',
+                    )}
+                  >
+                    <p className="font-bold text-text-primary">{title}</p>
+                    <p className="mt-1 text-caption leading-relaxed text-text-secondary">{body}</p>
+                  </button>
+                )
+              })}
+            </div>
+
+            <p className="mt-8 text-caption font-bold uppercase tracking-wide text-text-tertiary">
+              {t('landingPageBuilder.step2')}
+            </p>
+            <label className="mt-2 block text-sm font-medium text-text-secondary">
+              {t('landingPageBuilder.briefLabel')}
+            </label>
+            <textarea
+              value={creativeBrief}
+              onChange={(e) => setCreativeBrief(e.target.value)}
+              placeholder={t('landingPageBuilder.briefPlaceholder')}
+              rows={4}
+              className="mt-1 w-full resize-y rounded-2xl border border-border/90 bg-surface px-3 py-2.5 text-sm text-text-primary placeholder:text-text-tertiary focus:border-brand-mid/50 focus:outline-none focus:ring-2 focus:ring-brand-mid/20 dark:bg-surface-elevated"
+            />
+
+            <p className="mt-8 text-caption font-bold uppercase tracking-wide text-text-tertiary">
+              {t('landingPageBuilder.step3')}
+            </p>
+            <p className="mt-1 text-sm text-text-secondary">{t('landingPageBuilder.photosHint')}</p>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              multiple
+              className="hidden"
+              onChange={(e) => {
+                void readFilesAsPayload(e.target.files)
+                e.target.value = ''
+              }}
+            />
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                className="gap-2 rounded-xl"
+                disabled={imageItems.length >= MAX_LP_IMAGES}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <ImagePlus className="h-4 w-4" aria-hidden />
+                {t('landingPageBuilder.photosPick')}
+              </Button>
+              <span className="text-caption text-text-tertiary">
+                {imageItems.length}/{MAX_LP_IMAGES}
+              </span>
+            </div>
+            {imageItems.length > 0 ? (
+              <ul className="mt-3 flex flex-wrap gap-3">
+                {imageItems.map((img) => (
+                  <li key={img.id} className="relative h-20 w-20 overflow-hidden rounded-xl border border-border/80">
+                    <img src={img.preview} alt="" className="h-full w-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(img.id)}
+                      className="absolute inset-x-0 bottom-0 bg-black/55 py-0.5 text-[10px] font-medium text-white"
+                    >
+                      {t('landingPageBuilder.photosRemove')}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </Card>
+
+          <Card className="h-fit border-border/80 p-5 shadow-md dark:border-brand-mid/15 lg:col-span-2">
+            <p className="text-sm font-bold text-text-primary">{t('landingPageBuilder.checkTitle')}</p>
+            <ul className="mt-3 space-y-2 text-sm text-text-secondary">
+              <li className="flex gap-2">
+                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-brand-mid dark:text-brand-lime" aria-hidden />
+                {t('landingPageBuilder.check1')}
+              </li>
+              <li className="flex gap-2">
+                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-brand-mid dark:text-brand-lime" aria-hidden />
+                {t('landingPageBuilder.check2')}
+              </li>
+              <li className="flex gap-2">
+                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-brand-mid dark:text-brand-lime" aria-hidden />
+                {t('landingPageBuilder.check3')}
+              </li>
+              <li className="flex gap-2">
+                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-brand-mid dark:text-brand-lime" aria-hidden />
+                {t('landingPageBuilder.check4')}
+              </li>
+            </ul>
+            <p className="mt-4 text-caption leading-relaxed text-text-tertiary">{t('landingPageBuilder.etaNote')}</p>
+          </Card>
+        </div>
+
+        {error ? (
+          <div>
+            <Alert variant="error">{error}</Alert>
+          </div>
+        ) : null}
+
+        <Button
+          type="button"
+          onClick={() => void handleGenerate('initial')}
+          disabled={generating || !templateId}
+          loading={generating}
+          size="lg"
+          fullWidth
+          className="rounded-2xl"
+        >
+          {generating ? t('landingPageBuilder.generatingCta') : t('landingPageBuilder.generateCta')}
         </Button>
-        <p className="text-xs text-text-tertiary mt-3">Taxminan 10–20 soniya</p>
+        <p className="text-center text-caption text-text-tertiary">{t('landingPageBuilder.regenerateHint')}</p>
       </div>
     )
   }
@@ -332,7 +648,8 @@ export default function LandingPageEditor() {
 
       {/* Regenerate */}
       <button
-        onClick={handleGenerate}
+        type="button"
+        onClick={() => void handleGenerate('regenerate')}
         disabled={generating}
         className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed border-border text-sm text-text-tertiary hover:text-text-primary hover:border-border transition-all"
       >

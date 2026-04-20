@@ -4,8 +4,10 @@ import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Compass, Filter, RefreshCw, Search, X } from 'lucide-react'
 import { useI18n } from '@/i18n/use-i18n'
+import { useWorkspaceStore } from '@/stores/workspace.store'
+import { meta as metaApi } from '@/lib/api-client'
 import { PageHeader, Button, Dialog, Alert } from '@/components/ui'
-import { cn } from '@/lib/utils'
+import { cn, formatCurrency, formatNumber } from '@/lib/utils'
 
 type AuditTab = 'meta' | 'targeting' | 'auction' | 'geo' | 'creative' | 'adcopy'
 
@@ -63,6 +65,208 @@ const MOCK_COPY = [
 
 const VIEW_STORAGE = 'meta-audit-saved-view-v1'
 
+type KpiMode = 'roas' | 'leads' | 'spend' | 'ctr' | 'clicks'
+
+interface CampaignMetrics {
+  spend: number
+  clicks: number
+  impressions: number
+  ctr: number
+  cpc: number
+}
+
+interface ReportCampaign {
+  id: string
+  name: string
+  status: string
+  objective: string | null
+  metrics: CampaignMetrics
+}
+
+interface ReportAccount {
+  id: string
+  name: string
+  currency: string
+  campaigns: ReportCampaign[]
+}
+
+interface ReportData {
+  workspaceId: string
+  days: number
+  accounts: ReportAccount[]
+}
+
+interface LiveCampaignRow {
+  id: string
+  name: string
+  status: string
+  spend: number
+  clicks: number
+  impressions: number
+  ctr: number
+  cpc: number
+  accountName: string
+  currency: string
+}
+
+const STATUS_BADGE: Record<string, string> = {
+  ACTIVE: 'text-emerald-400 bg-emerald-400/10',
+  PAUSED: 'text-amber-400 bg-amber-400/10',
+  DELETED: 'text-red-400 bg-red-400/10',
+  ARCHIVED: 'text-text-tertiary bg-surface-2',
+}
+
+function daysForDateRange(range: '7' | '30' | 'month'): number {
+  if (range === '7') return 7
+  if (range === '30') return 30
+  const d = new Date()
+  return Math.max(1, d.getDate())
+}
+
+function tpl(template: string, vars: Record<string, string | number>): string {
+  let out = template
+  for (const [k, v] of Object.entries(vars)) {
+    out = out.split(`{{${k}}}`).join(String(v))
+  }
+  return out
+}
+
+function flattenReportData(data: ReportData): LiveCampaignRow[] {
+  const rows: LiveCampaignRow[] = []
+  for (const a of data.accounts) {
+    const currency = a.currency || 'USD'
+    for (const c of a.campaigns) {
+      rows.push({
+        id: c.id,
+        name: c.name,
+        status: c.status,
+        spend: c.metrics.spend,
+        clicks: c.metrics.clicks,
+        impressions: c.metrics.impressions,
+        ctr: c.metrics.ctr,
+        cpc: c.metrics.cpc,
+        accountName: a.name,
+        currency,
+      })
+    }
+  }
+  return rows
+}
+
+function median(nums: number[]): number {
+  if (!nums.length) return 0
+  const s = [...nums].sort((a, b) => a - b)
+  const m = Math.floor(s.length / 2)
+  return s.length % 2 ? s[m]! : (s[m - 1]! + s[m]!) / 2
+}
+
+function computeAuditFindings(
+  rows: LiveCampaignRow[],
+  t: (key: string, def: string) => string,
+): { facts: string[]; risks: string[]; actions: string[] } {
+  const facts: string[] = []
+  const risks: string[] = []
+  const actions: string[] = []
+  if (!rows.length) return { facts, risks, actions }
+
+  const currency = rows[0]?.currency ?? 'USD'
+  const totalSpend = rows.reduce((s, r) => s + r.spend, 0)
+  const totalClicks = rows.reduce((s, r) => s + r.clicks, 0)
+  const totalImpressions = rows.reduce((s, r) => s + r.impressions, 0)
+  const blendedCtr = totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0
+
+  facts.push(
+    tpl(t('metaAudit.factTotalSpend', 'Total spend in period: {{amount}}.'), {
+      amount: formatCurrency(totalSpend, currency),
+    }),
+  )
+  facts.push(tpl(t('metaAudit.factCampaignCount', '{{count}} campaigns in scope.'), { count: rows.length }))
+  const accountNames = new Set(rows.map((r) => r.accountName))
+  facts.push(tpl(t('metaAudit.factAccountCount', '{{count}} ad account(s) included.'), { count: accountNames.size }))
+
+  const top = [...rows].sort((a, b) => b.spend - a.spend)[0]!
+  const topShare = totalSpend > 0 ? Math.round((top.spend / totalSpend) * 1000) / 10 : 0
+  facts.push(
+    tpl(t('metaAudit.factTopSpend', 'Highest spend: "{{name}}" at {{amount}} ({{share}}% of total).'), {
+      name: top.name,
+      amount: formatCurrency(top.spend, currency),
+      share: topShare,
+    }),
+  )
+  facts.push(
+    tpl(t('metaAudit.factWeightedCtr', 'Blended CTR (clicks ÷ impressions): {{ctr}}%.'), {
+      ctr: blendedCtr.toFixed(2),
+    }),
+  )
+  facts.push(tpl(t('metaAudit.factTotalClicks', 'Total clicks: {{count}}.'), { count: totalClicks }))
+  facts.push(tpl(t('metaAudit.factTotalImpressions', 'Total impressions: {{count}}.'), { count: totalImpressions }))
+
+  if (totalSpend > 0 && topShare >= 55) {
+    risks.push(
+      tpl(t('metaAudit.riskSpendConcentration', 'Budget is concentrated: top campaign "{{name}}" takes {{share}}% of spend.'), {
+        name: top.name,
+        share: topShare,
+      }),
+    )
+    actions.push(t('metaAudit.actionRebalanceBudget', 'Reallocate part of the budget away from the single largest spender until efficiency is validated.'))
+  }
+
+  const cpcPool = rows.filter((r) => r.clicks >= 5 && r.cpc > 0).map((r) => r.cpc)
+  const medianCpc = median(cpcPool)
+
+  for (const r of rows) {
+    if (r.spend >= 25 && r.clicks === 0 && r.impressions >= 500) {
+      risks.push(
+        tpl(t('metaAudit.riskSpendNoClicks', '"{{name}}" spent {{amount}} with zero clicks.'), {
+          name: r.name,
+          amount: formatCurrency(r.spend, currency),
+        }),
+      )
+      actions.push(
+        tpl(t('metaAudit.actionFixNoClicks', 'Pause or cap delivery on "{{name}}" until click-through returns.'), { name: r.name }),
+      )
+    }
+  }
+
+  for (const r of rows) {
+    if (r.impressions < 2000 || r.spend < 50) continue
+    if (blendedCtr <= 0) continue
+    if (r.ctr < blendedCtr * 0.5) {
+      risks.push(
+        tpl(t('metaAudit.riskLowCtrVsAvg', 'CTR on "{{name}}" is {{ctr}}%, well below the account blended {{avg}}%.'), {
+          name: r.name,
+          ctr: r.ctr.toFixed(2),
+          avg: blendedCtr.toFixed(2),
+        }),
+      )
+      actions.push(
+        tpl(t('metaAudit.actionReviewLowCtr', 'Open "{{name}}" in Ads Manager: test new primary text/creative.'), { name: r.name }),
+      )
+      break
+    }
+  }
+
+  for (const r of rows) {
+    if (r.clicks < 10 || medianCpc <= 0) continue
+    if (r.cpc > medianCpc * 2) {
+      risks.push(
+        tpl(t('metaAudit.riskHighCpcVsMedian', 'CPC on "{{name}}" is {{cpc}} vs. median {{median}}.'), {
+          name: r.name,
+          cpc: formatCurrency(r.cpc, currency),
+          median: formatCurrency(medianCpc, currency),
+        }),
+      )
+      actions.push(
+        tpl(t('metaAudit.actionReviewHighCpc', 'Audit "{{name}}": check frequency and placements.'), { name: r.name }),
+      )
+      break
+    }
+  }
+
+  const dedupe = (arr: string[]) => Array.from(new Set(arr))
+  return { facts, risks: dedupe(risks), actions: dedupe(actions) }
+}
+
 function MetaGlyph({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden>
@@ -73,6 +277,7 @@ function MetaGlyph({ className }: { className?: string }) {
 
 export default function MetaAuditPage() {
   const { t } = useI18n()
+  const { currentWorkspace } = useWorkspaceStore()
   const searchRef = useRef<HTMLInputElement>(null)
 
   const [tab, setTab] = useState<AuditTab>('meta')
@@ -81,7 +286,8 @@ export default function MetaAuditPage() {
   const [maxSpend, setMaxSpend] = useState('0')
   const [gradedBy, setGradedBy] = useState('leads')
   const [dateRange, setDateRange] = useState<'7' | '30' | 'month'>('7')
-  const [kpi, setKpi] = useState<'roas' | 'leads' | 'spend'>('roas')
+  const [kpi, setKpi] = useState<KpiMode>('roas')
+  const [persona, setPersona] = useState<'owner' | 'specialist'>('owner')
   const [preset, setPreset] = useState('')
   const [search, setSearch] = useState('')
   const [showSearch, setShowSearch] = useState(false)
@@ -90,6 +296,52 @@ export default function MetaAuditPage() {
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null)
   const [selectedFormats, setSelectedFormats] = useState<Record<string, boolean>>({})
   const [selectedCopy, setSelectedCopy] = useState<Record<string, boolean>>({})
+  const [liveData, setLiveData] = useState<ReportData | null>(null)
+  const [liveLoading, setLiveLoading] = useState(false)
+  const [liveError, setLiveError] = useState('')
+
+  const reportingDays = useMemo(() => daysForDateRange(dateRange), [dateRange])
+
+  const loadReporting = useCallback(() => {
+    if (!currentWorkspace?.id) {
+      setLiveData(null)
+      setLiveError('')
+      setLiveLoading(false)
+      return
+    }
+    setLiveLoading(true)
+    setLiveError('')
+    metaApi
+      .reporting(currentWorkspace.id, reportingDays)
+      .then((res) => {
+        setLiveData(res.data as ReportData)
+      })
+      .catch(() => {
+        setLiveData(null)
+        setLiveError(t('metaAudit.loadError', 'Could not load Meta reporting. Check that Meta Ads is connected for this workspace.'))
+      })
+      .finally(() => {
+        setLiveLoading(false)
+        setLastRefresh(new Date())
+      })
+  }, [currentWorkspace?.id, reportingDays, t])
+
+  useEffect(() => {
+    loadReporting()
+  }, [loadReporting])
+
+  const liveRows = useMemo(() => (liveData ? flattenReportData(liveData) : []), [liveData])
+  const isLiveData = liveRows.length > 0
+  const hasReportingAccounts = Boolean(liveData && liveData.accounts.length > 0)
+  const noCampaignRows = hasReportingAccounts && liveRows.length === 0 && !liveError
+
+  useEffect(() => {
+    if (isLiveData && (kpi === 'roas' || kpi === 'leads')) setKpi('spend')
+  }, [isLiveData, kpi])
+
+  useEffect(() => {
+    if (!isLiveData && (kpi === 'ctr' || kpi === 'clicks')) setKpi('roas')
+  }, [isLiveData, kpi])
 
   useEffect(() => {
     if (!feedback) return
@@ -111,16 +363,41 @@ export default function MetaAuditPage() {
   )
 
   const tabHelp: Record<AuditTab, string> = useMemo(
-    () => ({
-      meta: t('metaAudit.metaHelp', 'Account snapshot: spend, ROAS, and top campaigns (sample).'),
-      targeting: t('metaAudit.targetingHelp', 'Audience breadth vs. performance — spot overlap or fatigue risk (sample).'),
-      auction: t('metaAudit.auctionHelp', 'Auction pressure and delivery — why costs move (sample).'),
-      geo: t('metaAudit.geoHelp', 'Budget split by region — where results come from (sample).'),
-      creative: t('metaAudit.creativeHelp', 'Formats and a simple performance map — pick winners for Ad Launcher (sample).'),
-      adcopy: t('metaAudit.adcopyHelp', 'Headline and body patterns vs. metrics (sample).'),
-    }),
-    [t],
+    () =>
+      isLiveData
+        ? {
+            meta: t('metaAudit.metaHelpLive', 'Account snapshot from synced reporting: spend, CTR, CPC, and campaigns in this date range.'),
+            targeting: t(
+              'metaAudit.targetingHelpLive',
+              'Illustrative layout. Audience overlap and fatigue still require breakdowns not yet in this reporting feed.',
+            ),
+            auction: t('metaAudit.auctionHelpLive', 'Illustrative layout. Auction diagnostics need placement/auction breakdowns from Meta.'),
+            geo: t('metaAudit.geoHelpLive', 'Illustrative layout. Geo split is not in the current campaign-level reporting payload.'),
+            creative: t('metaAudit.creativeHelpLive', 'Illustrative layout. Use Reporting export or Ads Manager for creative-level IDs.'),
+            adcopy: t('metaAudit.adcopyHelpLive', 'Illustrative layout. Copy-level metrics need ad-level breakdowns.'),
+          }
+        : {
+            meta: t('metaAudit.metaHelp', 'Account snapshot: spend, ROAS, and top campaigns (sample).'),
+            targeting: t('metaAudit.targetingHelp', 'Audience breadth vs. performance — spot overlap or fatigue risk (sample).'),
+            auction: t('metaAudit.auctionHelp', 'Auction pressure and delivery — why costs move (sample).'),
+            geo: t('metaAudit.geoHelp', 'Budget split by region — where results come from (sample).'),
+            creative: t('metaAudit.creativeHelp', 'Formats and a simple performance map — pick winners for Ad Launcher (sample).'),
+            adcopy: t('metaAudit.adcopyHelp', 'Headline and body patterns vs. metrics (sample).'),
+          },
+    [isLiveData, t],
   )
+
+  const auditFindings = useMemo(() => computeAuditFindings(liveRows, t), [liveRows, t])
+
+  const liveTotals = useMemo(() => {
+    if (!liveRows.length) return null
+    const spend = liveRows.reduce((s, r) => s + r.spend, 0)
+    const clicks = liveRows.reduce((s, r) => s + r.clicks, 0)
+    const impressions = liveRows.reduce((s, r) => s + r.impressions, 0)
+    const ctr = impressions > 0 ? (clicks / impressions) * 100 : 0
+    const currency = liveRows[0]?.currency ?? 'USD'
+    return { spend, clicks, impressions, ctr, currency }
+  }, [liveRows])
 
   const dateLabel = useMemo(() => {
     if (dateRange === '7') return t('metaAudit.date7', 'Last 7 days')
@@ -128,7 +405,27 @@ export default function MetaAuditPage() {
     return t('metaAudit.dateMonth', 'This month')
   }, [dateRange, t])
 
-  const filteredCampaigns = useMemo(() => {
+  const filteredLiveRows = useMemo(() => {
+    let list = liveRows
+    if (preset === 'winners') {
+      const med = median(list.map((r) => r.ctr).filter((x) => x > 0))
+      list = list.filter((r) => r.ctr >= med || med === 0)
+    }
+    if (preset === 'learning') {
+      list = list.filter((r) => /limited|learning/i.test(r.status))
+    }
+    const q = search.trim().toLowerCase()
+    if (q) list = list.filter((c) => c.name.toLowerCase().includes(q) || c.id.toLowerCase().includes(q))
+    const dir = (a: LiveCampaignRow, b: LiveCampaignRow) => {
+      if (kpi === 'ctr') return b.ctr - a.ctr
+      if (kpi === 'clicks') return b.clicks - a.clicks
+      if (kpi === 'spend') return b.spend - a.spend
+      return b.spend - a.spend
+    }
+    return [...list].sort(dir)
+  }, [liveRows, search, preset, kpi])
+
+  const filteredMockCampaigns = useMemo(() => {
     const q = search.trim().toLowerCase()
     if (!q) return MOCK_CAMPAIGNS
     return MOCK_CAMPAIGNS.filter((c) => c.name.toLowerCase().includes(q) || c.id.includes(q))
@@ -148,8 +445,12 @@ export default function MetaAuditPage() {
   }, [])
 
   const onRefresh = () => {
-    setLastRefresh(new Date())
-    setFeedback(t('metaAudit.refreshed', 'Preview refreshed (demo). Connect Meta for live sync.'))
+    loadReporting()
+    setFeedback(
+      isLiveData
+        ? t('metaAudit.refreshedLive', 'Reporting data refreshed.')
+        : t('metaAudit.refreshed', 'Preview refreshed (demo). Connect Meta for live sync.'),
+    )
   }
 
   const onSaveView = () => {
@@ -260,15 +561,20 @@ export default function MetaAuditPage() {
       </Dialog>
 
       {introOpen && (
-        <Alert variant="info" className="border-primary/20 bg-primary/5">
+        <Alert variant="info" className="border-brand-mid/25 bg-brand-lime/10 dark:border-brand-mid/30 dark:bg-brand-lime/5">
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="font-semibold text-text-primary">{t('metaAudit.introTitle', 'How to use Meta Audit')}</p>
               <p className="mt-1 text-sm text-text-secondary">
-                {t(
-                  'metaAudit.introBody',
-                  'Each tab answers one question about your Meta ads. Figures here are samples so you can learn the layout before connecting Meta.',
-                )}
+                {isLiveData
+                  ? t(
+                      'metaAudit.introBodyLive',
+                      'Each tab answers one question about your Meta ads. The dashboard tab uses live reporting data; other tabs stay illustrative until deeper breakdowns sync.',
+                    )
+                  : t(
+                      'metaAudit.introBody',
+                      'Each tab answers one question about your Meta ads. Figures here are samples so you can learn the layout before connecting Meta.',
+                    )}
               </p>
               <ol className="mt-3 list-decimal space-y-1 pl-5 text-sm text-text-secondary">
                 <li>{t('metaAudit.introStep1', 'Choose a date range and KPI (top right).')}</li>
@@ -280,6 +586,14 @@ export default function MetaAuditPage() {
                 </li>
                 <li>{t('metaAudit.introStep3', 'Use presets and filters, then save a view you open every week.')}</li>
               </ol>
+              <p className="mt-3 text-sm text-text-secondary">
+                {persona === 'owner'
+                  ? t('metaAudit.tipOwner', 'Prioritize spend concentration and any campaigns with spend but no clicks — those waste budget first.')
+                  : t(
+                      'metaAudit.tipSpecialist',
+                      'Compare CTR and CPC to the account median; pause or retest outliers before scaling winners.',
+                    )}
+              </p>
             </div>
             <button
               type="button"
@@ -307,31 +621,74 @@ export default function MetaAuditPage() {
         </Alert>
       )}
 
-      <section className="rounded-2xl border border-border bg-surface-2/90 p-3 dark:bg-surface-elevated/90">
+      {liveError && (
+        <Alert variant="error" className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <span>{liveError}</span>
+          <Link
+            href="/settings/meta"
+            className="shrink-0 text-sm font-semibold text-brand-ink underline decoration-brand-mid/50 hover:no-underline dark:text-brand-lime"
+          >
+            {t('metaAudit.connectMeta', 'Open Meta settings')}
+          </Link>
+        </Alert>
+      )}
+
+      <section className="rounded-2xl border border-brand-mid/20 bg-gradient-to-br from-brand-lime/[0.08] via-surface-2/95 to-surface-2/90 p-3 dark:from-brand-lime/5 dark:via-surface-elevated/90 dark:to-surface-elevated/90 dark:border-brand-mid/25">
         <PageHeader
           className="mb-0 border-0 bg-transparent p-2 shadow-none"
           title={
             <span className="inline-flex items-center gap-2">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/15 text-primary">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-brand-mid/30 bg-gradient-to-br from-brand-mid/25 to-brand-lime/40 text-brand-ink shadow-sm dark:from-brand-mid/40 dark:to-brand-lime/30">
                 <Compass className="h-4 w-4" />
               </span>
               {t('metaAudit.title', '360° Meta Audit')}
             </span>
           }
-          subtitle={t(
-            'metaAudit.subtitle',
-            'Six views to diagnose Meta performance. Below is sample data until your ad account is connected.',
-          )}
+          subtitle={
+            <span className="space-y-2">
+              <span className="mr-2 inline-flex items-center gap-2 align-middle">
+                <span
+                  className={cn(
+                    'rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide',
+                    isLiveData
+                      ? 'border-brand-mid/35 bg-brand-lime/35 text-brand-ink dark:bg-brand-lime/25 dark:text-brand-lime'
+                      : 'border-border bg-surface-2 text-text-tertiary',
+                  )}
+                >
+                  {isLiveData ? t('metaAudit.badgeLive', 'Live data') : t('metaAudit.badgeSample', 'Sample walkthrough')}
+                </span>
+                {liveLoading && <span className="text-xs text-text-tertiary">{t('common.loading', 'Loading…')}</span>}
+              </span>
+              <span className="block">
+                {isLiveData
+                  ? t(
+                      'metaAudit.subtitleLive',
+                      'Six views to diagnose Meta performance. Numbers below come from your connected Meta accounts for the selected period.',
+                    )
+                  : t(
+                      'metaAudit.subtitle',
+                      'Six views to diagnose Meta performance. Below is sample data until your ad account is connected.',
+                    )}
+              </span>
+            </span>
+          }
           actions={
             <div className="flex flex-wrap items-center gap-2">
-              <Button variant="secondary" size="sm" type="button" className="gap-1.5" onClick={onRefresh}>
-                <RefreshCw className="h-3.5 w-3.5" />
+              <Button
+                variant="secondary"
+                size="sm"
+                type="button"
+                className="gap-1.5"
+                onClick={onRefresh}
+                disabled={liveLoading}
+              >
+                <RefreshCw className={cn('h-3.5 w-3.5', liveLoading && 'animate-spin')} />
                 {t('common.refresh', 'Refresh')}
               </Button>
               <select
                 value={dateRange}
                 onChange={(e) => setDateRange(e.target.value as typeof dateRange)}
-                className="rounded-xl border border-border bg-surface px-3 py-2 text-xs font-medium text-text-primary shadow-sm"
+                className="rounded-xl border border-brand-mid/20 bg-surface px-3 py-2 text-xs font-medium text-text-primary shadow-sm focus:border-brand-mid focus:outline-none focus:ring-2 focus:ring-brand-lime/40"
               >
                 <option value="7">{t('metaAudit.date7', 'Last 7 days')}</option>
                 <option value="30">{t('metaAudit.date30', 'Last 30 days')}</option>
@@ -350,18 +707,21 @@ export default function MetaAuditPage() {
         />
       </section>
 
-      <div className="overflow-x-auto border-b border-border/80">
-        <nav className="flex min-w-max gap-1 pb-px" aria-label="Meta audit sections">
+      <div className="overflow-x-auto">
+        <nav
+          className="flex min-w-max gap-1 rounded-xl border border-border bg-surface-2 p-1 shadow-sm dark:bg-surface-elevated/80"
+          aria-label="Meta audit sections"
+        >
           {TAB_IDS.map((id) => (
             <button
               key={id}
               type="button"
               onClick={() => setTab(id)}
               className={cn(
-                'whitespace-nowrap border-b-2 px-3 py-2.5 text-xs font-medium transition-colors sm:text-sm',
+                'whitespace-nowrap rounded-lg px-3 py-2.5 text-xs font-medium transition-all duration-200 sm:text-sm',
                 tab === id
-                  ? 'border-primary text-primary'
-                  : 'border-transparent text-text-tertiary hover:text-text-secondary',
+                  ? 'bg-gradient-to-r from-brand-mid to-brand-lime text-brand-ink shadow-sm'
+                  : 'text-text-tertiary hover:bg-surface hover:text-text-primary dark:hover:bg-surface-2',
               )}
             >
               {tabLabels[id]}
@@ -372,7 +732,117 @@ export default function MetaAuditPage() {
 
       <p className="text-sm text-text-secondary">{tabHelp[tab]}</p>
 
-      <div className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-surface p-3 shadow-sm">
+      {isLiveData && (
+        <div className="rounded-xl border border-amber-500/25 bg-amber-500/10 px-4 py-3 dark:border-amber-500/30 dark:bg-amber-500/10">
+          <p className="text-xs font-medium text-amber-900 dark:text-amber-200">
+            {t('metaAudit.periodNote', 'Period-over-period is not available until daily or comparison windows are exposed by the API.')}
+          </p>
+        </div>
+      )}
+
+      {(isLiveData || noCampaignRows) && (
+        <section className="rounded-2xl border border-brand-mid/20 bg-surface p-4 shadow-sm ring-1 ring-brand-lime/10 dark:border-brand-mid/25 dark:ring-brand-lime/5">
+          <h2 className="text-sm font-semibold text-brand-ink dark:text-brand-lime">
+            {t('metaAudit.findingsTitle', 'Audit findings (from reporting)')}
+          </h2>
+          {noCampaignRows && (
+            <p className="mt-2 rounded-lg border border-amber-500/25 bg-amber-500/10 px-3 py-2 text-sm text-amber-950 dark:text-amber-100">
+              {t(
+                'metaAudit.findingNoCampaigns',
+                'Meta is connected but no campaign rows were returned for this period — widen the date range or check account access.',
+              )}
+            </p>
+          )}
+          {isLiveData && (
+            <div className="mt-3 grid gap-4 md:grid-cols-3">
+              <div className="rounded-xl border border-brand-mid/20 bg-brand-lime/[0.07] p-4 dark:bg-brand-lime/5">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-brand-ink/80 dark:text-brand-lime/90">
+                  {t('metaAudit.factsTitle', 'Facts')}
+                </p>
+                <ul className="list-disc space-y-1.5 pl-4 text-sm text-text-secondary">
+                  {auditFindings.facts.map((line, i) => (
+                    <li key={i}>{line}</li>
+                  ))}
+                </ul>
+              </div>
+              <div className="rounded-xl border border-amber-500/25 bg-amber-500/10 p-4 dark:border-amber-500/30 dark:bg-amber-500/10">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-amber-800 dark:text-amber-300">
+                  {t('metaAudit.risksTitle', 'Weak spots')}
+                </p>
+                {auditFindings.risks.length === 0 ? (
+                  <p className="text-sm text-amber-950/80 dark:text-amber-100/90">
+                    {t(
+                      'metaAudit.risksEmpty',
+                      'No automatic risk flags for this window. Rules check spend concentration, CTR vs. blended average, CPC vs. median, and spend without clicks.',
+                    )}
+                  </p>
+                ) : (
+                  <ul className="list-disc space-y-1.5 pl-4 text-sm text-amber-950/90 dark:text-amber-50/95">
+                    {auditFindings.risks.map((line, i) => (
+                      <li key={i}>{line}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+              <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/10 p-4 dark:border-emerald-500/30 dark:bg-emerald-500/10">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-emerald-800 dark:text-emerald-300">
+                  {t('metaAudit.actionsTitle', 'Recommendations')}
+                </p>
+                {auditFindings.actions.length === 0 ? (
+                  <p className="text-sm text-emerald-950/70 dark:text-emerald-100/80">—</p>
+                ) : (
+                  <ul className="list-disc space-y-1.5 pl-4 text-sm text-emerald-950/90 dark:text-emerald-50/95">
+                    {auditFindings.actions.map((line, i) => (
+                      <li key={i}>{line}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+
+      {currentWorkspace && !liveLoading && liveData && liveData.accounts.length === 0 && !liveError && (
+        <Alert variant="info">{t('metaAudit.findingEmptyConnect', 'Connect a Meta ad account in workspace settings to run a live audit.')}</Alert>
+      )}
+
+      <div className="flex flex-col gap-3 rounded-xl border border-brand-mid/15 bg-surface p-3 shadow-sm ring-1 ring-border/50 lg:flex-row lg:flex-wrap lg:items-center dark:border-brand-mid/20">
+        <div className="flex flex-col gap-1 border-b border-border pb-3 text-xs lg:border-b-0 lg:border-r lg:pb-0 lg:pr-4">
+          <span className="font-semibold uppercase tracking-wide text-text-tertiary">{t('metaAudit.personaLabel', 'View as')}</span>
+          <div className="flex flex-wrap gap-1">
+            <button
+              type="button"
+              onClick={() => setPersona('owner')}
+              className={cn(
+                'rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-all duration-200',
+                persona === 'owner'
+                  ? 'border-transparent bg-gradient-to-r from-brand-mid to-brand-lime text-brand-ink shadow-sm'
+                  : 'border-border text-text-secondary hover:bg-surface-2',
+              )}
+            >
+              {t('metaAudit.personaOwner', 'Account owner')}
+            </button>
+            <button
+              type="button"
+              onClick={() => setPersona('specialist')}
+              className={cn(
+                'rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-all duration-200',
+                persona === 'specialist'
+                  ? 'border-transparent bg-gradient-to-r from-brand-mid to-brand-lime text-brand-ink shadow-sm'
+                  : 'border-border text-text-secondary hover:bg-surface-2',
+              )}
+            >
+              {t('metaAudit.personaSpecialist', 'Targetologist')}
+            </button>
+          </div>
+          <span className="max-w-xs text-[11px] leading-snug text-text-tertiary lg:max-w-[220px]">
+            {persona === 'owner'
+              ? t('metaAudit.personaHintOwner', 'High-level risks, budget concentration, and clear next checks.')
+              : t('metaAudit.personaHintSpecialist', 'Delivery metrics (CTR, CPC), outliers vs. account average, and campaign-level fixes.')}
+          </span>
+        </div>
+        <div className="flex flex-1 flex-wrap items-center gap-2">
         <button
           type="button"
           onClick={() => {
@@ -411,62 +881,146 @@ export default function MetaAuditPage() {
           <MetaGlyph className="h-4 w-4 shrink-0 text-text-tertiary" />
           <select
             value={kpi}
-            onChange={(e) => setKpi(e.target.value as typeof kpi)}
+            onChange={(e) => setKpi(e.target.value as KpiMode)}
             className="min-w-[110px] bg-transparent text-xs font-medium text-text-primary outline-none"
           >
-            <option value="roas">{t('metaAudit.metricRoas', 'ROAS (All)')}</option>
-            <option value="leads">{t('metaAudit.metricLeads', 'Leads (All)')}</option>
-            <option value="spend">{t('metaAudit.metricSpend', 'Amount spent')}</option>
+            {isLiveData ? (
+              <>
+                <option value="spend">{t('metaAudit.metricSpend', 'Amount spent')}</option>
+                <option value="ctr">{t('metaAudit.metricCtr', 'CTR (blended)')}</option>
+                <option value="clicks">{t('metaAudit.kpiClicks', 'Clicks')}</option>
+              </>
+            ) : (
+              <>
+                <option value="roas">{t('metaAudit.metricRoas', 'ROAS (All)')}</option>
+                <option value="leads">{t('metaAudit.metricLeads', 'Leads (All)')}</option>
+                <option value="spend">{t('metaAudit.metricSpend', 'Amount spent')}</option>
+              </>
+            )}
           </select>
+        </div>
         </div>
       </div>
 
       {tab === 'meta' && (
         <div className="space-y-4">
           <div className="grid gap-3 sm:grid-cols-3">
-            <div className="rounded-xl border border-border bg-surface p-4">
-              <p className="text-xs text-text-tertiary">{t('metaAudit.kpiSpend', 'Amount spent')}</p>
-              <p className="mt-1 text-2xl font-semibold tabular-nums text-text-primary">
-                ${(13270 * (dateRange === '7' ? 1 : dateRange === '30' ? 3.2 : 4.5)).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-              </p>
-              <p className="mt-1 text-[11px] text-text-tertiary">{dateLabel}</p>
-            </div>
-            <div className="rounded-xl border border-border bg-surface p-4">
-              <p className="text-xs text-text-tertiary">{t('metaAudit.metricRoas', 'ROAS (All)')}</p>
-              <p className="mt-1 text-2xl font-semibold tabular-nums text-text-primary">
-                {kpi === 'roas' ? '2.6' : kpi === 'leads' ? '—' : '—'}
-              </p>
-            </div>
-            <div className="rounded-xl border border-border bg-surface p-4">
-              <p className="text-xs text-text-tertiary">{t('metaAudit.kpiLeads', 'Leads (All)')}</p>
-              <p className="mt-1 text-2xl font-semibold tabular-nums text-text-primary">{kpi === 'leads' ? '184' : '142'}</p>
-            </div>
+            {isLiveData && liveTotals ? (
+              <>
+                <div className="rounded-xl border border-border bg-surface p-4 shadow-sm">
+                  <p className="text-xs font-medium text-text-tertiary">{t('metaAudit.kpiSpend', 'Amount spent')}</p>
+                  <p className="mt-1 text-2xl font-bold tabular-nums text-text-primary">
+                    {formatCurrency(liveTotals.spend, liveTotals.currency)}
+                  </p>
+                  <p className="mt-1 text-[11px] text-text-tertiary">{dateLabel}</p>
+                </div>
+                <div className="rounded-xl border border-brand-mid/25 bg-gradient-to-br from-brand-lime/20 to-brand-lime/5 p-4 shadow-sm dark:from-brand-lime/15 dark:to-transparent">
+                  <p className="text-xs font-medium text-brand-ink/70 dark:text-brand-lime/80">{t('metaAudit.kpiCtr', 'CTR (blended)')}</p>
+                  <p className="mt-1 text-2xl font-bold tabular-nums text-brand-ink dark:text-brand-lime">{liveTotals.ctr.toFixed(2)}%</p>
+                  <p className="mt-1 text-[11px] text-text-tertiary">{t('metaAudit.metricCtr', 'CTR (blended)')}</p>
+                </div>
+                <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/10 p-4 shadow-sm dark:border-emerald-500/30">
+                  <p className="text-xs font-medium text-emerald-800/80 dark:text-emerald-300/90">{t('metaAudit.kpiClicks', 'Clicks')}</p>
+                  <p className="mt-1 text-2xl font-bold tabular-nums text-emerald-800 dark:text-emerald-200">
+                    {formatNumber(liveTotals.clicks)}
+                  </p>
+                  <p className="mt-1 text-[11px] text-emerald-900/70 dark:text-emerald-200/80">
+                    {t('metaAudit.roasUnavailableNote', 'ROAS is not in this reporting sync yet.')}
+                  </p>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="rounded-xl border border-border bg-surface p-4 shadow-sm">
+                  <p className="text-xs font-medium text-text-tertiary">{t('metaAudit.kpiSpend', 'Amount spent')}</p>
+                  <p className="mt-1 text-2xl font-bold tabular-nums text-text-primary">
+                    ${(13270 * (dateRange === '7' ? 1 : dateRange === '30' ? 3.2 : 4.5)).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                  </p>
+                  <p className="mt-1 text-[11px] text-text-tertiary">{dateLabel}</p>
+                </div>
+                <div className="rounded-xl border border-brand-mid/20 bg-brand-lime/10 p-4 shadow-sm dark:bg-brand-lime/5">
+                  <p className="text-xs font-medium text-text-tertiary">{t('metaAudit.metricRoas', 'ROAS (All)')}</p>
+                  <p className="mt-1 text-2xl font-bold tabular-nums text-brand-ink dark:text-brand-lime">
+                    {kpi === 'roas' ? '2.6' : kpi === 'leads' ? '—' : '—'}
+                  </p>
+                </div>
+                <div className="rounded-xl border border-amber-500/20 bg-amber-500/10 p-4 shadow-sm dark:border-amber-500/25">
+                  <p className="text-xs font-medium text-amber-900/70 dark:text-amber-200/80">{t('metaAudit.kpiLeads', 'Leads (All)')}</p>
+                  <p className="mt-1 text-2xl font-bold tabular-nums text-amber-900 dark:text-amber-100">{kpi === 'leads' ? '184' : '142'}</p>
+                </div>
+              </>
+            )}
           </div>
-          <div className="overflow-x-auto rounded-2xl border border-border bg-surface shadow-sm">
+          <div className="overflow-x-auto rounded-2xl border border-brand-mid/15 bg-surface shadow-sm dark:border-brand-mid/20">
             <table className="w-full min-w-[560px] border-collapse text-left text-sm">
-              <thead className="border-b border-border bg-surface-2 text-xs uppercase tracking-wide text-text-tertiary dark:bg-surface-elevated">
+              <thead className="border-b border-brand-mid/10 bg-surface-2 text-xs uppercase tracking-wide text-text-tertiary dark:bg-surface-elevated">
                 <tr>
                   <th className="px-4 py-3">{t('metaAudit.campaignColumn', 'Campaign')}</th>
-                  <th className="px-4 py-3">{t('metaAudit.spendColumn', 'Spend')}</th>
-                  <th className="px-4 py-3">{t('metaAudit.roasColumn', 'ROAS')}</th>
+                  <th className="px-4 py-3 text-right">{t('metaAudit.spendColumn', 'Spend')}</th>
+                  {isLiveData ? (
+                    <>
+                      <th className="px-4 py-3 text-right">{t('metaAudit.clicksColumn', 'Clicks')}</th>
+                      <th className="px-4 py-3 text-right">{t('metaAudit.impressionsColumn', 'Impressions')}</th>
+                      <th className="px-4 py-3 text-right">{t('metaAudit.ctrColumn', 'CTR')}</th>
+                      <th className="px-4 py-3 text-right">{t('metaAudit.cpcColumn', 'CPC')}</th>
+                    </>
+                  ) : (
+                    <th className="px-4 py-3 text-right">{t('metaAudit.roasColumn', 'ROAS')}</th>
+                  )}
                   <th className="px-4 py-3">{t('metaAudit.statusColumn', 'Status')}</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredCampaigns.map((row) => (
-                  <tr key={row.id} className="border-b border-border/70 last:border-0">
-                    <td className="px-4 py-3 font-medium text-text-primary">{row.name}</td>
-                    <td className="px-4 py-3 tabular-nums text-text-secondary">${row.spend.toLocaleString()}</td>
-                    <td className="px-4 py-3 tabular-nums text-text-secondary">{row.roas.toFixed(1)}×</td>
-                    <td className="px-4 py-3 text-text-secondary">{row.status}</td>
-                  </tr>
-                ))}
+                {isLiveData
+                  ? filteredLiveRows.map((row) => (
+                      <tr key={row.id} className="border-b border-border/70 last:border-0">
+                        <td className="px-4 py-3 font-medium text-text-primary">{row.name}</td>
+                        <td className="px-4 py-3 text-right tabular-nums text-text-secondary">
+                          {formatCurrency(row.spend, row.currency)}
+                        </td>
+                        <td className="px-4 py-3 text-right tabular-nums text-text-secondary">{formatNumber(row.clicks)}</td>
+                        <td className="px-4 py-3 text-right tabular-nums text-text-secondary">{formatNumber(row.impressions)}</td>
+                        <td
+                          className={cn(
+                            'px-4 py-3 text-right tabular-nums',
+                            row.ctr >= 2 ? 'text-emerald-500' : row.ctr >= 1 ? 'text-text-primary' : row.ctr > 0 ? 'text-amber-500' : 'text-text-tertiary',
+                          )}
+                        >
+                          {row.ctr.toFixed(2)}%
+                        </td>
+                        <td className="px-4 py-3 text-right tabular-nums text-text-secondary">
+                          {row.cpc > 0 ? formatCurrency(row.cpc, row.currency) : '—'}
+                        </td>
+                        <td className="px-4 py-3">
+                          <span
+                            className={cn(
+                              'rounded px-2 py-0.5 text-[10px] font-semibold uppercase',
+                              STATUS_BADGE[row.status] ?? 'text-text-tertiary bg-surface-2',
+                            )}
+                          >
+                            {row.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  : filteredMockCampaigns.map((row) => (
+                      <tr key={row.id} className="border-b border-border/70 last:border-0">
+                        <td className="px-4 py-3 font-medium text-text-primary">{row.name}</td>
+                        <td className="px-4 py-3 text-right tabular-nums text-text-secondary">${row.spend.toLocaleString()}</td>
+                        <td className="px-4 py-3 text-right tabular-nums text-text-secondary">{row.roas.toFixed(1)}×</td>
+                        <td className="px-4 py-3 text-text-secondary">{row.status}</td>
+                      </tr>
+                    ))}
               </tbody>
             </table>
           </div>
-          <p className="text-center text-xs text-text-tertiary">
-            <span className="rounded-full border border-border bg-surface-2 px-2 py-0.5">{t('metaAudit.sampleNote', 'Sample data')}</span>
-          </p>
+          {!isLiveData && (
+            <p className="text-center text-xs">
+              <span className="inline-flex rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 font-medium text-amber-900 dark:text-amber-200">
+                {t('metaAudit.sampleNote', 'Sample data')}
+              </span>
+            </p>
+          )}
         </div>
       )}
 
@@ -509,7 +1063,10 @@ export default function MetaAuditPage() {
                   <span className="tabular-nums font-medium text-text-secondary">{row.value}%</span>
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-surface-2">
-                  <div className="h-full rounded-full bg-primary/80" style={{ width: `${row.value}%` }} />
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-brand-mid to-brand-lime"
+                    style={{ width: `${row.value}%` }}
+                  />
                 </div>
               </li>
             ))}
@@ -579,7 +1136,7 @@ export default function MetaAuditPage() {
             <button
               type="button"
               onClick={() => setFiltersOpen(true)}
-              className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-primary/35 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/15"
+              className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-brand-mid/35 bg-brand-lime/15 px-3 py-1.5 text-xs font-semibold text-brand-ink hover:bg-brand-lime/25 dark:text-brand-lime"
             >
               <Filter className="h-3.5 w-3.5" />
               {t('metaAudit.smartFilter', 'Smart filter')}
@@ -600,7 +1157,9 @@ export default function MetaAuditPage() {
                       onClick={() => toggleFormat(f.id)}
                       className={cn(
                         'flex min-h-[168px] flex-col gap-2 rounded-xl border p-3 text-left shadow-sm transition-colors',
-                        on ? 'border-primary bg-primary/5 ring-1 ring-primary/25' : 'border-border bg-surface hover:border-primary/30',
+                        on
+                          ? 'border-brand-mid/40 bg-brand-lime/10 ring-1 ring-brand-lime/25 dark:border-brand-mid/50'
+                          : 'border-border bg-surface hover:border-brand-mid/30',
                       )}
                     >
                       <div className="flex items-center justify-between gap-1">
@@ -620,8 +1179,11 @@ export default function MetaAuditPage() {
                         <span className="text-right font-medium tabular-nums">{st.conv.toFixed(1)}%</span>
                       </div>
                       <div className="space-y-1 border-t border-border/60 pt-1">
-                        <div className="h-1 overflow-hidden rounded-full bg-surface-2">
-                          <div className="h-full rounded-full bg-primary" style={{ width: `${spendPct}%` }} />
+                          <div className="h-1 overflow-hidden rounded-full bg-surface-2">
+                          <div
+                            className="h-full rounded-full bg-gradient-to-r from-brand-mid to-brand-lime"
+                            style={{ width: `${spendPct}%` }}
+                          />
                         </div>
                         <div className="flex justify-between text-[9px] text-text-tertiary">
                           <span>{t('metaAudit.leadsBar', 'Leads')}</span>

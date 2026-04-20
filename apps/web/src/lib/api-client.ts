@@ -257,7 +257,24 @@ export const aiAgent = {
     workspaceId: string
     message: string
     history?: { role: 'user' | 'assistant'; content: string }[]
+    assistantPersona?: 'targetologist' | 'optimizer' | 'general'
   }) => apiClient.post<{ reply: string }>('/ai-agent/chat', body),
+  /** Multi-competitor portfolio (names + links); same payload can be forwarded to Manus later */
+  competitorAnalysisBatch: (body: Record<string, unknown>) =>
+    apiClient.post('/ai-agent/competitor-analysis-batch', body),
+}
+
+/** HeyGen photo avatars (server proxies with `HEYGEN_API_KEY`). */
+export const heygen = {
+  generatePhotoAvatar: (body: Record<string, unknown>) =>
+    apiClient.post<{ generationId: string }>('/heygen/photo-avatar/generate', body),
+  getPhotoGeneration: (generationId: string) =>
+    apiClient.get<{
+      id: string
+      status: string
+      imageUrlList: string[] | null
+      message: string | null
+    }>(`/heygen/photo-avatar/generation/${encodeURIComponent(generationId)}`),
 }
 
 export const campaigns = {
@@ -296,8 +313,8 @@ export const platforms = {
 }
 
 export const landingPages = {
-  generate: (workspaceId: string) =>
-    apiClient.post(`/landing-pages/workspace/${workspaceId}/generate`),
+  generate: (workspaceId: string, body?: Record<string, unknown>) =>
+    apiClient.post(`/landing-pages/workspace/${workspaceId}/generate`, body ?? {}),
   getByWorkspace: (workspaceId: string) =>
     apiClient.get(`/landing-pages/workspace/${workspaceId}`),
   update: (id: string, data: any) =>

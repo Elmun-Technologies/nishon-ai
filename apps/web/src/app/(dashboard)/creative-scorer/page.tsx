@@ -1,5 +1,22 @@
 'use client'
+
 import { useState, useRef, useCallback } from 'react'
+import {
+  BarChart3,
+  Film,
+  ImageIcon,
+  Layers,
+  LayoutGrid,
+  Loader2,
+  MousePointer2,
+  Palette,
+  Smartphone,
+  Sparkles,
+  Target,
+  Type,
+  Wand2,
+  X,
+} from 'lucide-react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { useI18n } from '@/i18n/use-i18n'
 import { Button } from '@/components/ui/Button'
@@ -7,21 +24,21 @@ import { Card } from '@/components/ui/Card'
 import { Alert } from '@/components/ui/Alert'
 import { Badge } from '@/components/ui/Badge'
 import { Spinner } from '@/components/ui/Spinner'
-import { PageHeader } from '@/components/ui'
 import apiClient from '@/lib/api-client'
+import { cn } from '@/lib/utils'
 
 // ─── TYPES ───────────────────────────────────────────────────────────────────
 
 interface ScoreParameter {
   name: string
-  score: number          // 0-10
+  score: number
   status: 'good' | 'medium' | 'bad'
-  feedback: string       // specific feedback in Uzbek
-  tip: string            // how to improve
+  feedback: string
+  tip: string
 }
 
 interface CreativeScore {
-  overallScore: number   // 0-100
+  overallScore: number
   grade: 'A' | 'B' | 'C' | 'D' | 'F'
   verdict: 'ready' | 'needs_work' | 'not_ready'
   verdictText: string
@@ -29,130 +46,141 @@ interface CreativeScore {
   topStrengths: string[]
   topIssues: string[]
   improvements: string[]
-  platformFit: Record<string, number>  // e.g. { meta: 85, tiktok: 60 }
-  estimatedCtr: string   // e.g. "1.2-1.8%"
+  platformFit: Record<string, number>
+  estimatedCtr: string
   abTestSuggestion: string
 }
 
-// ─── SCORE PARAMETERS DEFINITION ─────────────────────────────────────────────
+type GradeKey = 'A' | 'B' | 'C' | 'D' | 'F'
 
-const PARAMETER_ICONS: Record<string, string> = {
-  'Hook kuchi':           '🎣',
-  'Vizual sifat':         '🎨',
-  'Matn o\'qilishi':      '📝',
-  'CTA aniqligi':         '👆',
-  'Rang psixologiyasi':   '🎨',
-  'Brend izchilligi':     '🏷️',
-  'Auditoriya mosligi':   '🎯',
-  'Raqobat farqi':        '⚔️',
-  'Mobil optimizatsiya':  '📱',
-  'Platform talablari':   '✅',
+/** SVG ring + surface styles aligned with AdSpectr brand (no raw “blue panel”). */
+const GRADE_STYLES: Record<
+  GradeKey,
+  {
+    ring: string
+    labelKey: string
+    labelFb: string
+    surface: string
+    text: string
+    border: string
+  }
+> = {
+  A: {
+    ring: '#7aab4d',
+    labelKey: 'creativeScorer.gradeA',
+    labelFb: 'Excellent',
+    surface: 'bg-success/10 border-success/25 text-success dark:bg-success/15 dark:border-success/30',
+    text: 'text-success dark:text-brand-lime',
+    border: 'border-success/30 dark:border-success/25',
+  },
+  B: {
+    ring: '#93c75b',
+    labelKey: 'creativeScorer.gradeB',
+    labelFb: 'Good',
+    surface: 'bg-brand-mid/12 border-brand-mid/30 text-brand-ink dark:bg-brand-lime/10 dark:border-brand-lime/35 dark:text-brand-lime',
+    text: 'text-brand-mid dark:text-brand-lime',
+    border: 'border-brand-mid/35 dark:border-brand-lime/30',
+  },
+  C: {
+    ring: '#d97706',
+    labelKey: 'creativeScorer.gradeC',
+    labelFb: 'Average',
+    surface: 'bg-amber-500/10 border-amber-500/25 text-amber-800 dark:bg-amber-500/15 dark:border-amber-400/30 dark:text-amber-200',
+    text: 'text-amber-700 dark:text-amber-200',
+    border: 'border-amber-400/35 dark:border-amber-500/30',
+  },
+  D: {
+    ring: '#ea580c',
+    labelKey: 'creativeScorer.gradeD',
+    labelFb: 'Weak',
+    surface: 'bg-orange-500/10 border-orange-500/25 text-orange-900 dark:bg-orange-500/12 dark:border-orange-400/30 dark:text-orange-200',
+    text: 'text-orange-800 dark:text-orange-200',
+    border: 'border-orange-400/35 dark:border-orange-500/25',
+  },
+  F: {
+    ring: '#dc2626',
+    labelKey: 'creativeScorer.gradeF',
+    labelFb: 'Not usable',
+    surface: 'bg-red-500/10 border-red-500/25 text-red-800 dark:bg-red-500/12 dark:border-red-400/30 dark:text-red-200',
+    text: 'text-red-700 dark:text-red-200',
+    border: 'border-red-400/35 dark:border-red-500/25',
+  },
+}
+
+const PARAM_ICON: Record<string, React.ComponentType<{ className?: string }>> = {
+  'Hook kuchi': Target,
+  'Vizual sifat': Palette,
+  "Matn o'qilishi": Type,
+  'CTA aniqligi': MousePointer2,
+  'Rang psixologiyasi': Palette,
+  'Brend izchilligi': Layers,
+  'Auditoriya mosligi': Target,
+  'Raqobat farqi': BarChart3,
+  'Mobil optimizatsiya': Smartphone,
+  'Platform talablari': LayoutGrid,
 }
 
 const PLATFORMS = [
-  { value: 'meta',     label: '📘 Meta (Facebook/Instagram)' },
-  { value: 'tiktok',   label: '🎵 TikTok' },
-  { value: 'google',   label: '🔍 Google Display' },
-  { value: 'youtube',  label: '▶️ YouTube' },
-  { value: 'telegram', label: '✈️ Telegram' },
-]
+  { value: 'meta', labelKey: 'creativeScorer.platformMeta', labelFb: 'Meta (Facebook / Instagram)' },
+  { value: 'tiktok', labelKey: 'creativeScorer.platformTiktok', labelFb: 'TikTok' },
+  { value: 'google', labelKey: 'creativeScorer.platformGoogle', labelFb: 'Google Display' },
+  { value: 'youtube', labelKey: 'creativeScorer.platformYoutube', labelFb: 'YouTube' },
+  { value: 'telegram', labelKey: 'creativeScorer.platformTelegram', labelFb: 'Telegram' },
+] as const
 
 const CREATIVE_TYPES = [
-  { value: 'image',    label: '🖼 Rasm / Banner' },
-  { value: 'video',    label: '🎬 Video thumbnail' },
-  { value: 'carousel', label: '🗂 Carousel birinchi slayd' },
-  { value: 'story',    label: '📱 Story / Reels cover' },
-]
-
-// ─── GRADE CONFIG ────────────────────────────────────────────────────────────
-
-/* Real chroma — app Tailwind "blue/emerald" map to brand green, so use explicit values for readable grades */
-const GRADE_CONFIG = {
-  A: {
-    color: 'text-[#065f46] dark:text-[#6ee7b7]',
-    bg: 'bg-[#ecfdf5] dark:bg-[#064e3b]/45',
-    border: 'border-[#6ee7b7] dark:border-[#34d399]/45',
-    ring: '#10b981',
-    label: 'Mukammal',
-  },
-  B: {
-    color: 'text-[#1e40af] dark:text-[#93c5fd]',
-    bg: 'bg-[#eff6ff] dark:bg-[#172554]/55',
-    border: 'border-[#93c5fd] dark:border-[#3b82f6]/45',
-    ring: '#2563eb',
-    label: 'Yaxshi',
-  },
-  C: {
-    color: 'text-[#b45309] dark:text-[#fcd34d]',
-    bg: 'bg-[#fffbeb] dark:bg-[#422006]/50',
-    border: 'border-[#fcd34d] dark:border-[#f59e0b]/45',
-    ring: '#d97706',
-    label: "O'rtacha",
-  },
-  D: {
-    color: 'text-[#c2410c] dark:text-[#fdba74]',
-    bg: 'bg-[#fff7ed] dark:bg-[#431407]/45',
-    border: 'border-[#fdba74] dark:border-[#fb923c]/45',
-    ring: '#ea580c',
-    label: 'Zaif',
-  },
-  F: {
-    color: 'text-[#b91c1c] dark:text-[#fca5a5]',
-    bg: 'bg-[#fef2f2] dark:bg-[#450a0a]/45',
-    border: 'border-[#fca5a5] dark:border-[#f87171]/45',
-    ring: '#dc2626',
-    label: 'Yaroqsiz',
-  },
-}
-
-// ─── SCORE BAR ────────────────────────────────────────────────────────────────
+  { value: 'image', labelKey: 'creativeScorer.typeImage', labelFb: 'Image / banner', icon: ImageIcon },
+  { value: 'video', labelKey: 'creativeScorer.typeVideo', labelFb: 'Video thumbnail', icon: Film },
+  { value: 'carousel', labelKey: 'creativeScorer.typeCarousel', labelFb: 'Carousel first slide', icon: Layers },
+  { value: 'story', labelKey: 'creativeScorer.typeStory', labelFb: 'Story / Reels cover', icon: Smartphone },
+] as const
 
 function ScoreBar({ score, max = 10 }: { score: number; max?: number }) {
   const pct = (score / max) * 100
-  const color = pct >= 70 ? '#059669' : pct >= 40 ? '#d97706' : '#dc2626'
+  const bar =
+    pct >= 70
+      ? 'bg-gradient-to-r from-brand-mid to-brand-lime'
+      : pct >= 40
+        ? 'bg-amber-500 dark:bg-amber-400'
+        : 'bg-red-500 dark:bg-red-400'
   return (
     <div className="flex items-center gap-2">
-      <div className="flex-1 h-1.5 bg-surface-2 rounded-full overflow-hidden">
-        <div
-          className="h-full rounded-full transition-all duration-700"
-          style={{ width: `${pct}%`, backgroundColor: color }}
-        />
+      <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-2 dark:bg-brand-ink/50">
+        <div className={cn('h-full rounded-full transition-all duration-700', bar)} style={{ width: `${pct}%` }} />
       </div>
-      <span className="text-xs font-mono text-text-tertiary w-8 text-right">
+      <span className="w-9 text-right font-mono text-xs text-text-tertiary">
         {score}/{max}
       </span>
     </div>
   )
 }
 
-// ─── STATUS ICON ─────────────────────────────────────────────────────────────
-
 function StatusDot({ status }: { status: 'good' | 'medium' | 'bad' }) {
   return (
     <div
-      className="mt-1.5 h-2 w-2 shrink-0 rounded-full"
-      style={{
-        backgroundColor: status === 'good' ? '#059669' : status === 'medium' ? '#d97706' : '#dc2626',
-      }}
+      className={cn(
+        'mt-1.5 h-2 w-2 shrink-0 rounded-full',
+        status === 'good' && 'bg-brand-mid dark:bg-brand-lime',
+        status === 'medium' && 'bg-amber-500',
+        status === 'bad' && 'bg-red-500',
+      )}
     />
   )
 }
 
-// ─── CIRCULAR SCORE ──────────────────────────────────────────────────────────
-
-function CircularScore({ score, grade }: { score: number; grade: keyof typeof GRADE_CONFIG }) {
-  const cfg = GRADE_CONFIG[grade]
+function CircularScore({ score, grade }: { score: number; grade: GradeKey }) {
+  const cfg = GRADE_STYLES[grade]
   const circumference = 2 * Math.PI * 45
   const dashOffset = circumference - (score / 100) * circumference
 
   return (
     <div className="relative inline-flex items-center justify-center">
-      <svg width="120" height="120" viewBox="0 0 120 120">
-        {/* Background — follows theme border (light/dark) */}
+      <svg width="120" height="120" viewBox="0 0 120 120" className="drop-shadow-sm">
         <circle cx="60" cy="60" r="45" fill="none" stroke="var(--c-border)" strokeWidth="8" />
-        {/* Arc color matches letter grade (not remapped brand green) */}
         <circle
-          cx="60" cy="60" r="45"
+          cx="60"
+          cy="60"
+          r="45"
           fill="none"
           stroke={cfg.ring}
           strokeWidth="8"
@@ -164,34 +192,57 @@ function CircularScore({ score, grade }: { score: number; grade: keyof typeof GR
         />
       </svg>
       <div className="absolute text-center">
-        <p className={`text-3xl font-black ${cfg.color}`}>{score}</p>
-        <p className={`text-xs font-bold ${cfg.color}`}>{grade}</p>
+        <p className={cn('text-3xl font-black', cfg.text)}>{score}</p>
+        <p className={cn('text-xs font-bold', cfg.text)}>{grade}</p>
       </div>
     </div>
   )
 }
 
-// ─── DEMO SCORE ───────────────────────────────────────────────────────────────
-
 const DEMO_SCORE: CreativeScore = {
   overallScore: 72,
   grade: 'B',
   verdict: 'needs_work',
-  verdictText: "Kreativ yaxshi bazaga ega, ammo hook kuchi va CTA aniqligi yaxshilanishi lozim. Platform talablariga asosan kichik o'zgarishlar bilan reklamaga tayyor bo'ladi.",
+  verdictText:
+    "Kreativ yaxshi bazaga ega, ammo hook kuchi va CTA aniqligi yaxshilanishi lozim. Platform talablariga asosan kichik o'zgarishlar bilan reklamaga tayyor bo'ladi.",
   parameters: [
-    { name: 'Hook kuchi',          score: 6, status: 'medium', feedback: "Birinchi 3 soniyada diqqatni tortish o'rtacha darajada", tip: "Kuchli savol yoki ajablanarli statistika bilan boshlang" },
-    { name: 'Vizual sifat',        score: 8, status: 'good',   feedback: "Rasm aniqligi va kompozitsiya juda yaxshi", tip: "" },
-    { name: "Matn o'qilishi",      score: 7, status: 'good',   feedback: "Shrift o'lchami va kontrast maqbul", tip: "" },
-    { name: 'CTA aniqligi',        score: 5, status: 'medium', feedback: "Harakatga chaqiruv unchalik aniq emas", tip: "'Hozir buyurtma bering' yoki 'Bepul sinab ko'ring' kabi aniq CTA qo'shing" },
-    { name: 'Rang psixologiyasi',  score: 8, status: 'good',   feedback: "Ranglar brend bilan uyg'un va ishonch uyg'otadi", tip: "" },
-    { name: 'Brend izchilligi',    score: 9, status: 'good',   feedback: "Logo va korporativ uslub to'g'ri ishlatilgan", tip: "" },
-    { name: 'Auditoriya mosligi',  score: 7, status: 'good',   feedback: "Target auditoriyaga mos vizual til", tip: "" },
-    { name: 'Raqobat farqi',       score: 6, status: 'medium', feedback: "Raqobatchilardan farq qiluvchi element kam", tip: "Noyob USP ni vizual ko'rsating" },
-    { name: 'Mobil optimizatsiya', score: 8, status: 'good',   feedback: "Mobil ekranda yaxshi ko'rinadi", tip: "" },
-    { name: 'Platform talablari',  score: 4, status: 'bad',    feedback: "Story formatida matn xavfsiz zonadan chiqib ketgan", tip: "Matnni pastki va yuqori 15% dan uzoqlashtirib joylashtiring" },
+    {
+      name: 'Hook kuchi',
+      score: 6,
+      status: 'medium',
+      feedback: "Birinchi 3 soniyada diqqatni tortish o'rtacha darajada",
+      tip: "Kuchli savol yoki ajablanarli statistika bilan boshlang",
+    },
+    { name: 'Vizual sifat', score: 8, status: 'good', feedback: 'Rasm aniqligi va kompozitsiya juda yaxshi', tip: '' },
+    { name: "Matn o'qilishi", score: 7, status: 'good', feedback: 'Shrift o\'lchami va kontrast maqbul', tip: '' },
+    {
+      name: 'CTA aniqligi',
+      score: 5,
+      status: 'medium',
+      feedback: "Harakatga chaqiruv unchalik aniq emas",
+      tip: "'Hozir buyurtma bering' yoki 'Bepul sinab ko'ring' kabi aniq CTA qo'shing",
+    },
+    { name: 'Rang psixologiyasi', score: 8, status: 'good', feedback: 'Ranglar brend bilan uyg\'un va ishonch uyg\'otadi', tip: '' },
+    { name: 'Brend izchilligi', score: 9, status: 'good', feedback: "Logo va korporativ uslub to'g'ri ishlatilgan", tip: '' },
+    { name: 'Auditoriya mosligi', score: 7, status: 'good', feedback: 'Target auditoriyaga mos vizual til', tip: '' },
+    {
+      name: 'Raqobat farqi',
+      score: 6,
+      status: 'medium',
+      feedback: "Raqobatchilardan farq qiluvchi element kam",
+      tip: "Noyob USP ni vizual ko'rsating",
+    },
+    { name: 'Mobil optimizatsiya', score: 8, status: 'good', feedback: "Mobil ekranda yaxshi ko'rinadi", tip: '' },
+    {
+      name: 'Platform talablari',
+      score: 4,
+      status: 'bad',
+      feedback: "Story formatida matn xavfsiz zonadan chiqib ketgan",
+      tip: "Matnni pastki va yuqori 15% dan uzoqlashtirib joylashtiring",
+    },
   ],
   topStrengths: ['Vizual sifat yuqori', 'Brend izchilligi mukammal', 'Mobil optimizatsiya yaxshi'],
-  topIssues: ["CTA aniq emas", 'Hook kuchi zaif', 'Platform talablariga to\'liq mos emas'],
+  topIssues: ["CTA aniq emas", 'Hook kuchi zaif', "Platform talablariga to'liq mos emas"],
   improvements: [
     "CTA ni aniqlashtiring: 'Hozir buyurtma bering' kabi to'g'ridan-to'g'ri chaqiruv qo'shing",
     "Story formatida matnni xavfsiz zonaga olib keling (15% qoida)",
@@ -199,32 +250,43 @@ const DEMO_SCORE: CreativeScore = {
   ],
   platformFit: { meta: 78, tiktok: 55, google: 82, youtube: 60, telegram: 88 },
   estimatedCtr: '1.4–2.1%',
-  abTestSuggestion: "Joriy kreativni hook kuchsiz versiya deb olib, CTA va Hook o'zgartirilgan B varianti bilan A/B test o'tkazing. 3 kun test muddati tavsiya etiladi.",
+  abTestSuggestion:
+    "Joriy kreativni hook kuchsiz versiya deb olib, CTA va Hook o'zgartirilgan B varianti bilan A/B test o'tkazing. 3 kun test muddati tavsiya etiladi.",
 }
 
-// ─── MAIN PAGE ────────────────────────────────────────────────────────────────
+function platformBarColor(score: number): string {
+  if (score >= 70) return 'from-brand-mid to-brand-lime'
+  if (score >= 50) return 'from-amber-500 to-amber-400'
+  return 'from-red-500 to-red-400'
+}
+
+const PLATFORM_SHORT: Record<string, { key: string; fb: string }> = {
+  meta: { key: 'creativeScorer.platformMetaShort', fb: 'Meta' },
+  google: { key: 'creativeScorer.platformGoogleShort', fb: 'Google' },
+  tiktok: { key: 'creativeScorer.platformTiktokShort', fb: 'TikTok' },
+  youtube: { key: 'creativeScorer.platformYoutubeShort', fb: 'YouTube' },
+  telegram: { key: 'creativeScorer.platformTelegramShort', fb: 'Telegram' },
+}
 
 export default function CreativeScorerPage() {
   const { t } = useI18n()
   const { currentWorkspace } = useWorkspaceStore()
 
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const [file, setFile]               = useState<File | null>(null)
-  const [preview, setPreview]         = useState<string | null>(null)
-  const [platform, setPlatform]       = useState('meta')
+  const [file, setFile] = useState<File | null>(null)
+  const [preview, setPreview] = useState<string | null>(null)
+  const [platform, setPlatform] = useState('meta')
   const [creativeType, setCreativeType] = useState('image')
-  const [goal, setGoal]               = useState('')
-  const [loading, setLoading]         = useState(false)
-  const [error, setError]             = useState('')
-  const [result, setResult]           = useState<CreativeScore | null>(DEMO_SCORE)
-  const [isDragging, setIsDragging]   = useState(false)
-
-  // ─── FILE HANDLING ───────────────────────────────────────────────────────
+  const [goal, setGoal] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [result, setResult] = useState<CreativeScore | null>(DEMO_SCORE)
+  const [isDragging, setIsDragging] = useState(false)
 
   function handleFileSelect(selectedFile: File) {
     if (!selectedFile) return
 
-    const maxSize = 10 * 1024 * 1024 // 10MB
+    const maxSize = 10 * 1024 * 1024
     if (selectedFile.size > maxSize) {
       setError(t('creativeScorer.maxSizeError', 'File size must be less than 10MB'))
       return
@@ -240,11 +302,9 @@ export default function CreativeScorerPage() {
     setError('')
     setResult(null)
 
-    // Create preview URL
     const url = URL.createObjectURL(selectedFile)
     setPreview(url)
 
-    // Auto-detect creative type
     if (selectedFile.type.startsWith('video/')) {
       setCreativeType('video')
     }
@@ -266,18 +326,21 @@ export default function CreativeScorerPage() {
     setIsDragging(false)
   }, [])
 
-  // ─── SCORE FUNCTION ──────────────────────────────────────────────────────
-
   async function handleScore() {
-    if (!file) { setError(t('creativeScorer.uploadRequired', 'Please upload a file')); return }
-    if (!goal) { setError(t('creativeScorer.goalRequired', 'Please enter your campaign goal')); return }
+    if (!file) {
+      setError(t('creativeScorer.uploadRequired', 'Please upload a file'))
+      return
+    }
+    if (!goal) {
+      setError(t('creativeScorer.goalRequired', 'Please enter your campaign goal'))
+      return
+    }
 
     setLoading(true)
     setError('')
     setResult(null)
 
     try {
-      // Convert file to base64 for API
       const base64 = await fileToBase64(file)
 
       const res = await apiClient.post('/ai-agent/score-creative', {
@@ -288,30 +351,30 @@ export default function CreativeScorerPage() {
         goal,
         workspaceContext: {
           name: currentWorkspace?.name,
-          industry: (currentWorkspace as any)?.industry,
-          targetAudience: (currentWorkspace as any)?.targetAudience,
+          industry: (currentWorkspace as { industry?: string })?.industry,
+          targetAudience: (currentWorkspace as { targetAudience?: string })?.targetAudience,
           aiStrategy: currentWorkspace?.aiStrategy,
         },
       })
 
-      setResult(res.data)
-    } catch (err: any) {
-      setError(err.response?.data?.message || t('creativeScorer.scoreFailed', 'Creative scoring failed'))
+      setResult(res.data as CreativeScore)
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { message?: string } } }
+      setError(e.response?.data?.message || t('creativeScorer.scoreFailed', 'Creative scoring failed'))
     } finally {
       setLoading(false)
     }
   }
 
-  function fileToBase64(file: File): Promise<string> {
+  function fileToBase64(f: File): Promise<string> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader()
       reader.onload = () => {
-        const result = reader.result as string
-        // Remove data URL prefix, keep only base64
-        resolve(result.split(',')[1])
+        const r = reader.result as string
+        resolve(r.split(',')[1] || '')
       }
       reader.onerror = reject
-      reader.readAsDataURL(file)
+      reader.readAsDataURL(f)
     })
   }
 
@@ -323,90 +386,119 @@ export default function CreativeScorerPage() {
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
-  // ─── RENDER ──────────────────────────────────────────────────────────────
+  const selectCls = (on: boolean) =>
+    cn(
+      'flex w-full items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left text-sm transition-all',
+      on
+        ? 'border-brand-mid/45 bg-brand-mid/10 text-text-primary shadow-sm dark:border-brand-lime/40 dark:bg-brand-lime/10 dark:text-brand-lime'
+        : 'border-border/80 text-text-secondary hover:border-brand-mid/25 hover:bg-surface-2 dark:hover:bg-brand-ink/30',
+    )
+
+  const chipCls = (on: boolean) =>
+    cn(
+      'rounded-xl border px-3 py-2 text-left text-xs font-medium transition-all',
+      on
+        ? 'border-brand-mid/45 bg-brand-mid/10 text-text-primary dark:border-brand-lime/40 dark:bg-brand-lime/10'
+        : 'border-border/80 text-text-secondary hover:border-brand-mid/25 hover:bg-surface-2',
+    )
 
   return (
-    <div className="space-y-6 max-w-4xl">
-      <PageHeader
-        title={t('navigation.creativeScorer', 'Creative Scorer')}
-        subtitle={t('creativeScorer.subtitle', 'Upload your ad creative and get AI scoring across 10 quality dimensions')}
-        actions={
-          <Badge variant="secondary" className="border-border bg-surface text-text-secondary">
-            🎨 {t('creativeScorer.aiScoring', 'AI scoring')}
+    <div className="mx-auto max-w-6xl space-y-8 pb-12 pt-1">
+      <section
+        className={cn(
+          'relative overflow-hidden rounded-3xl border border-border/80 bg-gradient-to-br px-5 py-6 shadow-sm md:px-8 md:py-8',
+          'from-white via-surface to-surface-2/90',
+          'dark:from-[#1a2d0d] dark:via-brand-ink dark:to-[#152508]',
+        )}
+      >
+        <div className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-brand-lime/15 blur-3xl dark:bg-brand-lime/10" />
+        <div className="relative flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+          <div className="flex min-w-0 items-start gap-4">
+            <div
+              className={cn(
+                'flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl shadow-md ring-1',
+                'bg-gradient-to-br from-brand-mid to-brand-lime ring-brand-ink/10',
+              )}
+            >
+              <Wand2 className="h-7 w-7 text-brand-ink" aria-hidden />
+            </div>
+            <div className="min-w-0">
+              <p className="text-caption font-semibold uppercase tracking-wider text-brand-mid dark:text-brand-lime">
+                {t('creativeScorer.heroEyebrow', 'Creative quality')}
+              </p>
+              <h1 className="mt-1 text-2xl font-bold tracking-tight text-text-primary md:text-3xl">
+                {t('navigation.creativeScorer', 'Creative Scorer')}
+              </h1>
+              <p className="mt-2 max-w-2xl text-body-sm text-text-secondary md:text-body">
+                {t('creativeScorer.subtitle', 'Upload your ad creative and get AI scoring across 10 quality dimensions')}
+              </p>
+            </div>
+          </div>
+          <Badge
+            variant="secondary"
+            className="shrink-0 border-brand-mid/30 bg-brand-mid/10 text-brand-ink dark:border-brand-lime/30 dark:bg-brand-lime/10 dark:text-brand-lime"
+          >
+            <Sparkles className="mr-1 inline h-3.5 w-3.5" aria-hidden />
+            {t('creativeScorer.aiScoring', 'AI scoring')}
           </Badge>
-        }
-      />
+        </div>
+      </section>
 
-      <div className="grid grid-cols-1 gap-6 rounded-2xl border border-border bg-surface p-4 shadow-sm lg:grid-cols-2 lg:p-6 dark:bg-surface-elevated">
-
-        {/* LEFT: Upload + Settings */}
-        <div className="space-y-4">
-
-          {/* File upload zone */}
-          <Card padding="none">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+        {/* LEFT — input */}
+        <div className="space-y-5 lg:col-span-5">
+          <Card padding="none" className="overflow-hidden border-border/80 shadow-md dark:border-brand-mid/15">
             <div
               onDrop={onDrop}
               onDragOver={onDragOver}
               onDragLeave={onDragLeave}
               onClick={() => !file && fileInputRef.current?.click()}
-              className={`
-                relative rounded-xl border-2 border-dashed transition-all duration-200
-                min-h-[240px] flex items-center justify-center
-                ${isDragging
-                  ? 'border-border bg-surface-2 cursor-copy'
-                  : file
-                  ? 'border-border cursor-default'
-                  : 'border-border hover:border-border/50 hover:bg-surface-2 cursor-pointer'
-                }
-              `}
+              className={cn(
+                'relative flex min-h-[220px] cursor-pointer items-center justify-center rounded-2xl border-2 border-dashed transition-all duration-200 md:min-h-[260px]',
+                isDragging && 'border-brand-mid/60 bg-brand-mid/5 dark:border-brand-lime/50 dark:bg-brand-lime/5',
+                !isDragging &&
+                  !file &&
+                  'border-border/80 hover:border-brand-mid/40 hover:bg-surface-2/80 dark:hover:bg-brand-ink/25',
+                file && 'cursor-default border-border/60',
+              )}
             >
               {preview ? (
-                <div className="w-full h-full relative rounded-xl overflow-hidden">
+                <div className="relative h-full w-full overflow-hidden rounded-xl">
                   {file?.type.startsWith('video/') ? (
-                    <video
-                      src={preview}
-                      className="w-full h-full object-cover rounded-xl max-h-60"
-                      controls={false}
-                      muted
-                    />
+                    <video src={preview} className="max-h-64 w-full object-contain" muted playsInline />
                   ) : (
-                    <img
-                      src={preview}
-                      alt="Creative preview"
-                      className="w-full object-contain rounded-xl max-h-60"
-                    />
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={preview} alt="" className="max-h-64 w-full object-contain" />
                   )}
-                  {/* Replace button */}
                   <button
+                    type="button"
                     onClick={(e) => {
                       e.stopPropagation()
                       handleReset()
                     }}
-                    className="absolute top-2 right-2 bg-black/60 text-text-primary text-xs px-2 py-1 rounded-lg hover:bg-black/80 transition-colors"
+                    className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-lg bg-brand-ink/80 px-2 py-1 text-xs font-medium text-brand-lime backdrop-blur-sm transition-colors hover:bg-brand-ink"
                   >
-                    ✕ O'chirish
+                    <X className="h-3.5 w-3.5" aria-hidden />
+                    {t('creativeScorer.removeFile', 'Remove')}
                   </button>
-                  {/* File info */}
-                  <div className="absolute bottom-2 left-2 bg-black/60 text-text-primary text-xs px-2 py-1 rounded-lg">
-                    {file?.name} · {((file?.size ?? 0) / 1024).toFixed(0)}KB
+                  <div className="absolute bottom-2 left-2 rounded-lg bg-brand-ink/75 px-2 py-1 text-xs text-brand-lime backdrop-blur-sm">
+                    {file?.name} · {((file?.size ?? 0) / 1024).toFixed(0)} KB
                   </div>
                 </div>
               ) : (
-                <div className="text-center p-8">
-                  <div className="text-5xl mb-3">
-                    {isDragging ? '📂' : '🖼'}
+                <div className="px-6 py-10 text-center">
+                  <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-mid/15 text-brand-mid dark:bg-brand-lime/15 dark:text-brand-lime">
+                    <ImageIcon className="h-7 w-7" aria-hidden />
                   </div>
-                  <p className="text-text-primary font-medium text-sm mb-1">
-                    {isDragging
-                      ? 'Faylni bu yerga tashlang'
-                      : 'Rasm yoki video yuklang'}
+                  <p className="text-sm font-semibold text-text-primary">
+                    {isDragging ? t('creativeScorer.uploadDrop', 'Drop file here') : t('creativeScorer.uploadTap', 'Upload image or video')}
                   </p>
-                  <p className="text-text-tertiary text-xs mb-3">
-                    Suring yoki bosing · JPG, PNG, WebP, MP4 · Max 10MB
+                  <p className="mx-auto mt-1 max-w-xs text-xs text-text-tertiary">
+                    {t('creativeScorer.uploadHint', 'Drag and drop or click · JPG, PNG, WebP, MP4 · Max 10 MB')}
                   </p>
-                  <div className="inline-flex items-center gap-2 bg-surface-2 border border-border rounded-lg px-3 py-1.5">
-                    <span className="text-text-secondary text-xs">Fayl tanlash</span>
-                  </div>
+                  <span className="mt-4 inline-flex items-center rounded-xl border border-brand-mid/30 bg-brand-mid/10 px-4 py-2 text-xs font-semibold text-brand-ink dark:border-brand-lime/35 dark:bg-brand-lime/10 dark:text-brand-lime">
+                    {t('creativeScorer.selectFile', 'Choose file')}
+                  </span>
                 </div>
               )}
             </div>
@@ -419,301 +511,259 @@ export default function CreativeScorerPage() {
             />
           </Card>
 
-          {/* Settings */}
-          <Card>
-            <div className="space-y-4">
-
-              {/* Platform */}
+          <Card className="border-border/80 shadow-md dark:border-brand-mid/15">
+            <div className="space-y-5">
               <div>
-                <label className="block text-sm font-medium text-text-tertiary mb-2">
-                  Platform
+                <label className="mb-2 block text-caption font-semibold uppercase tracking-wide text-text-tertiary">
+                  {t('creativeScorer.platform', 'Platform')}
                 </label>
                 <div className="grid grid-cols-1 gap-1.5">
                   {PLATFORMS.map((p) => (
-                    <button
-                      key={p.value}
-                      onClick={() => setPlatform(p.value)}
-                      className={`
-                        flex items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left text-sm transition-all
-                        ${
-                          platform === p.value
-                            ? 'border-[#2563eb]/35 bg-[#eff6ff] text-text-primary dark:border-[#60a5fa]/40 dark:bg-[#172554]/40'
-                            : 'border-border text-text-tertiary hover:border-[#93c5fd]/40 hover:bg-surface-2'
-                        }
-                      `}
-                    >
+                    <button key={p.value} type="button" onClick={() => setPlatform(p.value)} className={selectCls(platform === p.value)}>
                       <span
-                        className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
-                          platform === p.value ? 'border-[#2563eb] dark:border-[#60a5fa]' : 'border-border'
-                        }`}
+                        className={cn(
+                          'flex h-4 w-4 shrink-0 items-center justify-center rounded-full border',
+                          platform === p.value ? 'border-brand-mid dark:border-brand-lime' : 'border-border',
+                        )}
                       >
                         {platform === p.value && (
-                          <span className="block h-2 w-2 rounded-full bg-[#2563eb] dark:bg-[#60a5fa]" />
+                          <span className="block h-2 w-2 rounded-full bg-brand-mid dark:bg-brand-lime" />
                         )}
                       </span>
-                      {p.label}
+                      {t(p.labelKey, p.labelFb)}
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Creative type */}
               <div>
-                <label className="block text-sm font-medium text-text-tertiary mb-2">
-                  Kreativ turi
+                <label className="mb-2 block text-caption font-semibold uppercase tracking-wide text-text-tertiary">
+                  {t('creativeScorer.creativeType', 'Creative type')}
                 </label>
                 <div className="grid grid-cols-2 gap-2">
-                  {CREATIVE_TYPES.map((ct) => (
-                    <button
-                      key={ct.value}
-                      onClick={() => setCreativeType(ct.value)}
-                      className={`
-                        rounded-lg border px-3 py-2 text-xs font-medium transition-all
-                        ${
-                          creativeType === ct.value
-                            ? 'border-[#2563eb]/35 bg-[#eff6ff] text-text-primary dark:border-[#60a5fa]/40 dark:bg-[#172554]/40'
-                            : 'border-border text-text-tertiary hover:border-[#93c5fd]/40 hover:bg-surface-2'
-                        }
-                      `}
-                    >
-                      {ct.label}
-                    </button>
-                  ))}
+                  {CREATIVE_TYPES.map((ct) => {
+                    const Icon = ct.icon
+                    return (
+                      <button key={ct.value} type="button" onClick={() => setCreativeType(ct.value)} className={chipCls(creativeType === ct.value)}>
+                        <Icon className="h-4 w-4 shrink-0 text-brand-mid dark:text-brand-lime" aria-hidden />
+                        <span className="leading-snug">{t(ct.labelKey, ct.value)}</span>
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
 
-              {/* Goal */}
               <div>
-                <label className="block text-sm font-medium text-text-tertiary mb-2">
-                  Reklama maqsadi <span className="text-red-400">*</span>
+                <label className="mb-2 block text-caption font-semibold uppercase tracking-wide text-text-tertiary">
+                  {t('creativeScorer.goalLabel', 'Campaign goal')} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={goal}
                   onChange={(e) => setGoal(e.target.value)}
-                  placeholder="Masalan: telefon sotish, kurs ro'yxatdan o'tkazish..."
-                  className="w-full bg-surface-2 border border-border rounded-xl px-4 py-3 text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-border transition-all text-sm"
+                  placeholder={t('creativeScorer.goalPlaceholder', 'e.g. sell phones, webinar sign-ups…')}
+                  className="w-full rounded-xl border border-border/90 bg-surface-2/80 px-4 py-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-brand-mid/50 focus:outline-none focus:ring-2 focus:ring-brand-mid/20 dark:bg-brand-ink/40"
                 />
               </div>
 
-              {error && <Alert variant="error">{error}</Alert>}
+              {error ? <Alert variant="error">{error}</Alert> : null}
 
-              <Button
-                fullWidth
-                size="lg"
-                loading={loading}
-                onClick={handleScore}
-                disabled={!file}
-              >
-                {loading ? 'Baholanmoqda...' : '🎯 Kreativni baholash'}
+              <Button fullWidth size="lg" loading={loading} onClick={handleScore} disabled={!file}>
+                {loading ? t('creativeScorer.ctaScoring', 'Scoring…') : t('creativeScorer.ctaScore', 'Score creative')}
               </Button>
             </div>
           </Card>
         </div>
 
-        {/* RIGHT: Results */}
-        <div className="space-y-4">
-
-          {/* Empty state */}
+        {/* RIGHT — results */}
+        <div className="space-y-5 lg:col-span-7">
           {!result && !loading && (
-            <Card>
+            <Card className="border-border/80 shadow-md dark:border-brand-mid/15">
               <div className="py-12 text-center">
-                <div className="text-5xl mb-4">🎨</div>
-                <p className="text-text-primary font-medium mb-2">
-                  Kreativingizni baholaymiz
-                </p>
-                <p className="text-text-tertiary text-sm leading-relaxed max-w-xs mx-auto mb-6">
-                  Rasm yoki video yuklang, platform tanlang va AI 10 parametr
-                  bo'yicha baholab beradi
-                </p>
-                <div className="space-y-1.5 text-left max-w-xs mx-auto">
-                  {Object.entries(PARAMETER_ICONS).map(([name, icon]) => (
-                    <div key={name} className="flex items-center gap-2 text-xs text-text-tertiary">
-                      <span>{icon}</span> {name}
-                    </div>
-                  ))}
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-mid/12 text-brand-mid dark:bg-brand-lime/12 dark:text-brand-lime">
+                  <BarChart3 className="h-8 w-8" aria-hidden />
                 </div>
+                <p className="font-semibold text-text-primary">{t('creativeScorer.emptyTitle', 'We score your creative')}</p>
+                <p className="mx-auto mt-2 max-w-md text-sm text-text-secondary">{t('creativeScorer.emptyBody', '')}</p>
+                <ul className="mx-auto mt-6 max-w-sm space-y-2 text-left text-xs text-text-tertiary">
+                  {Object.keys(PARAM_ICON).map((name) => {
+                    const Icon = PARAM_ICON[name] ?? Sparkles
+                    return (
+                      <li key={name} className="flex items-center gap-2">
+                        <Icon className="h-3.5 w-3.5 shrink-0 text-brand-mid dark:text-brand-lime" aria-hidden />
+                        {name}
+                      </li>
+                    )
+                  })}
+                </ul>
               </div>
             </Card>
           )}
 
-          {/* Loading */}
           {loading && (
-            <Card>
-              <div className="py-12 text-center">
-                <div className="w-16 h-16 rounded-2xl bg-surface-2 border border-border flex items-center justify-center mx-auto mb-4">
+            <Card className="border-border/80 shadow-md dark:border-brand-mid/15">
+              <div className="py-14 text-center">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-brand-mid/25 bg-brand-mid/10 dark:border-brand-lime/30 dark:bg-brand-lime/10">
                   <Spinner size="lg" />
                 </div>
-                <p className="text-text-primary font-medium mb-1">
-                  Kreativ tahlil qilinmoqda...
-                </p>
-                <p className="text-text-tertiary text-sm mb-4">
-                  GPT-4o Vision 10 parametrni tekshirmoqda
-                </p>
-                <div className="space-y-1.5 max-w-xs mx-auto">
-                  {[
-                    'Vizual sifat tekshirilmoqda...',
-                    'Hook kuchi baholanmoqda...',
-                    'Matn va CTA analizlanmoqda...',
-                    'Platform talablari solishtirilmoqda...',
-                    'Natija tayyorlanmoqda...',
-                  ].map((msg, i) => (
-                    <p key={i} className="text-text-tertiary text-xs">{msg}</p>
+                <p className="font-semibold text-text-primary">{t('creativeScorer.loadingTitle', 'Analyzing creative…')}</p>
+                <p className="mt-1 text-sm text-text-secondary">{t('creativeScorer.loadingSub', '')}</p>
+                <div className="mx-auto mt-6 max-w-sm space-y-1.5 text-left text-xs text-text-tertiary">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <p key={i} className="flex items-center gap-2">
+                      <Loader2 className="h-3 w-3 shrink-0 animate-spin text-brand-mid dark:text-brand-lime" aria-hidden />
+                      {t(`creativeScorer.loadStep${i}`, '')}
+                    </p>
                   ))}
                 </div>
               </div>
             </Card>
           )}
 
-          {/* Results */}
           {result && !loading && (
-            <div className="space-y-4">
-
-              {/* Overall score */}
-              <Card className={`border-2 bg-surface shadow-sm dark:bg-surface-elevated ${GRADE_CONFIG[result.grade].border}`}>
-                <div className="flex items-center gap-5">
+            <div className="space-y-5">
+              <Card
+                className={cn(
+                  'border-2 shadow-md dark:bg-surface-elevated/90',
+                  GRADE_STYLES[result.grade].border,
+                  'bg-surface dark:border-brand-mid/20',
+                )}
+              >
+                <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
                   <CircularScore score={result.overallScore} grade={result.grade} />
-                  <div className="flex-1">
-                    <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border mb-2 ${GRADE_CONFIG[result.grade].bg} ${GRADE_CONFIG[result.grade].border} ${GRADE_CONFIG[result.grade].color}`}>
-                      {result.verdict === 'ready' ? '✅ Reklamaga tayyor' :
-                       result.verdict === 'needs_work' ? '⚠️ Yaxshilash kerak' :
-                       '❌ Reklamaga tayyor emas'}
+                  <div className="min-w-0 flex-1 text-center sm:text-left">
+                    <div
+                      className={cn(
+                        'mb-2 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold',
+                        GRADE_STYLES[result.grade].surface,
+                      )}
+                    >
+                      {result.verdict === 'ready'
+                        ? t('creativeScorer.verdictReady', 'Ready to run')
+                        : result.verdict === 'needs_work'
+                          ? t('creativeScorer.verdictNeeds', 'Needs improvement')
+                          : t('creativeScorer.verdictNot', 'Not ready')}
                     </div>
-                    <p className="text-text-primary text-sm font-medium mb-1">
-                      {GRADE_CONFIG[result.grade].label}
+                    <p className={cn('text-base font-semibold', GRADE_STYLES[result.grade].text)}>
+                      {t(GRADE_STYLES[result.grade].labelKey, GRADE_STYLES[result.grade].labelFb)}
                     </p>
-                    <p className="text-text-tertiary text-xs leading-relaxed">
-                      {result.verdictText}
+                    <p className="mt-2 text-sm leading-relaxed text-text-secondary">{result.verdictText}</p>
+                    <p className="mt-3 text-xs text-text-tertiary">
+                      {t('creativeScorer.estCtr', 'Est. CTR')}:{' '}
+                      <span className="font-semibold text-text-primary">{result.estimatedCtr}</span>
                     </p>
-                    <div className="flex items-center gap-3 mt-2">
-                      <span className="text-xs text-text-tertiary">
-                        Est. CTR: <span className="text-text-secondary font-medium">{result.estimatedCtr}</span>
-                      </span>
-                    </div>
                   </div>
                 </div>
                 {!file && (
-                  <div className="mt-3 pt-3 border-t border-border">
-                    <p className="rounded-lg border border-[#fcd34d] bg-[#fffbeb] px-3 py-2 text-xs text-[#92400e] dark:border-[#b45309]/50 dark:bg-[#422006]/50 dark:text-[#fde68a]">
-                      📌 Demo natija ko'rsatilmoqda — chap tarafdan o'z kreativingizni yuklang
-                    </p>
+                  <div className="mt-5 border-t border-border/70 pt-5 dark:border-brand-mid/15">
+                    <Alert variant="info" className="border-amber-500/25 bg-amber-500/10 text-amber-950 dark:border-amber-400/25 dark:bg-amber-500/10 dark:text-amber-100">
+                      {t('creativeScorer.demoBanner', '')}
+                    </Alert>
                   </div>
                 )}
               </Card>
 
-              {/* Platform fit */}
               {Object.keys(result.platformFit).length > 0 && (
-                <Card>
-                  <p className="text-text-tertiary text-xs font-medium uppercase tracking-wide mb-3">
-                    Platform mosligi
+                <Card className="border-border/80 shadow-md dark:border-brand-mid/15">
+                  <p className="mb-4 text-caption font-bold uppercase tracking-wider text-text-tertiary">
+                    {t('creativeScorer.platformFit', 'Platform fit')}
                   </p>
-                  <div className="space-y-2">
-                    {Object.entries(result.platformFit).map(([p, score]) => {
-                      const labels: Record<string, string> = {
-                        meta: '📘 Meta', google: '🔍 Google',
-                        tiktok: '🎵 TikTok', youtube: '▶️ YouTube', telegram: '✈️ Telegram',
-                      }
-                      return (
-                        <div key={p}>
-                          <div className="flex justify-between text-xs mb-1">
-                            <span className="text-text-tertiary">{labels[p] || p}</span>
-                            <span
-                              className="font-medium"
-                              style={{
-                                color: score >= 70 ? '#1d4ed8' : score >= 50 ? '#b45309' : '#b91c1c',
-                              }}
-                            >
-                              {score}%
-                            </span>
-                          </div>
-                          <div className="h-1.5 overflow-hidden rounded-full bg-surface-2 dark:bg-surface-2/80">
-                            <div
-                              className="h-full rounded-full transition-all duration-700"
-                              style={{
-                                width: `${score}%`,
-                                backgroundColor: score >= 70 ? '#2563eb' : score >= 50 ? '#d97706' : '#dc2626',
-                              }}
-                            />
-                          </div>
+                  <div className="space-y-3">
+                    {Object.entries(result.platformFit).map(([p, score]) => (
+                      <div key={p}>
+                        <div className="mb-1 flex justify-between text-xs">
+                          <span className="text-text-secondary">
+                            {PLATFORM_SHORT[p] ? t(PLATFORM_SHORT[p].key, PLATFORM_SHORT[p].fb) : p}
+                          </span>
+                          <span
+                            className={cn(
+                              'font-semibold',
+                              score >= 70 && 'text-brand-mid dark:text-brand-lime',
+                              score >= 50 && score < 70 && 'text-amber-600 dark:text-amber-300',
+                              score < 50 && 'text-red-600 dark:text-red-400',
+                            )}
+                          >
+                            {score}%
+                          </span>
                         </div>
-                      )
-                    })}
-                  </div>
-                </Card>
-              )}
-
-              {/* 10 Parameters */}
-              <Card padding="none">
-                <div className="px-5 py-3 border-b border-border">
-                  <p className="text-text-primary font-semibold text-sm">10 Parametr Tahlili</p>
-                </div>
-                <div className="divide-y divide-border dark:divide-border">
-                  {result.parameters.map((param, i) => (
-                    <div key={i} className="px-5 py-3">
-                      <div className="flex items-start gap-3">
-                        <StatusDot status={param.status} />
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-1.5">
-                            <p className="text-text-primary text-xs font-medium">
-                              {PARAMETER_ICONS[param.name] || '•'} {param.name}
-                            </p>
-                          </div>
-                          <ScoreBar score={param.score} />
-                          <p className="text-text-tertiary text-xs mt-1.5 leading-relaxed">
-                            {param.feedback}
-                          </p>
-                          {param.status !== 'good' && (
-                            <p className="text-text-secondary text-xs mt-1 flex items-start gap-1">
-                              <span className="shrink-0">→</span>
-                              {param.tip}
-                            </p>
-                          )}
+                        <div className="h-2 overflow-hidden rounded-full bg-surface-2 dark:bg-brand-ink/50">
+                          <div
+                            className={cn('h-full rounded-full bg-gradient-to-r transition-all duration-700', platformBarColor(score))}
+                            style={{ width: `${score}%` }}
+                          />
                         </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-
-              {/* Improvements */}
-              {result.improvements.length > 0 && (
-                <Card className="border border-[#fcd34d] bg-[#fffbeb] dark:border-[#b45309]/40 dark:bg-[#422006]/35">
-                  <p className="mb-3 text-sm font-semibold text-[#b45309] dark:text-[#fcd34d]">
-                    ⚡ Darhol o'zgartirish kerak
-                  </p>
-                  <div className="space-y-2">
-                    {result.improvements.map((imp, i) => (
-                      <div key={i} className="flex items-start gap-2.5 text-sm">
-                        <span className="shrink-0 font-bold text-[#d97706] dark:text-[#fcd34d]">{i + 1}.</span>
-                        <p className="text-text-secondary">{imp}</p>
                       </div>
                     ))}
                   </div>
                 </Card>
               )}
 
-              {/* A/B test suggestion */}
-              {result.abTestSuggestion && (
-                <Card variant="outlined">
-                  <div className="flex items-start gap-3">
-                    <span className="text-xl shrink-0">🔬</span>
-                    <div>
-                      <p className="text-text-primary text-sm font-medium mb-1">A/B Test tavsiyasi</p>
-                      <p className="text-text-tertiary text-sm leading-relaxed">
-                        {result.abTestSuggestion}
-                      </p>
-                    </div>
+              <Card padding="none" className="overflow-hidden border-border/80 shadow-md dark:border-brand-mid/15">
+                <div className="border-b border-border/80 bg-surface-2/50 px-5 py-3 dark:border-brand-mid/15 dark:bg-brand-ink/30">
+                  <p className="text-sm font-semibold text-text-primary">{t('creativeScorer.parametersTitle', '10-dimension breakdown')}</p>
+                </div>
+                <div className="divide-y divide-border/80 dark:divide-brand-mid/15">
+                  {result.parameters.map((param, i) => {
+                    const Icon = PARAM_ICON[param.name] ?? Sparkles
+                    return (
+                      <div key={i} className="px-5 py-4">
+                        <div className="flex items-start gap-3">
+                          <StatusDot status={param.status} />
+                          <div className="min-w-0 flex-1">
+                            <div className="mb-1.5 flex items-center justify-between gap-2">
+                              <p className="flex items-center gap-2 text-xs font-semibold text-text-primary">
+                                <Icon className="h-3.5 w-3.5 shrink-0 text-brand-mid dark:text-brand-lime" aria-hidden />
+                                {param.name}
+                              </p>
+                            </div>
+                            <ScoreBar score={param.score} />
+                            <p className="mt-2 text-xs leading-relaxed text-text-secondary">{param.feedback}</p>
+                            {param.status !== 'good' && param.tip ? (
+                              <p className="mt-1.5 flex items-start gap-1.5 text-xs text-brand-mid dark:text-brand-lime">
+                                <span className="shrink-0 font-bold">→</span>
+                                {param.tip}
+                              </p>
+                            ) : null}
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </Card>
+
+              {result.improvements.length > 0 && (
+                <Card className="border-amber-500/30 bg-amber-500/5 shadow-md dark:border-amber-400/25 dark:bg-amber-500/10">
+                  <p className="mb-3 text-sm font-semibold text-amber-900 dark:text-amber-200">
+                    {t('creativeScorer.improvementsTitle', 'Priority fixes')}
+                  </p>
+                  <div className="space-y-2">
+                    {result.improvements.map((imp, idx) => (
+                      <div key={idx} className="flex items-start gap-2.5 text-sm text-text-secondary">
+                        <span className="shrink-0 font-bold text-amber-600 dark:text-amber-300">{idx + 1}.</span>
+                        <p>{imp}</p>
+                      </div>
+                    ))}
                   </div>
                 </Card>
               )}
 
-              {/* Score another */}
-              <Button
-                variant="secondary"
-                fullWidth
-                onClick={handleReset}
-              >
-                + Yangi kreativ baholash
+              {result.abTestSuggestion ? (
+                <Card variant="outlined" className="border-brand-mid/25 dark:border-brand-lime/20">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-mid/15 text-brand-mid dark:bg-brand-lime/15 dark:text-brand-lime">
+                      <Sparkles className="h-5 w-5" aria-hidden />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-text-primary">{t('creativeScorer.abTestTitle', 'A/B test suggestion')}</p>
+                      <p className="mt-1 text-sm leading-relaxed text-text-secondary">{result.abTestSuggestion}</p>
+                    </div>
+                  </div>
+                </Card>
+              ) : null}
+
+              <Button variant="secondary" fullWidth onClick={handleReset} className="rounded-2xl border-brand-mid/20">
+                {t('creativeScorer.newScore', 'Score another creative')}
               </Button>
             </div>
           )}

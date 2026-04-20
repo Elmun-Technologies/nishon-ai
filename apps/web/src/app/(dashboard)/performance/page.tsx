@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { useI18n } from '@/i18n/use-i18n'
@@ -141,7 +142,17 @@ export default function PerformancePage() {
     <div className="space-y-5 max-w-6xl">
       <PageHeader
         title={t('navigation.performance', 'Performance')}
-        subtitle={t('performance.subtitle', 'Monitor and analyze your campaign performance')}
+        subtitle={
+          <span className="block space-y-1.5">
+            <span className="block">{t('performance.subtitle', 'Monitor and analyze your campaign performance')}</span>
+            <span className="block text-xs font-normal text-text-tertiary">
+              {t(
+                'performance.helperLine',
+                'Campaign rows load from Meta reporting for this workspace. Pick a date window, then search. When the API returns data, this table is live — otherwise you see samples.',
+              )}
+            </span>
+          </span>
+        }
       />
 
       <Card>
@@ -170,7 +181,15 @@ export default function PerformancePage() {
       </Card>
 
       {demoMode && (
-        <Alert variant="info">{t('performance.demoNotice', 'Showing sample performance data.')}</Alert>
+        <Alert variant="info" className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm leading-relaxed">{t('performance.demoNotice', 'Showing sample performance data.')}</p>
+          <Link
+            href="/settings/meta"
+            className="shrink-0 rounded-lg border border-brand-mid/30 bg-brand-lime/15 px-3 py-2 text-center text-sm font-semibold text-brand-ink hover:bg-brand-lime/25 dark:text-brand-lime"
+          >
+            {t('metaAudit.connectMeta', 'Open Meta settings')}
+          </Link>
+        </Alert>
       )}
       <Card padding="none">
         {loading ? (

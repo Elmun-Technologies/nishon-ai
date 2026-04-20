@@ -44,10 +44,21 @@ export class AiAgentController {
   @Post("competitor-analysis")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: "Analyze a competitor against the client's business (12-category audit)",
+    summary:
+      "Analyze a competitor against the client's business (12-category audit); may prepend Meta Ad Library snippets from the Marketing API when available.",
   })
   async analyzeCompetitor(@Body() dto: any) {
     return this.aiAgentService.analyzeCompetitor(dto);
+  }
+
+  @Post("competitor-analysis-batch")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary:
+      "Portfolio analysis for multiple competitors (links + names); enriches prompts with Meta Marketing API Ad Library (ads_archive) when app credentials are configured, then returns Uzbek JSON via the AI model.",
+  })
+  async analyzeCompetitorsBatch(@Body() dto: any) {
+    return this.aiAgentService.analyzeCompetitorsBatch(dto);
   }
 
   @Post("workspaces/:workspaceId/strategy")
@@ -132,6 +143,8 @@ export class AiAgentController {
       workspaceId: string;
       message: string;
       history?: { role: "user" | "assistant"; content: string }[];
+      /** Narrow assistant behavior for hire flows (AI Assistant page). */
+      assistantPersona?: "targetologist" | "optimizer" | "general";
     },
   ) {
     return this.aiAgentService.chat(dto);

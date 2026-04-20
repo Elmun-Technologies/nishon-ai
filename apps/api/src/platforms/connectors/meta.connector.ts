@@ -340,6 +340,30 @@ export class MetaConnector {
     }));
   }
 
+  /**
+   * App access token (client_credentials) for server-side Graph calls such as
+   * Ad Library search. Does not represent a specific Facebook user.
+   */
+  async getAppAccessToken(): Promise<string | null> {
+    if (!this.appId || !this.appSecret) {
+      this.logger.warn("META_APP_ID / META_APP_SECRET missing — cannot obtain app access token");
+      return null;
+    }
+    try {
+      const url = `${META_BASE_URL}/oauth/access_token`;
+      const data = await this.apiGet<{ access_token: string }>(url, {
+        client_id: this.appId,
+        client_secret: this.appSecret,
+        grant_type: "client_credentials",
+      });
+      return data.access_token ?? null;
+    } catch (error: any) {
+      const msg = error?.response?.data?.error?.message || error?.message || String(error);
+      this.logger.warn(`Meta app access token failed: ${msg}`);
+      return null;
+    }
+  }
+
   // ─── COMPETITOR INTELLIGENCE ──────────────────────────────────────────────
 
   /**

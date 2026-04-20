@@ -3,25 +3,44 @@
 export const dynamic = 'force-dynamic'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Bot, MessageCircle, SendHorizontal, Sparkles, Trash2 } from 'lucide-react'
+import { Bot, MessageCircle, SendHorizontal, Sparkles, Trash2, Crosshair, Gauge } from 'lucide-react'
 import { useI18n } from '@/i18n/use-i18n'
 import { useWorkspaceStore } from '@/stores/workspace.store'
-import { aiAgent } from '@/lib/api-client'
+import { aiAgent, workspaces as workspacesApi } from '@/lib/api-client'
 import { Button, Alert, Card } from '@/components/ui'
 import { Textarea } from '@/components/ui/Textarea'
 import { Spinner } from '@/components/ui/Spinner'
 import { cn } from '@/lib/utils'
 
 type ChatMessage = { id: string; role: 'user' | 'assistant'; content: string }
+type AgentHireRole = 'targetologist' | 'optimizer'
 
-function storageKey(workspaceId: string) {
+type WizardPhase = 'idle' | 'questioning' | 'awaiting_confirm' | 'done'
+
+type WizardState = {
+  phase: WizardPhase
+  step: number
+  answers: string[]
+}
+
+const WIZARD_STEP_COUNT = 5
+
+function messagesKey(workspaceId: string) {
   return `adspectr-ai-assistant-${workspaceId}`
 }
 
-function loadStored(workspaceId: string): ChatMessage[] {
+function roleKey(workspaceId: string) {
+  return `adspectr-ai-assistant-role-${workspaceId}`
+}
+
+function wizardKey(workspaceId: string) {
+  return `adspectr-ai-assistant-wizard-${workspaceId}`
+}
+
+function loadMessages(workspaceId: string): ChatMessage[] {
   if (typeof window === 'undefined') return []
   try {
-    const raw = localStorage.getItem(storageKey(workspaceId))
+    const raw = localStorage.getItem(messagesKey(workspaceId))
     if (!raw) return []
     const parsed = JSON.parse(raw) as unknown
     if (!Array.isArray(parsed)) return []
@@ -38,38 +57,124 @@ function loadStored(workspaceId: string): ChatMessage[] {
   }
 }
 
+function loadRole(workspaceId: string): AgentHireRole {
+  if (typeof window === 'undefined') return 'targetologist'
+  try {
+    const r = localStorage.getItem(roleKey(workspaceId))
+    if (r === 'optimizer') return 'optimizer'
+  } catch {
+    /* ignore */
+  }
+  return 'targetologist'
+}
+
+function saveRole(workspaceId: string, role: AgentHireRole) {
+  try {
+    localStorage.setItem(roleKey(workspaceId), role)
+  } catch {
+    /* ignore */
+  }
+}
+
+function loadWizard(workspaceId: string): WizardState {
+  if (typeof window === 'undefined') {
+    return { phase: 'idle', step: 0, answers: [] }
+  }
+  try {
+    const raw = localStorage.getItem(wizardKey(workspaceId))
+    if (!raw) return { phase: 'idle', step: 0, answers: [] }
+    const o = JSON.parse(raw) as Partial<WizardState>
+    const phase = o.phase === 'questioning' || o.phase === 'awaiting_confirm' || o.phase === 'done' ? o.phase : 'idle'
+    const step = typeof o.step === 'number' && o.step >= 0 ? o.step : 0
+    const answers = Array.isArray(o.answers) ? o.answers.filter((a) => typeof a === 'string') : []
+    return { phase, step, answers }
+  } catch {
+    return { phase: 'idle', step: 0, answers: [] }
+  }
+}
+
+function saveWizard(workspaceId: string, w: WizardState) {
+  try {
+    localStorage.setItem(wizardKey(workspaceId), JSON.stringify(w))
+  } catch {
+    /* ignore */
+  }
+}
+
+function newId(prefix: string) {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID()
+  return `${prefix}-${Date.now()}`
+}
+
 export default function AiAssistantPage() {
   const { t } = useI18n()
-  const { currentWorkspace } = useWorkspaceStore()
-  const workspaceId = currentWorkspace?.id
+  const { currentWorkspace, setCurrentWorkspace } = useWorkspaceStore()
+  const workspaceId = currentWorkspace?.id ?? undefined
 
   const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [agentRole, setAgentRole] = useState<AgentHireRole>('targetologist')
+  const [wizard, setWizard] = useState<WizardState>({ phase: 'idle', step: 0, answers: [] })
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [confirmBusy, setConfirmBusy] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
     if (!workspaceId) {
       setMessages([])
+      setWizard({ phase: 'idle', step: 0, answers: [] })
       return
     }
-    setMessages(loadStored(workspaceId))
+    const loadedMessages = loadMessages(workspaceId)
+    const loadedWizard = loadWizard(workspaceId)
+    if (loadedWizard.phase === 'questioning' && loadedMessages.length === 0) {
+      saveWizard(workspaceId, { phase: 'idle', step: 0, answers: [] })
+      setWizard({ phase: 'idle', step: 0, answers: [] })
+    } else {
+      setWizard(loadedWizard)
+    }
+    setMessages(loadedMessages)
+    setAgentRole(loadRole(workspaceId))
   }, [workspaceId])
 
   useEffect(() => {
     if (!workspaceId || messages.length === 0) return
     try {
-      localStorage.setItem(storageKey(workspaceId), JSON.stringify(messages))
+      localStorage.setItem(messagesKey(workspaceId), JSON.stringify(messages))
     } catch {
       /* ignore quota */
     }
   }, [workspaceId, messages])
 
   useEffect(() => {
+    if (!workspaceId) return
+    saveRole(workspaceId, agentRole)
+  }, [workspaceId, agentRole])
+
+  useEffect(() => {
+    if (!workspaceId) return
+    saveWizard(workspaceId, wizard)
+  }, [workspaceId, wizard])
+
+  useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
-  }, [messages, loading])
+  }, [messages, loading, wizard.phase])
+
+  const questionKeys = useMemo(() => {
+    const base =
+      agentRole === 'optimizer'
+        ? 'aiAssistantPage.wizard.optimizer'
+        : 'aiAssistantPage.wizard.targetologist'
+    return Array.from({ length: WIZARD_STEP_COUNT }, (_, i) => `${base}.q${i + 1}`)
+  }, [agentRole])
+
+  const summaryLabelKeys = useMemo(() => {
+    const base =
+      agentRole === 'optimizer' ? 'aiAssistantPage.wizard.summaryLabelsOpt' : 'aiAssistantPage.wizard.summaryLabelsTgt'
+    return Array.from({ length: WIZARD_STEP_COUNT }, (_, i) => `${base}.l${i + 1}`)
+  }, [agentRole])
 
   const starterPrompts = useMemo(
     () => [
@@ -80,16 +185,43 @@ export default function AiAssistantPage() {
     [t],
   )
 
-  const sendMessage = useCallback(
+  const appendAssistant = useCallback((content: string) => {
+    setMessages((prev) => [...prev, { id: newId('a'), role: 'assistant', content }])
+  }, [])
+
+  const buildSummary = useCallback(
+    (answers: string[]) => {
+      const head = t('aiAssistantPage.wizard.summaryTitle', 'Here is your agent brief')
+      const lines = answers.map((a, i) => {
+        const label = t(summaryLabelKeys[i], `Answer ${i + 1}`)
+        return `• ${label}: ${a}`
+      })
+      const foot = t('aiAssistantPage.wizard.confirmAsk', 'If this looks right, confirm below to enable assisted mode (AI suggests changes; you approve before major actions).')
+      return [head, '', ...lines, '', foot].join('\n')
+    },
+    [t, summaryLabelKeys],
+  )
+
+  const startAgentWizard = useCallback(() => {
+    if (!workspaceId) return
+    setError(null)
+    const intro =
+      agentRole === 'optimizer'
+        ? t('aiAssistantPage.wizard.optimizer.intro', '')
+        : t('aiAssistantPage.wizard.targetologist.intro', '')
+    const q1 = t(questionKeys[0], '')
+    const first = [intro, intro && q1 ? '\n\n' : '', q1].filter(Boolean).join('')
+    setWizard({ phase: 'questioning', step: 0, answers: [] })
+    appendAssistant(first || q1)
+  }, [workspaceId, agentRole, questionKeys, t, appendAssistant])
+
+  const sendFreeChat = useCallback(
     async (text: string) => {
       const trimmed = text.trim()
       if (!trimmed || !workspaceId || loading) return
 
       setError(null)
-      const userId =
-        typeof crypto !== 'undefined' && crypto.randomUUID
-          ? crypto.randomUUID()
-          : `u-${Date.now()}`
+      const userId = newId('u')
       const historyPayload = messages.map(({ role, content }) => ({ role, content }))
 
       setMessages((prev) => [...prev, { id: userId, role: 'user', content: trimmed }])
@@ -100,20 +232,10 @@ export default function AiAssistantPage() {
           workspaceId,
           message: trimmed,
           history: historyPayload,
+          assistantPersona: agentRole,
         })
         const reply = typeof data?.reply === 'string' ? data.reply : ''
-        const assistantId =
-          typeof crypto !== 'undefined' && crypto.randomUUID
-            ? crypto.randomUUID()
-            : `a-${Date.now()}`
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: assistantId,
-            role: 'assistant',
-            content: reply || t('aiAssistantPage.emptyReply', 'No reply received. Try again.'),
-          },
-        ])
+        appendAssistant(reply || t('aiAssistantPage.emptyReply', 'No reply received. Try again.'))
         setInput('')
       } catch (e: unknown) {
         const msg =
@@ -128,25 +250,112 @@ export default function AiAssistantPage() {
         textareaRef.current?.focus()
       }
     },
-    [workspaceId, loading, messages, t],
+    [workspaceId, loading, messages, t, appendAssistant, agentRole],
+  )
+
+  const handleWizardUserReply = useCallback(
+    (trimmed: string) => {
+      const userId = newId('u')
+      setMessages((prev) => [...prev, { id: userId, role: 'user', content: trimmed }])
+
+      const nextAnswers = [...wizard.answers, trimmed]
+      const nextStep = wizard.step + 1
+
+      if (nextStep < WIZARD_STEP_COUNT) {
+        setWizard({ phase: 'questioning', step: nextStep, answers: nextAnswers })
+        const q = t(questionKeys[nextStep], '')
+        appendAssistant(q)
+      } else {
+        setWizard({ phase: 'awaiting_confirm', step: WIZARD_STEP_COUNT, answers: nextAnswers })
+        appendAssistant(buildSummary(nextAnswers))
+      }
+      setInput('')
+    },
+    [wizard, questionKeys, t, appendAssistant, buildSummary],
+  )
+
+  const submitText = useCallback(
+    async (text: string) => {
+      const trimmed = text.trim()
+      if (!trimmed || !workspaceId || loading || confirmBusy) return
+
+      if (wizard.phase === 'questioning') {
+        handleWizardUserReply(trimmed)
+        textareaRef.current?.focus()
+        return
+      }
+
+      if (wizard.phase === 'awaiting_confirm') {
+        setInput(trimmed)
+        return
+      }
+
+      await sendFreeChat(trimmed)
+    },
+    [workspaceId, loading, confirmBusy, wizard.phase, handleWizardUserReply, sendFreeChat],
   )
 
   const clearChat = useCallback(() => {
     setMessages([])
+    setWizard({ phase: 'idle', step: 0, answers: [] })
     setError(null)
     if (workspaceId) {
       try {
-        localStorage.removeItem(storageKey(workspaceId))
+        localStorage.removeItem(messagesKey(workspaceId))
+        localStorage.removeItem(wizardKey(workspaceId))
       } catch {
         /* ignore */
       }
     }
   }, [workspaceId])
 
+  const onConfirmLaunch = useCallback(async () => {
+    if (!workspaceId || wizard.phase !== 'awaiting_confirm') return
+    setConfirmBusy(true)
+    setError(null)
+    try {
+      const res = await workspacesApi.setAutopilot(workspaceId, 'assisted')
+      const data = res.data as { autopilotMode?: string } | undefined
+      const mode = data?.autopilotMode ?? 'assisted'
+      if (currentWorkspace) {
+        setCurrentWorkspace({ ...currentWorkspace, autopilotMode: mode })
+      }
+      appendAssistant(t('aiAssistantPage.wizard.successBody', 'Assisted mode is on. Important changes will ask for your approval first.'))
+      setWizard({ phase: 'done', step: WIZARD_STEP_COUNT, answers: wizard.answers })
+    } catch (e: unknown) {
+      const msg =
+        e && typeof e === 'object' && 'message' in e && typeof (e as { message: string }).message === 'string'
+          ? (e as { message: string }).message
+          : t('aiAssistantPage.wizard.confirmError', 'Could not update workspace. Try again from settings.')
+      setError(msg)
+    } finally {
+      setConfirmBusy(false)
+    }
+  }, [
+    workspaceId,
+    wizard.phase,
+    wizard.answers,
+    currentWorkspace,
+    setCurrentWorkspace,
+    appendAssistant,
+    t,
+  ])
+
+  const onRejectLaunch = useCallback(() => {
+    appendAssistant(t('aiAssistantPage.wizard.cancelBody', 'Understood — nothing was changed. You can adjust answers by clearing the chat or ask me anything in free mode.'))
+    setWizard({ phase: 'done', step: WIZARD_STEP_COUNT, answers: wizard.answers })
+  }, [appendAssistant, t, wizard.answers])
+
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    void sendMessage(input)
+    void submitText(input)
   }
+
+  const inputLocked = wizard.phase === 'awaiting_confirm' || confirmBusy
+  const assistantBadge =
+    agentRole === 'optimizer'
+      ? t('aiAssistantPage.badgeOptimizer', 'Optimizer')
+      : t('aiAssistantPage.badgeTargetologist', 'Targetologist')
 
   const hero = (
     <section
@@ -191,6 +400,59 @@ export default function AiAssistantPage() {
           </Button>
         ) : null}
       </div>
+
+      {workspaceId ? (
+        <div className="mt-6 rounded-2xl border border-border/70 bg-surface/80 p-4 dark:bg-surface-elevated/40">
+          <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
+            {t('aiAssistantPage.agentRoleTitle', 'Which agent are you setting up?')}
+          </p>
+          <p className="mt-1 text-body-sm text-text-secondary">
+            {t('aiAssistantPage.agentRoleSub', 'Default is Targetologist. You can switch before starting the setup chat.')}
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <button
+              type="button"
+              onClick={() => setAgentRole('targetologist')}
+              className={cn(
+                'flex w-full items-start gap-3 rounded-2xl border px-4 py-3 text-left transition-all',
+                agentRole === 'targetologist'
+                  ? 'border-brand-mid bg-brand-mid/10 ring-1 ring-brand-mid/25 dark:border-brand-lime/40 dark:bg-brand-lime/10'
+                  : 'border-border/80 bg-surface hover:border-border',
+              )}
+            >
+              <Crosshair className="mt-0.5 h-5 w-5 shrink-0 text-brand-mid dark:text-brand-lime" aria-hidden />
+              <span>
+                <span className="block text-sm font-semibold text-text-primary">
+                  {t('aiAssistantPage.agentRoleTargetTitle', 'Targetologist')}
+                </span>
+                <span className="mt-1 block text-xs text-text-secondary">
+                  {t('aiAssistantPage.agentRoleTargetDesc', 'Audiences, placements, geo, funnel — who to reach and where.')}
+                </span>
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setAgentRole('optimizer')}
+              className={cn(
+                'flex w-full items-start gap-3 rounded-2xl border px-4 py-3 text-left transition-all',
+                agentRole === 'optimizer'
+                  ? 'border-brand-mid bg-brand-mid/10 ring-1 ring-brand-mid/25 dark:border-brand-lime/40 dark:bg-brand-lime/10'
+                  : 'border-border/80 bg-surface hover:border-border',
+              )}
+            >
+              <Gauge className="mt-0.5 h-5 w-5 shrink-0 text-brand-mid dark:text-brand-lime" aria-hidden />
+              <span>
+                <span className="block text-sm font-semibold text-text-primary">
+                  {t('aiAssistantPage.agentRoleOptTitle', 'Optimizer')}
+                </span>
+                <span className="mt-1 block text-xs text-text-secondary">
+                  {t('aiAssistantPage.agentRoleOptDesc', 'Bids, budgets, tests, scaling — how spend performs and when to adjust.')}
+                </span>
+              </span>
+            </button>
+          </div>
+        </div>
+      ) : null}
     </section>
   )
 
@@ -258,17 +520,25 @@ export default function AiAssistantPage() {
                   )}
                 </p>
               </div>
+              <div className="flex w-full max-w-md flex-col gap-2">
+                <Button type="button" className="h-11 w-full rounded-2xl" onClick={startAgentWizard} disabled={loading}>
+                  {t('aiAssistantPage.startAgentWizard', 'Set up my agent (guided)')}
+                </Button>
+                <p className="text-caption text-text-tertiary">
+                  {t('aiAssistantPage.freeChatHint', 'Or jump into free chat with the prompts below — the assistant uses the role you selected above.')}
+                </p>
+              </div>
               <div className="flex w-full flex-col gap-2.5">
                 {starterPrompts.map((prompt) => (
                   <button
                     key={prompt}
                     type="button"
-                    disabled={loading}
-                    onClick={() => void sendMessage(prompt)}
+                    disabled={loading || (wizard.phase !== 'idle' && wizard.phase !== 'done')}
+                    onClick={() => void submitText(prompt)}
                     className={cn(
                       'rounded-2xl border border-border/80 bg-surface px-4 py-3.5 text-left text-body-sm text-text-primary shadow-sm transition-all',
                       'hover:border-brand-mid/50 hover:bg-surface-2/80 hover:shadow dark:hover:bg-surface-elevated/80',
-                      loading && 'pointer-events-none opacity-50',
+                      (loading || (wizard.phase !== 'idle' && wizard.phase !== 'done')) && 'pointer-events-none opacity-50',
                     )}
                   >
                     {prompt}
@@ -301,7 +571,7 @@ export default function AiAssistantPage() {
                       <Bot className="h-4 w-4 text-brand-mid dark:text-brand-lime" aria-hidden />
                     </span>
                     <span className="text-xs font-semibold uppercase tracking-wide text-text-tertiary dark:text-brand-lime/90">
-                      {t('aiAssistantPage.assistantLabel', 'AdSpectr')}
+                      {t('aiAssistantPage.assistantLabel', 'AdSpectr')} · {assistantBadge}
                     </span>
                   </div>
                 )}
@@ -325,6 +595,22 @@ export default function AiAssistantPage() {
           )}
         </div>
 
+        {wizard.phase === 'awaiting_confirm' ? (
+          <div className="border-t border-border/80 bg-surface-2/90 px-4 py-4 dark:border-brand-mid/20 dark:bg-surface-elevated/90 md:px-8">
+            <p className="text-sm font-semibold text-text-primary">{t('aiAssistantPage.wizard.confirmBarTitle', 'Enable assisted mode?')}</p>
+            <p className="mt-1 text-body-sm text-text-secondary">{t('aiAssistantPage.wizard.confirmBarBody', 'This turns on assisted autopilot for this workspace so AI can propose changes; you approve before major actions.')}</p>
+            <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+              <Button type="button" className="sm:flex-1 gap-2" disabled={confirmBusy} onClick={() => void onConfirmLaunch()}>
+                {confirmBusy ? <Spinner size="sm" className="!border-t-white" /> : null}
+                <span>{t('aiAssistantPage.wizard.confirmYes', 'Confirm & enable')}</span>
+              </Button>
+              <Button type="button" variant="secondary" className="sm:flex-1" disabled={confirmBusy} onClick={onRejectLaunch}>
+                {t('aiAssistantPage.wizard.confirmNo', 'Not now')}
+              </Button>
+            </div>
+          </div>
+        ) : null}
+
         <form
           onSubmit={onSubmit}
           className={cn(
@@ -337,12 +623,19 @@ export default function AiAssistantPage() {
               ref={textareaRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={t(
-                'aiAssistantPage.placeholder',
-                'Describe a process, ask about metrics, or paste a campaign question…',
-              )}
+              placeholder={
+                wizard.phase === 'questioning'
+                  ? t('aiAssistantPage.wizard.answerPlaceholder', 'Type your answer…')
+                  : wizard.phase === 'awaiting_confirm'
+                    ? t('aiAssistantPage.wizard.waitConfirmPlaceholder', 'Use the buttons above to confirm or cancel.')
+                    : t(
+                        'aiAssistantPage.placeholder',
+                        'Describe a process, ask about metrics, or paste a campaign question…',
+                      )
+              }
               rows={3}
-              disabled={loading}
+              disabled={loading || inputLocked}
+              readOnly={wizard.phase === 'awaiting_confirm'}
               className={cn(
                 'min-h-[5.25rem] flex-1 rounded-2xl border-border/90 md:min-h-[4.75rem]',
                 'focus:border-brand-mid/60 focus:ring-2 focus:ring-brand-mid/15',
@@ -350,13 +643,13 @@ export default function AiAssistantPage() {
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault()
-                  void sendMessage(input)
+                  void submitText(input)
                 }
               }}
             />
             <Button
               type="submit"
-              disabled={loading || !input.trim()}
+              disabled={loading || !input.trim() || inputLocked}
               className="h-12 shrink-0 gap-2 rounded-2xl px-6 md:h-auto md:min-w-[7.5rem]"
             >
               {loading ? <Spinner size="sm" className="!border-t-white" /> : <SendHorizontal className="h-4 w-4" />}

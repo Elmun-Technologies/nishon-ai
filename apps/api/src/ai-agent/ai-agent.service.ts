@@ -15,6 +15,7 @@ import { DecisionLoopService } from "./decision-loop.service";
 import { AiDecision } from "../ai-decisions/entities/ai-decision.entity";
 import { ConfigService } from "@nestjs/config";
 import { AdSpectrAiClient } from "@adspectr/ai-sdk";
+import { MetaConnector } from "../platforms/connectors/meta.connector";
 
 /**
  * AiAgentService is the public facade for all AI capabilities.
@@ -35,6 +36,7 @@ export class AiAgentService {
     private readonly strategyEngine: StrategyEngineService,
     private readonly decisionLoop: DecisionLoopService,
     private readonly config: ConfigService,
+    private readonly metaConnector: MetaConnector,
     @InjectRepository(AiDecision)
     private readonly decisionRepo: Repository<AiDecision>,
   ) {
@@ -48,6 +50,55 @@ export class AiAgentService {
       ? this.config.get<string>("ANTHROPIC_BASE_URL", "")
       : this.config.get<string>("OPENAI_BASE_URL", "");
     this.aiClient = new AdSpectrAiClient(apiKey, baseURL || undefined, provider);
+  }
+
+  /**
+   * Fetches recent public ads from Meta Ad Library (Marketing API / ads_archive)
+   * for each competitor name and formats a prompt appendix. Best-effort: returns
+   * empty string if the app token is missing or Meta returns nothing useful.
+   */
+  private async buildMetaAdLibraryAppendix(
+    competitors: Array<{ name: string }>,
+    countryCode = "UZ",
+  ): Promise<string> {
+    const token = await this.metaConnector.getAppAccessToken();
+    if (!token) return "";
+
+    const lines: string[] = [];
+    for (const c of competitors) {
+      const term = c.name?.trim();
+      if (!term || term.length < 2) continue;
+      try {
+        const ads = await this.metaConnector.searchAdLibrary({
+          searchTerms: term,
+          countryCode,
+          limit: 12,
+          accessToken: token,
+        });
+        if (!ads.length) continue;
+        lines.push(`\n【${term}】 — Ad Library: ${ads.length} ta natija (qisqa):`);
+        for (const ad of ads.slice(0, 8)) {
+          const body = (ad.adCreativeBody || "").replace(/\s+/g, " ").trim().slice(0, 200);
+          const cap = (ad.adCreativeLinkCaption || "").trim().slice(0, 80);
+          lines.push(
+            `- Sahifa: ${ad.pageName} | boshlangan: ${(ad.adDeliveryStartTime || "").slice(0, 10) || "?"}` +
+              (cap ? ` | caption: ${cap}` : "") +
+              `\n  Matn: ${body || "(matn yo'q)"}`,
+          );
+        }
+      } catch (err: any) {
+        this.logger.debug(`Ad Library search skipped for "${term}": ${err?.message || err}`);
+      }
+    }
+    if (!lines.length) return "";
+
+    return (
+      `\n\n--- Meta Marketing API — Ad Library (ads_archive) ---\n` +
+      `Quyidagi qatorlar Facebook/Instagram jamoat reklama arxividan (Graph API) olingan namunalar. ` +
+      `Ularni kuch/xavf va kreativ yo‘nalishlarida asosiy dalil sifatida ishlating; bu to‘liq hisobot emas.\n` +
+      lines.join("\n") +
+      `\n`
+    );
   }
 
   async generateStrategy(workspaceId: string): Promise<StrategyResult> {
@@ -110,7 +161,15 @@ export class AiAgentService {
     workspaceId: string;
     message: string;
     history?: { role: "user" | "assistant"; content: string }[];
+    assistantPersona?: "targetologist" | "optimizer" | "general";
   }): Promise<{ reply: string }> {
+    const persona =
+      dto.assistantPersona === "optimizer"
+        ? `Primary persona for this thread: ADS OPTIMIZER. Prioritize bid strategies, budget pacing, A/B testing cadence, creative performance diagnostics, scaling rules, and guardrails before spend changes. Still stay within platform safety and never promise unauthorized account actions.`
+        : dto.assistantPersona === "targetologist"
+          ? `Primary persona for this thread: TARGETOLOGIST (media buyer focused on targeting). Prioritize audiences, placements, geo/demographics, interest layering, exclusions, funnel structure, and measurement for targeting decisions. Still stay within platform safety and never promise unauthorized account actions.`
+          : "";
+
     const systemPrompt = `You are AdSpectr — a helpful advertising assistant for the AdSpectr platform.
 You help users understand their Meta ad campaign performance, troubleshoot errors, and optimize their strategy.
 You also help them think through marketing workflows, automation ideas, team handoffs, and day-to-day processes — not only metrics.
@@ -118,6 +177,7 @@ You have knowledge about Meta Ads (Facebook/Instagram), campaign budgets, CTR, R
 Answer in the same language the user writes in (Uzbek, Russian, or English).
 Be concise, practical, and friendly. When giving advice, use concrete numbers from context if available.
 If asked about a specific campaign or metric, explain what it means and what actions to take.
+${persona ? `\n${persona}\n` : ""}
 Workspace ID for this conversation: ${dto.workspaceId}`;
 
     const historyText = (dto.history || [])
@@ -314,7 +374,12 @@ RULES:
 - Include ALL 12 categories with ALL 6 sub-params each
 - Be specific and realistic based on provided Instagram/website URLs
 - If data not available, make educated estimates based on industry
+- When a "Meta Marketing API — Ad Library" section appears in the user message, use it as evidence for active paid/social creative patterns; reconcile with URL-based notes.
 `
+
+    const adLibraryAppendixSingle = await this.buildMetaAdLibraryAppendix([
+      { name: dto.competitor.name },
+    ]);
 
     const userPrompt = `
 Analyze this competitor vs our client:
@@ -332,7 +397,7 @@ COMPETITOR:
 - Name: ${dto.competitor.name}
 - Instagram: ${dto.competitor.instagram || 'Not provided'}
 - Website: ${dto.competitor.website || 'Not provided'}
-
+${adLibraryAppendixSingle}
 Please analyze both businesses across all 12 categories and 72 sub-parameters.
 Use the Instagram and website URLs to gather real insights about the competitor.
 Be specific, actionable, and write all notes in Uzbek language.
@@ -349,6 +414,126 @@ Be specific, actionable, and write all notes in Uzbek language.
       this.logger.error(`Competitor analysis failed: ${detail}`)
       throw new InternalServerErrorException(
         `AI tahlil amalga oshmadi: ${detail.slice(0, 200)}`
+      )
+    }
+  }
+
+  /**
+   * Multi-competitor portfolio view (condensed JSON).
+   * Intended for careful strategic review; can later be delegated to Manus with the same payload shape.
+   */
+  async analyzeCompetitorsBatch(dto: {
+    workspaceId: string
+    businessContext: Record<string, unknown>
+    competitors: Array<{ name: string; instagram?: string; website?: string; extraLinks?: string }>
+  }): Promise<Record<string, unknown>> {
+    const list = dto.competitors || []
+    if (list.length === 0) {
+      throw new BadRequestException("Kamida bitta raqobatchi kerak")
+    }
+    if (list.length > 12) {
+      throw new BadRequestException("Bir vaqtning o‘zida 12 tadan ortiq raqobatchi yuborilmaydi")
+    }
+    for (let i = 0; i < list.length; i++) {
+      const c = list[i]
+      if (!c?.name?.trim()) {
+        throw new BadRequestException(`Raqobatchi #${i + 1}: nom majburiy`)
+      }
+      const hasLink = Boolean(
+        (c.instagram && String(c.instagram).trim()) ||
+          (c.website && String(c.website).trim()) ||
+          (c.extraLinks && String(c.extraLinks).trim()),
+      )
+      if (!hasLink) {
+        throw new BadRequestException(
+          `Raqobatchi "${c.name.trim()}": kamida bitta havola (Instagram, sayt yoki qo‘shimcha havolalar) kiriting`,
+        )
+      }
+    }
+
+    const systemPrompt = `
+You are a senior competitive intelligence analyst for Uzbekistan / CIS digital markets.
+A business depends on this analysis — be careful, evidence-based, and avoid overclaiming when URLs are incomplete.
+Return VALID JSON ONLY with this exact shape (all user-facing strings in Uzbek):
+
+{
+  "executiveSummary": "2-4 jumla: umumiy landshaft, asosiy bosim, nimaga e'tibor berish kerak",
+  "analysisCareNote": "1-2 jumla: bu tahlil qarorlar uchun yo'l-yo'riq, kafolat emas; ma'lumotlar cheklangan bo'lishi mumkin",
+  "portfolioPressureScore": 0-100,
+  "competitors": [
+    {
+      "name": "string",
+      "instagram": "string",
+      "website": "string",
+      "threatLevel": "low" | "medium" | "high",
+      "oneLinePositioning": "Uzbek: ularning pozitsiyasi",
+      "strengthBullets": ["...", "..."],
+      "weaknessBullets": ["...", "..."],
+      "whatToWatch": "Uzbek: kuzatish kerak bo'lgan 1-2 signal"
+    }
+  ],
+  "topRisks": ["...", "...", "..."],
+  "topOpportunities": ["...", "...", "..."],
+  "ninetyDayPlan": {
+    "focus": "Uzbek",
+    "actions": ["...", "..."]
+  },
+  "twelveMonthOutlook": {
+    "summary": "Uzbek",
+    "milestones": ["...", "..."]
+  }
+}
+
+RULES:
+- threatLevel must be exactly "low", "medium", or "high"
+- portfolioPressureScore: higher = more competitive pressure on the client
+- 3-5 bullets max per strengths/weaknesses per competitor
+- Be specific when URLs/names suggest a category; otherwise say what is unknown
+- When a "Meta Marketing API — Ad Library" section is present in the user message, treat those rows as real public ad samples for the search term; align strength/threat notes with them where possible, and say when the Library returned nothing useful for a brand.
+`
+
+    const biz = dto.businessContext || {}
+    const adLibraryAppendix = await this.buildMetaAdLibraryAppendix(list)
+    const competitorBlock = list
+      .map(
+        (c, idx) =>
+          `${idx + 1}. ${c.name.trim()}
+   - Instagram: ${(c.instagram || "").trim() || "yo'q"}
+   - Website: ${(c.website || "").trim() || "yo'q"}
+   - Qo'shimcha havolalar / izoh: ${(c.extraLinks || "").trim() || "yo'q"}`,
+      )
+      .join("\n\n")
+
+    const userPrompt = `
+Workspace ID: ${dto.workspaceId}
+
+BIZNING MIJOZ:
+- Nomi: ${String(biz.name ?? "noma'lum")}
+- Soha: ${String(biz.industry ?? "noma'lum")}
+- Tavsif: ${String((biz as { productDescription?: string }).productDescription ?? "berilmagan")}
+- Joy: ${String(biz.targetLocation ?? "O'zbekiston")}
+- Oylik byudjet (taxmin): $${String(biz.monthlyBudget ?? 500)}
+- Maqsad: ${String(biz.goal ?? "lead")}
+- Auditoriya: ${String(biz.targetAudience ?? "berilmagan")}
+- Strategiya (qisqa): ${JSON.stringify(biz.aiStrategy ?? {}).slice(0, 800)}
+
+RAQOBATCHILAR (${list.length} ta):
+${competitorBlock}
+${adLibraryAppendix}
+Barcha raqobatchilar bo'yicha portfolio tahlilini bering. JSON qaytaring.
+`
+
+    try {
+      return (await this.aiClient.completeJson(userPrompt, systemPrompt, {
+        taskType: "competitor",
+        agentName: "CompetitorPortfolioBatch",
+        temperature: 0.25,
+      })) as Record<string, unknown>
+    } catch (err: any) {
+      const detail = err?.message || String(err)
+      this.logger.error(`Competitor batch analysis failed: ${detail}`)
+      throw new InternalServerErrorException(
+        `Portfolio tahlili amalga oshmadi: ${detail.slice(0, 200)}`,
       )
     }
   }

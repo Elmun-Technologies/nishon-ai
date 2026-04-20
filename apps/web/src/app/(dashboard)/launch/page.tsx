@@ -9,6 +9,7 @@ import {
   Globe,
   Megaphone,
   Search,
+  Send,
   ShoppingCart,
   Target,
 } from 'lucide-react'
@@ -22,6 +23,7 @@ import {
   WizardProgressBar,
   WizardStepCard,
 } from '@/components/launch/wizard-shell'
+import { cn } from '@/lib/utils'
 
 type Platform = 'meta' | 'google' | 'yandex'
 type LaunchMode = 'self' | 'ai' | 'expert'
@@ -38,6 +40,65 @@ function parsePositiveNumber(v: string) {
 
 function formatMoneyUsd(n: number) {
   return new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n)
+}
+
+/** Multicolor “G” mark so Google reads clearly at a glance (official palette). */
+function GoogleLogoMark({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <path
+        fill="#4285F4"
+        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+      />
+      <path
+        fill="#34A853"
+        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+      />
+      <path
+        fill="#EA4335"
+        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+      />
+    </svg>
+  )
+}
+
+function platformIconShell(variant: 'meta' | 'google' | 'yandex' | 'telegram') {
+  const base = 'flex h-[4.5rem] w-[4.5rem] shrink-0 items-center justify-center rounded-2xl shadow-sm'
+  switch (variant) {
+    case 'meta':
+      return cn(base, 'bg-[#0866FF]/14 ring-2 ring-[#0866FF]/25 dark:bg-[#0866FF]/20')
+    case 'google':
+      return cn(base, 'bg-white ring-2 ring-border/90 dark:bg-surface dark:ring-border')
+    case 'yandex':
+      return cn(base, 'bg-[#FC3F1D]/12 ring-2 ring-[#FC3F1D]/28 dark:bg-[#FC3F1D]/15')
+    case 'telegram':
+      return cn(base, 'bg-[#229ED9]/14 ring-2 ring-[#229ED9]/30 dark:bg-[#229ED9]/18')
+    default:
+      return base
+  }
+}
+
+function PlatformGlyph({ variant }: { variant: 'meta' | 'google' | 'yandex' | 'telegram' }) {
+  switch (variant) {
+    case 'meta':
+      return <Facebook className="h-10 w-10 text-[#0866FF]" strokeWidth={2} aria-hidden />
+    case 'google':
+      return <GoogleLogoMark className="h-10 w-10" />
+    case 'yandex':
+      return (
+        <span className="select-none text-[2.125rem] font-black leading-none tracking-tight text-[#FC3F1D]" aria-hidden>
+          Я
+        </span>
+      )
+    case 'telegram':
+      return <Send className="h-9 w-9 -rotate-12 text-[#229ED9]" strokeWidth={2.25} aria-hidden />
+    default:
+      return null
+  }
 }
 
 export default function LaunchPage() {
@@ -86,7 +147,23 @@ export default function LaunchPage() {
       return
     }
     if (launchMode === 'expert') {
-      router.push(`/service?platform=${platform}`)
+      const ws = currentWorkspace
+      const params = new URLSearchParams()
+      params.set('from', 'launch')
+      if (platform) params.set('platform', platform)
+      if (ws?.name?.trim()) params.set('business', ws.name.trim())
+      if (ws?.industry?.trim()) params.set('industry', ws.industry.trim())
+      if (ws?.goal) params.set('goal', String(ws.goal))
+      const qParts: string[] = []
+      if (ws?.industry?.trim()) qParts.push(ws.industry.trim())
+      if (ws?.goal) qParts.push(String(ws.goal).replace(/_/g, ' '))
+      if (ws?.name?.trim()) qParts.push(ws.name.trim())
+      if (platform === 'meta') qParts.push('Meta Facebook Instagram ads')
+      else if (platform === 'google') qParts.push('Google Ads')
+      else if (platform === 'yandex') qParts.push('Yandex Direct')
+      const q = qParts.join(' ').trim()
+      if (q) params.set('q', q)
+      router.push(`/marketplace/search?${params.toString()}`)
       return
     }
     setLaunchModeConfirmed(true)
@@ -272,28 +349,37 @@ export default function LaunchPage() {
     [lt],
   )
 
-  const platformCards = useMemo(
+  const selectablePlatformCards = useMemo(
     () =>
       [
         {
           id: 'meta' as const,
+          variant: 'meta' as const,
           title: lt('platforms.metaName', 'Meta'),
           desc: lt('platforms.metaDesc', ''),
-          icon: <Facebook className="h-6 w-6 text-[#0866FF]" aria-hidden />,
         },
         {
           id: 'google' as const,
+          variant: 'google' as const,
           title: lt('platforms.googleName', 'Google Ads'),
           desc: lt('platforms.googleDesc', ''),
-          icon: <Search className="h-6 w-6 text-[#4285F4]" aria-hidden />,
         },
         {
           id: 'yandex' as const,
+          variant: 'yandex' as const,
           title: lt('platforms.yandexName', 'Yandex Direct'),
           desc: lt('platforms.yandexDesc', ''),
-          icon: <span className="text-lg font-bold text-[#FC3F1D]" aria-hidden>Y</span>,
         },
       ],
+    [lt],
+  )
+
+  const telegramSoonCard = useMemo(
+    () => ({
+      title: lt('platforms.telegramName', 'Telegram Ads'),
+      desc: lt('platforms.telegramDesc', ''),
+      badge: lt('platforms.comingSoon', 'Coming soon'),
+    }),
     [lt],
   )
 
@@ -340,16 +426,16 @@ export default function LaunchPage() {
           <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-text-tertiary">
             {lt('hub.platformEyebrow', 'Platform')}
           </p>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            {platformCards.map((p) => (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {selectablePlatformCards.map((p) => (
               <button
                 key={p.id}
                 type="button"
                 onClick={() => handlePlatformPick(p.id)}
                 className="group rounded-2xl border border-border bg-surface p-6 text-left shadow-sm transition-all hover:border-primary/35 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25"
               >
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-surface-2">
-                  {p.icon}
+                <div className={cn('mb-4', platformIconShell(p.variant))}>
+                  <PlatformGlyph variant={p.variant} />
                 </div>
                 <h3 className="text-base font-semibold text-text-primary">{p.title}</h3>
                 <p className="mt-2 text-sm text-text-secondary">{p.desc}</p>
@@ -359,6 +445,22 @@ export default function LaunchPage() {
                 </span>
               </button>
             ))}
+            <div
+              role="note"
+              aria-label={`${telegramSoonCard.title} — ${telegramSoonCard.badge}`}
+              className="flex flex-col rounded-2xl border border-dashed border-border/90 bg-surface-2/50 p-6 text-left shadow-inner dark:bg-surface-elevated/40"
+            >
+              <div className="mb-4 flex items-start justify-between gap-2">
+                <div className={platformIconShell('telegram')}>
+                  <PlatformGlyph variant="telegram" />
+                </div>
+                <span className="shrink-0 rounded-full border border-border bg-surface px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-text-secondary">
+                  {telegramSoonCard.badge}
+                </span>
+              </div>
+              <h3 className="text-base font-semibold text-text-primary">{telegramSoonCard.title}</h3>
+              <p className="mt-2 text-sm text-text-secondary">{telegramSoonCard.desc}</p>
+            </div>
           </div>
         </div>
 

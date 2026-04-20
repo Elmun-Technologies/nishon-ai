@@ -18,6 +18,7 @@ import {
 } from "@nestjs/swagger";
 import { AuthGuard } from "@nestjs/passport";
 import { LandingPagesService } from "./landing-pages.service";
+import { GenerateLandingPageDto } from "./dto/generate-landing-page.dto";
 
 @ApiTags("Landing Pages")
 @Controller("landing-pages")
@@ -37,8 +38,9 @@ export class LandingPagesController {
   async generate(
     @Param("workspaceId") workspaceId: string,
     @Request() req: any,
+    @Body() dto: GenerateLandingPageDto,
   ) {
-    return this.service.generate(workspaceId, req.user.id);
+    return this.service.generate(workspaceId, req.user.id, dto ?? {});
   }
 
   /**

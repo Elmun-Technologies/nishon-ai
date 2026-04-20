@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "description": "Drop final assets next to this file and wire paths in code or swap placeholder.svg. Animation libraries can mount into [data-animation-root] inside each slot.",
+  "slots": [
+    {
+      "id": "onboarding-step-0-welcome",
+      "domSelector": "[data-media-slot=\"onboarding-step-0-welcome\"]",
+      "recommendedFile": "/onboarding/welcome.webp",
+      "ratio": "4:3",
+      "exportSize": { "w": 1200, "h": 900 },
+      "formats": ["image/webp", "image/png", "image/svg+xml"],
+      "animation": { "optional": true, "types": ["lottie-json", "rive", "css-keyframes", "mp4-loop"] }
+    },
+    {
+      "id": "onboarding-step-1-goal",
+      "domSelector": "[data-media-slot=\"onboarding-step-1-goal\"]",
+      "recommendedFile": "/onboarding/goal.webp",
+      "ratio": "21:9",
+      "exportSize": { "w": 1600, "h": 686 },
+      "formats": ["image/webp", "image/png"],
+      "animation": { "optional": true, "types": ["lottie-json", "css-keyframes"] }
+    },
+    {
+      "id": "onboarding-step-2-budget",
+      "domSelector": "[data-media-slot=\"onboarding-step-2-budget\"]",
+      "recommendedFile": "/onboarding/budget.webp",
+      "ratio": "21:9",
+      "exportSize": { "w": 1600, "h": 686 },
+      "formats": ["image/webp", "image/png"],
+      "animation": { "optional": true, "types": ["lottie-json"] }
+    },
+    {
+      "id": "onboarding-step-3-industry",
+      "domSelector": "[data-media-slot=\"onboarding-step-3-industry\"]",
+      "recommendedFile": "/onboarding/industry.webp",
+      "ratio": "21:9",
+      "exportSize": { "w": 1600, "h": 686 },
+      "formats": ["image/webp", "image/png"],
+      "animation": { "optional": true, "types": ["lottie-json"] }
+    },
+    {
+      "id": "onboarding-step-4-split",
+      "domSelector": "[data-media-slot=\"onboarding-step-4-split\"]",
+      "recommendedFile": "/onboarding/split-diagram.webp",
+      "ratio": "4:3",
+      "exportSize": { "w": 960, "h": 720 },
+      "formats": ["image/webp", "image/svg+xml", "image/png"],
+      "animation": { "optional": true, "types": ["lottie-json", "rive"] }
+    },
+    {
+      "id": "onboarding-step-5-geo",
+      "domSelector": "[data-media-slot=\"onboarding-step-5-geo\"]",
+      "recommendedFile": "/onboarding/geo-map.webp",
+      "ratio": "16:9",
+      "exportSize": { "w": 1280, "h": 720 },
+      "formats": ["image/webp", "image/png"],
+      "animation": { "optional": true, "types": ["lottie-json", "mp4-loop"] }
+    },
+    {
+      "id": "onboarding-step-6-summary",
+      "domSelector": "[data-media-slot=\"onboarding-step-6-summary\"]",
+      "recommendedFile": "/onboarding/summary-success.webp",
+      "ratio": "16:9",
+      "exportSize": { "w": 1280, "h": 720 },
+      "formats": ["image/webp", "image/png"],
+      "animation": { "optional": true, "types": ["lottie-json", "css-keyframes"] }
+    },
+    {
+      "id": "register-hero",
+      "domSelector": "[data-media-slot=\"register-hero\"]",
+      "recommendedFile": "/onboarding/register-hero.webp",
+      "ratio": "16:9",
+      "exportSize": { "w": 1280, "h": 720 },
+      "formats": ["image/webp", "image/png", "image/svg+xml"],
+      "animation": { "optional": true, "types": ["lottie-json", "mp4-loop"] }
+    }
+  ]
+}

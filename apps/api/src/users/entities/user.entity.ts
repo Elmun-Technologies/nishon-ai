@@ -44,6 +44,14 @@ export class User {
   })
   plan: UserPlan;
 
+  /**
+   * When the time-boxed product trial ends for FREE-plan users.
+   * Null = not applicable (paid) or legacy row before trials were tracked.
+   * Paid upgrades clear this so access is governed by plan only.
+   */
+  @Column({ type: "timestamp", nullable: true, name: "trial_ends_at" })
+  trialEndsAt: Date | null;
+
   @Column({ default: false })
   isEmailVerified: boolean;
 

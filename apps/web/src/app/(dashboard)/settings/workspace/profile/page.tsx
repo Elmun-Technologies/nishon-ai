@@ -40,6 +40,8 @@ export default function WorkspaceUserProfilePage() {
         name: (data as any).name ?? userForm.name,
         email: (data as any).email ?? userForm.email,
         plan: (data as any).plan ?? user?.plan ?? 'free',
+        trialEndsAt: (data as any).trialEndsAt ?? user?.trialEndsAt ?? null,
+        isAdmin: (data as any).isAdmin ?? user?.isAdmin ?? false,
       })
       setEditUserOpen(false)
       setNote(t('workspaceSettings.profile.savedProfile', 'Profile saved.'))

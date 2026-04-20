@@ -1,14 +1,20 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { Badge } from '@/components/ui/Badge'
-import { Search, TrendingUp, Grid3X3, List, CheckCircle2, Loader2 } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
+import { Alert } from '@/components/ui'
+import { Search, Grid3X3, List, CheckCircle2, Loader2 } from 'lucide-react'
 import { useSpecialistSearch } from '@/hooks/useSpecialistSearch'
+import { useI18n } from '@/i18n/use-i18n'
 
 const PLATFORM_ICONS: Record<string, string> = { meta: '📘', google: '🔍', yandex: '🟡', tiktok: '🎵' }
 
 export function Marketplace() {
+  const { t } = useI18n()
+  const searchParams = useSearchParams()
+  const urlKey = searchParams.toString()
+
   const [sortBy, setSortBy] = useState<'rating' | 'roas' | 'trending'>('rating')
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
   const [searchQuery, setSearchQuery] = useState('')
@@ -26,6 +32,36 @@ export function Marketplace() {
     ;(handleSearch as any)._timer = setTimeout(() => setDebouncedQuery(value), 400)
   }
 
+  /** Pre-fill from Launch → Marketplace expert (query string). */
+  useEffect(() => {
+    const sp = new URLSearchParams(urlKey)
+    const q = sp.get('q')?.trim()
+    if (q) {
+      setSearchQuery(q)
+      setDebouncedQuery(q)
+    }
+    const plat = sp.get('platform')
+    if (plat && ['meta', 'google', 'yandex', 'tiktok'].includes(plat)) {
+      setFilters((prev) => ({ ...prev, platforms: [plat] }))
+    }
+  }, [urlKey])
+
+  const launchExpertBanner = useMemo(() => {
+    const sp = new URLSearchParams(urlKey)
+    if (sp.get('from') !== 'launch') return null
+    const business = sp.get('business')?.trim() || ''
+    const industry = sp.get('industry')?.trim() || ''
+    const goal = sp.get('goal')?.trim() || ''
+    const platform = sp.get('platform')?.trim() || ''
+    if (!business && !industry && !goal && !platform) return null
+    const bits: string[] = []
+    if (business) bits.push(`${t('marketplace.launchExpertBusiness', 'Business')}: ${business}`)
+    if (industry) bits.push(`${t('marketplace.launchExpertIndustry', 'Industry')}: ${industry}`)
+    if (goal) bits.push(`${t('marketplace.launchExpertGoal', 'Goal')}: ${goal.replace(/_/g, ' ')}`)
+    if (platform) bits.push(`${t('marketplace.launchExpertPlatform', 'Platform')}: ${platform}`)
+    return { bits }
+  }, [urlKey, t])
+
   const { specialists, loading, error, total } = useSpecialistSearch(
     {
       query: debouncedQuery || undefined,
@@ -40,6 +76,21 @@ export function Marketplace() {
 
   return (
     <div className="flex flex-col min-h-full" style={{ color: 'var(--c-text-primary)' }}>
+
+      {launchExpertBanner && (
+        <Alert variant="info" className="mb-5">
+          <p className="text-sm font-semibold text-text-primary">
+            {t('marketplace.launchExpertTitle', 'Recommended specialists for your launch')}
+          </p>
+          <p className="mt-1 text-sm text-text-secondary">
+            {t(
+              'marketplace.launchExpertSubtitle',
+              'We filled search and platform filter from your workspace and the channel you chose. You can edit them anytime.',
+            )}
+          </p>
+          <p className="mt-2 text-xs text-text-tertiary">{launchExpertBanner.bits.join(' · ')}</p>
+        </Alert>
+      )}
 
       {/* Search */}
       <div className="mb-6">

@@ -14,7 +14,33 @@ import {
   AdSpectrAiClient,
   LANDING_PAGE_SYSTEM_PROMPT,
   buildLandingPagePrompt,
+  type LandingPageTemplateId,
 } from "@adspectr/ai-sdk";
+import type { GenerateLandingPageDto } from "./dto/generate-landing-page.dto";
+
+const LP_IMAGE_SUMMARY_SYSTEM = `You summarize images for an Uzbek-language landing page.
+Respond with VALID JSON ONLY: {"visualSummary":"2-4 sentences in Uzbek for a copywriter: what is shown, category (product/service/team/space), mood, trust signals. No invented brand names or prices."}`;
+
+const LP_IMAGE_SUMMARY_USER = `Bu rasmni professional landing sahifa uchun qisqa tahlil qiling. JSON qaytaring.`;
+
+const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
+
+function approxBytesFromBase64(b64: string): number {
+  const pad = b64.endsWith("==") ? 2 : b64.endsWith("=") ? 1 : 0;
+  return Math.floor((b64.length * 3) / 4) - pad;
+}
+
+function unwrapVisionRow(raw: unknown): { visualSummary?: string } {
+  if (raw && typeof raw === "object") {
+    const o = raw as Record<string, unknown>;
+    if (typeof o.visualSummary === "string") return { visualSummary: o.visualSummary };
+    const c = o.content as Record<string, unknown> | undefined;
+    if (c && typeof c === "object" && typeof c.visualSummary === "string") {
+      return { visualSummary: c.visualSummary };
+    }
+  }
+  return {};
+}
 
 function generateSlug(name: string): string {
   const base = name
@@ -58,7 +84,11 @@ export class LandingPagesService {
    * If a landing page already exists for this workspace, it is updated.
    * Otherwise a new one is created with an auto-generated slug.
    */
-  async generate(workspaceId: string, userId: string): Promise<LandingPage> {
+  async generate(
+    workspaceId: string,
+    userId: string,
+    dto: GenerateLandingPageDto = {} as GenerateLandingPageDto,
+  ): Promise<LandingPage> {
     const workspace = await this.workspaceRepo.findOne({
       where: { id: workspaceId, userId },
     });
@@ -73,12 +103,35 @@ export class LandingPagesService {
 
     const strategy = workspace.aiStrategy as any;
 
+    const images = dto.images ?? [];
+    for (const img of images) {
+      if (approxBytesFromBase64(img.base64) > MAX_IMAGE_BYTES) {
+        throw new BadRequestException("Har bir rasm 4 MB dan oshmasligi kerak");
+      }
+    }
+
+    let visualSummaries: string[] = [];
+    if (images.length > 0) {
+      try {
+        visualSummaries = await this.summarizeImagesForLanding(images);
+      } catch (e: any) {
+        this.logger.warn(`Landing page image pipeline skipped: ${e?.message}`);
+      }
+      if (visualSummaries.length === 0 && images.length > 0) {
+        this.logger.warn(
+          "Landing page: images were sent but no summaries were produced (check OpenAI vision availability).",
+        );
+      }
+    }
+
+    const templateId = (dto.templateId as LandingPageTemplateId | undefined) || undefined;
+
     const prompt = buildLandingPagePrompt({
       businessName: workspace.name,
       industry: workspace.industry,
       productDescription: workspace.productDescription || workspace.industry,
       targetAudience: workspace.targetAudience || "O'zbek iste'molchilar",
-      goal: workspace.goal,
+      goal: String(workspace.goal),
       uniqueAdvantage: strategy?.creativeGuidelines?.keyMessages?.join(", "),
       strategy: strategy
         ? {
@@ -86,16 +139,25 @@ export class LandingPagesService {
             creativeGuidelines: strategy.creativeGuidelines,
           }
         : undefined,
+      templateId,
+      creativeBrief: dto.creativeBrief,
+      visualSummaries: visualSummaries.length ? visualSummaries : undefined,
     });
 
-    this.logger.log(`Generating landing page for workspace: ${workspaceId}`);
+    this.logger.log(
+      `Generating landing page for workspace: ${workspaceId} template=${templateId ?? "default"} images=${images.length}`,
+    );
 
     let content: any;
     try {
       content = await this.aiClient.completeJson(
         prompt,
         LANDING_PAGE_SYSTEM_PROMPT,
-        { taskType: "creative", agentName: "LandingPageEngine", temperature: 0.6 },
+        {
+          taskType: "landing-page",
+          agentName: "LandingPageEnginePro",
+          temperature: 0.4,
+        },
       );
     } catch (err: any) {
       this.logger.error({ message: "Landing page AI generation failed", error: err?.message });
@@ -193,6 +255,39 @@ export class LandingPagesService {
     const page = await this.findOwnedPage(id, userId);
     page.isPublished = !page.isPublished;
     return this.landingPageRepo.save(page);
+  }
+
+  /**
+   * Short Uzbek summaries from product/business photos (OpenAI vision only).
+   */
+  private async summarizeImagesForLanding(
+    images: { base64: string; mimeType: string }[],
+  ): Promise<string[]> {
+    if (!this.aiClient) return [];
+    const summaries: string[] = [];
+    const slice = images.slice(0, 4);
+    for (const img of slice) {
+      try {
+        const raw = await this.aiClient.completeVision<Record<string, unknown>>(
+          img.base64,
+          img.mimeType,
+          LP_IMAGE_SUMMARY_USER,
+          LP_IMAGE_SUMMARY_SYSTEM,
+          {
+            taskType: "vision",
+            agentName: "LandingPageImageSummary",
+            model: "gpt-4o",
+            maxTokens: 450,
+            temperature: 0.2,
+          },
+        );
+        const row = unwrapVisionRow(raw);
+        if (row.visualSummary?.trim()) summaries.push(row.visualSummary.trim());
+      } catch (err: any) {
+        this.logger.warn(`Landing image vision step failed: ${err?.message}`);
+      }
+    }
+    return summaries;
   }
 
   private async findOwnedPage(id: string, userId: string): Promise<LandingPage> {

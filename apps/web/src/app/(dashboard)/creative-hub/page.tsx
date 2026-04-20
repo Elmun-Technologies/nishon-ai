@@ -223,7 +223,13 @@ function CreativeHubInner() {
               <button
                 key={tab}
                 type="button"
-                onClick={() => selectTab(tab, true)}
+                onClick={() => {
+                  if (tab === 'image') {
+                    router.push('/creative-hub/image-ads')
+                    return
+                  }
+                  selectTab(tab, true)
+                }}
                 className={cn(
                   'group relative flex flex-col overflow-hidden rounded-3xl border text-left shadow-md transition-all',
                   'border-border/80 bg-surface hover:-translate-y-0.5 hover:shadow-lg',

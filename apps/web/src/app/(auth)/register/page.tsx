@@ -1,14 +1,15 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { ContentMediaSlot } from '@/components/media/ContentMediaSlot'
 import { Alert, Button, Input } from '@/components/ui'
 import { PageSpinner } from '@/components/ui/Spinner'
 import { auth } from '@/lib/api-client'
 import { useI18n } from '@/i18n/use-i18n'
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher'
-import { clearPreAuthOnboarding, isPreAuthOnboardingComplete } from '@/lib/pre-auth-onboarding'
+import { clearPreAuthOnboarding, isPreAuthOnboardingComplete, loadPreAuthOnboardingDraft } from '@/lib/pre-auth-onboarding'
 
 export default function RegisterPage() {
   const { t } = useI18n()
@@ -17,6 +18,8 @@ export default function RegisterPage() {
   const [form, setForm] = useState({ name: '', email: '', password: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  const draft = useMemo(() => (gateChecked ? loadPreAuthOnboardingDraft() : null), [gateChecked])
 
   useEffect(() => {
     if (!isPreAuthOnboardingComplete()) {
@@ -49,7 +52,7 @@ export default function RegisterPage() {
 
   if (!gateChecked) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-surface-2 text-text-secondary">
+      <main className="flex min-h-screen items-center justify-center bg-surface text-text-secondary">
         <div className="flex flex-col items-center gap-3">
           <PageSpinner />
           <p className="text-sm">{t('preAuthOnboarding.registerGateLoading', 'Checking onboarding…')}</p>
@@ -58,43 +61,111 @@ export default function RegisterPage() {
     )
   }
 
+  const p = (key: string, fb: string) => t(`preAuthOnboarding.${key}`, fb)
+
   return (
-    <main className="min-h-screen bg-surface-2 px-4 py-10 text-text-primary">
-      <div className="mx-auto flex max-w-6xl items-center justify-end gap-3 px-0 pb-4">
-        <Link href="/" className="text-sm text-text-secondary hover:text-text-primary">
+    <main className="min-h-screen bg-surface px-4 py-10 text-text-primary md:py-14">
+      <div className="mx-auto flex max-w-6xl items-center justify-end gap-3 pb-6">
+        <Link href="/" className="text-sm text-text-secondary transition-colors hover:text-text-primary">
           {t('common.home', 'Home')}
         </Link>
         <LanguageSwitcher />
       </div>
-      <div className="mx-auto grid w-full max-w-6xl gap-6 lg:grid-cols-2">
-        <section className="rounded-2xl border border-border bg-surface p-8">
-          <p className="text-sm font-medium text-primary">{t('auth.registerPage.badge', 'Create account')}</p>
-          <h1 className="mt-2 text-3xl font-semibold">{t('auth.registerPage.heroTitle', 'Start using AdSpectr in minutes')}</h1>
-          <p className="mt-3 text-text-secondary">{t('auth.registerPage.heroSubtitle', 'Launch campaigns, track AI decisions, and manage workspace governance from one place.')}</p>
 
-          <div className="mt-6 grid gap-3 sm:grid-cols-3">
+      <div className="mx-auto grid w-full max-w-6xl gap-6 lg:grid-cols-2 lg:gap-8">
+        <section className="flex flex-col rounded-2xl border border-border bg-surface p-6 shadow-sm md:p-8 dark:bg-surface-elevated/30">
+          <p className="inline-flex w-fit rounded-md border border-border bg-surface-2 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-text-secondary">
+            {t('auth.registerPage.badge', 'Create account')}
+          </p>
+          <h1 className="mt-4 text-balance text-2xl font-semibold tracking-tight md:text-3xl">
+            {t('auth.registerPage.heroTitle', 'Start using AdSpectr in minutes')}
+          </h1>
+          <p className="mt-3 text-sm leading-relaxed text-text-secondary md:text-base">
+            {t('auth.registerPage.heroSubtitle', '')}
+          </p>
+
+          <ContentMediaSlot
+            slotId="register-hero"
+            ratio="16:9"
+            caption={t('preAuthOnboarding.mediaSlotCaption', '')}
+            className="mx-auto mt-6 max-w-lg"
+          />
+          <p className="mt-2 text-center text-[11px] text-text-tertiary">{t('preAuthOnboarding.mediaSlotHint', '')}</p>
+
+          <div className="mt-8 grid gap-3 sm:grid-cols-3">
             {statCards.map((card) => (
-              <div key={card.label} className="rounded-xl border border-border bg-surface-2 p-4">
-                <p className="text-lg font-semibold">{card.value}</p>
-                <p className="text-xs text-text-secondary">{card.label}</p>
+              <div key={card.label} className="rounded-xl border border-border bg-surface-2/60 p-4 dark:bg-surface-2/25">
+                <p className="text-lg font-semibold tabular-nums">{card.value}</p>
+                <p className="mt-1 text-xs text-text-secondary">{card.label}</p>
               </div>
             ))}
           </div>
+
+          {draft ? (
+            <div className="mt-8 rounded-xl border border-border bg-surface-2/40 p-4 dark:bg-surface-2/20">
+              <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
+                {t('auth.registerPage.planTitle', 'From your onboarding')}
+              </p>
+              <p className="mt-1 text-sm text-text-secondary">{t('auth.registerPage.planSubtitle', '')}</p>
+              <dl className="mt-4 space-y-2.5 text-sm">
+                <div className="flex justify-between gap-3">
+                  <dt className="text-text-tertiary">{p('summaryGoal', 'Goal')}</dt>
+                  <dd className="max-w-[58%] text-right font-medium text-text-primary">
+                    {draft.goal ? p(`goal.${draft.goal}`, draft.goal) : '—'}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <dt className="text-text-tertiary">{p('summaryBudget', 'Budget')}</dt>
+                  <dd className="max-w-[58%] text-right font-medium text-text-primary">
+                    {draft.budgetBand ? p(`budget.${draft.budgetBand}`, draft.budgetBand) : '—'}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <dt className="text-text-tertiary">{p('summaryIndustry', 'Industry')}</dt>
+                  <dd className="max-w-[58%] text-right font-medium text-text-primary">
+                    {draft.industry ? p(`industry.${draft.industry}`, draft.industry) : '—'}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-text-tertiary">{p('summarySplit', 'Platform mix')}</dt>
+                  <dd className="mt-2">
+                    <div className="flex h-2 overflow-hidden rounded-full bg-border/50">
+                      <div className="bg-[#1877F2]" style={{ width: `${draft.platformSplit.meta}%` }} />
+                      <div className="bg-[#4285F4]" style={{ width: `${draft.platformSplit.google}%` }} />
+                      <div className="bg-[#FC3F1D]" style={{ width: `${draft.platformSplit.yandex}%` }} />
+                    </div>
+                    <p className="mt-1.5 text-xs text-text-secondary">
+                      Meta {draft.platformSplit.meta}% · Google {draft.platformSplit.google}% · Yandex {draft.platformSplit.yandex}%
+                    </p>
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <dt className="text-text-tertiary">{p('summaryGeo', 'Geo focus')}</dt>
+                  <dd className="max-w-[58%] text-right font-medium text-text-primary">
+                    {draft.geoFocus ? p(`geo.${draft.geoFocus}`, draft.geoFocus) : '—'}
+                  </dd>
+                </div>
+              </dl>
+              <p className="mt-4 border-t border-border pt-3 text-xs leading-relaxed text-text-tertiary">
+                {p('registerPlanHint', '')}
+              </p>
+            </div>
+          ) : null}
         </section>
 
-        <section className="rounded-2xl border border-border bg-surface p-8">
-          <h2 className="text-xl font-semibold">{t('auth.registerPage.panelTitle', 'Register')}</h2>
-          <p className="mt-1 text-sm text-text-secondary">{t('auth.registerPage.panelSubtitle', 'Use your work email to create a workspace account.')}</p>
+        <section className="rounded-2xl border border-border bg-surface p-6 shadow-sm md:p-8 dark:bg-surface-elevated/30">
+          <h2 className="text-xl font-semibold tracking-tight">{t('auth.registerPage.panelTitle', 'Register')}</h2>
+          <p className="mt-2 text-sm text-text-secondary">{t('auth.registerPage.panelSubtitle', '')}</p>
 
-          <Alert variant="success" className="mt-4">
-            {t('preAuthOnboarding.registerReady', 'Onboarding complete — create your account below.')}
-          </Alert>
+          <div className="mt-5 rounded-lg border border-border/80 bg-surface-2/50 px-4 py-3 text-sm text-text-secondary dark:bg-surface-2/25">
+            {p('registerPlanTitle', 'Your setup plan')} — {p('registerReady', '')}
+          </div>
 
-          <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <Input
               label={t('auth.registerPage.nameLabel', 'Full name')}
               value={form.name}
-              onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+              onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
               placeholder={t('auth.registerPage.namePlaceholder', 'Your name')}
               required
             />
@@ -102,7 +173,7 @@ export default function RegisterPage() {
               label={t('auth.email', 'Email')}
               type="email"
               value={form.email}
-              onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
+              onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
               placeholder={t('auth.loginPage.emailPlaceholder', 'you@company.com')}
               required
             />
@@ -110,21 +181,21 @@ export default function RegisterPage() {
               label={t('auth.password', 'Password')}
               type="password"
               value={form.password}
-              onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))}
+              onChange={(e) => setForm((prev) => ({ ...prev, password: e.target.value }))}
               placeholder={t('auth.registerPage.passwordHint', 'At least 8 characters')}
               required
             />
 
-            {error && <Alert variant="error">{error}</Alert>}
+            {error ? <Alert variant="error">{error}</Alert> : null}
 
-            <Button type="submit" loading={loading} fullWidth size="lg">
+            <Button type="submit" loading={loading} fullWidth size="lg" className="min-h-[3rem]">
               {t('auth.registerPage.createButton', 'Create account')}
             </Button>
           </form>
 
-          <p className="mt-4 text-center text-sm text-text-secondary">
+          <p className="mt-6 text-center text-sm text-text-secondary">
             {t('auth.registerPage.signInPrompt', 'Already have an account?')}{' '}
-            <Link href="/login" className="font-medium text-primary hover:underline">
+            <Link href="/login" className="font-semibold text-text-primary underline-offset-2 hover:underline">
               {t('auth.registerPage.signInLink', 'Sign in')}
             </Link>
           </p>

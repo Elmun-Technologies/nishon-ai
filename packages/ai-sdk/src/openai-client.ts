@@ -163,6 +163,7 @@ export class AdSpectrAiClient {
         const response = await this.openai.chat.completions.create({
           model,
           max_tokens: maxTokens,
+          response_format: { type: 'json_object' as const },
           messages: [
             { role: 'system', content: systemPrompt },
             {

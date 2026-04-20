@@ -10,6 +10,7 @@ import { ConfigService } from "@nestjs/config";
 import * as bcrypt from "bcryptjs";
 import { User } from "../users/entities/user.entity";
 import { RegisterDto, LoginDto, AuthResponseDto } from "@adspectr/shared";
+import { trialEndsAtFromNow } from "../config/trial.config";
 
 @Injectable()
 export class AuthService {
@@ -41,6 +42,7 @@ export class AuthService {
       email: dto.email,
       password: hashedPassword,
       name: dto.name,
+      trialEndsAt: trialEndsAtFromNow(),
     });
 
     const savedUser = await this.userRepo.save(user);
@@ -122,7 +124,9 @@ export class AuthService {
   async updateMe(
     userId: string,
     patch: { name?: string; email?: string },
-  ): Promise<Pick<User, "id" | "email" | "name" | "plan">> {
+  ): Promise<
+    Pick<User, "id" | "email" | "name" | "plan" | "trialEndsAt" | "isAdmin">
+  > {
     const user = await this.userRepo.findOne({ where: { id: userId } });
     if (!user) throw new UnauthorizedException("User not found");
 
@@ -140,6 +144,8 @@ export class AuthService {
       email: updated.email,
       name: updated.name,
       plan: updated.plan,
+      trialEndsAt: updated.trialEndsAt,
+      isAdmin: updated.isAdmin,
     };
   }
 
@@ -178,6 +184,7 @@ export class AuthService {
             googleId: profile.googleId,
             picture:  profile.picture ?? null,
             password: null,
+            trialEndsAt: trialEndsAtFromNow(),
           }),
         );
       }
@@ -211,6 +218,7 @@ export class AuthService {
             facebookId: profile.facebookId,
             picture:    profile.picture ?? null,
             password:   null,
+            trialEndsAt: trialEndsAtFromNow(),
           }),
         );
       }
@@ -264,6 +272,8 @@ export class AuthService {
         email: user.email,
         name: user.name,
         plan: user.plan,
+        trialEndsAt: user.trialEndsAt ? user.trialEndsAt.toISOString() : null,
+        isAdmin: user.isAdmin,
       },
     };
   }

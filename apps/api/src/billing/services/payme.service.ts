@@ -269,8 +269,11 @@ export class PaymeService {
       tx.paymeCancelTime = Date.now()
       await this.txRepo.save(tx)
 
-      // Downgrade plan back to FREE
-      await this.userRepo.update(tx.userId, { plan: UserPlan.FREE })
+      // Downgrade plan back to FREE — trial clock stops (immediate lock for demo gate)
+      await this.userRepo.update(tx.userId, {
+        plan: UserPlan.FREE,
+        trialEndsAt: new Date(0),
+      })
       this.logger.warn(`Refund processed: order=${tx.orderId}, user downgraded to FREE`)
 
       return this.txToResult(tx)
@@ -408,7 +411,10 @@ export class PaymeService {
       this.logger.error(`Invalid target plan: ${plan}`)
       return
     }
-    await this.userRepo.update(tx.userId, { plan })
+    await this.userRepo.update(tx.userId, {
+      plan,
+      trialEndsAt: null,
+    })
   }
 
   private async createInvoiceRecord(tx: PaymeTransaction): Promise<void> {

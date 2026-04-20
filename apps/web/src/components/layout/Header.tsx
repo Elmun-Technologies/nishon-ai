@@ -15,12 +15,20 @@ const PAGE_TITLES: Record<string, { titleKey: string; titleFallback: string; sub
   '/ai-decisions':         { titleKey: 'navigation.aiDecisions', titleFallback: 'AI Decisions', subtitleKey: 'header.aiDecisionsSubtitle', subtitleFallback: 'Every action the AI has taken — with full reasoning' },
   '/budget':               { titleKey: 'navigation.budget', titleFallback: 'Budget', subtitleKey: 'header.budgetSubtitle', subtitleFallback: 'Allocation and performance by platform' },
   '/simulation':           { titleKey: 'navigation.simulation', titleFallback: 'Simulation', subtitleKey: 'header.simulationSubtitle', subtitleFallback: 'Forecast results before committing budget' },
-  '/competitors':          { titleKey: 'navigation.competitors', titleFallback: 'Competitors', subtitleKey: 'header.competitorsSubtitle', subtitleFallback: 'Competitive intelligence and SWOT benchmarking' },
+  '/competitors':          { titleKey: 'navigation.competitors', titleFallback: 'Competitors', subtitleKey: 'header.competitorsSubtitle', subtitleFallback: 'Meta Ad Library signals plus AI portfolio synthesis' },
   '/creative-scorer':      { titleKey: 'navigation.creativeScorer', titleFallback: 'Creative Scorer', subtitleKey: 'header.creativeScorerSubtitle', subtitleFallback: 'AI-powered ad creative evaluation' },
   '/roi-calculator':       { titleKey: 'navigation.roi', titleFallback: 'ROI & outcomes', subtitleKey: 'header.roiSubtitle', subtitleFallback: 'We learn from real outcomes first; the ROI calculator launches when benchmark data is ready.' },
   '/settings':             { titleKey: 'navigation.settings', titleFallback: 'Settings', subtitleKey: 'header.settingsSubtitle', subtitleFallback: 'Workspace and account configuration' },
   '/reporting':            { titleKey: 'navigation.reporting', titleFallback: 'Reporting', subtitleKey: 'header.reportingSubtitle', subtitleFallback: 'Campaign-level metrics and trends' },
   '/meta-audit':           { titleKey: 'navigation.metaAudit', titleFallback: 'Meta Audit', subtitleKey: 'header.metaAuditSubtitle', subtitleFallback: '360° creative, targeting, and auction diagnostics' },
+  '/retargeting/wizard':   { titleKey: 'navigation.retargeting', titleFallback: 'Retargeting', subtitleKey: 'header.retargetingWizardSubtitle', subtitleFallback: 'Step-by-step retargeting setup' },
+  '/retargeting':          { titleKey: 'navigation.retargeting', titleFallback: 'Retargeting', subtitleKey: 'header.retargetingSubtitle', subtitleFallback: 'Audiences and flows for bringing visitors back' },
+  '/wizard':               { titleKey: 'navigation.campaignWizard', titleFallback: 'Campaign wizard', subtitleKey: 'header.wizardSubtitle', subtitleFallback: 'Guided setup for campaigns and workspace' },
+  '/performance':        { titleKey: 'navigation.performance', titleFallback: 'Performance', subtitleKey: 'header.performanceSubtitle', subtitleFallback: 'Campaign table from Meta reporting for the selected period' },
+  '/creative-hub':         { titleKey: 'navigation.creativeHub', titleFallback: 'Creative Hub', subtitleKey: 'header.creativeHubSubtitle', subtitleFallback: 'Image ads, actors, brand kit, and media in one place' },
+  '/marketplace/search':   { titleKey: 'navigation.marketplaceSearch', titleFallback: 'Browse specialists', subtitleKey: 'header.marketplaceSearchSubtitle', subtitleFallback: 'Search and filter marketing specialists for your business' },
+  '/marketplace/leaderboard': { titleKey: 'navigation.leaderboard', titleFallback: 'Leaderboard', subtitleKey: 'header.marketplaceLeaderboardSubtitle', subtitleFallback: 'Top performers and benchmark visibility' },
+  '/marketplace/portfolio': { titleKey: 'navigation.marketplacePortfolios', titleFallback: 'Portfolios', subtitleKey: 'header.marketplacePortfoliosSubtitle', subtitleFallback: 'Public specialist showcases on the marketplace' },
   '/marketplace':          { titleKey: 'navigation.marketplace', titleFallback: 'Marketplace', subtitleKey: 'header.marketplaceSubtitle', subtitleFallback: 'Professional marketing specialists' },
   '/launch':               { titleKey: 'navigation.launch', titleFallback: 'Launch', subtitleKey: 'header.launchSubtitle', subtitleFallback: 'Create and launch campaigns efficiently' },
   '/auto-optimization':    { titleKey: 'navigation.autoOptimization', titleFallback: 'Auto Optimization', subtitleKey: 'header.autoOptimizationSubtitle', subtitleFallback: 'Automation settings and execution policy' },
@@ -53,7 +61,8 @@ export default function Header() {
     pathname === '/creative-hub/projects' ||
     pathname === '/creative-hub/brand-kit' ||
     pathname === '/creative-hub/products' ||
-    pathname === '/creative-hub/media'
+    pathname === '/creative-hub/media' ||
+    pathname.startsWith('/creative-hub/image-ads')
   const pageConfig =
     pathname.startsWith('/settings/workspace')
       ? {
@@ -63,7 +72,9 @@ export default function Header() {
             : t('header.workspaceSubtitle', 'ad accounts, subscription, payments, team, MCP'),
         }
       : (() => {
-          const matched = Object.entries(PAGE_TITLES).find(([route]) => pathname.startsWith(route))?.[1]
+          const matched = [...Object.entries(PAGE_TITLES)]
+            .sort((a, b) => b[0].length - a[0].length)
+            .find(([route]) => pathname.startsWith(route))?.[1]
           if (!matched) return { title: 'AdSpectr', subtitle: '' }
           return {
             title: t(matched.titleKey, matched.titleFallback),
@@ -74,51 +85,56 @@ export default function Header() {
   useEffect(() => { setMounted(true) }, [])
 
   return (
-    <header className="h-14 border-b border-border/70 bg-brand-white/90 px-6 backdrop-blur supports-[backdrop-filter]:bg-brand-white/80 flex items-center justify-between shrink-0 transition-colors dark:bg-brand-ink/95 dark:border-brand-mid/20">
-      <div>
+    <header className="flex h-12 shrink-0 items-center justify-between border-b border-border/60 bg-brand-white/90 px-4 backdrop-blur-md transition-colors supports-[backdrop-filter]:bg-brand-white/80 md:px-5 dark:border-white/[0.08] dark:bg-[#161618]/95">
+      <div className="min-w-0 pr-2">
         {!hideTitleForPageHeaderRoutes && (
           <>
-            <h1 className="text-text-primary font-semibold text-base tracking-tight">{pageConfig.title}</h1>
+            <h1 className="truncate text-sm font-semibold tracking-tight text-text-primary">{pageConfig.title}</h1>
             {pageConfig.subtitle && (
-              <p className="text-text-tertiary text-sm mt-0.5 hidden lg:block">{pageConfig.subtitle}</p>
+              <p className="mt-0.5 hidden max-w-2xl truncate text-xs text-text-tertiary md:block">{pageConfig.subtitle}</p>
             )}
           </>
         )}
       </div>
 
-      <div className="flex items-center gap-3">
-        {/* Autopilot badge */}
+      <div className="flex shrink-0 items-center gap-2 md:gap-2.5">
         {currentWorkspace && (
-          <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium ${
-            currentWorkspace.autopilotMode === 'full_auto'
-              ? 'bg-success/10 border-success/20 text-success'
-              : currentWorkspace.autopilotMode === 'assisted'
-              ? 'bg-amber-500/10 border-amber-500/20 text-amber-500'
-              : 'bg-slate-500/10 border-slate-500/20 text-text-secondary'
-          }`}>
-            <span className={`w-1.5 h-1.5 rounded-full ${
-              currentWorkspace.autopilotMode === 'full_auto' ? 'bg-success animate-pulse' :
-              currentWorkspace.autopilotMode === 'assisted'  ? 'bg-warning' : 'bg-text-tertiary'
-            }`} />
+          <div
+            className={`hidden items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium sm:flex ${
+              currentWorkspace.autopilotMode === 'full_auto'
+                ? 'border-success/25 bg-success/10 text-success'
+                : currentWorkspace.autopilotMode === 'assisted'
+                  ? 'border-amber-500/25 bg-amber-500/10 text-amber-700 dark:text-amber-400'
+                  : 'border-border bg-surface-2/80 text-text-secondary dark:border-white/10 dark:bg-white/[0.05]'
+            }`}
+          >
+            <span
+              className={`h-1.5 w-1.5 shrink-0 rounded-full ${
+                currentWorkspace.autopilotMode === 'full_auto'
+                  ? 'animate-pulse bg-success'
+                  : currentWorkspace.autopilotMode === 'assisted'
+                    ? 'bg-warning'
+                    : 'bg-text-tertiary'
+              }`}
+            />
             {currentWorkspace.autopilotMode === 'full_auto'
               ? t('sidebar.autopilot.fullAuto', 'Full Auto')
               : currentWorkspace.autopilotMode === 'assisted'
-              ? t('sidebar.autopilot.assisted', 'Assisted')
-              : t('sidebar.autopilot.manual', 'Manual')}
+                ? t('sidebar.autopilot.assisted', 'Assisted')
+                : t('sidebar.autopilot.manual', 'Manual')}
           </div>
         )}
 
-        {/* Language switcher */}
         <LanguageSwitcher />
 
-        {/* Theme toggle */}
         {mounted && (
           <button
+            type="button"
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="p-1.5 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-2 transition-colors"
+            className="rounded-lg p-1.5 text-text-secondary transition-colors hover:bg-surface-2 hover:text-text-primary dark:hover:bg-white/[0.08]"
             aria-label={t('header.toggleTheme', 'Toggle theme')}
           >
-            {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
         )}
       </div>

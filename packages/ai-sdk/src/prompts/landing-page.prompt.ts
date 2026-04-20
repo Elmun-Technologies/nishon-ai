@@ -60,6 +60,24 @@ RULES:
 - Respond ONLY with the JSON object. No preamble, no explanation.
 `
 
+/** Preset layout + tone hints for the generator (Uzbek market). */
+export type LandingPageTemplateId =
+  | 'local_service'
+  | 'product_store'
+  | 'saas_b2b'
+  | 'promo_event'
+
+const TEMPLATE_INSTRUCTIONS: Record<LandingPageTemplateId, string> = {
+  local_service:
+    'SHABLON: mahalliy xizmat / ustaxona / klinika / oquv markaz. Hero qisqa va ishonchli; telefon va WhatsApp CTA ustun; ijtimoiy isbot va joylashuv ishonchi muhim.',
+  product_store:
+    'SHABLON: mahsulot / do\'kon / e-commerce. Hero mahsulot foydasi va vizual tasvir; xususiyatlar ro\'yxati aniq; chegirma/yetkazib berish kabi aniq takliflar.',
+  saas_b2b:
+    'SHABLON: B2B / SaaS / agentlik. Professional ton; muammo-yechim; ishonch (logo, raqamlar); FAQ texnik savollar uchun; CTA "demo" yoki "bog\'lanish".',
+  promo_event:
+    'SHABLON: aksiya / tadbir / muddatli kampaniya. Shoshilinchlik va aniq muddat; bir ekranda asosiy taklif; CTA qisqa va harakatga chaqiruvchi.',
+}
+
 export const buildLandingPagePrompt = (data: {
   businessName: string
   industry: string
@@ -76,8 +94,28 @@ export const buildLandingPagePrompt = (data: {
       callToActions?: string[]
     }
   }
-}): string => `
+  /** Layout / tone preset */
+  templateId?: LandingPageTemplateId
+  /** Free-form marketer brief */
+  creativeBrief?: string
+  /** Short Uzbek descriptions from vision pass (product/office/brand photos) */
+  visualSummaries?: string[]
+}): string => {
+  const templateKey: LandingPageTemplateId =
+    data.templateId && data.templateId in TEMPLATE_INSTRUCTIONS ? data.templateId : 'local_service'
+  const templateBlock = TEMPLATE_INSTRUCTIONS[templateKey]
+  const briefBlock = data.creativeBrief?.trim()
+    ? `Qo'shimcha brif (foydalanuvchi):\n${data.creativeBrief.trim()}`
+    : ''
+  const visualBlock =
+    data.visualSummaries && data.visualSummaries.length > 0
+      ? `Foydalanuvchi yuklagan rasmlar bo'yicha qisqa vizual tahlil (matn):\n${data.visualSummaries.map((s, i) => `${i + 1}. ${s}`).join('\n')}\nMatn va trust badge'larda ushbu tasvirlarga mos keladigan ifodalarni ishlating (o'ylab topilgan faktlarni qo'shmang).`
+      : ''
+
+  return `
 Quyidagi biznes uchun Uzbek tilida yuqori konversiyali landing page kontentini yarating:
+
+${templateBlock}
 
 Biznes nomi: ${data.businessName}
 Soha: ${data.industry}
@@ -89,6 +127,9 @@ Asosiy maqsad: ${data.goal}
 ${data.strategy?.summary ? `AI Strategiya xulosasi: ${data.strategy.summary}` : ''}
 ${data.strategy?.creativeGuidelines?.tone ? `Ton: ${data.strategy.creativeGuidelines.tone}` : ''}
 ${data.strategy?.creativeGuidelines?.keyMessages?.length ? `Asosiy xabarlar: ${data.strategy.creativeGuidelines.keyMessages.join(', ')}` : ''}
+${briefBlock ? `\n${briefBlock}\n` : ''}
+${visualBlock ? `\n${visualBlock}\n` : ''}
 
 Landing page kontentini hozir yarating.
 `
+}
