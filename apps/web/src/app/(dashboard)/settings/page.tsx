@@ -776,6 +776,12 @@ export default function SettingsPage() {
                 <p className="text-xs text-text-tertiary mt-1">
                   Har kuni soat 09:00 da kampaniya natijalari Telegramga yuboriladi. Bot orqali Chat ID oling.
                 </p>
+                <Link
+                  href="/settings/telegram"
+                  className="inline-flex mt-3 text-sm font-medium text-violet-500 hover:text-violet-400 hover:underline"
+                >
+                  Telegram bot — to‘liq sozlash →
+                </Link>
               </div>
 
               <div className="bg-surface-2 border border-border rounded-lg p-4 mb-4 text-xs text-text-tertiary space-y-1.5">

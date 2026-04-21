@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { ArrowRight, CheckCircle2, Search, SlidersHorizontal, Star, TrendingUp, Users } from 'lucide-react'
 import { PublicContainer, PublicFooter } from '@/components/public/PublicLayout'
 import { ContentMediaSlot } from '@/components/media/ContentMediaSlot'
+import { MarketplaceLiveDiscovery } from '@/components/marketplace/MarketplaceLiveDiscovery'
 import { useI18n } from '@/i18n/use-i18n'
 
 const specialists = [
@@ -88,6 +89,8 @@ export default function MarketplacePage() {
           </div>
         </PublicContainer>
       </section>
+
+      <MarketplaceLiveDiscovery />
 
       <section className="bg-surface py-10">
         <PublicContainer>

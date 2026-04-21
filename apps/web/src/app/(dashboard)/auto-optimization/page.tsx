@@ -8,6 +8,13 @@ import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Spinner } from '@/components/ui/Spinner'
 import { PageHeader } from '@/components/ui'
+import {
+  bumpOptimizerFailureCount,
+  checkCampaign,
+  DEFAULT_OPTIMIZER_PREFS,
+  OPTIMIZER_INTERVALS,
+  type OptimizerTickResult,
+} from '@/lib/optimizer'
 
 // ─── Types (mirrors backend OptimizationReport) ───────────────────────────────
 
@@ -253,6 +260,8 @@ const DEMO_PAYLOAD = {
 type Tab = 'run' | 'history'
 type OptimizationApproach = 'ai_agent' | 'specialist' | 'self'
 
+const DEMO_OPT_CAMPAIGN = 'cmp_auto_demo_1'
+
 export default function AutoOptimizationPage() {
   const { t } = useI18n()
   const { currentWorkspace } = useWorkspaceStore()
@@ -265,8 +274,49 @@ export default function AutoOptimizationPage() {
   const [report, setReport] = useState<OptimizationReport | null>(null)
   const [history, setHistory] = useState<HistoryRun[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [optimizerTick, setOptimizerTick] = useState<OptimizerTickResult | null>(null)
+  const [optimizerTickLoading, setOptimizerTickLoading] = useState(false)
+  const [optimizerApiError, setOptimizerApiError] = useState<string | null>(null)
 
   const workspaceId = currentWorkspace?.id ?? 'demo'
+
+  async function handleOptimizerClientTick() {
+    setOptimizerTickLoading(true)
+    setOptimizerApiError(null)
+    try {
+      const r = await checkCampaign(DEMO_OPT_CAMPAIGN, DEFAULT_OPTIMIZER_PREFS)
+      setOptimizerTick(r)
+    } finally {
+      setOptimizerTickLoading(false)
+    }
+  }
+
+  async function handleOptimizerApiTick() {
+    setOptimizerTickLoading(true)
+    setOptimizerApiError(null)
+    try {
+      const res = await fetch('/api/optimizer/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ campaignId: DEMO_OPT_CAMPAIGN, prefs: DEFAULT_OPTIMIZER_PREFS }),
+      })
+      const json = await res.json()
+      if (!res.ok || !json.ok) {
+        setOptimizerApiError(json?.message ?? json?.error ?? 'API xato')
+        return
+      }
+      setOptimizerTick(json.result as OptimizerTickResult)
+    } catch (e: unknown) {
+      setOptimizerApiError(e instanceof Error ? e.message : 'Tarmoq xato')
+    } finally {
+      setOptimizerTickLoading(false)
+    }
+  }
+
+  function handleBumpOptimizerFailures() {
+    bumpOptimizerFailureCount(DEMO_OPT_CAMPAIGN)
+    void handleOptimizerClientTick()
+  }
 
   async function handleRun() {
     setLoading(true)
@@ -308,6 +358,60 @@ export default function AutoOptimizationPage() {
         title={t('navigation.autoOptimization', 'Auto Optimization')}
         subtitle={t('autoOptimization.subtitle', 'AI analyzes campaigns, detects issues, and prioritizes governed actions.')}
       />
+
+      <Card className="p-5 space-y-4 border border-border">
+        <div>
+          <p className="text-sm font-semibold text-text-primary">3 qavatli Auto-Optimization</p>
+          <p className="text-xs text-text-tertiary mt-1 leading-relaxed">
+            Qavat 1: AI agent har {OPTIMIZER_INTERVALS.agentHours} soatda tekshiradi (cron). Qavat 2: smart alerts (real-time). Qavat 3: agent 3 marta muvaffaqiyatsiz — marketplace ticket.
+          </p>
+        </div>
+        <details className="text-xs text-text-tertiary">
+          <summary className="cursor-pointer text-text-secondary font-medium">Nega 3-kundan keyin natija tushadi — 5 ta sabab</summary>
+          <ul className="mt-2 space-y-1 list-disc pl-4">
+            <li>Creative fatigue — bir xil rasmni ko‘p ko‘rish CTR ni tushiradi</li>
+            <li>Audience saturation — bir segmentga tez-tez yetib borish</li>
+            <li>Auction competition — raqib budgeti, CPM oshishi</li>
+            <li>Learning phase buzilishi — budget o‘zgarishi, qayta o‘rganish</li>
+            <li>Vaqt — kechasi ROAS tushishi, ertaga ko‘rish kech</li>
+          </ul>
+        </details>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            disabled={optimizerTickLoading}
+            onClick={() => void handleOptimizerClientTick()}
+          >
+            {optimizerTickLoading ? '…' : 'Tick (brauzer)'}
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            disabled={optimizerTickLoading}
+            onClick={() => void handleOptimizerApiTick()}
+          >
+            Tick (API / cron namuna)
+          </Button>
+          <Button type="button" variant="ghost" size="sm" onClick={handleBumpOptimizerFailures}>
+            +1 muvaffaqiyatsiz (escalate demo)
+          </Button>
+        </div>
+        {optimizerApiError && (
+          <p className="text-xs text-red-400">{optimizerApiError}</p>
+        )}
+        {optimizerTick && (
+          <pre className="text-[11px] leading-relaxed bg-surface-2 border border-border rounded-lg p-3 overflow-x-auto text-text-secondary">
+            {JSON.stringify(optimizerTick, null, 2)}
+          </pre>
+        )}
+        <p className="text-[10px] text-text-tertiary">
+          Demo: signal <code className="text-text-tertiary">getSignal</code> hash; o‘rganish{' '}
+          <code className="text-text-tertiary">localStorage</code> — kampaniya: {DEMO_OPT_CAMPAIGN}
+        </p>
+      </Card>
 
       {/* ── Approach selector ── */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

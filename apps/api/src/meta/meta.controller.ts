@@ -37,6 +37,7 @@ import { MetaInsight } from "./entities/meta-insight.entity";
 import { Workspace } from "../workspaces/entities/workspace.entity";
 import { User } from "../users/entities/user.entity";
 import { ConversionAnalyticsService } from "../analytics/conversion-analytics.service";
+import { extractMetaAccessToken } from "./meta-token.util";
 
 // Maps the user-facing range shorthand to Meta's date_preset values
 const RANGE_TO_DATE_PRESET: Record<string, string> = {
@@ -811,25 +812,6 @@ export class MetaController {
 
   /** Resolves a Meta access token from the Authorization header or cookie. */
   private extractMetaToken(authorization?: string, req?: Request): string {
-    if (authorization) {
-      const [scheme, token] = authorization.split(" ");
-      if (scheme?.toLowerCase() === "bearer" && token) return token;
-    }
-
-    const cookieHeader = req?.headers?.cookie ?? "";
-    const pair = cookieHeader
-      .split(";")
-      .map((p) => p.trim())
-      .find((p) => p.startsWith("meta_access_token="));
-
-    if (pair) {
-      const value = pair.split("=")[1];
-      if (value) return decodeURIComponent(value);
-    }
-
-    throw new UnauthorizedException(
-      "Meta access token is required. Provide it as Authorization: Bearer <token> " +
-        "or as a meta_access_token cookie.",
-    );
+    return extractMetaAccessToken(authorization, req);
   }
 }

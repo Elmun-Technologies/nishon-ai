@@ -9,39 +9,18 @@ import { useI18n } from '@/i18n/use-i18n'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { Button, Alert, Card, Input } from '@/components/ui'
 import { cn } from '@/lib/utils'
-
-type CreativeProject = { id: string; name: string; updatedAt: number }
-
-function storageKey(workspaceId: string) {
-  return `adspectr-creative-projects-${workspaceId}`
-}
-
-function loadProjects(workspaceId: string): CreativeProject[] {
-  if (typeof window === 'undefined') return []
-  try {
-    const raw = localStorage.getItem(storageKey(workspaceId))
-    if (!raw) return []
-    const parsed = JSON.parse(raw) as unknown
-    if (!Array.isArray(parsed)) return []
-    return parsed
-      .filter(
-        (p): p is CreativeProject =>
-          p &&
-          typeof p === 'object' &&
-          typeof (p as CreativeProject).id === 'string' &&
-          typeof (p as CreativeProject).name === 'string' &&
-          typeof (p as CreativeProject).updatedAt === 'number',
-      )
-      .sort((a, b) => b.updatedAt - a.updatedAt)
-  } catch {
-    return []
-  }
-}
+import {
+  creativeProjectsStorageKey,
+  loadCreativeProjects,
+  type CreativeProject,
+  writeCreativeProjects,
+} from '@/lib/creative-hub/project-storage'
 
 export default function CreativeProjectsPage() {
   const { t, language } = useI18n()
   const { currentWorkspace } = useWorkspaceStore()
   const workspaceId = currentWorkspace?.id
+  const [adLibraryImportNotice, setAdLibraryImportNotice] = useState(false)
 
   const [projects, setProjects] = useState<CreativeProject[]>([])
   const [name, setName] = useState('')
@@ -51,13 +30,17 @@ export default function CreativeProjectsPage() {
       setProjects([])
       return
     }
-    setProjects(loadProjects(workspaceId))
+    setProjects(loadCreativeProjects(workspaceId))
+    if (typeof window !== 'undefined' && sessionStorage.getItem('adspectr-adlib-import-notice')) {
+      sessionStorage.removeItem('adspectr-adlib-import-notice')
+      setAdLibraryImportNotice(true)
+    }
   }, [workspaceId])
 
   useEffect(() => {
     if (!workspaceId || projects.length === 0) return
     try {
-      localStorage.setItem(storageKey(workspaceId), JSON.stringify(projects))
+      writeCreativeProjects(workspaceId, projects)
     } catch {
       /* quota */
     }
@@ -91,7 +74,7 @@ export default function CreativeProjectsPage() {
       const next = prev.filter((p) => p.id !== id)
       if (workspaceId && next.length === 0) {
         try {
-          localStorage.removeItem(storageKey(workspaceId))
+          localStorage.removeItem(creativeProjectsStorageKey(workspaceId))
         } catch {
           /* ignore */
         }
@@ -160,6 +143,15 @@ export default function CreativeProjectsPage() {
       {hero}
 
       <Alert variant="info">{t('creativeProjectsPage.syncNotice', '')}</Alert>
+
+      {adLibraryImportNotice && (
+        <Alert variant="success">
+          {t(
+            'creativeProjectsPage.adLibraryImportBanner',
+            'Ad Library dan loyiha qo‘shildi. Matn va rasm drafti loyiha kartochkasi bilan birga saqlandi — Creative Hub da tahrirlang.',
+          )}
+        </Alert>
+      )}
 
       <Card padding="md" className="border-border/80 shadow-sm">
         <h2 className="mb-4 text-heading font-semibold text-text-primary">

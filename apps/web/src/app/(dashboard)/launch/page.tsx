@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useMemo, useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
   ChevronLeft,
@@ -397,6 +398,20 @@ export default function LaunchPage() {
             {lt('hub.newCampaign', '+ New campaign')}
           </Button>
         </div>
+
+        <Link
+          href="/launch/preview"
+          className="flex flex-col gap-1 rounded-2xl border border-brand-mid/30 bg-brand-mid/5 p-4 transition-colors hover:bg-brand-mid/10 dark:border-brand-lime/25 dark:bg-brand-lime/5 dark:hover:bg-brand-lime/10 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wide text-brand-mid dark:text-brand-lime">
+              Yangi oqim
+            </p>
+            <p className="mt-1 text-sm font-semibold text-text-primary">Strategiya mindmap → tasdiq → Agent yoki mutaxassis</p>
+            <p className="mt-0.5 text-xs text-text-secondary">Preview, 2 yo‘l, Meta ketma-ketligi bilan chalkashmaslik</p>
+          </div>
+          <span className="text-sm font-semibold text-primary underline">Ochish</span>
+        </Link>
 
         <div className="flex gap-1 overflow-x-auto border-b border-border pb-px">
           {tabs.map((tab) => (

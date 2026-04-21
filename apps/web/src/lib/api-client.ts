@@ -34,11 +34,13 @@ async function apiRequest<T>(
   method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE',
   pathOrUrl: string,
   body?: any,
-  retry = true
+  retry = true,
+  extraHeaders?: Record<string, string>,
 ): Promise<ApiResponse<T>> {
   const url = toUrl(pathOrUrl)
 
   const headers: Record<string, string> = {
+    ...(extraHeaders ?? {}),
     'Content-Type': 'application/json',
   }
 
@@ -71,7 +73,7 @@ async function apiRequest<T>(
         const newToken = refreshJson.accessToken
         if (newToken) setAccessToken(newToken)
 
-        return apiRequest<T>(method, pathOrUrl, body, false)
+        return apiRequest<T>(method, pathOrUrl, body, false, extraHeaders)
       } catch {
         clearAuthTokens()
         window.location.href = '/login'
@@ -118,8 +120,11 @@ async function apiRequest<T>(
 const apiClient = {
   get: <T = any>(pathOrUrl: string): Promise<ApiResponse<T>> =>
     apiRequest('GET', pathOrUrl),
-  post: <T = any>(pathOrUrl: string, body?: any): Promise<ApiResponse<T>> =>
-    apiRequest('POST', pathOrUrl, body),
+  post: <T = any>(
+    pathOrUrl: string,
+    body?: any,
+    extraHeaders?: Record<string, string>,
+  ): Promise<ApiResponse<T>> => apiRequest('POST', pathOrUrl, body, true, extraHeaders),
   patch: <T = any>(pathOrUrl: string, body?: any): Promise<ApiResponse<T>> =>
     apiRequest('PATCH', pathOrUrl, body),
 }
@@ -148,6 +153,7 @@ export const team = {
     role?: 'admin' | 'advertiser'
     note?: string
   }) => apiClient.post('/team/invites', body),
+  acceptInvite: (body: { token: string }) => apiClient.post('/team/invites/accept', body),
   revokeInvite: (inviteId: string) =>
     apiRequest('DELETE', `/team/invites/${inviteId}`),
   updateMemberRole: (body: {
@@ -415,6 +421,68 @@ export const autoOptimization = {
     apiClient.post(`/auto-optimization/workspaces/${workspaceId}/run`, dto),
   history: (workspaceId: string, limit = 10) =>
     apiClient.get(`/auto-optimization/workspaces/${workspaceId}/history?limit=${limit}`),
+}
+
+/** CRM click → Redis `retarget:{phone}` + 7 kunlik Bull job (post-purchase) */
+export const retargetBridge = {
+  signals: () => apiClient.get<RetargetSignalsResponse>('/api/retarget/signals'),
+  start: (phone: string) => apiClient.post('/api/retarget/start', { phone }),
+  publishAdset: (body: PublishAdsetBody, metaAccessToken?: string) =>
+    apiClient.post(
+      '/api/retarget/publish-adset',
+      body,
+      metaAccessToken ? { 'X-Meta-Access-Token': metaAccessToken } : undefined,
+    ),
+  publishTelegram: (body: PublishTelegramBody) => apiClient.post('/api/retarget/publish-telegram', body),
+}
+
+export type PublishAdsetBody = {
+  phoneDigits: string
+  adAccountId: string
+  pageId: string
+  linkUrl?: string
+  dailyBudget?: number
+  sendTelegram?: boolean
+  shopButtonUrl?: string
+}
+
+export type PublishTelegramBody = {
+  phoneDigits: string
+  shopButtonUrl?: string
+  shopButtonText?: string
+}
+
+export type RetargetSignalsResponse = {
+  summary: {
+    waitingSignals: number
+    activeRetargets: number
+    converted: number
+    convertRatePct: number
+  }
+  rows: Array<{
+    phone: string
+    phoneDigits: string
+    amount: number
+    daysSincePurchase: number
+    status: string
+    lastPurchase: number
+    campaignId?: string
+    repeatPurchasesAfterRetarget: number
+    productId: string
+    headlinePreview: string
+    creativeMappingKey: string
+    metaAdSetId?: string
+    metaPublishError?: string
+    waitLabel?: string
+    canPublishAdSet: boolean
+    unifiedHash?: string
+    telegramLinked?: boolean
+    metaChannelReady?: boolean
+    telegramChannelReady?: boolean
+    telegramLastError?: string
+    unifiedBadge?: boolean
+    canPublishTelegram?: boolean
+  }>
 }
 
 export default apiClient

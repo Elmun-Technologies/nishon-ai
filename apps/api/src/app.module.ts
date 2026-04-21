@@ -26,6 +26,7 @@ import { WorkspaceServiceModule } from "./workspace-service/workspace-service.mo
 import { IntegrationsModule } from "./integrations/integrations.module";
 import { McpModule } from "./mcp/mcp.module";
 import { HeygenModule } from "./heygen/heygen.module";
+import { RetargetSignalModule } from "./retarget-signal/retarget-signal.module";
 import { validateEnv } from "./config/env.validation";
 import { HealthController } from "./health/health.controller";
 import { HealthService } from "./health/health.service";
@@ -77,6 +78,7 @@ import { RequestLoggingInterceptor } from "./common/interceptors/request-logging
     AnalyticsModule,
     AiDecisionsModule,
     QueueModule,
+    RetargetSignalModule,
     MetaModule,
     EventsModule,
     AutoOptimizationModule,

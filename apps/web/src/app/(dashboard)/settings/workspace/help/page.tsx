@@ -12,6 +12,9 @@ const LINKS = [
   { title: 'Meta dashboard (ad accounts)', href: '/settings/meta', keywords: 'facebook spend account' },
   { title: 'Kampaniya yoqish', href: '/launch', keywords: 'launch wizard' },
   { title: 'Hisobot', href: '/reporting', keywords: 'reporting meta' },
+  { title: 'Hisobot quruvchi', href: '/reports', keywords: 'dashboard drag metrics shablon' },
+  { title: 'Ad Library', href: '/ad-library', keywords: 'raqib reklama meta library' },
+  { title: 'Audience Story', href: '/audiences/story', keywords: 'persona journey dilnoza' },
   { title: 'Hujjatlar', href: '/docs', keywords: "docs qo'llanma" },
 ]
 

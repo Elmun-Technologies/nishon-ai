@@ -51,6 +51,7 @@ import { QUEUE_NAMES } from "./queue.constants";
       { name: QUEUE_NAMES.OPTIMIZATION },
       { name: QUEUE_NAMES.CAMPAIGN_SYNC },
       { name: QUEUE_NAMES.REPORTS },
+      { name: QUEUE_NAMES.RETARGET_POST_PURCHASE },
     ),
     AiAgentModule,
     TriggersetModule,

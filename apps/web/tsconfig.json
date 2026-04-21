@@ -22,7 +22,8 @@
     "paths": {
       "@/*": ["./*"],
       "@adspectr/shared": ["../../packages/shared/src"],
-      "@adspectr/shared/*": ["../../packages/shared/src/*"]
+      "@adspectr/shared/*": ["../../packages/shared/src/*"],
+      "@adspectr/creative-hub-core": ["../../packages/creative-hub-core/src"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

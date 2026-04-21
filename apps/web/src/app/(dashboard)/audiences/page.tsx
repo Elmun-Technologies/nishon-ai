@@ -296,12 +296,20 @@ export default function AudiencesPage() {
         title={t('navigation.audiences', 'Audiences')}
         subtitle={t('audiences.subtitle', 'Build full-funnel audience sets and launch them consistently')}
         actions={
-          <Link
-            href="/audiences/studio"
-            className="inline-flex items-center justify-center rounded-xl border border-primary/35 bg-surface px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/10"
-          >
-            {t('audiences.openStudio', 'Audience Studio')}
-          </Link>
+          <div className="flex flex-wrap gap-2 justify-end">
+            <Link
+              href="/audiences/story"
+              className="inline-flex items-center justify-center rounded-xl border border-violet-500/35 bg-violet-500/10 px-4 py-2 text-sm font-medium text-violet-700 dark:text-violet-200 transition-colors hover:bg-violet-500/15"
+            >
+              {t('audiences.openStory', 'Audience Story')}
+            </Link>
+            <Link
+              href="/audiences/studio"
+              className="inline-flex items-center justify-center rounded-xl border border-primary/35 bg-surface px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/10"
+            >
+              {t('audiences.openStudio', 'Audience Studio')}
+            </Link>
+          </div>
         }
       />
       <div className="min-h-full overflow-hidden rounded-2xl border border-border bg-surface text-text-secondary shadow-sm dark:bg-surface-elevated">

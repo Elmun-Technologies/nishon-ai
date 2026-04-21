@@ -30,6 +30,7 @@ import {
   Package,
   Image,
   RefreshCcw,
+  Radio,
   Workflow,
   Bot,
   Compass,
@@ -37,6 +38,14 @@ import {
   ChevronsLeft,
   ChevronsRight,
   UserCircle,
+  Stethoscope,
+  Globe2,
+  Cpu,
+  LayoutTemplate,
+  Binoculars,
+  BookHeart,
+  CreditCard,
+  UserPlus,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -72,6 +81,7 @@ const CATEGORIES: Array<{
       { href: '/launch', labelKey: 'navigation.launch', fallback: 'Launch', icon: Rocket },
       { href: '/campaigns', labelKey: 'navigation.campaigns', fallback: 'Campaigns', icon: Zap },
       { href: '/audiences', labelKey: 'navigation.audiences', fallback: 'Audiences', icon: Users },
+      { href: '/audiences/story', labelKey: 'navigation.audienceStory', fallback: 'Audience Story', icon: BookHeart },
       { href: '/ad-launcher', labelKey: 'navigation.adLauncher', fallback: 'Ad Launcher', icon: Clapperboard },
     ],
   },
@@ -83,6 +93,7 @@ const CATEGORIES: Array<{
     items: [
       { href: '/dashboard', labelKey: 'navigation.dashboard', fallback: 'Dashboard', icon: LayoutGrid },
       { href: '/reporting', labelKey: 'navigation.reporting', fallback: 'Reporting', icon: BarChart3 },
+      { href: '/reports', labelKey: 'navigation.reportBuilder', fallback: 'Report builder', icon: LayoutTemplate },
       { href: '/meta-audit', labelKey: 'navigation.metaAudit', fallback: 'Meta Audit', icon: Compass },
       { href: '/ai-decisions', labelKey: 'navigation.aiDecisions', fallback: 'AI Decisions', icon: Brain, badge: true },
       { href: '/performance', labelKey: 'navigation.performance', fallback: 'Performance', icon: TrendingUp },
@@ -134,9 +145,13 @@ const CATEGORIES: Array<{
     icon: Sparkles,
     items: [
       { href: '/retargeting', labelKey: 'navigation.retargeting', fallback: 'Retargeting', icon: RefreshCcw },
+      { href: '/retarget', labelKey: 'navigation.signalBridge', fallback: 'Signal Bridge (CRM)', icon: Radio },
       { href: '/creative-scorer', labelKey: 'navigation.creativeScorer', fallback: 'Creative Scorer', icon: Sparkles },
       { href: '/competitors', labelKey: 'navigation.competitors', fallback: 'Competitors', icon: Users },
+      { href: '/ad-library', labelKey: 'navigation.adLibrary', fallback: 'Ad Library', icon: Binoculars },
       { href: '/landing-page', labelKey: 'navigation.landingPage', fallback: 'Landing Page', icon: TrendingUp },
+      { href: '/site-generator', labelKey: 'navigation.siteGenerator', fallback: 'Site Generator', icon: Globe2 },
+      { href: '/ai-agents', labelKey: 'navigation.aiAgents', fallback: 'AI Agents', icon: Cpu },
       { href: '/create-agent', labelKey: 'navigation.aiAssistant', fallback: 'AI Assistant', icon: Bot },
     ],
   },
@@ -147,6 +162,7 @@ const CATEGORIES: Array<{
     icon: Wand2,
     items: [
       { href: '/creative-hub', labelKey: 'navigation.creativeHub', fallback: 'Creative Hub', icon: Palette },
+      { href: '/creative-audit', labelKey: 'navigation.creativeAudit', fallback: 'Creative Audit Pro', icon: Stethoscope },
       { href: '/creative-hub/image-ads', labelKey: 'navigation.imageAds', fallback: 'Image Ads', icon: ImagePlus },
       { href: '/creative-hub/ai-actors', labelKey: 'navigation.aiActors', fallback: 'AI Actors', icon: Users2 },
       { href: '/creative-hub/projects', labelKey: 'navigation.projects', fallback: 'Projects', icon: Folder },
@@ -159,8 +175,17 @@ const CATEGORIES: Array<{
 
 const BOTTOM_NAV = [
   { href: '/settings/workspace', labelKey: 'navigation.workspace', fallback: 'Workspace', icon: Users },
+  { href: '/team', labelKey: 'navigation.team', fallback: 'Team', icon: UserPlus },
+  { href: '/billing', labelKey: 'navigation.billing', fallback: 'Billing', icon: CreditCard },
   { href: '/settings', labelKey: 'navigation.settings', fallback: 'Settings', icon: Settings2 },
 ]
+
+function isBottomNavActive(pathname: string, href: string) {
+  if (href === '/settings/workspace') return pathname.startsWith('/settings/workspace')
+  if (href === '/team') return pathname === '/team' || pathname.startsWith('/team/')
+  if (href === '/billing') return pathname === '/billing' || pathname.startsWith('/billing/')
+  return pathname.startsWith('/settings') && !pathname.startsWith('/settings/workspace')
+}
 
 type SidebarMode = 'wide' | 'rail'
 
@@ -338,10 +363,7 @@ export default function Sidebar() {
           <div className="flex flex-col items-center gap-0.5 border-t border-white/[0.06] px-1 py-1.5">
             {BOTTOM_NAV.map((item) => {
               const Icon = item.icon
-              const isActive =
-                item.href === '/settings/workspace'
-                  ? pathname.startsWith('/settings/workspace')
-                  : pathname.startsWith('/settings') && !pathname.startsWith('/settings/workspace')
+              const isActive = isBottomNavActive(pathname, item.href)
               return (
                 <Link
                   key={item.href}
@@ -502,10 +524,7 @@ export default function Sidebar() {
       <div className="space-y-px border-t border-white/[0.06] px-1.5 py-1.5">
         {BOTTOM_NAV.map((item) => {
           const Icon = item.icon
-          const isActive =
-            item.href === '/settings/workspace'
-              ? pathname.startsWith('/settings/workspace')
-              : pathname.startsWith('/settings') && !pathname.startsWith('/settings/workspace')
+          const isActive = isBottomNavActive(pathname, item.href)
           return (
             <Link
               key={item.href}

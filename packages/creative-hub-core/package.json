@@ -1,0 +1,15 @@
+{
+  "name": "@adspectr/creative-hub-core",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Creative Hub: Brand Brain + Performance Loop + factory contracts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

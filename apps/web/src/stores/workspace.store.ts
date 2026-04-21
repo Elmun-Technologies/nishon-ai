@@ -24,6 +24,8 @@ interface Workspace {
   aiStrategy: any | null
   targetAudience?: string | null
   targetLocation?: string | null
+  /** Telegram Bot API chat_id — alertlar */
+  telegramChatId?: string | null
 }
 
 interface WorkspaceStore {

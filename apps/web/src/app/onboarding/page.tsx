@@ -1,559 +1,458 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ArrowRight, Check, CheckCircle2, ChevronLeft } from 'lucide-react'
-import { ContentMediaSlot } from '@/components/media/ContentMediaSlot'
+import { Check, ChevronLeft } from 'lucide-react'
 import { PublicContainer, PublicFooter, PublicNavbar } from '@/components/public/PublicLayout'
 import { useI18n } from '@/i18n/use-i18n'
 import { Button } from '@/components/ui/Button'
-import { Textarea } from '@/components/ui'
+import { Input } from '@/components/ui'
 import { cn } from '@/lib/utils'
+import { getAccessToken } from '@/lib/auth-storage'
 import {
-  adjustChannelSplit,
-  CHANNEL_COLORS,
-  CHANNEL_KEYS,
-  clearPreAuthOnboarding,
-  emptyPreAuthOnboardingDraft,
-  loadPreAuthOnboardingDraft,
-  markPreAuthOnboardingComplete,
-  savePreAuthOnboardingDraft,
-  type ChannelKey,
-  type PreAuthOnboardingDraft,
-} from '@/lib/pre-auth-onboarding'
+  type BusinessTypeV2,
+  type GoalV2,
+  type OnboardingV2State,
+  type PixelModeV2,
+  clearOnboardingV2,
+  finalizeForRegister,
+  loadOnboardingV2,
+  saveOnboardingV2,
+  setFirstCampaignBanner,
+} from '@/lib/onboarding-v2'
+import { useWorkspaceStore } from '@/stores/workspace.store'
 
-const TOTAL_STEPS = 7
+const TOTAL = 6
 
-const GEO_OPTIONS = ['home', 'cis', 'global'] as const
-type GeoOption = (typeof GEO_OPTIONS)[number]
+const BIZ: { id: BusinessTypeV2; emoji: string; labelUz: string }[] = [
+  { id: 'shop', emoji: '🛍️', labelUz: "Do'kon (kiyim, aksessuar)" },
+  { id: 'course', emoji: '🎓', labelUz: 'Kurs / Ta‘lim' },
+  { id: 'restaurant', emoji: '🍔', labelUz: 'Restoran / Kafe' },
+  { id: 'service', emoji: '💼', labelUz: 'Xizmat' },
+  { id: 'other', emoji: '📦', labelUz: 'Boshqa' },
+]
 
-const GOALS = ['roas', 'leads', 'awareness', 'scale'] as const
-const BUDGETS = ['under_1k', '1k_5k', '5k_20k', '20k_plus'] as const
-const INDUSTRIES = ['ecommerce', 'saas', 'local', 'agency', 'other'] as const
+const GOALS: { id: GoalV2; titleUz: string; subUz: string }[] = [
+  { id: 'sales', titleUz: 'Savdo oshirish', subUz: 'Dashboardda asosiy metrika — savdo / ROAS' },
+  { id: 'leads', titleUz: "Lead yig'ish", subUz: 'Dashboardda birinchi — ariza / lead' },
+  { id: 'awareness', titleUz: 'Brand awareness', subUz: 'Dashboardda birinchi — qamrov va eslash' },
+]
 
-type GoalId = (typeof GOALS)[number]
-type BudgetId = (typeof BUDGETS)[number]
-type IndustryId = (typeof INDUSTRIES)[number]
-
-function textSnippet(s: string, max = 140) {
-  const t = s.trim()
-  if (!t) return ''
-  return t.length <= max ? t : `${t.slice(0, max)}…`
+function formatUzs(n: number) {
+  return new Intl.NumberFormat('uz-UZ').format(n) + " so'm"
 }
 
-function ChoiceTile({
+function estimatedReach(dailyUzs: number) {
+  return Math.max(1000, Math.round(dailyUzs / 3.33))
+}
+
+function looksLikeMetaPixelId(s: string) {
+  const t = s.replace(/\s/g, '')
+  return /^\d{8,20}$/.test(t)
+}
+
+function ensureComplete(s: OnboardingV2State): OnboardingV2State {
+  const pixelMode = (s.pixelMode || 'skipped') as PixelModeV2
+  const pixelId =
+    pixelMode === 'has_pixel' && s.pixelId?.trim() && looksLikeMetaPixelId(s.pixelId) ? s.pixelId.trim() : null
+  return {
+    ...s,
+    businessType: (s.businessType || 'other') as BusinessTypeV2,
+    goal: (s.goal || 'sales') as GoalV2,
+    pixelMode,
+    pixelId,
+    dailyBudgetUzs: s.dailyBudgetUzs >= 50_000 && s.dailyBudgetUzs <= 500_000 ? s.dailyBudgetUzs : 100_000,
+    telegram: s.telegram.trim().replace(/^@+/, '') ? `@${s.telegram.trim().replace(/^@+/, '')}` : '',
+  }
+}
+
+function BigChoice({
   selected,
-  label,
-  description,
   onClick,
+  children,
+  className,
 }: {
   selected: boolean
-  label: string
-  description?: string
   onClick: () => void
+  children: React.ReactNode
+  className?: string
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
       className={cn(
-        'relative flex w-full items-start gap-3 rounded-xl border px-4 py-3.5 text-left text-sm font-medium transition-all duration-200',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-2',
+        'w-full rounded-2xl border px-4 py-4 text-left text-base font-semibold transition-all',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2',
+        'active:scale-[0.99]',
         selected
-          ? 'border-border bg-surface-2 shadow-sm ring-1 ring-black/[0.04] dark:ring-white/[0.06]'
-          : 'border-border bg-surface hover:border-text-tertiary/25 hover:bg-surface-2/80 dark:bg-surface-elevated/40',
+          ? 'border-brand-mid/50 bg-brand-mid/10 shadow-md ring-2 ring-brand-mid/25'
+          : 'border-border bg-surface hover:bg-surface-2',
+        className,
       )}
     >
-      <span
-        className={cn(
-          'mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border text-[10px]',
-          selected
-            ? 'border-brand-mid/50 bg-brand-mid/15 text-brand-ink dark:border-brand-lime/40 dark:bg-brand-lime/15 dark:text-brand-lime'
-            : 'border-border bg-transparent text-transparent',
-        )}
-        aria-hidden
-      >
-        {selected ? <Check className="h-3 w-3" strokeWidth={3} /> : null}
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block leading-snug text-text-primary">{label}</span>
-        {description ? <span className="mt-1 block text-xs font-normal leading-relaxed text-text-secondary">{description}</span> : null}
-      </span>
+      {children}
     </button>
-  )
-}
-
-function SplitSlider({
-  label,
-  value,
-  accent,
-  onChange,
-}: {
-  label: string
-  value: number
-  accent: string
-  onChange: (n: number) => void
-}) {
-  return (
-    <div>
-      <div className="flex items-baseline justify-between gap-2">
-        <span className="text-sm font-medium text-text-primary">{label}</span>
-        <span className="tabular-nums text-sm text-text-secondary">{value}%</span>
-      </div>
-      <input
-        type="range"
-        min={0}
-        max={100}
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        className="mt-2 h-2 w-full cursor-pointer rounded-full bg-border/60 dark:bg-border/40"
-        style={{ accentColor: accent }}
-      />
-    </div>
   )
 }
 
 export default function OnboardingPage() {
   const { t } = useI18n()
   const router = useRouter()
-  const p = (key: string, fb: string) => t(`preAuthOnboarding.${key}`, fb)
+  const accessToken = useWorkspaceStore((s) => s.accessToken)
 
-  const [step, setStep] = useState(0)
-  const [draft, setDraft] = useState<PreAuthOnboardingDraft>(() =>
-    typeof window === 'undefined' ? emptyPreAuthOnboardingDraft() : loadPreAuthOnboardingDraft(),
-  )
+  const [state, setState] = useState<OnboardingV2State>(() => ({
+    ...loadOnboardingV2(),
+  }))
+  const [hydrated, setHydrated] = useState(false)
+  const [pixelInput, setPixelInput] = useState('')
+  const [pixelError, setPixelError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
-    setDraft(loadPreAuthOnboardingDraft())
+    const d = loadOnboardingV2()
+    setState(d)
+    if (d.pixelId) setPixelInput(d.pixelId)
+    setHydrated(true)
   }, [])
 
-  const syncDraft = useCallback((next: Partial<PreAuthOnboardingDraft>) => {
-    savePreAuthOnboardingDraft(next)
-    setDraft(loadPreAuthOnboardingDraft())
+  useEffect(() => {
+    if (!hydrated) return
+    saveOnboardingV2(state)
+  }, [state, hydrated])
+
+  const pct = useMemo(() => Math.round(((state.step + 1) / TOTAL) * 100), [state.step])
+
+  const go = useCallback((step: number) => {
+    setState((s) => ({ ...s, step: Math.max(0, Math.min(5, step)) }))
   }, [])
 
-  const canNext = useMemo(() => {
-    if (step === 0) return true
-    if (step === 1) return !!draft.goal
-    if (step === 2) return !!draft.budgetBand
-    if (step === 3) return !!draft.industry
-    if (step === 4) return true
-    if (step === 5) return !!draft.geoFocus
-    return true
-  }, [step, draft])
+  const skipStep = useCallback(() => {
+    go(state.step + 1)
+  }, [go, state.step])
 
-  const goRegister = () => {
-    markPreAuthOnboardingComplete()
-    router.push('/register')
-  }
+  const back = useCallback(() => {
+    go(state.step - 1)
+  }, [go, state.step])
 
-  const restart = () => {
-    clearPreAuthOnboarding()
-    setDraft(loadPreAuthOnboardingDraft())
-    setStep(0)
-  }
+  const finish = useCallback(async () => {
+    const ready = ensureComplete({ ...state, pixelId: state.pixelMode === 'has_pixel' ? pixelInput : state.pixelId })
+    setSubmitting(true)
+    setPixelError('')
 
-  const updateSplit = (key: ChannelKey, value: number) => {
-    const next = adjustChannelSplit(draft.channelSplit, key, value)
-    savePreAuthOnboardingDraft({ channelSplit: next })
-    setDraft(loadPreAuthOnboardingDraft())
+    if (ready.pixelMode === 'has_pixel' && ready.pixelId == null) {
+      setPixelError(t('onboardingV2.pixelInvalid', 'Pixel ID noto‘g‘ri — faqat raqam, 8–20 belgi.'))
+      setSubmitting(false)
+      go(3)
+      return
+    }
+
+    const body = {
+      businessType: ready.businessType,
+      goal: ready.goal,
+      pixelId: ready.pixelId,
+      pixelMode: ready.pixelMode,
+      dailyBudget: ready.dailyBudgetUzs,
+      telegram: ready.telegram,
+    }
+
+    try {
+      if (accessToken) {
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+        const tok = getAccessToken()
+        if (tok) headers.Authorization = `Bearer ${tok}`
+        const res = await fetch('/api/onboarding/complete', {
+          method: 'POST',
+          headers,
+          credentials: 'include',
+          body: JSON.stringify(body),
+        })
+        if (!res.ok) {
+          const j = await res.json().catch(() => ({}))
+          throw new Error((j as { message?: string }).message ?? 'API xato')
+        }
+        setFirstCampaignBanner()
+        clearOnboardingV2()
+        router.push('/dashboard')
+      } else {
+        finalizeForRegister(ready)
+        router.push('/register')
+      }
+    } catch {
+      setSubmitting(false)
+    }
+  }, [accessToken, go, router, state, pixelInput, t])
+
+  const skipAll = useCallback(() => {
+    setState((prev) => {
+      const merged = ensureComplete({
+        ...prev,
+        businessType: (prev.businessType || 'other') as BusinessTypeV2,
+        goal: (prev.goal || 'sales') as GoalV2,
+        pixelMode: (prev.pixelMode || 'skipped') as PixelModeV2,
+      })
+      return { ...merged, step: 5 }
+    })
+  }, [])
+
+  if (!hydrated) {
+    return (
+      <div className="min-h-[50vh] flex items-center justify-center text-text-secondary text-sm">
+        {t('onboardingV2.loading', 'Yuklanmoqda…')}
+      </div>
+    )
   }
 
   return (
-    <main className="flex min-h-screen flex-col bg-surface text-text-primary">
+    <div className="min-h-screen flex flex-col bg-background">
       <PublicNavbar />
-      <section className="relative flex flex-1 flex-col border-b border-border bg-surface py-12 md:py-16">
-        <div
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(147,199,91,0.12),transparent_55%)] dark:bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(147,199,91,0.08),transparent_55%)]"
-          aria-hidden
-        />
-        <PublicContainer className="relative z-[1] flex max-w-4xl flex-1 flex-col">
-          <div className="flex flex-1 flex-col rounded-2xl border border-border bg-surface/90 p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_12px_40px_-16px_rgba(0,0,0,0.12)] backdrop-blur-sm dark:bg-surface-elevated/50 dark:shadow-[0_1px_0_rgba(255,255,255,0.04)_inset,0_20px_50px_-24px_rgba(0,0,0,0.5)] md:p-10">
-            <div className="mb-8 flex flex-wrap items-end justify-between gap-4 border-b border-border pb-6">
-              <div>
-                <p className="inline-flex items-center rounded-md border border-border bg-surface-2 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-text-secondary">
-                  {p('badge', 'Onboarding')}
-                </p>
-                <p className="mt-3 text-xs text-text-tertiary md:text-sm">
-                  {p('step', 'Step')} <span className="font-semibold text-text-primary">{Math.min(step + 1, TOTAL_STEPS)}</span>{' '}
-                  {p('of', 'of')} {TOTAL_STEPS}
-                </p>
-              </div>
+      <PublicContainer className="flex-1 py-6 md:py-10">
+        <div className="mx-auto max-w-lg w-full px-1">
+          {/* Progress */}
+          <div className="mb-6">
+            <div className="flex justify-between text-xs text-text-tertiary mb-1.5">
+              <span>
+                {t('onboardingV2.stepOf', '{n}-qadam').replace('{n}', String(state.step + 1))} / {TOTAL}
+              </span>
+              <span>{pct}%</span>
             </div>
-            <div className="mb-10 h-1.5 overflow-hidden rounded-full bg-border/40 dark:bg-border/30">
+            <div className="h-2 rounded-full bg-surface-2 overflow-hidden border border-border/60">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-[#5c8239] to-[#7aab4d] transition-[width] duration-500 ease-out dark:from-[#6d9048] dark:to-[#8fbc62]"
-                style={{ width: `${((step + 1) / TOTAL_STEPS) * 100}%` }}
-                role="progressbar"
-                aria-valuenow={step + 1}
-                aria-valuemin={1}
-                aria-valuemax={TOTAL_STEPS}
+                className="h-full rounded-full bg-gradient-to-r from-violet-500 to-brand-mid transition-[width] duration-300"
+                style={{ width: `${pct}%` }}
               />
-            </div>
-
-            <div className="min-h-0 flex-1">
-          {step === 0 && (
-            <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(260px,360px)] lg:items-start lg:gap-10">
-              <div className="order-2 max-w-xl lg:order-1">
-                <h1 className="text-balance text-3xl font-semibold tracking-tight text-text-primary md:text-[2rem] md:leading-tight">
-                  {p('welcomeTitle', 'Welcome to AdSpectr')}
-                </h1>
-                <p className="mt-5 text-base leading-relaxed text-text-secondary md:text-lg">{p('welcomeBody', '')}</p>
-                <ul className="mt-8 space-y-4 text-sm leading-relaxed text-text-secondary md:text-[15px]">
-                  {[0, 1, 2].map((i) => (
-                    <li key={i} className="flex gap-3">
-                      <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-surface-2 text-[#5c8239] dark:text-[#8fbc62]">
-                        <CheckCircle2 className="h-3.5 w-3.5" strokeWidth={2.25} />
-                      </span>
-                      <span>{p(`welcomeBullet${i}`, '')}</span>
-                    </li>
-                  ))}
-                </ul>
-                <p className="mt-6 hidden text-xs text-text-tertiary lg:block">{p('mediaSlotHint', '')}</p>
-              </div>
-              <div className="order-1 lg:sticky lg:top-6 lg:order-2">
-                <ContentMediaSlot
-                  slotId="onboarding-step-0-welcome"
-                  ratio="4:3"
-                  caption={p('mediaSlotCaption', '')}
-                  priority
-                  className="mx-auto max-w-md lg:mx-0 lg:max-w-none"
-                />
-              </div>
-            </div>
-          )}
-
-          {step === 1 && (
-            <div>
-              <h1 className="text-balance text-2xl font-semibold tracking-tight text-text-primary md:text-3xl">
-                {p('goalTitle', 'What is your main goal?')}
-              </h1>
-              <p className="mt-3 max-w-xl text-sm leading-relaxed text-text-secondary md:text-base">{p('goalSubtitle', '')}</p>
-              <div className="mt-8 grid gap-3 sm:grid-cols-2">
-                {GOALS.map((id) => (
-                  <ChoiceTile
-                    key={id}
-                    selected={draft.goal === id}
-                    label={p(`goal.${id}`, id)}
-                    onClick={() => syncDraft({ goal: id })}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {step === 2 && (
-            <div>
-              <h1 className="text-balance text-2xl font-semibold tracking-tight text-text-primary md:text-3xl">
-                {p('budgetTitle', 'Monthly ad spend (approx.)')}
-              </h1>
-              <p className="mt-3 max-w-xl text-sm leading-relaxed text-text-secondary md:text-base">{p('budgetSubtitle', '')}</p>
-              <ContentMediaSlot
-                slotId="onboarding-step-2-budget"
-                ratio="21:9"
-                caption={p('mediaSlotCaption', '')}
-                className="mx-auto mt-6 max-w-2xl"
-              />
-              <div className="mt-8 grid gap-3 sm:grid-cols-2">
-                {BUDGETS.map((id) => (
-                  <ChoiceTile
-                    key={id}
-                    selected={draft.budgetBand === id}
-                    label={p(`budget.${id}`, id)}
-                    onClick={() => syncDraft({ budgetBand: id })}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {step === 3 && (
-            <div>
-              <h1 className="text-balance text-2xl font-semibold tracking-tight text-text-primary md:text-3xl">
-                {p('industryTitle', 'What do you market?')}
-              </h1>
-              <p className="mt-3 max-w-xl text-sm leading-relaxed text-text-secondary md:text-base">{p('industrySubtitle', '')}</p>
-              <ContentMediaSlot
-                slotId="onboarding-step-3-industry"
-                ratio="21:9"
-                caption={p('mediaSlotCaption', '')}
-                className="mx-auto mt-6 max-w-2xl"
-              />
-              <div className="mt-8 grid gap-3 sm:grid-cols-2">
-                {INDUSTRIES.map((id) => (
-                  <ChoiceTile
-                    key={id}
-                    selected={draft.industry === id}
-                    label={p(`industry.${id}`, id)}
-                    onClick={() => syncDraft({ industry: id })}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {step === 4 && (
-            <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(240px,360px)] lg:items-start">
-              <div className="min-w-0">
-                <h1 className="text-balance text-2xl font-semibold tracking-tight text-text-primary md:text-3xl">
-                  {p('splitTitle', 'Channels & budget mix')}
-                </h1>
-                <p className="mt-3 max-w-xl text-sm leading-relaxed text-text-secondary md:text-base">{p('splitSubtitle', '')}</p>
-
-                <div className="mt-8 space-y-6">
-                  <div>
-                    <label className="text-sm font-medium text-text-primary" htmlFor="onb-touchpoints">
-                      {p('splitTouchpointsLabel', 'Where are your customers?')}
-                    </label>
-                    <p className="mt-1 text-xs leading-relaxed text-text-tertiary">{p('splitTouchpointsHelp', '')}</p>
-                    <Textarea
-                      id="onb-touchpoints"
-                      value={draft.customerTouchpoints}
-                      onChange={(e) => syncDraft({ customerTouchpoints: e.target.value })}
-                      placeholder={p('splitTouchpointsPh', '')}
-                      rows={3}
-                      className="mt-2"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-text-primary" htmlFor="onb-ig-avatars">
-                      {p('splitInstagramAvatarsLabel', 'Instagram customer avatars')}
-                    </label>
-                    <p className="mt-1 text-xs leading-relaxed text-text-tertiary">{p('splitInstagramAvatarsHelp', '')}</p>
-                    <Textarea
-                      id="onb-ig-avatars"
-                      value={draft.instagramAvatars}
-                      onChange={(e) => syncDraft({ instagramAvatars: e.target.value })}
-                      placeholder={p('splitInstagramAvatarsPh', '')}
-                      rows={3}
-                      className="mt-2"
-                    />
-                  </div>
-                  <div className="grid gap-6 sm:grid-cols-2">
-                    <div>
-                      <label className="text-sm font-medium text-text-primary" htmlFor="onb-tg-ch">
-                        {p('splitTelegramChannelsLabel', 'Telegram channels / groups')}
-                      </label>
-                      <p className="mt-1 text-xs leading-relaxed text-text-tertiary">{p('splitTelegramChannelsHelp', '')}</p>
-                      <Textarea
-                        id="onb-tg-ch"
-                        value={draft.telegramChannels}
-                        onChange={(e) => syncDraft({ telegramChannels: e.target.value })}
-                        placeholder={p('splitTelegramChannelsPh', '')}
-                        rows={3}
-                        className="mt-2"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-text-primary" htmlFor="onb-tg-aud">
-                        {p('splitTelegramAudiencesLabel', 'Telegram audiences')}
-                      </label>
-                      <p className="mt-1 text-xs leading-relaxed text-text-tertiary">{p('splitTelegramAudiencesHelp', '')}</p>
-                      <Textarea
-                        id="onb-tg-aud"
-                        value={draft.telegramAudiences}
-                        onChange={(e) => syncDraft({ telegramAudiences: e.target.value })}
-                        placeholder={p('splitTelegramAudiencesPh', '')}
-                        rows={3}
-                        className="mt-2"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-8 flex h-3 min-h-[12px] overflow-hidden rounded-full bg-border/50 dark:bg-border/30">
-                  {CHANNEL_KEYS.map((k) => (
-                    <div
-                      key={k}
-                      className="min-w-0 transition-all duration-300"
-                      style={{ width: `${draft.channelSplit[k]}%`, backgroundColor: CHANNEL_COLORS[k] }}
-                    />
-                  ))}
-                </div>
-                <p className="mt-2 text-xs text-text-tertiary">{p('splitTotal', 'Total')}: 100%</p>
-
-                <div className="mt-8 max-h-[min(52vh,28rem)] space-y-5 overflow-y-auto pr-1 sm:max-h-none sm:overflow-visible">
-                  {CHANNEL_KEYS.map((k) => (
-                    <SplitSlider
-                      key={k}
-                      label={p(`splitChannel.${k}`, k)}
-                      value={draft.channelSplit[k]}
-                      accent={CHANNEL_COLORS[k]}
-                      onChange={(n) => updateSplit(k, n)}
-                    />
-                  ))}
-                </div>
-                <p className="mt-6 text-xs leading-relaxed text-text-tertiary">{p('splitHint', '')}</p>
-              </div>
-              <ContentMediaSlot
-                slotId="onboarding-step-4-split"
-                ratio="4:3"
-                caption={p('mediaSlotCaption', '')}
-                className="lg:sticky lg:top-6"
-              />
-            </div>
-          )}
-
-          {step === 5 && (
-            <div>
-              <h1 className="text-balance text-2xl font-semibold tracking-tight text-text-primary md:text-3xl">
-                {p('geoTitle', 'Where should spend focus first?')}
-              </h1>
-              <p className="mt-3 max-w-xl text-sm leading-relaxed text-text-secondary md:text-base">{p('geoSubtitle', '')}</p>
-              <ContentMediaSlot
-                slotId="onboarding-step-5-geo"
-                ratio="16:9"
-                caption={p('mediaSlotCaption', '')}
-                className="mx-auto mt-6 max-w-2xl"
-              />
-              <div className="mt-8 space-y-2">
-                {GEO_OPTIONS.map((id) => (
-                  <ChoiceTile
-                    key={id}
-                    selected={draft.geoFocus === id}
-                    label={p(`geo.${id}`, id)}
-                    description={p(`geoDesc.${id}`, '')}
-                    onClick={() => syncDraft({ geoFocus: id })}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {step === 6 && (
-            <div>
-              <h1 className="text-balance text-2xl font-semibold tracking-tight text-text-primary md:text-3xl">
-                {p('summaryTitle', 'You are ready to register')}
-              </h1>
-              <p className="mt-3 max-w-xl text-sm leading-relaxed text-text-secondary md:text-base">{p('summaryIntro', '')}</p>
-              <ContentMediaSlot
-                slotId="onboarding-step-6-summary"
-                ratio="16:9"
-                caption={p('mediaSlotCaption', '')}
-                className="mx-auto mt-6 max-w-xl"
-              />
-              <dl className="mt-8 space-y-0 divide-y divide-border rounded-xl border border-border bg-surface-2/40 p-1 dark:bg-surface-2/20">
-                <div className="flex justify-between gap-4 px-4 py-3 text-sm">
-                  <dt className="text-text-tertiary">{p('summaryGoal', 'Goal')}</dt>
-                  <dd className="max-w-[55%] text-right font-medium text-text-primary">
-                    {draft.goal ? p(`goal.${draft.goal as GoalId}`, draft.goal) : '—'}
-                  </dd>
-                </div>
-                <div className="flex justify-between gap-4 px-4 py-3 text-sm">
-                  <dt className="text-text-tertiary">{p('summaryBudget', 'Budget')}</dt>
-                  <dd className="max-w-[55%] text-right font-medium text-text-primary">
-                    {draft.budgetBand ? p(`budget.${draft.budgetBand as BudgetId}`, draft.budgetBand) : '—'}
-                  </dd>
-                </div>
-                <div className="flex justify-between gap-4 px-4 py-3 text-sm">
-                  <dt className="text-text-tertiary">{p('summaryIndustry', 'Industry')}</dt>
-                  <dd className="max-w-[55%] text-right font-medium text-text-primary">
-                    {draft.industry ? p(`industry.${draft.industry as IndustryId}`, draft.industry) : '—'}
-                  </dd>
-                </div>
-                {draft.customerTouchpoints.trim() ? (
-                  <div className="px-4 py-3 text-sm">
-                    <dt className="text-text-tertiary">{p('summaryTouchpoints', 'Customer touchpoints')}</dt>
-                    <dd className="mt-1.5 text-xs leading-relaxed text-text-secondary">{textSnippet(draft.customerTouchpoints, 220)}</dd>
-                  </div>
-                ) : null}
-                {draft.instagramAvatars.trim() ? (
-                  <div className="px-4 py-3 text-sm">
-                    <dt className="text-text-tertiary">{p('summaryInstagramAvatars', 'Instagram avatars')}</dt>
-                    <dd className="mt-1.5 text-xs leading-relaxed text-text-secondary">{textSnippet(draft.instagramAvatars, 220)}</dd>
-                  </div>
-                ) : null}
-                {(draft.telegramChannels.trim() || draft.telegramAudiences.trim()) ? (
-                  <div className="px-4 py-3 text-sm">
-                    <dt className="text-text-tertiary">{p('summaryTelegram', 'Telegram')}</dt>
-                    <dd className="mt-1.5 space-y-1 text-xs leading-relaxed text-text-secondary">
-                      {draft.telegramChannels.trim() ? (
-                        <p>
-                          <span className="font-medium text-text-tertiary">{p('summaryTelegramChannels', 'Channels')}: </span>
-                          {textSnippet(draft.telegramChannels, 160)}
-                        </p>
-                      ) : null}
-                      {draft.telegramAudiences.trim() ? (
-                        <p>
-                          <span className="font-medium text-text-tertiary">{p('summaryTelegramAudiences', 'Audiences')}: </span>
-                          {textSnippet(draft.telegramAudiences, 160)}
-                        </p>
-                      ) : null}
-                    </dd>
-                  </div>
-                ) : null}
-                <div className="px-4 py-3 text-sm">
-                  <dt className="text-text-tertiary">{p('summarySplit', 'Channel mix')}</dt>
-                  <dd className="mt-2">
-                    <div className="flex h-2.5 min-h-[10px] overflow-hidden rounded-full bg-border/50">
-                      {CHANNEL_KEYS.map((k) => (
-                        <div
-                          key={k}
-                          className="min-w-0"
-                          style={{ width: `${draft.channelSplit[k]}%`, backgroundColor: CHANNEL_COLORS[k] }}
-                        />
-                      ))}
-                    </div>
-                    <p className="mt-2 text-xs leading-relaxed text-text-secondary">
-                      {CHANNEL_KEYS.filter((k) => draft.channelSplit[k] > 0)
-                        .map((k) => `${p(`splitChannel.${k}`, k)} ${draft.channelSplit[k]}%`)
-                        .join(' · ') || '—'}
-                    </p>
-                  </dd>
-                </div>
-                <div className="flex justify-between gap-4 px-4 py-3 text-sm">
-                  <dt className="text-text-tertiary">{p('summaryGeo', 'Geo focus')}</dt>
-                  <dd className="max-w-[55%] text-right font-medium text-text-primary">
-                    {draft.geoFocus ? p(`geo.${draft.geoFocus}`, draft.geoFocus) : '—'}
-                  </dd>
-                </div>
-              </dl>
-              <p className="mt-5 text-xs leading-relaxed text-text-tertiary">{p('summaryNote', '')}</p>
-            </div>
-          )}
-            </div>
-
-            <div className="mt-auto border-t border-border pt-8">
-              <div className="flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
-                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                  {step > 0 ? (
-                    <Button type="button" variant="secondary" size="lg" className="gap-2" onClick={() => setStep((s) => s - 1)}>
-                      <ChevronLeft className="h-4 w-4" />
-                      {p('back', 'Back')}
-                    </Button>
-                  ) : null}
-                  <Button type="button" variant="ghost" size="lg" className="text-text-tertiary hover:text-text-primary" onClick={restart}>
-                    {p('restart', 'Start over')}
-                  </Button>
-                </div>
-                <div className="w-full sm:w-auto sm:shrink-0">
-                  {step < TOTAL_STEPS - 1 ? (
-                    <Button type="button" size="lg" fullWidth className="min-h-[3rem] gap-2 px-8 sm:w-auto sm:min-w-[13rem]" disabled={!canNext} onClick={() => setStep((s) => s + 1)}>
-                      {p('next', 'Continue')}
-                      <ArrowRight className="h-4 w-4" />
-                    </Button>
-                  ) : null}
-                  {step === TOTAL_STEPS - 1 ? (
-                    <Button type="button" size="lg" fullWidth className="min-h-[3rem] gap-2 px-8 sm:w-auto sm:min-w-[13rem]" onClick={goRegister}>
-                      {p('ctaRegister', 'Create account')}
-                      <ArrowRight className="h-4 w-4" />
-                    </Button>
-                  ) : null}
-                </div>
-              </div>
-
-              <p className="mt-8 rounded-lg bg-surface-2/60 px-4 py-3 text-center text-sm text-text-secondary dark:bg-surface-2/30">
-                {p('hasAccount', 'Already have an account?')}{' '}
-                <Link href="/login" className="font-semibold text-text-primary underline-offset-2 hover:underline">
-                  {p('login', 'Log in')}
-                </Link>
-              </p>
             </div>
           </div>
-        </PublicContainer>
-      </section>
+
+          <div className="flex items-center justify-between gap-2 mb-4">
+            {state.step > 0 ? (
+              <button
+                type="button"
+                onClick={back}
+                className="inline-flex items-center gap-1 text-sm text-text-secondary hover:text-text-primary"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                {t('onboardingV2.back', 'Orqaga')}
+              </button>
+            ) : (
+              <span />
+            )}
+            {state.step < 5 && (
+              <div className="flex items-center gap-2">
+                <button type="button" onClick={skipAll} className="text-xs text-text-tertiary hover:text-text-secondary underline">
+                  {t('onboardingV2.skipAll', "Hammasini o'tkazish")}
+                </button>
+                <button type="button" onClick={skipStep} className="text-sm font-medium text-violet-600 dark:text-violet-400">
+                  {t('onboardingV2.skip', "O'tkazib yuborish")}
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Step 0 */}
+          {state.step === 0 && (
+            <div className="space-y-6 text-center pt-2">
+              <h1 className="text-2xl md:text-3xl font-bold text-text-primary leading-tight">
+                {t('onboardingV2.welcomeTitle', "3 daqiqada birinchi kampaniyangizni yoqamiz")}
+              </h1>
+              <p className="text-sm text-text-secondary">
+                {t('onboardingV2.welcomeSub', '5 qisqa qadam — har biri bitta savol, katta tugmalar.')}
+              </p>
+              <Button className="w-full rounded-2xl py-6 text-lg font-semibold" onClick={() => go(1)}>
+                {t('onboardingV2.start', 'Boshlash')}
+              </Button>
+            </div>
+          )}
+
+          {/* Step 1 — biznes */}
+          {state.step === 1 && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-text-primary">{t('onboardingV2.whoTitle', 'Siz kimsiz?')}</h2>
+              <p className="text-sm text-text-secondary">{t('onboardingV2.whoSub', 'Biznes turi — shablon va filtrlar keyinroq moslashadi.')}</p>
+              <div className="grid gap-3">
+                {BIZ.map((b) => (
+                  <BigChoice
+                    key={b.id}
+                    selected={state.businessType === b.id}
+                    onClick={() => {
+                      setState((s) => ({ ...s, businessType: b.id }))
+                      go(2)
+                    }}
+                  >
+                    <span className="mr-2">{b.emoji}</span>
+                    {b.labelUz}
+                  </BigChoice>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Step 2 — maqsad */}
+          {state.step === 2 && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-text-primary">{t('onboardingV2.goalTitle', 'Nima sotmoqchisiz?')}</h2>
+              <div className="grid gap-3">
+                {GOALS.map((g) => (
+                  <BigChoice
+                    key={g.id}
+                    selected={state.goal === g.id}
+                    onClick={() => {
+                      setState((s) => ({ ...s, goal: g.id }))
+                      go(3)
+                    }}
+                  >
+                    <div>
+                      <div>{g.titleUz}</div>
+                      <div className="text-xs font-normal text-text-tertiary mt-1">{g.subUz}</div>
+                    </div>
+                  </BigChoice>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Step 3 — pixel */}
+          {state.step === 3 && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-text-primary">{t('onboardingV2.pixelTitle', 'Meta Pixel')}</h2>
+              <p className="text-sm text-text-secondary">
+                {t(
+                  'onboardingV2.pixelHint',
+                  "Ko'pchilik hozir o'tkazadi — bu normal. Pixel siz ham boshlash mumkin, ma'lumot kamroq bo'ladi.",
+                )}
+              </p>
+              <div className="grid gap-3">
+                <BigChoice
+                  selected={state.pixelMode === 'has_pixel'}
+                  onClick={() => setState((s) => ({ ...s, pixelMode: 'has_pixel' }))}
+                >
+                  {t('onboardingV2.pixelHas', 'Pixel bor — ID kiritaman')}
+                </BigChoice>
+                {state.pixelMode === 'has_pixel' && (
+                  <div className="rounded-xl border border-border bg-surface p-3 space-y-2">
+                    <label className="text-xs text-text-tertiary">Pixel ID</label>
+                    <Input
+                      value={pixelInput}
+                      onChange={(e) => {
+                        setPixelInput(e.target.value)
+                        setState((s) => ({ ...s, pixelId: e.target.value.trim() || null }))
+                      }}
+                      placeholder="123456789012345"
+                      inputMode="numeric"
+                      className="font-mono"
+                    />
+                    {pixelError ? <p className="text-xs text-red-500">{pixelError}</p> : null}
+                  </div>
+                )}
+                <BigChoice
+                  selected={state.pixelMode === 'help'}
+                  onClick={() => setState((s) => ({ ...s, pixelMode: 'help', pixelId: null }))}
+                >
+                  <div>
+                    <div>{t('onboardingV2.pixelHelp', "Yo'rdam — video + mutaxassis ($5)")}</div>
+                    <p className="text-xs font-normal text-text-tertiary mt-1">
+                      {t('onboardingV2.pixelHelpSub', 'Qisqa video (~45 s), keyin mutaxassis ulab beradi.')}
+                    </p>
+                  </div>
+                </BigChoice>
+                <BigChoice
+                  selected={state.pixelMode === 'skipped'}
+                  onClick={() => setState((s) => ({ ...s, pixelMode: 'skipped', pixelId: null }))}
+                >
+                  {t('onboardingV2.pixelSkip', "Hozir o'tkazib yuborish — keyin eslatamiz")}
+                </BigChoice>
+              </div>
+              <Button className="w-full rounded-2xl py-5" onClick={() => go(4)} disabled={!state.pixelMode}>
+                {t('onboardingV2.continue', 'Davom etish')}
+              </Button>
+            </div>
+          )}
+
+          {/* Step 4 — budget */}
+          {state.step === 4 && (
+            <div className="space-y-5">
+              <h2 className="text-xl font-bold text-text-primary">{t('onboardingV2.budgetTitle', "Kuniga qancha sarflaysiz?")}</h2>
+              <p className="text-2xl font-bold tabular-nums text-violet-600 dark:text-violet-400">{formatUzs(state.dailyBudgetUzs)}</p>
+              <input
+                type="range"
+                min={50_000}
+                max={500_000}
+                step={10_000}
+                value={state.dailyBudgetUzs}
+                onChange={(e) => setState((s) => ({ ...s, dailyBudgetUzs: Number(e.target.value) }))}
+                className="w-full h-3 accent-violet-600 cursor-pointer"
+              />
+              <div className="flex justify-between text-xs text-text-tertiary">
+                <span>50 000</span>
+                <span>500 000</span>
+              </div>
+              <p className="text-sm text-text-secondary rounded-xl bg-surface-2/80 border border-border/60 px-3 py-2">
+                {t('onboardingV2.budgetReach', 'Taxminan {n} kishi ko‘radi')
+                  .replace('{n}', new Intl.NumberFormat('uz-UZ').format(estimatedReach(state.dailyBudgetUzs)))}
+              </p>
+              <p className="text-xs text-text-tertiary">{t('onboardingV2.budgetTip', "Boshlash uchun 100 000 so'm tavsiya etiladi.")}</p>
+              <Button className="w-full rounded-2xl py-5" onClick={() => go(5)}>
+                {t('onboardingV2.continue', 'Davom etish')}
+              </Button>
+            </div>
+          )}
+
+          {/* Step 5 — tayyor */}
+          {state.step === 5 && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-bold text-text-primary">{t('onboardingV2.doneTitle', 'Tayyor')}</h2>
+              <ul className="space-y-3 text-sm">
+                <li className="flex items-center gap-2">
+                  <Check className="w-5 h-5 text-emerald-500 shrink-0" />
+                  {t('onboardingV2.doneProfile', 'Profil sozlamalari saqlandi')}
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-5 h-5 text-emerald-500 shrink-0" />
+                  {t('onboardingV2.doneDashboard', 'Dashboard metrikalari tanlovingizga mos')}
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-5 h-5 text-emerald-500 shrink-0" />
+                  {t('onboardingV2.doneTg', 'Telegram (ixtiyoriy)')}
+                </li>
+              </ul>
+              <div>
+                <label className="text-xs text-text-tertiary block mb-1">Telegram</label>
+                <Input
+                  value={state.telegram.replace(/^@/, '')}
+                  onChange={(e) => setState((s) => ({ ...s, telegram: e.target.value }))}
+                  placeholder="username"
+                  className="rounded-xl"
+                />
+              </div>
+              <div className="rounded-xl border border-border bg-surface-2/40 p-3 text-xs text-text-secondary space-y-1">
+                <div>
+                  {t('onboardingV2.summaryBiz', 'Biznes')}: {state.businessType || '—'}
+                </div>
+                <div>
+                  {t('onboardingV2.summaryGoal', 'Maqsad')}: {state.goal || '—'}
+                </div>
+                <div>
+                  Pixel: {state.pixelMode || '—'} {state.pixelId ? `(${state.pixelId})` : ''}
+                </div>
+                <div>
+                  {t('onboardingV2.summaryBudget', 'Kunlik')}: {formatUzs(state.dailyBudgetUzs || 100_000)}
+                </div>
+              </div>
+              <Button className="w-full rounded-2xl py-6 text-lg font-semibold" onClick={() => void finish()} disabled={submitting}>
+                {accessToken
+                  ? t('onboardingV2.goDashboard', "Dashboard ga o'tish")
+                  : t('onboardingV2.goRegister', "Ro'yxatdan o'tish")}
+              </Button>
+              {!accessToken && (
+                <p className="text-center text-xs text-text-tertiary">
+                  {t('onboardingV2.registerNote', 'Keyingi qadam — akkaunt yaratish.')}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      </PublicContainer>
       <PublicFooter />
-    </main>
+    </div>
   )
 }

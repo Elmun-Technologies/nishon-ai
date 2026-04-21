@@ -16,6 +16,7 @@ import { PlatformIcon } from "@/components/ui/PlatformIcon";
 import { campaigns as campaignsApi } from "@/lib/api-client";
 import { formatCurrency, timeAgo } from "@/lib/utils";
 import { CreateCampaignForm } from "@/components/campaigns/CreateCampaignForm";
+import { CampaignCollaborationPanel } from "@/components/campaigns/CampaignCollaborationPanel";
 import { AdsManagerPanel } from "@/components/campaigns/AdsManagerPanel";
 import { DateRangeFilter } from "@/components/filters/DateRangeFilter";
 
@@ -44,7 +45,7 @@ const OBJECTIVE_LABELS: Record<string, string> = {
 export default function CampaignsPage() {
   const { t } = useI18n();
   const router = useRouter();
-  const { currentWorkspace } = useWorkspaceStore();
+  const { currentWorkspace, user } = useWorkspaceStore();
   const [items, setItems] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -336,7 +337,8 @@ export default function CampaignsPage() {
                 </Card>
 
                 {isSelected && (
-                  <div className="mt-1 rounded-2xl border border-border/70 bg-white/85 px-5 py-4 shadow-sm backdrop-blur-sm dark:bg-slate-900/70">
+                  <div className="mt-1 grid gap-3 lg:grid-cols-3">
+                    <div className="lg:col-span-2 rounded-2xl border border-border/70 bg-white/85 px-5 py-4 shadow-sm backdrop-blur-sm dark:bg-slate-900/70">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                       {[
                         {
@@ -419,6 +421,15 @@ export default function CampaignsPage() {
                         )}
                       </div>
                     </div>
+                    </div>
+                    {currentWorkspace?.id ? (
+                      <CampaignCollaborationPanel
+                        workspaceId={currentWorkspace.id}
+                        campaignId={campaign.id}
+                        campaignName={campaign.name}
+                        authorName={user?.name || user?.email || "User"}
+                      />
+                    ) : null}
                   </div>
                 )}
               </div>

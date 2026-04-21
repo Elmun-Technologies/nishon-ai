@@ -10,19 +10,23 @@ import { useI18n } from '@/i18n/use-i18n'
 const PAGE_TITLES: Record<string, { titleKey: string; titleFallback: string; subtitleKey: string; subtitleFallback: string }> = {
   '/dashboard':            { titleKey: 'navigation.dashboard', titleFallback: 'Dashboard', subtitleKey: 'header.dashboardSubtitle', subtitleFallback: 'Overview of your advertising performance' },
   '/campaigns':            { titleKey: 'navigation.campaigns', titleFallback: 'Campaigns', subtitleKey: 'header.campaignsSubtitle', subtitleFallback: 'All campaigns managed by AdSpectr' },
+  '/audiences/story':      { titleKey: 'audienceStory.pageTitle', titleFallback: 'Audience Story', subtitleKey: 'header.audienceStorySubtitle', subtitleFallback: 'Persona narrative, journey, interests, creative fit, and competitor timing' },
   '/audiences/studio':     { titleKey: 'audiences.studioTitle', titleFallback: 'Audience Studio', subtitleKey: 'header.audienceStudioSubtitle', subtitleFallback: 'Performance table and audience mixer' },
   '/audiences':            { titleKey: 'navigation.audiences', titleFallback: 'Audiences', subtitleKey: 'header.audiencesSubtitle', subtitleFallback: 'Build and launch full-funnel audiences' },
   '/ai-decisions':         { titleKey: 'navigation.aiDecisions', titleFallback: 'AI Decisions', subtitleKey: 'header.aiDecisionsSubtitle', subtitleFallback: 'Every action the AI has taken — with full reasoning' },
   '/budget':               { titleKey: 'navigation.budget', titleFallback: 'Budget', subtitleKey: 'header.budgetSubtitle', subtitleFallback: 'Allocation and performance by platform' },
   '/simulation':           { titleKey: 'navigation.simulation', titleFallback: 'Simulation', subtitleKey: 'header.simulationSubtitle', subtitleFallback: 'Forecast results before committing budget' },
   '/competitors':          { titleKey: 'navigation.competitors', titleFallback: 'Competitors', subtitleKey: 'header.competitorsSubtitle', subtitleFallback: 'Meta Ad Library signals plus AI portfolio synthesis' },
+  '/ad-library':           { titleKey: 'navigation.adLibrary', titleFallback: 'Ad Library', subtitleKey: 'header.adLibrarySubtitle', subtitleFallback: 'Competitive ads intelligence for Uzbekistan — filters, scoring, Creative Hub handoff' },
   '/creative-scorer':      { titleKey: 'navigation.creativeScorer', titleFallback: 'Creative Scorer', subtitleKey: 'header.creativeScorerSubtitle', subtitleFallback: 'AI-powered ad creative evaluation' },
   '/roi-calculator':       { titleKey: 'navigation.roi', titleFallback: 'ROI & outcomes', subtitleKey: 'header.roiSubtitle', subtitleFallback: 'We learn from real outcomes first; the ROI calculator launches when benchmark data is ready.' },
   '/settings':             { titleKey: 'navigation.settings', titleFallback: 'Settings', subtitleKey: 'header.settingsSubtitle', subtitleFallback: 'Workspace and account configuration' },
   '/reporting':            { titleKey: 'navigation.reporting', titleFallback: 'Reporting', subtitleKey: 'header.reportingSubtitle', subtitleFallback: 'Campaign-level metrics and trends' },
+  '/reports':              { titleKey: 'navigation.reportBuilder', titleFallback: 'Report builder', subtitleKey: 'header.reportBuilderSubtitle', subtitleFallback: 'Metric library, canvas, and saved layouts by persona' },
   '/meta-audit':           { titleKey: 'navigation.metaAudit', titleFallback: 'Meta Audit', subtitleKey: 'header.metaAuditSubtitle', subtitleFallback: '360° creative, targeting, and auction diagnostics' },
   '/retargeting/wizard':   { titleKey: 'navigation.retargeting', titleFallback: 'Retargeting', subtitleKey: 'header.retargetingWizardSubtitle', subtitleFallback: 'Step-by-step retargeting setup' },
   '/retargeting':          { titleKey: 'navigation.retargeting', titleFallback: 'Retargeting', subtitleKey: 'header.retargetingSubtitle', subtitleFallback: 'Audiences and flows for bringing visitors back' },
+  '/retarget':             { titleKey: 'navigation.signalBridge', titleFallback: 'Signal Bridge (CRM)', subtitleKey: 'header.signalBridgeSubtitle', subtitleFallback: 'Post-purchase Redis signals and repeat-buy flow' },
   '/wizard':               { titleKey: 'navigation.campaignWizard', titleFallback: 'Campaign wizard', subtitleKey: 'header.wizardSubtitle', subtitleFallback: 'Guided setup for campaigns and workspace' },
   '/performance':        { titleKey: 'navigation.performance', titleFallback: 'Performance', subtitleKey: 'header.performanceSubtitle', subtitleFallback: 'Campaign table from Meta reporting for the selected period' },
   '/creative-hub':         { titleKey: 'navigation.creativeHub', titleFallback: 'Creative Hub', subtitleKey: 'header.creativeHubSubtitle', subtitleFallback: 'Image ads, actors, brand kit, and media in one place' },
@@ -49,11 +53,14 @@ export default function Header() {
     pathname === '/dashboard' ||
     pathname === '/campaigns' ||
     pathname === '/reporting' ||
+    pathname === '/reports' ||
+    pathname === '/ad-library' ||
     pathname === '/meta-audit' ||
     pathname === '/automation' ||
     pathname.startsWith('/automation/wizard') ||
     pathname === '/ad-launcher' ||
     pathname === '/audiences/studio' ||
+    pathname === '/audiences/story' ||
     pathname === '/settings' ||
     pathname.startsWith('/settings/workspace') ||
     pathname === '/create-agent' ||
@@ -62,7 +69,8 @@ export default function Header() {
     pathname === '/creative-hub/brand-kit' ||
     pathname === '/creative-hub/products' ||
     pathname === '/creative-hub/media' ||
-    pathname.startsWith('/creative-hub/image-ads')
+    pathname.startsWith('/creative-hub/image-ads') ||
+    pathname === '/retarget'
   const pageConfig =
     pathname.startsWith('/settings/workspace')
       ? {

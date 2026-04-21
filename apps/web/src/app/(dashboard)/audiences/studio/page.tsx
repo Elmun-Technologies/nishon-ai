@@ -29,15 +29,26 @@ export default function AudienceStudioPage() {
         title={t('audiences.studioTitle', 'Audience Studio')}
         subtitle={t('audiences.studioSubtitle', 'Explore performance, discover interests, and build intersections before launch.')}
         actions={
-          <Link
-            href="/audiences"
-            className={cn(
-              'inline-flex items-center justify-center rounded-xl font-medium transition-all duration-200 text-sm',
-              'bg-white/80 dark:bg-slate-900/70 hover:bg-white dark:hover:bg-slate-900 text-text-primary border border-border hover:border-border px-4 py-2',
-            )}
-          >
-            {t('audiences.backToLauncher', 'Back to Launcher')}
-          </Link>
+          <div className="flex flex-wrap gap-2 justify-end">
+            <Link
+              href="/audiences/story"
+              className={cn(
+                'inline-flex items-center justify-center rounded-xl font-medium transition-all duration-200 text-sm',
+                'border border-violet-500/35 bg-violet-500/10 px-4 py-2 text-violet-700 dark:text-violet-200 hover:bg-violet-500/15',
+              )}
+            >
+              {t('audiences.openStory', 'Audience Story')}
+            </Link>
+            <Link
+              href="/audiences"
+              className={cn(
+                'inline-flex items-center justify-center rounded-xl font-medium transition-all duration-200 text-sm',
+                'bg-white/80 dark:bg-slate-900/70 hover:bg-white dark:hover:bg-slate-900 text-text-primary border border-border hover:border-border px-4 py-2',
+              )}
+            >
+              {t('audiences.backToLauncher', 'Back to Launcher')}
+            </Link>
+          </div>
         }
       />
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Alert, Button, Input } from '@/components/ui'
 import { auth, workspaces as workspacesApi } from '@/lib/api-client'
@@ -52,16 +52,23 @@ const DEMO_WORKSPACE = {
 export default function LoginPage() {
   const { t } = useI18n()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { setUser, setAccessToken, setCurrentWorkspace } = useWorkspaceStore()
   const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
+  function safeNext(): string | null {
+    const n = searchParams.get('next')
+    if (n && n.startsWith('/') && !n.startsWith('//')) return n
+    return null
+  }
+
   function handleDemoLogin() {
     setAccessToken('demo-token-local-preview')
     setUser(DEMO_USER)
     setCurrentWorkspace(DEMO_WORKSPACE)
-    router.push('/dashboard')
+    router.push(safeNext() ?? '/dashboard')
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -82,9 +89,9 @@ export default function LoginPage() {
 
       if (ws) {
         setCurrentWorkspace(ws)
-        router.push('/dashboard')
+        router.push(safeNext() ?? '/dashboard')
       } else {
-        router.push('/onboarding')
+        router.push(safeNext() ?? '/onboarding')
       }
     } catch (err: any) {
       setError(err.response?.data?.message || t('auth.loginPage.badCredentials', 'Invalid email or password'))
