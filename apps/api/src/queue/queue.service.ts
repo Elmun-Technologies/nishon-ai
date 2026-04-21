@@ -43,14 +43,14 @@ export class QueueService {
       `Scheduling optimization for ${workspaces.length} workspaces`,
     );
 
-    for (const workspace of workspaces) {
+    for (let i = 0; i < workspaces.length; i++) {
       await this.optimizationQueue.add(
         "run-optimization",
-        { workspaceId: workspace.id },
+        { workspaceId: workspaces[i].id },
         {
           // Stagger jobs 5 seconds apart to avoid hammering OpenAI API
-          delay: workspaces.indexOf(workspace) * 5000,
-          jobId: `optimization-${workspace.id}-${Date.now()}`,
+          delay: i * 5000,
+          jobId: `optimization-${workspaces[i].id}-${Date.now()}`,
         },
       );
     }
@@ -65,11 +65,11 @@ export class QueueService {
       where: { isOnboardingComplete: true },
     });
 
-    for (const workspace of workspaces) {
+    for (let i = 0; i < workspaces.length; i++) {
       await this.reportsQueue.add(
         "send-daily-report",
-        { workspaceId: workspace.id },
-        { delay: workspaces.indexOf(workspace) * 2000 },
+        { workspaceId: workspaces[i].id },
+        { delay: i * 2000 },
       );
     }
   }

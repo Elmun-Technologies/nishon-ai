@@ -51,7 +51,7 @@ import { cn } from '@/lib/utils'
 
 const STORAGE_KEY = 'adspectr-sidebar-mode'
 
-/** True if `pathname` is exactly `href` or a deeper segment under `href` (avoids `/auto` matching `/automation`). */
+/** True if `pathname` is exactly `href` or a deeper segment under `href`. */
 function navPathMatches(pathname: string, href: string): boolean {
   if (!pathname || !href) return false
   if (pathname === href) return true
@@ -117,24 +117,9 @@ const CATEGORIES: Array<{
     fallback: 'Marketplace',
     icon: ShoppingBag,
     items: [
-      {
-        href: '/marketplace/search',
-        labelKey: 'navigation.marketplaceSearch',
-        fallback: 'Browse specialists',
-        icon: Search,
-      },
-      {
-        href: '/marketplace/leaderboard',
-        labelKey: 'navigation.leaderboard',
-        fallback: 'Leaderboard',
-        icon: Trophy,
-      },
-      {
-        href: '/marketplace/portfolio',
-        labelKey: 'navigation.marketplacePortfolios',
-        fallback: 'Portfolios',
-        icon: Folder,
-      },
+      { href: '/marketplace/search', labelKey: 'navigation.marketplaceSearch', fallback: 'Browse specialists', icon: Search },
+      { href: '/marketplace/leaderboard', labelKey: 'navigation.leaderboard', fallback: 'Leaderboard', icon: Trophy },
+      { href: '/marketplace/portfolio', labelKey: 'navigation.marketplacePortfolios', fallback: 'Portfolios', icon: Folder },
       { href: '/my-portfolio', labelKey: 'navigation.portfolio', fallback: 'My portfolio', icon: UserCircle },
     ],
   },
@@ -189,22 +174,12 @@ function isBottomNavActive(pathname: string, href: string) {
 
 type SidebarMode = 'wide' | 'rail'
 
-function expandedForPath(pathname: string): Record<string, boolean> {
+function activeCategory(pathname: string): string | null {
   const href = activeNavHref(pathname)
   const match = href
     ? CATEGORIES.find((c) => c.items.some((i) => i.href === href))
     : CATEGORIES.find((c) => c.items.some((i) => navPathMatches(pathname, i.href)))
-  if (!match) {
-    return {
-      marketing: true,
-      analytics: false,
-      optimization: false,
-      marketplace: false,
-      tools: false,
-      creative: false,
-    }
-  }
-  return Object.fromEntries(CATEGORIES.map((c) => [c.id, c.id === match.id])) as Record<string, boolean>
+  return match?.id ?? null
 }
 
 export default function Sidebar() {
@@ -219,8 +194,11 @@ export default function Sidebar() {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
   const [openFlyout, setOpenFlyout] = useState<string | null>(null)
 
+  // Only open the active category — never collapse manually opened ones
   useLayoutEffect(() => {
-    setExpanded(expandedForPath(pathname))
+    const id = activeCategory(pathname)
+    if (!id) return
+    setExpanded((prev) => (prev[id] ? prev : { ...prev, [id]: true }))
   }, [pathname])
 
   useEffect(() => {
@@ -262,7 +240,7 @@ export default function Sidebar() {
   }
 
   const asideClass = cn(
-    'flex flex-col shrink-0 border-r border-white/[0.06] bg-[#121214] text-zinc-400 antialiased transition-[width] duration-200 ease-out',
+    'flex flex-col shrink-0 overflow-hidden border-r border-white/[0.06] bg-[#121214] text-zinc-400 antialiased transition-[width] duration-200 ease-out',
     mode === 'wide' ? 'w-56 sm:w-[240px]' : 'w-[60px]',
   )
 
@@ -270,7 +248,7 @@ export default function Sidebar() {
     <button
       type="button"
       onClick={() => setModePersist(rail ? 'wide' : 'rail')}
-      className="rounded-md p-1 text-zinc-500 transition hover:bg-white/[0.06] hover:text-zinc-200"
+      className="rounded-md p-1 text-zinc-500 transition-colors hover:bg-white/[0.06] hover:text-zinc-200"
       title={rail ? t('sidebar.expandWide', 'Expand sidebar') : t('sidebar.compactRail', 'Compact sidebar')}
       aria-label={rail ? t('sidebar.expandWide', 'Expand sidebar') : t('sidebar.compactRail', 'Compact sidebar')}
     >
@@ -345,7 +323,7 @@ export default function Sidebar() {
                     }}
                     title={t(cat.labelKey, cat.fallback)}
                     className={cn(
-                      'flex h-9 w-9 items-center justify-center rounded-lg transition-colors',
+                      'flex h-9 w-9 items-center justify-center rounded-lg transition-colors duration-150',
                       anyActive || flyoutOpen
                         ? 'bg-brand-lime/15 text-brand-lime ring-1 ring-brand-lime/25'
                         : 'text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200',
@@ -371,7 +349,7 @@ export default function Sidebar() {
                   title={t(item.labelKey, item.fallback)}
                   onClick={() => setOpenFlyout(null)}
                   className={cn(
-                    'flex h-10 w-10 items-center justify-center rounded-lg transition-colors',
+                    'flex h-10 w-10 items-center justify-center rounded-lg transition-colors duration-150',
                     isActive
                       ? 'bg-brand-mid/35 text-brand-white ring-1 ring-brand-lime/40'
                       : 'text-brand-lime/70 hover:bg-brand-mid/15 hover:text-brand-white',
@@ -391,16 +369,18 @@ export default function Sidebar() {
               type="button"
               onClick={handleLogout}
               title={t('common.logout', 'Logout')}
-              className="rounded-lg p-1.5 text-zinc-500 transition hover:bg-white/[0.06] hover:text-zinc-200"
+              className="rounded-lg p-1.5 text-zinc-500 transition-colors hover:bg-white/[0.06] hover:text-zinc-200"
             >
               <LogOut size={15} strokeWidth={1.5} />
             </button>
           </div>
         </aside>
 
+        {/* Flyout — fade + slide in from left */}
         {openFlyout && (
           <div
-            className="absolute left-[60px] top-0 z-[70] flex h-full min-h-0 w-[min(248px,calc(100vw-4.5rem))] flex-col border-r border-white/[0.08] bg-[#121214] py-2 shadow-2xl shadow-black/40"
+            key={openFlyout}
+            className="animate-in fade-in slide-in-from-left-2 absolute left-[60px] top-0 z-[70] flex h-full min-h-0 w-[min(248px,calc(100vw-4.5rem))] flex-col border-r border-white/[0.08] bg-[#121214] py-2 shadow-2xl shadow-black/40 duration-150"
             onPointerDown={(e) => e.stopPropagation()}
           >
             {CATEGORIES.filter((c) => c.id === openFlyout).map((cat) => (
@@ -418,7 +398,7 @@ export default function Sidebar() {
                         href={item.href}
                         onClick={() => setOpenFlyout(null)}
                         className={cn(
-                          'flex items-center gap-2 rounded-md px-2 py-1.5 text-[12px] leading-snug transition-colors',
+                          'flex items-center gap-2 rounded-md px-2 py-1.5 text-[12px] leading-snug transition-colors duration-150',
                           isActive
                             ? 'bg-brand-lime/10 font-medium text-brand-lime'
                             : 'text-zinc-500 hover:bg-white/[0.05] hover:text-zinc-200',
@@ -459,17 +439,18 @@ export default function Sidebar() {
 
       <nav className="flex-1 space-y-0.5 overflow-y-auto px-1.5 py-2">
         {CATEGORIES.map((cat) => {
-          const isOpen = expanded[cat.id]
+          const isOpen = !!expanded[cat.id]
           const Icon = cat.icon
           const anyActive = cat.items.some((i) => navPathMatches(pathname, i.href))
-          const showSub = Boolean(isOpen || anyActive)
+          // Show subcategories when explicitly opened OR when a child is active
+          const showSub = isOpen || anyActive
           return (
-            <div key={cat.id} className="rounded-lg">
+            <div key={cat.id}>
               <button
                 type="button"
                 onClick={() => toggle(cat.id)}
                 className={cn(
-                  'flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[13px] font-medium leading-snug transition-colors',
+                  'flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[13px] font-medium leading-snug transition-colors duration-150',
                   anyActive
                     ? 'bg-white/[0.06] text-brand-lime'
                     : 'text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-200',
@@ -481,39 +462,53 @@ export default function Sidebar() {
                   size={12}
                   strokeWidth={2}
                   className={cn(
-                    'shrink-0 text-zinc-600 transition-transform duration-200',
-                    showSub ? 'rotate-180' : '',
+                    'shrink-0 text-zinc-600 transition-transform duration-200 ease-out',
+                    showSub ? 'rotate-180' : 'rotate-0',
                     anyActive && 'text-brand-lime/70',
                   )}
                 />
               </button>
 
-              {showSub && (
-                <div className="mb-0.5 ml-2 mt-0.5 border-l border-zinc-700/80 pl-2">
-                  <div className="space-y-px py-0.5">
-                    {cat.items.map((item) => {
-                      const ItemIcon = item.icon
-                      const isActive = currentNavHref === item.href
-                      return (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          className={cn(
-                            'flex items-center gap-2 rounded-md py-1.5 pl-1.5 pr-1.5 text-[12px] leading-snug transition-colors',
-                            isActive
-                              ? 'bg-brand-lime/10 font-medium text-brand-lime'
-                              : 'text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-300',
-                          )}
-                        >
-                          <ItemIcon size={13} strokeWidth={1.5} className={cn('shrink-0', isActive ? 'text-brand-lime' : 'opacity-80')} />
-                          <span className="min-w-0 flex-1 truncate">{t(item.labelKey, item.fallback)}</span>
-                          {'badge' in item && item.badge && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand-lime" />}
-                        </Link>
-                      )
-                    })}
+              {/* Animated subcategory panel — CSS grid trick for height 0→auto */}
+              <div
+                className={cn(
+                  'grid transition-[grid-template-rows] duration-200 ease-out',
+                  showSub ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]',
+                )}
+              >
+                <div className="overflow-hidden">
+                  <div className="mb-0.5 ml-2 mt-0.5 border-l border-zinc-700/60 pl-2">
+                    <div className="space-y-px py-0.5">
+                      {cat.items.map((item) => {
+                        const ItemIcon = item.icon
+                        const isActive = currentNavHref === item.href
+                        return (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            className={cn(
+                              'flex items-center gap-2 rounded-md py-1.5 pl-1.5 pr-1.5 text-[12px] leading-snug transition-colors duration-150',
+                              isActive
+                                ? 'bg-brand-lime/10 font-medium text-brand-lime'
+                                : 'text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-300',
+                            )}
+                          >
+                            <ItemIcon
+                              size={13}
+                              strokeWidth={1.5}
+                              className={cn('shrink-0', isActive ? 'text-brand-lime' : 'opacity-80')}
+                            />
+                            <span className="min-w-0 flex-1 truncate">{t(item.labelKey, item.fallback)}</span>
+                            {'badge' in item && item.badge && (
+                              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand-lime" />
+                            )}
+                          </Link>
+                        )
+                      })}
+                    </div>
                   </div>
                 </div>
-              )}
+              </div>
             </div>
           )
         })}
@@ -530,7 +525,7 @@ export default function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex items-center gap-2 rounded-lg px-2 py-1.5 text-[12px] font-medium leading-snug transition-colors',
+                'flex items-center gap-2 rounded-lg px-2 py-1.5 text-[12px] font-medium leading-snug transition-colors duration-150',
                 isActive
                   ? 'bg-brand-lime/10 text-brand-lime'
                   : 'text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-200',

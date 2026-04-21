@@ -24,6 +24,7 @@ import { Workspace } from "../../workspaces/entities/workspace.entity";
 @Entity("meta_insights")
 @Index("IDX_meta_insights_workspace", ["workspaceId"])
 @Index("IDX_meta_insights_campaign_workspace", ["campaignId", "workspaceId"])
+@Index("IDX_meta_insights_workspace_date", ["workspaceId", "date"])
 export class MetaInsight {
   /**
    * Deterministic PK: `${campaignId}_${date}` (e.g. "120214192783690_2024-01-15").
