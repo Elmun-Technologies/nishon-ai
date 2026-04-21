@@ -194,11 +194,10 @@ export default function Sidebar() {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
   const [openFlyout, setOpenFlyout] = useState<string | null>(null)
 
-  // Only open the active category — never collapse manually opened ones
+  // Accordion: keep only the active category open on navigation
   useLayoutEffect(() => {
     const id = activeCategory(pathname)
-    if (!id) return
-    setExpanded((prev) => (prev[id] ? prev : { ...prev, [id]: true }))
+    setExpanded(Object.fromEntries(CATEGORIES.map((c) => [c.id, c.id === id])))
   }, [pathname])
 
   useEffect(() => {
@@ -230,8 +229,15 @@ export default function Sidebar() {
     return () => document.removeEventListener('pointerdown', onDocPointerDown)
   }, [mode, openFlyout])
 
+  // Accordion: opening one category closes all others
   function toggle(id: string) {
-    setExpanded((p) => ({ ...p, [id]: !p[id] }))
+    setExpanded((p) => {
+      const opening = !p[id]
+      if (opening) {
+        return Object.fromEntries(CATEGORIES.map((c) => [c.id, c.id === id]))
+      }
+      return { ...p, [id]: false }
+    })
   }
 
   function handleLogout() {
