@@ -11,7 +11,7 @@ import { MetaConnector } from "../../platforms/connectors/meta.connector";
 import { GoogleConnector } from "../../platforms/connectors/google.connector";
 import { TiktokConnector } from "../../platforms/connectors/tiktok.connector";
 import { YandexConnector } from "../../platforms/connectors/yandex.connector";
-import { Platform, CampaignStatus } from "@adspectr/shared";
+import { Platform } from "@adspectr/shared";
 import * as crypto from "crypto";
 import { ConfigService } from "@nestjs/config";
 
@@ -19,6 +19,20 @@ interface CampaignSyncJobData {
   workspaceId: string;
   platform: string;
   campaignId?: string;
+}
+
+interface MetricPayload {
+  adId: string;
+  recordedAt: Date;
+  impressions: number;
+  clicks: number;
+  spend: number;
+  conversions: number;
+  revenue: number;
+  ctr: number;
+  cpa: number;
+  roas: number;
+  cpm: number;
 }
 
 /**
@@ -69,7 +83,7 @@ export class CampaignSyncProcessor {
     }
 
     const accessToken = this.decrypt(account.accessToken);
-    const since = this.daysAgo(2); // Sync last 2 days (yesterday + today)
+    const since = this.daysAgo(2);
     const until = this.daysAgo(0);
 
     try {
@@ -89,7 +103,7 @@ export class CampaignSyncProcessor {
       this.logger.error(
         `Sync failed for ${platform} workspace ${workspaceId}: ${error.message}`,
       );
-      throw error; // Let Bull retry according to job options
+      throw error;
     }
   }
 
@@ -137,45 +151,53 @@ export class CampaignSyncProcessor {
         since,
         until,
         level: campaignId ? "campaign" : "ad",
-        fields: ["impressions", "clicks", "spend", "actions", "ctr", "cpm", "reach"],
+        fields: ["impressions", "clicks", "spend", "actions", "action_values", "ctr", "cpm", "reach", "ad_id"],
       },
     );
 
-    // Find campaigns in our DB that belong to this workspace and have an externalId
+    // Load all ads for this workspace indexed by their externalId for O(1) lookup
     const campaigns = await this.campaignRepo.find({
       where: { workspaceId: account.workspaceId, platform: Platform.META },
       relations: ["adSets", "adSets.ads"],
     });
 
-    for (const insight of insights) {
-      // Find matching ads in our DB to associate metrics
-      for (const campaign of campaigns) {
-        for (const adSet of campaign.adSets ?? []) {
-          for (const ad of adSet.ads ?? []) {
-            if (!ad.id) continue;
-
-            const actions = insight.actions ?? [];
-            const conversions = actions
-              .filter((a) => a.action_type === "offsite_conversion.fb_pixel_purchase")
-              .reduce((sum, a) => sum + parseInt(a.value || "0"), 0);
-
-            // Extract revenue from action_values (purchase conversion value)
-            const actionValues = insight.action_values ?? [];
-            const revenue = actionValues
-              .filter((a) => a.action_type === "offsite_conversion.fb_pixel_purchase")
-              .reduce((sum, a) => sum + parseFloat(a.value || "0"), 0);
-
-            await this.upsertMetric(ad.id, insight.date_start, {
-              impressions: insight.impressions,
-              clicks: insight.clicks,
-              spend: insight.spend,
-              conversions,
-              revenue,
-            });
+    const adByExternalId = new Map<string, string>();
+    for (const campaign of campaigns) {
+      for (const adSet of campaign.adSets ?? []) {
+        for (const ad of adSet.ads ?? []) {
+          if (ad.externalId && ad.id) {
+            adByExternalId.set(ad.externalId, ad.id);
           }
         }
       }
     }
+
+    const metrics: MetricPayload[] = [];
+
+    for (const insight of insights) {
+      const adId = adByExternalId.get(insight.ad_id);
+      if (!adId) continue;
+
+      const actions = insight.actions ?? [];
+      const conversions = actions
+        .filter((a: any) => a.action_type === "offsite_conversion.fb_pixel_purchase")
+        .reduce((sum: number, a: any) => sum + parseInt(a.value || "0"), 0);
+
+      const actionValues = insight.action_values ?? [];
+      const revenue = actionValues
+        .filter((a: any) => a.action_type === "offsite_conversion.fb_pixel_purchase")
+        .reduce((sum: number, a: any) => sum + parseFloat(a.value || "0"), 0);
+
+      metrics.push(this.buildMetric(adId, insight.date_start, {
+        impressions: insight.impressions,
+        clicks: insight.clicks,
+        spend: insight.spend,
+        conversions,
+        revenue,
+      }));
+    }
+
+    await this.batchUpsertMetrics(metrics);
   }
 
   private async syncGoogle(
@@ -186,13 +208,11 @@ export class CampaignSyncProcessor {
     until: string,
     campaignId?: string,
   ): Promise<void> {
-    // Refresh token if needed
     let token = accessToken;
     if (account.tokenExpiresAt && new Date() >= account.tokenExpiresAt && refreshToken) {
       try {
         const refreshed = await this.googleConnector.refreshAccessToken(refreshToken);
         token = refreshed.accessToken;
-        // Update the token in DB
         await this.accountRepo.update(account.id, {
           accessToken: this.encrypt(token),
           tokenExpiresAt: refreshed.expiresAt,
@@ -215,22 +235,27 @@ export class CampaignSyncProcessor {
       relations: ["adSets", "adSets.ads"],
     });
 
+    const campaignMap = new Map(campaigns.map((c) => [c.externalId, c]));
+
+    const metrics: MetricPayload[] = [];
     for (const row of rows) {
-      const matched = campaigns.find((c) => c.externalId === row.campaignId);
+      const matched = campaignMap.get(row.campaignId);
       if (!matched) continue;
 
       for (const adSet of matched.adSets ?? []) {
         for (const ad of adSet.ads ?? []) {
-          await this.upsertMetric(ad.id, row.date, {
+          metrics.push(this.buildMetric(ad.id, row.date, {
             impressions: row.impressions,
             clicks: row.clicks,
             spend: row.costMicros / 1_000_000,
             conversions: row.conversions,
             revenue: row.conversionValue ?? 0,
-          });
+          }));
         }
       }
     }
+
+    await this.batchUpsertMetrics(metrics);
   }
 
   private async syncTiktok(
@@ -254,24 +279,27 @@ export class CampaignSyncProcessor {
       relations: ["adSets", "adSets.ads"],
     });
 
+    const campaignMap = new Map(campaigns.map((c) => [c.externalId, c]));
+
+    const metrics: MetricPayload[] = [];
     for (const row of rows) {
-      const matched = campaigns.find((c) => c.externalId === row.campaignId);
+      const matched = campaignMap.get(row.campaignId);
       if (!matched) continue;
 
       for (const adSet of matched.adSets ?? []) {
         for (const ad of adSet.ads ?? []) {
-          await this.upsertMetric(ad.id, row.date, {
+          metrics.push(this.buildMetric(ad.id, row.date, {
             impressions: row.impressions,
             clicks: row.clicks,
             spend: row.spend,
             conversions: row.conversions,
-            // TikTok Ads API does not expose conversion_value in standard reporting;
-            // revenue tracking requires TikTok Pixel events or offline conversion upload
             revenue: 0,
-          });
+          }));
         }
       }
     }
+
+    await this.batchUpsertMetrics(metrics);
   }
 
   private async syncYandex(
@@ -292,90 +320,73 @@ export class CampaignSyncProcessor {
       relations: ["adSets", "adSets.ads"],
     });
 
+    const campaignMap = new Map(campaigns.map((c) => [c.externalId, c]));
+
+    const metrics: MetricPayload[] = [];
     for (const row of rows) {
-      const matched = campaigns.find((c) => c.externalId === row.campaignId);
+      const matched = campaignMap.get(row.campaignId);
       if (!matched) continue;
 
       for (const adSet of matched.adSets ?? []) {
         for (const ad of adSet.ads ?? []) {
-          await this.upsertMetric(ad.id, row.date, {
+          metrics.push(this.buildMetric(ad.id, row.date, {
             impressions: row.impressions,
             clicks: row.clicks,
             spend: row.cost,
             conversions: row.conversions,
-            // Yandex Direct API returns conversions via goals but does not provide
-            // conversion value in standard stat reports; needs Yandex.Metrika integration
             revenue: 0,
-          });
+          }));
         }
       }
     }
+
+    await this.batchUpsertMetrics(metrics);
   }
 
   // ─── HELPERS ──────────────────────────────────────────────────────────────
 
-  /**
-   * Upsert a daily performance metric row for an ad.
-   * If a metric row already exists for this ad/date, update it.
-   * Otherwise insert a new row.
-   */
-  private async upsertMetric(
+  private buildMetric(
     adId: string,
     date: string,
-    data: {
-      impressions: number;
-      clicks: number;
-      spend: number;
-      conversions: number;
-      revenue: number;
-    },
-  ): Promise<void> {
-    const existing = await this.metricRepo.findOne({
-      where: { adId, recordedAt: new Date(date) as any },
-    });
+    data: { impressions: number; clicks: number; spend: number; conversions: number; revenue: number },
+  ): MetricPayload {
+    const ctr = data.impressions > 0 ? (data.clicks / data.impressions) * 100 : 0;
+    const cpa = data.conversions > 0 ? data.spend / data.conversions : 0;
+    const roas = data.spend > 0 ? data.revenue / data.spend : 0;
+    const cpm = data.impressions > 0 ? (data.spend / data.impressions) * 1000 : 0;
 
-    const ctr = data.impressions > 0
-      ? (data.clicks / data.impressions) * 100
-      : 0;
-    const cpa = data.conversions > 0
-      ? data.spend / data.conversions
-      : 0;
-    const roas = data.spend > 0
-      ? data.revenue / data.spend
-      : 0;
-    const cpm = data.impressions > 0
-      ? (data.spend / data.impressions) * 1000
-      : 0;
+    return {
+      adId,
+      recordedAt: new Date(date),
+      impressions: data.impressions,
+      clicks: data.clicks,
+      spend: data.spend,
+      conversions: data.conversions,
+      revenue: data.revenue,
+      ctr,
+      cpa,
+      roas,
+      cpm,
+    };
+  }
 
-    if (existing) {
-      await this.metricRepo.update(existing.id, {
-        impressions: data.impressions,
-        clicks: data.clicks,
-        spend: data.spend,
-        conversions: data.conversions,
-        revenue: data.revenue,
-        ctr,
-        cpa,
-        roas,
-        cpm,
-      });
-    } else {
-      await this.metricRepo.save(
-        this.metricRepo.create({
-          adId,
-          recordedAt: new Date(date) as any,
-          impressions: data.impressions,
-          clicks: data.clicks,
-          spend: data.spend,
-          conversions: data.conversions,
-          revenue: data.revenue,
-          ctr,
-          cpa,
-          roas,
-          cpm,
-        }),
-      );
-    }
+  /**
+   * Batch upsert all metrics in a single query using ON CONFLICT DO UPDATE.
+   * Relies on the unique index IDX_performance_metric_ad_date on (adId, recordedAt).
+   */
+  private async batchUpsertMetrics(metrics: MetricPayload[]): Promise<void> {
+    if (!metrics.length) return;
+
+    await this.metricRepo
+      .createQueryBuilder()
+      .insert()
+      .into(PerformanceMetric)
+      .values(metrics)
+      .orUpdate(
+        ["impressions", "clicks", "spend", "conversions", "revenue", "ctr", "cpa", "roas", "cpm"],
+        ["ad_id", "recorded_at"],
+      )
+      .execute();
   }
 
   private daysAgo(n: number): string {

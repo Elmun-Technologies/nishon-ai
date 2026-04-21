@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   ManyToOne,
   JoinColumn,
+  Index,
 } from "typeorm";
 import { Ad } from "../../ads/entities/ad.entity";
 
@@ -15,6 +16,7 @@ import { Ad } from "../../ads/entities/ad.entity";
  * even though they can be derived from other fields (to avoid heavy computation on read).
  */
 @Entity("performance_metrics")
+@Index("IDX_performance_metric_ad_date", ["adId", "recordedAt"], { unique: true })
 export class PerformanceMetric {
   @PrimaryGeneratedColumn("uuid")
   id: string;
