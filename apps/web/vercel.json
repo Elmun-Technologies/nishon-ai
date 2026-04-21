@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
+  "installCommand": "cd \"$(git rev-parse --show-toplevel 2>/dev/null || echo ../..)\" && pnpm install --frozen-lockfile",
   "buildCommand": "pnpm run build",
   "env": {
     "NEXT_TELEMETRY_DISABLED": "1"

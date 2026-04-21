@@ -238,8 +238,8 @@ importers:
   apps/web:
     dependencies:
       '@adspectr/creative-hub-core':
-        specifier: workspace:*
-        version: link:../../packages/creative-hub-core
+        specifier: file:../../packages/creative-hub-core
+        version: file:packages/creative-hub-core
       '@hookform/resolvers':
         specifier: ^3.3.4
         version: 3.10.0(react-hook-form@7.71.2)
@@ -11685,4 +11685,9 @@ packages:
       '@types/react': 18.2.48
       react: 18.2.0
       use-sync-external-store: 1.6.0(react@18.2.0)
+    dev: false
+
+  file:packages/creative-hub-core:
+    resolution: {directory: packages/creative-hub-core, type: directory}
+    name: '@adspectr/creative-hub-core'
     dev: false
