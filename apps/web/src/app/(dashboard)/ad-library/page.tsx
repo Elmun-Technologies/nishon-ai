@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Binoculars, TrendingUp } from 'lucide-react'
+import { ScanSearch, TrendingUp } from 'lucide-react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { useI18n } from '@/i18n/use-i18n'
 import { PageHeader } from '@/components/ui'
@@ -139,7 +139,7 @@ export default function AdLibraryPage() {
 
       <section>
         <div className="flex items-center gap-2 mb-3">
-          <Binoculars className="w-5 h-5 text-violet-400" aria-hidden />
+          <ScanSearch className="w-5 h-5 text-violet-400" aria-hidden />
           <h2 className="text-sm font-semibold text-text-primary">
             {t('adLibrary.top30', 'Top 30 reklama beruvchi')}
           </h2>

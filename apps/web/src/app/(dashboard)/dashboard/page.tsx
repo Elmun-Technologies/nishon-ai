@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
   BarChart3,
-  Binoculars,
+  ScanSearch,
   BookHeart,
   FileText,
   LineChart as LineChartIcon,
@@ -615,7 +615,7 @@ function QuickActionsBlock({ t }: { t: (k: string, d: string) => string }) {
   const items = [
     { href: '/launch', label: t('dashboard.dashboardHome.actionLaunch', '🚀 Yangi kampaniya'), icon: Rocket },
     { href: '/reports', label: t('dashboard.dashboardHome.actionReport', '📊 Hisobot yaratish'), icon: FileText },
-    { href: '/ad-library', label: t('dashboard.dashboardHome.actionIdea', '💡 Idea olish'), icon: Binoculars },
+    { href: '/ad-library', label: t('dashboard.dashboardHome.actionIdea', '💡 Idea olish'), icon: ScanSearch },
     { href: '/audiences/story', label: t('dashboard.dashboardHome.actionAudience', '👥 Auditoriya'), icon: BookHeart },
   ]
   return (
