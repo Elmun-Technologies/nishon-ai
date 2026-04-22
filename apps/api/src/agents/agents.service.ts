@@ -7,7 +7,7 @@ import {
   OnModuleInit,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { QueryFailedError, Repository } from "typeorm";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { AgentProfile } from "./entities/agent-profile.entity";
 import { ServiceEngagement } from "./entities/service-engagement.entity";
@@ -18,6 +18,14 @@ import { getLimits } from "../config/plan-limits.config";
 
 function slugify(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
+/** Postgres 42P01 — relation does not exist (e.g. migrations not applied). */
+function isMissingTableError(err: unknown, tableName: string): boolean {
+  const e = err as QueryFailedError & { driverError?: { code?: string; message?: string } };
+  const code = e?.driverError?.code ?? (e as { code?: string }).code;
+  const message = String(e?.driverError?.message ?? (err instanceof Error ? err.message : ""));
+  return code === "42P01" && message.includes(tableName);
 }
 
 /** Default AdSpectr-owned AI agents seeded on startup */
@@ -135,7 +143,18 @@ export class AgentsService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    await this.seedAdSpectrAgents();
+    try {
+      await this.seedAdSpectrAgents();
+    } catch (err) {
+      if (isMissingTableError(err, "agent_profiles")) {
+        this.logger.warn(
+          'Skipped AdSpectr AI agent seed: table "agent_profiles" is missing (run DB migrations, then restart). ' +
+            "Example: cd apps/api && npx typeorm migration:run -d dist/database/database.providers",
+        );
+        return;
+      }
+      throw err;
+    }
   }
 
   /** Create AdSpectr's default AI agents if they don't exist */
