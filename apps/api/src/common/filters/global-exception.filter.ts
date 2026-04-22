@@ -36,13 +36,20 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const requestId = request.requestId || this.requestContext.getRequestId();
 
     if (!isHttpException || status >= 500) {
+      const err = exception instanceof Error ? exception : undefined;
+      const driverMsg =
+        err && "driverError" in err
+          ? String((err as { driverError?: { message?: string } }).driverError?.message ?? "")
+          : "";
       this.logger.error({
         message: "Unhandled exception",
         method: request.method,
         path: request.url,
         statusCode: status,
         requestId,
-        stack: exception instanceof Error ? exception.stack : undefined,
+        errorMessage: err?.message,
+        driverErrorMessage: driverMsg || undefined,
+        stack: err?.stack,
       });
     }
 
