@@ -9,7 +9,8 @@ services:
       pnpm --filter @adspectr/shared build &&
       pnpm --filter @adspectr/ai-sdk build &&
       NODE_OPTIONS='--max-old-space-size=400' pnpm --filter api build
-    startCommand: pnpm --filter api start:prod
+    # Run pending DB migrations on every deploy, then start the API.
+    startCommand: pnpm --filter api run start:prod:with-migrations
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV
