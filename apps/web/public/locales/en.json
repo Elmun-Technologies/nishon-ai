@@ -84,7 +84,9 @@
     "simulation": "Simulation",
     "metaAudit": "Meta Audit",
     "team": "Team",
-    "billing": "Billing"
+    "billing": "Billing",
+    "topAds": "Top Ads",
+    "triggersets": "Triggersets"
   },
   "landing": {
     "hero": {
@@ -2542,5 +2544,25 @@
     "etaNote": "Usually 20–60 seconds if images are attached (vision pass + copy).",
     "regenerateHint": "Last template & brief are reused for “Regenerate” until you change them here again.",
     "selectTemplate": "Select a template above to continue."
+  },
+  "topAds": {
+    "title": "Top Ads",
+    "subtitle": "Best performing ads ranked by spend and engagement",
+    "demoNotice": "Showing demo data. Connect your Meta account to see real top ads.",
+    "totalSpend": "Total Spend",
+    "totalClicks": "Total Clicks",
+    "totalImpressions": "Impressions",
+    "avgCtr": "Avg CTR",
+    "searchPlaceholder": "Search ad name…",
+    "show": "Show:",
+    "colName": "Ad name",
+    "colStatus": "Status",
+    "colSpend": "Spend",
+    "colClicks": "Clicks",
+    "colImpressions": "Impressions",
+    "emptyTitle": "No ads found",
+    "emptyDesc": "Try adjusting your search or connect a Meta ad account.",
+    "footerNote": "Data sourced from connected Meta Ad accounts via the Meta Marketing API.",
+    "fullReport": "Full report"
   }
 }

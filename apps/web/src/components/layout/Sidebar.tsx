@@ -45,6 +45,7 @@ import {
   BookHeart,
   CreditCard,
   UserPlus,
+  Star,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -96,6 +97,7 @@ const CATEGORIES: Array<{
       { href: '/meta-audit', labelKey: 'navigation.metaAudit', fallback: 'Meta Audit', icon: Compass },
       { href: '/ai-decisions', labelKey: 'navigation.aiDecisions', fallback: 'AI Decisions', icon: Brain, badge: true },
       { href: '/performance', labelKey: 'navigation.performance', fallback: 'Performance', icon: TrendingUp },
+      { href: '/top-ads', labelKey: 'navigation.topAds', fallback: 'Top Ads', icon: Star },
     ],
   },
   {
@@ -108,6 +110,7 @@ const CATEGORIES: Array<{
       { href: '/auto-optimization', labelKey: 'navigation.autoOptimization', fallback: 'Auto Optimization', icon: Settings2 },
       { href: '/roi-calculator', labelKey: 'navigation.roi', fallback: 'ROI & outcomes', icon: BarChart3 },
       { href: '/automation', labelKey: 'navigation.automation', fallback: 'Automation', icon: Workflow },
+      { href: '/triggersets', labelKey: 'navigation.triggersets', fallback: 'Triggersets', icon: Zap },
     ],
   },
   {
@@ -116,7 +119,7 @@ const CATEGORIES: Array<{
     fallback: 'Marketplace',
     icon: ShoppingBag,
     items: [
-      { href: '/marketplace/search', labelKey: 'navigation.marketplaceSearch', fallback: 'Browse specialists', icon: Search },
+      { href: '/marketplace', labelKey: 'navigation.marketplaceSearch', fallback: 'Browse specialists', icon: Search },
       { href: '/marketplace/leaderboard', labelKey: 'navigation.leaderboard', fallback: 'Leaderboard', icon: Trophy },
       { href: '/marketplace/portfolio', labelKey: 'navigation.marketplacePortfolios', fallback: 'Portfolios', icon: Folder },
       { href: '/my-portfolio', labelKey: 'navigation.portfolio', fallback: 'My portfolio', icon: UserCircle },
