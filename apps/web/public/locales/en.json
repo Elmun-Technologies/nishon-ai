@@ -420,7 +420,19 @@
       "trialTitle": "Your 7-day trial has ended",
       "trialBody": "Subscribe to keep full access to campaigns, reporting, automation, and connected ad accounts on the FREE tier.",
       "trialCta": "View plans & pay"
-    }
+    },
+    "filter1d": "Today",
+    "filter7d": "7 days",
+    "filter14d": "14 days",
+    "filter30d": "30 days",
+    "filter90d": "90 days",
+    "period": "Period:",
+    "kpiClicks": "Clicks",
+    "kpiImpressions": "Impressions: ",
+    "chartHint": "Actual spend and estimated revenue (Spend × ROAS)",
+    "viewAll": "View all →",
+    "topAdsTitle": "Top Ads",
+    "refresh": "Refresh"
   },
   "metaAudit": {
     "title": "360° Meta Audit",
