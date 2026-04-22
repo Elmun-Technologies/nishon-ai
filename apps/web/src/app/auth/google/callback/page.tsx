@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { auth, workspaces as workspacesApi } from '@/lib/api-client'
+import { env } from '@/lib/env'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { setRefreshToken } from '@/lib/auth-storage'
 
@@ -28,10 +29,23 @@ function GoogleOAuthCallbackInner() {
       next && next.startsWith('/') && !next.startsWith('//') ? next : null
 
     if (!accessToken || !refreshToken) {
-      setError(
-        'Tokenlar URLda yo‘q. Agar sahifada API JSON (500) ko‘rsangiz, muammo serverda — ' +
-          'Render log va JWT / DB migratsiyasini tekshiring.',
-      )
+      const googleCode = searchParams.get('code')
+      const apiCallback = env.apiBaseUrl
+        ? `${env.apiBaseUrl.replace(/\/$/, '')}/auth/google/callback`
+        : 'https://<API-domeningiz>/auth/google/callback'
+
+      if (googleCode) {
+        setError(
+          'URLda Google code bor, lekin accessToken / refreshToken yo‘q. Odatda Google Cloud → OAuth → ' +
+            'Authorized redirect URIs noto‘g‘ri: u yerga frontend (adspectr.com) emas, faqat API callback ' +
+            `kirishi kerak, masalan: ${apiCallback} — tuzatgach loginni qayta urinib ko‘ring.`,
+        )
+      } else {
+        setError(
+          'Tokenlar URLda yo‘q (sahifani to‘g‘ridan-to‘g‘ri ochgansiz yoki API redirect qilmagan). ' +
+            'Agar avval API sahifasida JSON 500 ko‘rgan bo‘lsangiz — Render log va DB migratsiyasini tekshiring.',
+        )
+      }
       return
     }
 
