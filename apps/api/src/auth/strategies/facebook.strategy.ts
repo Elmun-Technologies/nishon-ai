@@ -26,6 +26,7 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
     super({
       clientID,
       clientSecret,
+      // Default host is for local dev only; production must set API_BASE_URL (e.g. https://api.adspectr.com).
       callbackURL: config.get<string>('FACEBOOK_CALLBACK_URL') ||
         `${config.get<string>('API_BASE_URL', 'http://localhost:3001')}/auth/facebook/callback`,
       scope:        ['email', 'public_profile'],
