@@ -174,7 +174,11 @@ export class AuthService {
           googleId: profile.googleId,
           picture:  profile.picture ?? user.picture,
         });
-        user.googleId = profile.googleId;
+        const reloaded = await this.userRepo.findOne({ where: { id: user.id } });
+        if (!reloaded) {
+          throw new UnauthorizedException("User disappeared after Google link update");
+        }
+        user = reloaded;
       } else {
         // Create a brand-new user
         user = await this.userRepo.save(
@@ -255,8 +259,13 @@ export class AuthService {
       expiresIn: this.config.get("JWT_EXPIRES_IN", "15m"),
     });
 
+    const refreshSecret = this.config.get<string>("JWT_REFRESH_SECRET");
+    if (!refreshSecret?.trim()) {
+      throw new Error("JWT_REFRESH_SECRET is not set");
+    }
+
     const refreshToken = this.jwtService.sign(payload, {
-      secret: this.config.get<string>("JWT_REFRESH_SECRET"),
+      secret: refreshSecret,
       expiresIn: this.config.get("JWT_REFRESH_EXPIRES_IN", "7d"),
     });
 

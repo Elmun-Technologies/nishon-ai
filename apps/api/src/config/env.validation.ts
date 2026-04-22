@@ -3,6 +3,7 @@ type EnvRecord = Record<string, string | undefined>;
 const REQUIRED_ENV_VARS = [
   "DATABASE_URL",
   "JWT_SECRET",
+  "JWT_REFRESH_SECRET",
   "ENCRYPTION_KEY",
 ] as const;
 
