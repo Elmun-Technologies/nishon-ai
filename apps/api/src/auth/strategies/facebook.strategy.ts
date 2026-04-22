@@ -10,9 +10,22 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
     config: ConfigService,
     private readonly authService: AuthService,
   ) {
+    // Same Meta developer app: Marketing API uses META_*; social login historically used FACEBOOK_*.
+    // Allow one pair in env — fall back so operators don't duplicate App ID / Secret.
+    const clientID =
+      config.get<string>('FACEBOOK_APP_ID', '').trim() ||
+      config.get<string>('META_APP_ID', '').trim()
+    const clientSecret =
+      config.get<string>('FACEBOOK_APP_SECRET', '').trim() ||
+      config.get<string>('META_APP_SECRET', '').trim()
+    if (!clientID || !clientSecret) {
+      throw new Error(
+        'Facebook login requires FACEBOOK_APP_ID and FACEBOOK_APP_SECRET, or the same values as META_APP_ID and META_APP_SECRET.',
+      )
+    }
     super({
-      clientID:     config.getOrThrow<string>('FACEBOOK_APP_ID'),
-      clientSecret: config.getOrThrow<string>('FACEBOOK_APP_SECRET'),
+      clientID,
+      clientSecret,
       callbackURL: config.get<string>('FACEBOOK_CALLBACK_URL') ||
         `${config.get<string>('API_BASE_URL', 'http://localhost:3001')}/auth/facebook/callback`,
       scope:        ['email', 'public_profile'],
