@@ -33,10 +33,12 @@ import { AgentCaseStudy } from "./entities/agent-case-study.entity";
 import { Workspace } from "../workspaces/entities/workspace.entity";
 import { User } from "../users/entities/user.entity";
 import { ConnectedAccount } from "../platforms/entities/connected-account.entity";
+import { MetaModule } from "../meta/meta.module";
 
 @Module({
   imports: [
     HttpModule,
+    MetaModule,
     TypeOrmModule.forFeature([
       AgentProfile,
       ServiceEngagement,
