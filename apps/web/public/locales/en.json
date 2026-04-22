@@ -82,7 +82,9 @@
     "mediaLibrary": "Media Library",
     "workspace": "Workspace",
     "simulation": "Simulation",
-    "metaAudit": "Meta Audit"
+    "metaAudit": "Meta Audit",
+    "team": "Team",
+    "billing": "Billing"
   },
   "landing": {
     "hero": {

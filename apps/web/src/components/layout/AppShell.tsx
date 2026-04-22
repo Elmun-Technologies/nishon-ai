@@ -32,7 +32,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Header />
         <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
-            <main
+          <main
             className={cn(
               'flex-1 overflow-y-auto p-4 md:p-5 lg:p-6',
               showBlur && 'pointer-events-none select-none'
