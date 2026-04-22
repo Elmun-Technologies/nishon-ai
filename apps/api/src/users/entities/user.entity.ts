@@ -52,33 +52,33 @@ export class User {
   @Column({ type: "timestamp", nullable: true, name: "trial_ends_at" })
   trialEndsAt: Date | null;
 
-  @Column({ default: false })
+  @Column({ default: false, name: "is_email_verified" })
   isEmailVerified: boolean;
 
   /** Platform administrator — grants access to admin-only endpoints */
-  @Column({ default: false })
+  @Column({ default: false, name: "is_admin" })
   isAdmin: boolean;
 
-  @Column({ type: "text", nullable: true, select: false })
+  @Column({ type: "text", nullable: true, select: false, name: "refresh_token" })
   // Stores hashed refresh token in DB for invalidation on logout
   refreshToken: string | null;
 
   /** Google OAuth subject ID — null for email/password users */
-  @Column({ length: 255, nullable: true, unique: true })
+  @Column({ length: 255, nullable: true, unique: true, name: "google_id" })
   googleId: string | null;
 
   /** Facebook OAuth user ID */
-  @Column({ length: 255, nullable: true, unique: true })
+  @Column({ length: 255, nullable: true, unique: true, name: "facebook_id" })
   facebookId: string | null;
 
   /** Profile picture URL from OAuth provider */
   @Column({ type: "text", nullable: true })
   picture: string | null;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: "updated_at" })
   updatedAt: Date;
 
   @OneToMany(() => Workspace, (workspace) => workspace.user, { cascade: true })
