@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState, useTransition } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
@@ -47,6 +47,8 @@ import { FIRST_CAMPAIGN_BANNER_KEY } from '@/lib/onboarding-v2'
 import { ChatWidget } from '@/components/ui/ChatWidget'
 
 export const dynamic = 'force-dynamic'
+
+const PRESET_DAYS: Record<string, number> = { '1d': 1, '7d': 7, '14d': 14, '30d': 30, '90d': 90 }
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -254,9 +256,9 @@ export default function DashboardPage() {
 
   // ── Filters ──────────────────────────────────────────────────────────────
   const [datePreset, setDatePreset] = useState<DatePreset>('7d')
+  const [, startFilterTransition] = useTransition()
 
-  const presetDays: Record<DatePreset, number> = { '1d': 1, '7d': 7, '14d': 14, '30d': 30, '90d': 90 }
-  const days = presetDays[datePreset]
+  const days = PRESET_DAYS[datePreset]
 
   // ── Boot ──────────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -267,12 +269,16 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!currentWorkspace?.id) return
+    let cancelled = false
     fetch('/api/crm/summary')
       .then((r) => r.json() as Promise<CrmSummaryPayload>)
-      .then((d) => { if (d.ok) setCrmSummary(d) })
+      .then((d) => { if (!cancelled && d.ok) setCrmSummary(d) })
       .catch(() => {})
+    return () => { cancelled = true }
   }, [currentWorkspace?.id])
 
+  // Effect 1: workspace performance summary — only re-runs when workspace changes,
+  // NOT when the date filter changes (ROAS/spend are workspace-level blended metrics).
   const loadPerformance = useCallback(() => {
     if (!currentWorkspace?.id) return
     workspacesApi
@@ -286,16 +292,31 @@ export default function DashboardPage() {
     if (!currentWorkspace?.id) { setLoadingPerf(false); return }
     setLoadingPerf(true)
     loadPerformance()
+  }, [currentWorkspace?.id, loadPerformance])
+
+  // Effect 2: date-sensitive reporting — cancels in-flight request when days changes.
+  useEffect(() => {
+    if (!currentWorkspace?.id) return
+    let cancelled = false
     metaApi.reporting(currentWorkspace.id, days)
       .then((res) => {
+        if (cancelled) return
         const data = res.data as { accounts?: Array<{ campaigns?: ReportCampaign[] }> }
         setReportCampaigns((data?.accounts ?? []).flatMap((a) => a.campaigns ?? []))
       })
-      .catch(() => setReportCampaigns([]))
+      .catch(() => { if (!cancelled) setReportCampaigns([]) })
+    return () => { cancelled = true }
+  }, [currentWorkspace?.id, days])
+
+  // Effect 3: top ads — workspace-level, no date dependency.
+  useEffect(() => {
+    if (!currentWorkspace?.id) return
+    let cancelled = false
     metaApi.topAds(currentWorkspace.id, 5)
-      .then((res) => setTopAds((res.data as TopAd[]) ?? []))
-      .catch(() => setTopAds([]))
-  }, [currentWorkspace?.id, days, loadPerformance])
+      .then((res) => { if (!cancelled) setTopAds((res.data as TopAd[]) ?? []) })
+      .catch(() => { if (!cancelled) setTopAds([]) })
+    return () => { cancelled = true }
+  }, [currentWorkspace?.id])
 
   useRealtimeRefresh(currentWorkspace?.id, ['meta_synced', 'optimization_done'], loadPerformance)
 
@@ -479,7 +500,7 @@ export default function DashboardPage() {
         {DATE_PRESETS.map((p) => (
           <button
             key={p.id}
-            onClick={() => setDatePreset(p.id)}
+            onClick={() => startFilterTransition(() => setDatePreset(p.id))}
             className={cn(
               'rounded-lg px-3 py-1 text-xs font-medium transition-all',
               datePreset === p.id
