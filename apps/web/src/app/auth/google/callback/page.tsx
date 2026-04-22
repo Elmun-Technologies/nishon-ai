@@ -73,7 +73,8 @@ function GoogleOAuthCallbackInner() {
 
   if (error) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-surface-2 px-4 text-center text-text-primary">
+      <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-surface-2 px-4 text-center text-text-primary">
+        <h1 className="text-lg font-semibold text-text-primary">Kirishda xatolik</h1>
         <p className="max-w-md text-sm text-text-secondary">{error}</p>
         <Link href="/login" className="text-sm font-medium text-accent underline">
           Login sahifasiga qaytish
@@ -83,8 +84,9 @@ function GoogleOAuthCallbackInner() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-surface-2 text-text-secondary">
-      <p className="text-sm">Google orqali kirish…</p>
+    <main className="flex min-h-screen flex-col items-center justify-center gap-3 bg-surface-2 px-4 text-text-secondary">
+      <h1 className="text-base font-semibold text-text-primary">AdSpectr</h1>
+      <p className="text-sm">Google orqali kirish yakunlanmoqda…</p>
     </main>
   )
 }
@@ -93,7 +95,8 @@ export default function GoogleOAuthCallbackPage() {
   return (
     <Suspense
       fallback={
-        <main className="flex min-h-screen items-center justify-center bg-surface-2 text-text-secondary">
+        <main className="flex min-h-screen flex-col items-center justify-center gap-3 bg-surface-2 px-4 text-text-secondary">
+          <h1 className="text-base font-semibold text-text-primary">AdSpectr</h1>
           <p className="text-sm">Yuklanmoqda…</p>
         </main>
       }
