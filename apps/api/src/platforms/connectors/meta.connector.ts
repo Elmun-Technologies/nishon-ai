@@ -312,6 +312,8 @@ export class MetaConnector {
       actions: Array<{ action_type: string; value: string }>;
       action_values: Array<{ action_type: string; value: string }>;
       date_start: string;
+      /** Present when `level: "ad"` and `ad_id` was requested in `fields`. */
+      ad_id?: string;
     }>
   > {
     const defaultFields = "impressions,clicks,spend,actions,action_values,ctr,cpm,cpp,reach";
@@ -337,6 +339,7 @@ export class MetaConnector {
       actions: row.actions || [],
       action_values: row.action_values || [],
       date_start: row.date_start,
+      ad_id: row.ad_id != null && row.ad_id !== "" ? String(row.ad_id) : undefined,
     }));
   }
 

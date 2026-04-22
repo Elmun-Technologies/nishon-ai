@@ -175,6 +175,7 @@ export class CampaignSyncProcessor {
     const metrics: MetricPayload[] = [];
 
     for (const insight of insights) {
+      if (!insight.ad_id) continue;
       const adId = adByExternalId.get(insight.ad_id);
       if (!adId) continue;
 
