@@ -82,7 +82,9 @@
     "mediaLibrary": "Медиатека",
     "workspace": "Рабочее пространство",
     "simulation": "Симуляция",
-    "metaAudit": "Meta Audit"
+    "metaAudit": "Meta Audit",
+    "team": "Команда",
+    "billing": "Оплата"
   },
   "landing": {
     "hero": {

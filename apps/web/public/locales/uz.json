@@ -82,7 +82,9 @@
     "workspace": "Workspace",
     "simulation": "Simulyatsiya",
     "metaAudit": "Meta Audit",
-    "campaignWizard": "Kampaniya ustasi"
+    "campaignWizard": "Kampaniya ustasi",
+    "team": "Jamoa",
+    "billing": "To'lov"
   },
   "landing": {
     "hero": {
