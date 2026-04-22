@@ -8,6 +8,7 @@ import { ContentMediaSlot } from '@/components/media/ContentMediaSlot'
 import { Alert, Button, Input } from '@/components/ui'
 import { PageSpinner } from '@/components/ui/Spinner'
 import { auth } from '@/lib/api-client'
+import { getApiErrorMessage } from '@/lib/api-error'
 import { useI18n } from '@/i18n/use-i18n'
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher'
 import {
@@ -45,8 +46,16 @@ export default function RegisterPage() {
       await auth.register(form)
       clearPreAuthOnboarding()
       router.push('/login')
-    } catch (err: any) {
-      setError(err?.response?.data?.message || t('auth.registerPage.genericError', 'Registration failed. Please try again.'))
+    } catch (err: unknown) {
+      const fallback = t('auth.registerPage.genericError', 'Registration failed. Please try again.')
+      let msg = getApiErrorMessage(err, fallback)
+      if (/failed to fetch|networkerror|load failed/i.test(msg)) {
+        msg = t(
+          'auth.registerPage.networkError',
+          'Could not reach the server. Check that the API is running and that FRONTEND_URL on the API includes this site (CORS).',
+        )
+      }
+      setError(msg)
     } finally {
       setLoading(false)
     }
