@@ -84,7 +84,9 @@
     "metaAudit": "Meta Audit",
     "campaignWizard": "Kampaniya ustasi",
     "team": "Jamoa",
-    "billing": "To'lov"
+    "billing": "To'lov",
+    "topAds": "Top reklamalar",
+    "triggersets": "Triggerset"
   },
   "landing": {
     "hero": {
@@ -418,7 +420,19 @@
       "trialTitle": "7 kunlik demo muddati tugadi",
       "trialBody": "FREE tarifda kampaniyalar, hisobotlar, avtomatizatsiya va ulangan reklama akkauntlariga to‘liq kirishni saqlab qolish uchun obuna rasmiylashtiring.",
       "trialCta": "Tariflar va to‘lov"
-    }
+    },
+    "filter1d": "Bugun",
+    "filter7d": "7 kun",
+    "filter14d": "14 kun",
+    "filter30d": "30 kun",
+    "filter90d": "90 kun",
+    "period": "Davr:",
+    "kpiClicks": "Kliklar",
+    "kpiImpressions": "Ko‘rinishlar: ",
+    "chartHint": "Haqiqiy xarajat va taxminiy daromad (Spend × ROAS)",
+    "viewAll": "Barchasini ko‘rish →",
+    "topAdsTitle": "Top reklamalar",
+    "refresh": "Yangilash"
   },
   "metaAudit": {
     "title": "360° Meta Audit",
@@ -2542,5 +2556,25 @@
     "etaNote": "Odatda 20–60 soniya (rasmlar bo‘lsa: vision + matn).",
     "regenerateHint": "«Qayta yaratish» oxirgi shablon va brifni qayta ishlatadi — bu yerdan o‘zgartirmaguncha.",
     "selectTemplate": "Davom etish uchun yuqoridan shablon tanlang."
+  },
+  "topAds": {
+    "title": "Top reklamalar",
+    "subtitle": "Xarajat va qamrov bo'yicha eng yaxshi reklamalar",
+    "demoNotice": "Demo ma'lumotlar ko'rsatilmoqda. Haqiqiy reklamalarni ko'rish uchun Meta hisobingizni ulang.",
+    "totalSpend": "Jami xarajat",
+    "totalClicks": "Jami kliklar",
+    "totalImpressions": "Ko'rinishlar",
+    "avgCtr": "O'rtacha CTR",
+    "searchPlaceholder": "Reklama nomini qidiring…",
+    "show": "Ko'rsatish:",
+    "colName": "Reklama nomi",
+    "colStatus": "Holat",
+    "colSpend": "Xarajat",
+    "colClicks": "Kliklar",
+    "colImpressions": "Ko'rinishlar",
+    "emptyTitle": "Reklamalar topilmadi",
+    "emptyDesc": "Qidiruvni o'zgartiring yoki Meta hisobingizni ulang.",
+    "footerNote": "Ma'lumotlar Meta Marketing API orqali Meta reklama hisoblaridan olinadi.",
+    "fullReport": "To'liq hisobot"
   }
 }
