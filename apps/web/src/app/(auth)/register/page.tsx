@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { Eye, EyeOff } from 'lucide-react'
 import { ContentMediaSlot } from '@/components/media/ContentMediaSlot'
 import { Alert, Button, Input } from '@/components/ui'
 import { PageSpinner } from '@/components/ui/Spinner'
@@ -22,6 +23,7 @@ export default function RegisterPage() {
   const router = useRouter()
   const [gateChecked, setGateChecked] = useState(false)
   const [form, setForm] = useState({ name: '', email: '', password: '' })
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -191,10 +193,25 @@ export default function RegisterPage() {
             />
             <Input
               label={t('auth.password', 'Password')}
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               value={form.password}
               onChange={(e) => setForm((prev) => ({ ...prev, password: e.target.value }))}
               placeholder={t('auth.registerPage.passwordHint', 'At least 8 characters')}
+              autoComplete="new-password"
+              rightIcon={
+                <button
+                  type="button"
+                  className="rounded-md p-0.5 text-text-tertiary transition-colors hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
+                  onClick={() => setShowPassword((v) => !v)}
+                  aria-label={
+                    showPassword
+                      ? t('auth.hidePassword', 'Hide password')
+                      : t('auth.showPassword', 'Show password')
+                  }
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4 shrink-0" aria-hidden /> : <Eye className="h-4 w-4 shrink-0" aria-hidden />}
+                </button>
+              }
               required
             />
 
