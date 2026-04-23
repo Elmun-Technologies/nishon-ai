@@ -1699,7 +1699,10 @@
     "language": {
       "title": "Interface language",
       "description": "Choose Russian, English, or Uzbek for the platform. Your choice is saved in this browser and applies across the app.",
-      "active": "Current selection"
+      "active": "Current selection",
+      "browserDetected": "Your browser language",
+      "switchPrompt": "Switch to it?",
+      "coverageNote": "% — share of UI strings translated. Missing strings fall back to Russian."
     },
     "payments": {
       "loadError": "Failed to load payment data",
