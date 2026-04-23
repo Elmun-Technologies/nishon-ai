@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { Alert, Button, Input } from '@/components/ui'
 import { auth, workspaces as workspacesApi } from '@/lib/api-client'
 import { useWorkspaceStore } from '@/stores/workspace.store'
-import { setRefreshToken } from '@/lib/auth-storage'
+import { DEMO_ACCESS_TOKEN, setRefreshToken } from '@/lib/auth-storage'
 import { useI18n } from '@/i18n/use-i18n'
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher'
 
@@ -65,7 +65,7 @@ export function LoginClient() {
   }
 
   function handleDemoLogin() {
-    setAccessToken('demo-token-local-preview')
+    setAccessToken(DEMO_ACCESS_TOKEN)
     setUser(DEMO_USER)
     setCurrentWorkspace(DEMO_WORKSPACE)
     router.push(safeNext() ?? '/dashboard')
