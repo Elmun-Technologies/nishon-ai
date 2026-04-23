@@ -28,6 +28,24 @@ import {
   UpdateMeDto,
 } from "@adspectr/shared";
 
+/**
+ * FRONTEND_URL is a comma-separated allowlist used for CORS. For OAuth
+ * redirects we need a single well-formed URL — pick the first https:// (or
+ * http://) entry and strip a trailing slash. Silently ignores typos like
+ * `https//example.com` (missing colon) that would otherwise DNS-fail in
+ * the browser after redirect.
+ */
+function pickPrimaryFrontendUrl(raw: string, fallback: string): string {
+  const parts = raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const https = parts.find((p) => p.startsWith("https://"));
+  const http = parts.find((p) => p.startsWith("http://"));
+  const pick = https ?? http ?? fallback;
+  return pick.replace(/\/$/, "");
+}
+
 @ApiTags("Authentication")
 @Controller("auth")
 export class AuthController {
@@ -35,6 +53,11 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly config: ConfigService,
   ) {}
+
+  private frontendUrl(): string {
+    const raw = this.config.get<string>("FRONTEND_URL", "http://localhost:3000");
+    return pickPrimaryFrontendUrl(raw, "http://localhost:3000");
+  }
 
   @Post("register")
   @HttpCode(HttpStatus.CREATED)
@@ -113,10 +136,7 @@ export class AuthController {
   @UseGuards(AuthGuard("google"))
   @ApiOperation({ summary: "Google OAuth callback" })
   googleCallback(@Request() req: any, @Res() res: Response) {
-    const frontendUrl = this.config.get<string>(
-      "FRONTEND_URL",
-      "http://localhost:3000",
-    );
+    const frontendUrl = this.frontendUrl();
     const payload = req.user as any;
 
     // Strategy signals an internal error via marker object — redirect with detail
@@ -154,7 +174,7 @@ export class AuthController {
   @ApiOperation({ summary: "Facebook OAuth callback" })
   facebookCallback(@Request() req: any, @Res() res: Response) {
     const { accessToken, refreshToken } = req.user as AuthResponseDto;
-    const frontendUrl = this.config.get<string>("FRONTEND_URL", "http://localhost:3000");
+    const frontendUrl = this.frontendUrl();
     const params = new URLSearchParams({ accessToken, refreshToken });
     // Reuse the same callback page as Google
     res.redirect(`${frontendUrl}/auth/google/callback?${params.toString()}`);
