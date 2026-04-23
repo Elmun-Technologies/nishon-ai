@@ -17,6 +17,7 @@ import {
   CreateTeamInviteDto,
   UpdateMemberAccountsDto,
   UpdateMemberRoleDto,
+  RemoveMemberDto,
 } from "./dto/team-invite.dto";
 
 @Controller("team")
@@ -47,6 +48,18 @@ export class TeamInvitesController {
   @Patch("members/ad-accounts")
   updateAdAccounts(@Body() dto: UpdateMemberAccountsDto, @Req() req: Request) {
     return this.service.updateMemberAccounts(dto, (req.user as any).id);
+  }
+
+  @Delete("workspaces/:workspaceId/members/:memberUserId")
+  removeMember(
+    @Param("workspaceId") workspaceId: string,
+    @Param("memberUserId") memberUserId: string,
+    @Req() req: Request,
+  ) {
+    return this.service.removeMember(
+      { workspaceId, memberUserId } as RemoveMemberDto,
+      (req.user as any).id,
+    );
   }
 
   @Delete("invites/:inviteId")

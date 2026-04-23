@@ -55,3 +55,11 @@ export class UpdateMemberAccountsDto {
   @IsString({ each: true })
   allowedAdAccountIds: string[];
 }
+
+export class RemoveMemberDto {
+  @IsUUID()
+  workspaceId: string;
+
+  @IsUUID()
+  memberUserId: string;
+}

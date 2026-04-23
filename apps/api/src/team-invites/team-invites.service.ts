@@ -14,6 +14,7 @@ import {
   AcceptTeamInviteDto,
   UpdateMemberAccountsDto,
   UpdateMemberRoleDto,
+  RemoveMemberDto,
 } from "./dto/team-invite.dto";
 import { Workspace } from "../workspaces/entities/workspace.entity";
 import { User } from "../users/entities/user.entity";
@@ -157,6 +158,28 @@ export class TeamInvitesService {
     member.allowedAdAccountIds = dto.allowedAdAccountIds;
     await this.memberRepo.save(member);
     return member;
+  }
+
+  async removeMember(dto: RemoveMemberDto, actorUserId: string) {
+    await this.assertInviteWriteAccess(dto.workspaceId, actorUserId);
+
+    if (dto.memberUserId === actorUserId) {
+      throw new BadRequestException("You cannot remove yourself from the workspace");
+    }
+
+    const workspace = await this.workspaceRepo.findOne({
+      where: { id: dto.workspaceId },
+    });
+    if (workspace?.userId === dto.memberUserId) {
+      throw new ForbiddenException("Cannot remove the workspace creator");
+    }
+
+    const member = await this.memberRepo.findOne({
+      where: { workspaceId: dto.workspaceId, userId: dto.memberUserId },
+    });
+    if (!member) throw new NotFoundException("Member not found");
+    await this.memberRepo.remove(member);
+    return { removed: true };
   }
 
   async revokeInvite(inviteId: string, actorUserId: string) {
