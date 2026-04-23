@@ -175,13 +175,14 @@ export default function WorkspaceSettingsLayout({
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="border-b border-border/50 bg-white dark:bg-slate-950">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="relative border-b border-border/50 bg-gradient-to-b from-white to-white/95 dark:from-slate-950 dark:to-slate-950/95 backdrop-blur-sm">
+        <div className="absolute inset-0 bg-gradient-to-r from-violet-50/30 to-transparent dark:from-violet-950/10 dark:to-transparent pointer-events-none" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-4 min-w-0">
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="lg:hidden inline-flex items-center justify-center rounded-lg border border-border bg-surface p-2 text-text-secondary hover:bg-surface-2 hover:text-text-primary transition-all"
+                className="lg:hidden inline-flex items-center justify-center rounded-lg border border-border bg-surface/80 p-2 text-text-secondary hover:bg-surface-2 hover:text-text-primary transition-all duration-200 hover:scale-105"
                 aria-label="Toggle navigation"
               >
                 {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -190,18 +191,18 @@ export default function WorkspaceSettingsLayout({
                 <p className="text-xs font-semibold uppercase tracking-wider text-violet-600 dark:text-violet-400">
                   {t('workspaceSettings.title', 'Workspace Settings')}
                 </p>
-                <div className="mt-3 flex items-center gap-3">
+                <div className="mt-3 flex items-center gap-3 flex-wrap">
                   <h1 className="text-3xl font-bold tracking-tight text-text-primary">
                     {t('workspaceSettings.title', 'Workspace Settings')}
                   </h1>
                   <button
                     type="button"
-                    className="hidden sm:inline-flex items-center gap-2 rounded-lg border border-border bg-white/50 px-3 py-2 text-sm font-medium text-text-primary backdrop-blur hover:bg-white/80 dark:bg-slate-800/50 dark:hover:bg-slate-800"
+                    className="hidden sm:inline-flex items-center gap-2 rounded-lg border border-border/80 bg-white/50 px-3 py-2 text-sm font-medium text-text-primary backdrop-blur hover:bg-white/80 hover:border-violet-400/50 dark:bg-slate-800/50 dark:hover:bg-slate-800 transition-all duration-200 group"
                     aria-label={t('workspaceSettings.workspace', 'Workspace')}
                   >
-                    <Building2 className="h-4 w-4 text-violet-500" />
+                    <Building2 className="h-4 w-4 text-violet-500 group-hover:scale-110 transition-transform" />
                     <span className="max-w-[250px] truncate">{currentWorkspace?.name ?? t('workspaceSettings.workspace', 'Workspace')}</span>
-                    <ChevronDown className="h-4 w-4 text-text-tertiary" />
+                    <ChevronDown className="h-4 w-4 text-text-tertiary group-hover:text-violet-600 transition-all group-hover:rotate-180" />
                   </button>
                 </div>
                 <p className="mt-2 text-sm text-text-tertiary">
@@ -214,7 +215,7 @@ export default function WorkspaceSettingsLayout({
             </div>
             <Link
               href="/settings"
-              className="shrink-0 inline-flex items-center justify-center rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-text-secondary transition-all hover:bg-surface-2 hover:text-text-primary"
+              className="shrink-0 inline-flex items-center justify-center rounded-lg border border-border bg-surface/80 px-4 py-2 text-sm font-medium text-text-secondary transition-all duration-200 hover:bg-surface-2 hover:text-text-primary hover:scale-105"
             >
               ← {t('workspaceSettings.classicSettings', 'Back to Settings')}
             </Link>
@@ -270,32 +271,40 @@ export default function WorkspaceSettingsLayout({
                       {section.icon}
                       {t(section.titleKey, section.title)}
                     </h3>
-                    <div className="space-y-1">
+                    <div className="space-y-2">
                       {section.items.map((item) => (
                         <Link
                           key={item.href}
                           href={item.href}
                           onClick={() => setSidebarOpen(false)}
                           className={`
-                            group flex items-start gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all
+                            group flex items-start gap-3 rounded-lg px-3 py-2.5 text-sm font-medium
+                            transition-all duration-200 ease-out
                             ${
                               isActive(item.href)
-                                ? 'bg-violet-50 text-violet-700 dark:bg-violet-950/40 dark:text-violet-300'
-                                : 'text-text-secondary hover:bg-surface-2 hover:text-text-primary'
+                                ? 'bg-gradient-to-r from-violet-50 to-violet-50/50 text-violet-700 shadow-sm dark:from-violet-950/50 dark:to-violet-950/20 dark:text-violet-300 border border-violet-200/50 dark:border-violet-900/30'
+                                : 'text-text-secondary hover:bg-surface-2 hover:text-text-primary border border-transparent hover:border-border/50'
                             }
                           `}
                         >
-                          <span className={`mt-0.5 flex-shrink-0 ${isActive(item.href) ? 'text-violet-600' : 'text-text-tertiary group-hover:text-text-secondary'}`}>
+                          <span className={`mt-0.5 flex-shrink-0 transition-all duration-200 ${
+                            isActive(item.href)
+                              ? 'text-violet-600 dark:text-violet-400'
+                              : 'text-text-tertiary group-hover:text-violet-600 group-hover:scale-110'
+                          }`}>
                             {item.icon}
                           </span>
-                          <div className="flex-1">
-                            <div>{t(item.labelKey, item.label)}</div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium">{t(item.labelKey, item.label)}</div>
                             {item.description && (
-                              <p className="mt-0.5 text-xs text-text-tertiary group-hover:text-text-secondary">
+                              <p className="mt-0.5 text-xs text-text-tertiary group-hover:text-text-secondary transition-colors line-clamp-2">
                                 {t(item.descriptionKey || '', item.description)}
                               </p>
                             )}
                           </div>
+                          {isActive(item.href) && (
+                            <div className="ml-auto mt-0.5 h-2 w-2 rounded-full bg-violet-600 dark:bg-violet-400 flex-shrink-0 animate-pulse" />
+                          )}
                         </Link>
                       ))}
                     </div>
