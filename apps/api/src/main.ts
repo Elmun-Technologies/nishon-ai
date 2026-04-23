@@ -88,47 +88,40 @@ async function bootstrap() {
   await app.listen(port);
 
   if (nodeEnv === "production") {
-    // Belt-and-suspenders schema repair: run idempotent SQL for every column that
-    // TypeORM entities reference but older DBs may be missing. This runs on every
-    // deploy and is safe to re-run (DO ... EXCEPTION WHEN duplicate_column THEN NULL).
-    // Bypasses migration-tracking so it works even if typeorm_migrations shows "done".
+    // Full idempotent schema repair for the users table.
+    // Adds every column the User entity needs in one shot — safe to re-run on
+    // every deploy. Uses DO...EXCEPTION so existing columns are silently skipped.
     try {
       await dataSource.query(`
-        DO $$ BEGIN ALTER TABLE "users" ADD COLUMN "trial_ends_at" TIMESTAMP NULL;
-        EXCEPTION WHEN duplicate_column THEN NULL; END $$;
+        DO $$ BEGIN
+          -- OAuth / social columns
+          BEGIN ALTER TABLE "users" ADD COLUMN "google_id"   VARCHAR(255) NULL; EXCEPTION WHEN duplicate_column THEN NULL; END;
+          BEGIN ALTER TABLE "users" ADD COLUMN "facebook_id" VARCHAR(255) NULL; EXCEPTION WHEN duplicate_column THEN NULL; END;
+          BEGIN ALTER TABLE "users" ADD COLUMN "picture"     TEXT         NULL; EXCEPTION WHEN duplicate_column THEN NULL; END;
+
+          -- Auth columns
+          BEGIN ALTER TABLE "users" ADD COLUMN "refresh_token"     TEXT    NULL;                   EXCEPTION WHEN duplicate_column THEN NULL; END;
+          BEGIN ALTER TABLE "users" ADD COLUMN "is_email_verified" BOOLEAN NOT NULL DEFAULT false; EXCEPTION WHEN duplicate_column THEN NULL; END;
+          BEGIN ALTER TABLE "users" ADD COLUMN "is_admin"          BOOLEAN NOT NULL DEFAULT false; EXCEPTION WHEN duplicate_column THEN NULL; END;
+
+          -- Trial / billing
+          BEGIN ALTER TABLE "users" ADD COLUMN "trial_ends_at" TIMESTAMP NULL; EXCEPTION WHEN duplicate_column THEN NULL; END;
+
+          -- Timestamps (may be missing on very old DBs created before migrations)
+          BEGIN ALTER TABLE "users" ADD COLUMN "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP; EXCEPTION WHEN duplicate_column THEN NULL; END;
+          BEGIN ALTER TABLE "users" ADD COLUMN "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP; EXCEPTION WHEN duplicate_column THEN NULL; END;
+
+          -- password nullable for OAuth-only users
+          BEGIN ALTER TABLE "users" ALTER COLUMN "password" DROP NOT NULL; EXCEPTION WHEN OTHERS THEN NULL; END;
+        END $$;
       `);
-      await dataSource.query(`
-        DO $$ BEGIN ALTER TABLE "users" ADD COLUMN "google_id" VARCHAR(255) NULL;
-        EXCEPTION WHEN duplicate_column THEN NULL; END $$;
-      `);
-      await dataSource.query(`
-        DO $$ BEGIN ALTER TABLE "users" ADD COLUMN "facebook_id" VARCHAR(255) NULL;
-        EXCEPTION WHEN duplicate_column THEN NULL; END $$;
-      `);
-      await dataSource.query(`
-        DO $$ BEGIN ALTER TABLE "users" ADD COLUMN "picture" TEXT NULL;
-        EXCEPTION WHEN duplicate_column THEN NULL; END $$;
-      `);
-      await dataSource.query(`
-        DO $$ BEGIN ALTER TABLE "users" ADD COLUMN "is_admin" BOOLEAN NOT NULL DEFAULT false;
-        EXCEPTION WHEN duplicate_column THEN NULL; END $$;
-      `);
-      await dataSource.query(`
-        DO $$ BEGIN ALTER TABLE "users" ADD COLUMN "is_email_verified" BOOLEAN NOT NULL DEFAULT false;
-        EXCEPTION WHEN duplicate_column THEN NULL; END $$;
-      `);
-      await dataSource.query(`
-        DO $$ BEGIN ALTER TABLE "users" ADD COLUMN "refresh_token" TEXT NULL;
-        EXCEPTION WHEN duplicate_column THEN NULL; END $$;
-      `);
-      await dataSource.query(`
-        DO $$ BEGIN ALTER TABLE "users" ALTER COLUMN "password" DROP NOT NULL;
-        EXCEPTION WHEN OTHERS THEN NULL; END $$;
-      `);
+
+      // Backfill trial for free users who don't have one yet
       await dataSource.query(`
         UPDATE "users" SET "trial_ends_at" = NOW() + INTERVAL '7 days'
         WHERE "plan"::text = 'free' AND "trial_ends_at" IS NULL;
       `);
+
       logger.log({ message: "users schema repair: OK", context: "Bootstrap" });
     } catch (e) {
       logger.error({
