@@ -87,6 +87,31 @@ async function bootstrap() {
 
   await app.listen(port);
 
+  if (nodeEnv === "production") {
+    try {
+      const rows = await dataSource.query<{ exists: boolean }[]>(
+        `SELECT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_schema = 'public' AND table_name = 'users' AND column_name = 'trial_ends_at'
+        ) AS "exists"`,
+      );
+      if (!rows?.[0]?.exists) {
+        logger.error({
+          message:
+            "Schema check failed: public.users.trial_ends_at is missing. " +
+            "Use start:prod:with-migrations on Render and redeploy.",
+          context: "Bootstrap",
+        });
+      }
+    } catch (e) {
+      logger.warn({
+        message: "Could not verify users.trial_ends_at column (non-fatal)",
+        context: "Bootstrap",
+        error: e instanceof Error ? e.message : String(e),
+      });
+    }
+  }
+
   const redisHost = configService.get<string>("REDIS_HOST", "redis");
   const redisPort = configService.get<string>("REDIS_PORT", "6379");
   const isDatabaseConnected = dataSource.isInitialized;

@@ -2,6 +2,7 @@ import {
   Injectable,
   UnauthorizedException,
   ConflictException,
+  InternalServerErrorException,
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -258,14 +259,19 @@ export class AuthService {
   private async generateAuthResponse(user: User): Promise<AuthResponseDto> {
     const payload = { sub: user.id, email: user.email };
 
+    const jwtSecret = this.config.get<string>("JWT_SECRET");
+    if (!jwtSecret?.trim()) {
+      throw new InternalServerErrorException("JWT_SECRET is not set");
+    }
+
     const accessToken = this.jwtService.sign(payload, {
-      secret: this.config.get<string>("JWT_SECRET"),
+      secret: jwtSecret,
       expiresIn: this.config.get("JWT_EXPIRES_IN", "15m"),
     });
 
     const refreshSecret = this.config.get<string>("JWT_REFRESH_SECRET");
     if (!refreshSecret?.trim()) {
-      throw new Error("JWT_REFRESH_SECRET is not set");
+      throw new InternalServerErrorException("JWT_REFRESH_SECRET is not set");
     }
 
     const refreshToken = this.jwtService.sign(payload, {

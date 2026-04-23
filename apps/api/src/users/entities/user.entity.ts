@@ -37,11 +37,11 @@ export class User {
   @Column({ length: 100, nullable: true })
   name: string | null;
 
-  @Column({
-    type: "enum",
-    enum: UserPlan,
-    default: UserPlan.FREE,
-  })
+  /**
+   * Stored as varchar in DB (see migrations) or legacy `user_plan_enum` — TypeORM
+   * maps string labels the same way; avoids PG enum type name drift vs `user_plan_enum` / `users_plan_enum`.
+   */
+  @Column({ type: "varchar", length: 20, default: UserPlan.FREE })
   plan: UserPlan;
 
   /**

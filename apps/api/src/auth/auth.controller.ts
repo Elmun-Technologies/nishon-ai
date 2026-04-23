@@ -113,21 +113,28 @@ export class AuthController {
   @UseGuards(AuthGuard("google"))
   @ApiOperation({ summary: "Google OAuth callback" })
   googleCallback(@Request() req: any, @Res() res: Response) {
-    // req.user is the AuthResponseDto returned by GoogleStrategy.validate()
-    const { accessToken, refreshToken, user } = req.user as AuthResponseDto;
     const frontendUrl = this.config.get<string>(
       "FRONTEND_URL",
-      "http://localhost:3000", // override with FRONTEND_URL on Render
+      "http://localhost:3000",
     );
+    const auth = req.user as AuthResponseDto | undefined;
+    if (!auth?.accessToken || !auth?.refreshToken) {
+      const params = new URLSearchParams({
+        error: "oauth_incomplete",
+        detail: "Missing tokens after Google sign-in — check API logs.",
+      });
+      return res.redirect(`${frontendUrl}/auth/google/callback?${params.toString()}`);
+    }
 
-    const isNew = !user; // won't happen — always exists after findOrCreate
+    const { accessToken, refreshToken, user } = auth;
+    const isNew = !user;
     const params = new URLSearchParams({
       accessToken,
       refreshToken,
       isNew: String(isNew),
     });
 
-    res.redirect(`${frontendUrl}/auth/google/callback?${params.toString()}`);
+    return res.redirect(`${frontendUrl}/auth/google/callback?${params.toString()}`);
   }
 
   // ─── Facebook OAuth ─────────────────────────────────────────────────────────
