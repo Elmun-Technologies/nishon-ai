@@ -85,52 +85,63 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api", app, document);
 
-  await app.listen(port);
-
   if (nodeEnv === "production") {
-    // Full idempotent schema repair for the users table.
-    // Adds every column the User entity needs in one shot — safe to re-run on
-    // every deploy. Uses DO...EXCEPTION so existing columns are silently skipped.
+    // Idempotent schema repair — runs before the server accepts traffic so the
+    // very first request after deploy never hits a missing-column error.
+    // Every ADD COLUMN uses EXCEPTION WHEN OTHERS so if the column already exists
+    // (or has a type conflict) the block silently continues instead of aborting.
     try {
+      // ── users ──────────────────────────────────────────────────────────────
       await dataSource.query(`
         DO $$ BEGIN
-          -- OAuth / social columns
-          BEGIN ALTER TABLE "users" ADD COLUMN "google_id"   VARCHAR(255) NULL; EXCEPTION WHEN duplicate_column THEN NULL; END;
-          BEGIN ALTER TABLE "users" ADD COLUMN "facebook_id" VARCHAR(255) NULL; EXCEPTION WHEN duplicate_column THEN NULL; END;
-          BEGIN ALTER TABLE "users" ADD COLUMN "picture"     TEXT         NULL; EXCEPTION WHEN duplicate_column THEN NULL; END;
-
-          -- Auth columns
-          BEGIN ALTER TABLE "users" ADD COLUMN "refresh_token"     TEXT    NULL;                   EXCEPTION WHEN duplicate_column THEN NULL; END;
-          BEGIN ALTER TABLE "users" ADD COLUMN "is_email_verified" BOOLEAN NOT NULL DEFAULT false; EXCEPTION WHEN duplicate_column THEN NULL; END;
-          BEGIN ALTER TABLE "users" ADD COLUMN "is_admin"          BOOLEAN NOT NULL DEFAULT false; EXCEPTION WHEN duplicate_column THEN NULL; END;
-
-          -- Trial / billing
-          BEGIN ALTER TABLE "users" ADD COLUMN "trial_ends_at" TIMESTAMP NULL; EXCEPTION WHEN duplicate_column THEN NULL; END;
-
-          -- Timestamps (may be missing on very old DBs created before migrations)
-          BEGIN ALTER TABLE "users" ADD COLUMN "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP; EXCEPTION WHEN duplicate_column THEN NULL; END;
-          BEGIN ALTER TABLE "users" ADD COLUMN "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP; EXCEPTION WHEN duplicate_column THEN NULL; END;
-
-          -- password nullable for OAuth-only users
-          BEGIN ALTER TABLE "users" ALTER COLUMN "password" DROP NOT NULL; EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "users" ADD COLUMN "google_id"         VARCHAR(255) NULL;                    EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "users" ADD COLUMN "facebook_id"       VARCHAR(255) NULL;                    EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "users" ADD COLUMN "picture"           TEXT         NULL;                    EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "users" ADD COLUMN "refresh_token"     TEXT         NULL;                    EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "users" ADD COLUMN "is_email_verified" BOOLEAN      NOT NULL DEFAULT false;  EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "users" ADD COLUMN "is_admin"          BOOLEAN      NOT NULL DEFAULT false;  EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "users" ADD COLUMN "trial_ends_at"     TIMESTAMP    NULL;                    EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "users" ADD COLUMN "created_at"        TIMESTAMP    NOT NULL DEFAULT NOW();  EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "users" ADD COLUMN "updated_at"        TIMESTAMP    NOT NULL DEFAULT NOW();  EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "users" ALTER COLUMN "password" DROP NOT NULL;                               EXCEPTION WHEN OTHERS THEN NULL; END;
         END $$;
       `);
-
-      // Backfill trial for free users who don't have one yet
       await dataSource.query(`
         UPDATE "users" SET "trial_ends_at" = NOW() + INTERVAL '7 days'
         WHERE "plan"::text = 'free' AND "trial_ends_at" IS NULL;
       `);
-
       logger.log({ message: "users schema repair: OK", context: "Bootstrap" });
+
+      // ── workspaces ─────────────────────────────────────────────────────────
+      await dataSource.query(`
+        DO $$ BEGIN
+          BEGIN ALTER TABLE "workspaces" ADD COLUMN "product_description"  TEXT         NULL;                       EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "workspaces" ADD COLUMN "target_audience"      TEXT         NULL;                       EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "workspaces" ADD COLUMN "monthly_budget"       DECIMAL(10,2) NULL;                      EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "workspaces" ADD COLUMN "ai_strategy"          JSONB        NULL;                       EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "workspaces" ADD COLUMN "is_onboarding_complete" BOOLEAN    NOT NULL DEFAULT false;     EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "workspaces" ADD COLUMN "optimization_policy"  JSONB        NULL;                       EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "workspaces" ADD COLUMN "target_location"      VARCHAR(100) NOT NULL DEFAULT 'Uzbekistan'; EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "workspaces" ADD COLUMN "telegram_chat_id"     VARCHAR(64)  NULL;                       EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "workspaces" ADD COLUMN "service_type"         VARCHAR(20)  NOT NULL DEFAULT 'self';    EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "workspaces" ADD COLUMN "assigned_agent_id"    VARCHAR      NULL;                       EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "workspaces" ADD COLUMN "created_at"           TIMESTAMP    NOT NULL DEFAULT NOW();     EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "workspaces" ADD COLUMN "updated_at"           TIMESTAMP    NOT NULL DEFAULT NOW();     EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "workspaces" ADD COLUMN "user_id"              UUID         NULL;                       EXCEPTION WHEN OTHERS THEN NULL; END;
+        END $$;
+      `);
+      logger.log({ message: "workspaces schema repair: OK", context: "Bootstrap" });
+
     } catch (e) {
       logger.error({
-        message: "users schema repair failed — Google OAuth and login may break",
+        message: "schema repair failed — login or workspaces may break",
         context: "Bootstrap",
         error: e instanceof Error ? e.message : String(e),
       });
     }
   }
+
+  await app.listen(port);
 
   const redisHost = configService.get<string>("REDIS_HOST", "redis");
   const redisPort = configService.get<string>("REDIS_PORT", "6379");
