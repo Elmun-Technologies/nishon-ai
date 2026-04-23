@@ -9,8 +9,10 @@ import { Alert, Button, Input } from '@/components/ui'
 import { PageSpinner } from '@/components/ui/Spinner'
 import { auth } from '@/lib/api-client'
 import { getApiErrorMessage } from '@/lib/api-error'
+import { setRefreshToken } from '@/lib/auth-storage'
 import { useI18n } from '@/i18n/use-i18n'
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher'
+import { useWorkspaceStore } from '@/stores/workspace.store'
 import {
   CHANNEL_COLORS,
   CHANNEL_KEYS,
@@ -22,6 +24,7 @@ import {
 export default function RegisterPage() {
   const { t } = useI18n()
   const router = useRouter()
+  const { setUser, setAccessToken } = useWorkspaceStore()
   const [gateChecked, setGateChecked] = useState(false)
   const [form, setForm] = useState({ name: '', email: '', password: '' })
   const [showPassword, setShowPassword] = useState(false)
@@ -43,9 +46,13 @@ export default function RegisterPage() {
     setLoading(true)
     setError('')
     try {
-      await auth.register(form)
+      const res = await auth.register(form)
+      const { accessToken, refreshToken, user } = res.data
+      setRefreshToken(refreshToken)
+      setAccessToken(accessToken)
+      setUser(user)
       clearPreAuthOnboarding()
-      router.push('/login')
+      router.push('/onboarding')
     } catch (err: unknown) {
       const fallback = t('auth.registerPage.genericError', 'Registration failed. Please try again.')
       let msg = getApiErrorMessage(err, fallback)
