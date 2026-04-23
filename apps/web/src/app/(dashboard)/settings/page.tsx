@@ -15,52 +15,40 @@ import { getAccessToken } from '@/lib/auth-storage'
 
 type Tab = 'general' | 'integrations' | 'notifications' | 'policy' | 'danger'
 
+interface SettingsHistoryItem {
+  id: string
+  setting: string
+  previous: string
+  current: string
+  timestamp: Date
+  user?: string
+}
+
 const TABS = [
   {
     id: 'general' as Tab,
-    label: 'General',
-    icon: (
-      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-        <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-        <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-      </svg>
-    ),
+    label: 'Asosiy',
+    icon: '⚙️',
   },
   {
     id: 'integrations' as Tab,
-    label: 'Integrations',
-    icon: (
-      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-        <path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
-      </svg>
-    ),
+    label: 'Integratsiyalar',
+    icon: '🔗',
   },
   {
     id: 'notifications' as Tab,
-    label: 'Notifications',
-    icon: (
-      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-        <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-      </svg>
-    ),
+    label: 'Bildirishnomalar',
+    icon: '🔔',
   },
   {
     id: 'policy' as Tab,
     label: 'Optimallashtirish',
-    icon: (
-      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-        <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-      </svg>
-    ),
+    icon: '🛡️',
   },
   {
     id: 'danger' as Tab,
-    label: 'Danger Zone',
-    icon: (
-      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-        <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-      </svg>
-    ),
+    label: 'Xavfli Zonasi',
+    icon: '⚠️',
     danger: true,
   },
 ]
@@ -89,12 +77,36 @@ const AUTOPILOT_MODES = [
   },
 ]
 
+const INTEGRATION_CATEGORIES = [
+  {
+    id: 'advertising',
+    label: '📢 Reklama Platformalari',
+    description: 'Reklama accountingizni ulang',
+  },
+  {
+    id: 'crm',
+    label: '📊 CRM Sistemalari',
+    description: 'Mijozlarni boshqarish',
+  },
+  {
+    id: 'analytics',
+    label: '📈 Analitika',
+    description: 'Analytics va tracking',
+  },
+  {
+    id: 'messaging',
+    label: '💬 Xabarlar va Bildirishnomalar',
+    description: 'Aloqa vositalari',
+  },
+]
+
 const INTEGRATIONS_STATIC = [
   // Ad Platforms
   {
     id: 'yandex',
     name: 'Yandex Direct',
     description: 'Search advertising and smart banners on Yandex.',
+    category: 'advertising',
     logo: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-yellow-500">
         <path d="M6 2h3v14c0 2.21-1.79 4-4 4H2V2h4zm8 0h3v20h-3V2z"/>
@@ -107,6 +119,7 @@ const INTEGRATIONS_STATIC = [
     id: 'google',
     name: 'Google Ads',
     description: 'Search, Display, Shopping and YouTube advertising on Google.',
+    category: 'advertising',
     logo: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-red-400">
         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -122,6 +135,7 @@ const INTEGRATIONS_STATIC = [
     id: 'tiktok',
     name: 'TikTok Ads',
     description: 'Short-form video advertising on TikTok for Gen Z and Millennial audiences.',
+    category: 'advertising',
     logo: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-text-primary">
         <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.78a4.85 4.85 0 01-1.01-.09z"/>
@@ -135,6 +149,7 @@ const INTEGRATIONS_STATIC = [
     id: 'amocrm',
     name: 'AmoCRM',
     description: 'Customer management system for sales teams.',
+    category: 'crm',
     logo: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-red-500">
         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
@@ -147,6 +162,7 @@ const INTEGRATIONS_STATIC = [
     id: 'bitrix24',
     name: 'Bitrix24',
     description: 'All-in-one business management platform.',
+    category: 'crm',
     logo: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-blue-600">
         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
@@ -160,6 +176,7 @@ const INTEGRATIONS_STATIC = [
     id: 'ga4',
     name: 'Google Analytics 4',
     description: 'Advanced analytics and conversion tracking.',
+    category: 'analytics',
     logo: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-orange-500">
         <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
@@ -172,6 +189,7 @@ const INTEGRATIONS_STATIC = [
     id: 'yandex-metrica',
     name: 'Yandex Metrica',
     description: 'Yandex analytics and conversion tracking.',
+    category: 'analytics',
     logo: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-yellow-600">
         <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/>
@@ -185,6 +203,7 @@ const INTEGRATIONS_STATIC = [
     id: 'telegram-bot',
     name: 'Telegram Bot',
     description: 'Automated notifications and reports via Telegram.',
+    category: 'messaging',
     logo: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-blue-400">
         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.43-1.12 7.21-.16.85-.48 1.13-.78 1.16-.66.07-1.16-.44-1.8-.86-1.01-.66-1.57-1.06-2.55-1.7-.57-.37-1-1.02-.1-1.62.91-.6 5.05-4.63 5.14-5.02.02-.08.03-.38-.14-.54-.18-.15-.44-.1-.62-.05-.27.07-4.56 2.85-6.46 3.78-.61.33-1.16.49-1.66.48-.55-.01-1.6-.3-2.38-.55-.96-.3-1.72-.46-1.65-.97.03-.51.68-.99 1.87-1.48 7.4-3.24 9.74-4.27 10.33-4.27.23 0 .37.05.48.15.11.1.14.24.15.35z"/>
@@ -197,6 +216,7 @@ const INTEGRATIONS_STATIC = [
     id: 'whatsapp-business',
     name: 'WhatsApp Business',
     description: 'Send messages and notifications via WhatsApp.',
+    category: 'messaging',
     logo: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-green-500">
         <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371 0-.57 0-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004a9.87 9.87 0 00-4.928 1.227.11.11 0 00-.044.197l1.453 1.77a.11.11 0 00.176.023 6.466 6.466 0 015.192-2.48h.004a6.466 6.466 0 015.457 3.06.11.11 0 00.177-.013l1.449-1.773a.11.11 0 00-.044-.197 9.87 9.87 0 00-8.292-1.614z"/>
@@ -226,12 +246,14 @@ export default function SettingsPage() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<Tab>('general')
 
+  // Settings state
   const [workspaceName, setWorkspaceName] = useState(currentWorkspace?.name ?? 'My Workspace')
   const [autopilotMode, setAutopilotMode] = useState(currentWorkspace?.autopilotMode ?? 'assisted')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [saveError, setSaveError] = useState('')
 
+  // Notifications
   const [emailNotifs, setEmailNotifs] = useState(true)
   const [weeklyReport, setWeeklyReport] = useState(true)
   const [aiAlerts, setAiAlerts] = useState(true)
@@ -239,10 +261,12 @@ export default function SettingsPage() {
   const [telegramSaving, setTelegramSaving] = useState(false)
   const [telegramSaved, setTelegramSaved] = useState(false)
 
+  // Integrations
   const [metaConnected, setMetaConnected] = useState<boolean | null>(null)
   const [metaConnecting, setMetaConnecting] = useState(false)
+  const [integrationSearch, setIntegrationSearch] = useState('')
 
-  // ── Optimization policy state ──────────────────────────────────────────────
+  // Optimization policy
   const [policy, setPolicy] = useState({
     allowAutoBudgetChange:    false,
     maxAutoBudgetChangePct:   0,
@@ -253,6 +277,9 @@ export default function SettingsPage() {
   const [policyLoading, setPolicyLoading] = useState(false)
   const [policySaving, setPolicySaving] = useState(false)
   const [policySaved, setPolicySaved] = useState(false)
+
+  // Settings history
+  const [settingsHistory, setSettingsHistory] = useState<SettingsHistoryItem[]>([])
 
   // Sync local state when workspace loads from store
   useEffect(() => {
@@ -346,54 +373,72 @@ export default function SettingsPage() {
     connectMeta(currentWorkspace.id)
   }
 
-  return (
-    <div className="max-w-7xl mx-auto">
-      <section className="rounded-2xl border border-blue-200/70 bg-gradient-to-r from-blue-50 via-indigo-50 to-violet-50 p-3 dark:border-slate-700 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
-        <PageHeader
-          className="mb-0 border-0 bg-transparent p-2 shadow-none"
-          title="Settings"
-          subtitle="Manage your workspace preferences, integrations, and account."
-          actions={(
-            <Link
-              href="/settings/workspace"
-              className="inline-flex items-center gap-2 rounded-xl border border-border bg-white/80 px-4 py-2 text-sm font-medium text-text-secondary transition-colors hover:bg-white dark:bg-slate-900/70"
-            >
-              Open workspace hub
-            </Link>
-          )}
-        />
-      </section>
+  // Filter integrations based on search
+  const filteredIntegrations = INTEGRATIONS_STATIC.filter((integration) => {
+    const search = integrationSearch.toLowerCase()
+    return integration.name.toLowerCase().includes(search) || integration.description.toLowerCase().includes(search)
+  })
 
-      <div className="mt-5 flex gap-6">
-        {/* Left tab nav */}
-        <nav className="w-56 shrink-0 space-y-1 rounded-2xl border border-slate-800/90 bg-[#0b1220] p-2 shadow-xl">
-          {TABS.map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveTab(tab.id)}
-              className={`
-                w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
-                transition-all duration-150 text-left
-                ${activeTab === tab.id
-                  ? tab.danger
-                    ? 'bg-red-500/15 text-red-300 border border-red-500/30'
-                    : 'bg-gradient-to-r from-blue-500/25 to-violet-500/25 text-white border border-blue-400/30'
-                  : tab.danger
-                  ? 'text-red-300/70 hover:text-red-200 hover:bg-red-500/10 border border-transparent'
-                  : 'text-slate-300 hover:text-white hover:bg-white/10 border border-transparent'
-                }
-              `}
-            >
-              <span className={activeTab === tab.id ? (tab.danger ? 'text-red-300' : 'text-white') : ''}>
-                {tab.icon}
-              </span>
-              {tab.label}
-            </button>
-          ))}
+  // Add to settings history
+  const addToHistory = (setting: string, previous: string, current: string) => {
+    if (previous !== current) {
+      const newEntry: SettingsHistoryItem = {
+        id: Date.now().toString(),
+        setting,
+        previous,
+        current,
+        timestamp: new Date(),
+        user: user?.name ?? 'You',
+      }
+      setSettingsHistory((prev) => [newEntry, ...prev].slice(0, 10))
+    }
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto pb-12 px-4 space-y-6">
+      {/* Header */}
+      <div className="space-y-4">
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-text-primary">Sozlamalar</h1>
+            <p className="text-text-tertiary text-sm mt-1">Workspace va account sozlamalarini boshqaring</p>
+          </div>
+          <Link
+            href="/settings/workspace"
+            className="inline-flex items-center gap-2 rounded-xl border border-border bg-surface px-4 py-2 text-sm font-medium text-text-secondary transition-colors hover:bg-surface-2"
+          >
+            Workspace hub
+          </Link>
+        </div>
+      </div>
+
+      <div className="flex gap-6">
+        {/* Left sidebar navigation */}
+        <nav className="w-56 shrink-0">
+          <div className="space-y-1 rounded-xl border border-border bg-surface p-2">
+            {TABS.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={`
+                  w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all text-left
+                  ${activeTab === tab.id
+                    ? tab.danger
+                      ? 'bg-red-500/15 text-red-400 border border-red-500/30'
+                      : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-surface-2 border border-transparent'
+                  }
+                `}
+              >
+                <span className="text-base">{tab.icon}</span>
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </nav>
 
-        {/* Content */}
+        {/* Content area */}
         <div className="flex-1 min-w-0 space-y-5">
 
           {saveError && <Alert variant="error">{saveError}</Alert>}
@@ -523,179 +568,162 @@ export default function SettingsPage() {
                     <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                       <path d="M5 13l4 4L19 7"/>
                     </svg>
-                    Changes saved
+                    O'zgartirishlar saqlandi
                   </span>
                 )}
-                <Button onClick={handleSave} loading={saving}>
-                  {saving ? 'Saving…' : 'Save Changes'}
+                <Button onClick={() => {
+                  addToHistory('Workspace Name', currentWorkspace?.name ?? '', workspaceName)
+                  addToHistory('Autopilot Mode', currentWorkspace?.autopilotMode ?? 'assisted', autopilotMode)
+                  handleSave()
+                }} loading={saving}>
+                  {saving ? 'Saqlanmoqda…' : 'Saqlash'}
                 </Button>
               </div>
+
+              {/* Recent Changes */}
+              {settingsHistory.length > 0 && (
+                <Card>
+                  <div className="mb-4">
+                    <h2 className="text-base font-semibold text-text-primary">Yangi O'zgartirishlar</h2>
+                    <p className="text-xs text-text-tertiary mt-0.5">Oxirgi 10 ta o'zgartirilgan sozlama</p>
+                  </div>
+                  <div className="space-y-0 divide-y divide-border">
+                    {settingsHistory.map((item, idx) => (
+                      <div key={item.id} className="py-3 first:pt-0 last:pb-0 flex items-start justify-between">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-text-primary">{item.setting}</p>
+                          <p className="text-xs text-text-tertiary mt-0.5">
+                            <span className="line-through text-text-tertiary/70">{item.previous}</span>
+                            <span className="mx-2">→</span>
+                            <span className="text-emerald-400">{item.current}</span>
+                          </p>
+                        </div>
+                        <span className="text-xs text-text-tertiary ml-4 shrink-0">
+                          {item.timestamp.toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              )}
             </>
           )}
 
           {/* ── INTEGRATIONS ── */}
           {activeTab === 'integrations' && (
             <div className="space-y-6">
-              {/* Advertising Platforms */}
+              {/* Search bar */}
+              <Card>
+                <div className="relative">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-tertiary">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.35-4.35" />
+                  </svg>
+                  <Input
+                    value={integrationSearch}
+                    onChange={(e) => setIntegrationSearch(e.target.value)}
+                    placeholder="Integratsiyalar qidirish..."
+                    className="pl-10"
+                  />
+                </div>
+              </Card>
+
+              {/* Active integrations */}
               <Card>
                 <div className="mb-5">
-                  <h2 className="text-base font-semibold text-text-primary">📢 Reklama Platformalari</h2>
-                  <p className="text-xs text-text-tertiary mt-0.5">
-                    Reklama accountingizni ulang va kampaniyalarni boshqaring
-                  </p>
+                  <h2 className="text-base font-semibold text-text-primary">📡 Faol Integratsiyalar</h2>
+                  <p className="text-xs text-text-tertiary mt-0.5">Ulangan va ishlab turgan platformalar</p>
                 </div>
                 <div className="space-y-3">
-
-                {/* ── Meta (live connection status) ── */}
-                {INTEGRATIONS.map((integration) => (
-                  <div
-                    key={integration.id}
-                    className="flex items-center gap-4 p-4 rounded-xl border border-border bg-surface"
-                  >
-                    <div className="w-10 h-10 rounded-xl bg-surface-2 border border-border flex items-center justify-center shrink-0">
-                      {integration.logo}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm font-medium text-text-primary">{integration.name}</p>
-                        {/* Dynamic connection status */}
-                        {metaConnected === null && (
-                          <span className="text-xs px-1.5 py-0.5 rounded-md bg-surface-2 text-text-tertiary border border-border">
-                            Checking…
-                          </span>
-                        )}
-                        {metaConnected === true && (
-                          <span className="text-xs px-1.5 py-0.5 rounded-md bg-emerald-400/10 text-emerald-400 border border-emerald-400/20 flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                            Connected
-                          </span>
-                        )}
+                  {INTEGRATIONS.map((integration) => (
+                    <div
+                      key={integration.id}
+                      className="flex items-center gap-4 p-4 rounded-xl border border-border bg-surface-2 hover:bg-surface transition-colors"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-surface border border-border flex items-center justify-center shrink-0">
+                        {integration.logo}
                       </div>
-                      <p className="text-xs text-text-tertiary mt-0.5">{integration.description}</p>
-                    </div>
-                    {/* Action */}
-                    {metaConnected === true ? (
-                      <Link
-                        href={integration.href}
-                        className="text-xs px-3 py-1.5 rounded-lg border border-border text-text-secondary hover:bg-surface-2 transition-colors shrink-0"
-                      >
-                        Manage
-                      </Link>
-                    ) : (
-                      <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-medium text-text-primary">{integration.name}</p>
+                          {metaConnected === null && (
+                            <span className="text-xs px-1.5 py-0.5 rounded-md bg-surface text-text-tertiary border border-border">
+                              Tekshirilmoqda…
+                            </span>
+                          )}
+                          {metaConnected === true && (
+                            <span className="text-xs px-1.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                              Ulangan
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-text-tertiary mt-0.5">{integration.description}</p>
+                      </div>
+                      {metaConnected === true ? (
+                        <Link
+                          href={integration.href}
+                          className="text-xs px-3 py-1.5 rounded-lg border border-border text-text-secondary hover:bg-surface transition-colors shrink-0"
+                        >
+                          Boshqarish
+                        </Link>
+                      ) : (
                         <button
                           type="button"
                           onClick={handleMetaConnect}
                           disabled={!currentWorkspace?.id || metaConnecting}
-                          className="text-xs px-3 py-1.5 rounded-lg border border-border text-text-secondary hover:bg-surface-2 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                          className="text-xs px-3 py-1.5 rounded-lg border border-border text-text-secondary hover:bg-surface disabled:opacity-40 disabled:cursor-not-allowed transition-colors shrink-0"
                         >
-                          {metaConnecting ? 'Connecting…' : 'Connect'}
+                          {metaConnecting ? 'Ulanmoqda…' : 'Ulash'}
                         </button>
-                        <Link
-                          href={integration.href}
-                          className="text-xs px-3 py-1.5 rounded-lg border border-border text-text-tertiary hover:text-text-primary hover:bg-surface-2 transition-colors"
-                        >
-                          Details
-                        </Link>
-                      </div>
-                    )}
-                  </div>
-                ))}
-
-              </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </Card>
 
-              {/* Coming Soon Integrations - by Category */}
-              <div className="space-y-5">
-                {/* Ad Platforms */}
-                <Card>
-                  <h3 className="text-sm font-semibold text-text-tertiary uppercase tracking-wider mb-4">🔜 Tez orada: Reklama Platformalari</h3>
-                  <div className="space-y-2">
-                    {INTEGRATIONS_STATIC.slice(0, 3).map((integration) => (
-                      <div key={integration.id} className="flex items-center gap-4 p-3 rounded-lg border border-border bg-surface-2">
-                        <div className="w-9 h-9 rounded-lg bg-surface border border-border flex items-center justify-center shrink-0">
-                          {integration.logo}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <p className="text-sm font-medium text-text-primary">{integration.name}</p>
-                            <span className="text-xs px-1.5 py-0.5 rounded-md bg-amber-500/15/50 text-amber-500 border border-amber-500/20">
-                              Tez orada
-                            </span>
+              {/* Integrations by category */}
+              {INTEGRATION_CATEGORIES.map((category) => {
+                const categoryIntegrations = filteredIntegrations.filter((i) => i.category === category.id)
+                if (categoryIntegrations.length === 0) return null
+                return (
+                  <Card key={category.id}>
+                    <div className="mb-4">
+                      <h3 className="text-sm font-semibold text-text-primary">{category.label}</h3>
+                      <p className="text-xs text-text-tertiary mt-0.5">{category.description}</p>
+                    </div>
+                    <div className="space-y-2">
+                      {categoryIntegrations.map((integration) => (
+                        <div key={integration.id} className="flex items-center gap-4 p-3 rounded-lg border border-border bg-surface-2 hover:bg-surface transition-colors">
+                          <div className="w-9 h-9 rounded-lg bg-surface border border-border flex items-center justify-center shrink-0">
+                            {integration.logo}
                           </div>
-                          <p className="text-xs text-text-tertiary mt-0.5">{integration.description}</p>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm font-medium text-text-primary">{integration.name}</p>
+                              <span className="text-xs px-1.5 py-0.5 rounded-md bg-amber-500/15 text-amber-500 border border-amber-500/20">
+                                Tez orada
+                              </span>
+                            </div>
+                            <p className="text-xs text-text-tertiary mt-0.5">{integration.description}</p>
+                          </div>
+                          <button disabled className="text-xs px-3 py-1.5 rounded-lg bg-surface text-text-tertiary cursor-not-allowed shrink-0">
+                            Ulash
+                          </button>
                         </div>
-                        <button disabled className="text-xs px-3 py-1.5 rounded-lg bg-surface-2 text-text-tertiary cursor-not-allowed shrink-0">
-                          Ulash
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </Card>
+                      ))}
+                    </div>
+                  </Card>
+                )
+              })}
 
-                {/* CRM Integrations */}
+              {filteredIntegrations.length === 0 && integrationSearch && (
                 <Card>
-                  <h3 className="text-sm font-semibold text-text-tertiary uppercase tracking-wider mb-4">🔜 Tez orada: CRM Sistemalari</h3>
-                  <div className="space-y-2">
-                    {INTEGRATIONS_STATIC.slice(3, 5).map((integration) => (
-                      <div key={integration.id} className="flex items-center gap-4 p-3 rounded-lg border border-border bg-surface-2">
-                        <div className="w-9 h-9 rounded-lg bg-surface border border-border flex items-center justify-center shrink-0">
-                          {integration.logo}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-text-primary">{integration.name}</p>
-                          <p className="text-xs text-text-tertiary mt-0.5">{integration.description}</p>
-                        </div>
-                        <button disabled className="text-xs px-3 py-1.5 rounded-lg bg-surface-2 text-text-tertiary cursor-not-allowed shrink-0">
-                          Ulash
-                        </button>
-                      </div>
-                    ))}
+                  <div className="py-8 text-center">
+                    <p className="text-text-tertiary text-sm">"{integrationSearch}" uchun hech narsa topilmadi</p>
                   </div>
                 </Card>
-
-                {/* Analytics */}
-                <Card>
-                  <h3 className="text-sm font-semibold text-text-tertiary uppercase tracking-wider mb-4">🔜 Tez orada: Analitika</h3>
-                  <div className="space-y-2">
-                    {INTEGRATIONS_STATIC.slice(5, 7).map((integration) => (
-                      <div key={integration.id} className="flex items-center gap-4 p-3 rounded-lg border border-border bg-surface-2">
-                        <div className="w-9 h-9 rounded-lg bg-surface border border-border flex items-center justify-center shrink-0">
-                          {integration.logo}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-text-primary">{integration.name}</p>
-                          <p className="text-xs text-text-tertiary mt-0.5">{integration.description}</p>
-                        </div>
-                        <button disabled className="text-xs px-3 py-1.5 rounded-lg bg-surface-2 text-text-tertiary cursor-not-allowed shrink-0">
-                          Ulash
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </Card>
-
-                {/* Messengers */}
-                <Card>
-                  <h3 className="text-sm font-semibold text-text-tertiary uppercase tracking-wider mb-4">🔜 Tez orada: Xabarlar va Bildirishnomalar</h3>
-                  <div className="space-y-2">
-                    {INTEGRATIONS_STATIC.slice(7).map((integration) => (
-                      <div key={integration.id} className="flex items-center gap-4 p-3 rounded-lg border border-border bg-surface-2">
-                        <div className="w-9 h-9 rounded-lg bg-surface border border-border flex items-center justify-center shrink-0">
-                          {integration.logo}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-text-primary">{integration.name}</p>
-                          <p className="text-xs text-text-tertiary mt-0.5">{integration.description}</p>
-                        </div>
-                        <button disabled className="text-xs px-3 py-1.5 rounded-lg bg-surface-2 text-text-tertiary cursor-not-allowed shrink-0">
-                          Ulash
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </Card>
-              </div>
+              )}
             </div>
           )}
 
