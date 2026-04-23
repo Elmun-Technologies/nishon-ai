@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { ConfigService } from '@nestjs/config';
@@ -6,6 +6,8 @@ import { AuthService } from '../auth.service';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
+  private readonly logger = new Logger(GoogleStrategy.name);
+
   constructor(
     config: ConfigService,
     private readonly authService: AuthService,
@@ -33,13 +35,24 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       return done(new Error('Google profile has no email'), undefined);
     }
 
-    const authResponse = await this.authService.findOrCreateFromGoogle({
-      googleId: profile.id,
-      email,
-      name,
-      picture,
-    });
-
-    done(null, authResponse);
+    try {
+      const authResponse = await this.authService.findOrCreateFromGoogle({
+        googleId: profile.id,
+        email,
+        name,
+        picture,
+      });
+      done(null, authResponse);
+    } catch (err) {
+      const e = err as Error & { driverError?: { message?: string; code?: string } };
+      this.logger.error({
+        message: 'Google OAuth validate failed',
+        email,
+        error: e?.message,
+        pgCode: e?.driverError?.code,
+        pgMessage: e?.driverError?.message,
+      });
+      done(e instanceof Error ? e : new Error(String(err)), undefined);
+    }
   }
 }

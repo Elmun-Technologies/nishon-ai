@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-facebook';
 import { ConfigService } from '@nestjs/config';
@@ -6,6 +6,8 @@ import { AuthService } from '../auth.service';
 
 @Injectable()
 export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
+  private readonly logger = new Logger(FacebookStrategy.name);
+
   constructor(
     config: ConfigService,
     private readonly authService: AuthService,
@@ -48,13 +50,24 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
     const name    = profile.displayName ?? 'Facebook User';
     const picture = profile.photos?.[0]?.value ?? undefined;
 
-    const authResponse = await this.authService.findOrCreateFromFacebook({
-      facebookId: profile.id,
-      email,
-      name,
-      picture,
-    });
-
-    done(null, authResponse);
+    try {
+      const authResponse = await this.authService.findOrCreateFromFacebook({
+        facebookId: profile.id,
+        email,
+        name,
+        picture,
+      });
+      done(null, authResponse);
+    } catch (err) {
+      const e = err as Error & { driverError?: { message?: string; code?: string } };
+      this.logger.error({
+        message: 'Facebook OAuth validate failed',
+        email,
+        error: e?.message,
+        pgCode: e?.driverError?.code,
+        pgMessage: e?.driverError?.message,
+      });
+      done(e instanceof Error ? e : new Error(String(err)), undefined);
+    }
   }
 }

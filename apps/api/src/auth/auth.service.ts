@@ -213,7 +213,11 @@ export class AuthService {
           facebookId: profile.facebookId,
           picture:    profile.picture ?? user.picture,
         });
-        user.facebookId = profile.facebookId;
+        const reloaded = await this.userRepo.findOne({ where: { id: user.id } });
+        if (!reloaded) {
+          throw new UnauthorizedException("User disappeared after Facebook link update");
+        }
+        user = reloaded;
       } else {
         user = await this.userRepo.save(
           this.userRepo.create({
