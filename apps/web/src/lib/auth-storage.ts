@@ -7,6 +7,13 @@ const REFRESH_TOKEN_KEY = 'adspectr_refresh_token'
 const LEGACY_ACCESS_TOKEN_KEY = 'performa_access_token'
 const LEGACY_REFRESH_TOKEN_KEY = 'performa_refresh_token'
 
+/** Fake access token written by the "Demo sign-in" button — never sent to API. */
+export const DEMO_ACCESS_TOKEN = 'demo-token-local-preview'
+
+export function isDemoToken(token: string | null | undefined): boolean {
+  return token === DEMO_ACCESS_TOKEN
+}
+
 function migrateLegacyPair(
   legacyKey: string,
   nextKey: string,

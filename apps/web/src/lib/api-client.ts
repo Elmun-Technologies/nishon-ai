@@ -3,6 +3,7 @@ import {
   clearAuthTokens,
   getAccessToken,
   getRefreshToken,
+  isDemoToken,
   setAccessToken,
 } from './auth-storage'
 
@@ -46,6 +47,15 @@ async function apiRequest<T>(
 
   if (typeof window !== 'undefined') {
     const token = getAccessToken()
+    // Demo sign-in uses a fake token — never hit the real API (backend would 401
+    // and the 401 handler below would kick the user back to /login).
+    if (isDemoToken(token)) {
+      const err: ApiError = {
+        response: { data: { message: 'Demo mode — data not available' }, status: 204 },
+        message: 'Demo mode — ma\'lumot mavjud emas (demo rejimi).',
+      }
+      throw err
+    }
     if (token) headers.Authorization = `Bearer ${token}`
   }
 
