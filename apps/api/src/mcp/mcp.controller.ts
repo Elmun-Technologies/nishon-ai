@@ -16,13 +16,25 @@ import {
   ListMcpCredentialsQueryDto,
 } from "./dto/mcp-credentials.dto";
 import { McpService } from "./mcp.service";
+import { MCP_TOOLS } from "./mcp-tools.service";
 
 @Controller("mcp")
-@UseGuards(AuthGuard("jwt"))
 export class McpController {
   constructor(private readonly mcpService: McpService) {}
 
+  @Get("health")
+  health() {
+    return {
+      status: "ok",
+      service: "AdSpectr MCP",
+      version: "1.0",
+      tools: MCP_TOOLS.length,
+      timestamp: new Date().toISOString(),
+    };
+  }
+
   @Get("credentials")
+  @UseGuards(AuthGuard("jwt"))
   list(
     @Query() query: ListMcpCredentialsQueryDto,
     @Req() req: Request,
@@ -31,6 +43,7 @@ export class McpController {
   }
 
   @Post("credentials")
+  @UseGuards(AuthGuard("jwt"))
   create(
     @Body() dto: CreateMcpCredentialsDto,
     @Req() req: Request,
@@ -39,6 +52,7 @@ export class McpController {
   }
 
   @Delete("credentials/:id")
+  @UseGuards(AuthGuard("jwt"))
   revoke(
     @Param("id") id: string,
     @Query() query: ListMcpCredentialsQueryDto,
