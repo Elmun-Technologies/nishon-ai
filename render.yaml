@@ -19,9 +19,9 @@ services:
         value: 10000
 
       # ── Public URLs ────────────────────────────────────────────────────────
-      # Set these to YOUR actual Render service URL and Vercel URL
+      # Custom domain example; override if you only use *.onrender.com
       - key: API_BASE_URL
-        value: https://adspectr-api.onrender.com   # ← set to your Render URL
+        value: https://api.adspectr.com
       - key: FRONTEND_URL
         value: https://adspectr.com               # ← set to your production web URL
 
@@ -64,7 +64,7 @@ services:
       - key: META_APP_SECRET
         sync: false
       - key: META_CALLBACK_URL
-        value: https://adspectr-api.onrender.com/platforms/meta/callback
+        value: https://api.adspectr.com/platforms/meta/callback
 
       # ── TikTok ─────────────────────────────────────────────────────────────
       - key: TIKTOK_APP_ID
