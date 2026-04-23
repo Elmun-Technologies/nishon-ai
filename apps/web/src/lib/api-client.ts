@@ -176,6 +176,8 @@ export const team = {
     memberUserId: string
     allowedAdAccountIds: string[]
   }) => apiClient.patch('/team/members/ad-accounts', body),
+  removeMember: (workspaceId: string, memberUserId: string) =>
+    apiRequest('DELETE', `/team/workspaces/${workspaceId}/members/${memberUserId}`),
 }
 
 export const workspaces = {
