@@ -235,6 +235,7 @@ export const mcpCredentials = {
     apiClient.post('/mcp/credentials', { workspaceId }),
   revoke: (credentialId: string, workspaceId: string) =>
     apiRequest('DELETE', `/mcp/credentials/${credentialId}?workspaceId=${encodeURIComponent(workspaceId)}`),
+  health: () => apiClient.get<{ status: string; tools: number }>('/mcp/health'),
 }
 
 export const aiAgent = {

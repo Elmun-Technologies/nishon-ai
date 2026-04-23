@@ -10,6 +10,11 @@ import { IntegrationConfigEntity } from "../integrations/entities/integration-co
 import { Workspace } from "../workspaces/entities/workspace.entity";
 import { WorkspaceMember } from "../workspace-members/entities/workspace-member.entity";
 
+export interface McpCredentialContext {
+  workspaceId: string;
+  userId: string;
+}
+
 @Injectable()
 export class McpService {
   constructor(
@@ -57,6 +62,7 @@ export class McpService {
         secretMasked,
         createdAt: new Date().toISOString(),
         revokedAt: null,
+        userId,
       },
       updatedAt: new Date().toISOString(),
       workspaceId,
@@ -95,6 +101,35 @@ export class McpService {
     };
     await this.configRepo.save(config);
     return { revoked: true };
+  }
+
+  async validateCredential(
+    clientId: string,
+    clientSecret: string,
+  ): Promise<McpCredentialContext | null> {
+    const secretHash = createHash("sha256").update(clientSecret).digest("hex");
+
+    // Search all mcp:* configs for one matching this clientId
+    const configs = await this.configRepo
+      .createQueryBuilder("cfg")
+      .addSelect("cfg.webhookSecret")
+      .where("cfg.connectionId LIKE :prefix", { prefix: "mcp:%" })
+      .getMany();
+
+    const config = configs.find(
+      (c) =>
+        c.customFields?.credential?.clientId === clientId &&
+        !c.customFields?.credential?.revokedAt &&
+        c.webhookSecret === secretHash,
+    );
+
+    if (!config) return null;
+
+    const workspaceId = config.customFields?.workspaceId as string;
+    const userId = config.customFields?.credential?.userId as string;
+    if (!workspaceId || !userId) return null;
+
+    return { workspaceId, userId };
   }
 
   private connectionId(workspaceId: string) {
