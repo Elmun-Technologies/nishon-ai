@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
 
-export default function WorkspaceSettingsIndexPage() {
+export default async function WorkspaceSettingsIndexPage() {
   redirect('/settings/workspace/ad-accounts')
 }
