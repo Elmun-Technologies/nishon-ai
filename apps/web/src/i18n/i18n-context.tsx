@@ -16,6 +16,7 @@ import { getNestedTranslation } from './use-i18n'
 export interface I18nContextType {
   language: Language
   translations: Translations
+  isLoading: boolean
   setLanguage: (lang: Language) => void
   t: (key: string, defaultValue?: string) => string
 }
@@ -45,6 +46,7 @@ function mergeDeep<T extends Record<string, any>>(base: T, patch: Record<string,
 export const I18nContext = createContext<I18nContextType>({
   language: DEFAULT_LANGUAGE,
   translations: EMPTY_TRANSLATIONS,
+  isLoading: false,
   setLanguage: () => {},
   t: (key: string, defaultValue?: string) => defaultValue ?? key,
 })
@@ -61,6 +63,7 @@ export function I18nProvider({
   defaultLanguage = DEFAULT_LANGUAGE,
 }: I18nProviderProps) {
   const [language, setLanguageState] = useState<Language>(defaultLanguage)
+  const [isLoading, setIsLoading] = useState(false)
   const canonicalRu = ruLocaleCanonical as unknown as Record<string, unknown>
   const [translations, setTranslations] = useState<Translations>(
     () => canonicalRu as unknown as Translations,
@@ -86,11 +89,12 @@ export function I18nProvider({
     }
   }, [])
 
-  // Load active locale and merge on top of Russian canonical strings (missing keys fall back to ru).
+  // Load active locale and merge on top of Russian canonical strings.
   useEffect(() => {
     let cancelled = false
 
     const loadTranslations = async () => {
+      setIsLoading(true)
       try {
         const response = await fetch(`/locales/${language}.json`)
         const data = (await response.json()) as Record<string, unknown>
@@ -101,6 +105,8 @@ export function I18nProvider({
       } catch (error) {
         console.error(`Failed to load ${language} translations:`, error)
         if (!cancelled) setTranslations(canonicalRu as unknown as Translations)
+      } finally {
+        if (!cancelled) setIsLoading(false)
       }
     }
 
@@ -118,7 +124,7 @@ export function I18nProvider({
     (key: string, defaultValue: string = key): string => {
       return getNestedTranslation(translations, key) || defaultValue
     },
-    [translations]
+    [translations],
   )
 
   return (
@@ -126,6 +132,7 @@ export function I18nProvider({
       value={{
         language,
         translations,
+        isLoading,
         setLanguage,
         t,
       }}

@@ -1699,7 +1699,10 @@
     "language": {
       "title": "Interfeys tili",
       "description": "Platforma tilini tanlang (rus, ingliz yoki o‘zbek). Tanlov shu brauzerda saqlanadi va barcha bo‘limlarga qo‘llanadi.",
-      "active": "Hozirgi tanlov"
+      "active": "Hozirgi tanlov",
+      "browserDetected": "Brauzeringiz tili",
+      "switchPrompt": "Shu tilga o'tishni xohlaysizmi?",
+      "coverageNote": "% — tarjima qilingan UI satrlar ulushi. Tarjima qilinmagan satrlar ruscha ko'rsatiladi."
     },
     "payments": {
       "loadError": "To'lov ma'lumotlarini yuklashda xatolik",
