@@ -109,6 +109,7 @@ export default function OnboardingPage() {
   const [pixelInput, setPixelInput] = useState('')
   const [pixelError, setPixelError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [finishError, setFinishError] = useState('')
 
   useEffect(() => {
     const d = loadOnboardingV2()
@@ -140,6 +141,7 @@ export default function OnboardingPage() {
     const ready = ensureComplete({ ...state, pixelId: state.pixelMode === 'has_pixel' ? pixelInput : state.pixelId })
     setSubmitting(true)
     setPixelError('')
+    setFinishError('')
 
     if (ready.pixelMode === 'has_pixel' && ready.pixelId == null) {
       setPixelError(t('onboardingV2.pixelInvalid', 'Pixel ID noto‘g‘ri — faqat raqam, 8–20 belgi.'))
@@ -168,12 +170,12 @@ export default function OnboardingPage() {
           credentials: 'include',
           body: JSON.stringify(body),
         })
-        if (!res.ok) {
-          const j = await res.json().catch(() => ({}))
-          throw new Error((j as { message?: string }).message ?? 'API xato')
+        if (res.ok) {
+          const data = await res.json().catch(() => ({})) as { workspace?: any }
+          if (data.workspace) setCurrentWorkspace(data.workspace)
         }
-        const data = await res.json().catch(() => ({})) as { workspace?: any }
-        if (data.workspace) setCurrentWorkspace(data.workspace)
+        // Workspace creation may fail on first deploy (DB migration pending) — still
+        // navigate to dashboard so the user isn't stuck. They can set up workspace later.
         setFirstCampaignBanner()
         clearOnboardingV2()
         router.push('/dashboard')
@@ -181,7 +183,8 @@ export default function OnboardingPage() {
         finalizeForRegister(ready)
         router.push('/register')
       }
-    } catch {
+    } catch (e: unknown) {
+      setFinishError(e instanceof Error ? e.message : "Xatolik yuz berdi. Qayta urinib ko'ring.")
       setSubmitting(false)
     }
   }, [accessToken, go, router, setCurrentWorkspace, state, pixelInput, t])
@@ -441,10 +444,17 @@ export default function OnboardingPage() {
                   {t('onboardingV2.summaryBudget', 'Kunlik')}: {formatUzs(state.dailyBudgetUzs || 100_000)}
                 </div>
               </div>
+              {finishError && (
+                <p className="text-sm text-red-500 rounded-xl border border-red-200 bg-red-50 px-3 py-2">
+                  {finishError}
+                </p>
+              )}
               <Button className="w-full rounded-2xl py-6 text-lg font-semibold" onClick={() => void finish()} disabled={submitting}>
-                {accessToken
-                  ? t('onboardingV2.goDashboard', "Dashboard ga o'tish")
-                  : t('onboardingV2.goRegister', "Ro'yxatdan o'tish")}
+                {submitting
+                  ? t('onboardingV2.saving', 'Saqlanmoqda…')
+                  : accessToken
+                    ? t('onboardingV2.goDashboard', "Dashboard ga o'tish")
+                    : t('onboardingV2.goRegister', "Ro'yxatdan o'tish")}
               </Button>
               {!accessToken && (
                 <p className="text-center text-xs text-text-tertiary">

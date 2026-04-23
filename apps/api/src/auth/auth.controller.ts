@@ -173,10 +173,28 @@ export class AuthController {
   @UseGuards(AuthGuard("facebook"))
   @ApiOperation({ summary: "Facebook OAuth callback" })
   facebookCallback(@Request() req: any, @Res() res: Response) {
-    const { accessToken, refreshToken } = req.user as AuthResponseDto;
     const frontendUrl = this.frontendUrl();
+    const payload = req.user as any;
+
+    if (payload?._oauthError) {
+      const params = new URLSearchParams({
+        error: "oauth_failed",
+        detail: String(payload._oauthError),
+      });
+      return res.redirect(`${frontendUrl}/auth/google/callback?${params.toString()}`);
+    }
+
+    const auth = payload as AuthResponseDto | undefined;
+    if (!auth?.accessToken || !auth?.refreshToken) {
+      const params = new URLSearchParams({
+        error: "oauth_incomplete",
+        detail: "Missing tokens after Facebook sign-in — check API logs.",
+      });
+      return res.redirect(`${frontendUrl}/auth/google/callback?${params.toString()}`);
+    }
+
+    const { accessToken, refreshToken } = auth;
     const params = new URLSearchParams({ accessToken, refreshToken });
-    // Reuse the same callback page as Google
     res.redirect(`${frontendUrl}/auth/google/callback?${params.toString()}`);
   }
 }

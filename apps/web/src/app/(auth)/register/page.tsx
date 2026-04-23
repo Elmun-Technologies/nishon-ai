@@ -19,7 +19,34 @@ import {
   clearPreAuthOnboarding,
   isPreAuthOnboardingComplete,
   loadPreAuthOnboardingDraft,
+  type PreAuthOnboardingDraft,
 } from '@/lib/pre-auth-onboarding'
+
+const INDUSTRY_TO_BIZ: Record<string, string> = {
+  ecommerce: 'shop', local: 'service', agency: 'service', other: 'other',
+}
+const GOAL_TO_V2: Record<string, string> = {
+  roas: 'sales', leads: 'leads', awareness: 'awareness',
+}
+const BUDGET_TO_DAILY: Record<string, number> = {
+  under_1k: 100_000, '1k_5k': 150_000, '5k_20k': 250_000, '20k_plus': 350_000,
+}
+
+async function tryCreateWorkspace(accessToken: string, draft: PreAuthOnboardingDraft) {
+  try {
+    const businessType = INDUSTRY_TO_BIZ[draft.industry] ?? 'other'
+    const goal = GOAL_TO_V2[draft.goal] ?? 'sales'
+    const dailyBudget = BUDGET_TO_DAILY[draft.budgetBand] ?? 100_000
+    await fetch('/api/onboarding/complete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+      credentials: 'include',
+      body: JSON.stringify({ businessType, goal, dailyBudget }),
+    })
+  } catch {
+    // Non-blocking — user can set up workspace from dashboard
+  }
+}
 
 export default function RegisterPage() {
   const { t } = useI18n()
@@ -51,8 +78,13 @@ export default function RegisterPage() {
       setRefreshToken(refreshToken)
       setAccessToken(accessToken)
       setUser(user)
+
+      // Try to create workspace from onboarding draft before navigating
+      const onboardingDraft = loadPreAuthOnboardingDraft()
       clearPreAuthOnboarding()
-      router.push('/onboarding')
+      await tryCreateWorkspace(accessToken, onboardingDraft)
+
+      router.push('/dashboard')
     } catch (err: unknown) {
       const fallback = t('auth.registerPage.genericError', 'Registration failed. Please try again.')
       let msg = getApiErrorMessage(err, fallback)

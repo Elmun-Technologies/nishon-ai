@@ -41,8 +41,14 @@ export function getRefreshToken(): string | null {
 export function setAccessToken(token: string | null): void {
   if (typeof window === 'undefined') return
   localStorage.removeItem(LEGACY_ACCESS_TOKEN_KEY)
-  if (token) localStorage.setItem(ACCESS_TOKEN_KEY, token)
-  else localStorage.removeItem(ACCESS_TOKEN_KEY)
+  if (token) {
+    localStorage.setItem(ACCESS_TOKEN_KEY, token)
+    // Hint cookie lets Next.js middleware detect an active session without reading localStorage
+    document.cookie = 'adspectr_auth=1; path=/; SameSite=Lax; max-age=604800'
+  } else {
+    localStorage.removeItem(ACCESS_TOKEN_KEY)
+    document.cookie = 'adspectr_auth=; path=/; SameSite=Lax; max-age=0'
+  }
 }
 
 export function setRefreshToken(token: string | null): void {
@@ -58,6 +64,7 @@ export function clearAuthTokens(): void {
   localStorage.removeItem(REFRESH_TOKEN_KEY)
   localStorage.removeItem(LEGACY_ACCESS_TOKEN_KEY)
   localStorage.removeItem(LEGACY_REFRESH_TOKEN_KEY)
+  document.cookie = 'adspectr_auth=; path=/; SameSite=Lax; max-age=0'
 }
 
 export { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY }
