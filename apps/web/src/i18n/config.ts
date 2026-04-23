@@ -2,9 +2,9 @@
 
 /** UI languages. Russian is the canonical copy source for the product (default). */
 export const LANGUAGES = {
-  ru: { name: 'Русский', flag: '🇷🇺', dir: 'ltr' },
-  en: { name: 'English', flag: '🇬🇧', dir: 'ltr' },
-  uz: { name: "O'zbek", flag: '🇺🇿', dir: 'ltr' },
+  ru: { name: 'Русский', flag: '🇷🇺', displayCode: 'RU', localeCode: 'RU', dir: 'ltr' },
+  en: { name: 'English', flag: '🇬🇧', displayCode: 'GB', localeCode: 'EN', dir: 'ltr' },
+  uz: { name: "O'zbek", flag: '🇺🇿', displayCode: 'UZ', localeCode: 'UZ', dir: 'ltr' },
 } as const
 
 export type Language = keyof typeof LANGUAGES
