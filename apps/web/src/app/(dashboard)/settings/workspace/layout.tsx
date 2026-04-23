@@ -4,93 +4,141 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { useI18n } from '@/i18n/use-i18n'
-import { Building2, ChevronDown } from 'lucide-react'
+import {
+  LayoutGrid,
+  Package,
+  CreditCard,
+  User,
+  Globe,
+  Users,
+  Plug,
+  BookOpen,
+  Building2,
+  ArrowLeft,
+} from 'lucide-react'
 
-const TAB_KEYS: { href: string; labelKey: string; fallback: string }[] = [
-  { href: '/settings/workspace/ad-accounts', labelKey: 'workspaceSettings.tabs.adAccounts', fallback: 'Ad accounts' },
-  { href: '/settings/workspace/products', labelKey: 'workspaceSettings.tabs.products', fallback: 'Products & Usage' },
-  { href: '/settings/workspace/payments', labelKey: 'workspaceSettings.tabs.payments', fallback: 'Payments' },
-  { href: '/settings/workspace/profile', labelKey: 'workspaceSettings.tabs.profile', fallback: 'User Profile' },
-  { href: '/settings/workspace/language', labelKey: 'workspaceSettings.tabs.language', fallback: 'Language' },
-  { href: '/settings/workspace/team', labelKey: 'workspaceSettings.tabs.team', fallback: 'Team Members' },
-  { href: '/settings/workspace/mcp', labelKey: 'workspaceSettings.tabs.mcp', fallback: 'MCP Integration' },
-  { href: '/settings/workspace/help', labelKey: 'workspaceSettings.tabs.help', fallback: 'Resource Center' },
+const NAV_ITEMS = [
+  { href: '/settings/workspace/ad-accounts', icon: LayoutGrid, labelKey: 'workspaceSettings.tabs.adAccounts', fallback: 'Ad accounts' },
+  { href: '/settings/workspace/products', icon: Package, labelKey: 'workspaceSettings.tabs.products', fallback: 'Products & Usage' },
+  { href: '/settings/workspace/payments', icon: CreditCard, labelKey: 'workspaceSettings.tabs.payments', fallback: 'Payments' },
+  { href: '/settings/workspace/profile', icon: User, labelKey: 'workspaceSettings.tabs.profile', fallback: 'User Profile' },
+  { href: '/settings/workspace/language', icon: Globe, labelKey: 'workspaceSettings.tabs.language', fallback: 'Language' },
+  { href: '/settings/workspace/team', icon: Users, labelKey: 'workspaceSettings.tabs.team', fallback: 'Team Members' },
+  { href: '/settings/workspace/mcp', icon: Plug, labelKey: 'workspaceSettings.tabs.mcp', fallback: 'MCP Integration' },
+  { href: '/settings/workspace/help', icon: BookOpen, labelKey: 'workspaceSettings.tabs.help', fallback: 'Resource Center' },
 ]
 
-export default function WorkspaceSettingsLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+function isActive(pathname: string, href: string) {
+  return pathname === href || (href === '/settings/workspace/ad-accounts' && pathname === '/settings/workspace')
+}
+
+export default function WorkspaceSettingsLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const { currentWorkspace } = useWorkspaceStore()
   const { t } = useI18n()
 
   return (
-    <div className="max-w-6xl mx-auto pb-12">
-      <div className="mb-2 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-violet-600 dark:text-violet-400">
-            {t('workspaceSettings.title', 'Workspace settings')}
-          </p>
-          <div className="mt-2 flex flex-wrap items-center gap-3">
-            <h1 className="text-2xl font-bold tracking-tight text-text-primary sm:text-[1.65rem]">
-              {t('workspaceSettings.title', 'Workspace settings')}
-            </h1>
-            <button
-              type="button"
-              className="inline-flex items-center gap-2 rounded-xl border border-border bg-white/90 px-3 py-2 text-sm font-medium text-text-primary shadow-sm backdrop-blur dark:bg-slate-900/80"
-              aria-haspopup="listbox"
-              aria-label={t('workspaceSettings.workspace', 'Workspace')}
+    <div className="min-h-screen">
+      {/* Top header bar */}
+      <div className="border-b border-border/70 bg-surface/95 backdrop-blur-sm">
+        <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between gap-4">
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-text-tertiary">
+                {t('workspaceSettings.title', 'Workspace settings')}
+              </p>
+              <h1 className="mt-0.5 text-xl font-bold tracking-tight text-text-primary">
+                {t('workspaceSettings.title', 'Workspace settings')}
+              </h1>
+              <p className="mt-0.5 hidden text-xs text-text-tertiary sm:block">
+                {t('workspaceSettings.shellSubtitle', 'Ad accounts, subscription, payments, profile, team, and MCP — in one place.')}
+              </p>
+            </div>
+            <Link
+              href="/settings"
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-2 text-xs font-medium text-text-secondary transition-colors hover:bg-surface-2 hover:text-text-primary"
             >
-              <Building2 className="h-4 w-4 text-violet-500" />
-              <span className="max-w-[200px] truncate">{currentWorkspace?.name ?? t('workspaceSettings.workspace', 'Workspace')}</span>
-              <ChevronDown className="h-4 w-4 text-text-tertiary" />
-            </button>
+              <ArrowLeft className="h-3.5 w-3.5" />
+              {t('workspaceSettings.classicSettings', 'Classic settings')}
+            </Link>
           </div>
-          <p className="mt-2 max-w-2xl text-sm text-text-tertiary">
-            {t(
-              'workspaceSettings.shellSubtitle',
-              'Ad accounts, subscription, payments, profile, team, and MCP — in one place.',
-            )}
-          </p>
         </div>
-        <Link
-          href="/settings"
-          className="shrink-0 self-start rounded-xl border border-border bg-surface px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-surface-2 hover:text-text-primary"
-        >
-          ← {t('workspaceSettings.classicSettings', 'Classic settings')}
-        </Link>
       </div>
 
-      <nav
-        className="-mx-1 mb-8 flex gap-1 overflow-x-auto border-b border-border/80 pb-px scrollbar-thin"
-        aria-label="Workspace settings tabs"
-      >
-        {TAB_KEYS.map((tab) => {
-          const active =
-            pathname === tab.href ||
-            (tab.href === '/settings/workspace/ad-accounts' && pathname === '/settings/workspace')
-          return (
-            <Link
-              key={tab.href}
-              href={tab.href}
-              className={`
-                shrink-0 whitespace-nowrap border-b-2 px-3 py-2.5 text-sm font-medium transition-colors
-                ${
-                  active
-                    ? 'border-violet-600 text-violet-700 dark:border-violet-400 dark:text-violet-300'
-                    : 'border-transparent text-text-tertiary hover:text-text-secondary'
-                }
-              `}
-            >
-              {t(tab.labelKey, tab.fallback)}
-            </Link>
-          )
-        })}
-      </nav>
+      {/* Body */}
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex gap-0 lg:gap-10">
+          {/* ── Sidebar (desktop) ─────────────────────────────── */}
+          <aside className="hidden w-56 shrink-0 py-8 lg:block">
+            {/* Workspace pill */}
+            <div className="mb-5 flex items-center gap-3 rounded-2xl border border-border/70 bg-surface p-3 shadow-sm">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-lime/20 text-brand-ink dark:text-brand-lime">
+                <Building2 className="h-4 w-4" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold text-text-primary">
+                  {currentWorkspace?.name ?? t('workspaceSettings.workspace', 'Workspace')}
+                </p>
+                <p className="text-[11px] text-text-tertiary">Workspace</p>
+              </div>
+            </div>
 
-      {children}
+            {/* Nav */}
+            <nav className="space-y-0.5" aria-label="Workspace settings navigation">
+              {NAV_ITEMS.map((item) => {
+                const active = isActive(pathname, item.href)
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
+                      active
+                        ? 'bg-brand-lime/15 text-brand-ink shadow-sm dark:bg-brand-lime/10 dark:text-brand-lime'
+                        : 'text-text-tertiary hover:bg-surface-2 hover:text-text-primary'
+                    }`}
+                  >
+                    <item.icon
+                      className={`h-4 w-4 shrink-0 ${
+                        active ? 'text-brand-mid dark:text-brand-lime' : 'text-text-tertiary'
+                      }`}
+                    />
+                    {t(item.labelKey, item.fallback)}
+                  </Link>
+                )
+              })}
+            </nav>
+          </aside>
+
+          {/* ── Main content ───────────────────────────────────── */}
+          <main className="min-w-0 flex-1 py-6 pb-16 lg:py-8">
+            {/* Mobile nav — horizontal scrollable tabs */}
+            <nav
+              className="-mx-4 mb-6 flex gap-0 overflow-x-auto border-b border-border/70 px-4 scrollbar-thin sm:-mx-6 sm:px-6 lg:hidden"
+              aria-label="Workspace settings tabs"
+            >
+              {NAV_ITEMS.map((item) => {
+                const active = isActive(pathname, item.href)
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap border-b-2 px-3 py-3 text-sm font-medium transition-colors ${
+                      active
+                        ? 'border-brand-mid text-brand-ink dark:border-brand-lime dark:text-brand-lime'
+                        : 'border-transparent text-text-tertiary hover:text-text-secondary'
+                    }`}
+                  >
+                    <item.icon className="h-3.5 w-3.5" />
+                    {t(item.labelKey, item.fallback)}
+                  </Link>
+                )
+              })}
+            </nav>
+
+            {children}
+          </main>
+        </div>
+      </div>
     </div>
   )
 }
