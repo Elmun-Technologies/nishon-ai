@@ -20,7 +20,7 @@ import {
   X,
   Search
 } from 'lucide-react'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 
 interface NavSection {
   title: string;
@@ -171,6 +171,26 @@ export default function WorkspaceSettingsLayout({
   }, [searchQuery])
 
   const currentPage = getCurrentPageLabel()
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Cmd/Ctrl + K to focus search
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        searchInputRef.current?.focus()
+      }
+
+      // Escape to close sidebar on mobile
+      if (e.key === 'Escape' && sidebarOpen) {
+        setSidebarOpen(false)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [sidebarOpen])
 
   return (
     <div className="min-h-screen bg-background">
@@ -245,15 +265,19 @@ export default function WorkspaceSettingsLayout({
           >
             {/* Search Bar */}
             <div className="mb-6 hidden lg:block sticky top-0 z-10">
-              <div className="relative">
+              <div className="relative group">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-text-tertiary pointer-events-none" />
                 <input
+                  ref={searchInputRef}
                   type="text"
                   placeholder={t('common.search', 'Search settings...')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full rounded-lg border border-border bg-surface/50 py-2 pl-10 pr-3 text-sm text-text-primary placeholder-text-tertiary focus:border-violet-500 focus:outline-none dark:bg-slate-800/50"
+                  className="w-full rounded-lg border border-border bg-surface/50 py-2 pl-10 pr-8 text-sm text-text-primary placeholder-text-tertiary focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/20 dark:bg-slate-800/50 transition-all"
                 />
+                <kbd className="absolute right-2 top-2 hidden group-focus-within:hidden text-xs font-semibold text-text-tertiary bg-surface/80 px-2 py-1 rounded pointer-events-none">
+                  {/Mac|iPhone|iPad|iPod/.test(navigator.platform) ? '⌘' : 'Ctrl'} K
+                </kbd>
               </div>
             </div>
 
