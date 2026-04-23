@@ -132,6 +132,30 @@ async function bootstrap() {
       `);
       logger.log({ message: "workspaces schema repair: OK", context: "Bootstrap" });
 
+      // ── connected_accounts ─────────────────────────────────────────────────
+      await dataSource.query(`
+        DO $$ BEGIN
+          BEGIN ALTER TABLE "connected_accounts" ADD COLUMN "token_expires_at"     TIMESTAMP    NULL;                   EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "connected_accounts" ADD COLUMN "tracking_started_at"  TIMESTAMP    NULL;                   EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "connected_accounts" ADD COLUMN "is_active"            BOOLEAN      NOT NULL DEFAULT true;  EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "connected_accounts" ADD COLUMN "created_at"           TIMESTAMP    NOT NULL DEFAULT NOW(); EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "connected_accounts" ADD COLUMN "updated_at"           TIMESTAMP    NOT NULL DEFAULT NOW(); EXCEPTION WHEN OTHERS THEN NULL; END;
+        END $$;
+      `);
+      logger.log({ message: "connected_accounts schema repair: OK", context: "Bootstrap" });
+
+      // ── budgets ────────────────────────────────────────────────────────────
+      await dataSource.query(`
+        DO $$ BEGIN
+          BEGIN ALTER TABLE "budgets" ADD COLUMN "platform_split"  JSONB        NULL;                        EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "budgets" ADD COLUMN "auto_rebalance"  BOOLEAN      NOT NULL DEFAULT true;       EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "budgets" ADD COLUMN "created_at"      TIMESTAMP    NOT NULL DEFAULT NOW();      EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "budgets" ADD COLUMN "updated_at"      TIMESTAMP    NOT NULL DEFAULT NOW();      EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "budgets" ADD COLUMN "workspace_id"    UUID         NULL;                        EXCEPTION WHEN OTHERS THEN NULL; END;
+        END $$;
+      `);
+      logger.log({ message: "budgets schema repair: OK", context: "Bootstrap" });
+
     } catch (e) {
       logger.error({
         message: "schema repair failed — login or workspaces may break",
