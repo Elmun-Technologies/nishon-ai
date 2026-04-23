@@ -126,13 +126,8 @@ export class AuthController {
       return res.redirect(`${frontendUrl}/auth/google/callback?${params.toString()}`);
     }
 
-    const { accessToken, refreshToken, user } = auth;
-    const isNew = !user;
-    const params = new URLSearchParams({
-      accessToken,
-      refreshToken,
-      isNew: String(isNew),
-    });
+    const { accessToken, refreshToken } = auth;
+    const params = new URLSearchParams({ accessToken, refreshToken });
 
     return res.redirect(`${frontendUrl}/auth/google/callback?${params.toString()}`);
   }

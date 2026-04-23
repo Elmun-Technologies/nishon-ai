@@ -100,6 +100,7 @@ export default function OnboardingPage() {
   const { t } = useI18n()
   const router = useRouter()
   const accessToken = useWorkspaceStore((s) => s.accessToken)
+  const setCurrentWorkspace = useWorkspaceStore((s) => s.setCurrentWorkspace)
 
   const [state, setState] = useState<OnboardingV2State>(() => ({
     ...loadOnboardingV2(),
@@ -171,6 +172,8 @@ export default function OnboardingPage() {
           const j = await res.json().catch(() => ({}))
           throw new Error((j as { message?: string }).message ?? 'API xato')
         }
+        const data = await res.json().catch(() => ({})) as { workspace?: any }
+        if (data.workspace) setCurrentWorkspace(data.workspace)
         setFirstCampaignBanner()
         clearOnboardingV2()
         router.push('/dashboard')
@@ -181,7 +184,7 @@ export default function OnboardingPage() {
     } catch {
       setSubmitting(false)
     }
-  }, [accessToken, go, router, state, pixelInput, t])
+  }, [accessToken, go, router, setCurrentWorkspace, state, pixelInput, t])
 
   const skipAll = useCallback(() => {
     setState((prev) => {
