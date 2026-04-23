@@ -114,6 +114,14 @@ async function bootstrap() {
         EXCEPTION WHEN duplicate_column THEN NULL; END $$;
       `);
       await dataSource.query(`
+        DO $$ BEGIN ALTER TABLE "users" ADD COLUMN "is_email_verified" BOOLEAN NOT NULL DEFAULT false;
+        EXCEPTION WHEN duplicate_column THEN NULL; END $$;
+      `);
+      await dataSource.query(`
+        DO $$ BEGIN ALTER TABLE "users" ADD COLUMN "refresh_token" TEXT NULL;
+        EXCEPTION WHEN duplicate_column THEN NULL; END $$;
+      `);
+      await dataSource.query(`
         DO $$ BEGIN ALTER TABLE "users" ALTER COLUMN "password" DROP NOT NULL;
         EXCEPTION WHEN OTHERS THEN NULL; END $$;
       `);
