@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Alert, Dialog } from '@/components/ui'
+import { useToast } from '@/components/ui/Toaster'
 import Link from 'next/link'
 import { Plus, Pencil, Users } from 'lucide-react'
 import { team } from '@/lib/api-client'
@@ -25,18 +26,29 @@ type PendingInvite = {
   status: string
 }
 
+function parseEmails(raw: string): string[] {
+  return raw
+    .split(/[\s,;\n]+/)
+    .map((e) => e.trim().toLowerCase())
+    .filter((e) => e.includes('@'))
+}
+
 export default function WorkspaceTeamPage() {
   const { t } = useI18n()
+  const { toast } = useToast()
   const { currentWorkspace, user } = useWorkspaceStore()
   const [members, setMembers] = useState<MemberRow[]>([])
   const [pending, setPending] = useState<PendingInvite[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [inviteOpen, setInviteOpen] = useState(false)
-  const [inviteEmail, setInviteEmail] = useState('')
+  const [inviteRaw, setInviteRaw] = useState('')
   const [inviteBusy, setInviteBusy] = useState(false)
-  const [inviteMsg, setInviteMsg] = useState('')
   const [adAccounts, setAdAccounts] = useState<Array<{ id: string; name: string }>>([])
+
+  useEffect(() => {
+    document.title = 'Team Members — Workspace settings | AdSpectr'
+  }, [])
 
   const load = useCallback(async () => {
     if (!currentWorkspace?.id) { setLoading(false); return }
@@ -58,29 +70,40 @@ export default function WorkspaceTeamPage() {
 
   useEffect(() => { void load() }, [load])
 
+  const parsedEmails = parseEmails(inviteRaw)
+  const emailsValid = parsedEmails.length > 0
+
   async function sendInvite() {
-    if (!currentWorkspace?.id || !inviteEmail.trim()) return
+    if (!currentWorkspace?.id || !emailsValid) return
     setInviteBusy(true)
-    setInviteMsg('')
     try {
-      await team.createInvites({ workspaceId: currentWorkspace.id, emails: [inviteEmail.trim()], role: 'advertiser' })
-      setInviteEmail('')
+      await team.createInvites({ workspaceId: currentWorkspace.id, emails: parsedEmails, role: 'advertiser' })
+      setInviteRaw('')
       setInviteOpen(false)
+      toast(parsedEmails.length === 1 ? `Invite sent to ${parsedEmails[0]}.` : `${parsedEmails.length} invites sent.`)
       await load()
     } catch (e: any) {
-      setInviteMsg(e?.message ?? 'Xato')
+      toast(e?.message ?? 'Failed to send invite', 'error')
     } finally {
       setInviteBusy(false)
     }
   }
 
   async function revoke(id: string) {
-    try { await team.revokeInvite(id); await load() } catch { /* noop */ }
+    try {
+      await team.revokeInvite(id)
+      toast('Invite revoked.')
+      await load()
+    } catch { /* noop */ }
   }
 
   async function updateRole(memberUserId: string, role: MemberRow['role']) {
     if (!currentWorkspace?.id) return
-    try { await team.updateMemberRole({ workspaceId: currentWorkspace.id, memberUserId, role }); await load() } catch { /* noop */ }
+    try {
+      await team.updateMemberRole({ workspaceId: currentWorkspace.id, memberUserId, role })
+      toast('Role updated.')
+      await load()
+    } catch { /* noop */ }
   }
 
   async function toggleAccount(member: MemberRow, accountId: string) {
@@ -105,28 +128,22 @@ export default function WorkspaceTeamPage() {
             </div>
             <div className="flex items-center gap-2">
               <span className="text-base font-semibold text-text-primary">{currentWorkspace?.name ?? '—'}</span>
-              <Link
-                href="/settings/workspace/profile"
-                className="inline-flex rounded-lg p-1 text-text-tertiary transition-colors hover:bg-surface-2 hover:text-brand-mid"
-                aria-label={t('common.edit', 'Edit')}
-              >
+              <Link href="/settings/workspace/profile" className="inline-flex rounded-lg p-1 text-text-tertiary transition-colors hover:bg-surface-2 hover:text-brand-mid" aria-label={t('common.edit', 'Edit')}>
                 <Pencil className="h-3.5 w-3.5" />
               </Link>
             </div>
           </div>
-          <Button
-            size="sm"
-            type="button"
-            className="gap-1.5"
-            onClick={() => setInviteOpen(true)}
-            disabled={!currentWorkspace?.id}
-          >
+          <Button size="sm" type="button" className="gap-1.5" onClick={() => setInviteOpen(true)} disabled={!currentWorkspace?.id}>
             <Plus className="h-3.5 w-3.5" />
             {t('workspaceSettings.team.invite', 'Invite member')}
           </Button>
         </div>
 
-        {error && <div className="p-5"><Alert variant="error">{error}</Alert></div>}
+        {error && (
+          <div className="p-5">
+            <Alert variant="error">{error}</Alert>
+          </div>
+        )}
 
         {/* Members table */}
         <div className="overflow-x-auto">
@@ -208,7 +225,7 @@ export default function WorkspaceTeamPage() {
                 <li key={p.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border/70 px-4 py-2.5 text-sm">
                   <span className="font-medium text-text-primary">{p.email}</span>
                   <span className="rounded-full bg-surface-2 px-2 py-0.5 text-[11px] text-text-tertiary">{p.role}</span>
-                  <button type="button" onClick={() => revoke(p.id)} className="text-xs text-red-500 hover:underline">
+                  <button type="button" onClick={() => void revoke(p.id)} className="text-xs text-red-500 hover:underline">
                     {t('workspaceSettings.team.revoke', 'Revoke')}
                   </button>
                 </li>
@@ -218,7 +235,7 @@ export default function WorkspaceTeamPage() {
         )}
       </section>
 
-      {/* Ad-account permissions matrix */}
+      {/* Ad-account permissions */}
       {adAccounts.length > 0 && members.length > 0 && (
         <section className="rounded-2xl border border-border/70 bg-surface p-5 shadow-sm sm:p-6">
           <h3 className="text-sm font-semibold text-text-secondary">
@@ -238,11 +255,7 @@ export default function WorkspaceTeamPage() {
                         key={acc.id}
                         type="button"
                         onClick={() => void toggleAccount(m, acc.id)}
-                        className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
-                          active
-                            ? 'border-brand-mid/40 bg-brand-lime/15 text-brand-ink dark:text-brand-lime'
-                            : 'border-border bg-surface text-text-tertiary hover:bg-surface-2'
-                        }`}
+                        className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${active ? 'border-brand-mid/40 bg-brand-lime/15 text-brand-ink dark:text-brand-lime' : 'border-border bg-surface text-text-tertiary hover:bg-surface-2'}`}
                       >
                         {acc.name}
                       </button>
@@ -255,20 +268,37 @@ export default function WorkspaceTeamPage() {
         </section>
       )}
 
-      {/* Invite dialog */}
+      {/* Invite dialog — bulk emails */}
       {inviteOpen && (
-        <Dialog open={inviteOpen} onClose={() => setInviteOpen(false)} title={t('workspaceSettings.team.invite', 'Invite team member')} className="max-w-md">
+        <Dialog open={inviteOpen} onClose={() => { setInviteOpen(false); setInviteRaw('') }} title={t('workspaceSettings.team.invite', 'Invite team members')} className="max-w-md">
           <p className="mt-2 text-sm text-text-tertiary">
-            {t('workspaceSettings.team.inviteHint', 'Send an email invitation. The user should be registered with the same email.')}
+            Enter one or more email addresses — separated by commas, spaces, or new lines.
           </p>
-          <label className="mt-4 block text-xs font-medium uppercase tracking-wide text-text-tertiary" htmlFor="invite-email">
-            Email
-          </label>
-          <Input id="invite-email" className="mt-1.5" placeholder="user@example.com" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} />
-          {inviteMsg && <p className="mt-2 text-sm text-amber-500">{inviteMsg}</p>}
+          <div className="mt-4">
+            <label className="text-xs font-medium uppercase tracking-wide text-text-tertiary" htmlFor="invite-emails">
+              Email addresses
+            </label>
+            <textarea
+              id="invite-emails"
+              className="mt-1.5 w-full resize-none rounded-xl border border-border/70 bg-surface px-3 py-2.5 text-sm text-text-primary placeholder-text-tertiary focus:outline-none focus:ring-1 focus:ring-brand-mid dark:bg-surface"
+              rows={4}
+              placeholder={'alice@example.com\nbob@example.com, carol@example.com'}
+              value={inviteRaw}
+              onChange={(e) => setInviteRaw(e.target.value)}
+            />
+            {parsedEmails.length > 0 && (
+              <p className="mt-1 text-xs text-brand-mid dark:text-brand-lime">
+                {parsedEmails.length} valid email{parsedEmails.length !== 1 ? 's' : ''} detected
+              </p>
+            )}
+          </div>
           <div className="mt-6 flex justify-end gap-2">
-            <Button variant="secondary" size="sm" type="button" onClick={() => setInviteOpen(false)}>{t('common.cancel', 'Cancel')}</Button>
-            <Button size="sm" type="button" loading={inviteBusy} onClick={() => void sendInvite()}>{t('common.send', 'Send invite')}</Button>
+            <Button variant="secondary" size="sm" type="button" onClick={() => { setInviteOpen(false); setInviteRaw('') }}>
+              {t('common.cancel', 'Cancel')}
+            </Button>
+            <Button size="sm" type="button" loading={inviteBusy} onClick={() => void sendInvite()} disabled={!emailsValid}>
+              {t('common.send', 'Send invite')} {parsedEmails.length > 1 ? `(${parsedEmails.length})` : ''}
+            </Button>
           </div>
         </Dialog>
       )}

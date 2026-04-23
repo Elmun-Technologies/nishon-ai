@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -8,15 +8,21 @@ import { Dialog } from '@/components/ui'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { auth, workspaces } from '@/lib/api-client'
 import { useI18n } from '@/i18n/use-i18n'
+import { useToast } from '@/components/ui/Toaster'
 import { User, Building2, Globe } from 'lucide-react'
 
 export default function WorkspaceUserProfilePage() {
   const { t } = useI18n()
+  const { toast } = useToast()
   const { user, currentWorkspace, setUser, setCurrentWorkspace } = useWorkspaceStore()
   const [editUserOpen, setEditUserOpen] = useState(false)
   const [workspaceModalOpen, setWorkspaceModalOpen] = useState(false)
   const [saving, setSaving] = useState(false)
   const [note, setNote] = useState('')
+
+  useEffect(() => {
+    document.title = 'User Profile — Workspace settings | AdSpectr'
+  }, [])
   const [userForm, setUserForm] = useState({ name: user?.name ?? '', email: user?.email ?? '' })
   const [workspaceForm, setWorkspaceForm] = useState({
     name: currentWorkspace?.name ?? '',
@@ -42,8 +48,10 @@ export default function WorkspaceUserProfilePage() {
       })
       setEditUserOpen(false)
       setNote(t('workspaceSettings.profile.savedProfile', 'Profile saved.'))
+      toast(t('workspaceSettings.profile.savedProfile', 'Profile saved.'))
     } catch (e: any) {
       setNote(e?.message ?? 'Error')
+      toast(e?.message ?? 'Failed to save profile', 'error')
     } finally {
       setSaving(false)
     }
@@ -62,8 +70,10 @@ export default function WorkspaceUserProfilePage() {
       setCurrentWorkspace({ ...(currentWorkspace as any), ...(data as any), name: workspaceForm.name, industry: workspaceForm.businessType })
       setWorkspaceModalOpen(false)
       setNote(t('workspaceSettings.profile.savedWorkspace', 'Workspace settings saved.'))
+      toast(t('workspaceSettings.profile.savedWorkspace', 'Workspace settings saved.'))
     } catch (e: any) {
       setNote(e?.message ?? 'Error')
+      toast(e?.message ?? 'Failed to save workspace', 'error')
     } finally {
       setSaving(false)
     }

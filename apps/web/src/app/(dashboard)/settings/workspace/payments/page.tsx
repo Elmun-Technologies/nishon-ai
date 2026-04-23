@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Alert, DataTable, Dialog } from '@/components/ui'
-import { CreditCard, FileText, Receipt, Plus, Star } from 'lucide-react'
+import { useToast } from '@/components/ui/Toaster'
+import { CreditCard, FileText, Receipt, Plus, Star, RefreshCw } from 'lucide-react'
 import { billing } from '@/lib/api-client'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { useI18n } from '@/i18n/use-i18n'
@@ -36,6 +37,24 @@ type InvoiceRow = {
   status: string
   createdAt: string
   pdfUrl?: string | null
+}
+
+function luhn(value: string): boolean {
+  const digits = value.replace(/\D/g, '')
+  if (digits.length < 13) return false
+  let sum = 0
+  let alt = false
+  for (let i = digits.length - 1; i >= 0; i--) {
+    let n = parseInt(digits[i], 10)
+    if (alt) { n *= 2; if (n > 9) n -= 9 }
+    sum += n
+    alt = !alt
+  }
+  return sum % 10 === 0
+}
+
+function formatCardDisplay(raw: string) {
+  return raw.replace(/\D/g, '').slice(0, 16).replace(/(.{4})/g, '$1 ').trim()
 }
 
 function SectionHeader({
@@ -76,6 +95,7 @@ function InfoField({ label, value }: { label: string; value?: string }) {
 
 export default function WorkspacePaymentsPage() {
   const { t } = useI18n()
+  const { toast } = useToast()
   const { currentWorkspace } = useWorkspaceStore()
   const [methods, setMethods] = useState<PaymentMethod[]>([])
   const [invoices, setInvoices] = useState<InvoiceRow[]>([])
@@ -84,15 +104,17 @@ export default function WorkspacePaymentsPage() {
   const [editOpen, setEditOpen] = useState(false)
   const [brand, setBrand] = useState('visa')
   const [cardNo, setCardNo] = useState('')
+  const [cardError, setCardError] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
+  useEffect(() => {
+    document.title = 'Payments — Workspace settings | AdSpectr'
+  }, [])
+
   async function loadAll() {
-    if (!currentWorkspace?.id) {
-      setLoading(false)
-      return
-    }
+    if (!currentWorkspace?.id) { setLoading(false); return }
     setLoading(true)
     setError('')
     try {
@@ -111,25 +133,33 @@ export default function WorkspacePaymentsPage() {
     }
   }
 
-  useEffect(() => {
-    void loadAll()
-  }, [currentWorkspace?.id])
+  useEffect(() => { void loadAll() }, [currentWorkspace?.id])
+
+  function validateCard(): boolean {
+    const digits = cardNo.replace(/\D/g, '')
+    if (digits.length !== 16) { setCardError('Card number must be 16 digits'); return false }
+    if (!luhn(digits)) { setCardError('Invalid card number'); return false }
+    setCardError('')
+    return true
+  }
 
   async function addMethod() {
-    if (!currentWorkspace?.id || cardNo.length < 4) return
+    if (!currentWorkspace?.id || !validateCard()) return
     setSaving(true)
     try {
       await billing.addPaymentMethod({
         workspaceId: currentWorkspace.id,
         brand,
-        last4: cardNo.slice(-4),
+        last4: cardNo.replace(/\D/g, '').slice(-4),
         isDefault: methods.length === 0,
       })
       setAddOpen(false)
       setCardNo('')
+      setCardError('')
+      toast(t('workspaceSettings.payments.cardAdded', 'Payment method added.'))
       await loadAll()
     } catch (e: any) {
-      setError(e?.message ?? t('workspaceSettings.payments.addCardError', 'Failed to add card'))
+      toast(e?.message ?? t('workspaceSettings.payments.addCardError', 'Failed to add card'), 'error')
     } finally {
       setSaving(false)
     }
@@ -137,8 +167,13 @@ export default function WorkspacePaymentsPage() {
 
   async function setDefault(methodId: string) {
     if (!currentWorkspace?.id) return
-    await billing.setDefaultPaymentMethod(currentWorkspace.id, methodId)
-    await loadAll()
+    try {
+      await billing.setDefaultPaymentMethod(currentWorkspace.id, methodId)
+      toast(t('workspaceSettings.payments.defaultSet', 'Default payment method updated.'))
+      await loadAll()
+    } catch (e: any) {
+      toast(e?.message ?? 'Failed to update default', 'error')
+    }
   }
 
   async function saveContact() {
@@ -147,9 +182,10 @@ export default function WorkspacePaymentsPage() {
     try {
       await billing.updateBillingContact(currentWorkspace.id, contact)
       setEditOpen(false)
+      toast(t('workspaceSettings.payments.billingContactSaved', 'Billing information saved.'))
       await loadAll()
     } catch (e: any) {
-      setError(e?.message ?? t('workspaceSettings.payments.saveBillingError', 'Failed to save billing info'))
+      toast(e?.message ?? t('workspaceSettings.payments.saveBillingError', 'Failed to save billing info'), 'error')
     } finally {
       setSaving(false)
     }
@@ -158,38 +194,38 @@ export default function WorkspacePaymentsPage() {
   return (
     <div className="space-y-6">
       {error && (
-        <Alert variant="error" className="rounded-2xl">
-          {error}
-        </Alert>
+        <div className="flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800/50 dark:bg-red-900/20 dark:text-red-300">
+          <span className="flex-1">{error}</span>
+          <Button
+            size="sm"
+            variant="secondary"
+            type="button"
+            onClick={() => void loadAll()}
+            className="shrink-0 gap-1.5 border-red-200 text-red-600 hover:bg-red-100 dark:border-red-800 dark:text-red-400"
+          >
+            <RefreshCw className="h-3.5 w-3.5" />
+            Retry
+          </Button>
+        </div>
       )}
 
-      {/* ── Payment methods ─────────────────────────────────── */}
+      {/* Payment methods */}
       <section className="rounded-2xl border border-border/70 bg-surface p-5 shadow-sm sm:p-6">
         <SectionHeader
           icon={CreditCard}
           title={t('workspaceSettings.payments.paymentMethod', 'Payment method')}
           description={t('workspaceSettings.payments.paymentMethodDesc', 'Cards saved to this workspace for subscription billing.')}
           action={
-            <Button
-              size="sm"
-              type="button"
-              variant="secondary"
-              onClick={() => setAddOpen(true)}
-              disabled={!currentWorkspace?.id}
-              className="gap-1.5"
-            >
+            <Button size="sm" type="button" variant="secondary" onClick={() => setAddOpen(true)} disabled={!currentWorkspace?.id} className="gap-1.5">
               <Plus className="h-3.5 w-3.5" />
               {t('workspaceSettings.payments.addPaymentMethod', 'Add method')}
             </Button>
           }
         />
-
         <div className="mt-5">
           {loading ? (
             <div className="flex flex-col gap-2">
-              {[1, 2].map((i) => (
-                <div key={i} className="h-16 animate-pulse rounded-xl bg-surface-2/60" />
-              ))}
+              {[1, 2].map((i) => <div key={i} className="h-16 animate-pulse rounded-xl bg-surface-2/60" />)}
             </div>
           ) : methods.length === 0 ? (
             <div className="rounded-xl border border-dashed border-border bg-surface-2/30 px-6 py-10 text-center">
@@ -197,13 +233,7 @@ export default function WorkspacePaymentsPage() {
               <p className="mt-3 text-sm font-medium text-text-tertiary">
                 {t('workspaceSettings.payments.noMethods', 'No saved payment methods yet.')}
               </p>
-              <Button
-                size="sm"
-                type="button"
-                className="mt-4 gap-1.5"
-                onClick={() => setAddOpen(true)}
-                disabled={!currentWorkspace?.id}
-              >
+              <Button size="sm" type="button" className="mt-4 gap-1.5" onClick={() => setAddOpen(true)} disabled={!currentWorkspace?.id}>
                 <Plus className="h-3.5 w-3.5" />
                 {t('workspaceSettings.payments.addPaymentMethod', 'Add payment method')}
               </Button>
@@ -211,10 +241,7 @@ export default function WorkspacePaymentsPage() {
           ) : (
             <ul className="space-y-2">
               {methods.map((m) => (
-                <li
-                  key={m.id}
-                  className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/70 bg-surface-2/25 px-4 py-3.5"
-                >
+                <li key={m.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/70 bg-surface-2/25 px-4 py-3.5">
                   <div className="flex min-w-0 flex-1 items-center gap-3">
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-surface text-xs font-bold uppercase text-text-secondary">
                       {(m.brand ?? 'card').slice(0, 2)}
@@ -243,7 +270,7 @@ export default function WorkspacePaymentsPage() {
         </div>
       </section>
 
-      {/* ── Billing information ─────────────────────────────── */}
+      {/* Billing information */}
       <section className="rounded-2xl border border-border/70 bg-surface p-5 shadow-sm sm:p-6">
         <SectionHeader
           icon={FileText}
@@ -269,7 +296,7 @@ export default function WorkspacePaymentsPage() {
         </div>
       </section>
 
-      {/* ── Invoices ─────────────────────────────────────────── */}
+      {/* Invoices */}
       <section className="rounded-2xl border border-border/70 bg-surface p-5 shadow-sm sm:p-6">
         <SectionHeader
           icon={Receipt}
@@ -282,65 +309,30 @@ export default function WorkspacePaymentsPage() {
             rowKey={(row) => row.id}
             emptyMessage={t('workspaceSettings.payments.noInvoices', 'No invoices yet.')}
             columns={[
+              { key: 'no', header: 'Invoice #', render: (row) => <span className="font-mono text-sm font-medium text-text-primary">{row.invoiceNo}</span> },
+              { key: 'date', header: 'Date', render: (row) => <span className="text-sm text-text-secondary">{new Date(row.createdAt).toLocaleDateString()}</span> },
+              { key: 'amount', header: 'Amount', render: (row) => <span className="text-sm font-semibold text-text-primary">${Number(row.amount ?? 0).toFixed(2)}</span> },
               {
-                key: 'no',
-                header: 'Invoice #',
-                render: (row) => <span className="font-mono text-sm font-medium text-text-primary">{row.invoiceNo}</span>,
-              },
-              {
-                key: 'date',
-                header: 'Date',
-                render: (row) => <span className="text-sm text-text-secondary">{new Date(row.createdAt).toLocaleDateString()}</span>,
-              },
-              {
-                key: 'amount',
-                header: 'Amount',
-                render: (row) => <span className="text-sm font-semibold text-text-primary">${Number(row.amount ?? 0).toFixed(2)}</span>,
-              },
-              {
-                key: 'status',
-                header: 'Status',
+                key: 'status', header: 'Status',
                 render: (row) => (
-                  <span
-                    className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                      row.status === 'paid'
-                        ? 'bg-brand-lime/15 text-brand-ink dark:text-brand-lime'
-                        : 'bg-surface-2 text-text-tertiary'
-                    }`}
-                  >
+                  <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold ${row.status === 'paid' ? 'bg-brand-lime/15 text-brand-ink dark:text-brand-lime' : 'bg-surface-2 text-text-tertiary'}`}>
                     {row.status}
                   </span>
                 ),
               },
               {
-                key: 'pdf',
-                header: 'PDF',
-                render: (row) =>
-                  row.pdfUrl ? (
-                    <a
-                      className="text-sm font-medium text-brand-mid underline-offset-2 hover:underline dark:text-brand-lime"
-                      href={row.pdfUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Download
-                    </a>
-                  ) : (
-                    <span className="text-text-tertiary">—</span>
-                  ),
+                key: 'pdf', header: 'PDF',
+                render: (row) => row.pdfUrl
+                  ? <a className="text-sm font-medium text-brand-mid underline-offset-2 hover:underline dark:text-brand-lime" href={row.pdfUrl} target="_blank" rel="noreferrer">Download</a>
+                  : <span className="text-text-tertiary">—</span>,
               },
             ]}
           />
         </div>
       </section>
 
-      {/* ── Add payment method dialog ─────────────────────────── */}
-      <Dialog
-        open={addOpen}
-        onClose={() => setAddOpen(false)}
-        title={t('workspaceSettings.payments.addPaymentMethod', 'Add payment method')}
-        className="max-w-md"
-      >
+      {/* Add card dialog */}
+      <Dialog open={addOpen} onClose={() => { setAddOpen(false); setCardNo(''); setCardError('') }} title={t('workspaceSettings.payments.addPaymentMethod', 'Add payment method')} className="max-w-md">
         <div className="mt-4 space-y-3">
           <Input
             label={t('workspaceSettings.payments.brand', 'Brand')}
@@ -348,31 +340,36 @@ export default function WorkspacePaymentsPage() {
             onChange={(e) => setBrand(e.target.value)}
             placeholder="visa / mastercard"
           />
-          <Input
-            label={t('workspaceSettings.payments.cardNumber', 'Card number')}
-            value={cardNo}
-            onChange={(e) => setCardNo(e.target.value.replace(/[^\d]/g, ''))}
-            placeholder="4242 4242 4242 4242"
-            maxLength={16}
-          />
+          <div>
+            <Input
+              label={t('workspaceSettings.payments.cardNumber', 'Card number')}
+              value={formatCardDisplay(cardNo)}
+              onChange={(e) => {
+                setCardNo(e.target.value.replace(/\D/g, ''))
+                setCardError('')
+              }}
+              placeholder="4242 4242 4242 4242"
+              maxLength={19}
+              inputMode="numeric"
+            />
+            {cardError && <p className="mt-1 text-xs text-red-500">{cardError}</p>}
+            {cardNo.replace(/\D/g, '').length === 16 && !cardError && luhn(cardNo) && (
+              <p className="mt-1 text-xs text-brand-mid dark:text-brand-lime">✓ Valid card number</p>
+            )}
+          </div>
         </div>
         <div className="mt-6 flex justify-end gap-2">
-          <Button variant="secondary" size="sm" type="button" onClick={() => setAddOpen(false)}>
+          <Button variant="secondary" size="sm" type="button" onClick={() => { setAddOpen(false); setCardNo(''); setCardError('') }}>
             {t('common.cancel', 'Cancel')}
           </Button>
-          <Button size="sm" type="button" loading={saving} onClick={() => void addMethod()} disabled={cardNo.length < 4}>
+          <Button size="sm" type="button" loading={saving} onClick={() => void addMethod()}>
             {t('common.save', 'Save card')}
           </Button>
         </div>
       </Dialog>
 
-      {/* ── Edit billing contact dialog ───────────────────────── */}
-      <Dialog
-        open={editOpen}
-        onClose={() => setEditOpen(false)}
-        title={t('workspaceSettings.payments.editContactDetails', 'Edit billing information')}
-        className="max-w-2xl"
-      >
+      {/* Edit billing dialog */}
+      <Dialog open={editOpen} onClose={() => setEditOpen(false)} title={t('workspaceSettings.payments.editContactDetails', 'Edit billing information')} className="max-w-2xl">
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           <Input label="Your name" value={contact.yourName ?? ''} onChange={(e) => setContact((p) => ({ ...p, yourName: e.target.value }))} />
           <Input label="Company name" value={contact.companyName ?? ''} onChange={(e) => setContact((p) => ({ ...p, companyName: e.target.value }))} />
@@ -386,12 +383,8 @@ export default function WorkspacePaymentsPage() {
           <Input label="Tax ID" value={contact.taxId ?? ''} onChange={(e) => setContact((p) => ({ ...p, taxId: e.target.value }))} />
         </div>
         <div className="mt-6 flex justify-end gap-2">
-          <Button variant="secondary" size="sm" type="button" onClick={() => setEditOpen(false)}>
-            {t('common.cancel', 'Cancel')}
-          </Button>
-          <Button size="sm" type="button" loading={saving} onClick={() => void saveContact()}>
-            {t('common.apply', 'Save changes')}
-          </Button>
+          <Button variant="secondary" size="sm" type="button" onClick={() => setEditOpen(false)}>{t('common.cancel', 'Cancel')}</Button>
+          <Button size="sm" type="button" loading={saving} onClick={() => void saveContact()}>{t('common.apply', 'Save changes')}</Button>
         </div>
       </Dialog>
     </div>

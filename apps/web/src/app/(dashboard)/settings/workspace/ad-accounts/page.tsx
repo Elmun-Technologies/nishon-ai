@@ -3,11 +3,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
-import { Alert, Dialog } from '@/components/ui'
+import { Dialog } from '@/components/ui'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { Skeleton } from '@/components/ui/Skeleton'
-import { ChevronDown, ChevronRight, LayoutGrid, Plus, RefreshCw, Wallet } from 'lucide-react'
+import { useToast } from '@/components/ui/Toaster'
+import { ChevronDown, ChevronRight, LayoutGrid, Plus, RefreshCw, Search, Wallet } from 'lucide-react'
 import { fetchMetaDashboard, triggerSync, type MetaDashboardAccount } from '@/lib/meta'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { useI18n } from '@/i18n/use-i18n'
@@ -88,6 +89,7 @@ function defaultMetrics(): OptimizationMetrics {
 
 export default function WorkspaceAdAccountsPage() {
   const { t } = useI18n()
+  const { toast } = useToast()
   const { currentWorkspace } = useWorkspaceStore()
   const [accounts, setAccounts] = useState<MetaDashboardAccount[]>([])
   const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>([])
@@ -96,11 +98,16 @@ export default function WorkspaceAdAccountsPage() {
   const [syncing, setSyncing] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [saveNote, setSaveNote] = useState('')
+  const [search, setSearch] = useState('')
+  const [lastSyncAt, setLastSyncAt] = useState<Date | null>(null)
   const [optimizationMetrics, setOptimizationMetrics] = useState<Record<string, OptimizationMetrics>>({})
   const [setupOpen, setSetupOpen] = useState(false)
   const [setupStep, setSetupStep] = useState(1)
   const [setupAccountId, setSetupAccountId] = useState('')
+
+  useEffect(() => {
+    document.title = 'Ad accounts — Workspace settings | AdSpectr'
+  }, [])
 
   const connectedCount = accounts.length
   const totalSpend30d = useMemo(
@@ -180,12 +187,21 @@ export default function WorkspaceAdAccountsPage() {
     try {
       await triggerSync(currentWorkspace.id)
       await loadData()
+      setLastSyncAt(new Date())
+      toast('Ad accounts synced successfully.')
     } catch (e: any) {
       setError(e?.message ?? 'Sync failed')
+      toast(e?.message ?? 'Sync failed', 'error')
     } finally {
       setSyncing(false)
     }
   }
+
+  const filteredAccounts = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    if (!q) return accounts
+    return accounts.filter((a) => a.name.toLowerCase().includes(q))
+  }, [accounts, search])
 
   const setupAccount = accounts.find((a) => a.id === setupAccountId) ?? null
   const setupMapping = setupAccountId ? (mappings[setupAccountId] ?? defaultMapping(setupAccount?.timezone)) : defaultMapping('')
@@ -214,17 +230,24 @@ export default function WorkspaceAdAccountsPage() {
             <Button size="sm" type="button" variant="secondary" onClick={() => openSetup()}>
               {t('workspaceSettings.adAccounts.guidedSetup', 'Guided setup')}
             </Button>
-            <Button
-              size="sm"
-              type="button"
-              variant="secondary"
-              loading={syncing}
-              onClick={() => void runSync()}
-              className="gap-1.5 border-border"
-            >
-              <RefreshCw className="h-3.5 w-3.5" />
-              {syncing ? t('workspaceSettings.adAccounts.resync', 'Syncing…') : t('workspaceSettings.adAccounts.reauthenticate', 'Re-sync')}
-            </Button>
+            <div className="flex flex-col items-end gap-0.5">
+              <Button
+                size="sm"
+                type="button"
+                variant="secondary"
+                loading={syncing}
+                onClick={() => void runSync()}
+                className="gap-1.5 border-border"
+              >
+                <RefreshCw className="h-3.5 w-3.5" />
+                {syncing ? t('workspaceSettings.adAccounts.resync', 'Syncing…') : t('workspaceSettings.adAccounts.reauthenticate', 'Re-sync')}
+              </Button>
+              {lastSyncAt && (
+                <span className="text-[11px] text-text-tertiary">
+                  Last sync: {lastSyncAt.toLocaleTimeString()}
+                </span>
+              )}
+            </div>
             <Link
               href="/settings/meta"
               className="inline-flex items-center gap-1.5 rounded-xl border border-brand-mid/40 bg-brand-mid px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-brand-mid/90"
@@ -256,13 +279,29 @@ export default function WorkspaceAdAccountsPage() {
           </div>
         </div>
 
-        {error && <Alert className="mt-4" variant="error">{error}</Alert>}
-        {saveNote && (
-          <p className="mt-4 rounded-xl border border-brand-lime/20 bg-brand-lime/10 px-3 py-2.5 text-sm text-brand-ink dark:text-brand-lime">
-            {saveNote}
-          </p>
+        {error && (
+          <div className="mt-4 flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800/50 dark:bg-red-900/20 dark:text-red-300">
+            <span className="flex-1">{error}</span>
+            <Button size="sm" variant="secondary" type="button" onClick={() => void loadData()} className="shrink-0 gap-1.5 border-red-200 text-red-600 hover:bg-red-100 dark:border-red-800 dark:text-red-400">
+              <RefreshCw className="h-3.5 w-3.5" />
+              Retry
+            </Button>
+          </div>
         )}
       </section>
+
+      {/* Search bar */}
+      {accounts.length > 0 && (
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-tertiary" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search ad accounts…"
+            className="rounded-2xl border-border/70 bg-surface pl-9 shadow-sm"
+          />
+        </div>
+      )}
 
       {/* Accounts list */}
       <section className="rounded-2xl border border-border/70 bg-surface shadow-sm">
@@ -300,8 +339,14 @@ export default function WorkspaceAdAccountsPage() {
               <span className="w-4 shrink-0" />
             </div>
 
+            {filteredAccounts.length === 0 && search && (
+              <p className="px-5 py-8 text-center text-sm text-text-tertiary">
+                No accounts match &ldquo;{search}&rdquo;
+              </p>
+            )}
+
             <ul className="divide-y divide-border/50">
-              {accounts.map((account) => {
+              {filteredAccounts.map((account) => {
                 const isOpen = expanded[account.id] ?? false
                 const map = mappings[account.id] ?? defaultMapping(account.timezone)
                 const spend = account.campaigns.reduce((sum, c) => sum + c.metrics.spend, 0)
@@ -354,7 +399,7 @@ export default function WorkspaceAdAccountsPage() {
             </ul>
 
             <div className="flex items-center justify-end gap-2 border-t border-border/70 px-5 py-4">
-              <Button size="sm" type="button" variant="secondary" onClick={() => { setMappings({}); setSaveNote('') }}>
+              <Button size="sm" type="button" variant="secondary" onClick={() => setMappings({})}>
                 Reset
               </Button>
               <Button
@@ -362,7 +407,7 @@ export default function WorkspaceAdAccountsPage() {
                 type="button"
                 onClick={() => {
                   persistSetup()
-                  setSaveNote('Mappings saved locally. Backend persistence can be enabled once API endpoint is ready.')
+                  toast('Mappings saved locally.')
                 }}
               >
                 Save mappings

@@ -4,11 +4,12 @@ import { useCallback, useEffect, useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Alert, Dialog } from '@/components/ui'
+import { useToast } from '@/components/ui/Toaster'
 import { env } from '@/lib/env'
 import { mcpCredentials } from '@/lib/api-client'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { useI18n } from '@/i18n/use-i18n'
-import { KeyRound, Link2, Lock, Copy, Check, Plug, Plus } from 'lucide-react'
+import { KeyRound, Link2, Lock, Copy, Check, Plug, Plus, Wifi, WifiOff } from 'lucide-react'
 
 const DOCS_URL = 'https://adspectr.com/docs'
 
@@ -20,8 +21,11 @@ type Credential = {
   revokedAt?: string | null
 }
 
+type ConnectionState = 'idle' | 'checking' | 'ok' | 'error'
+
 export default function WorkspaceMcpPage() {
   const { t } = useI18n()
+  const { toast } = useToast()
   const { currentWorkspace } = useWorkspaceStore()
   const [credentials, setCredentials] = useState<Credential[]>([])
   const [showSecretModal, setShowSecretModal] = useState(false)
@@ -31,6 +35,12 @@ export default function WorkspaceMcpPage() {
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState('')
   const [copiedField, setCopiedField] = useState<'id' | 'secret' | null>(null)
+  const [connState, setConnState] = useState<ConnectionState>('idle')
+  const [connLatencyMs, setConnLatencyMs] = useState<number | null>(null)
+
+  useEffect(() => {
+    document.title = 'MCP Integration — Workspace settings | AdSpectr'
+  }, [])
 
   const loadCredentials = useCallback(async () => {
     if (!currentWorkspace?.id) { setLoading(false); return }
@@ -58,7 +68,7 @@ export default function WorkspaceMcpPage() {
       setShowSecretModal(true)
       await loadCredentials()
     } catch (e: any) {
-      setError(e?.message ?? 'Credential yaratilmagan')
+      toast(e?.message ?? 'Credential yaratilmagan', 'error')
     } finally {
       setCreating(false)
     }
@@ -66,8 +76,13 @@ export default function WorkspaceMcpPage() {
 
   async function revokeCredential(id: string) {
     if (!currentWorkspace?.id) return
-    await mcpCredentials.revoke(id, currentWorkspace.id)
-    await loadCredentials()
+    try {
+      await mcpCredentials.revoke(id, currentWorkspace.id)
+      toast('Credential revoked.')
+      await loadCredentials()
+    } catch (e: any) {
+      toast(e?.message ?? 'Failed to revoke', 'error')
+    }
   }
 
   async function copyField(value: string, field: 'id' | 'secret') {
@@ -78,9 +93,32 @@ export default function WorkspaceMcpPage() {
     } catch { /* clipboard blocked */ }
   }
 
+  async function testConnection() {
+    const mcpUrl = `${env.apiBaseUrl?.replace(/\/$/, '') ?? ''}/mcp`
+    setConnState('checking')
+    setConnLatencyMs(null)
+    const start = Date.now()
+    try {
+      const res = await fetch(mcpUrl, { method: 'GET', signal: AbortSignal.timeout(8000) })
+      const ms = Date.now() - start
+      setConnLatencyMs(ms)
+      if (res.ok || res.status === 401 || res.status === 405) {
+        setConnState('ok')
+        toast(`MCP server reachable — ${ms}ms`)
+      } else {
+        setConnState('error')
+        toast(`MCP server returned ${res.status}`, 'error')
+      }
+    } catch {
+      setConnLatencyMs(null)
+      setConnState('error')
+      toast('MCP server unreachable', 'error')
+    }
+  }
+
   return (
     <div className="space-y-6">
-      {/* Credentials section */}
+      {/* Credentials */}
       <section className="rounded-2xl border border-border/70 bg-surface p-5 shadow-sm sm:p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-start gap-3">
@@ -119,10 +157,10 @@ export default function WorkspaceMcpPage() {
               <h3 className="mt-4 text-base font-semibold text-text-primary">
                 {t('workspaceSettings.mcp.noCredentials', 'No credentials yet')}
               </h3>
-              <p className="mt-1.5 max-w-xs mx-auto text-sm text-text-tertiary">
+              <p className="mx-auto mt-1.5 max-w-xs text-sm text-text-tertiary">
                 {t('workspaceSettings.mcp.noCredentialsBody', 'Generate a Client ID and Client Secret to connect AI agents to this workspace.')}
               </p>
-              <div className="mt-4 rounded-xl border border-amber-500/20 bg-amber-500/10 px-3 py-2 text-left text-xs text-amber-700 dark:text-amber-200 max-w-xs mx-auto">
+              <div className="mx-auto mt-4 max-w-xs rounded-xl border border-amber-500/20 bg-amber-500/10 px-3 py-2 text-left text-xs text-amber-700 dark:text-amber-200">
                 {t('workspaceSettings.mcp.securityNote', 'Secrets are shown only once when generated. Copy them immediately to your secure vault.')}
               </div>
               <Button className="mt-5 gap-1.5" size="sm" type="button" loading={creating} onClick={() => void createCredential()} disabled={!currentWorkspace?.id}>
@@ -136,10 +174,7 @@ export default function WorkspaceMcpPage() {
                 {t('workspaceSettings.mcp.existingCredentials', 'Existing credentials')}
               </p>
               {credentials.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/70 bg-surface-2/30 px-4 py-3"
-                >
+                <div key={item.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/70 bg-surface-2/30 px-4 py-3">
                   <div className="min-w-0">
                     <p className="truncate font-mono text-sm font-semibold text-text-primary">{item.clientId}</p>
                     <p className="mt-0.5 text-xs text-text-tertiary">
@@ -156,19 +191,49 @@ export default function WorkspaceMcpPage() {
         </div>
       </section>
 
-      {/* Server info */}
+      {/* Server info + Test connection */}
       <section className="rounded-2xl border border-border/70 bg-surface p-5 shadow-sm sm:p-6">
-        <div className="flex items-start gap-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-lime/15 text-brand-mid dark:text-brand-lime">
-            <Link2 className="h-4.5 w-4.5" />
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex items-start gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-lime/15 text-brand-mid dark:text-brand-lime">
+              <Link2 className="h-4.5 w-4.5" />
+            </div>
+            <div>
+              <h3 className="text-base font-semibold text-text-primary">
+                {t('workspaceSettings.mcp.serverAndDocs', 'Server and documentation')}
+              </h3>
+              <p className="mt-0.5 text-xs text-text-tertiary">
+                Use this MCP server URL and documentation to connect AI agents to your workspace.
+              </p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-base font-semibold text-text-primary">
-              {t('workspaceSettings.mcp.serverAndDocs', 'Server and documentation')}
-            </h3>
-            <p className="mt-0.5 text-xs text-text-tertiary">
-              Use this MCP server URL and documentation to connect AI agents to your workspace.
-            </p>
+
+          {/* Test connection button */}
+          <div className="flex shrink-0 flex-col items-end gap-1">
+            <Button
+              size="sm"
+              variant="secondary"
+              type="button"
+              loading={connState === 'checking'}
+              onClick={() => void testConnection()}
+              className="gap-1.5"
+            >
+              {connState === 'ok'
+                ? <Wifi className="h-3.5 w-3.5 text-brand-mid" />
+                : connState === 'error'
+                ? <WifiOff className="h-3.5 w-3.5 text-red-500" />
+                : <Wifi className="h-3.5 w-3.5" />
+              }
+              Test connection
+            </Button>
+            {connState === 'ok' && connLatencyMs !== null && (
+              <span className="text-[11px] text-brand-mid dark:text-brand-lime">
+                Reachable · {connLatencyMs}ms
+              </span>
+            )}
+            {connState === 'error' && (
+              <span className="text-[11px] text-red-500">Unreachable</span>
+            )}
           </div>
         </div>
 
@@ -187,12 +252,7 @@ export default function WorkspaceMcpPage() {
               <KeyRound className="h-3.5 w-3.5" />
               Documentation
             </p>
-            <a
-              href={DOCS_URL}
-              className="mt-2 inline-block text-sm font-medium text-brand-mid underline-offset-2 hover:underline dark:text-brand-lime"
-              target="_blank"
-              rel="noreferrer"
-            >
+            <a href={DOCS_URL} className="mt-2 inline-block text-sm font-medium text-brand-mid underline-offset-2 hover:underline dark:text-brand-lime" target="_blank" rel="noreferrer">
               {DOCS_URL}
             </a>
           </div>
@@ -200,12 +260,7 @@ export default function WorkspaceMcpPage() {
       </section>
 
       {/* New credential modal */}
-      <Dialog
-        open={showSecretModal}
-        onClose={() => setShowSecretModal(false)}
-        title={t('workspaceSettings.mcp.credentialsModalTitle', 'Your new credentials')}
-        className="max-w-lg"
-      >
+      <Dialog open={showSecretModal} onClose={() => setShowSecretModal(false)} title={t('workspaceSettings.mcp.credentialsModalTitle', 'Your new credentials')} className="max-w-lg">
         <p className="mt-2 text-sm text-text-tertiary">
           {t('workspaceSettings.mcp.credentialsModalHint', 'Copy these now and store them somewhere safe. You will not be able to see the Client Secret again.')}
         </p>
@@ -233,7 +288,7 @@ export default function WorkspaceMcpPage() {
           <Button size="sm" type="button" variant="secondary" onClick={() => { setShowSecretModal(false); setNewClientSecret('') }}>
             {t('common.cancel', 'Cancel')}
           </Button>
-          <Button size="sm" type="button" onClick={() => { setShowSecretModal(false); setNewClientSecret('') }}>
+          <Button size="sm" type="button" onClick={() => { setShowSecretModal(false); setNewClientSecret(''); toast('Credentials saved. Keep them secure.') }}>
             {t('workspaceSettings.mcp.savedCredentials', "I've saved my credentials")}
           </Button>
         </div>

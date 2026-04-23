@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Input } from '@/components/ui/Input'
 import { useWorkspaceStore } from '@/stores/workspace.store'
@@ -20,6 +20,10 @@ const LINKS = [
 export default function ResourceCenterPage() {
   const { user } = useWorkspaceStore()
   const [q, setQ] = useState('')
+
+  useEffect(() => {
+    document.title = 'Resource Center — Workspace settings | AdSpectr'
+  }, [])
 
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase()
