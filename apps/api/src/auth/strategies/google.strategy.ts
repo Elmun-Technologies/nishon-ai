@@ -52,7 +52,9 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         pgCode: e?.driverError?.code,
         pgMessage: e?.driverError?.message,
       });
-      done(e instanceof Error ? e : new Error(String(err)), undefined);
+      // Pass error as a marker object so the callback controller can redirect
+      // to the frontend with a human-readable error instead of returning 500.
+      done(null, { _oauthError: e?.message ?? 'Google authentication failed' });
     }
   }
 }

@@ -117,7 +117,18 @@ export class AuthController {
       "FRONTEND_URL",
       "http://localhost:3000",
     );
-    const auth = req.user as AuthResponseDto | undefined;
+    const payload = req.user as any;
+
+    // Strategy signals an internal error via marker object — redirect with detail
+    if (payload?._oauthError) {
+      const params = new URLSearchParams({
+        error: "oauth_failed",
+        detail: String(payload._oauthError),
+      });
+      return res.redirect(`${frontendUrl}/auth/google/callback?${params.toString()}`);
+    }
+
+    const auth = payload as AuthResponseDto | undefined;
     if (!auth?.accessToken || !auth?.refreshToken) {
       const params = new URLSearchParams({
         error: "oauth_incomplete",
@@ -128,7 +139,6 @@ export class AuthController {
 
     const { accessToken, refreshToken } = auth;
     const params = new URLSearchParams({ accessToken, refreshToken });
-
     return res.redirect(`${frontendUrl}/auth/google/callback?${params.toString()}`);
   }
 
