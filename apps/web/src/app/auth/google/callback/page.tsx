@@ -22,28 +22,36 @@ function GoogleOAuthCallbackInner() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const accessToken = searchParams.get('accessToken')
-    const refreshToken = searchParams.get('refreshToken')
-    const next = searchParams.get('next')
+    const accessToken = searchParams.get(‘accessToken’)
+    const refreshToken = searchParams.get(‘refreshToken’)
+    const next = searchParams.get(‘next’)
     const safeNext =
-      next && next.startsWith('/') && !next.startsWith('//') ? next : null
+      next && next.startsWith(‘/’) && !next.startsWith(‘//’) ? next : null
+
+    // Backend redirects here with error= when OAuth fails (e.g. DB error, JWT secret missing)
+    const oauthError = searchParams.get(‘error’)
+    const oauthDetail = searchParams.get(‘detail’)
+    if (oauthError) {
+      setError(oauthDetail || `Google orqali kirish amalga oshmadi (${oauthError}). API loglarini tekshiring.`)
+      return
+    }
 
     if (!accessToken || !refreshToken) {
-      const googleCode = searchParams.get('code')
+      const googleCode = searchParams.get(‘code’)
       const apiCallback = env.apiBaseUrl
-        ? `${env.apiBaseUrl.replace(/\/$/, '')}/auth/google/callback`
-        : 'https://<API-domeningiz>/auth/google/callback'
+        ? `${env.apiBaseUrl.replace(/\/$/, ‘’)}/auth/google/callback`
+        : ‘https://<API-domeningiz>/auth/google/callback’
 
       if (googleCode) {
         setError(
-          'URLda Google code bor, lekin accessToken / refreshToken yo‘q. Odatda Google Cloud → OAuth → ' +
-            'Authorized redirect URIs noto‘g‘ri: u yerga frontend (adspectr.com) emas, faqat API callback ' +
-            `kirishi kerak, masalan: ${apiCallback} — tuzatgach loginni qayta urinib ko‘ring.`,
+          ‘URLda Google code bor, lekin accessToken / refreshToken yo\’q. Odatda Google Cloud → OAuth → ‘ +
+            ‘Authorized redirect URIs noto\’g\’ri: u yerga frontend (adspectr.com) emas, faqat API callback ‘ +
+            `kirishi kerak, masalan: ${apiCallback} — tuzatgach loginni qayta urinib ko’ring.`,
         )
       } else {
         setError(
-          'Tokenlar URLda yo‘q (sahifani to‘g‘ridan-to‘g‘ri ochgansiz yoki API redirect qilmagan). ' +
-            'Agar avval API sahifasida JSON 500 ko‘rgan bo‘lsangiz — Render log va DB migratsiyasini tekshiring.',
+          ‘Tokenlar URLda yo\’q (sahifani to\’g\’ridan-to\’g\’ri ochgansiz yoki API redirect qilmagan). ‘ +
+            ‘Agar avval API sahifasida JSON 500 ko\’rgan bo\’lsangiz — Render log va DB migratsiyasini tekshiring.’,
         )
       }
       return

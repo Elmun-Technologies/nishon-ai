@@ -88,24 +88,43 @@ async function bootstrap() {
   await app.listen(port);
 
   if (nodeEnv === "production") {
+    // Belt-and-suspenders schema repair: run idempotent SQL for every column that
+    // TypeORM entities reference but older DBs may be missing. This runs on every
+    // deploy and is safe to re-run (DO ... EXCEPTION WHEN duplicate_column THEN NULL).
+    // Bypasses migration-tracking so it works even if typeorm_migrations shows "done".
     try {
-      const rows = await dataSource.query<{ exists: boolean }[]>(
-        `SELECT EXISTS (
-          SELECT 1 FROM information_schema.columns
-          WHERE table_schema = 'public' AND table_name = 'users' AND column_name = 'trial_ends_at'
-        ) AS "exists"`,
-      );
-      if (!rows?.[0]?.exists) {
-        logger.error({
-          message:
-            "Schema check failed: public.users.trial_ends_at is missing. " +
-            "Use start:prod:with-migrations on Render and redeploy.",
-          context: "Bootstrap",
-        });
-      }
+      await dataSource.query(`
+        DO $$ BEGIN ALTER TABLE "users" ADD COLUMN "trial_ends_at" TIMESTAMP NULL;
+        EXCEPTION WHEN duplicate_column THEN NULL; END $$;
+      `);
+      await dataSource.query(`
+        DO $$ BEGIN ALTER TABLE "users" ADD COLUMN "google_id" VARCHAR(255) NULL;
+        EXCEPTION WHEN duplicate_column THEN NULL; END $$;
+      `);
+      await dataSource.query(`
+        DO $$ BEGIN ALTER TABLE "users" ADD COLUMN "facebook_id" VARCHAR(255) NULL;
+        EXCEPTION WHEN duplicate_column THEN NULL; END $$;
+      `);
+      await dataSource.query(`
+        DO $$ BEGIN ALTER TABLE "users" ADD COLUMN "picture" TEXT NULL;
+        EXCEPTION WHEN duplicate_column THEN NULL; END $$;
+      `);
+      await dataSource.query(`
+        DO $$ BEGIN ALTER TABLE "users" ADD COLUMN "is_admin" BOOLEAN NOT NULL DEFAULT false;
+        EXCEPTION WHEN duplicate_column THEN NULL; END $$;
+      `);
+      await dataSource.query(`
+        DO $$ BEGIN ALTER TABLE "users" ALTER COLUMN "password" DROP NOT NULL;
+        EXCEPTION WHEN OTHERS THEN NULL; END $$;
+      `);
+      await dataSource.query(`
+        UPDATE "users" SET "trial_ends_at" = NOW() + INTERVAL '7 days'
+        WHERE "plan"::text = 'free' AND "trial_ends_at" IS NULL;
+      `);
+      logger.log({ message: "users schema repair: OK", context: "Bootstrap" });
     } catch (e) {
-      logger.warn({
-        message: "Could not verify users.trial_ends_at column (non-fatal)",
+      logger.error({
+        message: "users schema repair failed — Google OAuth and login may break",
         context: "Bootstrap",
         error: e instanceof Error ? e.message : String(e),
       });
