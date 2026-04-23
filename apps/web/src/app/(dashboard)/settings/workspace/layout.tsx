@@ -7,6 +7,7 @@ import { useI18n } from '@/i18n/use-i18n'
 import {
   Building2,
   ChevronDown,
+  ChevronRight,
   CreditCard,
   Users,
   Globe,
@@ -16,9 +17,10 @@ import {
   User,
   Settings as SettingsIcon,
   Menu,
-  X
+  X,
+  Search
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 
 interface NavSection {
   title: string;
@@ -138,10 +140,37 @@ export default function WorkspaceSettingsLayout({
   const { currentWorkspace } = useWorkspaceStore()
   const { t } = useI18n()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
 
   const isActive = (href: string) => {
     return pathname === href || (href === '/settings/workspace/ad-accounts' && pathname === '/settings/workspace')
   }
+
+  const getCurrentPageLabel = () => {
+    for (const section of NAV_SECTIONS) {
+      for (const item of section.items) {
+        if (isActive(item.href)) {
+          return { section: section.title, page: item.label }
+        }
+      }
+    }
+    return null
+  }
+
+  const filteredSections = useMemo(() => {
+    if (!searchQuery.trim()) return NAV_SECTIONS
+
+    return NAV_SECTIONS.map(section => ({
+      ...section,
+      items: section.items.filter(item =>
+        item.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        section.title.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    })).filter(section => section.items.length > 0)
+  }, [searchQuery])
+
+  const currentPage = getCurrentPageLabel()
 
   return (
     <div className="min-h-screen bg-background">
@@ -213,42 +242,80 @@ export default function WorkspaceSettingsLayout({
               ${sidebarOpen ? 'block' : 'hidden lg:block'}
             `}
           >
-            <nav className="space-y-1 lg:sticky lg:top-8" aria-label="Settings navigation">
-              {NAV_SECTIONS.map((section) => (
-                <div key={section.title} className="mb-6">
-                  <h3 className="mb-3 flex items-center gap-2 px-3 text-xs font-semibold uppercase tracking-wider text-text-tertiary">
-                    {section.icon}
-                    {t(section.titleKey, section.title)}
-                  </h3>
-                  <div className="space-y-1">
-                    {section.items.map((item) => (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={() => setSidebarOpen(false)}
-                        className={`
-                          flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all
-                          ${
-                            isActive(item.href)
-                              ? 'bg-violet-50 text-violet-700 dark:bg-violet-950/40 dark:text-violet-300'
-                              : 'text-text-secondary hover:bg-surface-2 hover:text-text-primary'
-                          }
-                        `}
-                      >
-                        <span className={`${isActive(item.href) ? 'text-violet-600' : 'text-text-tertiary'}`}>
-                          {item.icon}
-                        </span>
-                        {t(item.labelKey, item.label)}
-                      </Link>
-                    ))}
-                  </div>
+            {/* Search Bar */}
+            <div className="mb-6 hidden lg:block sticky top-0 z-10">
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-text-tertiary pointer-events-none" />
+                <input
+                  type="text"
+                  placeholder={t('common.search', 'Search settings...')}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full rounded-lg border border-border bg-surface/50 py-2 pl-10 pr-3 text-sm text-text-primary placeholder-text-tertiary focus:border-violet-500 focus:outline-none dark:bg-slate-800/50"
+                />
+              </div>
+            </div>
+
+            <nav className="space-y-1 lg:sticky lg:top-20" aria-label="Settings navigation">
+              {filteredSections.length === 0 ? (
+                <div className="px-3 py-8 text-center">
+                  <p className="text-sm text-text-tertiary">
+                    {t('common.noResults', 'No settings found')}
+                  </p>
                 </div>
-              ))}
+              ) : (
+                filteredSections.map((section) => (
+                  <div key={section.title} className="mb-6">
+                    <h3 className="mb-3 flex items-center gap-2 px-3 text-xs font-semibold uppercase tracking-wider text-text-tertiary">
+                      {section.icon}
+                      {t(section.titleKey, section.title)}
+                    </h3>
+                    <div className="space-y-1">
+                      {section.items.map((item) => (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          onClick={() => setSidebarOpen(false)}
+                          className={`
+                            group flex items-start gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all
+                            ${
+                              isActive(item.href)
+                                ? 'bg-violet-50 text-violet-700 dark:bg-violet-950/40 dark:text-violet-300'
+                                : 'text-text-secondary hover:bg-surface-2 hover:text-text-primary'
+                            }
+                          `}
+                        >
+                          <span className={`mt-0.5 flex-shrink-0 ${isActive(item.href) ? 'text-violet-600' : 'text-text-tertiary group-hover:text-text-secondary'}`}>
+                            {item.icon}
+                          </span>
+                          <div className="flex-1">
+                            <div>{t(item.labelKey, item.label)}</div>
+                            {item.description && (
+                              <p className="mt-0.5 text-xs text-text-tertiary group-hover:text-text-secondary">
+                                {t(item.descriptionKey || '', item.description)}
+                              </p>
+                            )}
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                ))
+              )}
             </nav>
           </aside>
 
           {/* Main Content Area */}
           <main className="lg:col-span-3">
+            {/* Breadcrumb */}
+            {currentPage && (
+              <div className="mb-6 flex items-center gap-2 text-sm">
+                <span className="text-text-tertiary">{t('workspaceSettings.title', 'Workspace Settings')}</span>
+                <ChevronRight className="h-4 w-4 text-text-tertiary" />
+                <span className="text-text-secondary">{t(NAV_SECTIONS.find(s => s.items.some(i => isActive(i.href)))?.items.find(i => isActive(i.href))?.labelKey || '', currentPage.page)}</span>
+              </div>
+            )}
+
             <div className="rounded-xl border border-border/50 bg-white p-6 dark:bg-slate-950">
               {children}
             </div>
