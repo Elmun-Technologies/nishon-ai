@@ -156,6 +156,39 @@ async function bootstrap() {
       `);
       logger.log({ message: "budgets schema repair: OK", context: "Bootstrap" });
 
+      // ── campaigns ──────────────────────────────────────────────────────────
+      await dataSource.query(`
+        DO $$ BEGIN
+          BEGIN ALTER TABLE "campaigns" ADD COLUMN "budget"       DECIMAL(12,2) NULL;                    EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "campaigns" ADD COLUMN "budget_type"  VARCHAR(20)   NOT NULL DEFAULT 'daily'; EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "campaigns" ADD COLUMN "currency"     VARCHAR(10)   NOT NULL DEFAULT 'USD';   EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "campaigns" ADD COLUMN "schedule"     JSONB         NULL;                    EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "campaigns" ADD COLUMN "start_date"   DATE          NULL;                    EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "campaigns" ADD COLUMN "end_date"     DATE          NULL;                    EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "campaigns" ADD COLUMN "ai_config"    JSONB         NULL;                    EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "campaigns" ADD COLUMN "workspace_id" UUID          NULL;                    EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "campaigns" ADD COLUMN "created_at"   TIMESTAMP     NOT NULL DEFAULT NOW();  EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "campaigns" ADD COLUMN "updated_at"   TIMESTAMP     NOT NULL DEFAULT NOW();  EXCEPTION WHEN OTHERS THEN NULL; END;
+        END $$;
+      `);
+      logger.log({ message: "campaigns schema repair: OK", context: "Bootstrap" });
+
+      // ── ai_decisions ───────────────────────────────────────────────────────
+      await dataSource.query(`
+        DO $$ BEGIN
+          BEGIN ALTER TABLE "ai_decisions" ADD COLUMN "action_type"       VARCHAR(50)  NULL;                   EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "ai_decisions" ADD COLUMN "before_state"      JSONB        NULL;                   EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "ai_decisions" ADD COLUMN "after_state"       JSONB        NULL;                   EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "ai_decisions" ADD COLUMN "estimated_impact"  TEXT         NULL;                   EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "ai_decisions" ADD COLUMN "is_approved"       BOOLEAN      NULL;                   EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "ai_decisions" ADD COLUMN "is_executed"       BOOLEAN      NOT NULL DEFAULT false; EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "ai_decisions" ADD COLUMN "workspace_id"      UUID         NULL;                   EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "ai_decisions" ADD COLUMN "campaign_id"       UUID         NULL;                   EXCEPTION WHEN OTHERS THEN NULL; END;
+          BEGIN ALTER TABLE "ai_decisions" ADD COLUMN "created_at"        TIMESTAMP    NOT NULL DEFAULT NOW(); EXCEPTION WHEN OTHERS THEN NULL; END;
+        END $$;
+      `);
+      logger.log({ message: "ai_decisions schema repair: OK", context: "Bootstrap" });
+
     } catch (e) {
       logger.error({
         message: "schema repair failed — login or workspaces may break",

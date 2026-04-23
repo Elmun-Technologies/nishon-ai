@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
     const apiBase =
       process.env.NEXT_PUBLIC_API_BASE_URL ||
       process.env.NEXT_PUBLIC_API_URL ||
-      'http://localhost:3001'
+      (process.env.NODE_ENV === 'production' ? 'https://adspectr-api.onrender.com' : 'http://localhost:3001')
 
     const workspaceBody = {
       name: NAME_MAP[businessType] ?? 'Mening biznesim',
