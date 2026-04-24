@@ -1,5 +1,11 @@
-import { redirect } from 'next/navigation'
+'use client'
 
-export default async function WorkspaceSettingsIndexPage() {
-  redirect('/settings/workspace/ad-accounts')
+import { SettingsStatusDashboard } from '@/components/workspace-settings/SettingsStatusDashboard'
+
+export default function WorkspaceSettingsIndexPage() {
+  return (
+    <div className="space-y-8">
+      <SettingsStatusDashboard />
+    </div>
+  )
 }
