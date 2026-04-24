@@ -18,9 +18,16 @@ import {
   Settings as SettingsIcon,
   Menu,
   X,
-  Search
+  Search,
+  Star,
+  History,
+  Shield,
+  LineChart,
+  Rocket,
+  Copy
 } from 'lucide-react'
 import { useState, useMemo, useEffect, useRef } from 'react'
+import { useFavoriteSettings } from '@/hooks/useFavoriteSettings'
 
 interface NavSection {
   title: string;
@@ -37,6 +44,21 @@ interface NavSection {
 }
 
 const NAV_SECTIONS: NavSection[] = [
+  {
+    title: 'Getting Started',
+    titleKey: 'workspaceSettings.sections.gettingStarted',
+    icon: <Rocket className="h-4 w-4" />,
+    items: [
+      {
+        href: '/settings/workspace/setup',
+        label: 'Setup Wizard',
+        labelKey: 'workspaceSettings.tabs.setup',
+        icon: <Rocket className="h-4 w-4" />,
+        description: 'Step-by-step guide to set up your workspace',
+        descriptionKey: 'workspaceSettings.descriptions.setup',
+      },
+    ],
+  },
   {
     title: 'Account Management',
     titleKey: 'workspaceSettings.sections.account',
@@ -65,6 +87,14 @@ const NAV_SECTIONS: NavSection[] = [
         icon: <CreditCard className="h-4 w-4" />,
         description: 'Manage billing and payment methods',
         descriptionKey: 'workspaceSettings.descriptions.payments',
+      },
+      {
+        href: '/settings/workspace/templates',
+        label: 'Templates',
+        labelKey: 'workspaceSettings.tabs.templates',
+        icon: <Copy className="h-4 w-4" />,
+        description: 'Save and reuse configuration templates',
+        descriptionKey: 'workspaceSettings.descriptions.templates',
       },
     ],
   },
@@ -129,6 +159,29 @@ const NAV_SECTIONS: NavSection[] = [
       },
     ],
   },
+  {
+    title: 'Audit & Security',
+    titleKey: 'workspaceSettings.sections.audit',
+    icon: <Shield className="h-4 w-4" />,
+    items: [
+      {
+        href: '/settings/workspace/history',
+        label: 'Activity Log',
+        labelKey: 'workspaceSettings.tabs.history',
+        icon: <History className="h-4 w-4" />,
+        description: 'Track all settings changes',
+        descriptionKey: 'workspaceSettings.descriptions.history',
+      },
+      {
+        href: '/settings/workspace/analytics',
+        label: 'Usage Analytics',
+        labelKey: 'workspaceSettings.tabs.analytics',
+        icon: <LineChart className="h-4 w-4" />,
+        description: 'Track which settings are most used',
+        descriptionKey: 'workspaceSettings.descriptions.analytics',
+      },
+    ],
+  },
 ]
 
 export default function WorkspaceSettingsLayout({
@@ -141,6 +194,7 @@ export default function WorkspaceSettingsLayout({
   const { t } = useI18n()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const { favorites, isFavorite, toggleFavorite, isLoaded } = useFavoriteSettings()
 
   const isActive = (href: string) => {
     return pathname === href || (href === '/settings/workspace/ad-accounts' && pathname === '/settings/workspace')
@@ -263,6 +317,41 @@ export default function WorkspaceSettingsLayout({
               ${sidebarOpen ? 'block' : 'hidden lg:block'}
             `}
           >
+            {/* Favorites Section */}
+            {isLoaded && favorites.length > 0 && (
+              <div className="mb-6 hidden lg:block">
+                <h3 className="mb-3 flex items-center gap-2 px-3 text-xs font-semibold uppercase tracking-wider text-text-tertiary">
+                  <Star className="h-4 w-4 fill-amber-500 text-amber-500" />
+                  Favorites
+                </h3>
+                <div className="space-y-1">
+                  {favorites.slice(0, 5).map((fav) => {
+                    const setting = NAV_SECTIONS.flatMap(s => s.items).find(i => i.href === fav.href)
+                    if (!setting) return null
+                    return (
+                      <Link
+                        key={fav.href}
+                        href={fav.href}
+                        onClick={() => setSidebarOpen(false)}
+                        className={`
+                          group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium
+                          transition-all duration-200 ease-out
+                          ${
+                            isActive(fav.href)
+                              ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300'
+                              : 'text-text-secondary hover:bg-surface-2 hover:text-text-primary'
+                          }
+                        `}
+                      >
+                        <Star className={`h-4 w-4 flex-shrink-0 ${isActive(fav.href) ? 'fill-amber-500 text-amber-500' : 'fill-amber-400 text-amber-400'}`} />
+                        {setting?.label}
+                      </Link>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
             {/* Search Bar */}
             <div className="mb-6 hidden lg:block sticky top-0 z-10">
               <div className="relative group">
@@ -297,13 +386,11 @@ export default function WorkspaceSettingsLayout({
                     </h3>
                     <div className="space-y-2">
                       {section.items.map((item) => (
-                        <Link
+                        <div
                           key={item.href}
-                          href={item.href}
-                          onClick={() => setSidebarOpen(false)}
                           className={`
-                            group flex items-start gap-3 rounded-lg px-3 py-2.5 text-sm font-medium
-                            transition-all duration-200 ease-out
+                            group rounded-lg px-3 py-2.5 text-sm font-medium
+                            transition-all duration-200 ease-out flex items-start gap-3
                             ${
                               isActive(item.href)
                                 ? 'bg-gradient-to-r from-violet-50 to-violet-50/50 text-violet-700 shadow-sm dark:from-violet-950/50 dark:to-violet-950/20 dark:text-violet-300 border border-violet-200/50 dark:border-violet-900/30'
@@ -311,25 +398,52 @@ export default function WorkspaceSettingsLayout({
                             }
                           `}
                         >
-                          <span className={`mt-0.5 flex-shrink-0 transition-all duration-200 ${
-                            isActive(item.href)
-                              ? 'text-violet-600 dark:text-violet-400'
-                              : 'text-text-tertiary group-hover:text-violet-600 group-hover:scale-110'
-                          }`}>
-                            {item.icon}
-                          </span>
-                          <div className="flex-1 min-w-0">
-                            <div className="font-medium">{t(item.labelKey, item.label)}</div>
-                            {item.description && (
-                              <p className="mt-0.5 text-xs text-text-tertiary group-hover:text-text-secondary transition-colors line-clamp-2">
-                                {t(item.descriptionKey || '', item.description)}
-                              </p>
+                          <Link
+                            href={item.href}
+                            onClick={() => setSidebarOpen(false)}
+                            className="flex-1 flex items-start gap-3 min-w-0"
+                          >
+                            <span className={`mt-0.5 flex-shrink-0 transition-all duration-200 ${
+                              isActive(item.href)
+                                ? 'text-violet-600 dark:text-violet-400'
+                                : 'text-text-tertiary group-hover:text-violet-600 group-hover:scale-110'
+                            }`}>
+                              {item.icon}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium">{t(item.labelKey, item.label)}</div>
+                              {item.description && (
+                                <p className="mt-0.5 text-xs text-text-tertiary group-hover:text-text-secondary transition-colors line-clamp-2">
+                                  {t(item.descriptionKey || '', item.description)}
+                                </p>
+                              )}
+                            </div>
+                            {isActive(item.href) && (
+                              <div className="ml-auto mt-0.5 h-2 w-2 rounded-full bg-violet-600 dark:bg-violet-400 flex-shrink-0 animate-pulse" />
                             )}
-                          </div>
-                          {isActive(item.href) && (
-                            <div className="ml-auto mt-0.5 h-2 w-2 rounded-full bg-violet-600 dark:bg-violet-400 flex-shrink-0 animate-pulse" />
-                          )}
-                        </Link>
+                          </Link>
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault()
+                              toggleFavorite({
+                                id: item.href,
+                                href: item.href,
+                                label: item.label,
+                                icon: 'star',
+                              })
+                            }}
+                            className="ml-auto mt-0.5 p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 hover:bg-white/20"
+                            title={isFavorite(item.href) ? 'Remove from favorites' : 'Add to favorites'}
+                          >
+                            <Star
+                              className={`h-4 w-4 transition-all ${
+                                isFavorite(item.href)
+                                  ? 'fill-amber-500 text-amber-500'
+                                  : 'text-text-tertiary hover:text-amber-500'
+                              }`}
+                            />
+                          </button>
+                        </div>
                       ))}
                     </div>
                   </div>
