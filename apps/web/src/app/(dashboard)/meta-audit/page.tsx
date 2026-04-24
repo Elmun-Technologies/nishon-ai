@@ -1,19 +1,44 @@
 'use client'
 
 import Link from 'next/link'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Compass, Filter, RefreshCw, Search, X } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from 'react'
+import {
+  ArrowRight,
+  ArrowUpRight,
+  ChevronDown,
+  Compass,
+  Filter,
+  Gavel,
+  Globe2,
+  LayoutDashboard,
+  Palette,
+  RefreshCw,
+  Save,
+  Search,
+  Target,
+  Type,
+  X,
+} from 'lucide-react'
 import { useI18n } from '@/i18n/use-i18n'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { meta as metaApi } from '@/lib/api-client'
 import { daysBetweenInclusive } from '@/lib/date-range'
 import { DateRangeFilter } from '@/components/filters/DateRangeFilter'
-import { PageHeader, Button, Dialog, Alert } from '@/components/ui'
+import { Button, Dialog, Alert } from '@/components/ui'
 import { cn, formatCurrency, formatNumber } from '@/lib/utils'
 
 type AuditTab = 'meta' | 'targeting' | 'auction' | 'geo' | 'creative' | 'adcopy'
 
 const TAB_IDS: AuditTab[] = ['meta', 'targeting', 'auction', 'geo', 'creative', 'adcopy']
+
+const TAB_ICONS: Record<AuditTab, ComponentType<{ className?: string }>> = {
+  meta: LayoutDashboard,
+  targeting: Target,
+  auction: Gavel,
+  geo: Globe2,
+  creative: Palette,
+  adcopy: Type,
+}
 
 const CREATIVE_FORMATS = [
   { id: 'image', labelKey: 'metaAudit.formatImage', fallback: 'Image', icon: '🖼' },
@@ -109,13 +134,6 @@ interface LiveCampaignRow {
   cpc: number
   accountName: string
   currency: string
-}
-
-const STATUS_BADGE: Record<string, string> = {
-  ACTIVE: 'text-emerald-400 bg-emerald-400/10',
-  PAUSED: 'text-amber-400 bg-amber-400/10',
-  DELETED: 'text-red-400 bg-red-400/10',
-  ARCHIVED: 'text-text-tertiary bg-surface-2',
 }
 
 function daysForDateRange(
@@ -285,6 +303,126 @@ function MetaGlyph({ className }: { className?: string }) {
   )
 }
 
+function MetricCardSpend({
+  value,
+  dateLabel,
+  trend,
+}: {
+  value: string
+  dateLabel: string
+  trend: { label: string; positive: boolean } | null
+}) {
+  return (
+    <div className="flex h-full flex-col justify-between rounded-2xl border border-border bg-surface p-5 shadow-sm transition hover:border-brand-mid/30 hover:shadow-md">
+      <div className="flex items-start justify-between gap-2">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">Расход</p>
+        {trend && (
+          <span
+            className={cn(
+              'inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-[10px] font-bold',
+              trend.positive
+                ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
+                : 'bg-red-500/15 text-red-700 dark:text-red-300',
+            )}
+          >
+            <ArrowUpRight className={cn('h-2.5 w-2.5', !trend.positive && 'rotate-90')} />
+            {trend.label}
+          </span>
+        )}
+      </div>
+      <p className="mt-3 text-3xl font-bold tabular-nums tracking-tight text-text-primary">{value}</p>
+      <p className="mt-2 text-[11px] text-text-tertiary">{dateLabel}</p>
+    </div>
+  )
+}
+
+function MetricCardRoas({ value, target }: { value: number; target: number }) {
+  const ratio = Math.min(value / target, 1)
+  const radius = 26
+  const circumference = 2 * Math.PI * radius
+  const offset = circumference * (1 - ratio)
+  return (
+    <div className="flex h-full items-center justify-between gap-3 rounded-2xl border border-brand-mid/30 bg-gradient-to-br from-brand-lime/25 via-brand-lime/15 to-brand-lime/5 p-5 shadow-sm transition hover:border-brand-mid/50 hover:shadow-md dark:from-brand-lime/15 dark:to-transparent">
+      <div className="min-w-0 flex-1">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-brand-ink/70 dark:text-brand-lime/80">
+          ROAS (все)
+        </p>
+        <p className="mt-3 text-3xl font-bold tabular-nums tracking-tight text-brand-ink dark:text-brand-lime">
+          {value.toFixed(1)}
+        </p>
+        <p className="mt-2 text-[11px] text-brand-ink/60 dark:text-brand-lime/70">
+          Цель {target.toFixed(1)}
+        </p>
+      </div>
+      <div className="relative h-16 w-16 shrink-0">
+        <svg viewBox="0 0 64 64" className="h-full w-full -rotate-90">
+          <circle
+            cx="32"
+            cy="32"
+            r={radius}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="5"
+            className="text-brand-mid/20"
+          />
+          <circle
+            cx="32"
+            cy="32"
+            r={radius}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="5"
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={offset}
+            className="text-emerald-500 transition-[stroke-dashoffset] duration-500"
+          />
+        </svg>
+        <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-brand-ink dark:text-brand-lime">
+          {Math.round(ratio * 100)}%
+        </span>
+      </div>
+    </div>
+  )
+}
+
+function MetricCardLeads({ value, delta }: { value: number; delta: string }) {
+  return (
+    <div className="flex h-full flex-col justify-between rounded-2xl border border-amber-400/40 bg-gradient-to-br from-amber-100/80 via-amber-50 to-amber-50/60 p-5 shadow-sm transition hover:border-amber-500/60 hover:shadow-md dark:border-amber-500/25 dark:from-amber-500/15 dark:via-amber-500/5 dark:to-transparent">
+      <p className="text-[11px] font-semibold uppercase tracking-wider text-amber-800 dark:text-amber-300">
+        Лиды (все)
+      </p>
+      <p className="mt-3 text-3xl font-bold tabular-nums tracking-tight text-amber-950 dark:text-amber-100">
+        {value}
+      </p>
+      <p className="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold text-amber-800/90 dark:text-amber-200/90">
+        <ArrowUpRight className="h-3 w-3" />
+        {delta}
+      </p>
+    </div>
+  )
+}
+
+function StatusDot({ status }: { status: string }) {
+  const normalized = status.toLowerCase()
+  const config =
+    normalized === 'active' || normalized === 'активна'
+      ? { dot: 'bg-emerald-500', text: 'text-emerald-700 dark:text-emerald-400', label: 'Active' }
+      : normalized === 'limited' || normalized === 'ограничена' || normalized === 'learning'
+        ? { dot: 'bg-amber-500', text: 'text-amber-700 dark:text-amber-400', label: 'Limited' }
+        : normalized === 'paused'
+          ? { dot: 'bg-amber-500', text: 'text-amber-700 dark:text-amber-400', label: 'Paused' }
+          : normalized === 'deleted' || normalized === 'archived'
+            ? { dot: 'bg-red-500', text: 'text-red-700 dark:text-red-400', label: status }
+            : { dot: 'bg-text-tertiary', text: 'text-text-secondary', label: status }
+  return (
+    <span className={cn('inline-flex items-center gap-1.5 text-xs font-semibold', config.text)}>
+      <span className={cn('h-1.5 w-1.5 rounded-full shadow-sm ring-2 ring-white dark:ring-surface-elevated', config.dot)} />
+      {config.label}
+    </span>
+  )
+}
+
 export default function MetaAuditPage() {
   const { t } = useI18n()
   const { currentWorkspace } = useWorkspaceStore()
@@ -302,7 +440,6 @@ export default function MetaAuditPage() {
   const [persona, setPersona] = useState<'owner' | 'specialist'>('owner')
   const [preset, setPreset] = useState('')
   const [search, setSearch] = useState('')
-  const [showSearch, setShowSearch] = useState(false)
   const [introOpen, setIntroOpen] = useState(true)
   const [feedback, setFeedback] = useState<string | null>(null)
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null)
@@ -658,115 +795,131 @@ export default function MetaAuditPage() {
         </Alert>
       )}
 
-      {liveError && (
-        <Alert variant="error" className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <span>{liveError}</span>
-          <Link
-            href="/settings/meta"
-            className="shrink-0 text-sm font-semibold text-brand-ink underline decoration-brand-mid/50 hover:no-underline dark:text-brand-lime"
-          >
-            {t('metaAudit.connectMeta', 'Open Meta settings')}
-          </Link>
-        </Alert>
-      )}
-
-      <section className="rounded-2xl border border-brand-mid/20 bg-gradient-to-br from-brand-lime/[0.08] via-surface-2/95 to-surface-2/90 p-3 dark:from-brand-lime/5 dark:via-surface-elevated/90 dark:to-surface-elevated/90 dark:border-brand-mid/25">
-        <PageHeader
-          className="mb-0 border-0 bg-transparent p-2 shadow-none"
-          title={
-            <span className="inline-flex items-center gap-2">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-brand-mid/30 bg-gradient-to-br from-brand-mid/25 to-brand-lime/40 text-brand-ink shadow-sm dark:from-brand-mid/40 dark:to-brand-lime/30">
-                <Compass className="h-4 w-4" />
-              </span>
-              {t('metaAudit.title', '360° Meta Audit')}
-            </span>
-          }
-          subtitle={
-            <span className="space-y-2">
-              <span className="mr-2 inline-flex items-center gap-2 align-middle">
-                <span
-                  className={cn(
-                    'rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide',
-                    isLiveData
-                      ? 'border-brand-mid/35 bg-brand-lime/35 text-brand-ink dark:bg-brand-lime/25 dark:text-brand-lime'
-                      : 'border-border bg-surface-2 text-text-tertiary',
-                  )}
-                >
-                  {isLiveData ? t('metaAudit.badgeLive', 'Live data') : t('metaAudit.badgeSample', 'Sample walkthrough')}
-                </span>
-                {liveLoading && <span className="text-xs text-text-tertiary">{t('common.loading', 'Loading…')}</span>}
-              </span>
-              <span className="block">
-                {isLiveData
-                  ? t(
-                      'metaAudit.subtitleLive',
-                      'Six views to diagnose Meta performance. Numbers below come from your connected Meta accounts for the selected period.',
-                    )
-                  : t(
-                      'metaAudit.subtitle',
-                      'Six views to diagnose Meta performance. Below is sample data until your ad account is connected.',
-                    )}
-              </span>
-            </span>
-          }
-          actions={
-            <div className="flex flex-wrap items-center gap-2">
-              <Button
-                variant="secondary"
-                size="sm"
-                type="button"
-                className="gap-1.5"
-                onClick={onRefresh}
-                disabled={liveLoading}
-              >
-                <RefreshCw className={cn('h-3.5 w-3.5', liveLoading && 'animate-spin')} />
-                {t('common.refresh', 'Refresh')}
-              </Button>
-              <DateRangeFilter
-                variant="select"
-                value={dateRange}
-                onValueChange={(id) => setDateRange(id as typeof dateRange)}
-                presets={metaAuditDatePresets}
-                fromDate={customFromDate}
-                toDate={customToDate}
-                onFromDateChange={setCustomFromDate}
-                onToDateChange={setCustomToDate}
-                selectClassName="rounded-xl border border-brand-mid/20 bg-surface px-3 py-2 text-xs font-medium text-text-primary shadow-sm focus:border-brand-mid focus:outline-none focus:ring-2 focus:ring-brand-lime/40"
-                dateInputClassName="rounded-xl border border-brand-mid/20 bg-surface px-3 py-2 text-xs font-medium text-text-primary shadow-sm focus:border-brand-mid focus:outline-none focus:ring-2 focus:ring-brand-lime/40"
-              />
-              <span className="hidden text-xs text-text-tertiary sm:inline">
-                {dateLabel}
-                {lastRefresh && (
-                  <span className="ml-1">
-                    · {lastRefresh.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                )}
+      {!isLiveData && (
+        <div className="flex flex-col gap-3 rounded-2xl border border-amber-300/70 bg-amber-50 px-4 py-3.5 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-5 sm:py-4 dark:border-amber-500/30 dark:bg-amber-500/10">
+          <div className="flex items-start gap-3">
+            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm ring-1 ring-amber-200/80 dark:bg-surface-elevated dark:ring-amber-500/25">
+              <MetaGlyph className="h-6 w-6 text-[#1877F2]" />
+              <span className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border border-white bg-amber-400 text-[10px] font-bold leading-none text-amber-950 shadow dark:border-surface-elevated">
+                !
               </span>
             </div>
-          }
-        />
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-amber-950 dark:text-amber-100">
+                Подключите Meta Ads чтобы запустить 360° аудит
+              </p>
+              <p className="mt-0.5 text-xs text-amber-900/80 dark:text-amber-100/80">
+                Без подключённого рекламного аккаунта вы видите только пример интерфейса с демо-данными.
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/settings/meta"
+            className="inline-flex shrink-0 items-center justify-center gap-1.5 self-start rounded-xl bg-amber-900 px-4 py-2 text-xs font-semibold text-amber-50 shadow-sm transition hover:bg-amber-950 sm:self-auto dark:bg-amber-100 dark:text-amber-950 dark:hover:bg-white"
+          >
+            Настройки Meta
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+      )}
+
+      <section className="rounded-2xl border border-brand-mid/20 bg-gradient-to-br from-brand-lime/[0.12] via-surface to-surface p-5 shadow-sm dark:from-brand-lime/[0.06] dark:via-surface-elevated dark:to-surface-elevated dark:border-brand-mid/25">
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-brand-mid/35 bg-gradient-to-br from-brand-mid/30 to-brand-lime/50 text-brand-ink shadow-sm dark:from-brand-mid/40 dark:to-brand-lime/30">
+                <Compass className="h-5 w-5" />
+              </span>
+              <h1 className="text-2xl font-bold tracking-tight text-text-primary md:text-[1.75rem]">
+                360° Meta Audit
+              </h1>
+              <span
+                className={cn(
+                  'inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider',
+                  isLiveData
+                    ? 'border-emerald-400/40 bg-emerald-400/10 text-emerald-700 dark:text-emerald-300'
+                    : 'border-border bg-surface-2 text-text-tertiary dark:bg-surface-elevated',
+                )}
+              >
+                <span
+                  className={cn(
+                    'h-1.5 w-1.5 rounded-full',
+                    isLiveData ? 'bg-emerald-500' : 'bg-text-tertiary/60',
+                  )}
+                />
+                {isLiveData ? 'Живые данные' : 'Пример интерфейса'}
+              </span>
+              {liveLoading && <span className="text-xs text-text-tertiary">Загружаем…</span>}
+            </div>
+            <p className="mt-2.5 max-w-2xl text-sm leading-relaxed text-text-secondary">
+              {isLiveData
+                ? 'Шесть вкладок для диагностики Meta. Числа ниже — из подключённых рекламных аккаунтов за выбранный период.'
+                : 'Шесть вкладок для диагностики Meta. Ниже примеры данных, пока не подключён рекламный аккаунт.'}
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={onRefresh}
+              disabled={liveLoading}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-brand-mid/25 bg-surface px-3 py-2 text-xs font-semibold text-text-primary shadow-sm transition hover:border-brand-mid/45 hover:bg-brand-lime/5 disabled:opacity-60 dark:bg-surface-elevated"
+            >
+              <RefreshCw className={cn('h-3.5 w-3.5', liveLoading && 'animate-spin')} />
+              Обновить
+            </button>
+            <DateRangeFilter
+              variant="select"
+              value={dateRange}
+              onValueChange={(id) => setDateRange(id as typeof dateRange)}
+              presets={metaAuditDatePresets}
+              fromDate={customFromDate}
+              toDate={customToDate}
+              onFromDateChange={setCustomFromDate}
+              onToDateChange={setCustomToDate}
+              selectClassName="rounded-xl border border-brand-mid/25 bg-surface px-3 py-2 text-xs font-semibold text-text-primary shadow-sm focus:border-brand-mid focus:outline-none focus:ring-2 focus:ring-brand-lime/40 dark:bg-surface-elevated"
+              dateInputClassName="rounded-xl border border-brand-mid/25 bg-surface px-3 py-2 text-xs font-semibold text-text-primary shadow-sm focus:border-brand-mid focus:outline-none focus:ring-2 focus:ring-brand-lime/40 dark:bg-surface-elevated"
+            />
+            {lastRefresh && (
+              <span className="inline-flex items-center gap-1 rounded-lg border border-border/60 bg-surface-2/60 px-2.5 py-1.5 text-[11px] font-medium tabular-nums text-text-tertiary dark:bg-surface-elevated/80">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                {lastRefresh.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            )}
+          </div>
+        </div>
       </section>
 
       <div className="overflow-x-auto">
         <nav
-          className="flex min-w-max gap-1 rounded-xl border border-border bg-surface-2 p-1 shadow-sm dark:bg-surface-elevated/80"
+          className="grid min-w-max grid-cols-6 gap-1 rounded-2xl border border-border bg-surface-2/80 p-1 shadow-sm backdrop-blur-sm dark:bg-surface-elevated/80"
           aria-label="Meta audit sections"
         >
-          {TAB_IDS.map((id) => (
-            <button
-              key={id}
-              type="button"
-              onClick={() => setTab(id)}
-              className={cn(
-                'whitespace-nowrap rounded-lg px-3 py-2.5 text-xs font-medium transition-all duration-200 sm:text-sm',
-                tab === id
-                  ? 'bg-gradient-to-r from-brand-mid to-brand-lime text-brand-ink shadow-sm'
-                  : 'text-text-tertiary hover:bg-surface hover:text-text-primary dark:hover:bg-surface-2',
-              )}
-            >
-              {tabLabels[id]}
-            </button>
-          ))}
+          {TAB_IDS.map((id) => {
+            const Icon = TAB_ICONS[id]
+            const active = tab === id
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setTab(id)}
+                className={cn(
+                  'group relative flex items-center justify-center gap-1.5 whitespace-nowrap rounded-xl px-3 py-2.5 text-xs font-semibold transition-all duration-200 sm:text-sm',
+                  active
+                    ? 'bg-gradient-to-r from-brand-mid to-brand-lime text-brand-ink shadow-sm ring-1 ring-brand-mid/30'
+                    : 'text-text-secondary hover:bg-surface hover:text-text-primary dark:hover:bg-surface-2',
+                )}
+                aria-current={active ? 'page' : undefined}
+              >
+                <Icon
+                  className={cn(
+                    'h-3.5 w-3.5 shrink-0 transition-transform duration-200 group-hover:scale-110 sm:h-4 sm:w-4',
+                    active ? 'text-brand-ink' : 'text-text-tertiary',
+                  )}
+                />
+                <span className="truncate">{tabLabels[id]}</span>
+              </button>
+            )
+          })}
         </nav>
       </div>
 
@@ -847,219 +1000,246 @@ export default function MetaAuditPage() {
         <Alert variant="info">{t('metaAudit.findingEmptyConnect', 'Connect a Meta ad account in workspace settings to run a live audit.')}</Alert>
       )}
 
-      <div className="flex flex-col gap-3 rounded-xl border border-brand-mid/15 bg-surface p-3 shadow-sm ring-1 ring-border/50 lg:flex-row lg:flex-wrap lg:items-center dark:border-brand-mid/20">
-        <div className="flex flex-col gap-1 border-b border-border pb-3 text-xs lg:border-b-0 lg:border-r lg:pb-0 lg:pr-4">
-          <span className="font-semibold uppercase tracking-wide text-text-tertiary">{t('metaAudit.personaLabel', 'View as')}</span>
-          <div className="flex flex-wrap gap-1">
+      <div className="flex flex-col gap-4 rounded-2xl border border-brand-mid/15 bg-surface p-4 shadow-sm ring-1 ring-border/50 lg:flex-row lg:items-start lg:justify-between dark:border-brand-mid/20">
+        <div className="flex flex-col gap-2 lg:max-w-md">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-text-tertiary">
+            Показать как
+          </span>
+          <div className="inline-flex rounded-xl border border-border bg-surface-2/70 p-0.5 dark:bg-surface-elevated/70">
             <button
               type="button"
               onClick={() => setPersona('owner')}
               className={cn(
-                'rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-all duration-200',
+                'rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all duration-200',
                 persona === 'owner'
-                  ? 'border-transparent bg-gradient-to-r from-brand-mid to-brand-lime text-brand-ink shadow-sm'
-                  : 'border-border text-text-secondary hover:bg-surface-2',
+                  ? 'bg-gradient-to-r from-brand-mid to-brand-lime text-brand-ink shadow-sm'
+                  : 'text-text-secondary hover:text-text-primary',
               )}
             >
-              {t('metaAudit.personaOwner', 'Account owner')}
+              Владелец аккаунта
             </button>
             <button
               type="button"
               onClick={() => setPersona('specialist')}
               className={cn(
-                'rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-all duration-200',
+                'rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all duration-200',
                 persona === 'specialist'
-                  ? 'border-transparent bg-gradient-to-r from-brand-mid to-brand-lime text-brand-ink shadow-sm'
-                  : 'border-border text-text-secondary hover:bg-surface-2',
+                  ? 'bg-gradient-to-r from-brand-mid to-brand-lime text-brand-ink shadow-sm'
+                  : 'text-text-secondary hover:text-text-primary',
               )}
             >
-              {t('metaAudit.personaSpecialist', 'Targetologist')}
+              Таргетолог
             </button>
           </div>
-          <span className="max-w-xs text-[11px] leading-snug text-text-tertiary lg:max-w-[220px]">
+          <p className="text-[11px] leading-snug text-text-tertiary">
             {persona === 'owner'
-              ? t('metaAudit.personaHintOwner', 'High-level risks, budget concentration, and clear next checks.')
-              : t('metaAudit.personaHintSpecialist', 'Delivery metrics (CTR, CPC), outliers vs. account average, and campaign-level fixes.')}
-          </span>
+              ? 'Риски уровня бюджета, концентрация расходов и понятные следующие шаги.'
+              : 'Метрики доставки (CTR, CPC), отклонения от среднего и правки на уровне кампаний.'}
+          </p>
         </div>
-        <div className="flex flex-1 flex-wrap items-center gap-2">
-        <button
-          type="button"
-          onClick={() => {
-            if (tab !== 'meta') setTab('meta')
-            setShowSearch(true)
-            queueMicrotask(() => searchRef.current?.focus())
-          }}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium text-text-secondary transition-colors hover:bg-surface-2"
-        >
-          <Search className="h-3.5 w-3.5" />
-          {t('metaAudit.filterData', 'Filter data')}
-        </button>
-        {showSearch && (
-          <input
-            ref={searchRef}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={t('metaAudit.searchPlaceholder', 'Search campaigns…')}
-            className="min-w-[180px] flex-1 rounded-lg border border-border bg-surface-2 px-3 py-2 text-xs outline-none focus:border-primary md:max-w-xs dark:bg-surface"
-          />
-        )}
-        <select
-          value={preset}
-          onChange={(e) => setPreset(e.target.value)}
-          className="min-w-[140px] rounded-lg border border-border bg-surface-2 px-2 py-2 text-xs text-text-secondary dark:bg-surface"
-        >
-          <option value="">{t('metaAudit.loadPreset', 'Load filter preset…')}</option>
-          <option value="winners">{t('metaAudit.presetWinners', 'Winning ad sets')}</option>
-          <option value="learning">{t('metaAudit.presetLearning', 'Learning limited')}</option>
-        </select>
-        <Button type="button" variant="secondary" size="sm" onClick={onSaveView}>
-          {t('metaAudit.saveView', 'Save this view')}
-        </Button>
-        <div className="min-w-[120px] flex-1" />
-        <div className="flex items-center gap-1.5 rounded-lg border border-border bg-surface-2 px-2 py-1.5 dark:bg-surface">
-          <MetaGlyph className="h-4 w-4 shrink-0 text-text-tertiary" />
-          <select
-            value={kpi}
-            onChange={(e) => setKpi(e.target.value as KpiMode)}
-            className="min-w-[110px] bg-transparent text-xs font-medium text-text-primary outline-none"
+
+        <div className="flex flex-wrap items-center gap-2 lg:justify-end">
+          <div className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface-2/70 px-2.5 py-2 transition hover:border-brand-mid/30 focus-within:border-brand-mid dark:bg-surface-elevated/70">
+            <Search className="h-3.5 w-3.5 shrink-0 text-text-tertiary" />
+            <input
+              ref={searchRef}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onFocus={() => {
+                if (tab !== 'meta') setTab('meta')
+              }}
+              placeholder="Фильтр данных"
+              className="w-[140px] bg-transparent text-xs font-medium text-text-primary placeholder:text-text-tertiary outline-none"
+            />
+          </div>
+          <div className="relative inline-flex items-center">
+            <select
+              value={preset}
+              onChange={(e) => setPreset(e.target.value)}
+              className="appearance-none rounded-xl border border-border bg-surface-2/70 py-2 pl-3 pr-8 text-xs font-semibold text-text-secondary transition hover:border-brand-mid/30 dark:bg-surface-elevated/70"
+            >
+              <option value="">Загрузить пресет…</option>
+              <option value="winners">Работающие наборы</option>
+              <option value="learning">Ограниченное обучение</option>
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-2.5 h-3.5 w-3.5 text-text-tertiary" />
+          </div>
+          <button
+            type="button"
+            onClick={onSaveView}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface-2/70 px-3 py-2 text-xs font-semibold text-text-primary transition hover:border-brand-mid/30 hover:bg-surface dark:bg-surface-elevated/70"
           >
-            {isLiveData ? (
-              <>
-                <option value="spend">{t('metaAudit.metricSpend', 'Amount spent')}</option>
-                <option value="ctr">{t('metaAudit.metricCtr', 'CTR (blended)')}</option>
-                <option value="clicks">{t('metaAudit.kpiClicks', 'Clicks')}</option>
-              </>
-            ) : (
-              <>
-                <option value="roas">{t('metaAudit.metricRoas', 'ROAS (All)')}</option>
-                <option value="leads">{t('metaAudit.metricLeads', 'Leads (All)')}</option>
-                <option value="spend">{t('metaAudit.metricSpend', 'Amount spent')}</option>
-              </>
-            )}
-          </select>
-        </div>
+            <Save className="h-3.5 w-3.5" />
+            Сохранить вид
+          </button>
+          <div className="relative inline-flex items-center">
+            <MetaGlyph className="pointer-events-none absolute left-2.5 h-4 w-4 text-[#1877F2]" />
+            <select
+              value={kpi}
+              onChange={(e) => setKpi(e.target.value as KpiMode)}
+              className="appearance-none rounded-xl border border-brand-mid/25 bg-gradient-to-r from-brand-lime/10 to-surface py-2 pl-8 pr-8 text-xs font-semibold text-text-primary shadow-sm transition hover:border-brand-mid/45 dark:from-brand-lime/5 dark:bg-surface-elevated"
+            >
+              {isLiveData ? (
+                <>
+                  <option value="spend">Расход</option>
+                  <option value="ctr">CTR (общий)</option>
+                  <option value="clicks">Клики</option>
+                </>
+              ) : (
+                <>
+                  <option value="roas">ROAS (все)</option>
+                  <option value="leads">Лиды (все)</option>
+                  <option value="spend">Расход</option>
+                </>
+              )}
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-2.5 h-3.5 w-3.5 text-text-tertiary" />
+          </div>
         </div>
       </div>
 
       {tab === 'meta' && (
-        <div className="space-y-4">
-          <div className="grid gap-3 sm:grid-cols-3">
-            {isLiveData && liveTotals ? (
-              <>
-                <div className="rounded-xl border border-border bg-surface p-4 shadow-sm">
-                  <p className="text-xs font-medium text-text-tertiary">{t('metaAudit.kpiSpend', 'Amount spent')}</p>
-                  <p className="mt-1 text-2xl font-bold tabular-nums text-text-primary">
-                    {formatCurrency(liveTotals.spend, liveTotals.currency)}
-                  </p>
-                  <p className="mt-1 text-[11px] text-text-tertiary">{dateLabel}</p>
-                </div>
-                <div className="rounded-xl border border-brand-mid/25 bg-gradient-to-br from-brand-lime/20 to-brand-lime/5 p-4 shadow-sm dark:from-brand-lime/15 dark:to-transparent">
-                  <p className="text-xs font-medium text-brand-ink/70 dark:text-brand-lime/80">{t('metaAudit.kpiCtr', 'CTR (blended)')}</p>
-                  <p className="mt-1 text-2xl font-bold tabular-nums text-brand-ink dark:text-brand-lime">{liveTotals.ctr.toFixed(2)}%</p>
-                  <p className="mt-1 text-[11px] text-text-tertiary">{t('metaAudit.metricCtr', 'CTR (blended)')}</p>
-                </div>
-                <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/10 p-4 shadow-sm dark:border-emerald-500/30">
-                  <p className="text-xs font-medium text-emerald-800/80 dark:text-emerald-300/90">{t('metaAudit.kpiClicks', 'Clicks')}</p>
-                  <p className="mt-1 text-2xl font-bold tabular-nums text-emerald-800 dark:text-emerald-200">
-                    {formatNumber(liveTotals.clicks)}
-                  </p>
-                  <p className="mt-1 text-[11px] text-emerald-900/70 dark:text-emerald-200/80">
-                    {t('metaAudit.roasUnavailableNote', 'ROAS is not in this reporting sync yet.')}
-                  </p>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="rounded-xl border border-border bg-surface p-4 shadow-sm">
-                  <p className="text-xs font-medium text-text-tertiary">{t('metaAudit.kpiSpend', 'Amount spent')}</p>
-                  <p className="mt-1 text-2xl font-bold tabular-nums text-text-primary">
-                    ${(13270 * sampleSpendMultiplier).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                  </p>
-                  <p className="mt-1 text-[11px] text-text-tertiary">{dateLabel}</p>
-                </div>
-                <div className="rounded-xl border border-brand-mid/20 bg-brand-lime/10 p-4 shadow-sm dark:bg-brand-lime/5">
-                  <p className="text-xs font-medium text-text-tertiary">{t('metaAudit.metricRoas', 'ROAS (All)')}</p>
-                  <p className="mt-1 text-2xl font-bold tabular-nums text-brand-ink dark:text-brand-lime">
-                    {kpi === 'roas' ? '2.6' : kpi === 'leads' ? '—' : '—'}
-                  </p>
-                </div>
-                <div className="rounded-xl border border-amber-500/20 bg-amber-500/10 p-4 shadow-sm dark:border-amber-500/25">
-                  <p className="text-xs font-medium text-amber-900/70 dark:text-amber-200/80">{t('metaAudit.kpiLeads', 'Leads (All)')}</p>
-                  <p className="mt-1 text-2xl font-bold tabular-nums text-amber-900 dark:text-amber-100">{kpi === 'leads' ? '184' : '142'}</p>
-                </div>
-              </>
-            )}
-          </div>
-          <div className="overflow-x-auto rounded-2xl border border-brand-mid/15 bg-surface shadow-sm dark:border-brand-mid/20">
-            <table className="w-full min-w-[560px] border-collapse text-left text-sm">
-              <thead className="border-b border-brand-mid/10 bg-surface-2 text-xs uppercase tracking-wide text-text-tertiary dark:bg-surface-elevated">
-                <tr>
-                  <th className="px-4 py-3">{t('metaAudit.campaignColumn', 'Campaign')}</th>
-                  <th className="px-4 py-3 text-right">{t('metaAudit.spendColumn', 'Spend')}</th>
-                  {isLiveData ? (
-                    <>
-                      <th className="px-4 py-3 text-right">{t('metaAudit.clicksColumn', 'Clicks')}</th>
-                      <th className="px-4 py-3 text-right">{t('metaAudit.impressionsColumn', 'Impressions')}</th>
-                      <th className="px-4 py-3 text-right">{t('metaAudit.ctrColumn', 'CTR')}</th>
-                      <th className="px-4 py-3 text-right">{t('metaAudit.cpcColumn', 'CPC')}</th>
-                    </>
-                  ) : (
-                    <th className="px-4 py-3 text-right">{t('metaAudit.roasColumn', 'ROAS')}</th>
-                  )}
-                  <th className="px-4 py-3">{t('metaAudit.statusColumn', 'Status')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {isLiveData
-                  ? filteredLiveRows.map((row) => (
-                      <tr key={row.id} className="border-b border-border/70 last:border-0">
-                        <td className="px-4 py-3 font-medium text-text-primary">{row.name}</td>
-                        <td className="px-4 py-3 text-right tabular-nums text-text-secondary">
-                          {formatCurrency(row.spend, row.currency)}
-                        </td>
-                        <td className="px-4 py-3 text-right tabular-nums text-text-secondary">{formatNumber(row.clicks)}</td>
-                        <td className="px-4 py-3 text-right tabular-nums text-text-secondary">{formatNumber(row.impressions)}</td>
-                        <td
-                          className={cn(
-                            'px-4 py-3 text-right tabular-nums',
-                            row.ctr >= 2 ? 'text-emerald-500' : row.ctr >= 1 ? 'text-text-primary' : row.ctr > 0 ? 'text-amber-500' : 'text-text-tertiary',
-                          )}
+        <div className="relative">
+          <div className={cn('space-y-4 transition-opacity duration-300', !isLiveData && 'opacity-75')}>
+            <div className="grid gap-3 sm:grid-cols-3">
+              {isLiveData && liveTotals ? (
+                <>
+                  <MetricCardSpend
+                    value={formatCurrency(liveTotals.spend, liveTotals.currency)}
+                    dateLabel={dateLabel}
+                    trend={null}
+                  />
+                  <div className="flex h-full flex-col justify-between rounded-2xl border border-brand-mid/25 bg-gradient-to-br from-brand-lime/20 to-brand-lime/5 p-5 shadow-sm dark:from-brand-lime/15 dark:to-transparent">
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-brand-ink/70 dark:text-brand-lime/80">
+                      CTR (общий)
+                    </p>
+                    <p className="mt-3 text-3xl font-bold tabular-nums text-brand-ink dark:text-brand-lime">
+                      {liveTotals.ctr.toFixed(2)}%
+                    </p>
+                    <p className="mt-2 text-[11px] text-text-tertiary">CTR по всему периоду</p>
+                  </div>
+                  <div className="flex h-full flex-col justify-between rounded-2xl border border-emerald-500/25 bg-emerald-500/10 p-5 shadow-sm dark:border-emerald-500/30">
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-emerald-800/80 dark:text-emerald-300/90">
+                      Клики
+                    </p>
+                    <p className="mt-3 text-3xl font-bold tabular-nums text-emerald-800 dark:text-emerald-200">
+                      {formatNumber(liveTotals.clicks)}
+                    </p>
+                    <p className="mt-2 text-[11px] text-emerald-900/70 dark:text-emerald-200/80">
+                      ROAS появится после синхронизации
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <MetricCardSpend
+                    value={`$${(13270 * sampleSpendMultiplier).toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
+                    dateLabel={dateLabel}
+                    trend={{ label: '+12%', positive: true }}
+                  />
+                  <MetricCardRoas value={2.6} target={3.0} />
+                  <MetricCardLeads value={kpi === 'leads' ? 184 : 142} delta="+18 vs прошлый период" />
+                </>
+              )}
+            </div>
+
+            <div className="overflow-hidden rounded-2xl border border-brand-mid/15 bg-surface shadow-sm dark:border-brand-mid/20">
+              <table className="w-full min-w-[560px] border-collapse text-left text-sm">
+                <thead className="border-b border-brand-mid/15 bg-gradient-to-r from-surface-2 to-surface-2/70 text-[10px] font-bold uppercase tracking-wider text-text-tertiary dark:bg-surface-elevated dark:from-surface-elevated dark:to-surface-elevated/70">
+                  <tr>
+                    <th className="px-5 py-3.5">Кампания</th>
+                    <th className="px-5 py-3.5 text-right">Расход</th>
+                    {isLiveData ? (
+                      <>
+                        <th className="px-5 py-3.5 text-right">Клики</th>
+                        <th className="px-5 py-3.5 text-right">Показы</th>
+                        <th className="px-5 py-3.5 text-right">CTR</th>
+                        <th className="px-5 py-3.5 text-right">CPC</th>
+                      </>
+                    ) : (
+                      <th className="px-5 py-3.5 text-right">ROAS</th>
+                    )}
+                    <th className="px-5 py-3.5">Статус</th>
+                    <th className="w-8 px-2 py-3.5" aria-label="details" />
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/60">
+                  {isLiveData
+                    ? filteredLiveRows.map((row) => (
+                        <tr
+                          key={row.id}
+                          className="group cursor-pointer transition-colors hover:bg-brand-lime/[0.06] dark:hover:bg-brand-lime/5"
                         >
-                          {row.ctr.toFixed(2)}%
-                        </td>
-                        <td className="px-4 py-3 text-right tabular-nums text-text-secondary">
-                          {row.cpc > 0 ? formatCurrency(row.cpc, row.currency) : '—'}
-                        </td>
-                        <td className="px-4 py-3">
-                          <span
+                          <td className="px-5 py-3.5 font-semibold text-text-primary">{row.name}</td>
+                          <td className="px-5 py-3.5 text-right tabular-nums font-medium text-text-secondary">
+                            {formatCurrency(row.spend, row.currency)}
+                          </td>
+                          <td className="px-5 py-3.5 text-right tabular-nums text-text-secondary">{formatNumber(row.clicks)}</td>
+                          <td className="px-5 py-3.5 text-right tabular-nums text-text-secondary">{formatNumber(row.impressions)}</td>
+                          <td
                             className={cn(
-                              'rounded px-2 py-0.5 text-[10px] font-semibold uppercase',
-                              STATUS_BADGE[row.status] ?? 'text-text-tertiary bg-surface-2',
+                              'px-5 py-3.5 text-right tabular-nums font-semibold',
+                              row.ctr >= 2 ? 'text-emerald-500' : row.ctr >= 1 ? 'text-text-primary' : row.ctr > 0 ? 'text-amber-500' : 'text-text-tertiary',
                             )}
                           >
-                            {row.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))
-                  : filteredMockCampaigns.map((row) => (
-                      <tr key={row.id} className="border-b border-border/70 last:border-0">
-                        <td className="px-4 py-3 font-medium text-text-primary">{row.name}</td>
-                        <td className="px-4 py-3 text-right tabular-nums text-text-secondary">${row.spend.toLocaleString()}</td>
-                        <td className="px-4 py-3 text-right tabular-nums text-text-secondary">{row.roas.toFixed(1)}×</td>
-                        <td className="px-4 py-3 text-text-secondary">{row.status}</td>
-                      </tr>
-                    ))}
-              </tbody>
-            </table>
+                            {row.ctr.toFixed(2)}%
+                          </td>
+                          <td className="px-5 py-3.5 text-right tabular-nums text-text-secondary">
+                            {row.cpc > 0 ? formatCurrency(row.cpc, row.currency) : '—'}
+                          </td>
+                          <td className="px-5 py-3.5">
+                            <StatusDot status={row.status} />
+                          </td>
+                          <td className="px-2 py-3.5 text-text-tertiary">
+                            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:text-brand-ink dark:group-hover:text-brand-lime" />
+                          </td>
+                        </tr>
+                      ))
+                    : filteredMockCampaigns.map((row) => (
+                        <tr
+                          key={row.id}
+                          className="group cursor-pointer transition-colors hover:bg-brand-lime/[0.06] dark:hover:bg-brand-lime/5"
+                        >
+                          <td className="px-5 py-3.5 font-semibold text-text-primary">{row.name}</td>
+                          <td className="px-5 py-3.5 text-right tabular-nums font-medium text-text-secondary">
+                            ${row.spend.toLocaleString()}
+                          </td>
+                          <td
+                            className={cn(
+                              'px-5 py-3.5 text-right tabular-nums font-bold',
+                              row.roas >= 3
+                                ? 'text-emerald-600 dark:text-emerald-400'
+                                : row.roas >= 2
+                                  ? 'text-amber-600 dark:text-amber-400'
+                                  : 'text-red-500 dark:text-red-400',
+                            )}
+                          >
+                            {row.roas.toFixed(1)}×
+                          </td>
+                          <td className="px-5 py-3.5">
+                            <StatusDot status={row.status} />
+                          </td>
+                          <td className="px-2 py-3.5 text-text-tertiary">
+                            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:text-brand-ink dark:group-hover:text-brand-lime" />
+                          </td>
+                        </tr>
+                      ))}
+                </tbody>
+              </table>
+            </div>
           </div>
+
           {!isLiveData && (
-            <p className="text-center text-xs">
-              <span className="inline-flex rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 font-medium text-amber-900 dark:text-amber-200">
-                {t('metaAudit.sampleNote', 'Sample data')}
-              </span>
-            </p>
+            <div className="pointer-events-none absolute right-4 top-4 z-10">
+              <Link
+                href="/settings/meta"
+                className="pointer-events-auto inline-flex items-center gap-1.5 rounded-full border border-brand-mid/40 bg-white px-4 py-2 text-xs font-bold uppercase tracking-wider text-brand-ink shadow-lg shadow-brand-mid/10 transition hover:scale-105 hover:border-brand-mid hover:bg-brand-lime/10 dark:bg-surface-elevated dark:text-brand-lime"
+              >
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-500" />
+                Превью — подключить
+                <ArrowUpRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
           )}
         </div>
       )}
