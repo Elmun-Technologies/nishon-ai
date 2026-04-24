@@ -278,8 +278,9 @@ export default function SettingsPage() {
   const [policySaving, setPolicySaving] = useState(false)
   const [policySaved, setPolicySaved] = useState(false)
 
-  // Settings history
-  const [settingsHistory, setSettingsHistory] = useState<SettingsHistoryItem[]>([])
+  // Form validation state
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
+  const [touched, setTouched] = useState<Record<string, boolean>>({})
 
   // Sync local state when workspace loads from store
   useEffect(() => {
@@ -314,6 +315,14 @@ export default function SettingsPage() {
 
   async function handleSave() {
     if (!currentWorkspace?.id) return
+
+    // Validate all fields
+    setTouched({ workspaceName: true, autopilotMode: true, telegramChatId: true })
+    if (!validateAllFields()) {
+      setSaveError('Iltimos, barcha xatolarni to\'gri qiling')
+      return
+    }
+
     setSaving(true)
     setSaveError('')
     try {
@@ -326,7 +335,7 @@ export default function SettingsPage() {
       setSaved(true)
       setTimeout(() => setSaved(false), 2500)
     } catch (err: any) {
-      setSaveError(err?.message ?? 'Failed to save settings')
+      setSaveError(err?.message ?? 'Sozlamalarni saqlashda xato')
     } finally {
       setSaving(false)
     }
@@ -379,19 +388,64 @@ export default function SettingsPage() {
     return integration.name.toLowerCase().includes(search) || integration.description.toLowerCase().includes(search)
   })
 
-  // Add to settings history
-  const addToHistory = (setting: string, previous: string, current: string) => {
-    if (previous !== current) {
-      const newEntry: SettingsHistoryItem = {
-        id: Date.now().toString(),
-        setting,
-        previous,
-        current,
-        timestamp: new Date(),
-        user: user?.name ?? 'You',
-      }
-      setSettingsHistory((prev) => [newEntry, ...prev].slice(0, 10))
-    }
+  // Validation functions
+  const validateWorkspaceName = (name: string): string => {
+    if (!name || name.trim().length === 0) return 'Workspace nomi majburiy'
+    if (name.length < 2) return 'Nomi kamida 2 ta belgidan iborat bo\'lishi kerak'
+    if (name.length > 50) return 'Nomi 50 ta belgidan oshmasligi kerak'
+    return ''
+  }
+
+  const validateTelegramChatId = (id: string): string => {
+    if (!id) return ''
+    if (!/^\d+$/.test(id)) return 'Chat ID faqat raqamlardan iborat bo\'lishi kerak'
+    if (id.length < 8) return 'Chat ID noto\'g\'ri formatda'
+    return ''
+  }
+
+  const validateAutopilotMode = (mode: string): string => {
+    const valid = ['full_auto', 'assisted', 'manual']
+    if (!valid.includes(mode)) return 'Noto\'g\'ri Autopilot rejimi'
+    return ''
+  }
+
+  // Handle field blur for touched state
+  const handleFieldBlur = (fieldName: string) => {
+    setTouched((prev) => ({ ...prev, [fieldName]: true }))
+    validateField(fieldName)
+  }
+
+  // Validate single field
+  const validateField = (fieldName: string) => {
+    let error = ''
+    if (fieldName === 'workspaceName') error = validateWorkspaceName(workspaceName)
+    else if (fieldName === 'telegramChatId') error = validateTelegramChatId(telegramChatId)
+    else if (fieldName === 'autopilotMode') error = validateAutopilotMode(autopilotMode)
+
+    setValidationErrors((prev) => {
+      const updated = { ...prev }
+      if (error) updated[fieldName] = error
+      else delete updated[fieldName]
+      return updated
+    })
+    return !error
+  }
+
+  // Validate all fields
+  const validateAllFields = (): boolean => {
+    const errors: Record<string, string> = {}
+
+    const wsNameErr = validateWorkspaceName(workspaceName)
+    if (wsNameErr) errors['workspaceName'] = wsNameErr
+
+    const telegramErr = validateTelegramChatId(telegramChatId)
+    if (telegramErr) errors['telegramChatId'] = telegramErr
+
+    const autopilotErr = validateAutopilotMode(autopilotMode)
+    if (autopilotErr) errors['autopilotMode'] = autopilotErr
+
+    setValidationErrors(errors)
+    return Object.keys(errors).length === 0
   }
 
   return (
@@ -460,15 +514,48 @@ export default function SettingsPage() {
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-text-tertiary mb-1.5" htmlFor="ws-name">
-                      Workspace Name
-                    </label>
+                    <div className="flex items-center gap-1 mb-1.5">
+                      <label className="block text-sm text-text-tertiary" htmlFor="ws-name">
+                        Workspace Nomi
+                      </label>
+                      <span className="text-red-400">*</span>
+                      <div className="group relative ml-auto">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="text-text-tertiary cursor-help">
+                          <circle cx="12" cy="12" r="10" />
+                          <path d="M12 16v-4M12 8h.01" />
+                        </svg>
+                        <div className="invisible group-hover:visible absolute -top-10 right-0 bg-slate-900 text-white text-xs rounded-lg p-2 whitespace-nowrap border border-slate-700">
+                          2-50 ta belgidan iborat
+                        </div>
+                      </div>
+                    </div>
                     <Input
                       id="ws-name"
                       value={workspaceName}
-                      onChange={(e) => setWorkspaceName(e.target.value)}
-                      placeholder="e.g. My Clothing Brand"
+                      onChange={(e) => {
+                        setWorkspaceName(e.target.value)
+                        if (touched['workspaceName']) validateField('workspaceName')
+                      }}
+                      onBlur={() => handleFieldBlur('workspaceName')}
+                      placeholder="Masalan: Mening E-commerce Brendi"
+                      className={validationErrors['workspaceName'] ? 'border-red-500/50' : ''}
                     />
+                    {validationErrors['workspaceName'] && touched['workspaceName'] && (
+                      <p className="text-xs text-red-400 mt-1.5 flex items-center gap-1">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                        </svg>
+                        {validationErrors['workspaceName']}
+                      </p>
+                    )}
+                    {!validationErrors['workspaceName'] && touched['workspaceName'] && (
+                      <p className="text-xs text-emerald-400 mt-1.5 flex items-center gap-1">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="text-emerald-400">
+                          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                        </svg>
+                        Yaxshi
+                      </p>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
@@ -491,9 +578,20 @@ export default function SettingsPage() {
               {/* Autopilot Mode */}
               <Card>
                 <div className="mb-5">
-                  <h2 className="text-base font-semibold text-text-primary">Autopilot Mode</h2>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-base font-semibold text-text-primary">Autopilot Rejimi</h2>
+                    <div className="group relative">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="text-text-tertiary cursor-help">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 16v-4M12 8h.01" />
+                      </svg>
+                      <div className="invisible group-hover:visible absolute top-6 left-0 bg-slate-900 text-white text-xs rounded-lg p-2 whitespace-normal w-48 border border-slate-700 z-10">
+                        AI qancha avtomatik harakat qilishini tanlang
+                      </div>
+                    </div>
+                  </div>
                   <p className="text-xs text-text-tertiary mt-0.5">
-                    Control how much the AI acts on your behalf.
+                    AI sizning nomingizdan qancha harakat qilishi keakligini tanlang
                   </p>
                 </div>
                 <div className="space-y-3">
@@ -501,12 +599,15 @@ export default function SettingsPage() {
                     <button
                       key={mode.value}
                       type="button"
-                      onClick={() => setAutopilotMode(mode.value)}
+                      onClick={() => {
+                        setAutopilotMode(mode.value)
+                        setTouched((prev) => ({ ...prev, autopilotMode: true }))
+                      }}
                       className={`
                         w-full flex items-start gap-4 p-4 rounded-xl border text-left
                         transition-all duration-150
                         ${autopilotMode === mode.value
-                          ? 'border-border/40 bg-surface/5'
+                          ? 'border-blue-500/50 bg-blue-500/10'
                           : 'border-border hover:border-border hover:bg-surface-2'
                         }
                       `}
@@ -514,10 +615,10 @@ export default function SettingsPage() {
                       {/* Radio circle */}
                       <div className={`
                         mt-0.5 w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center
-                        ${autopilotMode === mode.value ? 'border-border' : 'border-border'}
+                        ${autopilotMode === mode.value ? 'border-blue-400 bg-blue-400' : 'border-border'}
                       `}>
                         {autopilotMode === mode.value && (
-                          <div className="w-2 h-2 rounded-full bg-surface" />
+                          <div className="w-1.5 h-1.5 rounded-full bg-white" />
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -732,53 +833,57 @@ export default function SettingsPage() {
             <div className="space-y-4">
             <Card>
               <div className="mb-5">
-                <h2 className="text-base font-semibold text-text-primary">Notification Preferences</h2>
+                <h2 className="text-base font-semibold text-text-primary">Bildirishnoma Sozlamalari</h2>
                 <p className="text-xs text-text-tertiary mt-0.5">
-                  Choose what updates you want to receive.
+                  Qanday xabarlar olishni tanlang
                 </p>
               </div>
               <div className="space-y-0 divide-y divide-[#2A2A3A]">
                 {[
                   {
                     key: 'email',
-                    label: 'Email Notifications',
-                    description: 'Receive important alerts and updates via email.',
-                    value: emailNotifs,
-                    onChange: setEmailNotifs,
+                    label: 'Email Bildirishnomalar',
+                    description: 'Muhim ogohlantirish va yangilanishlarni email orqali qabul qiling.',
+                    hint: 'Har kuni 1-2 ta muhim xabar'
                   },
                   {
                     key: 'weekly',
-                    label: 'Weekly Performance Report',
-                    description: 'A weekly summary of your campaign performance.',
-                    value: weeklyReport,
-                    onChange: setWeeklyReport,
+                    label: 'Haftalik Hisobot',
+                    description: 'Kampaniyaning haftalik umumiy natijalarini qabul qiling.',
+                    hint: 'Chorshanba kuniga 09:00 da'
                   },
                   {
                     key: 'ai',
-                    label: 'AI Decision Alerts',
-                    description: 'Get notified when the AI takes action on your campaigns.',
-                    value: aiAlerts,
-                    onChange: setAiAlerts,
+                    label: 'AI Qaror Ogohlantirishi',
+                    description: 'AI sizning kampaniyalaringizda harakat qilganda xabar olish.',
+                    hint: 'Avtomatik optimizatsiya xabarlari'
                   },
                 ].map((item) => (
                   <div key={item.key} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
-                    <div>
-                      <p className="text-sm font-medium text-text-primary">{item.label}</p>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-sm font-medium text-text-primary">{item.label}</p>
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">{item.hint}</span>
+                      </div>
                       <p className="text-xs text-text-tertiary mt-0.5">{item.description}</p>
                     </div>
                     {/* Toggle */}
                     <button
                       type="button"
-                      onClick={() => item.onChange((v: boolean) => !v)}
+                      onClick={() => {
+                        if (item.key === 'email') setEmailNotifs(!emailNotifs)
+                        else if (item.key === 'weekly') setWeeklyReport(!weeklyReport)
+                        else if (item.key === 'ai') setAiAlerts(!aiAlerts)
+                      }}
                       className={`
                         relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 shrink-0 ml-6
-                        ${item.value ? 'bg-surface' : 'bg-surface-2'}
+                        ${(item.key === 'email' ? emailNotifs : item.key === 'weekly' ? weeklyReport : aiAlerts) ? 'bg-blue-500/30' : 'bg-surface-2'}
                       `}
                     >
                       <span
                         className={`
-                          inline-block h-4 w-4 transform rounded-full bg-surface shadow transition-transform duration-200
-                          ${item.value ? 'translate-x-6' : 'translate-x-1'}
+                          inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200
+                          ${(item.key === 'email' ? emailNotifs : item.key === 'weekly' ? weeklyReport : aiAlerts) ? 'translate-x-6' : 'translate-x-1'}
                         `}
                       />
                     </button>
@@ -788,7 +893,7 @@ export default function SettingsPage() {
 
               <div className="mt-5 pt-5 border-t border-border flex justify-end">
                 <Button onClick={handleSave} loading={saving}>
-                  {saving ? 'Saving…' : 'Save Preferences'}
+                  {saving ? 'Saqlanmoqda…' : 'Saqlash'}
                 </Button>
               </div>
             </Card>
@@ -820,14 +925,37 @@ export default function SettingsPage() {
               </div>
 
               <div className="flex gap-3 items-end">
-                <div className="flex-1">
-                  <label className="block text-xs text-text-tertiary mb-1.5">Telegram Chat ID</label>
+                <div className="flex-1 space-y-1.5">
+                  <div className="flex items-center gap-1">
+                    <label className="block text-xs text-text-tertiary">Telegram Chat ID</label>
+                    <div className="group relative">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="text-text-tertiary cursor-help">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 16v-4M12 8h.01" />
+                      </svg>
+                      <div className="invisible group-hover:visible absolute -top-10 left-0 bg-slate-900 text-white text-xs rounded-lg p-2 whitespace-nowrap border border-slate-700 z-10">
+                        Raqamlar: 123456789
+                      </div>
+                    </div>
+                  </div>
                   <Input
                     value={telegramChatId}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTelegramChatId(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      setTelegramChatId(e.target.value)
+                      if (touched['telegramChatId']) validateField('telegramChatId')
+                    }}
+                    onBlur={() => handleFieldBlur('telegramChatId')}
                     placeholder="Masalan: 123456789"
-                    className="font-mono"
+                    className={`font-mono ${validationErrors['telegramChatId'] ? 'border-red-500/50' : ''}`}
                   />
+                  {validationErrors['telegramChatId'] && touched['telegramChatId'] && (
+                    <p className="text-xs text-red-400 flex items-center gap-1">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                      </svg>
+                      {validationErrors['telegramChatId']}
+                    </p>
+                  )}
                 </div>
                 <Button
                   onClick={async () => {
@@ -875,24 +1003,28 @@ export default function SettingsPage() {
                         label: 'Kreativ yangilanish taklifi',
                         description: 'AI kreativ muammolar aniqlanganda yangi sarlavha va matn variantlarini avtomatik taklif qiladi. (Faqat kontent — platforma o\'zgarmaydi)',
                         risk: 'low' as const,
+                        hint: 'CTR <2% bo\'lsa taklif qiladi'
                       },
                       {
                         key: 'allowAutoBudgetChange' as const,
                         label: 'Byudjet o\'zgartirishlariga ruxsat',
                         description: 'AI yuqori ROAS ko\'rsatkichli ad-setlarga byudjetni avtomatik ko\'chirishi mumkin.',
                         risk: 'high' as const,
+                        hint: 'Zararli bo\'lishi mumkin'
                       },
                       {
                         key: 'allowAutoPauseCreative' as const,
                         label: 'Kreativlarni avtomatik to\'xtatish',
                         description: 'Juda past CTR yoki charchagan kreativlarni AI o\'zi to\'xtatishi mumkin.',
                         risk: 'high' as const,
+                        hint: 'Yoqarlanishda o\'zgartira olasiz'
                       },
                       {
                         key: 'allowAudienceChanges' as const,
                         label: 'Auditoriya o\'zgartirishlariga ruxsat',
                         description: 'AI auditoriya targetingini kengaytirishi yoki toraytirishi mumkin.',
                         risk: 'high' as const,
+                        hint: 'Demographic targeting o\'zgaradi'
                       },
                     ].map((item) => (
                       <div key={item.key} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
@@ -906,6 +1038,15 @@ export default function SettingsPage() {
                             }`}>
                               {item.risk === 'low' ? 'xavfsiz' : 'yuqori xavf'}
                             </span>
+                            <div className="group relative ml-auto">
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="text-text-tertiary cursor-help">
+                                <circle cx="12" cy="12" r="10" />
+                                <path d="M12 16v-4M12 8h.01" />
+                              </svg>
+                              <div className="invisible group-hover:visible absolute top-6 right-0 bg-slate-900 text-white text-xs rounded-lg p-2 whitespace-nowrap border border-slate-700 z-10">
+                                {item.hint}
+                              </div>
+                            </div>
                           </div>
                           <p className="text-xs text-text-tertiary leading-relaxed">{item.description}</p>
                         </div>
@@ -913,10 +1054,10 @@ export default function SettingsPage() {
                           type="button"
                           onClick={() => setPolicy((p) => ({ ...p, [item.key]: !p[item.key] }))}
                           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 shrink-0 ${
-                            policy[item.key] ? 'bg-surface' : 'bg-surface-2'
+                            policy[item.key] ? 'bg-blue-500/30' : 'bg-surface-2'
                           }`}
                         >
-                          <span className={`inline-block h-4 w-4 transform rounded-full bg-surface shadow transition-transform duration-200 ${
+                          <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200 ${
                             policy[item.key] ? 'translate-x-6' : 'translate-x-1'
                           }`} />
                         </button>
