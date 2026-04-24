@@ -19,7 +19,7 @@ import { GeoTab } from './_components/tabs/GeoTab'
 import { CreativeTab } from './_components/tabs/CreativeTab'
 import { AdCopyTab } from './_components/tabs/AdCopyTab'
 
-import { TAB_IDS, CREATIVE_FORMATS, VIEW_STORAGE } from './_components/constants'
+import { TAB_IDS, CREATIVE_FORMATS, VIEW_STORAGE, MOCK_CAMPAIGNS } from './_components/constants'
 import { daysForDateRange, flattenReportData, computeAuditFindings, median } from './_components/utils'
 import type { AuditTab, KpiMode, Persona, DateRange, ReportData } from './_components/types'
 
@@ -179,18 +179,10 @@ export default function MetaAuditPage() {
     return [...list].sort(dir)
   }, [liveRows, search, preset, kpi])
 
-  const MOCK_CAMP = [
-    { id: 'c1', name: 'Prospecting — Catalog sales', spend: 4200, roas: 2.4, status: 'Active' },
-    { id: 'c2', name: 'Retargeting — 30d visitors',  spend: 1890, roas: 3.8, status: 'Active' },
-    { id: 'c3', name: 'Lead gen — Instant form',     spend: 960,  roas: 1.2, status: 'Limited' },
-    { id: 'c4', name: 'ASC — Advantage+ shopping',   spend: 6120, roas: 2.9, status: 'Active' },
-  ]
-
   const filteredMockCampaigns = useMemo(() => {
     const q = search.trim().toLowerCase()
-    if (!q) return MOCK_CAMP
-    return MOCK_CAMP.filter((c) => c.name.toLowerCase().includes(q) || c.id.includes(q))
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (!q) return MOCK_CAMPAIGNS
+    return MOCK_CAMPAIGNS.filter((c) => c.name.toLowerCase().includes(q) || c.id.includes(q))
   }, [search])
 
   const onRefresh = () => {

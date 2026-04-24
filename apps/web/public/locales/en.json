@@ -591,7 +591,14 @@
     "kpiClicks": "Clicks",
     "roasUnavailableNote": "ROAS is not in this reporting sync yet — use Ads Manager or your pixel/catalog for purchase ROAS.",
     "periodNote": "Period-over-period (↑/↓) is not available until daily or comparison windows are exposed by the API.",
-    "metricCtr": "CTR (blended)"
+    "metricCtr": "CTR (blended)",
+    "healthGood": "Good",
+    "healthFair": "Fair",
+    "healthWeak": "Weak",
+    "healthScoreColumn": "Score",
+    "targetingSampleNote": "Illustrative data — connect Meta Ads for live audience diagnostics.",
+    "auctionSampleNote": "Illustrative — real auction diagnostics need placement breakdowns from Meta.",
+    "geoSampleNote": "Illustrative data — geo split requires region breakdowns from Meta."
   },
   "automation": {
     "title": "Automation",

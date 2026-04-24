@@ -591,7 +591,14 @@
     "kpiClicks": "Клики",
     "roasUnavailableNote": "ROAS пока не в этом отчёте — смотрите Ads Manager или пиксель/каталог.",
     "periodNote": "Сравнение периодов (↑/↓) появится, когда API отдаст дневные данные или два окна.",
-    "metricCtr": "CTR (сводный)"
+    "metricCtr": "CTR (сводный)",
+    "healthGood": "Хорошо",
+    "healthFair": "Средне",
+    "healthWeak": "Слабо",
+    "healthScoreColumn": "Показатель",
+    "targetingSampleNote": "Иллюстративные данные — подключите Meta Ads для диагностики аудиторий.",
+    "auctionSampleNote": "Иллюстративные — реальная диагностика аукциона требует срезов по плейсментам из Meta.",
+    "geoSampleNote": "Иллюстративные данные — гео-разбивка требует региональных срезов из Meta."
   },
   "automation": {
     "title": "Автоматизация",

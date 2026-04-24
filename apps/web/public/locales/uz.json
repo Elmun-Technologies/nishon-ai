@@ -591,7 +591,14 @@
     "kpiClicks": "Kliklar",
     "roasUnavailableNote": "ROAS hozircha ushbu hisobotda yo‘q — sotib olish ROAS uchun Ads Manager yoki piksel/katalogdan foydalaning.",
     "periodNote": "Davr bilan taqqoslash (↑/↓) API kunlik yoki ikki oyna ma’lumotini bermaguncha mavjud emas.",
-    "metricCtr": "CTR (aralash)"
+    "metricCtr": "CTR (aralash)",
+    "healthGood": "Yaxshi",
+    "healthFair": "O'rtacha",
+    "healthWeak": "Zaif",
+    "healthScoreColumn": "Ball",
+    "targetingSampleNote": "Namunali ma'lumotlar — jonli auditoriya diagnostikasi uchun Meta Ads ulang.",
+    "auctionSampleNote": "Namunali — haqiqiy auktsion diagnostikasi Meta'dan joylashuv bo'yicha kesimlarni talab qiladi.",
+    "geoSampleNote": "Namunali ma'lumotlar — geo-taqsimlash Meta'dan mintaqa kesimlarini talab qiladi."
   },
   "automation": {
     "title": "Avtomatsiya",
