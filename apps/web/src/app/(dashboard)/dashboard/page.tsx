@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import {
   Activity,
   ArrowDown,
@@ -40,7 +40,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { Alert, Button } from '@/components/ui'
 import { Card } from '@/components/ui/Card'
 import { Skeleton } from '@/components/ui/Skeleton'
-import { workspaces as workspacesApi, aiAgent, meta as metaApi } from '@/lib/api-client'
+import { aiAgent } from '@/lib/api-client'
 import { formatCurrency, formatNumber, cn } from '@/lib/utils'
 import { formatUzs } from '@/lib/subscription-plans'
 import { FIRST_CAMPAIGN_BANNER_KEY } from '@/lib/onboarding-v2'
@@ -240,6 +240,7 @@ const TOOLTIP_STYLE = {
 export default function DashboardPage() {
   const { t } = useI18n()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { currentWorkspace, user } = useWorkspaceStore()
 
   const [performance, setPerformance] = useState<PerformanceSummary | null>(null)
@@ -251,6 +252,7 @@ export default function DashboardPage() {
   const [optimizeMsg, setOptimizeMsg] = useState('')
   const [error, setError] = useState('')
   const [firstCampaignBanner, setFirstCampaignBanner] = useState(false)
+  const [syncing, setSyncing] = useState(false)
 
   // ── Filters ──────────────────────────────────────────────────────────────
   const [datePreset, setDatePreset] = useState<DatePreset>('7d')
@@ -265,6 +267,22 @@ export default function DashboardPage() {
     } catch { /* ignore */ }
   }, [])
 
+  // Handle OAuth redirect feedback
+  useEffect(() => {
+    const metaConnected = searchParams.get('meta_connected')
+    const metaError     = searchParams.get('meta_error')
+    if (metaConnected) {
+      setOptimizeMsg('Meta ulandi! Ma\'lumot sinxronizatsiya qilinmoqda...')
+      setTimeout(() => setOptimizeMsg(''), 6000)
+      router.replace('/dashboard')
+    }
+    if (metaError) {
+      setError(`Meta ulanishda xatolik: ${metaError}`)
+      setTimeout(() => setError(''), 8000)
+      router.replace('/dashboard')
+    }
+  }, [searchParams, router])
+
   useEffect(() => {
     if (!currentWorkspace?.id) return
     fetch('/api/crm/summary')
@@ -275,56 +293,73 @@ export default function DashboardPage() {
 
   const loadPerformance = useCallback(() => {
     if (!currentWorkspace?.id) return
-    workspacesApi
-      .performance(currentWorkspace.id)
-      .then((res) => setPerformance((res.data as PerformanceSummary) ?? {}))
+    const params = new URLSearchParams({ workspaceId: currentWorkspace.id, days: String(days) })
+    fetch(`/api/meta/performance?${params}`)
+      .then((r) => r.json() as Promise<PerformanceSummary>)
+      .then((d) => setPerformance(d ?? {}))
       .catch(() => setPerformance({}))
       .finally(() => setLoadingPerf(false))
-  }, [currentWorkspace?.id])
+  }, [currentWorkspace?.id, days])
 
   useEffect(() => {
     if (!currentWorkspace?.id) { setLoadingPerf(false); return }
     setLoadingPerf(true)
     loadPerformance()
-    metaApi.reporting(currentWorkspace.id, days)
-      .then((res) => {
-        const data = res.data as { accounts?: Array<{ campaigns?: ReportCampaign[] }> }
-        setReportCampaigns((data?.accounts ?? []).flatMap((a) => a.campaigns ?? []))
-      })
+    const params = new URLSearchParams({ workspaceId: currentWorkspace.id, days: String(days) })
+    fetch(`/api/meta/campaigns?${params}`)
+      .then((r) => r.json() as Promise<{ accounts?: Array<{ campaigns?: ReportCampaign[] }> }>)
+      .then((data) => setReportCampaigns((data?.accounts ?? []).flatMap((a) => a.campaigns ?? [])))
       .catch(() => setReportCampaigns([]))
-    metaApi.topAds(currentWorkspace.id, 5)
-      .then((res) => setTopAds((res.data as TopAd[]) ?? []))
+    // Top ads: derive from campaigns sorted by CTR
+    fetch(`/api/meta/campaigns?${new URLSearchParams({ workspaceId: currentWorkspace.id, days: '30' })}`)
+      .then((r) => r.json() as Promise<{ accounts?: Array<{ campaigns?: Array<ReportCampaign & { name: string }> }> }>)
+      .then((data) => {
+        const all = (data?.accounts ?? []).flatMap((a) => a.campaigns ?? [])
+        const sorted = [...all]
+          .filter((c) => c.metrics.impressions > 0)
+          .sort((a, b) => b.metrics.ctr - a.metrics.ctr)
+          .slice(0, 5)
+          .map((c) => ({
+            campaignId:  c.id,
+            name:        c.name,
+            status:      c.status,
+            spend:       c.metrics.spend,
+            clicks:      c.metrics.clicks,
+            impressions: c.metrics.impressions,
+            ctr:         c.metrics.ctr,
+          }))
+        setTopAds(sorted)
+      })
       .catch(() => setTopAds([]))
   }, [currentWorkspace?.id, days, loadPerformance])
 
   useRealtimeRefresh(currentWorkspace?.id, ['meta_synced', 'optimization_done'], loadPerformance)
 
   // ── Derived values ────────────────────────────────────────────────────────
-  const roas  = performance?.overallRoas ?? performance?.avgRoas ?? 0
-  const spark = performance?.sparkline ?? []
-  const last  = spark[spark.length - 1]
-  const prev  = spark.length >= 2 ? spark[spark.length - 2] : null
+  const roas       = performance?.overallRoas ?? performance?.avgRoas ?? 0
+  const spark      = performance?.sparkline ?? []
 
-  const spendToday     = last?.spend ?? 0
-  const spendTrend     = prev ? pctChange(last.spend, prev.spend) : null
-  const revenueToday   = spendToday > 0 && roas > 0 ? spendToday * roas : 0
-  const prevRevEst     = prev && roas > 0 ? prev.spend * roas : 0
-  const revenueTrend   = prev && prevRevEst > 0 ? pctChange(revenueToday, prevRevEst) : null
-  const activeN        = performance?.activeCampaigns ?? performance?.campaignCount ?? 0
-  const totalClicks    = performance?.totalClicks ?? 0
-  const totalImpr      = performance?.totalImpressions ?? 0
-  const avgCtr         = totalImpr > 0 ? (totalClicks / totalImpr) * 100 : 0
-  const clicksTrend    = performance?.changes?.clicks ?? null
-  const imprTrend      = performance?.changes?.impressions ?? null
+  // Period totals (sum for selected days)
+  const totalSpend   = performance?.totalSpend ?? 0
+  const totalRevenue = totalSpend > 0 && roas > 0 ? totalSpend * roas : (performance?.totalRevenue ?? 0)
+  const activeN      = performance?.activeCampaigns ?? performance?.campaignCount ?? 0
+  const totalClicks  = performance?.totalClicks ?? 0
+  const totalImpr    = performance?.totalImpressions ?? 0
+  const avgCtr       = totalImpr > 0 ? (totalClicks / totalImpr) * 100 : 0
+  const spendTrend   = performance?.changes?.spend ?? null
+  const clicksTrend  = performance?.changes?.clicks ?? null
+  const imprTrend    = performance?.changes?.impressions ?? null
+
+  // Revenue trend = spend trend as proxy (both driven by same ROAS)
+  const revenueTrend = spendTrend
 
   const chartData = useMemo(() => {
-    const slice = spark.slice(-days)
-    return slice.map((p) => ({
-      label: formatDayLabel(p.day),
+    return spark.map((p) => ({
+      label:   formatDayLabel(p.day),
       spend:   Math.round(p.spend * 100) / 100,
       revenue: roas > 0 ? Math.round(p.spend * roas * 100) / 100 : 0,
     }))
-  }, [spark, roas, days])
+  }, [spark, roas])
 
   const aiAlerts = useMemo(() => [
     {
@@ -366,6 +401,32 @@ export default function DashboardPage() {
     try { sessionStorage.removeItem(FIRST_CAMPAIGN_BANNER_KEY) } catch { /* ignore */ }
     setFirstCampaignBanner(false)
   }, [])
+
+  async function handleSyncMeta() {
+    if (!currentWorkspace?.id || syncing) return
+    setSyncing(true)
+    try {
+      const res = await fetch('/api/sync/meta', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ workspaceId: currentWorkspace.id }),
+      })
+      const json = await res.json()
+      if (json.ok) {
+        setOptimizeMsg(`Sinxronizatsiya tugadi. ${json.insightRowsSynced ?? 0} ta yozuv yangilandi.`)
+        setTimeout(() => setOptimizeMsg(''), 5000)
+        loadPerformance()
+      } else {
+        setError(json.error ?? 'Sinxronizatsiya xatoligi')
+        setTimeout(() => setError(''), 5000)
+      }
+    } catch {
+      setError('Sinxronizatsiya so\'rovida xatolik')
+      setTimeout(() => setError(''), 5000)
+    } finally {
+      setSyncing(false)
+    }
+  }
 
   async function handleRunOptimization() {
     if (!currentWorkspace?.id) return
@@ -440,11 +501,31 @@ export default function DashboardPage() {
           </h1>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          {performance?.metaConnected && (
+          {performance?.metaConnected ? (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
               Meta Live
             </span>
+          ) : !loadingPerf && (
+            <Link
+              href={`/api/meta/oauth/connect?workspaceId=${currentWorkspace?.id}`}
+              className="inline-flex items-center gap-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-400 hover:bg-blue-500/20 transition-colors"
+            >
+              Meta ulash
+            </Link>
+          )}
+          {performance?.metaConnected && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-1.5"
+              onClick={handleSyncMeta}
+              disabled={syncing}
+              title="Meta ma'lumotlarini yangilash"
+            >
+              <RefreshCcw size={14} className={syncing ? 'animate-spin' : ''} />
+              <span className="hidden sm:inline">{syncing ? 'Sync...' : 'Sync'}</span>
+            </Button>
           )}
           <Button
             variant="ghost"
@@ -495,17 +576,17 @@ export default function DashboardPage() {
       {/* ── KPI cards (6) ──────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
         <KpiCard
-          label={t('dashboard.dashboardHome.cardSpendToday', 'Spend')}
-          value={loadingPerf ? '…' : formatCurrency(spendToday)}
+          label={t('dashboard.dashboardHome.cardSpendToday', 'Расход')}
+          value={loadingPerf ? '…' : formatCurrency(totalSpend)}
           trend={spendTrend}
           trendMode="neutral"
-          sub={t('dashboard.dashboardHome.cardSpendHint', 'So\'nggi kun')}
+          sub={`${days} ${t('dashboard.dashboardHome.cardSpendHint', 'kun')}`}
           icon={Wallet}
           loading={loadingPerf}
         />
         <KpiCard
-          label={t('dashboard.dashboardHome.cardRevenueToday', 'Daromad est.')}
-          value={loadingPerf ? '…' : revenueToday > 0 ? formatCurrency(revenueToday) : '—'}
+          label={t('dashboard.dashboardHome.cardRevenueToday', 'Даромад est.')}
+          value={loadingPerf ? '…' : totalRevenue > 0 ? formatCurrency(totalRevenue) : '—'}
           trend={revenueTrend}
           trendMode="higherBetter"
           sub={t('dashboard.dashboardHome.cardRevenueHint', 'Spend × ROAS')}
@@ -523,20 +604,20 @@ export default function DashboardPage() {
           loading={loadingPerf}
         />
         <KpiCard
-          label={t('dashboard.dashboardHome.cardActive', 'Aktiv')}
+          label={t('dashboard.dashboardHome.cardActive', 'Aktiv kampaniyalar')}
           value={loadingPerf ? '…' : String(activeN)}
           trend={null}
           trendMode="neutral"
-          sub={t('dashboard.dashboardHome.cardActiveHint', 'Kampaniyalar')}
+          sub={t('dashboard.dashboardHome.cardActiveHint', 'ACTIVE status')}
           icon={Rocket}
           loading={loadingPerf}
         />
         <KpiCard
-          label={t('dashboard.kpiClicks', 'Kliklar')}
+          label={t('dashboard.kpiClicks', 'Кликлар')}
           value={loadingPerf ? '…' : totalClicks > 0 ? formatNumber(totalClicks) : '—'}
           trend={typeof clicksTrend === 'number' ? clicksTrend : null}
           trendMode="higherBetter"
-          sub={`${days}d`}
+          sub={`${days} kun`}
           icon={MousePointerClick}
           loading={loadingPerf}
         />
