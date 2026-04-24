@@ -19,7 +19,9 @@ import {
   Menu,
   X,
   Search,
-  Star
+  Star,
+  History,
+  Shield
 } from 'lucide-react'
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { useFavoriteSettings } from '@/hooks/useFavoriteSettings'
@@ -128,6 +130,21 @@ const NAV_SECTIONS: NavSection[] = [
         icon: <HelpCircle className="h-4 w-4" />,
         description: 'Documentation and support resources',
         descriptionKey: 'workspaceSettings.descriptions.help',
+      },
+    ],
+  },
+  {
+    title: 'Audit & Security',
+    titleKey: 'workspaceSettings.sections.audit',
+    icon: <Shield className="h-4 w-4" />,
+    items: [
+      {
+        href: '/settings/workspace/history',
+        label: 'Activity Log',
+        labelKey: 'workspaceSettings.tabs.history',
+        icon: <History className="h-4 w-4" />,
+        description: 'Track all settings changes',
+        descriptionKey: 'workspaceSettings.descriptions.history',
       },
     ],
   },
