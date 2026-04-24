@@ -21,7 +21,8 @@ import {
   Search,
   Star,
   History,
-  Shield
+  Shield,
+  LineChart
 } from 'lucide-react'
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { useFavoriteSettings } from '@/hooks/useFavoriteSettings'
@@ -145,6 +146,14 @@ const NAV_SECTIONS: NavSection[] = [
         icon: <History className="h-4 w-4" />,
         description: 'Track all settings changes',
         descriptionKey: 'workspaceSettings.descriptions.history',
+      },
+      {
+        href: '/settings/workspace/analytics',
+        label: 'Usage Analytics',
+        labelKey: 'workspaceSettings.tabs.analytics',
+        icon: <LineChart className="h-4 w-4" />,
+        description: 'Track which settings are most used',
+        descriptionKey: 'workspaceSettings.descriptions.analytics',
       },
     ],
   },
