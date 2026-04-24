@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/Input'
 import { Alert, Dialog } from '@/components/ui'
 import { useToast } from '@/components/ui/Toaster'
 import Link from 'next/link'
-import { Plus, Pencil, Users } from 'lucide-react'
+import { Plus, Pencil, Users, AlertCircle } from 'lucide-react'
 import { team } from '@/lib/api-client'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { fetchMetaDashboard } from '@/lib/meta'
@@ -45,6 +45,9 @@ export default function WorkspaceTeamPage() {
   const [inviteRaw, setInviteRaw] = useState('')
   const [inviteBusy, setInviteBusy] = useState(false)
   const [adAccounts, setAdAccounts] = useState<Array<{ id: string; name: string }>>([])
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [confirmAction, setConfirmAction] = useState<{ type: 'revoke' | 'role-change'; id: string; email?: string; role?: MemberRow['role']; currentRole?: MemberRow['role'] } | null>(null)
+  const [inviteEmailError, setInviteEmailError] = useState('')
 
   useEffect(() => {
     document.title = 'Team Members — Workspace settings | AdSpectr'
@@ -71,7 +74,7 @@ export default function WorkspaceTeamPage() {
   useEffect(() => { void load() }, [load])
 
   const parsedEmails = parseEmails(inviteRaw)
-  const emailsValid = parsedEmails.length > 0
+  const emailsValid = parsedEmails.length > 0 && parsedEmails.every((e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e))
 
   async function sendInvite() {
     if (!currentWorkspace?.id || !emailsValid) return
@@ -89,21 +92,33 @@ export default function WorkspaceTeamPage() {
     }
   }
 
-  async function revoke(id: string) {
-    try {
-      await team.revokeInvite(id)
-      toast('Invite revoked.')
-      await load()
-    } catch { /* noop */ }
+  function showRevokeConfirm(id: string, email: string) {
+    setConfirmAction({ type: 'revoke', id, email })
+    setConfirmOpen(true)
   }
 
-  async function updateRole(memberUserId: string, role: MemberRow['role']) {
-    if (!currentWorkspace?.id) return
-    try {
-      await team.updateMemberRole({ workspaceId: currentWorkspace.id, memberUserId, role })
-      toast('Role updated.')
-      await load()
-    } catch { /* noop */ }
+  function showRoleChangeConfirm(memberUserId: string, role: MemberRow['role'], currentRole: MemberRow['role']) {
+    setConfirmAction({ type: 'role-change', id: memberUserId, role, currentRole })
+    setConfirmOpen(true)
+  }
+
+  async function confirmAction_() {
+    if (!confirmAction) return
+    if (confirmAction.type === 'revoke') {
+      try {
+        await team.revokeInvite(confirmAction.id)
+        toast('Invite revoked.')
+        await load()
+      } catch { /* noop */ }
+    } else if (confirmAction.type === 'role-change' && currentWorkspace?.id && confirmAction.role) {
+      try {
+        await team.updateMemberRole({ workspaceId: currentWorkspace.id, memberUserId: confirmAction.id, role: confirmAction.role })
+        toast('Role updated.')
+        await load()
+      } catch { /* noop */ }
+    }
+    setConfirmOpen(false)
+    setConfirmAction(null)
   }
 
   async function toggleAccount(member: MemberRow, accountId: string) {
@@ -158,11 +173,16 @@ export default function WorkspaceTeamPage() {
             </thead>
             <tbody className="divide-y divide-border/50">
               {loading && (
-                <tr>
-                  <td colSpan={4} className="px-5 py-10 text-center text-sm text-text-tertiary">
-                    {t('workspaceSettings.team.loading', 'Loading team…')}
-                  </td>
-                </tr>
+                <>
+                  {[1, 2, 3].map((i) => (
+                    <tr key={`skeleton-${i}`} className="animate-pulse">
+                      <td className="px-5 py-3.5"><div className="flex gap-3"><div className="h-8 w-8 rounded-full bg-surface-2/60" /><div className="h-4 w-32 rounded bg-surface-2/60" /></div></td>
+                      <td className="px-5 py-3.5"><div className="h-4 w-40 rounded bg-surface-2/60" /></td>
+                      <td className="px-5 py-3.5"><div className="h-6 w-8 rounded-full bg-surface-2/60" /></td>
+                      <td className="px-5 py-3.5"><div className="h-8 w-20 rounded bg-surface-2/60" /></td>
+                    </tr>
+                  ))}
+                </>
               )}
               {!loading && members.map((m) => {
                 const isYou = user?.id === m.userId
@@ -193,7 +213,7 @@ export default function WorkspaceTeamPage() {
                       <select
                         className="rounded-lg border border-border/70 bg-surface px-2.5 py-1.5 text-xs text-text-secondary focus:outline-none focus:ring-1 focus:ring-brand-mid"
                         value={m.role}
-                        onChange={(e) => void updateRole(m.userId, e.target.value as MemberRow['role'])}
+                        onChange={(e) => void showRoleChangeConfirm(m.userId, e.target.value as MemberRow['role'], m.role)}
                       >
                         <option value="owner">owner</option>
                         <option value="admin">admin</option>
@@ -225,7 +245,7 @@ export default function WorkspaceTeamPage() {
                 <li key={p.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border/70 px-4 py-2.5 text-sm">
                   <span className="font-medium text-text-primary">{p.email}</span>
                   <span className="rounded-full bg-surface-2 px-2 py-0.5 text-[11px] text-text-tertiary">{p.role}</span>
-                  <button type="button" onClick={() => void revoke(p.id)} className="text-xs text-red-500 hover:underline">
+                  <button type="button" onClick={() => void showRevokeConfirm(p.id, p.email)} className="text-xs text-red-500 hover:underline">
                     {t('workspaceSettings.team.revoke', 'Revoke')}
                   </button>
                 </li>
@@ -302,6 +322,56 @@ export default function WorkspaceTeamPage() {
           </div>
         </Dialog>
       )}
+
+      {/* Confirmation dialog */}
+      <Dialog open={confirmOpen} onClose={() => { setConfirmOpen(false); setConfirmAction(null) }} title="Confirm action" className="max-w-sm">
+        {confirmAction?.type === 'revoke' && (
+          <>
+            <div className="mt-2 flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-500/15 text-red-500">
+                <AlertCircle className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-sm text-text-primary">
+                  Revoke the invite sent to <span className="font-semibold">{confirmAction.email}</span>?
+                </p>
+                <p className="mt-1 text-xs text-text-tertiary">This will cancel their pending invite and they won't be able to join.</p>
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end gap-2">
+              <Button size="sm" variant="secondary" type="button" onClick={() => { setConfirmOpen(false); setConfirmAction(null) }}>
+                Cancel
+              </Button>
+              <Button size="sm" type="button" onClick={() => void confirmAction_()} className="bg-red-500 hover:bg-red-600">
+                Revoke
+              </Button>
+            </div>
+          </>
+        )}
+        {confirmAction?.type === 'role-change' && (
+          <>
+            <div className="mt-2 flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400">
+                <AlertCircle className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-sm text-text-primary">
+                  Change role from <span className="font-semibold">{confirmAction.currentRole}</span> to <span className="font-semibold">{confirmAction.role}</span>?
+                </p>
+                <p className="mt-1 text-xs text-text-tertiary">This will update the member's permissions and access level.</p>
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end gap-2">
+              <Button size="sm" variant="secondary" type="button" onClick={() => { setConfirmOpen(false); setConfirmAction(null) }}>
+                Cancel
+              </Button>
+              <Button size="sm" type="button" onClick={() => void confirmAction_()}>
+                Change role
+              </Button>
+            </div>
+          </>
+        )}
+      </Dialog>
     </div>
   )
 }

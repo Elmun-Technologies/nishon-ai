@@ -19,6 +19,7 @@ export default function WorkspaceUserProfilePage() {
   const [workspaceModalOpen, setWorkspaceModalOpen] = useState(false)
   const [saving, setSaving] = useState(false)
   const [note, setNote] = useState('')
+  const [noteType, setNoteType] = useState<'success' | 'error'>('success')
 
   useEffect(() => {
     document.title = 'User Profile — Workspace settings | AdSpectr'
@@ -32,8 +33,12 @@ export default function WorkspaceUserProfilePage() {
   })
 
   const phoneDisplay = workspaceForm.supportPhone || currentWorkspace?.targetAudience || ''
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  const userFormValid = userForm.name.trim().length > 0 && emailRegex.test(userForm.email)
+  const workspaceFormValid = workspaceForm.name.trim().length > 0
 
   async function saveUser() {
+    if (!userFormValid) return
     setSaving(true)
     setNote('')
     try {
@@ -47,9 +52,12 @@ export default function WorkspaceUserProfilePage() {
         isAdmin: (data as any).isAdmin ?? user?.isAdmin ?? false,
       })
       setEditUserOpen(false)
+      setNoteType('success')
       setNote(t('workspaceSettings.profile.savedProfile', 'Profile saved.'))
       toast(t('workspaceSettings.profile.savedProfile', 'Profile saved.'))
+      setTimeout(() => setNote(''), 3000)
     } catch (e: any) {
+      setNoteType('error')
       setNote(e?.message ?? 'Error')
       toast(e?.message ?? 'Failed to save profile', 'error')
     } finally {
@@ -58,7 +66,7 @@ export default function WorkspaceUserProfilePage() {
   }
 
   async function saveWorkspace() {
-    if (!currentWorkspace?.id) return
+    if (!currentWorkspace?.id || !workspaceFormValid) return
     setSaving(true)
     setNote('')
     try {
@@ -69,9 +77,12 @@ export default function WorkspaceUserProfilePage() {
       })
       setCurrentWorkspace({ ...(currentWorkspace as any), ...(data as any), name: workspaceForm.name, industry: workspaceForm.businessType })
       setWorkspaceModalOpen(false)
+      setNoteType('success')
       setNote(t('workspaceSettings.profile.savedWorkspace', 'Workspace settings saved.'))
       toast(t('workspaceSettings.profile.savedWorkspace', 'Workspace settings saved.'))
+      setTimeout(() => setNote(''), 3000)
     } catch (e: any) {
+      setNoteType('error')
       setNote(e?.message ?? 'Error')
       toast(e?.message ?? 'Failed to save workspace', 'error')
     } finally {
@@ -131,7 +142,15 @@ export default function WorkspaceUserProfilePage() {
           </div>
         </div>
 
-        {note && <p className="mt-4 rounded-xl border border-brand-lime/20 bg-brand-lime/10 px-3 py-2.5 text-sm font-medium text-brand-ink dark:text-brand-lime">{note}</p>}
+        {note && (
+          <p className={`mt-4 rounded-xl border px-3 py-2.5 text-sm font-medium animate-in fade-in ${
+            noteType === 'success'
+              ? 'border-brand-lime/20 bg-brand-lime/10 text-brand-ink dark:text-brand-lime'
+              : 'border-red-500/20 bg-red-500/10 text-red-700 dark:text-red-200'
+          }`}>
+            {note}
+          </p>
+        )}
 
         <div className="mt-5 flex flex-wrap gap-2 border-t border-border/70 pt-5">
           <Button
@@ -172,26 +191,35 @@ export default function WorkspaceUserProfilePage() {
       {/* Edit user dialog */}
       <Dialog open={editUserOpen} onClose={() => setEditUserOpen(false)} title={t('workspaceSettings.profile.editModalTitle', 'Edit user info')} className="max-w-md">
         <div className="mt-4 space-y-3">
-          <Input label={t('workspaceSettings.profile.name', 'Name')} value={userForm.name} onChange={(e) => setUserForm((p) => ({ ...p, name: e.target.value }))} />
-          <Input label={t('workspaceSettings.profile.email', 'Email')} value={userForm.email} onChange={(e) => setUserForm((p) => ({ ...p, email: e.target.value }))} />
+          <div>
+            <Input label={t('workspaceSettings.profile.name', 'Name')} value={userForm.name} onChange={(e) => setUserForm((p) => ({ ...p, name: e.target.value }))} />
+            {userForm.name.trim() === '' && <p className="mt-1 text-xs text-red-600 dark:text-red-400">Name is required</p>}
+          </div>
+          <div>
+            <Input label={t('workspaceSettings.profile.email', 'Email')} type="email" value={userForm.email} onChange={(e) => setUserForm((p) => ({ ...p, email: e.target.value }))} />
+            {userForm.email && !emailRegex.test(userForm.email) && <p className="mt-1 text-xs text-red-600 dark:text-red-400">Please enter a valid email</p>}
+          </div>
         </div>
         <div className="mt-6 flex justify-end gap-2">
           <Button size="sm" variant="secondary" type="button" onClick={() => setEditUserOpen(false)}>{t('common.cancel', 'Cancel')}</Button>
-          <Button size="sm" type="button" loading={saving} onClick={() => void saveUser()}>{t('common.save', 'Save')}</Button>
+          <Button size="sm" type="button" loading={saving} disabled={!userFormValid} onClick={() => void saveUser()}>{t('common.save', 'Save')}</Button>
         </div>
       </Dialog>
 
       {/* Workspace setup dialog */}
       <Dialog open={workspaceModalOpen} onClose={() => setWorkspaceModalOpen(false)} title={t('workspaceSettings.profile.workspaceModalTitle', 'Set up your workspace')} className="max-w-lg">
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <Input label={t('workspaceSettings.profile.workspaceName', 'Workspace name')} value={workspaceForm.name} onChange={(e) => setWorkspaceForm((p) => ({ ...p, name: e.target.value }))} />
+          <div>
+            <Input label={t('workspaceSettings.profile.workspaceName', 'Workspace name')} value={workspaceForm.name} onChange={(e) => setWorkspaceForm((p) => ({ ...p, name: e.target.value }))} />
+            {workspaceForm.name.trim() === '' && <p className="mt-1 text-xs text-red-600 dark:text-red-400">Workspace name is required</p>}
+          </div>
           <Input label={t('workspaceSettings.profile.businessType', 'Business type')} value={workspaceForm.businessType} onChange={(e) => setWorkspaceForm((p) => ({ ...p, businessType: e.target.value }))} placeholder="Brand / Agency" />
-          <Input label={t('workspaceSettings.profile.supportPhone', 'Support phone')} value={workspaceForm.supportPhone} onChange={(e) => setWorkspaceForm((p) => ({ ...p, supportPhone: e.target.value }))} />
-          <Input label={t('workspaceSettings.profile.supportEmail', 'Support email')} value={workspaceForm.supportEmail} onChange={(e) => setWorkspaceForm((p) => ({ ...p, supportEmail: e.target.value }))} />
+          <Input label={t('workspaceSettings.profile.supportPhone', 'Support phone')} type="tel" value={workspaceForm.supportPhone} onChange={(e) => setWorkspaceForm((p) => ({ ...p, supportPhone: e.target.value }))} />
+          <Input label={t('workspaceSettings.profile.supportEmail', 'Support email')} type="email" value={workspaceForm.supportEmail} onChange={(e) => setWorkspaceForm((p) => ({ ...p, supportEmail: e.target.value }))} />
         </div>
         <div className="mt-6 flex justify-end gap-2">
           <Button size="sm" variant="secondary" type="button" onClick={() => setWorkspaceModalOpen(false)}>{t('common.cancel', 'Cancel')}</Button>
-          <Button size="sm" type="button" loading={saving} onClick={() => void saveWorkspace()}>{t('common.save', 'Save')}</Button>
+          <Button size="sm" type="button" loading={saving} disabled={!workspaceFormValid} onClick={() => void saveWorkspace()}>{t('common.save', 'Save')}</Button>
         </div>
       </Dialog>
     </div>

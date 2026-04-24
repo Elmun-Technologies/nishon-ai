@@ -9,7 +9,7 @@ import { env } from '@/lib/env'
 import { mcpCredentials } from '@/lib/api-client'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { useI18n } from '@/i18n/use-i18n'
-import { KeyRound, Link2, Lock, Copy, Check, Plug, Plus, Wifi, WifiOff } from 'lucide-react'
+import { KeyRound, Link2, Lock, Copy, Check, Plug, Plus, Wifi, WifiOff, AlertCircle } from 'lucide-react'
 
 const DOCS_URL = 'https://adspectr.com/docs'
 
@@ -37,6 +37,9 @@ export default function WorkspaceMcpPage() {
   const [copiedField, setCopiedField] = useState<'id' | 'secret' | null>(null)
   const [connState, setConnState] = useState<ConnectionState>('idle')
   const [connLatencyMs, setConnLatencyMs] = useState<number | null>(null)
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [confirmCredentialId, setConfirmCredentialId] = useState<string | null>(null)
+  const [confirmCreating, setConfirmCreating] = useState(false)
 
   useEffect(() => {
     document.title = 'MCP Integration — Workspace settings | AdSpectr'
@@ -74,14 +77,24 @@ export default function WorkspaceMcpPage() {
     }
   }
 
-  async function revokeCredential(id: string) {
-    if (!currentWorkspace?.id) return
+  function showRevokeConfirm(id: string) {
+    setConfirmCredentialId(id)
+    setConfirmOpen(true)
+  }
+
+  async function confirmRevoke() {
+    if (!currentWorkspace?.id || !confirmCredentialId) return
+    setConfirmCreating(true)
     try {
-      await mcpCredentials.revoke(id, currentWorkspace.id)
+      await mcpCredentials.revoke(confirmCredentialId, currentWorkspace.id)
       toast('Credential revoked.')
       await loadCredentials()
+      setConfirmOpen(false)
+      setConfirmCredentialId(null)
     } catch (e: any) {
       toast(e?.message ?? 'Failed to revoke', 'error')
+    } finally {
+      setConfirmCreating(false)
     }
   }
 
@@ -147,7 +160,15 @@ export default function WorkspaceMcpPage() {
         <div className="mt-5">
           {loading ? (
             <div className="space-y-2">
-              {[1, 2].map((i) => <div key={i} className="h-14 animate-pulse rounded-xl bg-surface-2/60" />)}
+              {[1, 2].map((i) => (
+                <div key={i} className="flex items-center justify-between gap-3 rounded-xl border border-border/70 bg-surface-2/30 px-4 py-3 animate-pulse">
+                  <div className="min-w-0 flex-1 space-y-2">
+                    <div className="h-4 w-48 rounded bg-surface-2/60" />
+                    <div className="h-3 w-64 rounded bg-surface-2/60" />
+                  </div>
+                  <div className="h-8 w-20 rounded bg-surface-2/60" />
+                </div>
+              ))}
             </div>
           ) : credentials.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-border bg-surface-2/20 px-6 py-12 text-center">
@@ -181,7 +202,7 @@ export default function WorkspaceMcpPage() {
                       {item.secretMasked} · {new Date(item.createdAt).toLocaleString()}
                     </p>
                   </div>
-                  <Button size="sm" variant="secondary" type="button" onClick={() => void revokeCredential(item.id)}>
+                  <Button size="sm" variant="secondary" type="button" onClick={() => void showRevokeConfirm(item.id)}>
                     Revoke
                   </Button>
                 </div>
@@ -290,6 +311,29 @@ export default function WorkspaceMcpPage() {
           </Button>
           <Button size="sm" type="button" onClick={() => { setShowSecretModal(false); setNewClientSecret(''); toast('Credentials saved. Keep them secure.') }}>
             {t('workspaceSettings.mcp.savedCredentials', "I've saved my credentials")}
+          </Button>
+        </div>
+      </Dialog>
+
+      {/* Revoke confirmation dialog */}
+      <Dialog open={confirmOpen} onClose={() => { setConfirmOpen(false); setConfirmCredentialId(null) }} title="Revoke credential" className="max-w-sm">
+        <div className="mt-2 flex items-start gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-500/15 text-red-500">
+            <AlertCircle className="h-5 w-5" />
+          </div>
+          <div>
+            <p className="text-sm text-text-primary">
+              Revoke this MCP credential permanently?
+            </p>
+            <p className="mt-1 text-xs text-text-tertiary">Any AI agents using this credential will immediately lose access. This action cannot be undone.</p>
+          </div>
+        </div>
+        <div className="mt-6 flex justify-end gap-2">
+          <Button size="sm" variant="secondary" type="button" onClick={() => { setConfirmOpen(false); setConfirmCredentialId(null) }}>
+            Cancel
+          </Button>
+          <Button size="sm" type="button" loading={confirmCreating} onClick={() => void confirmRevoke()} className="bg-red-500 hover:bg-red-600">
+            Revoke
           </Button>
         </div>
       </Dialog>
