@@ -22,7 +22,9 @@ import {
   Star,
   History,
   Shield,
-  LineChart
+  LineChart,
+  Rocket,
+  Copy
 } from 'lucide-react'
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { useFavoriteSettings } from '@/hooks/useFavoriteSettings'
@@ -42,6 +44,21 @@ interface NavSection {
 }
 
 const NAV_SECTIONS: NavSection[] = [
+  {
+    title: 'Getting Started',
+    titleKey: 'workspaceSettings.sections.gettingStarted',
+    icon: <Rocket className="h-4 w-4" />,
+    items: [
+      {
+        href: '/settings/workspace/setup',
+        label: 'Setup Wizard',
+        labelKey: 'workspaceSettings.tabs.setup',
+        icon: <Rocket className="h-4 w-4" />,
+        description: 'Step-by-step guide to set up your workspace',
+        descriptionKey: 'workspaceSettings.descriptions.setup',
+      },
+    ],
+  },
   {
     title: 'Account Management',
     titleKey: 'workspaceSettings.sections.account',
@@ -70,6 +87,14 @@ const NAV_SECTIONS: NavSection[] = [
         icon: <CreditCard className="h-4 w-4" />,
         description: 'Manage billing and payment methods',
         descriptionKey: 'workspaceSettings.descriptions.payments',
+      },
+      {
+        href: '/settings/workspace/templates',
+        label: 'Templates',
+        labelKey: 'workspaceSettings.tabs.templates',
+        icon: <Copy className="h-4 w-4" />,
+        description: 'Save and reuse configuration templates',
+        descriptionKey: 'workspaceSettings.descriptions.templates',
       },
     ],
   },
