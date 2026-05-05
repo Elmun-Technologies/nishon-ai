@@ -436,6 +436,53 @@ export const autoOptimization = {
     apiClient.get(`/auto-optimization/workspaces/${workspaceId}/history?limit=${limit}`),
 }
 
+export type LaunchAudienceConfig = {
+  name: string
+  funnelStage:
+    | 'acquisition_prospecting'
+    | 'acquisition_reengagement'
+    | 'retargeting'
+    | 'retention'
+  location?: string
+}
+
+export type CreateLaunchJobInput = {
+  workspaceId: string
+  platform: 'meta' | 'google' | string
+  objective: string
+  budgetType: 'ABO' | 'CBO'
+  splitByFunnelStage?: boolean
+  audiences: LaunchAudienceConfig[]
+}
+
+export type LaunchJob = {
+  id: string
+  workspaceId: string
+  status: 'draft' | 'validated' | 'launching' | 'launched' | 'failed'
+  payload: Record<string, unknown> & {
+    launchResult?: {
+      platform: string
+      campaignId: string
+      accountId?: string
+    }
+  }
+  error: string | null
+  launchedAt: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export const launchOrchestrator = {
+  draft: (input: CreateLaunchJobInput) =>
+    apiClient.post<LaunchJob>('/launch-orchestrator/draft', input),
+  validate: (jobId: string) =>
+    apiClient.patch<LaunchJob>(`/launch-orchestrator/${jobId}/validate`),
+  launch: (jobId: string) =>
+    apiClient.patch<LaunchJob>(`/launch-orchestrator/${jobId}/launch`),
+  list: (workspaceId: string) =>
+    apiClient.get<LaunchJob[]>(`/launch-orchestrator/workspaces/${workspaceId}`),
+}
+
 /** CRM click → Redis `retarget:{phone}` + 7 kunlik Bull job (post-purchase) */
 export const retargetBridge = {
   signals: () => apiClient.get<RetargetSignalsResponse>('/api/retarget/signals'),
