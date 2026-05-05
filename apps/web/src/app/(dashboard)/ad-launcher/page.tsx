@@ -2,6 +2,9 @@
 
 import { PageHeader } from '@/components/ui'
 import { useI18n } from '@/i18n/use-i18n'
+import { ConfirmLaunchDialog } from './_components/ConfirmLaunchDialog'
+import { DemoBanner } from './_components/DemoBanner'
+import { LaunchHistory } from './_components/LaunchHistory'
 import { LaunchStep } from './_components/LaunchStep'
 import { PickStep } from './_components/PickStep'
 import { SelectionTray } from './_components/SelectionTray'
@@ -50,23 +53,33 @@ export default function AdLauncherPage() {
         )}
       />
 
+      {ctl.isDemoMode && <DemoBanner />}
+
       <section className="rounded-2xl border border-border bg-surface p-3 shadow-sm">
         <StepIndicator
           steps={steps}
           current={ctl.step}
           onJump={ctl.goToStep}
           isStepEnabled={isStepEnabled}
+          selectedCount={ctl.selectedCampaigns.length}
         />
       </section>
 
-      <div className="flex flex-col items-start gap-4 lg:flex-row">
-        <div className="min-w-0 flex-1 space-y-4">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="min-w-0 space-y-4">
           {ctl.step === 'source' && <SourceStep ctl={ctl} />}
           {ctl.step === 'pick' && <PickStep ctl={ctl} />}
           {ctl.step === 'launch' && <LaunchStep ctl={ctl} />}
         </div>
-        <SelectionTray ctl={ctl} />
+        <aside className="space-y-4">
+          <div className="lg:sticky lg:top-4">
+            <SelectionTray ctl={ctl} />
+          </div>
+          <LaunchHistory ctl={ctl} />
+        </aside>
       </div>
+
+      <ConfirmLaunchDialog ctl={ctl} />
     </div>
   )
 }
