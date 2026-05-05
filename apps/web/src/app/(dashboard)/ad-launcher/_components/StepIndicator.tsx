@@ -15,11 +15,14 @@ export function StepIndicator({
   current,
   onJump,
   isStepEnabled,
+  selectedCount = 0,
 }: {
   steps: Step[]
   current: StepId
   onJump?: (step: StepId) => void
   isStepEnabled?: (step: StepId) => boolean
+  /** Optional badge shown on the "pick" step when items are selected. */
+  selectedCount?: number
 }) {
   const currentIdx = steps.findIndex((s) => s.id === current)
 
@@ -30,6 +33,7 @@ export function StepIndicator({
         const active = i === currentIdx
         const enabled = isStepEnabled ? isStepEnabled(s.id) : true
         const clickable = onJump && enabled
+        const showBadge = s.id === 'pick' && selectedCount > 0
         return (
           <li key={s.id} className="flex flex-1 items-center">
             <button
@@ -44,13 +48,18 @@ export function StepIndicator({
             >
               <span
                 className={cn(
-                  'flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-xs font-semibold transition-colors',
+                  'relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-xs font-semibold transition-colors',
                   done && 'border-primary bg-primary text-brand-ink',
-                  active && 'border-primary bg-primary/10 text-primary',
+                  active && 'border-primary bg-primary/10 text-primary ring-2 ring-primary/15',
                   !done && !active && 'border-border bg-surface text-text-tertiary',
                 )}
               >
                 {done ? <Check className="h-4 w-4" /> : i + 1}
+                {showBadge && (
+                  <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-brand-ink ring-2 ring-surface">
+                    {selectedCount}
+                  </span>
+                )}
               </span>
               <span className="min-w-0">
                 <span

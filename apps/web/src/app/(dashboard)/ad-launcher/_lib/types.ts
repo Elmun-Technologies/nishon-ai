@@ -3,12 +3,13 @@
  *
  * The Ad Launcher is a 3-step flow:
  *   1. Source — pick a connected Meta ad account + date range.
- *   2. Pick   — browse synced campaigns from that account, select any.
- *   3. Launch — push the selected campaigns into a fresh launch job
+ *   2. Pick   — browse synced ads from that account, select any.
+ *   3. Launch — push the selected ads into a fresh launch job
  *               (creates a new Meta campaign via /launch-orchestrator).
  *
- * No mock data. If Meta is not connected or the workspace has no synced data,
- * the UI shows an explicit empty state with a CTA — never fake numbers.
+ * No mock data leaks into live usage. When the user is signed in via the
+ * Demo flow we surface a clearly-labeled curated dataset and lock the
+ * final launch behind a sign-up CTA.
  */
 
 export type StepId = 'source' | 'pick' | 'launch'
@@ -16,6 +17,9 @@ export type StepId = 'source' | 'pick' | 'launch'
 export type DateRangeId = '7d' | '30d' | '90d'
 
 export type StatusFilter = 'ALL' | 'ACTIVE' | 'PAUSED'
+
+export type SortKey = 'name' | 'status' | 'spend' | 'clicks' | 'ctr' | 'cpc' | 'aiHealth'
+export type SortDir = 'asc' | 'desc'
 
 export type AccountSummary = {
   id: string
@@ -68,3 +72,14 @@ export type LaunchPhase =
   | { state: 'launching'; jobId: string }
   | { state: 'success'; jobId: string; metaCampaignId?: string }
   | { state: 'error'; message: string; jobId?: string }
+
+export type HistoryItem = {
+  id: string
+  status: string
+  objective: string
+  audiences: string[]
+  budgetType: 'CBO' | 'ABO'
+  createdAt: string
+  metaCampaignId?: string
+  error?: string | null
+}

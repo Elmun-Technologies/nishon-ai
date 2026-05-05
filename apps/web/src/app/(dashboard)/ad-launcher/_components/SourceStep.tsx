@@ -2,7 +2,13 @@
 
 import Link from 'next/link'
 import { useEffect } from 'react'
-import { AlertCircle, ArrowRight, Loader2, PlugZap, RefreshCw } from 'lucide-react'
+import {
+  AlertCircle,
+  ArrowRight,
+  Loader2,
+  PlugZap,
+  RefreshCw,
+} from 'lucide-react'
 import { Button, Alert } from '@/components/ui'
 import { useI18n } from '@/i18n/use-i18n'
 import { cn } from '@/lib/utils'
@@ -21,21 +27,35 @@ const STATUS_OPTIONS: { id: StatusFilter; labelKey: string; fallback: string }[]
   { id: 'PAUSED', labelKey: 'adLauncher.statusPaused', fallback: 'To\'xtatilgan' },
 ]
 
+/** Maps an internal error code into a localized human message. */
+function errorMessage(code: string, t: (key: string, fallback?: string) => string): string {
+  switch (code) {
+    case 'NO_WORKSPACE':
+      return t('adLauncher.errNoWorkspace', 'Workspace topilmadi. Qaytadan login qiling.')
+    case 'LOAD_FAILED':
+      return t('adLauncher.errLoadFailed', 'Ma\'lumot yuklanmadi. Internet aloqasini tekshiring.')
+    case 'SYNC_FAILED':
+      return t('adLauncher.errSyncFailed', 'Meta\'dan sinxronlash bajarilmadi.')
+    default:
+      return code || t('adLauncher.errGeneric', 'Kutilmagan xato.')
+  }
+}
+
 export function SourceStep({ ctl }: { ctl: AdLauncherController }) {
   const { t } = useI18n()
 
-  // Auto-load on mount if we have a workspace and have not loaded yet.
   useEffect(() => {
-    if (ctl.workspaceId && !ctl.hasLoaded && !ctl.loading) ctl.loadData()
+    if (!ctl.hasLoaded && !ctl.loading) ctl.loadData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ctl.workspaceId])
+  }, [ctl.workspaceId, ctl.isDemoMode])
 
-  const noWorkspace = !ctl.workspaceId
-  const noAccounts = ctl.hasLoaded && !ctl.loading && ctl.accounts.length === 0 && !ctl.loadError
+  const noWorkspace = !ctl.workspaceId && !ctl.isDemoMode
+  const noAccounts =
+    ctl.hasLoaded && !ctl.loading && ctl.accounts.length === 0 && !ctl.loadError
   const canContinue = !!ctl.accountId && ctl.accounts.length > 0
 
   return (
-    <div className="space-y-4">
+    <div className="animate-in fade-in slide-in-from-bottom-1 space-y-4 duration-300">
       <header>
         <h2 className="text-lg font-semibold text-text-primary">
           {t('adLauncher.sourceTitle', '1. Manbani tanlang')}
@@ -50,25 +70,29 @@ export function SourceStep({ ctl }: { ctl: AdLauncherController }) {
 
       {noWorkspace && (
         <Alert variant="warning">
-          <AlertCircle className="h-4 w-4" />
-          {t('adLauncher.noWorkspace', 'Workspace topilmadi. Iltimos, qaytadan login qiling.')}
+          <div className="flex items-center gap-2">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            <span>{t('adLauncher.noWorkspace', 'Workspace topilmadi. Iltimos, qaytadan login qiling.')}</span>
+          </div>
         </Alert>
       )}
 
       {ctl.loadError && (
         <Alert variant="error">
-          <AlertCircle className="h-4 w-4" />
-          <span className="flex-1">{ctl.loadError}</span>
-          <Button size="sm" variant="ghost" onClick={ctl.loadData}>
-            {t('common.retry', 'Qayta urinish')}
-          </Button>
+          <div className="flex items-start gap-3">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+            <span className="flex-1">{errorMessage(ctl.loadError, t)}</span>
+            <Button size="sm" variant="ghost" onClick={ctl.loadData}>
+              {t('common.retry', 'Qayta urinish')}
+            </Button>
+          </div>
         </Alert>
       )}
 
       <div className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
         <div className="grid gap-4 md:grid-cols-3">
-          {/* ── Account picker ── */}
-          <div className="space-y-1.5 md:col-span-1">
+          {/* Account picker */}
+          <div className="space-y-1.5">
             <label className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
               {t('adLauncher.metaAccount', 'Meta reklama hisobi')}
             </label>
@@ -78,14 +102,14 @@ export function SourceStep({ ctl }: { ctl: AdLauncherController }) {
                 {t('adLauncher.loadingAccounts', 'Hisoblar yuklanmoqda...')}
               </div>
             ) : ctl.accounts.length === 0 ? (
-              <p className="text-sm text-text-tertiary">
+              <p className="flex h-10 items-center text-sm text-text-tertiary">
                 {t('adLauncher.noAccountsShort', 'Ulangan hisob yo\'q.')}
               </p>
             ) : (
               <select
                 value={ctl.accountId}
                 onChange={(e) => ctl.setAccountId(e.target.value)}
-                className="h-10 w-full rounded-lg border border-border bg-surface-2 px-3 text-sm dark:bg-surface"
+                className="h-10 w-full rounded-lg border border-border bg-surface-2 px-3 text-sm transition-colors focus:border-primary/60 focus:outline-none dark:bg-surface"
               >
                 {ctl.accounts.map((a) => (
                   <option key={a.id} value={a.id}>
@@ -102,8 +126,8 @@ export function SourceStep({ ctl }: { ctl: AdLauncherController }) {
             )}
           </div>
 
-          {/* ── Date range ── */}
-          <div className="space-y-1.5 md:col-span-1">
+          {/* Date range */}
+          <div className="space-y-1.5">
             <label className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
               {t('adLauncher.dateRange', 'Davr')}
             </label>
@@ -125,15 +149,12 @@ export function SourceStep({ ctl }: { ctl: AdLauncherController }) {
               ))}
             </div>
             <p className="text-xs text-text-tertiary">
-              {t(
-                'adLauncher.dateRangeHint',
-                'Metrikalar shu davr uchun ko\'rsatiladi.',
-              )}
+              {t('adLauncher.dateRangeHint', 'Metrikalar shu davr uchun ko\'rsatiladi.')}
             </p>
           </div>
 
-          {/* ── Status filter ── */}
-          <div className="space-y-1.5 md:col-span-1">
+          {/* Status filter */}
+          <div className="space-y-1.5">
             <label className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
               {t('adLauncher.status', 'Holat')}
             </label>
@@ -155,7 +176,7 @@ export function SourceStep({ ctl }: { ctl: AdLauncherController }) {
               ))}
             </div>
             <p className="text-xs text-text-tertiary">
-              {t('adLauncher.statusHint', 'Faol va to\'xtatilganlarni filterlash.')}
+              {t('adLauncher.statusHint', 'Yetkazib berish holati bo\'yicha filterlash.')}
             </p>
           </div>
         </div>
@@ -166,7 +187,7 @@ export function SourceStep({ ctl }: { ctl: AdLauncherController }) {
             variant="secondary"
             size="sm"
             onClick={ctl.triggerSync}
-            disabled={!ctl.workspaceId || ctl.syncing}
+            disabled={ctl.syncing || (!ctl.workspaceId && !ctl.isDemoMode)}
           >
             {ctl.syncing ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -190,13 +211,13 @@ export function SourceStep({ ctl }: { ctl: AdLauncherController }) {
         </div>
       </div>
 
-      {noAccounts && (
+      {noAccounts && !ctl.isDemoMode && (
         <div className="rounded-2xl border border-dashed border-border bg-surface-2/40 p-6 text-center">
           <PlugZap className="mx-auto h-10 w-10 text-text-tertiary" />
           <h3 className="mt-3 font-semibold text-text-primary">
             {t('adLauncher.connectMetaTitle', 'Meta hali ulanmagan')}
           </h3>
-          <p className="mt-1 text-sm text-text-tertiary">
+          <p className="mx-auto mt-1 max-w-md text-sm text-text-tertiary">
             {t(
               'adLauncher.connectMetaBody',
               'Reklama hisobini ulang yoki Meta\'dan ma\'lumotlarni sinxronlang. Shundan so\'ng bu yerda real reklamalar paydo bo\'ladi.',
@@ -204,9 +225,7 @@ export function SourceStep({ ctl }: { ctl: AdLauncherController }) {
           </p>
           <div className="mt-4 flex justify-center gap-2">
             <Link href="/settings">
-              <Button size="sm" variant="primary">
-                {t('adLauncher.connectMetaCta', 'Meta\'ni ulash')}
-              </Button>
+              <Button size="sm">{t('adLauncher.connectMetaCta', 'Meta\'ni ulash')}</Button>
             </Link>
             <Button size="sm" variant="secondary" onClick={ctl.triggerSync}>
               {t('adLauncher.syncNow', 'Meta\'dan yangilash')}
