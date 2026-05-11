@@ -77,6 +77,14 @@ const PRESET_NAME: Record<AudiencePresetId, string> = {
 
 const HEALTH_RANK: Record<CampaignRow['aiHealth'], number> = { BAD: 0, AVERAGE: 1, GOOD: 2 }
 
+const DEFAULT_LAUNCH_CONFIG: LaunchConfig = {
+  objective: 'OUTCOME_SALES',
+  budgetType: 'CBO',
+  dailyBudget: 25,
+  audiences: ['prospecting'],
+  splitByFunnelStage: false,
+}
+
 /** Sleep helper for simulating network timings in demo mode. */
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 
@@ -122,13 +130,7 @@ export function useAdLauncher() {
   const [sortDir, setSortDir] = useState<SortDir>('desc')
 
   // ── Launch state ───────────────────────────────────────────────────────────
-  const [launchConfig, setLaunchConfig] = useState<LaunchConfig>({
-    objective: 'OUTCOME_SALES',
-    budgetType: 'CBO',
-    dailyBudget: 25,
-    audiences: ['prospecting'],
-    splitByFunnelStage: false,
-  })
+  const [launchConfig, setLaunchConfig] = useState<LaunchConfig>(DEFAULT_LAUNCH_CONFIG)
   const [launchPhase, setLaunchPhase] = useState<LaunchPhase>({ state: 'idle' })
   const [confirmOpen, setConfirmOpen] = useState(false)
 
@@ -232,7 +234,10 @@ export function useAdLauncher() {
       setSyncing(false)
       return
     }
-    if (!workspaceId) return
+    if (!workspaceId) {
+      setLoadError('NO_WORKSPACE')
+      return
+    }
     setSyncing(true)
     setLoadError(null)
     try {
@@ -404,7 +409,9 @@ export function useAdLauncher() {
 
   const resetLaunch = useCallback(() => {
     setLaunchPhase({ state: 'idle' })
+    setLaunchConfig(DEFAULT_LAUNCH_CONFIG)
     clearSelection()
+    setSearch('')
     setStep('source')
   }, [clearSelection])
 

@@ -128,6 +128,7 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
               <button
                 key={o.id}
                 type="button"
+                aria-pressed={cfg.objective === o.id}
                 disabled={isBusy || isDone}
                 onClick={() => ctl.updateLaunchConfig({ objective: o.id })}
                 className={cn(
@@ -214,6 +215,7 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
                 <button
                   key={a.id}
                   type="button"
+                  aria-pressed={on}
                   disabled={isBusy || isDone}
                   onClick={() => toggleAudience(a.id)}
                   className={cn(
@@ -387,7 +389,8 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
               disabled={
                 isBusy ||
                 ctl.selectedCampaigns.length === 0 ||
-                cfg.audiences.length === 0
+                cfg.audiences.length === 0 ||
+                cfg.dailyBudget < 1
               }
               onClick={ctl.requestLaunch}
             >

@@ -43,10 +43,10 @@ function objectiveShort(o: string): string {
 export function LaunchHistory({ ctl }: { ctl: AdLauncherController }) {
   const { t } = useI18n()
 
+  const { loadHistory, workspaceId, isDemoMode } = ctl
   useEffect(() => {
-    ctl.loadHistory()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ctl.workspaceId, ctl.isDemoMode])
+    loadHistory()
+  }, [loadHistory, workspaceId, isDemoMode])
 
   return (
     <section className="rounded-2xl border border-border bg-surface shadow-sm">
