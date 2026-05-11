@@ -4,15 +4,20 @@ import { useCallback, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
+  Briefcase,
   ChevronLeft,
   ChevronRight,
   Facebook,
+  Flag,
   Globe,
+  Home,
+  Landmark,
   Megaphone,
   MessageCircle,
   Search,
   Send,
   ShoppingCart,
+  Smartphone,
   Target,
 } from 'lucide-react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
@@ -29,11 +34,11 @@ import { cn } from '@/lib/utils'
 
 type Platform = 'meta' | 'google' | 'yandex'
 type LaunchMode = 'self' | 'ai' | 'expert'
-type MetaStep = 1 | 2 | 3 | 4 | 5
+type MetaStep = 1 | 2 | 3 | 4 | 5 | 6
 type GoogleStep = 1 | 2 | 3 | 4 | 5
 type YandexStep = 1 | 2 | 3 | 4
 
-type MetaObjective = 'awareness' | 'traffic' | 'engagement' | 'leads' | 'sales'
+type MetaObjective = 'awareness' | 'traffic' | 'engagement' | 'leads' | 'app_promotion' | 'sales'
 
 const META_OBJECTIVES: {
   id: MetaObjective
@@ -41,41 +46,62 @@ const META_OBJECTIVES: {
   label: string
   desc: string
   goodFor: string[]
+  color: string       // icon bg
+  iconColor: string   // icon foreground
 }[] = [
   {
     id: 'awareness',
     icon: Megaphone,
-    label: 'Bilimdorlik',
-    desc: 'Brendingizni ko\'proq odamga tanittirish — ko\'rsinlar va eslab qolsinlar.',
+    label: 'Awareness',
+    desc: 'Show your ads to people who are most likely to remember them.',
     goodFor: ['Reach', 'Brand awareness', 'Video views'],
+    color: 'bg-amber-500/15',
+    iconColor: 'text-amber-600 dark:text-amber-400',
   },
   {
     id: 'traffic',
     icon: Globe,
-    label: 'Trafik',
-    desc: 'Sayt, ilova yoki Instagram profilingizga tashrif buyurtuvchilar jalb qilish.',
-    goodFor: ['Link clicks', 'Landing page views', 'Instagram visits', 'Calls'],
+    label: 'Traffic',
+    desc: 'Send people to a destination, like your website, app, Instagram profile or Facebook event.',
+    goodFor: ['Link clicks', 'Landing page views', 'Instagram profile visits', 'Messenger, Instagram and WhatsApp', 'Calls'],
+    color: 'bg-yellow-400/15',
+    iconColor: 'text-yellow-600 dark:text-yellow-400',
   },
   {
     id: 'engagement',
     icon: MessageCircle,
     label: 'Engagement',
-    desc: 'Post bilan muloqot — like, izoh, ulashish yoki xabarga javob.',
-    goodFor: ['Post reactions', 'Comments', 'Shares', 'Messaging'],
+    desc: 'Get more messages, purchases through messaging, video views, post engagement, Page likes or event responses.',
+    goodFor: ['Messenger, Instagram and WhatsApp', 'Video views', 'Post engagement', 'Conversions', 'Calls'],
+    color: 'bg-sky-500/15',
+    iconColor: 'text-sky-600 dark:text-sky-400',
   },
   {
     id: 'leads',
     icon: Target,
-    label: 'Lidlar',
-    desc: 'Aloqa ma\'lumotlarini to\'plash yoki so\'rov qabul qilish.',
-    goodFor: ['Lead forms', 'Messenger', 'Instagram DM', 'Calls'],
+    label: 'Leads',
+    desc: 'Collect leads for your business or brand.',
+    goodFor: ['Website and instant forms', 'Instant forms', 'Messenger, Instagram and WhatsApp', 'Conversions', 'Calls'],
+    color: 'bg-orange-500/15',
+    iconColor: 'text-orange-600 dark:text-orange-400',
+  },
+  {
+    id: 'app_promotion',
+    icon: Smartphone,
+    label: 'App promotion',
+    desc: 'Find new people to install your app and continue using it.',
+    goodFor: ['App installs', 'App events'],
+    color: 'bg-violet-500/15',
+    iconColor: 'text-violet-600 dark:text-violet-400',
   },
   {
     id: 'sales',
     icon: ShoppingCart,
-    label: 'Sotuvlar',
-    desc: 'Xarid qilishi mumkin bo\'lgan odamlarga ko\'rsatish va konversiyaga yo\'naltirish.',
-    goodFor: ['Conversions', 'Catalog sales', 'App installs', 'WhatsApp'],
+    label: 'Sales',
+    desc: 'Find people likely to purchase your product or service.',
+    goodFor: ['Conversions', 'Catalog sales', 'Messenger, Instagram and WhatsApp', 'Calls'],
+    color: 'bg-emerald-500/15',
+    iconColor: 'text-emerald-600 dark:text-emerald-400',
   },
 ]
 
@@ -183,6 +209,11 @@ export default function LaunchPage() {
       creativeUrl: '',
       creativeText: '',
       ctaButton: 'learn_more',
+      abTestEnabled: false,
+      abTestType: 'creative' as const,
+      abTestDuration: 7,
+      abTestMetric: 'cost_per_result',
+      specialAdCategories: [] as string[],
     })
   }
 
@@ -238,6 +269,11 @@ export default function LaunchPage() {
     creativeUrl: '',
     creativeText: '',
     ctaButton: 'learn_more',
+    abTestEnabled: false,
+    abTestType: 'creative' as 'creative' | 'audience' | 'placement' | 'custom',
+    abTestDuration: 7,
+    abTestMetric: 'cost_per_result',
+    specialAdCategories: [] as string[],
   })
 
   const [googleStep, setGoogleStep] = useState<GoogleStep>(1)
@@ -358,9 +394,10 @@ export default function LaunchPage() {
 
   const metaStepValid = useMemo(() => {
     if (metaStep === 1) return !!metaData.objective
-    if (metaStep === 2)
-      return metaData.name.trim().length >= 2 && metaData.minAge < metaData.maxAge && metaData.minAge >= 13
-    if (metaStep === 3) return parsePositiveNumber(metaData.dailyBudget) !== null
+    if (metaStep === 2) return metaData.name.trim().length >= 2
+    if (metaStep === 3)
+      return metaData.minAge < metaData.maxAge && metaData.minAge >= 13
+    if (metaStep === 4) return parsePositiveNumber(metaData.dailyBudget) !== null
     return true
   }, [metaStep, metaData])
 
@@ -606,7 +643,7 @@ export default function LaunchPage() {
 
     return (
       <div className="mx-auto max-w-3xl space-y-6 py-6">
-        {wizardHeader(lt('meta.pageTitle', 'Meta campaign'), metaStep, 5)}
+        {wizardHeader(lt('meta.pageTitle', 'Meta campaign'), metaStep, 6)}
         {error ? <Alert variant="error">{error}</Alert> : null}
 
         {metaStep === 1 && (
@@ -634,10 +671,11 @@ export default function LaunchPage() {
                   Erishmoqchi bo'lgan biznes natijani belgilang.
                 </p>
 
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   {META_OBJECTIVES.map((o) => {
                     const Icon = o.icon
                     const selected = metaData.objective === o.id
+                    const hovered = hoveredObjective === o.id
                     return (
                       <button
                         key={o.id}
@@ -646,37 +684,30 @@ export default function LaunchPage() {
                         onMouseLeave={() => setHoveredObjective(null)}
                         onClick={() => setMetaData((d) => ({ ...d, objective: o.id }))}
                         className={cn(
-                          'flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left transition-all',
+                          'flex w-full items-center gap-3 rounded-xl border px-4 py-2.5 text-left transition-all',
                           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0866FF]/25',
                           selected
-                            ? 'border-[#0866FF]/50 bg-[#0866FF]/[0.06] ring-1 ring-[#0866FF]/20'
-                            : 'border-transparent bg-transparent hover:border-border hover:bg-surface-2/60',
+                            ? 'border-[#0866FF]/40 bg-[#0866FF]/[0.06] ring-1 ring-[#0866FF]/15'
+                            : hovered
+                              ? 'border-border bg-surface-2/80'
+                              : 'border-transparent bg-transparent',
                         )}
                       >
                         <span
                           className={cn(
-                            'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border',
-                            selected
-                              ? 'border-[#0866FF]/30 bg-white dark:bg-surface-elevated'
-                              : 'border-border bg-surface-2/80',
+                            'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg',
+                            selected || hovered ? o.color : 'bg-surface-2',
                           )}
                         >
                           <Icon
                             className={cn(
                               'h-4 w-4',
-                              selected ? 'text-[#0866FF]' : 'text-text-secondary',
+                              selected || hovered ? o.iconColor : 'text-text-tertiary',
                             )}
                           />
                         </span>
-                        <span className="min-w-0 flex-1">
-                          <span
-                            className={cn(
-                              'block text-sm font-semibold',
-                              selected ? 'text-[#0866FF]' : 'text-text-primary',
-                            )}
-                          >
-                            {o.label}
-                          </span>
+                        <span className="min-w-0 flex-1 text-sm font-medium text-text-primary">
+                          {o.label}
                         </span>
                         <span
                           className={cn(
@@ -686,9 +717,7 @@ export default function LaunchPage() {
                               : 'border-border bg-transparent',
                           )}
                         >
-                          {selected && (
-                            <span className="h-2 w-2 rounded-full bg-white" />
-                          )}
+                          {selected && <span className="h-2 w-2 rounded-full bg-white" />}
                         </span>
                       </button>
                     )
@@ -697,23 +726,23 @@ export default function LaunchPage() {
               </div>
 
               {/* Right — dynamic preview */}
-              <div className="hidden rounded-r-2xl border-l border-border bg-surface-2/40 p-6 md:flex md:flex-col md:justify-center dark:bg-surface-elevated/30">
+              <div className="hidden rounded-r-2xl border-l border-border bg-surface-2/30 p-6 md:flex md:flex-col md:justify-center dark:bg-surface-elevated/20">
                 {previewObj ? (
                   <div className="space-y-4">
-                    <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-[#0866FF]/10 ring-1 ring-[#0866FF]/20">
-                      <previewObj.icon className="h-10 w-10 text-[#0866FF]" />
+                    <div className={cn('flex h-24 w-24 items-center justify-center rounded-2xl', previewObj.color)}>
+                      <previewObj.icon className={cn('h-12 w-12', previewObj.iconColor)} />
                     </div>
                     <div>
                       <h3 className="text-base font-semibold text-text-primary">{previewObj.label}</h3>
-                      <p className="mt-1 text-sm leading-relaxed text-text-secondary">{previewObj.desc}</p>
+                      <p className="mt-1.5 text-sm leading-relaxed text-text-secondary">{previewObj.desc}</p>
                     </div>
                     <div>
-                      <p className="mb-2 text-xs font-semibold text-text-tertiary">Bunga mos:</p>
+                      <p className="mb-2 text-xs font-bold text-text-primary">Good for:</p>
                       <div className="flex flex-wrap gap-1.5">
                         {previewObj.goodFor.map((tag) => (
                           <span
                             key={tag}
-                            className="rounded-full border border-border bg-surface px-2.5 py-0.5 text-xs font-medium text-text-secondary"
+                            className="rounded-full border border-border bg-surface px-2.5 py-0.5 text-xs text-text-secondary"
                           >
                             {tag}
                           </span>
@@ -723,7 +752,7 @@ export default function LaunchPage() {
                   </div>
                 ) : (
                   <p className="text-sm text-text-tertiary">
-                    Maqsad ustiga bosing yoki sichqonchani olib keling — batafsil ko'rishingiz mumkin.
+                    Hover over an objective to see details.
                   </p>
                 )}
               </div>
@@ -751,15 +780,261 @@ export default function LaunchPage() {
           <WizardStepCard>
             <div className="space-y-6 p-6 md:p-8">
               <div>
-                <h2 className="text-lg font-semibold text-text-primary">{lt('meta.audienceTitle', '')}</h2>
-                <p className="mt-1 text-sm text-text-secondary">{lt('meta.audienceSubtitle', '')}</p>
+                <h2 className="text-lg font-semibold text-text-primary">Kampaniya sozlamalari</h2>
+                <p className="mt-1 text-sm text-text-secondary">Nom, A/B test va maxsus kategoriyalarni belgilang.</p>
               </div>
+
+              {/* Campaign name */}
               <Input
-                label={lt('meta.campaignName', 'Campaign name')}
+                label="Kampaniya nomi"
                 value={metaData.name}
                 onChange={(e) => setMetaData((d) => ({ ...d, name: e.target.value }))}
-                placeholder={lt('meta.campaignNamePh', '')}
+                placeholder="Masalan: Bahor aktsiyasi 2026"
               />
+
+              {/* A/B test */}
+              <div className="rounded-xl border border-border bg-surface-2/40 p-4 dark:bg-surface-elevated/20">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-semibold text-text-primary">A/B test</p>
+                    <p className="mt-0.5 text-xs text-text-secondary">
+                      Qaysi versiya yaxshiroq ishlashini aniqlash uchun variantlarni solishtiring.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={metaData.abTestEnabled}
+                    onClick={() => setMetaData((d) => ({ ...d, abTestEnabled: !d.abTestEnabled }))}
+                    className={cn(
+                      'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25 focus-visible:ring-offset-2',
+                      metaData.abTestEnabled ? 'bg-[#0866FF]' : 'bg-border',
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm transition-transform',
+                        metaData.abTestEnabled ? 'translate-x-5' : 'translate-x-0',
+                      )}
+                    />
+                  </button>
+                </div>
+
+                {metaData.abTestEnabled && (
+                  <div className="mt-4 space-y-4 border-t border-border pt-4">
+                    <div>
+                      <label className="mb-1.5 block text-sm font-medium text-text-secondary" htmlFor="ab-type">
+                        Nima sinab ko'rmoqchisiz?
+                      </label>
+                      <select
+                        id="ab-type"
+                        value={metaData.abTestType}
+                        onChange={(e) =>
+                          setMetaData((d) => ({
+                            ...d,
+                            abTestType: e.target.value as typeof d.abTestType,
+                          }))
+                        }
+                        className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/15"
+                      >
+                        <option value="creative">Creative — qaysi rasm/video yaxshi ishlashini aniqlash</option>
+                        <option value="audience">Audience — yangi auditoriya ta'sirini ko'rish</option>
+                        <option value="placement">Placement — eng samarali joylarni topish</option>
+                        <option value="custom">Custom — bir nechta o'zgaruvchini solishtirish</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="mb-1.5 block text-sm font-medium text-text-secondary" htmlFor="ab-dur">
+                        Test qancha davom etsin?
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          id="ab-dur"
+                          type="number"
+                          min={1}
+                          max={30}
+                          value={metaData.abTestDuration}
+                          onChange={(e) =>
+                            setMetaData((d) => ({ ...d, abTestDuration: Math.max(1, Number(e.target.value)) }))
+                          }
+                          className="w-24 rounded-lg border border-border bg-surface px-3 py-2.5 text-sm focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/15"
+                        />
+                        <span className="text-sm text-text-tertiary">kun</span>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="mb-1.5 block text-sm font-medium text-text-secondary" htmlFor="ab-metric">
+                        Natijani qanday o'lchash kerak?
+                      </label>
+                      <select
+                        id="ab-metric"
+                        value={metaData.abTestMetric}
+                        onChange={(e) => setMetaData((d) => ({ ...d, abTestMetric: e.target.value }))}
+                        className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/15"
+                      >
+                        <option value="cost_per_result">Cost per result (Tavsiya etiladi)</option>
+                        <option value="cpc">CPC (cost per link click)</option>
+                        <option value="cpm">Cost per 1,000 Meta Accounts reached</option>
+                        <option value="cost_per_purchase">Cost per purchase</option>
+                        <optgroup label="Standard Events">
+                          <option value="cost_per_video_play">Cost per 3-second video play</option>
+                          <option value="cost_per_add_to_cart">Cost per add to cart</option>
+                          <option value="cost_per_app_install">Cost per app install</option>
+                          <option value="cost_per_checkout">Cost per checkout initiated</option>
+                          <option value="cost_per_content_view">Cost per content view</option>
+                          <option value="cost_per_lead">Cost per lead</option>
+                          <option value="cost_per_registration">Cost per registration completed</option>
+                        </optgroup>
+                      </select>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Special Ad Categories */}
+              <div className="rounded-xl border border-border bg-surface-2/40 p-4 dark:bg-surface-elevated/20">
+                <div className="flex items-start gap-2.5 pb-3">
+                  <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
+                    <svg viewBox="0 0 16 16" className="h-3 w-3 fill-current" aria-hidden><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-text-primary">Special Ad Categories</p>
+                    <p className="mt-0.5 text-xs leading-relaxed text-text-secondary">
+                      Moliyaviy mahsulotlar, ish joylari, uy-joy yoki siyosatga oid reklamalar bo'lsa, e'lon qiling.
+                      Reklama rad etilishini oldini olishga yordam beradi.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mb-3 border-t border-border pt-3">
+                  <p className="mb-2 text-xs font-semibold text-text-secondary">Kategoriyalar</p>
+                  <p className="mb-3 text-xs text-text-tertiary">
+                    Kampaniyangizni eng yaxshi tavsiflovchi kategoriyalarni tanlang.
+                  </p>
+                  <div className="space-y-2">
+                    {(
+                      [
+                        {
+                          id: 'credit',
+                          icon: Landmark,
+                          label: 'Financial products and services',
+                          desc: 'Kreditlar, moliyaviy xizmatlar, sug\'urta, investitsiya xizmatlari uchun reklamalar.',
+                        },
+                        {
+                          id: 'employment',
+                          icon: Briefcase,
+                          label: 'Employment',
+                          desc: 'Ish o\'rinlari, stajirovka, professional sertifikatlar uchun reklamalar.',
+                        },
+                        {
+                          id: 'housing',
+                          icon: Home,
+                          label: 'Housing',
+                          desc: 'Ko\'chmas mulk, uy-joy sug\'urtasi, ipoteka kreditlari uchun reklamalar.',
+                        },
+                        {
+                          id: 'social_issues',
+                          icon: Flag,
+                          label: 'Social issues, elections or politics',
+                          desc: 'Ijtimoiy masalalar, saylovlar yoki siyosiy shaxslarga oid reklamalar.',
+                        },
+                      ] as const
+                    ).map(({ id, icon: Icon, label, desc }) => {
+                      const checked = metaData.specialAdCategories.includes(id)
+                      return (
+                        <button
+                          key={id}
+                          type="button"
+                          onClick={() =>
+                            setMetaData((d) => ({
+                              ...d,
+                              specialAdCategories: checked
+                                ? d.specialAdCategories.filter((c) => c !== id)
+                                : [...d.specialAdCategories, id],
+                            }))
+                          }
+                          className={cn(
+                            'flex w-full items-start gap-3 rounded-xl border px-4 py-3 text-left transition-all',
+                            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0866FF]/20',
+                            checked
+                              ? 'border-[#0866FF]/40 bg-[#0866FF]/[0.05] ring-1 ring-[#0866FF]/15'
+                              : 'border-border bg-surface hover:border-text-tertiary/30 hover:bg-surface-2/50',
+                          )}
+                        >
+                          <div className={cn(
+                            'mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border',
+                            checked ? 'border-[#0866FF]/25 bg-white dark:bg-surface-elevated' : 'border-border bg-surface-2',
+                          )}>
+                            <Icon className={cn('h-4 w-4', checked ? 'text-[#0866FF]' : 'text-text-tertiary')} />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-medium text-text-primary">{label}</p>
+                            <p className="mt-0.5 text-xs leading-relaxed text-text-secondary">{desc}</p>
+                          </div>
+                          <span
+                            className={cn(
+                              'mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 transition-all',
+                              checked
+                                ? 'border-[#0866FF] bg-[#0866FF]'
+                                : 'border-border bg-transparent',
+                            )}
+                          >
+                            {checked && (
+                              <svg viewBox="0 0 12 10" className="h-3 w-3 fill-white" aria-hidden>
+                                <path d="M1 5l3.5 3.5L11 1" strokeWidth="2" stroke="white" fill="none" />
+                              </svg>
+                            )}
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* Countries */}
+                <div className="border-t border-border pt-3">
+                  <label className="mb-0.5 block text-sm font-semibold text-text-primary" htmlFor="meta-country">
+                    Countries
+                  </label>
+                  <p className="mb-2 text-xs text-text-secondary">
+                    Kampaniyani qaysi mamlakatda o'tkazmoqchisiz? Qo'shimcha talablar bo'lishi mumkin.
+                  </p>
+                  <select
+                    id="meta-country"
+                    value={metaData.location}
+                    onChange={(e) => setMetaData((d) => ({ ...d, location: e.target.value }))}
+                    className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/15"
+                  >
+                    <option value="UZ">{lt('meta.locUZ', 'Uzbekistan')}</option>
+                    <option value="KZ">{lt('meta.locKZ', 'Kazakhstan')}</option>
+                    <option value="TJ">{lt('meta.locTJ', 'Tajikistan')}</option>
+                    <option value="TM">{lt('meta.locTM', 'Turkmenistan')}</option>
+                    <option value="RU">Russia</option>
+                    <option value="US">United States</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col-reverse gap-2 border-t border-border px-6 py-4 md:flex-row md:justify-between md:px-8">
+              <Button type="button" variant="secondary" onClick={() => setMetaStep(1)}>
+                <ChevronLeft className="h-4 w-4" aria-hidden />
+                {lt('common.back', 'Back')}
+              </Button>
+              <Button type="button" disabled={!metaStepValid} onClick={() => setMetaStep(3)}>
+                {lt('common.continue', 'Continue')}
+                <ChevronRight className="h-4 w-4" aria-hidden />
+              </Button>
+            </div>
+          </WizardStepCard>
+        )}
+
+        {metaStep === 3 && (
+          <WizardStepCard>
+            <div className="space-y-6 p-6 md:p-8">
+              <div>
+                <h2 className="text-lg font-semibold text-text-primary">{lt('meta.audienceTitle', 'Audience')}</h2>
+                <p className="mt-1 text-sm text-text-secondary">{lt('meta.audienceSubtitle', 'Define who should see your ads.')}</p>
+              </div>
               <div>
                 <p className="text-label mb-2 font-medium text-text-secondary">{lt('meta.ageLabel', 'Age')}</p>
                 <div className="flex flex-wrap items-center gap-3">
@@ -782,29 +1057,13 @@ export default function LaunchPage() {
                   />
                 </div>
               </div>
-              <div>
-                <label className="text-label mb-2 block font-medium text-text-secondary" htmlFor="meta-loc">
-                  {lt('meta.locationLabel', 'Location')}
-                </label>
-                <select
-                  id="meta-loc"
-                  value={metaData.location}
-                  onChange={(e) => setMetaData((d) => ({ ...d, location: e.target.value }))}
-                  className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/15"
-                >
-                  <option value="UZ">{lt('meta.locUZ', '')}</option>
-                  <option value="KZ">{lt('meta.locKZ', '')}</option>
-                  <option value="TJ">{lt('meta.locTJ', '')}</option>
-                  <option value="TM">{lt('meta.locTM', '')}</option>
-                </select>
-              </div>
             </div>
             <div className="flex flex-col-reverse gap-2 border-t border-border px-6 py-4 md:flex-row md:justify-between md:px-8">
-              <Button type="button" variant="secondary" onClick={() => setMetaStep(1)}>
+              <Button type="button" variant="secondary" onClick={() => setMetaStep(2)}>
                 <ChevronLeft className="h-4 w-4" aria-hidden />
                 {lt('common.back', 'Back')}
               </Button>
-              <Button type="button" disabled={!metaStepValid} onClick={() => setMetaStep(3)}>
+              <Button type="button" disabled={!metaStepValid} onClick={() => setMetaStep(4)}>
                 {lt('common.continue', 'Continue')}
                 <ChevronRight className="h-4 w-4" aria-hidden />
               </Button>
@@ -812,7 +1071,7 @@ export default function LaunchPage() {
           </WizardStepCard>
         )}
 
-        {metaStep === 3 && (
+        {metaStep === 4 && (
           <WizardStepCard>
             <div className="space-y-6 p-6 md:p-8">
               <div>
@@ -863,11 +1122,11 @@ export default function LaunchPage() {
               </div>
             </div>
             <div className="flex flex-col-reverse gap-2 border-t border-border px-6 py-4 md:flex-row md:justify-between md:px-8">
-              <Button type="button" variant="secondary" onClick={() => setMetaStep(2)}>
+              <Button type="button" variant="secondary" onClick={() => setMetaStep(3)}>
                 <ChevronLeft className="h-4 w-4" aria-hidden />
                 {lt('common.back', 'Back')}
               </Button>
-              <Button type="button" disabled={!metaStepValid} onClick={() => setMetaStep(4)}>
+              <Button type="button" disabled={!metaStepValid} onClick={() => setMetaStep(5)}>
                 {lt('common.continue', 'Continue')}
                 <ChevronRight className="h-4 w-4" aria-hidden />
               </Button>
@@ -875,7 +1134,7 @@ export default function LaunchPage() {
           </WizardStepCard>
         )}
 
-        {metaStep === 4 && (
+        {metaStep === 5 && (
           <WizardStepCard>
             <div className="space-y-6 p-6 md:p-8">
               <div>
@@ -915,11 +1174,11 @@ export default function LaunchPage() {
               </div>
             </div>
             <div className="flex flex-col-reverse gap-2 border-t border-border px-6 py-4 md:flex-row md:justify-between md:px-8">
-              <Button type="button" variant="secondary" onClick={() => setMetaStep(3)}>
+              <Button type="button" variant="secondary" onClick={() => setMetaStep(4)}>
                 <ChevronLeft className="h-4 w-4" aria-hidden />
                 {lt('common.back', 'Back')}
               </Button>
-              <Button type="button" onClick={() => setMetaStep(5)}>
+              <Button type="button" onClick={() => setMetaStep(6)}>
                 {lt('common.review', 'Review')}
                 <ChevronRight className="h-4 w-4" aria-hidden />
               </Button>
@@ -927,62 +1186,81 @@ export default function LaunchPage() {
           </WizardStepCard>
         )}
 
-        {metaStep === 5 && (
+        {metaStep === 6 && (
           <WizardStepCard>
-            <div className="space-y-6 p-6 md:p-8">
-              <div>
-                <h2 className="text-lg font-semibold text-text-primary">{lt('meta.reviewTitle', '')}</h2>
-                <p className="mt-1 text-sm text-text-secondary">{lt('meta.reviewSubtitle', '')}</p>
+            <div className="p-6 md:p-8">
+              <div className="mb-5">
+                <h2 className="text-lg font-semibold text-text-primary">Review</h2>
+                <p className="mt-1 text-sm text-text-secondary">Publish qilishdan oldin kampaniya ma'lumotlarini tekshiring.</p>
               </div>
-              <dl className="space-y-3 rounded-xl border border-border bg-surface-2/50 p-4 text-sm">
-                <div className="flex justify-between gap-4">
-                  <dt className="text-text-tertiary">{lt('meta.revName', '')}</dt>
-                  <dd className="max-w-[60%] text-right font-medium text-text-primary">{metaData.name || '—'}</dd>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <dt className="text-text-tertiary">{lt('meta.revObjective', '')}</dt>
-                  <dd className="font-medium text-text-primary">
-                    {metaData.objective
+              <div className="divide-y divide-border rounded-xl border border-border bg-surface-2/30 dark:bg-surface-elevated/20">
+                {[
+                  { label: 'Campaign name', value: metaData.name || '—' },
+                  { label: 'Buying type', value: 'Auction' },
+                  {
+                    label: 'Objective',
+                    value: metaData.objective
                       ? META_OBJECTIVES.find((o) => o.id === metaData.objective)?.label ?? '—'
-                      : '—'}
-                  </dd>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <dt className="text-text-tertiary">{lt('meta.revAudience', '')}</dt>
-                  <dd className="font-medium text-text-primary">
-                    {metaData.minAge}–{metaData.maxAge},{' '}
-                    {
-                      {
-                        UZ: lt('meta.locUZ', ''),
-                        KZ: lt('meta.locKZ', ''),
-                        TJ: lt('meta.locTJ', ''),
-                        TM: lt('meta.locTM', ''),
-                      }[metaData.location]
-                    }
-                  </dd>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <dt className="text-text-tertiary">{lt('meta.revBudget', '')}</dt>
-                  <dd className="font-medium text-text-primary">${metaData.dailyBudget || '—'}</dd>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <dt className="text-text-tertiary">{lt('meta.revDuration', '')}</dt>
-                  <dd className="font-medium text-text-primary">
-                    {lt('meta.durationDays', '').replace('{{n}}', String(metaData.campaignDuration))}
-                  </dd>
-                </div>
-                <div className="flex justify-between gap-4 border-t border-border pt-3">
-                  <dt className="text-text-tertiary">{lt('meta.revTotal', '')}</dt>
-                  <dd className="text-base font-semibold text-text-primary">
-                    {formatMoneyUsd(
+                      : '—',
+                  },
+                  {
+                    label: 'A/B Test',
+                    value: metaData.abTestEnabled
+                      ? `On — ${metaData.abTestType}, ${metaData.abTestDuration} kun`
+                      : 'Off',
+                    note: metaData.abTestEnabled
+                      ? 'Publish bosgandan so\'ng kampaniyaning B versiyasi avtomatik yaratiladi.'
+                      : undefined,
+                  },
+                  {
+                    label: 'Budget strategy',
+                    value: `Campaign budget — Daily ${metaData.dailyBudget ? `$${metaData.dailyBudget}` : '—'} / day`,
+                  },
+                  {
+                    label: 'Campaign duration',
+                    value: `${metaData.campaignDuration} kun`,
+                  },
+                  {
+                    label: 'Total budget',
+                    value: formatMoneyUsd(
                       (parsePositiveNumber(metaData.dailyBudget) ?? 0) * metaData.campaignDuration,
-                    )}
-                  </dd>
-                </div>
-              </dl>
+                    ),
+                    bold: true,
+                  },
+                  {
+                    label: 'Audience',
+                    value: `${metaData.minAge}–${metaData.maxAge} yosh, ${{ UZ: 'Uzbekistan', KZ: 'Kazakhstan', TJ: 'Tajikistan', TM: 'Turkmenistan', RU: 'Russia', US: 'United States' }[metaData.location] ?? metaData.location}`,
+                  },
+                  { label: 'Campaign bid strategy', value: 'Highest volume' },
+                  { label: 'Delivery type', value: 'Standard' },
+                  {
+                    label: 'Special Ad Categories',
+                    value:
+                      metaData.specialAdCategories.length > 0
+                        ? metaData.specialAdCategories
+                            .map((c) =>
+                              c === 'credit'
+                                ? 'Financial products'
+                                : c === 'employment'
+                                  ? 'Employment'
+                                  : c === 'housing'
+                                    ? 'Housing'
+                                    : 'Social issues / politics',
+                            )
+                            .join(', ')
+                        : 'None',
+                  },
+                ].map(({ label, value, note, bold }) => (
+                  <div key={label} className="px-4 py-3">
+                    <p className="text-xs font-semibold text-text-tertiary">{label}</p>
+                    <p className={cn('mt-0.5 text-sm text-text-primary', bold && 'text-base font-semibold')}>{value}</p>
+                    {note && <p className="mt-1 text-xs text-text-secondary">{note}</p>}
+                  </div>
+                ))}
+              </div>
             </div>
             <div className="flex flex-col-reverse gap-2 border-t border-border px-6 py-4 md:flex-row md:justify-between md:px-8">
-              <Button type="button" variant="secondary" onClick={() => setMetaStep(4)}>
+              <Button type="button" variant="secondary" onClick={() => setMetaStep(5)}>
                 <ChevronLeft className="h-4 w-4" aria-hidden />
                 {lt('meta.edit', 'Edit')}
               </Button>
