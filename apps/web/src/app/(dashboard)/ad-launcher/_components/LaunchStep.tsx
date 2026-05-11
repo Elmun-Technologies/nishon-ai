@@ -8,56 +8,135 @@ import {
   ExternalLink,
   Lock,
   Loader2,
+  Megaphone,
   Rocket,
+  ShoppingCart,
   Sparkles,
+  Target,
+  TrendingUp,
+  Users,
 } from 'lucide-react'
 import { Alert, Button } from '@/components/ui'
 import { useI18n } from '@/i18n/use-i18n'
 import { cn } from '@/lib/utils'
 import type { AdLauncherController } from '../_lib/use-ad-launcher'
-import type {
-  AudiencePresetId,
-  LaunchObjective,
-} from '../_lib/types'
+import type { AudiencePresetId, LaunchObjective } from '../_lib/types'
 
-const OBJECTIVES: { id: LaunchObjective; labelKey: string; fallback: string; hintKey: string; hintFallback: string }[] = [
-  { id: 'OUTCOME_SALES', labelKey: 'adLauncher.objSales', fallback: 'Sotuvlar', hintKey: 'adLauncher.objSalesHint', hintFallback: 'Konversiyaga optimizatsiya' },
-  { id: 'OUTCOME_LEADS', labelKey: 'adLauncher.objLeads', fallback: 'Lidlar', hintKey: 'adLauncher.objLeadsHint', hintFallback: 'Lid forma yoki messaging' },
-  { id: 'OUTCOME_TRAFFIC', labelKey: 'adLauncher.objTraffic', fallback: 'Trafik', hintKey: 'adLauncher.objTrafficHint', hintFallback: 'Saytga tashriflar' },
-  { id: 'OUTCOME_ENGAGEMENT', labelKey: 'adLauncher.objEngagement', fallback: 'Engagement', hintKey: 'adLauncher.objEngagementHint', hintFallback: 'Reaksiya, izoh, ulashish' },
-  { id: 'OUTCOME_AWARENESS', labelKey: 'adLauncher.objAwareness', fallback: 'Bilimdorlik', hintKey: 'adLauncher.objAwarenessHint', hintFallback: 'Erish va brendni eslab qolish' },
+const OBJECTIVES: {
+  id: LaunchObjective
+  icon: React.ComponentType<{ className?: string }>
+  label: string
+  description: string
+}[] = [
+  {
+    id: 'OUTCOME_SALES',
+    icon: ShoppingCart,
+    label: 'Sotuvlar',
+    description: 'Xarid qilishi mumkin bo\'lgan odamlarga ko\'rsatish',
+  },
+  {
+    id: 'OUTCOME_LEADS',
+    icon: Users,
+    label: 'Lidlar',
+    description: 'Telefon/email to\'plash, forma to\'ldirtirish',
+  },
+  {
+    id: 'OUTCOME_TRAFFIC',
+    icon: TrendingUp,
+    label: 'Trafik',
+    description: 'Saytingizga tashrif buyurtuvchilar',
+  },
+  {
+    id: 'OUTCOME_ENGAGEMENT',
+    icon: Target,
+    label: 'Engagement',
+    description: 'Like, izoh, ulashish — brendga e\'tibor',
+  },
+  {
+    id: 'OUTCOME_AWARENESS',
+    icon: Megaphone,
+    label: 'Bilimdorlik',
+    description: 'Brendingizni ko\'proq odamga tanittirish',
+  },
 ]
 
-const AUDIENCE_PRESETS: { id: AudiencePresetId; labelKey: string; fallback: string; hintKey: string; hintFallback: string }[] = [
-  { id: 'prospecting', labelKey: 'adLauncher.audProspecting', fallback: 'Prospecting (sovuq)', hintKey: 'adLauncher.audProspectingHint', hintFallback: 'Yangi auditoriya — keng kirish' },
-  { id: 'reengagement', labelKey: 'adLauncher.audReengagement', fallback: 'Re-engagement', hintKey: 'adLauncher.audReengagementHint', hintFallback: 'Saytga kirgan, lekin xarid qilmagan' },
-  { id: 'retargeting', labelKey: 'adLauncher.audRetargeting', fallback: 'Retargeting', hintKey: 'adLauncher.audRetargetingHint', hintFallback: '30 kunlik faol auditoriya' },
-  { id: 'retention', labelKey: 'adLauncher.audRetention', fallback: 'Retention', hintKey: 'adLauncher.audRetentionHint', hintFallback: 'Mavjud mijozlar uchun' },
+const BUDGET_PRESETS = [10, 25, 50, 100, 200]
+
+const AUDIENCE_PRESETS: {
+  id: AudiencePresetId
+  emoji: string
+  label: string
+  who: string
+}[] = [
+  {
+    id: 'prospecting',
+    emoji: '🆕',
+    label: 'Yangi odamlar',
+    who: 'Siz bilan hali tanish bo\'lmagan potentsial mijozlar',
+  },
+  {
+    id: 'reengagement',
+    emoji: '🔄',
+    label: 'Qaytish uchun',
+    who: 'Saytga kirgan, lekin hali xarid qilmagan',
+  },
+  {
+    id: 'retargeting',
+    emoji: '🎯',
+    label: 'Retargeting',
+    who: 'So\'nggi 30 kundagi faol foydalanuvchilar',
+  },
+  {
+    id: 'retention',
+    emoji: '💎',
+    label: 'Mavjud mijozlar',
+    who: 'Avval xarid qilganlarni yana jalb qilish',
+  },
 ]
 
-function launchErrorMessage(
-  code: string,
-  t: (key: string, fallback?: string) => string,
-): string {
+const LAUNCH_STEPS: { key: string; label: string }[] = [
+  { key: 'creating_draft', label: 'Kampaniya tayyorlanmoqda...' },
+  { key: 'validating', label: 'Meta bilan tekshirilmoqda...' },
+  { key: 'launching', label: 'Meta\'ga yuborilmoqda...' },
+]
+
+function launchErrorMessage(code: string): string {
   switch (code) {
     case 'NO_WORKSPACE':
-      return t('adLauncher.errNoWorkspace', 'Workspace topilmadi. Qaytadan login qiling.')
+      return 'Workspace topilmadi. Qaytadan login qiling.'
     case 'NO_AUDIENCE':
-      return t('adLauncher.errNoAudience', 'Kamida bitta auditoriya tanlang.')
+      return 'Kamida bitta auditoriya tanlang.'
     case 'VALIDATION_FAILED':
-      return t('adLauncher.errValidation', 'Konfiguratsiya validatsiyadan o\'tmadi.')
+      return 'Konfiguratsiya validatsiyadan o\'tmadi. Sozlamalarni tekshiring.'
     case 'LAUNCH_FAILED':
-      return t('adLauncher.errLaunch', 'Meta\'ga yuborishda xato yuz berdi.')
+      return 'Meta\'ga yuborishda xato yuz berdi. Qayta urinib ko\'ring.'
     case 'DEMO_LAUNCH_BLOCKED':
-      return t(
-        'adLauncher.errDemoBlocked',
-        'Demo rejimda haqiqiy launch yoqilmagan. Bepul ro\'yxatdan o\'ting va Meta\'ni ulang.',
-      )
-    case 'UNEXPECTED_ERROR':
-      return t('adLauncher.errGeneric', 'Kutilmagan xato.')
+      return 'Demo rejimda haqiqiy launch yoqilmagan.'
     default:
-      return code || t('adLauncher.errGeneric', 'Kutilmagan xato.')
+      return code || 'Kutilmagan xato yuz berdi.'
   }
+}
+
+function SectionHeader({
+  num,
+  title,
+  subtitle,
+}: {
+  num: number
+  title: string
+  subtitle?: string
+}) {
+  return (
+    <div className="flex items-start gap-3">
+      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary ring-1 ring-primary/20">
+        {num}
+      </span>
+      <div>
+        <p className="text-sm font-semibold text-text-primary">{title}</p>
+        {subtitle && <p className="mt-0.5 text-xs text-text-tertiary">{subtitle}</p>}
+      </div>
+    </div>
+  )
 }
 
 export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
@@ -73,142 +152,192 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
 
   const isDone = phase.state === 'success'
 
+  const currentLaunchStepIndex = LAUNCH_STEPS.findIndex((s) => s.key === phase.state)
+
   const toggleAudience = (id: AudiencePresetId) => {
     const has = cfg.audiences.includes(id)
     const next = has ? cfg.audiences.filter((a) => a !== id) : [...cfg.audiences, id]
     ctl.updateLaunchConfig({ audiences: next })
   }
 
+  const canLaunch =
+    !isBusy &&
+    ctl.selectedCampaigns.length > 0 &&
+    cfg.audiences.length > 0 &&
+    cfg.dailyBudget >= 1
+
   return (
     <div className="animate-in fade-in slide-in-from-bottom-1 space-y-4 duration-300">
       <header>
-        <h2 className="text-lg font-semibold text-text-primary">
-          {t('adLauncher.launchTitle', '3. Ishga tushirish')}
-        </h2>
+        <h2 className="text-lg font-semibold text-text-primary">3. Kampaniyani sozlang</h2>
         <p className="mt-0.5 text-sm text-text-tertiary">
-          {t(
-            'adLauncher.launchSubtitle',
-            'Tanlangan reklamalar asosida yangi Meta kampaniya yaratiladi. Avval PAUSED holatda — siz Meta\'da yakuniy tasdiqlaysiz.',
-          )}
+          Quyidagi 3 ta savolga javob bering — kampaniya avtomatik yaratiladi.
         </p>
       </header>
 
-      {/* Selected ads summary */}
-      <div className="rounded-2xl border border-border bg-surface p-4 shadow-sm">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-text-primary">
-            {t('adLauncher.summarySelected', 'Tanlangan reklamalar')} ({ctl.selectedCampaigns.length})
-          </h3>
-          <Button type="button" variant="ghost" size="sm" onClick={() => ctl.goToStep('pick')}>
-            {t('adLauncher.editSelection', 'Tahrirlash')}
-          </Button>
+      {/* Tanlangan reklamalar */}
+      <div className="flex items-center justify-between rounded-xl border border-border bg-surface-2 px-4 py-3">
+        <div className="flex items-center gap-2">
+          <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+          <span className="text-sm font-medium text-text-primary">
+            {ctl.selectedCampaigns.length} ta reklama tanlangan
+          </span>
         </div>
-        <ul className="mt-2 max-h-32 space-y-1 overflow-y-auto text-sm">
-          {ctl.selectedCampaigns.map((c) => (
-            <li
-              key={c.id}
-              className="flex items-center justify-between gap-2 rounded-md bg-surface-2 px-2 py-1.5 dark:bg-surface-elevated"
-            >
-              <span className="truncate text-text-secondary">{c.name}</span>
-              <span className="shrink-0 text-xs text-text-tertiary">{c.status}</span>
-            </li>
-          ))}
-        </ul>
+        <button
+          type="button"
+          onClick={() => ctl.goToStep('pick')}
+          className="text-xs text-primary hover:underline"
+        >
+          O'zgartirish
+        </button>
       </div>
 
-      {/* Configure */}
-      <div className="space-y-5 rounded-2xl border border-border bg-surface p-5 shadow-sm">
-        {/* Objective */}
-        <section>
-          <label className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
-            {t('adLauncher.objective', 'Maqsad')}
-          </label>
-          <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {OBJECTIVES.map((o) => (
-              <button
-                key={o.id}
-                type="button"
-                aria-pressed={cfg.objective === o.id}
-                disabled={isBusy || isDone}
-                onClick={() => ctl.updateLaunchConfig({ objective: o.id })}
-                className={cn(
-                  'rounded-xl border px-3 py-2 text-left transition-all disabled:opacity-60',
-                  cfg.objective === o.id
-                    ? 'border-primary bg-primary/8 ring-1 ring-primary/30'
-                    : 'border-border bg-surface hover:border-primary/30 hover:bg-surface-2',
-                )}
-              >
-                <p className="text-sm font-semibold text-text-primary">{t(o.labelKey, o.fallback)}</p>
-                <p className="text-xs text-text-tertiary">{t(o.hintKey, o.hintFallback)}</p>
-              </button>
-            ))}
-          </div>
-        </section>
-
-        {/* Budget */}
-        <section className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
-              {t('adLauncher.budgetType', 'Byudjet rejimi')}
-            </label>
-            <div className="mt-2 flex gap-1 rounded-lg border border-border bg-surface-2 p-1 dark:bg-surface">
-              {(['CBO', 'ABO'] as const).map((bt) => (
+      <div className="space-y-0 divide-y divide-border rounded-2xl border border-border bg-surface shadow-sm">
+        {/* 1 — Maqsad */}
+        <section className="p-5">
+          <SectionHeader
+            num={1}
+            title="Kampaniyadan nima kutyapsiz?"
+            subtitle="Meta shu maqsadga qarab reklama ko'rsatadi"
+          />
+          <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {OBJECTIVES.map((o) => {
+              const Icon = o.icon
+              const active = cfg.objective === o.id
+              return (
                 <button
-                  key={bt}
+                  key={o.id}
                   type="button"
+                  aria-pressed={active}
                   disabled={isBusy || isDone}
-                  onClick={() => ctl.updateLaunchConfig({ budgetType: bt })}
+                  onClick={() => ctl.updateLaunchConfig({ objective: o.id })}
                   className={cn(
-                    'flex-1 rounded-md px-2 py-1.5 text-xs font-semibold transition-colors',
-                    cfg.budgetType === bt
-                      ? 'bg-primary text-brand-ink'
-                      : 'text-text-secondary hover:bg-surface',
+                    'flex items-start gap-3 rounded-xl border p-3 text-left transition-all disabled:opacity-50',
+                    active
+                      ? 'border-primary bg-primary/8 ring-1 ring-primary/25'
+                      : 'border-border bg-surface-2 hover:border-primary/30 hover:bg-surface',
                   )}
                 >
-                  {bt}
-                  <span className="ml-1 font-normal opacity-70">
-                    {bt === 'CBO'
-                      ? t('adLauncher.cboHint', '(kampaniya darajasida)')
-                      : t('adLauncher.aboHint', '(adset darajasida)')}
+                  <span
+                    className={cn(
+                      'mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
+                      active ? 'bg-primary/15 text-primary' : 'bg-border/60 text-text-tertiary',
+                    )}
+                  >
+                    <Icon className="h-4 w-4" />
                   </span>
+                  <span>
+                    <span className="block text-sm font-semibold text-text-primary">{o.label}</span>
+                    <span className="mt-0.5 block text-xs leading-relaxed text-text-tertiary">
+                      {o.description}
+                    </span>
+                  </span>
+                  {active && (
+                    <CheckCircle2 className="ml-auto h-4 w-4 shrink-0 text-primary" />
+                  )}
                 </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <label className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
-              {t('adLauncher.dailyBudget', 'Kunlik byudjet')} ({currency})
-            </label>
-            <div className="mt-2 flex items-center gap-2 rounded-lg border border-border bg-surface-2 px-3 py-2 transition-colors focus-within:border-primary/60 dark:bg-surface">
-              <span className="text-text-tertiary">$</span>
-              <input
-                type="number"
-                min={1}
-                step={1}
-                disabled={isBusy || isDone}
-                value={cfg.dailyBudget}
-                onChange={(e) =>
-                  ctl.updateLaunchConfig({ dailyBudget: Math.max(1, Number(e.target.value) || 0) })
-                }
-                className="w-full bg-transparent text-sm tabular-nums outline-none"
-              />
-            </div>
-            <p className="mt-1 text-xs text-text-tertiary">
-              {t('adLauncher.budgetHint', 'Boshlang\'ich byudjet — keyin Meta\'da o\'zgartirishingiz mumkin.')}
-            </p>
+              )
+            })}
           </div>
         </section>
 
-        {/* Audiences */}
-        <section>
-          <label className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
-            {t('adLauncher.audiences', 'Auditoriya')}
-            <span className="ml-2 font-normal lowercase text-text-tertiary">
-              {t('adLauncher.audiencesHint', '(birdan ko\'pini tanlash mumkin)')}
-            </span>
-          </label>
-          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+        {/* 2 — Byudjet */}
+        <section className="p-5">
+          <SectionHeader
+            num={2}
+            title="Kunlik byudjet qancha?"
+            subtitle="Bu boshlang'ich qiymat — keyin Meta'da o'zgartirishingiz mumkin"
+          />
+          <div className="mt-4 space-y-3">
+            {/* Quick presets */}
+            <div className="flex flex-wrap gap-2">
+              {BUDGET_PRESETS.map((preset) => (
+                <button
+                  key={preset}
+                  type="button"
+                  disabled={isBusy || isDone}
+                  onClick={() => ctl.updateLaunchConfig({ dailyBudget: preset })}
+                  className={cn(
+                    'rounded-lg border px-4 py-1.5 text-sm font-semibold transition-colors disabled:opacity-50',
+                    cfg.dailyBudget === preset
+                      ? 'border-primary bg-primary text-brand-ink'
+                      : 'border-border bg-surface-2 text-text-secondary hover:border-primary/40',
+                  )}
+                >
+                  {preset} {currency}
+                </button>
+              ))}
+              <span className="flex items-center text-xs text-text-tertiary">yoki</span>
+            </div>
+
+            {/* Custom amount */}
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 items-center gap-2 rounded-lg border border-border bg-surface-2 px-3 transition-colors focus-within:border-primary/60 dark:bg-surface">
+                <span className="text-sm text-text-tertiary">{currency}</span>
+                <input
+                  type="number"
+                  min={1}
+                  step={1}
+                  disabled={isBusy || isDone}
+                  value={cfg.dailyBudget}
+                  onChange={(e) =>
+                    ctl.updateLaunchConfig({
+                      dailyBudget: Math.max(1, Number(e.target.value) || 1),
+                    })
+                  }
+                  className="w-24 bg-transparent text-sm tabular-nums outline-none"
+                  placeholder="Miqdor"
+                />
+              </div>
+              <span className="text-xs text-text-tertiary">o'z miqdoringizni kiriting</span>
+            </div>
+
+            {/* Budget type */}
+            <div className="rounded-xl border border-border bg-surface-2 p-3 dark:bg-surface">
+              <p className="mb-2 text-xs font-semibold text-text-tertiary">Byudjet taqsimlanishi</p>
+              <div className="flex gap-2">
+                {([
+                  {
+                    id: 'CBO' as const,
+                    label: 'Avtomatik (CBO)',
+                    desc: 'Meta o\'zi eng yaxshi guruhga taqsimlaydi — tavsiya etiladi',
+                  },
+                  {
+                    id: 'ABO' as const,
+                    label: 'Qo\'lda (ABO)',
+                    desc: 'Har bir auditoriya uchun alohida byudjet belgilaysiz',
+                  },
+                ] as const).map((bt) => (
+                  <button
+                    key={bt.id}
+                    type="button"
+                    aria-pressed={cfg.budgetType === bt.id}
+                    disabled={isBusy || isDone}
+                    onClick={() => ctl.updateLaunchConfig({ budgetType: bt.id })}
+                    className={cn(
+                      'flex-1 rounded-lg border p-2.5 text-left transition-all disabled:opacity-50',
+                      cfg.budgetType === bt.id
+                        ? 'border-primary bg-primary/8 ring-1 ring-primary/20'
+                        : 'border-border bg-surface hover:border-primary/30',
+                    )}
+                  >
+                    <p className="text-xs font-semibold text-text-primary">{bt.label}</p>
+                    <p className="mt-0.5 text-[11px] leading-relaxed text-text-tertiary">{bt.desc}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 3 — Auditoriya */}
+        <section className="p-5">
+          <SectionHeader
+            num={3}
+            title="Kim ko'rsin? (bir yoki bir nechtasini tanlang)"
+            subtitle="Tanlagan har bir guruh uchun alohida adset yaratiladi"
+          />
+          <div className="mt-4 grid gap-2 sm:grid-cols-2">
             {AUDIENCE_PRESETS.map((a) => {
               const on = cfg.audiences.includes(a.id)
               return (
@@ -219,71 +348,84 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
                   disabled={isBusy || isDone}
                   onClick={() => toggleAudience(a.id)}
                   className={cn(
-                    'flex items-start gap-2 rounded-xl border px-3 py-2 text-left transition-all disabled:opacity-60',
+                    'flex items-start gap-3 rounded-xl border p-3 text-left transition-all disabled:opacity-50',
                     on
-                      ? 'border-primary bg-primary/8 ring-1 ring-primary/30'
-                      : 'border-border bg-surface hover:border-primary/30 hover:bg-surface-2',
+                      ? 'border-primary bg-primary/8 ring-1 ring-primary/25'
+                      : 'border-border bg-surface-2 hover:border-primary/30 hover:bg-surface',
                   )}
                 >
+                  <span className="text-xl leading-none">{a.emoji}</span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-semibold text-text-primary">{a.label}</span>
+                    <span className="mt-0.5 block text-xs leading-relaxed text-text-tertiary">
+                      {a.who}
+                    </span>
+                  </span>
                   <span
                     className={cn(
-                      'mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border',
-                      on ? 'border-primary bg-primary text-brand-ink' : 'border-border',
+                      'mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors',
+                      on ? 'border-primary bg-primary text-brand-ink' : 'border-border bg-surface',
                     )}
                   >
                     {on && <CheckCircle2 className="h-3 w-3" />}
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block text-sm font-semibold text-text-primary">
-                      {t(a.labelKey, a.fallback)}
-                    </span>
-                    <span className="block text-xs text-text-tertiary">{t(a.hintKey, a.hintFallback)}</span>
                   </span>
                 </button>
               )
             })}
           </div>
-          <label className="mt-3 flex cursor-pointer items-center gap-2 text-xs text-text-secondary">
-            <input
-              type="checkbox"
-              disabled={isBusy || isDone}
-              checked={cfg.splitByFunnelStage}
-              onChange={(e) => ctl.updateLaunchConfig({ splitByFunnelStage: e.target.checked })}
-              className="rounded border-border text-primary"
-            />
-            {t(
-              'adLauncher.splitByStage',
-              'Har bir auditoriya uchun alohida adset yaratish (funnel stage bo\'yicha)',
-            )}
-          </label>
+
+          {cfg.audiences.length > 1 && (
+            <label className="mt-3 flex cursor-pointer items-center gap-2 rounded-lg border border-border bg-surface-2 px-3 py-2 text-xs text-text-secondary">
+              <input
+                type="checkbox"
+                disabled={isBusy || isDone}
+                checked={cfg.splitByFunnelStage}
+                onChange={(e) => ctl.updateLaunchConfig({ splitByFunnelStage: e.target.checked })}
+                className="rounded border-border text-primary"
+              />
+              Har bir guruh uchun <strong>alohida adset</strong> yaratish (tavsiya etiladi)
+            </label>
+          )}
         </section>
       </div>
 
-      {/* Status / feedback */}
-      {phase.state === 'creating_draft' && (
-        <Alert variant="info">
-          <div className="flex items-center gap-2">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            <span>{t('adLauncher.phaseDraft', 'Launch job yaratilmoqda...')}</span>
+      {/* Launch progress */}
+      {isBusy && (
+        <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
+          <div className="space-y-3">
+            {LAUNCH_STEPS.map((s, i) => {
+              const done = i < currentLaunchStepIndex
+              const active = i === currentLaunchStepIndex
+              return (
+                <div key={s.key} className="flex items-center gap-3">
+                  <span
+                    className={cn(
+                      'flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs',
+                      done && 'bg-emerald-500 text-white',
+                      active && 'bg-primary text-brand-ink',
+                      !done && !active && 'bg-border text-text-tertiary',
+                    )}
+                  >
+                    {done ? <CheckCircle2 className="h-3.5 w-3.5" /> : active ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : i + 1}
+                  </span>
+                  <span
+                    className={cn(
+                      'text-sm',
+                      active && 'font-medium text-text-primary',
+                      done && 'text-text-secondary line-through',
+                      !done && !active && 'text-text-tertiary',
+                    )}
+                  >
+                    {s.label}
+                  </span>
+                </div>
+              )
+            })}
           </div>
-        </Alert>
+        </div>
       )}
-      {phase.state === 'validating' && (
-        <Alert variant="info">
-          <div className="flex items-center gap-2">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            <span>{t('adLauncher.phaseValidate', 'Validatsiya...')}</span>
-          </div>
-        </Alert>
-      )}
-      {phase.state === 'launching' && (
-        <Alert variant="info">
-          <div className="flex items-center gap-2">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            <span>{t('adLauncher.phaseLaunch', 'Meta\'ga yuborilmoqda...')}</span>
-          </div>
-        </Alert>
-      )}
+
+      {/* Error states */}
       {phase.state === 'error' &&
         (phase.message === 'DEMO_LAUNCH_BLOCKED' ? (
           <div className="rounded-2xl border border-amber-300/50 bg-gradient-to-br from-amber-50 to-amber-50/40 p-5 dark:border-amber-500/30 dark:from-amber-500/10 dark:to-transparent">
@@ -293,24 +435,21 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
               </span>
               <div className="flex-1">
                 <h3 className="text-base font-semibold text-amber-900 dark:text-amber-200">
-                  {t('adLauncher.demoBlockedTitle', 'Demo rejimda yakuniy launch o\'chirilgan')}
+                  Demo rejimda haqiqiy launch o'chirilgan
                 </h3>
                 <p className="mt-0.5 text-sm text-amber-800/85 dark:text-amber-200/80">
-                  {t(
-                    'adLauncher.demoBlockedBody',
-                    'Bepul ro\'yxatdan o\'ting va Meta hisobingizni ulang — keyin xuddi shu konfiguratsiya bilan haqiqiy kampaniya yaratiladi.',
-                  )}
+                  Bepul ro'yxatdan o'ting va Meta hisobingizni ulang — keyin xuddi shu sozlamalar bilan haqiqiy kampaniya yaratiladi.
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   <Link href="/register">
                     <Button size="sm">
                       <Sparkles className="h-4 w-4" />
-                      {t('adLauncher.demoBlockedCta', 'Bepul boshlash')}
+                      Bepul boshlash
                     </Button>
                   </Link>
                   <Link href="/login">
                     <Button size="sm" variant="secondary">
-                      {t('adLauncher.demoBlockedLogin', 'Akkauntim bor')}
+                      Akkauntim bor
                     </Button>
                   </Link>
                 </div>
@@ -321,13 +460,12 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
           <Alert variant="error">
             <div className="flex items-start gap-2">
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-              <span className="flex-1">
-                <strong>{t('adLauncher.launchFailed', 'Ishga tushirilmadi')}: </strong>
-                {launchErrorMessage(phase.message, t)}
-              </span>
+              <span className="flex-1">{launchErrorMessage(phase.message)}</span>
             </div>
           </Alert>
         ))}
+
+      {/* Success */}
       {phase.state === 'success' && (
         <div className="rounded-2xl border border-emerald-300/40 bg-gradient-to-br from-emerald-50 to-emerald-50/40 p-5 dark:border-emerald-500/30 dark:from-emerald-500/10 dark:to-transparent">
           <div className="flex items-start gap-3">
@@ -336,13 +474,10 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
             </span>
             <div className="flex-1">
               <h3 className="text-base font-semibold text-emerald-900 dark:text-emerald-200">
-                {t('adLauncher.launchSuccess', 'Kampaniya yaratildi!')}
+                Kampaniya yaratildi!
               </h3>
               <p className="mt-0.5 text-sm text-emerald-800/85 dark:text-emerald-200/80">
-                {t(
-                  'adLauncher.launchSuccessHint',
-                  'Meta\'da PAUSED holatda. Tasdiqlash uchun Meta Ads Manager\'ga o\'ting yoki bizning Campaigns sahifasiga.',
-                )}
+                Meta'da <strong>PAUSED</strong> holatda turibdi — siz u yerda ko'rib, faollashtirish tugmasini bosasiz.
               </p>
               {phase.metaCampaignId && (
                 <p className="mt-2 inline-flex items-center gap-1 rounded-md bg-emerald-500/15 px-2 py-1 text-xs text-emerald-900 dark:text-emerald-200">
@@ -352,12 +487,12 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
               <div className="mt-3 flex flex-wrap gap-2">
                 <Link href="/campaigns">
                   <Button size="sm">
-                    {t('adLauncher.viewCampaigns', 'Campaigns sahifasi')}
+                    Kampaniyalarni ko'rish
                     <ExternalLink className="h-4 w-4" />
                   </Button>
                 </Link>
                 <Button size="sm" variant="secondary" onClick={ctl.resetLaunch}>
-                  {t('adLauncher.startNew', 'Yangi launch')}
+                  Yangi launch
                 </Button>
               </div>
             </div>
@@ -367,7 +502,7 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
 
       {/* Footer */}
       {!isDone && (
-        <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <Button
             type="button"
             variant="secondary"
@@ -376,28 +511,36 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
             onClick={() => ctl.goToStep('pick')}
           >
             <ArrowLeft className="h-4 w-4" />
-            {t('adLauncher.backToPick', 'Tanlovga qaytish')}
+            Tanlovga qaytish
           </Button>
-          {phase.state === 'error' && phase.message !== 'DEMO_LAUNCH_BLOCKED' ? (
-            <Button type="button" size="sm" onClick={ctl.requestLaunch}>
-              {t('common.retry', 'Qayta urinish')}
-            </Button>
-          ) : (
-            <Button
-              type="button"
-              size="sm"
-              disabled={
-                isBusy ||
-                ctl.selectedCampaigns.length === 0 ||
-                cfg.audiences.length === 0 ||
-                cfg.dailyBudget < 1
-              }
-              onClick={ctl.requestLaunch}
-            >
-              {isBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Rocket className="h-4 w-4" />}
-              {t('adLauncher.launchNow', 'Hozir ishga tushirish')}
-            </Button>
-          )}
+
+          <div className="flex items-center gap-3">
+            {/* Inline validation hints */}
+            {cfg.audiences.length === 0 && !isBusy && (
+              <span className="text-xs text-amber-600 dark:text-amber-400">
+                ↑ Kamida 1 auditoriya tanlang
+              </span>
+            )}
+            {phase.state === 'error' && phase.message !== 'DEMO_LAUNCH_BLOCKED' ? (
+              <Button type="button" size="sm" onClick={ctl.requestLaunch}>
+                Qayta urinish
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                size="sm"
+                disabled={!canLaunch}
+                onClick={ctl.requestLaunch}
+              >
+                {isBusy ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Rocket className="h-4 w-4" />
+                )}
+                Kampaniyani yaratish
+              </Button>
+            )}
+          </div>
         </div>
       )}
     </div>
