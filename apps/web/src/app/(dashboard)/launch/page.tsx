@@ -13,6 +13,7 @@ import {
   Search,
   Send,
   ShoppingCart,
+  Smartphone,
   Target,
 } from 'lucide-react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
@@ -33,7 +34,7 @@ type MetaStep = 1 | 2 | 3 | 4 | 5
 type GoogleStep = 1 | 2 | 3 | 4 | 5
 type YandexStep = 1 | 2 | 3 | 4
 
-type MetaObjective = 'awareness' | 'traffic' | 'engagement' | 'leads' | 'sales'
+type MetaObjective = 'awareness' | 'traffic' | 'engagement' | 'leads' | 'app_promotion' | 'sales'
 
 const META_OBJECTIVES: {
   id: MetaObjective
@@ -41,41 +42,62 @@ const META_OBJECTIVES: {
   label: string
   desc: string
   goodFor: string[]
+  color: string       // icon bg
+  iconColor: string   // icon foreground
 }[] = [
   {
     id: 'awareness',
     icon: Megaphone,
-    label: 'Bilimdorlik',
-    desc: 'Brendingizni ko\'proq odamga tanittirish — ko\'rsinlar va eslab qolsinlar.',
+    label: 'Awareness',
+    desc: 'Show your ads to people who are most likely to remember them.',
     goodFor: ['Reach', 'Brand awareness', 'Video views'],
+    color: 'bg-amber-500/15',
+    iconColor: 'text-amber-600 dark:text-amber-400',
   },
   {
     id: 'traffic',
     icon: Globe,
-    label: 'Trafik',
-    desc: 'Sayt, ilova yoki Instagram profilingizga tashrif buyurtuvchilar jalb qilish.',
-    goodFor: ['Link clicks', 'Landing page views', 'Instagram visits', 'Calls'],
+    label: 'Traffic',
+    desc: 'Send people to a destination, like your website, app, Instagram profile or Facebook event.',
+    goodFor: ['Link clicks', 'Landing page views', 'Instagram profile visits', 'Messenger, Instagram and WhatsApp', 'Calls'],
+    color: 'bg-yellow-400/15',
+    iconColor: 'text-yellow-600 dark:text-yellow-400',
   },
   {
     id: 'engagement',
     icon: MessageCircle,
     label: 'Engagement',
-    desc: 'Post bilan muloqot — like, izoh, ulashish yoki xabarga javob.',
-    goodFor: ['Post reactions', 'Comments', 'Shares', 'Messaging'],
+    desc: 'Get more messages, purchases through messaging, video views, post engagement, Page likes or event responses.',
+    goodFor: ['Messenger, Instagram and WhatsApp', 'Video views', 'Post engagement', 'Conversions', 'Calls'],
+    color: 'bg-sky-500/15',
+    iconColor: 'text-sky-600 dark:text-sky-400',
   },
   {
     id: 'leads',
     icon: Target,
-    label: 'Lidlar',
-    desc: 'Aloqa ma\'lumotlarini to\'plash yoki so\'rov qabul qilish.',
-    goodFor: ['Lead forms', 'Messenger', 'Instagram DM', 'Calls'],
+    label: 'Leads',
+    desc: 'Collect leads for your business or brand.',
+    goodFor: ['Website and instant forms', 'Instant forms', 'Messenger, Instagram and WhatsApp', 'Conversions', 'Calls'],
+    color: 'bg-orange-500/15',
+    iconColor: 'text-orange-600 dark:text-orange-400',
+  },
+  {
+    id: 'app_promotion',
+    icon: Smartphone,
+    label: 'App promotion',
+    desc: 'Find new people to install your app and continue using it.',
+    goodFor: ['App installs', 'App events'],
+    color: 'bg-violet-500/15',
+    iconColor: 'text-violet-600 dark:text-violet-400',
   },
   {
     id: 'sales',
     icon: ShoppingCart,
-    label: 'Sotuvlar',
-    desc: 'Xarid qilishi mumkin bo\'lgan odamlarga ko\'rsatish va konversiyaga yo\'naltirish.',
-    goodFor: ['Conversions', 'Catalog sales', 'App installs', 'WhatsApp'],
+    label: 'Sales',
+    desc: 'Find people likely to purchase your product or service.',
+    goodFor: ['Conversions', 'Catalog sales', 'Messenger, Instagram and WhatsApp', 'Calls'],
+    color: 'bg-emerald-500/15',
+    iconColor: 'text-emerald-600 dark:text-emerald-400',
   },
 ]
 
@@ -634,10 +656,11 @@ export default function LaunchPage() {
                   Erishmoqchi bo'lgan biznes natijani belgilang.
                 </p>
 
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   {META_OBJECTIVES.map((o) => {
                     const Icon = o.icon
                     const selected = metaData.objective === o.id
+                    const hovered = hoveredObjective === o.id
                     return (
                       <button
                         key={o.id}
@@ -646,37 +669,30 @@ export default function LaunchPage() {
                         onMouseLeave={() => setHoveredObjective(null)}
                         onClick={() => setMetaData((d) => ({ ...d, objective: o.id }))}
                         className={cn(
-                          'flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left transition-all',
+                          'flex w-full items-center gap-3 rounded-xl border px-4 py-2.5 text-left transition-all',
                           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0866FF]/25',
                           selected
-                            ? 'border-[#0866FF]/50 bg-[#0866FF]/[0.06] ring-1 ring-[#0866FF]/20'
-                            : 'border-transparent bg-transparent hover:border-border hover:bg-surface-2/60',
+                            ? 'border-[#0866FF]/40 bg-[#0866FF]/[0.06] ring-1 ring-[#0866FF]/15'
+                            : hovered
+                              ? 'border-border bg-surface-2/80'
+                              : 'border-transparent bg-transparent',
                         )}
                       >
                         <span
                           className={cn(
-                            'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border',
-                            selected
-                              ? 'border-[#0866FF]/30 bg-white dark:bg-surface-elevated'
-                              : 'border-border bg-surface-2/80',
+                            'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg',
+                            selected || hovered ? o.color : 'bg-surface-2',
                           )}
                         >
                           <Icon
                             className={cn(
                               'h-4 w-4',
-                              selected ? 'text-[#0866FF]' : 'text-text-secondary',
+                              selected || hovered ? o.iconColor : 'text-text-tertiary',
                             )}
                           />
                         </span>
-                        <span className="min-w-0 flex-1">
-                          <span
-                            className={cn(
-                              'block text-sm font-semibold',
-                              selected ? 'text-[#0866FF]' : 'text-text-primary',
-                            )}
-                          >
-                            {o.label}
-                          </span>
+                        <span className="min-w-0 flex-1 text-sm font-medium text-text-primary">
+                          {o.label}
                         </span>
                         <span
                           className={cn(
@@ -686,9 +702,7 @@ export default function LaunchPage() {
                               : 'border-border bg-transparent',
                           )}
                         >
-                          {selected && (
-                            <span className="h-2 w-2 rounded-full bg-white" />
-                          )}
+                          {selected && <span className="h-2 w-2 rounded-full bg-white" />}
                         </span>
                       </button>
                     )
@@ -697,23 +711,23 @@ export default function LaunchPage() {
               </div>
 
               {/* Right — dynamic preview */}
-              <div className="hidden rounded-r-2xl border-l border-border bg-surface-2/40 p-6 md:flex md:flex-col md:justify-center dark:bg-surface-elevated/30">
+              <div className="hidden rounded-r-2xl border-l border-border bg-surface-2/30 p-6 md:flex md:flex-col md:justify-center dark:bg-surface-elevated/20">
                 {previewObj ? (
                   <div className="space-y-4">
-                    <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-[#0866FF]/10 ring-1 ring-[#0866FF]/20">
-                      <previewObj.icon className="h-10 w-10 text-[#0866FF]" />
+                    <div className={cn('flex h-24 w-24 items-center justify-center rounded-2xl', previewObj.color)}>
+                      <previewObj.icon className={cn('h-12 w-12', previewObj.iconColor)} />
                     </div>
                     <div>
                       <h3 className="text-base font-semibold text-text-primary">{previewObj.label}</h3>
-                      <p className="mt-1 text-sm leading-relaxed text-text-secondary">{previewObj.desc}</p>
+                      <p className="mt-1.5 text-sm leading-relaxed text-text-secondary">{previewObj.desc}</p>
                     </div>
                     <div>
-                      <p className="mb-2 text-xs font-semibold text-text-tertiary">Bunga mos:</p>
+                      <p className="mb-2 text-xs font-bold text-text-primary">Good for:</p>
                       <div className="flex flex-wrap gap-1.5">
                         {previewObj.goodFor.map((tag) => (
                           <span
                             key={tag}
-                            className="rounded-full border border-border bg-surface px-2.5 py-0.5 text-xs font-medium text-text-secondary"
+                            className="rounded-full border border-border bg-surface px-2.5 py-0.5 text-xs text-text-secondary"
                           >
                             {tag}
                           </span>
@@ -723,7 +737,7 @@ export default function LaunchPage() {
                   </div>
                 ) : (
                   <p className="text-sm text-text-tertiary">
-                    Maqsad ustiga bosing yoki sichqonchani olib keling — batafsil ko'rishingiz mumkin.
+                    Hover over an objective to see details.
                   </p>
                 )}
               </div>
