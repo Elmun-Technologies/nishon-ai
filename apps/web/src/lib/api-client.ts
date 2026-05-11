@@ -453,7 +453,9 @@ export type CreateLaunchJobInput = {
   platform: 'meta' | 'google' | string
   objective: string
   budgetType: 'ABO' | 'CBO'
+  dailyBudget?: number
   splitByFunnelStage?: boolean
+  sourceCampaignIds?: string[]
   audiences: LaunchAudienceConfig[]
 }
 

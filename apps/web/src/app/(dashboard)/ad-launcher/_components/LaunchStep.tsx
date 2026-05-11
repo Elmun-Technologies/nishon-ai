@@ -64,6 +64,7 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
   const { t } = useI18n()
   const cfg = ctl.launchConfig
   const phase = ctl.launchPhase
+  const currency = ctl.selectedAccount?.currency ?? 'USD'
 
   const isBusy =
     phase.state === 'creating_draft' ||
@@ -176,7 +177,7 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
 
           <div>
             <label className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
-              {t('adLauncher.dailyBudget', 'Kunlik byudjet (USD)')}
+              {t('adLauncher.dailyBudget', 'Kunlik byudjet')} ({currency})
             </label>
             <div className="mt-2 flex items-center gap-2 rounded-lg border border-border bg-surface-2 px-3 py-2 transition-colors focus-within:border-primary/60 dark:bg-surface">
               <span className="text-text-tertiary">$</span>
@@ -363,7 +364,7 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
       )}
 
       {/* Footer */}
-      {!isDone && phase.state !== 'error' && (
+      {!isDone && (
         <div className="flex flex-wrap items-center justify-between gap-2">
           <Button
             type="button"
@@ -375,26 +376,25 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
             <ArrowLeft className="h-4 w-4" />
             {t('adLauncher.backToPick', 'Tanlovga qaytish')}
           </Button>
-          <Button
-            type="button"
-            size="sm"
-            disabled={
-              isBusy ||
-              ctl.selectedCampaigns.length === 0 ||
-              cfg.audiences.length === 0
-            }
-            onClick={ctl.requestLaunch}
-          >
-            {isBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Rocket className="h-4 w-4" />}
-            {t('adLauncher.launchNow', 'Hozir ishga tushirish')}
-          </Button>
-        </div>
-      )}
-      {phase.state === 'error' && phase.message !== 'DEMO_LAUNCH_BLOCKED' && (
-        <div className="flex justify-end">
-          <Button type="button" size="sm" onClick={ctl.requestLaunch}>
-            {t('common.retry', 'Qayta urinish')}
-          </Button>
+          {phase.state === 'error' && phase.message !== 'DEMO_LAUNCH_BLOCKED' ? (
+            <Button type="button" size="sm" onClick={ctl.requestLaunch}>
+              {t('common.retry', 'Qayta urinish')}
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              size="sm"
+              disabled={
+                isBusy ||
+                ctl.selectedCampaigns.length === 0 ||
+                cfg.audiences.length === 0
+              }
+              onClick={ctl.requestLaunch}
+            >
+              {isBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Rocket className="h-4 w-4" />}
+              {t('adLauncher.launchNow', 'Hozir ishga tushirish')}
+            </Button>
+          )}
         </div>
       )}
     </div>

@@ -194,7 +194,7 @@ export function useAdLauncher() {
         setAccounts([DEMO_ACCOUNT])
         setCampaigns(DEMO_CAMPAIGNS)
         setHasLoaded(true)
-        if (!accountId) setAccountId(DEMO_ACCOUNT.id)
+        setAccountId((prev) => prev || DEMO_ACCOUNT.id)
         return
       }
       const res = await metaApi.dashboard(workspaceId as string)
@@ -202,7 +202,7 @@ export function useAdLauncher() {
       setAccounts(nextAccounts)
       setCampaigns(nextCampaigns)
       setHasLoaded(true)
-      if (!accountId && nextAccounts[0]) setAccountId(nextAccounts[0].id)
+      if (nextAccounts[0]) setAccountId((prev) => prev || nextAccounts[0].id)
     } catch (err: any) {
       // If the API client raised our DEMO_MODE marker, fall back to demo data
       // gracefully — never surface a raw "demo" error to the user.
@@ -212,7 +212,7 @@ export function useAdLauncher() {
         setAccounts([DEMO_ACCOUNT])
         setCampaigns(DEMO_CAMPAIGNS)
         setHasLoaded(true)
-        if (!accountId) setAccountId(DEMO_ACCOUNT.id)
+        setAccountId((prev) => prev || DEMO_ACCOUNT.id)
         return
       }
       setHasLoaded(true)
@@ -222,7 +222,7 @@ export function useAdLauncher() {
     } finally {
       setLoading(false)
     }
-  }, [workspaceId, isDemoMode, accountId])
+  }, [workspaceId, isDemoMode])
 
   const triggerSync = useCallback(async () => {
     if (isDemoMode) {
@@ -355,7 +355,9 @@ export function useAdLauncher() {
       platform: 'meta',
       objective: launchConfig.objective,
       budgetType: launchConfig.budgetType,
+      dailyBudget: launchConfig.dailyBudget,
       splitByFunnelStage: launchConfig.splitByFunnelStage,
+      sourceCampaignIds: [...selectedIds],
       audiences: launchConfig.audiences.map((preset) => ({
         name: PRESET_NAME[preset],
         funnelStage: FUNNEL_STAGE_BY_PRESET[preset],
@@ -398,7 +400,7 @@ export function useAdLauncher() {
       const msg = code ?? err?.message ?? 'UNEXPECTED_ERROR'
       setLaunchPhase({ state: 'error', message: msg })
     }
-  }, [workspaceId, launchConfig, isDemoMode, loadHistory])
+  }, [workspaceId, launchConfig, isDemoMode, loadHistory, selectedIds])
 
   const resetLaunch = useCallback(() => {
     setLaunchPhase({ state: 'idle' })

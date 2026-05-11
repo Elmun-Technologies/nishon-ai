@@ -7,6 +7,7 @@ import {
   Clock,
   History,
   Loader2,
+  RefreshCw,
   XCircle,
 } from 'lucide-react'
 import { useI18n } from '@/i18n/use-i18n'
@@ -60,7 +61,11 @@ export function LaunchHistory({ ctl }: { ctl: AdLauncherController }) {
           className="rounded p-1 text-text-tertiary transition-colors hover:bg-surface-2 hover:text-text-primary"
           aria-label={t('adLauncher.historyRefresh', 'Yangilash')}
         >
-          <Loader2 className={cn('h-3.5 w-3.5', ctl.historyLoading && 'animate-spin')} />
+          {ctl.historyLoading ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <RefreshCw className="h-3.5 w-3.5" />
+          )}
         </button>
       </header>
 

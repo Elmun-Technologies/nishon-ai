@@ -20,6 +20,7 @@ const OBJECTIVE_LABEL: Record<string, string> = {
 export function ConfirmLaunchDialog({ ctl }: { ctl: AdLauncherController }) {
   const { t } = useI18n()
   const cfg = ctl.launchConfig
+  const currency = ctl.selectedAccount?.currency ?? 'USD'
 
   return (
     <Dialog
@@ -51,7 +52,7 @@ export function ConfirmLaunchDialog({ ctl }: { ctl: AdLauncherController }) {
 
           <dt className="text-text-tertiary">{t('adLauncher.confirmBudget', 'Byudjet')}</dt>
           <dd className="font-medium text-text-primary">
-            ${cfg.dailyBudget}/{t('adLauncher.confirmBudgetDay', 'kun')} · {cfg.budgetType}
+            {cfg.dailyBudget} {currency}/{t('adLauncher.confirmBudgetDay', 'kun')} · {cfg.budgetType}
           </dd>
 
           <dt className="text-text-tertiary">{t('adLauncher.confirmAudiences', 'Auditoriya')}</dt>
