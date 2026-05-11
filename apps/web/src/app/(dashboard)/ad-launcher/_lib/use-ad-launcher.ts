@@ -77,6 +77,14 @@ const PRESET_NAME: Record<AudiencePresetId, string> = {
 
 const HEALTH_RANK: Record<CampaignRow['aiHealth'], number> = { BAD: 0, AVERAGE: 1, GOOD: 2 }
 
+const DEFAULT_LAUNCH_CONFIG: LaunchConfig = {
+  objective: 'OUTCOME_SALES',
+  budgetType: 'CBO',
+  dailyBudget: 25,
+  audiences: ['prospecting'],
+  splitByFunnelStage: false,
+}
+
 /** Sleep helper for simulating network timings in demo mode. */
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 
@@ -122,13 +130,7 @@ export function useAdLauncher() {
   const [sortDir, setSortDir] = useState<SortDir>('desc')
 
   // ── Launch state ───────────────────────────────────────────────────────────
-  const [launchConfig, setLaunchConfig] = useState<LaunchConfig>({
-    objective: 'OUTCOME_SALES',
-    budgetType: 'CBO',
-    dailyBudget: 25,
-    audiences: ['prospecting'],
-    splitByFunnelStage: false,
-  })
+  const [launchConfig, setLaunchConfig] = useState<LaunchConfig>(DEFAULT_LAUNCH_CONFIG)
   const [launchPhase, setLaunchPhase] = useState<LaunchPhase>({ state: 'idle' })
   const [confirmOpen, setConfirmOpen] = useState(false)
 
@@ -194,7 +196,7 @@ export function useAdLauncher() {
         setAccounts([DEMO_ACCOUNT])
         setCampaigns(DEMO_CAMPAIGNS)
         setHasLoaded(true)
-        if (!accountId) setAccountId(DEMO_ACCOUNT.id)
+        setAccountId((prev) => prev || DEMO_ACCOUNT.id)
         return
       }
       const res = await metaApi.dashboard(workspaceId as string)
@@ -202,7 +204,7 @@ export function useAdLauncher() {
       setAccounts(nextAccounts)
       setCampaigns(nextCampaigns)
       setHasLoaded(true)
-      if (!accountId && nextAccounts[0]) setAccountId(nextAccounts[0].id)
+      if (nextAccounts[0]) setAccountId((prev) => prev || nextAccounts[0].id)
     } catch (err: any) {
       // If the API client raised our DEMO_MODE marker, fall back to demo data
       // gracefully — never surface a raw "demo" error to the user.
@@ -212,7 +214,7 @@ export function useAdLauncher() {
         setAccounts([DEMO_ACCOUNT])
         setCampaigns(DEMO_CAMPAIGNS)
         setHasLoaded(true)
-        if (!accountId) setAccountId(DEMO_ACCOUNT.id)
+        setAccountId((prev) => prev || DEMO_ACCOUNT.id)
         return
       }
       setHasLoaded(true)
@@ -222,7 +224,7 @@ export function useAdLauncher() {
     } finally {
       setLoading(false)
     }
-  }, [workspaceId, isDemoMode, accountId])
+  }, [workspaceId, isDemoMode])
 
   const triggerSync = useCallback(async () => {
     if (isDemoMode) {
@@ -232,7 +234,10 @@ export function useAdLauncher() {
       setSyncing(false)
       return
     }
-    if (!workspaceId) return
+    if (!workspaceId) {
+      setLoadError('NO_WORKSPACE')
+      return
+    }
     setSyncing(true)
     setLoadError(null)
     try {
@@ -355,7 +360,9 @@ export function useAdLauncher() {
       platform: 'meta',
       objective: launchConfig.objective,
       budgetType: launchConfig.budgetType,
+      dailyBudget: launchConfig.dailyBudget,
       splitByFunnelStage: launchConfig.splitByFunnelStage,
+      sourceCampaignIds: [...selectedIds],
       audiences: launchConfig.audiences.map((preset) => ({
         name: PRESET_NAME[preset],
         funnelStage: FUNNEL_STAGE_BY_PRESET[preset],
@@ -398,11 +405,13 @@ export function useAdLauncher() {
       const msg = code ?? err?.message ?? 'UNEXPECTED_ERROR'
       setLaunchPhase({ state: 'error', message: msg })
     }
-  }, [workspaceId, launchConfig, isDemoMode, loadHistory])
+  }, [workspaceId, launchConfig, isDemoMode, loadHistory, selectedIds])
 
   const resetLaunch = useCallback(() => {
     setLaunchPhase({ state: 'idle' })
+    setLaunchConfig(DEFAULT_LAUNCH_CONFIG)
     clearSelection()
+    setSearch('')
     setStep('source')
   }, [clearSelection])
 

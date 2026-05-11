@@ -44,10 +44,10 @@ function errorMessage(code: string, t: (key: string, fallback?: string) => strin
 export function SourceStep({ ctl }: { ctl: AdLauncherController }) {
   const { t } = useI18n()
 
+  const { loadData, hasLoaded, loading, workspaceId, isDemoMode } = ctl
   useEffect(() => {
-    if (!ctl.hasLoaded && !ctl.loading) ctl.loadData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ctl.workspaceId, ctl.isDemoMode])
+    if (!hasLoaded && !loading) loadData()
+  }, [loadData, hasLoaded, loading, workspaceId, isDemoMode])
 
   const noWorkspace = !ctl.workspaceId && !ctl.isDemoMode
   const noAccounts =

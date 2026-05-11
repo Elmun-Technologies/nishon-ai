@@ -14,7 +14,7 @@ export function SelectionTray({ ctl }: { ctl: AdLauncherController }) {
   const items = ctl.selectedCampaigns
 
   return (
-    <aside className="sticky top-4 flex w-full flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-sm lg:w-80">
+    <aside className="flex w-full flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
       <header className="flex items-center justify-between border-b border-border bg-surface-2 px-3 py-2.5 dark:bg-surface-elevated">
         <h3 className="text-xs font-semibold uppercase tracking-wide text-text-primary">
           {t('adLauncher.trayTitle', 'Tanlangan')}
