@@ -4,10 +4,14 @@ import { useCallback, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
+  Briefcase,
   ChevronLeft,
   ChevronRight,
   Facebook,
+  Flag,
   Globe,
+  Home,
+  Landmark,
   Megaphone,
   MessageCircle,
   Search,
@@ -209,7 +213,7 @@ export default function LaunchPage() {
       abTestType: 'creative' as const,
       abTestDuration: 7,
       abTestMetric: 'cost_per_result',
-      specialAdCategory: '',
+      specialAdCategories: [] as string[],
     })
   }
 
@@ -269,7 +273,7 @@ export default function LaunchPage() {
     abTestType: 'creative' as 'creative' | 'audience' | 'placement' | 'custom',
     abTestDuration: 7,
     abTestMetric: 'cost_per_result',
-    specialAdCategory: '',
+    specialAdCategories: [] as string[],
   })
 
   const [googleStep, setGoogleStep] = useState<GoogleStep>(1)
@@ -889,32 +893,124 @@ export default function LaunchPage() {
 
               {/* Special Ad Categories */}
               <div className="rounded-xl border border-border bg-surface-2/40 p-4 dark:bg-surface-elevated/20">
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-2.5 pb-3">
                   <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
                     <svg viewBox="0 0 16 16" className="h-3 w-3 fill-current" aria-hidden><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg>
                   </div>
-                  <div className="flex-1">
+                  <div>
                     <p className="text-sm font-semibold text-text-primary">Special Ad Categories</p>
                     <p className="mt-0.5 text-xs leading-relaxed text-text-secondary">
                       Moliyaviy mahsulotlar, ish joylari, uy-joy yoki siyosatga oid reklamalar bo'lsa, e'lon qiling.
+                      Reklama rad etilishini oldini olishga yordam beradi.
                     </p>
                   </div>
                 </div>
-                <div className="mt-3">
-                  <label className="mb-1.5 block text-sm font-medium text-text-secondary" htmlFor="special-cat">
-                    Kategoriya
+
+                <div className="mb-3 border-t border-border pt-3">
+                  <p className="mb-2 text-xs font-semibold text-text-secondary">Kategoriyalar</p>
+                  <p className="mb-3 text-xs text-text-tertiary">
+                    Kampaniyangizni eng yaxshi tavsiflovchi kategoriyalarni tanlang.
+                  </p>
+                  <div className="space-y-2">
+                    {(
+                      [
+                        {
+                          id: 'credit',
+                          icon: Landmark,
+                          label: 'Financial products and services',
+                          desc: 'Kreditlar, moliyaviy xizmatlar, sug\'urta, investitsiya xizmatlari uchun reklamalar.',
+                        },
+                        {
+                          id: 'employment',
+                          icon: Briefcase,
+                          label: 'Employment',
+                          desc: 'Ish o\'rinlari, stajirovka, professional sertifikatlar uchun reklamalar.',
+                        },
+                        {
+                          id: 'housing',
+                          icon: Home,
+                          label: 'Housing',
+                          desc: 'Ko\'chmas mulk, uy-joy sug\'urtasi, ipoteka kreditlari uchun reklamalar.',
+                        },
+                        {
+                          id: 'social_issues',
+                          icon: Flag,
+                          label: 'Social issues, elections or politics',
+                          desc: 'Ijtimoiy masalalar, saylovlar yoki siyosiy shaxslarga oid reklamalar.',
+                        },
+                      ] as const
+                    ).map(({ id, icon: Icon, label, desc }) => {
+                      const checked = metaData.specialAdCategories.includes(id)
+                      return (
+                        <button
+                          key={id}
+                          type="button"
+                          onClick={() =>
+                            setMetaData((d) => ({
+                              ...d,
+                              specialAdCategories: checked
+                                ? d.specialAdCategories.filter((c) => c !== id)
+                                : [...d.specialAdCategories, id],
+                            }))
+                          }
+                          className={cn(
+                            'flex w-full items-start gap-3 rounded-xl border px-4 py-3 text-left transition-all',
+                            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0866FF]/20',
+                            checked
+                              ? 'border-[#0866FF]/40 bg-[#0866FF]/[0.05] ring-1 ring-[#0866FF]/15'
+                              : 'border-border bg-surface hover:border-text-tertiary/30 hover:bg-surface-2/50',
+                          )}
+                        >
+                          <div className={cn(
+                            'mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border',
+                            checked ? 'border-[#0866FF]/25 bg-white dark:bg-surface-elevated' : 'border-border bg-surface-2',
+                          )}>
+                            <Icon className={cn('h-4 w-4', checked ? 'text-[#0866FF]' : 'text-text-tertiary')} />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-medium text-text-primary">{label}</p>
+                            <p className="mt-0.5 text-xs leading-relaxed text-text-secondary">{desc}</p>
+                          </div>
+                          <span
+                            className={cn(
+                              'mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 transition-all',
+                              checked
+                                ? 'border-[#0866FF] bg-[#0866FF]'
+                                : 'border-border bg-transparent',
+                            )}
+                          >
+                            {checked && (
+                              <svg viewBox="0 0 12 10" className="h-3 w-3 fill-white" aria-hidden>
+                                <path d="M1 5l3.5 3.5L11 1" strokeWidth="2" stroke="white" fill="none" />
+                              </svg>
+                            )}
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* Countries */}
+                <div className="border-t border-border pt-3">
+                  <label className="mb-0.5 block text-sm font-semibold text-text-primary" htmlFor="meta-country">
+                    Countries
                   </label>
+                  <p className="mb-2 text-xs text-text-secondary">
+                    Kampaniyani qaysi mamlakatda o'tkazmoqchisiz? Qo'shimcha talablar bo'lishi mumkin.
+                  </p>
                   <select
-                    id="special-cat"
-                    value={metaData.specialAdCategory}
-                    onChange={(e) => setMetaData((d) => ({ ...d, specialAdCategory: e.target.value }))}
+                    id="meta-country"
+                    value={metaData.location}
+                    onChange={(e) => setMetaData((d) => ({ ...d, location: e.target.value }))}
                     className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/15"
                   >
-                    <option value="">Qo'llanilmaydi</option>
-                    <option value="credit">Credit — kredit va moliyaviy xizmatlar</option>
-                    <option value="employment">Employment — ish joyi va ta'lim</option>
-                    <option value="housing">Housing — ko'chmas mulk va uy-joy</option>
-                    <option value="social_issues">Social Issues, Elections or Politics</option>
+                    <option value="UZ">{lt('meta.locUZ', 'Uzbekistan')}</option>
+                    <option value="KZ">{lt('meta.locKZ', 'Kazakhstan')}</option>
+                    <option value="TJ">{lt('meta.locTJ', 'Tajikistan')}</option>
+                    <option value="TM">{lt('meta.locTM', 'Turkmenistan')}</option>
+                    <option value="RU">Russia</option>
+                    <option value="US">United States</option>
                   </select>
                 </div>
               </div>
@@ -936,8 +1032,8 @@ export default function LaunchPage() {
           <WizardStepCard>
             <div className="space-y-6 p-6 md:p-8">
               <div>
-                <h2 className="text-lg font-semibold text-text-primary">{lt('meta.audienceTitle', '')}</h2>
-                <p className="mt-1 text-sm text-text-secondary">{lt('meta.audienceSubtitle', '')}</p>
+                <h2 className="text-lg font-semibold text-text-primary">{lt('meta.audienceTitle', 'Audience')}</h2>
+                <p className="mt-1 text-sm text-text-secondary">{lt('meta.audienceSubtitle', 'Define who should see your ads.')}</p>
               </div>
               <div>
                 <p className="text-label mb-2 font-medium text-text-secondary">{lt('meta.ageLabel', 'Age')}</p>
@@ -960,22 +1056,6 @@ export default function LaunchPage() {
                     className="w-24 rounded-lg border border-border bg-surface px-3 py-2 text-sm focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/15"
                   />
                 </div>
-              </div>
-              <div>
-                <label className="text-label mb-2 block font-medium text-text-secondary" htmlFor="meta-loc">
-                  {lt('meta.locationLabel', 'Location')}
-                </label>
-                <select
-                  id="meta-loc"
-                  value={metaData.location}
-                  onChange={(e) => setMetaData((d) => ({ ...d, location: e.target.value }))}
-                  className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/15"
-                >
-                  <option value="UZ">{lt('meta.locUZ', '')}</option>
-                  <option value="KZ">{lt('meta.locKZ', '')}</option>
-                  <option value="TJ">{lt('meta.locTJ', '')}</option>
-                  <option value="TM">{lt('meta.locTM', '')}</option>
-                </select>
               </div>
             </div>
             <div className="flex flex-col-reverse gap-2 border-t border-border px-6 py-4 md:flex-row md:justify-between md:px-8">
@@ -1108,57 +1188,76 @@ export default function LaunchPage() {
 
         {metaStep === 6 && (
           <WizardStepCard>
-            <div className="space-y-6 p-6 md:p-8">
-              <div>
-                <h2 className="text-lg font-semibold text-text-primary">{lt('meta.reviewTitle', '')}</h2>
-                <p className="mt-1 text-sm text-text-secondary">{lt('meta.reviewSubtitle', '')}</p>
+            <div className="p-6 md:p-8">
+              <div className="mb-5">
+                <h2 className="text-lg font-semibold text-text-primary">Review</h2>
+                <p className="mt-1 text-sm text-text-secondary">Publish qilishdan oldin kampaniya ma'lumotlarini tekshiring.</p>
               </div>
-              <dl className="space-y-3 rounded-xl border border-border bg-surface-2/50 p-4 text-sm">
-                <div className="flex justify-between gap-4">
-                  <dt className="text-text-tertiary">{lt('meta.revName', '')}</dt>
-                  <dd className="max-w-[60%] text-right font-medium text-text-primary">{metaData.name || '—'}</dd>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <dt className="text-text-tertiary">{lt('meta.revObjective', '')}</dt>
-                  <dd className="font-medium text-text-primary">
-                    {metaData.objective
+              <div className="divide-y divide-border rounded-xl border border-border bg-surface-2/30 dark:bg-surface-elevated/20">
+                {[
+                  { label: 'Campaign name', value: metaData.name || '—' },
+                  { label: 'Buying type', value: 'Auction' },
+                  {
+                    label: 'Objective',
+                    value: metaData.objective
                       ? META_OBJECTIVES.find((o) => o.id === metaData.objective)?.label ?? '—'
-                      : '—'}
-                  </dd>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <dt className="text-text-tertiary">{lt('meta.revAudience', '')}</dt>
-                  <dd className="font-medium text-text-primary">
-                    {metaData.minAge}–{metaData.maxAge},{' '}
-                    {
-                      {
-                        UZ: lt('meta.locUZ', ''),
-                        KZ: lt('meta.locKZ', ''),
-                        TJ: lt('meta.locTJ', ''),
-                        TM: lt('meta.locTM', ''),
-                      }[metaData.location]
-                    }
-                  </dd>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <dt className="text-text-tertiary">{lt('meta.revBudget', '')}</dt>
-                  <dd className="font-medium text-text-primary">${metaData.dailyBudget || '—'}</dd>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <dt className="text-text-tertiary">{lt('meta.revDuration', '')}</dt>
-                  <dd className="font-medium text-text-primary">
-                    {lt('meta.durationDays', '').replace('{{n}}', String(metaData.campaignDuration))}
-                  </dd>
-                </div>
-                <div className="flex justify-between gap-4 border-t border-border pt-3">
-                  <dt className="text-text-tertiary">{lt('meta.revTotal', '')}</dt>
-                  <dd className="text-base font-semibold text-text-primary">
-                    {formatMoneyUsd(
+                      : '—',
+                  },
+                  {
+                    label: 'A/B Test',
+                    value: metaData.abTestEnabled
+                      ? `On — ${metaData.abTestType}, ${metaData.abTestDuration} kun`
+                      : 'Off',
+                    note: metaData.abTestEnabled
+                      ? 'Publish bosgandan so\'ng kampaniyaning B versiyasi avtomatik yaratiladi.'
+                      : undefined,
+                  },
+                  {
+                    label: 'Budget strategy',
+                    value: `Campaign budget — Daily ${metaData.dailyBudget ? `$${metaData.dailyBudget}` : '—'} / day`,
+                  },
+                  {
+                    label: 'Campaign duration',
+                    value: `${metaData.campaignDuration} kun`,
+                  },
+                  {
+                    label: 'Total budget',
+                    value: formatMoneyUsd(
                       (parsePositiveNumber(metaData.dailyBudget) ?? 0) * metaData.campaignDuration,
-                    )}
-                  </dd>
-                </div>
-              </dl>
+                    ),
+                    bold: true,
+                  },
+                  {
+                    label: 'Audience',
+                    value: `${metaData.minAge}–${metaData.maxAge} yosh, ${{ UZ: 'Uzbekistan', KZ: 'Kazakhstan', TJ: 'Tajikistan', TM: 'Turkmenistan', RU: 'Russia', US: 'United States' }[metaData.location] ?? metaData.location}`,
+                  },
+                  { label: 'Campaign bid strategy', value: 'Highest volume' },
+                  { label: 'Delivery type', value: 'Standard' },
+                  {
+                    label: 'Special Ad Categories',
+                    value:
+                      metaData.specialAdCategories.length > 0
+                        ? metaData.specialAdCategories
+                            .map((c) =>
+                              c === 'credit'
+                                ? 'Financial products'
+                                : c === 'employment'
+                                  ? 'Employment'
+                                  : c === 'housing'
+                                    ? 'Housing'
+                                    : 'Social issues / politics',
+                            )
+                            .join(', ')
+                        : 'None',
+                  },
+                ].map(({ label, value, note, bold }) => (
+                  <div key={label} className="px-4 py-3">
+                    <p className="text-xs font-semibold text-text-tertiary">{label}</p>
+                    <p className={cn('mt-0.5 text-sm text-text-primary', bold && 'text-base font-semibold')}>{value}</p>
+                    {note && <p className="mt-1 text-xs text-text-secondary">{note}</p>}
+                  </div>
+                ))}
+              </div>
             </div>
             <div className="flex flex-col-reverse gap-2 border-t border-border px-6 py-4 md:flex-row md:justify-between md:px-8">
               <Button type="button" variant="secondary" onClick={() => setMetaStep(5)}>
