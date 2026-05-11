@@ -9,6 +9,7 @@ import {
   Facebook,
   Globe,
   Megaphone,
+  MessageCircle,
   Search,
   Send,
   ShoppingCart,
@@ -32,7 +33,51 @@ type MetaStep = 1 | 2 | 3 | 4 | 5
 type GoogleStep = 1 | 2 | 3 | 4 | 5
 type YandexStep = 1 | 2 | 3 | 4
 
-type MetaObjective = 'leads' | 'traffic' | 'sales' | 'awareness'
+type MetaObjective = 'awareness' | 'traffic' | 'engagement' | 'leads' | 'sales'
+
+const META_OBJECTIVES: {
+  id: MetaObjective
+  icon: React.ComponentType<{ className?: string }>
+  label: string
+  desc: string
+  goodFor: string[]
+}[] = [
+  {
+    id: 'awareness',
+    icon: Megaphone,
+    label: 'Bilimdorlik',
+    desc: 'Brendingizni ko\'proq odamga tanittirish — ko\'rsinlar va eslab qolsinlar.',
+    goodFor: ['Reach', 'Brand awareness', 'Video views'],
+  },
+  {
+    id: 'traffic',
+    icon: Globe,
+    label: 'Trafik',
+    desc: 'Sayt, ilova yoki Instagram profilingizga tashrif buyurtuvchilar jalb qilish.',
+    goodFor: ['Link clicks', 'Landing page views', 'Instagram visits', 'Calls'],
+  },
+  {
+    id: 'engagement',
+    icon: MessageCircle,
+    label: 'Engagement',
+    desc: 'Post bilan muloqot — like, izoh, ulashish yoki xabarga javob.',
+    goodFor: ['Post reactions', 'Comments', 'Shares', 'Messaging'],
+  },
+  {
+    id: 'leads',
+    icon: Target,
+    label: 'Lidlar',
+    desc: 'Aloqa ma\'lumotlarini to\'plash yoki so\'rov qabul qilish.',
+    goodFor: ['Lead forms', 'Messenger', 'Instagram DM', 'Calls'],
+  },
+  {
+    id: 'sales',
+    icon: ShoppingCart,
+    label: 'Sotuvlar',
+    desc: 'Xarid qilishi mumkin bo\'lgan odamlarga ko\'rsatish va konversiyaga yo\'naltirish.',
+    goodFor: ['Conversions', 'Catalog sales', 'App installs', 'WhatsApp'],
+  },
+]
 
 function parsePositiveNumber(v: string) {
   const n = Number(String(v).replace(',', '.'))
@@ -178,6 +223,8 @@ export default function LaunchPage() {
     setError('')
   }
 
+  const [hoveredObjective, setHoveredObjective] = useState<MetaObjective | null>(null)
+
   const [metaStep, setMetaStep] = useState<MetaStep>(1)
   const [metaData, setMetaData] = useState({
     name: '',
@@ -222,28 +269,6 @@ export default function LaunchPage() {
     strategy: 'average_cpc',
   })
 
-  const metaObjectives = useMemo(
-    () =>
-      [
-        {
-          id: 'leads' as const,
-          icon: <Target className="h-5 w-5" aria-hidden />,
-        },
-        {
-          id: 'traffic' as const,
-          icon: <Globe className="h-5 w-5" aria-hidden />,
-        },
-        {
-          id: 'sales' as const,
-          icon: <ShoppingCart className="h-5 w-5" aria-hidden />,
-        },
-        {
-          id: 'awareness' as const,
-          icon: <Megaphone className="h-5 w-5" aria-hidden />,
-        },
-      ] as const,
-    [],
-  )
 
   const handleMetaLaunch = async () => {
     setSaving(true)
@@ -576,25 +601,8 @@ export default function LaunchPage() {
   )
 
   if (platform === 'meta') {
-    const objectiveLabel = (id: MetaObjective) => {
-      const map: Record<MetaObjective, string> = {
-        leads: lt('meta.objLeads', 'Leads'),
-        traffic: lt('meta.objTraffic', 'Traffic'),
-        sales: lt('meta.objSales', 'Sales'),
-        awareness: lt('meta.objAwareness', 'Awareness'),
-      }
-      return map[id]
-    }
-
-    const objectiveDesc = (id: MetaObjective) => {
-      const map: Record<MetaObjective, string> = {
-        leads: lt('meta.objLeadsDesc', ''),
-        traffic: lt('meta.objTrafficDesc', ''),
-        sales: lt('meta.objSalesDesc', ''),
-        awareness: lt('meta.objAwarenessDesc', ''),
-      }
-      return map[id]
-    }
+    const previewObj =
+      META_OBJECTIVES.find((o) => o.id === (hoveredObjective ?? metaData.objective)) ?? null
 
     return (
       <div className="mx-auto max-w-3xl space-y-6 py-6">
@@ -603,44 +611,127 @@ export default function LaunchPage() {
 
         {metaStep === 1 && (
           <WizardStepCard>
-            <div className="grid gap-8 p-6 md:grid-cols-[minmax(0,1fr)_minmax(0,280px)] md:p-8">
-              <div className="space-y-8">
-                <div>
-                  <label className="text-label font-medium text-text-secondary" htmlFor="meta-buying-type">
-                    {lt('meta.buyingType', 'Buying type')}
+            <div className="grid gap-0 md:grid-cols-[minmax(0,1fr)_minmax(0,260px)]">
+              {/* Left — objective list */}
+              <div className="p-6 md:p-8">
+                <div className="mb-5">
+                  <label className="text-xs font-semibold uppercase tracking-wide text-text-tertiary" htmlFor="meta-buying-type">
+                    Xarid turi
                   </label>
                   <select
                     id="meta-buying-type"
                     disabled
                     className="mt-2 w-full cursor-not-allowed rounded-xl border border-border bg-surface-2/80 px-4 py-3 text-sm text-text-secondary"
                   >
-                    <option>{lt('meta.buyingAuction', 'Auction')}</option>
+                    <option>Auktsion — real vaqtda stavka</option>
                   </select>
-                  <p className="mt-2 text-xs text-text-tertiary">{lt('meta.buyingHint', '')}</p>
                 </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-text-primary">{lt('meta.objectiveTitle', '')}</h2>
-                  <p className="mt-1 text-sm text-text-secondary">{lt('meta.objectiveSubtitle', '')}</p>
-                  <div className="mt-5 space-y-2">
-                    {metaObjectives.map((o) => (
-                      <WizardChoiceRow
+
+                <h2 className="mb-1 text-base font-semibold text-text-primary">
+                  Kampaniya maqsadini tanlang
+                </h2>
+                <p className="mb-4 text-sm text-text-secondary">
+                  Erishmoqchi bo'lgan biznes natijani belgilang.
+                </p>
+
+                <div className="space-y-1.5">
+                  {META_OBJECTIVES.map((o) => {
+                    const Icon = o.icon
+                    const selected = metaData.objective === o.id
+                    return (
+                      <button
                         key={o.id}
-                        tone="meta"
-                        selected={metaData.objective === o.id}
+                        type="button"
+                        onMouseEnter={() => setHoveredObjective(o.id)}
+                        onMouseLeave={() => setHoveredObjective(null)}
                         onClick={() => setMetaData((d) => ({ ...d, objective: o.id }))}
-                        icon={o.icon}
-                        title={objectiveLabel(o.id)}
-                        description={objectiveDesc(o.id)}
-                      />
-                    ))}
-                  </div>
+                        className={cn(
+                          'flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left transition-all',
+                          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0866FF]/25',
+                          selected
+                            ? 'border-[#0866FF]/50 bg-[#0866FF]/[0.06] ring-1 ring-[#0866FF]/20'
+                            : 'border-transparent bg-transparent hover:border-border hover:bg-surface-2/60',
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border',
+                            selected
+                              ? 'border-[#0866FF]/30 bg-white dark:bg-surface-elevated'
+                              : 'border-border bg-surface-2/80',
+                          )}
+                        >
+                          <Icon
+                            className={cn(
+                              'h-4 w-4',
+                              selected ? 'text-[#0866FF]' : 'text-text-secondary',
+                            )}
+                          />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span
+                            className={cn(
+                              'block text-sm font-semibold',
+                              selected ? 'text-[#0866FF]' : 'text-text-primary',
+                            )}
+                          >
+                            {o.label}
+                          </span>
+                        </span>
+                        <span
+                          className={cn(
+                            'flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-all',
+                            selected
+                              ? 'border-[#0866FF] bg-[#0866FF]'
+                              : 'border-border bg-transparent',
+                          )}
+                        >
+                          {selected && (
+                            <span className="h-2 w-2 rounded-full bg-white" />
+                          )}
+                        </span>
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
-              <WizardAsideHint>{lt('meta.objectiveHint', '')}</WizardAsideHint>
+
+              {/* Right — dynamic preview */}
+              <div className="hidden rounded-r-2xl border-l border-border bg-surface-2/40 p-6 md:flex md:flex-col md:justify-center dark:bg-surface-elevated/30">
+                {previewObj ? (
+                  <div className="space-y-4">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-[#0866FF]/10 ring-1 ring-[#0866FF]/20">
+                      <previewObj.icon className="h-10 w-10 text-[#0866FF]" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-semibold text-text-primary">{previewObj.label}</h3>
+                      <p className="mt-1 text-sm leading-relaxed text-text-secondary">{previewObj.desc}</p>
+                    </div>
+                    <div>
+                      <p className="mb-2 text-xs font-semibold text-text-tertiary">Bunga mos:</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {previewObj.goodFor.map((tag) => (
+                          <span
+                            key={tag}
+                            className="rounded-full border border-border bg-surface px-2.5 py-0.5 text-xs font-medium text-text-secondary"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-sm text-text-tertiary">
+                    Maqsad ustiga bosing yoki sichqonchani olib keling — batafsil ko'rishingiz mumkin.
+                  </p>
+                )}
+              </div>
             </div>
+
             <div className="flex flex-col-reverse gap-2 border-t border-border px-6 py-4 md:flex-row md:items-center md:justify-between md:px-8">
               <Button type="button" variant="ghost" size="md" onClick={exitToMode}>
-                {lt('common.exitWizard', 'Exit')}
+                {lt('common.exitWizard', 'Chiqish')}
               </Button>
               <Button
                 type="button"
@@ -649,7 +740,7 @@ export default function LaunchPage() {
                 onClick={() => setMetaStep(2)}
                 className="md:min-w-[160px]"
               >
-                {lt('common.continue', 'Continue')}
+                {lt('common.continue', 'Davom etish')}
                 <ChevronRight className="h-4 w-4" aria-hidden />
               </Button>
             </div>
@@ -851,7 +942,9 @@ export default function LaunchPage() {
                 <div className="flex justify-between gap-4">
                   <dt className="text-text-tertiary">{lt('meta.revObjective', '')}</dt>
                   <dd className="font-medium text-text-primary">
-                    {metaData.objective ? objectiveLabel(metaData.objective) : '—'}
+                    {metaData.objective
+                      ? META_OBJECTIVES.find((o) => o.id === metaData.objective)?.label ?? '—'
+                      : '—'}
                   </dd>
                 </div>
                 <div className="flex justify-between gap-4">
