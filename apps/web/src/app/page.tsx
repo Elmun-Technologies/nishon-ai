@@ -1,7 +1,26 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowRight, BarChart3, Brain, CheckCircle2, CreditCard, Layers3, Lock, Rocket, ShieldCheck, Sparkles, Users, Wallet } from 'lucide-react'
+import {
+  ArrowRight,
+  BarChart3,
+  Brain,
+  CheckCircle2,
+  CreditCard,
+  Gauge,
+  Layers3,
+  LineChart,
+  Lock,
+  Quote,
+  Rocket,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  Target,
+  Users,
+  Wallet,
+  Zap,
+} from 'lucide-react'
 import { PublicContainer, PublicFooter, PublicNavbar } from '@/components/public/PublicLayout'
 import { ContentMediaSlot } from '@/components/media/ContentMediaSlot'
 import { useI18n } from '@/i18n/use-i18n'
@@ -16,16 +35,31 @@ const CORE_MODULES = [
 ] as const
 
 const FLOW_KEYS = ['connect', 'launch', 'optimize', 'scale'] as const
-
 const PLAN_KEYS = ['free', 'starter', 'growth', 'pro', 'agency'] as const
+const PAIN_KEYS = ['roas', 'manual', 'team'] as const
+const USE_CASE_KEYS = ['brand', 'agency', 'specialist'] as const
+const TESTIMONIAL_KEYS = [0, 1, 2] as const
+const FAQ_INDICES = [0, 1, 2, 3, 4, 5] as const
+
+const PAIN_ICONS = { roas: LineChart, manual: Gauge, team: Users } as const
+const USE_CASE_ICONS = { brand: Target, agency: Layers3, specialist: Sparkles } as const
+
+const INTEGRATIONS = [
+  'Meta Ads',
+  'Google Ads',
+  'TikTok Ads',
+  'AmoCRM',
+  'Telegram',
+  'Payme',
+  'Google Sheets',
+  'Click',
+] as const
 
 const MONETIZATION_KEYS = [
   { key: 'subscription', icon: Wallet },
   { key: 'billing', icon: CreditCard },
   { key: 'marketplace', icon: Layers3 },
 ] as const
-
-const FAQ_INDICES = [0, 1, 2, 3] as const
 
 export default function HomePage() {
   const { t } = useI18n()
@@ -35,11 +69,16 @@ export default function HomePage() {
     v: t(`publicSite.home.stats.${i}.value`, ''),
     l: t(`publicSite.home.stats.${i}.label`, ''),
   }))
+  const roiStats = [0, 1, 2, 3].map((i) => ({
+    v: t(`publicSite.home.roi.${i}.value`, ''),
+    l: t(`publicSite.home.roi.${i}.label`, ''),
+  }))
 
   return (
     <main className="min-h-screen bg-surface text-text-primary">
       <PublicNavbar />
 
+      {/* ─── HERO ─────────────────────────────────────────────────────────── */}
       <section className="border-b border-border bg-[#f7faf2]">
         <PublicContainer className="grid gap-10 py-14 md:grid-cols-[1.1fr_1fr] md:py-20">
           <div>
@@ -51,7 +90,7 @@ export default function HomePage() {
               <br />
               {t('landing.hero.title2', '')}
               <br />
-              {t('landing.hero.title3', '')}
+              <span className="text-[#3f6212]">{t('landing.hero.title3', '')}</span>
             </h1>
             <p className="mt-4 max-w-xl text-lg text-text-secondary">{t('landing.hero.subtitle', '')}</p>
             <div className="mt-6 space-y-2 text-sm text-text-secondary">
@@ -77,6 +116,7 @@ export default function HomePage() {
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
+            <p className="mt-4 text-xs text-text-tertiary">{t('publicSite.home.hero.noCard', '')}</p>
           </div>
 
           <div className="space-y-3">
@@ -98,12 +138,66 @@ export default function HomePage() {
         </PublicContainer>
       </section>
 
+      {/* ─── TRUSTED BY / INTEGRATIONS STRIP ──────────────────────────────── */}
+      <section className="border-b border-border bg-white">
+        <PublicContainer className="py-8">
+          <p className="text-center text-xs font-medium uppercase tracking-wide text-text-tertiary">
+            {t('publicSite.home.trustedBy.title', '')}
+          </p>
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm font-medium text-text-secondary">
+            {INTEGRATIONS.map((name) => (
+              <span key={name} className="rounded-md border border-border bg-surface px-3 py-1.5">
+                {name}
+              </span>
+            ))}
+          </div>
+        </PublicContainer>
+      </section>
+
+      {/* ─── PROBLEM / PAIN POINTS ────────────────────────────────────────── */}
       <section className="bg-surface py-16">
         <PublicContainer>
-          <div className="mb-9">
+          <div className="mb-9 max-w-3xl">
+            <p className="text-sm font-medium text-[#65a30d]">{t('publicSite.home.painPoints.eyebrow', '')}</p>
+            <h2 className="mt-1 text-3xl font-semibold md:text-4xl">
+              {t('publicSite.home.painPoints.title', '')}
+            </h2>
+            <p className="mt-2 text-text-secondary">{t('publicSite.home.painPoints.subtitle', '')}</p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            {PAIN_KEYS.map((key) => {
+              const Icon = PAIN_ICONS[key]
+              return (
+                <article key={key} className="rounded-2xl border border-border bg-white p-6">
+                  <div className="mb-3 inline-flex rounded-xl border border-[#fecaca] bg-[#fef2f2] p-2 text-[#b91c1c]">
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  <h3 className="text-heading font-semibold">
+                    {t(`publicSite.home.painPoints.${key}.title`, '')}
+                  </h3>
+                  <p className="mt-2 text-body-sm text-text-secondary">
+                    {t(`publicSite.home.painPoints.${key}.problem`, '')}
+                  </p>
+                  <div className="mt-4 rounded-xl border border-[#bbf7d0] bg-[#f0fdf4] p-3 text-sm text-[#166534]">
+                    <p className="flex items-start gap-2">
+                      <Zap className="mt-0.5 h-4 w-4 shrink-0" />
+                      <span>{t(`publicSite.home.painPoints.${key}.solution`, '')}</span>
+                    </p>
+                  </div>
+                </article>
+              )
+            })}
+          </div>
+        </PublicContainer>
+      </section>
+
+      {/* ─── CORE CAPABILITIES ────────────────────────────────────────────── */}
+      <section className="border-y border-border bg-[#f8fbf2] py-16">
+        <PublicContainer>
+          <div className="mb-9 max-w-3xl">
             <p className="text-sm font-medium text-[#65a30d]">{t('publicSite.home.capabilitiesEyebrow', '')}</p>
             <h2 className="mt-1 text-3xl font-semibold md:text-4xl">{t('landing.capabilities.title', '')}</h2>
-            <p className="mt-2 max-w-3xl text-text-secondary">{t('landing.capabilities.subtitle', '')}</p>
+            <p className="mt-2 text-text-secondary">{t('landing.capabilities.subtitle', '')}</p>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -131,11 +225,13 @@ export default function HomePage() {
         </PublicContainer>
       </section>
 
-      <section className="border-y border-border bg-[#f8fbf2] py-16">
+      {/* ─── HOW IT WORKS ─────────────────────────────────────────────────── */}
+      <section className="bg-surface py-16">
         <PublicContainer>
-          <div className="mb-8">
+          <div className="mb-8 max-w-3xl">
             <p className="text-sm font-medium text-[#65a30d]">{t('publicSite.home.flow.eyebrow', '')}</p>
             <h2 className="mt-1 text-3xl font-semibold md:text-4xl">{t('publicSite.home.flow.title', '')}</h2>
+            <p className="mt-2 text-text-secondary">{t('publicSite.home.flow.subtitle', '')}</p>
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {FLOW_KEYS.map((flowKey) => (
@@ -151,7 +247,70 @@ export default function HomePage() {
         </PublicContainer>
       </section>
 
+      {/* ─── USE CASES / FOR WHO ──────────────────────────────────────────── */}
+      <section className="border-y border-border bg-[#f8fbf2] py-16">
+        <PublicContainer>
+          <div className="mb-8 max-w-3xl">
+            <p className="text-sm font-medium text-[#65a30d]">{t('publicSite.home.useCases.eyebrow', '')}</p>
+            <h2 className="mt-1 text-3xl font-semibold md:text-4xl">{t('publicSite.home.useCases.title', '')}</h2>
+            <p className="mt-2 text-text-secondary">{t('publicSite.home.useCases.subtitle', '')}</p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            {USE_CASE_KEYS.map((key) => {
+              const Icon = USE_CASE_ICONS[key]
+              const points = [0, 1, 2].map((i) => t(`publicSite.home.useCases.${key}.points.${i}`, ''))
+              return (
+                <article key={key} className="rounded-2xl border border-border bg-white p-6">
+                  <div className="mb-3 inline-flex rounded-xl border border-border bg-[#f4f9ea] p-2 text-[#65a30d]">
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  <h3 className="text-xl font-semibold">{t(`publicSite.home.useCases.${key}.title`, '')}</h3>
+                  <p className="mt-2 text-sm text-text-secondary">
+                    {t(`publicSite.home.useCases.${key}.desc`, '')}
+                  </p>
+                  <ul className="mt-4 space-y-2 text-sm text-text-secondary">
+                    {points.map((p) => (
+                      <li key={p} className="flex items-start gap-2">
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#65a30d]" />
+                        <span>{p}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    href={t(`publicSite.home.useCases.${key}.href`, '/features')}
+                    className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-[#65a30d]"
+                  >
+                    {t('publicSite.home.useCases.cta', '')}
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </article>
+              )
+            })}
+          </div>
+        </PublicContainer>
+      </section>
+
+      {/* ─── ROI / OUTCOMES ───────────────────────────────────────────────── */}
       <section className="bg-surface py-16">
+        <PublicContainer>
+          <div className="mb-8 max-w-3xl">
+            <p className="text-sm font-medium text-[#65a30d]">{t('publicSite.home.roi.eyebrow', '')}</p>
+            <h2 className="mt-1 text-3xl font-semibold md:text-4xl">{t('publicSite.home.roi.title', '')}</h2>
+            <p className="mt-2 text-text-secondary">{t('publicSite.home.roi.subtitle', '')}</p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {roiStats.map((item) => (
+              <article key={item.l} className="rounded-2xl border border-border bg-[#1f2b0f] p-6 text-white">
+                <p className="text-4xl font-semibold text-[#d9f99d]">{item.v}</p>
+                <p className="mt-2 text-sm text-slate-300">{item.l}</p>
+              </article>
+            ))}
+          </div>
+        </PublicContainer>
+      </section>
+
+      {/* ─── PRICING ──────────────────────────────────────────────────────── */}
+      <section className="border-y border-border bg-[#f8fbf2] py-16">
         <PublicContainer>
           <div className="mb-8 text-center">
             <p className="text-sm font-medium text-[#65a30d]">{t('publicSite.home.pricing.eyebrow', '')}</p>
@@ -166,10 +325,15 @@ export default function HomePage() {
               return (
                 <article
                   key={planKey}
-                  className={`rounded-2xl border p-5 ${
+                  className={`relative rounded-2xl border p-5 ${
                     featured ? 'border-[#84cc16] bg-[#1f2b0f] text-white' : 'border-border bg-white'
                   }`}
                 >
+                  {featured && (
+                    <span className="absolute -top-3 left-5 rounded-full bg-[#84cc16] px-3 py-1 text-xs font-semibold text-[#1a2e05]">
+                      {t('publicSite.home.pricing.popular', '')}
+                    </span>
+                  )}
                   <h3 className="text-lg font-semibold">{t(`publicSite.home.plans.${planKey}.name`, '')}</h3>
                   <p className={`mt-2 text-xl font-semibold ${featured ? 'text-[#d9f99d]' : 'text-text-primary'}`}>
                     {t(`publicSite.home.plans.${planKey}.price`, '')}
@@ -180,22 +344,34 @@ export default function HomePage() {
                   <ul className={`mt-4 space-y-2 text-xs ${featured ? 'text-slate-200' : 'text-text-secondary'}`}>
                     {points.map((item) => (
                       <li key={item} className="flex items-start gap-2">
-                        <CheckCircle2 className={`mt-0.5 h-3.5 w-3.5 shrink-0 ${featured ? 'text-[#d9f99d]' : 'text-[#65a30d]'}`} />
+                        <CheckCircle2
+                          className={`mt-0.5 h-3.5 w-3.5 shrink-0 ${featured ? 'text-[#d9f99d]' : 'text-[#65a30d]'}`}
+                        />
                         <span>{item}</span>
                       </li>
                     ))}
                   </ul>
+                  <Link
+                    href="/onboarding"
+                    className={`mt-5 block rounded-lg px-3 py-2 text-center text-xs font-semibold ${
+                      featured
+                        ? 'bg-[#84cc16] text-[#1a2e05]'
+                        : 'border border-border bg-surface text-text-primary hover:bg-surface-2'
+                    }`}
+                  >
+                    {t('publicSite.home.pricing.cta', '')}
+                  </Link>
                 </article>
               )
             })}
           </div>
 
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
             {MONETIZATION_KEYS.map((item) => {
               const Icon = item.icon
               return (
-                <article key={item.key} className="rounded-2xl border border-border bg-[#f8fbf2] p-5">
-                  <div className="mb-3 inline-flex rounded-xl border border-border bg-white p-2 text-[#65a30d]">
+                <article key={item.key} className="rounded-2xl border border-border bg-white p-5">
+                  <div className="mb-3 inline-flex rounded-xl border border-border bg-[#f4f9ea] p-2 text-[#65a30d]">
                     <Icon className="h-4 w-4" />
                   </div>
                   <h3 className="font-semibold">{t(`publicSite.home.monetization.${item.key}.title`, '')}</h3>
@@ -207,11 +383,12 @@ export default function HomePage() {
         </PublicContainer>
       </section>
 
-      <section className="border-y border-border bg-[#f8fbf2] py-16">
+      {/* ─── SECURITY & SNAPSHOT ──────────────────────────────────────────── */}
+      <section className="bg-surface py-16">
         <PublicContainer>
           <div className="grid gap-6 md:grid-cols-2">
             <article className="rounded-2xl border border-border bg-white p-8">
-              <h3 className="text-3xl font-semibold">{t('publicSite.home.security.title', '')}</h3>
+              <h3 className="text-2xl font-semibold md:text-3xl">{t('publicSite.home.security.title', '')}</h3>
               <p className="mt-3 text-text-secondary">{t('publicSite.home.security.intro', '')}</p>
               <ul className="mt-5 space-y-2 text-sm text-text-secondary">
                 {[0, 1, 2, 3].map((i) => (
@@ -224,7 +401,7 @@ export default function HomePage() {
             </article>
 
             <article className="rounded-2xl border border-border bg-white p-8">
-              <h3 className="text-3xl font-semibold">{t('publicSite.home.revenue.title', '')}</h3>
+              <h3 className="text-2xl font-semibold md:text-3xl">{t('publicSite.home.revenue.title', '')}</h3>
               <p className="mt-3 text-text-secondary">{t('publicSite.home.revenue.intro', '')}</p>
               <div className="mt-5 grid grid-cols-2 gap-3">
                 {[0, 1, 2, 3].map((i) => (
@@ -236,24 +413,50 @@ export default function HomePage() {
               </div>
             </article>
           </div>
-          <div className="mt-6">
-            <ContentMediaSlot
-              slotId="public-home-security-media"
-              ratio="21:9"
-              imageSrc="/stock/security-demo.svg"
-              caption={t('preAuthOnboarding.mediaSlotCaption', 'Illustration / motion')}
-            />
+        </PublicContainer>
+      </section>
+
+      {/* ─── TESTIMONIALS ─────────────────────────────────────────────────── */}
+      <section className="border-y border-border bg-[#f8fbf2] py-16">
+        <PublicContainer>
+          <div className="mb-8 max-w-3xl">
+            <p className="text-sm font-medium text-[#65a30d]">{t('publicSite.home.testimonials.eyebrow', '')}</p>
+            <h2 className="mt-1 text-3xl font-semibold md:text-4xl">
+              {t('publicSite.home.testimonials.title', '')}
+            </h2>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            {TESTIMONIAL_KEYS.map((i) => (
+              <article key={i} className="rounded-2xl border border-border bg-white p-6">
+                <Quote className="h-5 w-5 text-[#84cc16]" />
+                <p className="mt-3 text-sm text-text-secondary">
+                  {t(`publicSite.home.testimonials.${i}.quote`, '')}
+                </p>
+                <div className="mt-5 flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-semibold">{t(`publicSite.home.testimonials.${i}.name`, '')}</p>
+                    <p className="text-xs text-text-tertiary">{t(`publicSite.home.testimonials.${i}.role`, '')}</p>
+                  </div>
+                  <div className="flex gap-0.5 text-[#84cc16]">
+                    {Array.from({ length: 5 }).map((_, idx) => (
+                      <Star key={idx} className="h-3.5 w-3.5 fill-current" />
+                    ))}
+                  </div>
+                </div>
+              </article>
+            ))}
           </div>
         </PublicContainer>
       </section>
 
+      {/* ─── FAQ ──────────────────────────────────────────────────────────── */}
       <section className="bg-surface py-16">
         <PublicContainer>
           <div className="mb-8 text-center">
-            <h2 className="text-4xl font-semibold">{t('publicSite.home.faq.title', '')}</h2>
+            <h2 className="text-3xl font-semibold md:text-4xl">{t('publicSite.home.faq.title', '')}</h2>
             <p className="mt-2 text-text-secondary">{t('publicSite.home.faq.subtitle', '')}</p>
           </div>
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="mx-auto grid max-w-5xl gap-4 md:grid-cols-2">
             {FAQ_INDICES.map((i) => (
               <article key={i} className="rounded-2xl border border-border bg-white p-6">
                 <h3 className="text-lg font-semibold">{t(`publicSite.home.faq.q${i}`, '')}</h3>
@@ -264,12 +467,13 @@ export default function HomePage() {
         </PublicContainer>
       </section>
 
+      {/* ─── FINAL CTA ────────────────────────────────────────────────────── */}
       <section className="bg-surface py-16">
         <PublicContainer>
           <div className="grid items-center gap-8 md:grid-cols-[1fr_1fr]">
             <div>
               <p className="text-sm font-medium text-[#65a30d]">{t('publicSite.home.finalCta.eyebrow', '')}</p>
-              <h2 className="mt-1 text-5xl font-semibold">{t('publicSite.home.finalCta.title', '')}</h2>
+              <h2 className="mt-1 text-4xl font-semibold md:text-5xl">{t('publicSite.home.finalCta.title', '')}</h2>
               <p className="mt-3 text-lg text-text-secondary">{t('publicSite.home.finalCta.subtitle', '')}</p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <Link href="/onboarding" className="rounded-xl bg-[#84cc16] px-5 py-3 text-sm font-semibold text-[#1a2e05]">
@@ -279,6 +483,7 @@ export default function HomePage() {
                   {t('publicSite.home.finalCta.solutions', '')}
                 </Link>
               </div>
+              <p className="mt-3 text-xs text-text-tertiary">{t('publicSite.home.finalCta.note', '')}</p>
             </div>
             <div className="rounded-2xl border border-border bg-[#f8fbf2] p-6">
               <div className="mb-4 flex items-center justify-between">
@@ -297,14 +502,6 @@ export default function HomePage() {
                 ))}
               </div>
             </div>
-          </div>
-          <div className="mt-6">
-            <ContentMediaSlot
-              slotId="public-home-final-cta-media"
-              ratio="16:9"
-              imageSrc="/stock/home-hero-demo.svg"
-              caption={t('preAuthOnboarding.mediaSlotCaption', 'Illustration / motion')}
-            />
           </div>
         </PublicContainer>
       </section>
