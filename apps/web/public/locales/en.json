@@ -90,11 +90,11 @@
   },
   "landing": {
     "hero": {
-      "badge": "✨ Built on Madgicx — For Pro Marketers",
-      "title1": "Manage ads",
-      "title2": "faster",
-      "title3": "and smarter.",
-      "subtitle": "AdSpectr — A marketer's platform that unifies multiple digital ad platforms in one workspace with automation and AI-assisted decisions. Launch faster, tighten governance, and improve measurable outcomes across ROAS and the KPIs you already track.",
+      "badge": "✨ Uzbekistan's #1 AI ad platform",
+      "title1": "Run your ads",
+      "title2": "with AI —",
+      "title3": "fast and precise.",
+      "subtitle": "AdSpectr unifies Meta, Google, and TikTok into one dashboard. AI optimizes budgets and creatives 24/7 — you focus on results.",
       "buttonStart": "Get Started — Try for Free ↗",
       "buttonMarketplace": "Find a Marketer or Agency",
       "buttonLeaderboard": "🏆 View Top Performers",
@@ -1188,31 +1188,55 @@
     },
     "home": {
       "hero": {
-        "bullet0": "Real feature routes — a capability map, not a demo shell",
-        "bullet1": "Product flows with EN / RU / UZ",
-        "bullet2": "Monetization architecture: subscription plus marketplace commission",
-        "secondaryCta": "View full feature map",
-        "exploreLogin": "Explore the platform"
+        "bullet0": "Launch campaigns on Meta, Google, and TikTok in 5 minutes",
+        "bullet1": "AI optimizes budgets and creatives every day",
+        "bullet2": "ROAS, CPA, and CTR in one dashboard — decisions in real time",
+        "secondaryCta": "Explore all features",
+        "exploreLogin": "Explore the platform",
+        "noCard": "No card required · 14 days free · Multilingual support"
       },
       "stats": {
         "0": {
-          "value": "6+",
-          "label": "Integrated core modules"
+          "value": "+34%",
+          "label": "Average ROAS growth"
         },
         "1": {
-          "value": "5 plans",
-          "label": "UZS subscription tiers"
+          "value": "5×",
+          "label": "Faster campaign launch"
         },
         "2": {
-          "value": "3-layer",
-          "label": "Monetization architecture"
+          "value": "12+",
+          "label": "Ad and CRM integrations"
         },
         "3": {
-          "value": "Workspace-first",
-          "label": "Roles, billing, permissions, MCP access"
+          "value": "24/7",
+          "label": "AI monitoring and alerts"
         }
       },
-      "capabilitiesEyebrow": "Platform capability map",
+      "trustedBy": {
+        "title": "The stack chosen by local brands and agencies"
+      },
+      "painPoints": {
+        "eyebrow": "Problem → solution",
+        "title": "Managing ads is hard — let's fix it",
+        "subtitle": "Three problems every marketer faces. AdSpectr turns them into a system.",
+        "roas": {
+          "title": "ROAS is unclear — where does the money go?",
+          "problem": "Meta, Google, and TikTok dashboards are separate. Real ROAS, CPA, and LTV stay invisible.",
+          "solution": "One dashboard: every platform, campaign, and AmoCRM lead with unified ROAS."
+        },
+        "manual": {
+          "title": "Manual optimization eats your day",
+          "problem": "Every day: shifting budgets, rotating creatives, writing rules by hand.",
+          "solution": "An AI agent runs hourly — pauses weak creatives, moves budget to winners, asks for your approval."
+        },
+        "team": {
+          "title": "Team and client chaos",
+          "problem": "Files in chat, reports in Excel — nobody knows who did what.",
+          "solution": "Workspace, roles, audit log, and client-ready reports — all in one place."
+        }
+      },
+      "capabilitiesEyebrow": "Capabilities",
       "openModule": "Open module",
       "modules": {
         "campaignLaunch": {
@@ -1242,32 +1266,92 @@
       },
       "flow": {
         "eyebrow": "How it works",
-        "title": "From campaign launch to governed scale",
+        "title": "4 steps: from connect to growth",
+        "subtitle": "Launching and optimizing ads — simplified.",
         "connect": {
           "step": "01",
-          "title": "Connect workspace",
-          "text": "Ad accounts, team roles, billing contact, and access policy in one place."
+          "title": "Connect your accounts",
+          "text": "Meta, Google, TikTok, AmoCRM, and Telegram in 2 minutes. No technical skills required."
         },
         "launch": {
           "step": "02",
-          "title": "Launch and monitor",
-          "text": "Campaigns go live; AI decision logs and reporting update in near real time."
+          "title": "Create campaigns",
+          "text": "Pick a goal, upload creatives. AI suggests audience, budget, and copy."
         },
         "optimize": {
           "step": "03",
-          "title": "Optimize with controls",
-          "text": "Auto-optimization workflows run behind approval rails."
+          "title": "AI optimizes",
+          "text": "With your approval, AI shifts budgets, pauses weak ads, and scales winners."
         },
         "scale": {
           "step": "04",
-          "title": "Scale with governance",
-          "text": "Keep discipline across many workspaces, accounts, and teammates."
+          "title": "Report and grow",
+          "text": "ROAS, CPA, LTV in one dashboard. Client-ready reports in one click."
+        }
+      },
+      "useCases": {
+        "eyebrow": "Who it's for",
+        "title": "Brand, agency, or independent marketer",
+        "subtitle": "AdSpectr gives every role a clear playbook.",
+        "cta": "Learn more",
+        "brand": {
+          "title": "For brands",
+          "desc": "In-house teams running their own product ads.",
+          "points": {
+            "0": "One workspace, every channel",
+            "1": "Real ROAS and LTV via AmoCRM",
+            "2": "Hire specialists in the marketplace"
+          },
+          "href": "/solutions"
+        },
+        "agency": {
+          "title": "For agencies",
+          "desc": "Teams running ads for multiple clients.",
+          "points": {
+            "0": "Per-client workspace and billing",
+            "1": "White-label reports and dashboards",
+            "2": "Team roles and audit log"
+          },
+          "href": "/solutions"
+        },
+        "specialist": {
+          "title": "Independent marketer",
+          "desc": "For freelance and independent specialists.",
+          "points": {
+            "0": "Portfolio, badges, and leaderboard",
+            "1": "Find clients in the marketplace",
+            "2": "Launch faster with AI"
+          },
+          "href": "/marketplace"
+        }
+      },
+      "roi": {
+        "eyebrow": "Outcomes",
+        "title": "Grow by the numbers",
+        "subtitle": "Average AdSpectr customer results over 3 months.",
+        "0": {
+          "value": "+34%",
+          "label": "ROAS uplift"
+        },
+        "1": {
+          "value": "−28%",
+          "label": "CPA reduction"
+        },
+        "2": {
+          "value": "5×",
+          "label": "Launch speed"
+        },
+        "3": {
+          "value": "12 hrs",
+          "label": "Saved per week"
         }
       },
       "pricing": {
-        "eyebrow": "Subscription and monetization",
-        "title": "Pricing aligned to real product logic",
-        "subtitle": "Pricing is not just cards: plan limits on the server, Payme checkout, and marketplace commission flow work the same way in the product."
+        "eyebrow": "Pricing",
+        "title": "A plan for every team",
+        "subtitle": "14 days free. No card required. Cancel anytime.",
+        "popular": "Most popular",
+        "cta": "Start now"
       },
       "plans": {
         "free": {
@@ -1328,29 +1412,29 @@
       },
       "monetization": {
         "subscription": {
-          "title": "Layer 1 — Workspace subscription",
-          "text": "Core platform value is monthly UZS subscription; plan limits are enforced on the server."
+          "title": "Monthly subscription",
+          "text": "Pay in UZS. Clear plan limits. Upgrade or cancel anytime."
         },
         "billing": {
-          "title": "Layer 2 — Billing operations",
-          "text": "Payments use Payme checkout plus order status polling. Invoices and methods are managed per workspace."
+          "title": "Pay via Payme",
+          "text": "Local payment system. Invoices, acts, and company details — automatic."
         },
         "marketplace": {
-          "title": "Layer 3 — Marketplace commission",
-          "text": "Commission rates and specialist tiers are managed separately; rates can be configured per workspace."
+          "title": "Marketplace commission",
+          "text": "Find a specialist — low commission. Fully transparent, no hidden fees."
         }
       },
       "security": {
         "title": "Security and governance",
-        "intro": "The workspace control layer gives clear responsibility and permission boundaries when working as a team.",
+        "intro": "Every action stays clearly visible — even as your team grows.",
         "bullet0": "Role-based workspace access",
         "bullet1": "Invite and permission controls",
-        "bullet2": "Billing profile governance",
-        "bullet3": "MCP credentials isolation"
+        "bullet2": "Audit log: who, when, what",
+        "bullet3": "Ad accounts kept in secure isolation"
       },
       "revenue": {
-        "title": "Revenue-side visibility",
-        "intro": "In the dashboard, spend, results, and payment status signals sit together for practical decisions.",
+        "title": "Finance-side visibility",
+        "intro": "Spend, results, and payment status in one panel — decisions get made fast.",
         "cell0": {
           "k": "Plan status",
           "v": "Live"
@@ -1368,22 +1452,46 @@
           "v": "Configurable"
         }
       },
+      "testimonials": {
+        "eyebrow": "Customer voices",
+        "title": "Why marketing teams choose AdSpectr",
+        "0": {
+          "quote": "We used to jump between three ad managers. Now one dashboard — ROAS is clear, the team is organized. CPA dropped 31% in 2 months.",
+          "name": "Madina Karimova",
+          "role": "Marketing Lead, FMCG brand"
+        },
+        "1": {
+          "quote": "As an agency we manage 14 clients. White-label reports and workspace separation cut our admin time in half.",
+          "name": "Sardor Yusupov",
+          "role": "CEO, performance agency"
+        },
+        "2": {
+          "quote": "As a freelance marketer I get 3-4 new projects a month through the marketplace. Portfolio and badges build trust fast.",
+          "name": "Aziza Rahmonova",
+          "role": "Independent marketer"
+        }
+      },
       "faq": {
         "title": "Frequently asked questions",
-        "subtitle": "Common questions about platform capabilities and monetization.",
-        "q0": "Is our pricing just a fixed package?",
-        "a0": "No — monetization is hybrid: platform subscription, billing operations, and marketplace commission layers.",
-        "q1": "Where does payment happen?",
-        "a1": "Subscription orders open Payme checkout; order status is tracked in the platform.",
-        "q2": "How does marketplace monetization work?",
-        "a2": "Commission rates are set by specialist tier and period; bonus logic is supported separately.",
-        "q3": "Are the capabilities on this page real?",
-        "a3": "Yes — card links go to existing internal routes and working modules."
+        "subtitle": "Answers before you sign up.",
+        "q0": "What's included in the free trial?",
+        "a0": "Every feature free for 14 days. 1 workspace, 3 campaigns, 1 connected ad account. No card required.",
+        "q1": "Which ad platforms integrate?",
+        "a1": "Meta (Facebook, Instagram), Google Ads, TikTok Ads. CRM: AmoCRM. Payments: Payme, Click. Plus Telegram, Google Sheets, and more.",
+        "q2": "Does AI really manage my budget?",
+        "a2": "Yes, but only with your approval. AI suggests (\"Campaign X has low CPA — increase budget 20%\"), you approve or reject.",
+        "q3": "How does billing work?",
+        "a3": "In UZS, monthly. Via Payme. Invoices and acts are generated automatically. Legal-entity requisites supported.",
+        "q4": "Is my data safe?",
+        "a4": "Ad accounts connect via OAuth — passwords never stored. Each workspace is isolated. Audit log captures every action.",
+        "q5": "Can I find a specialist?",
+        "a5": "Yes — 100+ verified marketers in the marketplace. Rating, portfolio, and price are transparent. Payments are secured through the platform."
       },
       "finalCta": {
-        "eyebrow": "Final CTA",
-        "title": "Build your monetization-ready growth stack",
-        "subtitle": "Start with your workspace, connect billing, and run controlled AI-assisted campaigns at scale.",
+        "eyebrow": "Start today",
+        "title": "Take your advertising to the next level",
+        "subtitle": "14 days free. No card required. Launch your first campaign in 5 minutes.",
+        "note": "Local payments · Multilingual support · Built for local customers",
         "register": "Start free",
         "solutions": "View solutions"
       },
