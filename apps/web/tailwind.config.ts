@@ -17,7 +17,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Basis Grotesque Pro', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Helvetica Neue', 'sans-serif'],
+        sans: ['var(--font-sans)', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Helvetica Neue', 'sans-serif'],
       },
       colors: {
         // CSS variable based — auto-switch light/dark
