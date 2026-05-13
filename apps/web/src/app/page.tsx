@@ -22,8 +22,15 @@ import {
   Zap,
 } from 'lucide-react'
 import { PublicContainer, PublicFooter, PublicNavbar } from '@/components/public/PublicLayout'
-import { ContentMediaSlot } from '@/components/media/ContentMediaSlot'
 import { useI18n } from '@/i18n/use-i18n'
+import {
+  AnimatedArrow,
+  DecorativeBlob,
+  HeroDashboardMock,
+  IntegrationChip,
+  LiveDot,
+  ROIChart,
+} from './_components/LandingVisuals'
 
 const CORE_MODULES = [
   { key: 'campaignLaunch', href: '/launch', icon: Rocket },
@@ -79,9 +86,12 @@ export default function HomePage() {
       <PublicNavbar />
 
       {/* ─── HERO ─────────────────────────────────────────────────────────── */}
-      <section className="border-b border-border bg-[#f7faf2]">
-        <PublicContainer className="grid gap-10 py-14 md:grid-cols-[1.1fr_1fr] md:py-20">
-          <div>
+      <section className="relative overflow-hidden border-b border-border bg-[#f7faf2]">
+        <DecorativeBlob className="-left-32 top-10" color="#84cc16" size={420} />
+        <DecorativeBlob className="-right-24 top-40" color="#34d399" size={360} />
+
+        <PublicContainer className="relative grid gap-10 py-14 md:grid-cols-[1.1fr_1fr] md:py-20">
+          <div className="lp-fade-up">
             <p className="inline-flex rounded-full border border-[#b5d98f] bg-[#ebf8d9] px-3 py-1 text-xs font-medium text-[#3f6212]">
               {t('landing.hero.badge', '')}
             </p>
@@ -119,16 +129,15 @@ export default function HomePage() {
             <p className="mt-4 text-xs text-text-tertiary">{t('publicSite.home.hero.noCard', '')}</p>
           </div>
 
-          <div className="space-y-3">
-            <ContentMediaSlot
-              slotId="public-home-hero-media"
-              ratio="16:9"
-              imageSrc="/stock/home-hero-demo.svg"
-              caption={t('preAuthOnboarding.mediaSlotCaption', 'Illustration / motion')}
-            />
+          <div className="lp-fade-up space-y-3" style={{ animationDelay: '150ms' }}>
+            <HeroDashboardMock />
             <div className="grid gap-3 sm:grid-cols-2">
-              {stats.map((item) => (
-                <article key={item.l} className="rounded-2xl border border-border bg-white p-5">
+              {stats.map((item, idx) => (
+                <article
+                  key={item.l}
+                  className="lp-fade-up lp-card-hover rounded-2xl border border-border bg-white p-5"
+                  style={{ animationDelay: `${300 + idx * 80}ms` }}
+                >
                   <p className="text-2xl font-semibold">{item.v}</p>
                   <p className="mt-1 text-sm text-text-secondary">{item.l}</p>
                 </article>
@@ -140,15 +149,13 @@ export default function HomePage() {
 
       {/* ─── TRUSTED BY / INTEGRATIONS STRIP ──────────────────────────────── */}
       <section className="border-b border-border bg-white">
-        <PublicContainer className="py-8">
+        <PublicContainer className="py-10">
           <p className="text-center text-xs font-medium uppercase tracking-wide text-text-tertiary">
             {t('publicSite.home.trustedBy.title', '')}
           </p>
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm font-medium text-text-secondary">
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             {INTEGRATIONS.map((name) => (
-              <span key={name} className="rounded-md border border-border bg-surface px-3 py-1.5">
-                {name}
-              </span>
+              <IntegrationChip key={name} name={name} />
             ))}
           </div>
         </PublicContainer>
@@ -165,10 +172,14 @@ export default function HomePage() {
             <p className="mt-2 text-text-secondary">{t('publicSite.home.painPoints.subtitle', '')}</p>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
-            {PAIN_KEYS.map((key) => {
+            {PAIN_KEYS.map((key, idx) => {
               const Icon = PAIN_ICONS[key]
               return (
-                <article key={key} className="rounded-2xl border border-border bg-white p-6">
+                <article
+                  key={key}
+                  className="lp-card-hover lp-fade-up rounded-2xl border border-border bg-white p-6"
+                  style={{ animationDelay: `${idx * 100}ms` }}
+                >
                   <div className="mb-3 inline-flex rounded-xl border border-[#fecaca] bg-[#fef2f2] p-2 text-[#b91c1c]">
                     <Icon className="h-4 w-4" />
                   </div>
@@ -207,7 +218,7 @@ export default function HomePage() {
                 <Link
                   key={item.key}
                   href={item.href}
-                  className="group rounded-2xl border border-border bg-white p-6 transition hover:border-[#84cc16]/60"
+                  className="group lp-card-hover rounded-2xl border border-border bg-white p-6 hover:border-[#84cc16]/60"
                 >
                   <div className="mb-3 inline-flex rounded-xl border border-border bg-[#f4f9ea] p-2 text-[#65a30d]">
                     <Icon className="h-4 w-4" />
@@ -233,14 +244,20 @@ export default function HomePage() {
             <h2 className="mt-1 text-3xl font-semibold md:text-4xl">{t('publicSite.home.flow.title', '')}</h2>
             <p className="mt-2 text-text-secondary">{t('publicSite.home.flow.subtitle', '')}</p>
           </div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {FLOW_KEYS.map((flowKey) => (
-              <article key={flowKey} className="rounded-2xl border border-border bg-white p-5">
-                <p className="text-xs font-semibold tracking-wide text-[#65a30d]">
-                  {t(`publicSite.home.flow.${flowKey}.step`, '')}
-                </p>
-                <h3 className="mt-2 text-lg font-semibold">{t(`publicSite.home.flow.${flowKey}.title`, '')}</h3>
+          <div className="relative grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {FLOW_KEYS.map((flowKey, idx) => (
+              <article
+                key={flowKey}
+                className="lp-card-hover relative rounded-2xl border border-border bg-white p-5"
+              >
+                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#84cc16] text-sm font-bold text-[#1a2e05]">
+                  {idx + 1}
+                </div>
+                <h3 className="text-lg font-semibold">{t(`publicSite.home.flow.${flowKey}.title`, '')}</h3>
                 <p className="mt-2 text-sm text-text-secondary">{t(`publicSite.home.flow.${flowKey}.text`, '')}</p>
+                {idx < FLOW_KEYS.length - 1 && (
+                  <AnimatedArrow className="absolute -right-3 top-1/2 hidden h-5 w-5 -translate-y-1/2 text-[#84cc16] lg:block" />
+                )}
               </article>
             ))}
           </div>
@@ -260,7 +277,7 @@ export default function HomePage() {
               const Icon = USE_CASE_ICONS[key]
               const points = [0, 1, 2].map((i) => t(`publicSite.home.useCases.${key}.points.${i}`, ''))
               return (
-                <article key={key} className="rounded-2xl border border-border bg-white p-6">
+                <article key={key} className="lp-card-hover rounded-2xl border border-border bg-white p-6">
                   <div className="mb-3 inline-flex rounded-xl border border-border bg-[#f4f9ea] p-2 text-[#65a30d]">
                     <Icon className="h-4 w-4" />
                   </div>
@@ -298,13 +315,20 @@ export default function HomePage() {
             <h2 className="mt-1 text-3xl font-semibold md:text-4xl">{t('publicSite.home.roi.title', '')}</h2>
             <p className="mt-2 text-text-secondary">{t('publicSite.home.roi.subtitle', '')}</p>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {roiStats.map((item) => (
-              <article key={item.l} className="rounded-2xl border border-border bg-[#1f2b0f] p-6 text-white">
-                <p className="text-4xl font-semibold text-[#d9f99d]">{item.v}</p>
-                <p className="mt-2 text-sm text-slate-300">{item.l}</p>
-              </article>
-            ))}
+          <div className="grid gap-4 lg:grid-cols-[1fr_1fr]">
+            <ROIChart />
+            <div className="grid gap-3 sm:grid-cols-2">
+              {roiStats.map((item, idx) => (
+                <article
+                  key={item.l}
+                  className="lp-card-hover rounded-2xl border border-border bg-[#1f2b0f] p-6 text-white"
+                  style={{ animationDelay: `${idx * 100}ms` }}
+                >
+                  <p className="text-4xl font-semibold text-[#d9f99d]">{item.v}</p>
+                  <p className="mt-2 text-sm text-slate-300">{item.l}</p>
+                </article>
+              ))}
+            </div>
           </div>
         </PublicContainer>
       </section>
@@ -325,8 +349,8 @@ export default function HomePage() {
               return (
                 <article
                   key={planKey}
-                  className={`relative rounded-2xl border p-5 ${
-                    featured ? 'border-[#84cc16] bg-[#1f2b0f] text-white' : 'border-border bg-white'
+                  className={`lp-card-hover relative rounded-2xl border p-5 ${
+                    featured ? 'border-[#84cc16] bg-[#1f2b0f] text-white shadow-lg shadow-[#84cc16]/20' : 'border-border bg-white'
                   }`}
                 >
                   {featured && (
@@ -417,8 +441,9 @@ export default function HomePage() {
       </section>
 
       {/* ─── TESTIMONIALS ─────────────────────────────────────────────────── */}
-      <section className="border-y border-border bg-[#f8fbf2] py-16">
-        <PublicContainer>
+      <section className="relative overflow-hidden border-y border-border bg-[#f8fbf2] py-16">
+        <DecorativeBlob className="left-1/4 top-10" color="#84cc16" size={300} />
+        <PublicContainer className="relative">
           <div className="mb-8 max-w-3xl">
             <p className="text-sm font-medium text-[#65a30d]">{t('publicSite.home.testimonials.eyebrow', '')}</p>
             <h2 className="mt-1 text-3xl font-semibold md:text-4xl">
@@ -427,7 +452,7 @@ export default function HomePage() {
           </div>
           <div className="grid gap-4 md:grid-cols-3">
             {TESTIMONIAL_KEYS.map((i) => (
-              <article key={i} className="rounded-2xl border border-border bg-white p-6">
+              <article key={i} className="lp-card-hover rounded-2xl border border-border bg-white p-6">
                 <Quote className="h-5 w-5 text-[#84cc16]" />
                 <p className="mt-3 text-sm text-text-secondary">
                   {t(`publicSite.home.testimonials.${i}.quote`, '')}
@@ -488,7 +513,10 @@ export default function HomePage() {
             <div className="rounded-2xl border border-border bg-[#f8fbf2] p-6">
               <div className="mb-4 flex items-center justify-between">
                 <p className="font-semibold">{t('publicSite.home.snapshot.title', '')}</p>
-                <Lock className="h-4 w-4 text-[#65a30d]" />
+                <span className="inline-flex items-center gap-1.5 text-xs text-[#65a30d]">
+                  <LiveDot />
+                  <Lock className="h-4 w-4" />
+                </span>
               </div>
               <div className="space-y-3">
                 {[0, 1, 2, 3].map((i) => (
