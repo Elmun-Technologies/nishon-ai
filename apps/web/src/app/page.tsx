@@ -81,11 +81,11 @@ export default function HomePage() {
       />
       <a
         href="#hero-heading"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-white focus:px-3 focus:py-2 focus:text-sm focus:font-medium focus:shadow"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-[#1b2e06] focus:shadow-[0_8px_24px_-8px_rgba(27,46,6,0.32)] focus:ring-1 focus:ring-[#1b2e06]/20"
       >
         Skip to content
       </a>
-      <main className="min-h-screen bg-surface text-text-primary">
+      <main className="min-h-screen bg-white text-text-primary">
         <PublicNavbar />
         <HeroSection />
         <TrustedBySection />

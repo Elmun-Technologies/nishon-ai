@@ -1,11 +1,19 @@
 'use client'
 
 import { useMemo } from 'react'
-import Link from 'next/link'
-import { ArrowRight, CheckCircle2 } from 'lucide-react'
+import { ArrowRight, CheckCircle2, Sparkles } from 'lucide-react'
 import { PublicContainer } from '@/components/public/PublicLayout'
-import { ContentMediaSlot } from '@/components/media/ContentMediaSlot'
 import { useI18n } from '@/i18n/use-i18n'
+import { LandingButton } from '../ui/LandingButton'
+import { AnimatedCounter } from '../ui/AnimatedCounter'
+import { HeroLiveDemo } from '../ui/HeroLiveDemo'
+
+const STATS: Array<{ value: number; suffix: string; decimals?: number; prefix?: string }> = [
+  { value: 34, suffix: '%', prefix: '+' },
+  { value: 5, suffix: '×' },
+  { value: 12, suffix: '+' },
+  { value: 24, suffix: '/7' },
+]
 
 export function HeroSection() {
   const { t } = useI18n()
@@ -16,71 +24,90 @@ export function HeroSection() {
   )
   const stats = useMemo(
     () =>
-      [0, 1, 2, 3].map((i) => ({
-        v: t(`publicSite.home.stats.${i}.value`, ''),
-        l: t(`publicSite.home.stats.${i}.label`, ''),
+      STATS.map((s, i) => ({
+        ...s,
+        label: t(`publicSite.home.stats.${i}.label`, ''),
       })),
     [t],
   )
 
   return (
-    <section aria-labelledby="hero-heading" className="border-b border-border bg-[#f7faf2]">
-      <PublicContainer className="grid gap-10 py-14 md:grid-cols-[1.1fr_1fr] md:py-20">
+    <section
+      aria-labelledby="hero-heading"
+      className="relative isolate overflow-hidden border-b border-[#e6efd9] bg-[#fafdf5]"
+    >
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(80%_60%_at_50%_0%,#ecfccb_0%,transparent_60%)]"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-px bg-gradient-to-r from-transparent via-[#84cc16]/50 to-transparent"
+      />
+
+      <PublicContainer className="grid gap-12 py-16 md:grid-cols-[1.1fr_1fr] md:items-center md:py-24">
         <div>
-          <p className="inline-flex rounded-full border border-[#b5d98f] bg-[#ebf8d9] px-3 py-1 text-xs font-medium text-[#3f6212]">
+          <p className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-medium text-[#3f6212] ring-1 ring-inset ring-[#cfe8c0] shadow-[0_1px_2px_rgba(27,46,6,0.06)]">
+            <Sparkles className="h-3 w-3" aria-hidden="true" />
             {t('landing.hero.badge', '')}
           </p>
-          <h1 id="hero-heading" className="mt-4 text-4xl font-semibold leading-tight md:text-6xl">
-            {t('landing.hero.title1', '')}
-            <br />
-            {t('landing.hero.title2', '')}
-            <br />
-            <span className="text-[#3f6212]">{t('landing.hero.title3', '')}</span>
+          <h1
+            id="hero-heading"
+            className="mt-5 text-balance text-4xl font-medium tracking-tight text-text-primary md:text-[64px] md:leading-[1.02]"
+          >
+            {t('landing.hero.title1', '')}{' '}
+            <span className="text-text-primary/95">{t('landing.hero.title2', '')}</span>{' '}
+            <span className="bg-gradient-to-r from-[#3f6212] to-[#65a30d] bg-clip-text text-transparent">
+              {t('landing.hero.title3', '')}
+            </span>
           </h1>
-          <p className="mt-4 max-w-xl text-lg text-text-secondary">{t('landing.hero.subtitle', '')}</p>
-          <ul className="mt-6 space-y-2 text-sm text-text-secondary">
+          <p className="mt-5 max-w-xl text-pretty text-lg text-text-secondary">
+            {t('landing.hero.subtitle', '')}
+          </p>
+
+          <ul className="mt-7 space-y-2.5 text-sm text-text-secondary">
             {heroBullets.map((line) => (
-              <li key={line} className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 shrink-0 text-[#65a30d]" aria-hidden="true" />
-                {line}
+              <li key={line} className="flex items-start gap-2">
+                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#65a30d]" aria-hidden="true" />
+                <span>{line}</span>
               </li>
             ))}
           </ul>
-          <div className="mt-7 flex flex-wrap gap-3">
-            <Link
-              href="/onboarding"
-              className="rounded-xl bg-[#84cc16] px-5 py-3 text-sm font-semibold text-[#1a2e05] transition hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3f6212]"
-            >
+
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <LandingButton href="/onboarding" size="lg">
               {t('landing.hero.buttonStart', '')}
-            </Link>
-            <Link
-              href="/features"
-              className="inline-flex items-center gap-2 rounded-xl border border-border bg-white px-5 py-3 text-sm font-medium transition hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3f6212]"
-            >
-              {t('publicSite.home.hero.secondaryCta', '')}
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
+            </LandingButton>
+            <LandingButton href="/features" variant="secondary" size="lg">
+              {t('publicSite.home.hero.secondaryCta', '')}
+            </LandingButton>
           </div>
           <p className="mt-4 text-xs text-text-tertiary">{t('publicSite.home.hero.noCard', '')}</p>
         </div>
 
-        <div className="space-y-3">
-          <ContentMediaSlot
-            slotId="public-home-hero-media"
-            ratio="16:9"
-            imageSrc="/stock/home-hero-demo.svg"
-            imageAlt={t('landing.hero.title1', 'Nishon AI')}
-            caption={t('preAuthOnboarding.mediaSlotCaption', 'Illustration / motion')}
-            priority
-          />
-          <div className="grid gap-3 sm:grid-cols-2">
-            {stats.map((item) => (
-              <article key={item.l} className="rounded-2xl border border-border bg-white p-5">
-                <p className="text-2xl font-semibold">{item.v}</p>
-                <p className="mt-1 text-sm text-text-secondary">{item.l}</p>
-              </article>
+        <div className="space-y-4">
+          <HeroLiveDemo />
+          <dl className="grid grid-cols-2 gap-3">
+            {stats.map((item, i) => (
+              <div
+                key={item.label || i}
+                className="rounded-2xl bg-white p-4 ring-1 ring-inset ring-[#e6efd9] shadow-[0_1px_2px_rgba(27,46,6,0.04)]"
+              >
+                <dt className="sr-only">{item.label}</dt>
+                <dd className="text-2xl font-semibold tabular-nums tracking-tight text-text-primary md:text-3xl">
+                  <AnimatedCounter
+                    value={item.value}
+                    prefix={item.prefix ?? ''}
+                    suffix={item.suffix}
+                    decimals={item.decimals ?? 0}
+                    duration={1600}
+                  />
+                </dd>
+                <p className="mt-1 text-xs text-text-secondary md:text-sm">{item.label}</p>
+              </div>
             ))}
-          </div>
+          </dl>
         </div>
       </PublicContainer>
     </section>
