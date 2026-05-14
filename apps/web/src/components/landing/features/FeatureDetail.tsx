@@ -15,6 +15,7 @@ import {
   type CategoryId,
   type FeatureContent,
 } from './feature-content'
+import { FEATURE_ICONS } from './feature-icons'
 
 interface FeatureDetailProps {
   feature: FeatureContent
@@ -36,7 +37,7 @@ function CategoryAnimation({ category, header }: { category: CategoryId; header:
 }
 
 export function FeatureDetail({ feature }: FeatureDetailProps) {
-  const Icon = feature.icon
+  const Icon = FEATURE_ICONS[feature.iconKey]
   const related = feature.related
     .map((slug) => FEATURE_CONTENT[slug])
     .filter((f): f is FeatureContent => Boolean(f))
@@ -220,7 +221,7 @@ export function FeatureDetail({ feature }: FeatureDetailProps) {
             </div>
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
               {related.map((r) => {
-                const RIcon = r.icon
+                const RIcon = FEATURE_ICONS[r.iconKey]
                 return (
                   <Link
                     key={r.slug}

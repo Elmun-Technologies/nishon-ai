@@ -1,20 +1,4 @@
-import {
-  BarChart3,
-  Brain,
-  CreditCard,
-  Crown,
-  GitBranch,
-  Layers3,
-  type LucideIcon,
-  Rocket,
-  Search,
-  Settings2,
-  Shield,
-  Sparkles,
-  Target,
-  Users,
-  Wallet,
-} from 'lucide-react'
+import type { FeatureIconKey } from './feature-icons'
 
 export type CategoryId = 'execution' | 'aiOpt' | 'analytics' | 'governance'
 
@@ -31,7 +15,7 @@ export interface FeatureFaq {
 export interface FeatureContent {
   slug: string
   category: CategoryId
-  icon: LucideIcon
+  iconKey: FeatureIconKey
   hero: {
     eyebrow: string
     title: string
@@ -62,7 +46,7 @@ export const FEATURE_CONTENT: Record<string, FeatureContent> = {
   'launch-wizard': {
     slug: 'launch-wizard',
     category: 'execution',
-    icon: Rocket,
+    iconKey: 'rocket',
     hero: {
       eyebrow: 'Запуск кампаний',
       title: 'Мастер запуска',
@@ -104,7 +88,7 @@ export const FEATURE_CONTENT: Record<string, FeatureContent> = {
   'campaign-manager': {
     slug: 'campaign-manager',
     category: 'execution',
-    icon: Layers3,
+    iconKey: 'layers',
     hero: {
       eyebrow: 'Запуск кампаний',
       title: 'Менеджер кампаний',
@@ -135,7 +119,7 @@ export const FEATURE_CONTENT: Record<string, FeatureContent> = {
   'audience-builder': {
     slug: 'audience-builder',
     category: 'execution',
-    icon: Users,
+    iconKey: 'users',
     hero: {
       eyebrow: 'Запуск кампаний',
       title: 'Конструктор аудиторий',
@@ -166,7 +150,7 @@ export const FEATURE_CONTENT: Record<string, FeatureContent> = {
   'retargeting': {
     slug: 'retargeting',
     category: 'execution',
-    icon: Target,
+    iconKey: 'target',
     hero: {
       eyebrow: 'Запуск кампаний',
       title: 'Ретаргетинг',
@@ -199,7 +183,7 @@ export const FEATURE_CONTENT: Record<string, FeatureContent> = {
   'ai-decisions': {
     slug: 'ai-decisions',
     category: 'aiOpt',
-    icon: Brain,
+    iconKey: 'brain',
     hero: {
       eyebrow: 'AI и оптимизация',
       title: 'Решения AI',
@@ -230,7 +214,7 @@ export const FEATURE_CONTENT: Record<string, FeatureContent> = {
   'auto-optimization': {
     slug: 'auto-optimization',
     category: 'aiOpt',
-    icon: Settings2,
+    iconKey: 'settings',
     hero: {
       eyebrow: 'AI и оптимизация',
       title: 'Автооптимизация',
@@ -261,7 +245,7 @@ export const FEATURE_CONTENT: Record<string, FeatureContent> = {
   'creative-scorer': {
     slug: 'creative-scorer',
     category: 'aiOpt',
-    icon: Sparkles,
+    iconKey: 'sparkles',
     hero: {
       eyebrow: 'AI и оптимизация',
       title: 'Оценка креативов',
@@ -292,7 +276,7 @@ export const FEATURE_CONTENT: Record<string, FeatureContent> = {
   'budget-optimization': {
     slug: 'budget-optimization',
     category: 'aiOpt',
-    icon: Wallet,
+    iconKey: 'wallet',
     hero: {
       eyebrow: 'AI и оптимизация',
       title: 'Оптимизация бюджета',
@@ -323,7 +307,7 @@ export const FEATURE_CONTENT: Record<string, FeatureContent> = {
   'simulation': {
     slug: 'simulation',
     category: 'aiOpt',
-    icon: GitBranch,
+    iconKey: 'gitBranch',
     hero: {
       eyebrow: 'AI и оптимизация',
       title: 'Симуляция',
@@ -354,7 +338,7 @@ export const FEATURE_CONTENT: Record<string, FeatureContent> = {
   'roi-calculator': {
     slug: 'roi-calculator',
     category: 'aiOpt',
-    icon: BarChart3,
+    iconKey: 'barChart',
     hero: {
       eyebrow: 'AI и оптимизация',
       title: 'ROI и результаты',
@@ -387,7 +371,7 @@ export const FEATURE_CONTENT: Record<string, FeatureContent> = {
   'performance-analytics': {
     slug: 'performance-analytics',
     category: 'analytics',
-    icon: BarChart3,
+    iconKey: 'barChart',
     hero: {
       eyebrow: 'Аналитика и интеллект',
       title: 'Performance',
@@ -418,7 +402,7 @@ export const FEATURE_CONTENT: Record<string, FeatureContent> = {
   'reporting': {
     slug: 'reporting',
     category: 'analytics',
-    icon: Layers3,
+    iconKey: 'layers',
     hero: {
       eyebrow: 'Аналитика и интеллект',
       title: 'Отчётность',
@@ -449,7 +433,7 @@ export const FEATURE_CONTENT: Record<string, FeatureContent> = {
   'competitor-intel': {
     slug: 'competitor-intel',
     category: 'analytics',
-    icon: Search,
+    iconKey: 'search',
     hero: {
       eyebrow: 'Аналитика и интеллект',
       title: 'Конкурентная аналитика',
@@ -480,7 +464,7 @@ export const FEATURE_CONTENT: Record<string, FeatureContent> = {
   'automation-rules': {
     slug: 'automation-rules',
     category: 'analytics',
-    icon: Settings2,
+    iconKey: 'settings',
     hero: {
       eyebrow: 'Аналитика и интеллект',
       title: 'Правила автоматизации',
@@ -511,7 +495,7 @@ export const FEATURE_CONTENT: Record<string, FeatureContent> = {
   'top-ads': {
     slug: 'top-ads',
     category: 'analytics',
-    icon: Crown,
+    iconKey: 'crown',
     hero: {
       eyebrow: 'Аналитика и интеллект',
       title: 'Top Ads',
@@ -544,7 +528,7 @@ export const FEATURE_CONTENT: Record<string, FeatureContent> = {
   'workspace-team': {
     slug: 'workspace-team',
     category: 'governance',
-    icon: Users,
+    iconKey: 'users',
     hero: {
       eyebrow: 'Workspace, команда и финансы',
       title: 'Команда workspace',
@@ -575,7 +559,7 @@ export const FEATURE_CONTENT: Record<string, FeatureContent> = {
   'ad-accounts': {
     slug: 'ad-accounts',
     category: 'governance',
-    icon: Shield,
+    iconKey: 'shield',
     hero: {
       eyebrow: 'Workspace, команда и финансы',
       title: 'Рекламные аккаунты',
@@ -606,7 +590,7 @@ export const FEATURE_CONTENT: Record<string, FeatureContent> = {
   'products-plans': {
     slug: 'products-plans',
     category: 'governance',
-    icon: Crown,
+    iconKey: 'crown',
     hero: {
       eyebrow: 'Workspace, команда и финансы',
       title: 'Продукты и тарифы',
@@ -637,7 +621,7 @@ export const FEATURE_CONTENT: Record<string, FeatureContent> = {
   'payments-invoices': {
     slug: 'payments-invoices',
     category: 'governance',
-    icon: CreditCard,
+    iconKey: 'creditCard',
     hero: {
       eyebrow: 'Workspace, команда и финансы',
       title: 'Платежи и счета',
@@ -668,7 +652,7 @@ export const FEATURE_CONTENT: Record<string, FeatureContent> = {
   'mcp-credentials': {
     slug: 'mcp-credentials',
     category: 'governance',
-    icon: Settings2,
+    iconKey: 'settings',
     hero: {
       eyebrow: 'Workspace, команда и финансы',
       title: 'MCP credentials',
@@ -699,7 +683,7 @@ export const FEATURE_CONTENT: Record<string, FeatureContent> = {
   'help-center': {
     slug: 'help-center',
     category: 'governance',
-    icon: Layers3,
+    iconKey: 'layers',
     hero: {
       eyebrow: 'Workspace, команда и финансы',
       title: 'Справочный центр',
