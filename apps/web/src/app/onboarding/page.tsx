@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { Check, ChevronLeft } from 'lucide-react'
 import { PublicContainer, PublicFooter, PublicNavbar } from '@/components/public/PublicLayout'
 import { useI18n } from '@/i18n/use-i18n'
-import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui'
 import { cn } from '@/lib/utils'
 import { getAccessToken } from '@/lib/auth-storage'
@@ -81,13 +80,14 @@ function BigChoice({
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={selected}
       className={cn(
-        'w-full rounded-2xl border px-4 py-4 text-left text-base font-semibold transition-all',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2',
+        'w-full rounded-2xl px-5 py-4 text-left text-base font-medium tracking-tight transition-all duration-200',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1b2e06]/30 focus-visible:ring-offset-2',
         'active:scale-[0.99]',
         selected
-          ? 'border-brand-mid/50 bg-brand-mid/10 shadow-md ring-2 ring-brand-mid/25'
-          : 'border-border bg-surface hover:bg-surface-2',
+          ? 'bg-[#1b2e06] text-white shadow-[0_8px_24px_-12px_rgba(27,46,6,0.45)] ring-1 ring-inset ring-[#1b2e06]'
+          : 'bg-white text-text-primary ring-1 ring-inset ring-[#e6efd9] hover:bg-[#fafdf5] hover:ring-[#cfe8c0] shadow-[0_1px_2px_rgba(27,46,6,0.04)]',
         className,
       )}
     >
@@ -210,70 +210,100 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="relative isolate flex min-h-screen flex-col overflow-hidden bg-white">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[420px] bg-[radial-gradient(80%_70%_at_50%_0%,#ecfccb_0%,transparent_60%)]"
+      />
       <PublicNavbar />
-      <PublicContainer className="flex-1 py-6 md:py-10">
-        <div className="mx-auto max-w-lg w-full px-1">
-          {/* Progress */}
-          <div className="mb-6">
-            <div className="flex justify-between text-xs text-text-tertiary mb-1.5">
-              <span>
-                {t('onboardingV2.stepOf', '{n}-qadam').replace('{n}', String(state.step + 1))} / {TOTAL}
-              </span>
-              <span>{pct}%</span>
-            </div>
-            <div className="h-2 rounded-full bg-surface-2 overflow-hidden border border-border/60">
+      <PublicContainer className="flex-1 py-10 md:py-16">
+        <div className="mx-auto w-full max-w-lg">
+          <div className="rounded-3xl bg-white p-6 ring-1 ring-inset ring-[#e6efd9] shadow-[0_1px_2px_rgba(27,46,6,0.04),0_24px_48px_-24px_rgba(27,46,6,0.18)] md:p-8">
+            {/* Progress */}
+            <div className="mb-6">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-violet-500 to-brand-mid transition-[width] duration-300"
-                style={{ width: `${pct}%` }}
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between gap-2 mb-4">
-            {state.step > 0 ? (
-              <button
-                type="button"
-                onClick={back}
-                className="inline-flex items-center gap-1 text-sm text-text-secondary hover:text-text-primary"
+                className="mb-2 flex justify-between text-[11px] font-semibold uppercase tracking-[0.14em] text-text-tertiary"
+                aria-hidden="true"
               >
-                <ChevronLeft className="w-4 h-4" />
-                {t('onboardingV2.back', 'Orqaga')}
-              </button>
-            ) : (
-              <span />
-            )}
-            {state.step < 5 && (
-              <div className="flex items-center gap-2">
-                <button type="button" onClick={skipAll} className="text-xs text-text-tertiary hover:text-text-secondary underline">
-                  {t('onboardingV2.skipAll', "Hammasini o'tkazish")}
-                </button>
-                <button type="button" onClick={skipStep} className="text-sm font-medium text-violet-600 dark:text-violet-400">
-                  {t('onboardingV2.skip', "O'tkazib yuborish")}
-                </button>
+                <span>
+                  {t('onboardingV2.stepOf', '{n}-qadam').replace('{n}', String(state.step + 1))} / {TOTAL}
+                </span>
+                <span className="tabular-nums">{pct}%</span>
               </div>
-            )}
-          </div>
+              <div
+                className="h-1.5 overflow-hidden rounded-full bg-[#eef3e3]"
+                role="progressbar"
+                aria-valuenow={pct}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label={`${t('onboardingV2.stepOf', '{n}-qadam').replace('{n}', String(state.step + 1))} / ${TOTAL}`}
+              >
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-[#3f6212] via-[#65a30d] to-[#a3e635] transition-[width] duration-300"
+                  style={{ width: `${pct}%` }}
+                />
+              </div>
+            </div>
+
+            <div className="mb-5 flex items-center justify-between gap-2">
+              {state.step > 0 ? (
+                <button
+                  type="button"
+                  onClick={back}
+                  className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-sm font-medium text-text-secondary transition-colors hover:bg-[#f4f9ea] hover:text-text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1b2e06]"
+                >
+                  <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+                  {t('onboardingV2.back', 'Orqaga')}
+                </button>
+              ) : (
+                <span />
+              )}
+              {state.step < 5 && (
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={skipAll}
+                    className="text-xs text-text-tertiary underline-offset-2 hover:text-text-secondary hover:underline"
+                  >
+                    {t('onboardingV2.skipAll', "Hammasini o'tkazish")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={skipStep}
+                    className="rounded-full px-2.5 py-1 text-sm font-medium text-[#3f6212] hover:bg-[#f4f9ea] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1b2e06]"
+                  >
+                    {t('onboardingV2.skip', "O'tkazib yuborish")}
+                  </button>
+                </div>
+              )}
+            </div>
 
           {/* Step 0 */}
           {state.step === 0 && (
-            <div className="space-y-6 text-center pt-2">
-              <h1 className="text-2xl md:text-3xl font-bold text-text-primary leading-tight">
+            <div className="space-y-6 pt-2 text-center">
+              <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#1b2e06] text-[#d9f99d] shadow-[0_8px_24px_-12px_rgba(27,46,6,0.45)]">
+                <span className="text-lg font-bold">A</span>
+              </div>
+              <h1 className="text-balance text-2xl font-medium tracking-tight text-text-primary md:text-3xl md:leading-[1.15]">
                 {t('onboardingV2.welcomeTitle', "3 daqiqada birinchi kampaniyangizni yoqamiz")}
               </h1>
-              <p className="text-sm text-text-secondary">
+              <p className="text-pretty text-sm text-text-secondary md:text-base">
                 {t('onboardingV2.welcomeSub', '5 qisqa qadam — har biri bitta savol, katta tugmalar.')}
               </p>
-              <Button className="w-full rounded-2xl py-6 text-lg font-semibold" onClick={() => go(1)}>
+              <button
+                type="button"
+                onClick={() => go(1)}
+                className="inline-flex h-12 w-full items-center justify-center rounded-full bg-[#1b2e06] text-base font-medium text-white shadow-[0_1px_2px_rgba(27,46,6,0.18)] transition-all duration-200 hover:bg-[#243a12] hover:shadow-[0_4px_12px_-2px_rgba(27,46,6,0.28)] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1b2e06]"
+              >
                 {t('onboardingV2.start', 'Boshlash')}
-              </Button>
+              </button>
             </div>
           )}
 
           {/* Step 1 — biznes */}
           {state.step === 1 && (
             <div className="space-y-4">
-              <h2 className="text-xl font-bold text-text-primary">{t('onboardingV2.whoTitle', 'Siz kimsiz?')}</h2>
+              <h2 className="text-xl font-medium tracking-tight text-text-primary md:text-2xl">{t('onboardingV2.whoTitle', 'Siz kimsiz?')}</h2>
               <p className="text-sm text-text-secondary">{t('onboardingV2.whoSub', 'Biznes turi — shablon va filtrlar keyinroq moslashadi.')}</p>
               <div className="grid gap-3">
                 {BIZ.map((b) => (
@@ -296,7 +326,7 @@ export default function OnboardingPage() {
           {/* Step 2 — maqsad */}
           {state.step === 2 && (
             <div className="space-y-4">
-              <h2 className="text-xl font-bold text-text-primary">{t('onboardingV2.goalTitle', 'Nima sotmoqchisiz?')}</h2>
+              <h2 className="text-xl font-medium tracking-tight text-text-primary md:text-2xl">{t('onboardingV2.goalTitle', 'Nima sotmoqchisiz?')}</h2>
               <div className="grid gap-3">
                 {GOALS.map((g) => (
                   <BigChoice
@@ -320,7 +350,7 @@ export default function OnboardingPage() {
           {/* Step 3 — pixel */}
           {state.step === 3 && (
             <div className="space-y-4">
-              <h2 className="text-xl font-bold text-text-primary">{t('onboardingV2.pixelTitle', 'Meta Pixel')}</h2>
+              <h2 className="text-xl font-medium tracking-tight text-text-primary md:text-2xl">{t('onboardingV2.pixelTitle', 'Meta Pixel')}</h2>
               <p className="text-sm text-text-secondary">
                 {t(
                   'onboardingV2.pixelHint',
@@ -368,17 +398,26 @@ export default function OnboardingPage() {
                   {t('onboardingV2.pixelSkip', "Hozir o'tkazib yuborish — keyin eslatamiz")}
                 </BigChoice>
               </div>
-              <Button className="w-full rounded-2xl py-5" onClick={() => go(4)} disabled={!state.pixelMode}>
+              <button
+                type="button"
+                onClick={() => go(4)}
+                disabled={!state.pixelMode}
+                className="inline-flex h-11 w-full items-center justify-center rounded-full bg-[#1b2e06] text-sm font-medium text-white shadow-[0_1px_2px_rgba(27,46,6,0.18)] transition-all duration-200 hover:bg-[#243a12] hover:shadow-[0_4px_12px_-2px_rgba(27,46,6,0.28)] active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1b2e06]"
+              >
                 {t('onboardingV2.continue', 'Davom etish')}
-              </Button>
+              </button>
             </div>
           )}
 
           {/* Step 4 — budget */}
           {state.step === 4 && (
             <div className="space-y-5">
-              <h2 className="text-xl font-bold text-text-primary">{t('onboardingV2.budgetTitle', "Kuniga qancha sarflaysiz?")}</h2>
-              <p className="text-2xl font-bold tabular-nums text-violet-600 dark:text-violet-400">{formatUzs(state.dailyBudgetUzs)}</p>
+              <h2 className="text-xl font-medium tracking-tight text-text-primary md:text-2xl">
+                {t('onboardingV2.budgetTitle', "Kuniga qancha sarflaysiz?")}
+              </h2>
+              <p className="text-3xl font-semibold tabular-nums tracking-tight text-[#3f6212] md:text-4xl">
+                {formatUzs(state.dailyBudgetUzs)}
+              </p>
               <input
                 type="range"
                 min={50_000}
@@ -386,43 +425,50 @@ export default function OnboardingPage() {
                 step={10_000}
                 value={state.dailyBudgetUzs}
                 onChange={(e) => setState((s) => ({ ...s, dailyBudgetUzs: Number(e.target.value) }))}
-                className="w-full h-3 accent-violet-600 cursor-pointer"
+                aria-label={t('onboardingV2.budgetTitle', "Kuniga qancha sarflaysiz?")}
+                className="h-2 w-full cursor-pointer accent-[#65a30d]"
               />
-              <div className="flex justify-between text-xs text-text-tertiary">
+              <div className="flex justify-between text-xs text-text-tertiary tabular-nums">
                 <span>50 000</span>
                 <span>500 000</span>
               </div>
-              <p className="text-sm text-text-secondary rounded-xl bg-surface-2/80 border border-border/60 px-3 py-2">
+              <p className="rounded-xl bg-[#fafdf5] px-4 py-3 text-sm text-text-secondary ring-1 ring-inset ring-[#eef3e3]">
                 {t('onboardingV2.budgetReach', 'Taxminan {n} kishi ko‘radi')
                   .replace('{n}', new Intl.NumberFormat('uz-UZ').format(estimatedReach(state.dailyBudgetUzs)))}
               </p>
               <p className="text-xs text-text-tertiary">{t('onboardingV2.budgetTip', "Boshlash uchun 100 000 so'm tavsiya etiladi.")}</p>
-              <Button className="w-full rounded-2xl py-5" onClick={() => go(5)}>
+              <button
+                type="button"
+                onClick={() => go(5)}
+                className="inline-flex h-11 w-full items-center justify-center rounded-full bg-[#1b2e06] text-sm font-medium text-white shadow-[0_1px_2px_rgba(27,46,6,0.18)] transition-all duration-200 hover:bg-[#243a12] hover:shadow-[0_4px_12px_-2px_rgba(27,46,6,0.28)] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1b2e06]"
+              >
                 {t('onboardingV2.continue', 'Davom etish')}
-              </Button>
+              </button>
             </div>
           )}
 
           {/* Step 5 — tayyor */}
           {state.step === 5 && (
             <div className="space-y-6">
-              <h2 className="text-xl font-bold text-text-primary">{t('onboardingV2.doneTitle', 'Tayyor')}</h2>
-              <ul className="space-y-3 text-sm">
-                <li className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-emerald-500 shrink-0" />
-                  {t('onboardingV2.doneProfile', 'Profil sozlamalari saqlandi')}
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-emerald-500 shrink-0" />
-                  {t('onboardingV2.doneDashboard', 'Dashboard metrikalari tanlovingizga mos')}
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-emerald-500 shrink-0" />
-                  {t('onboardingV2.doneTg', 'Telegram (ixtiyoriy)')}
-                </li>
+              <h2 className="text-xl font-medium tracking-tight text-text-primary md:text-2xl">
+                {t('onboardingV2.doneTitle', 'Tayyor')}
+              </h2>
+              <ul className="space-y-2.5 text-sm text-text-secondary">
+                {[
+                  t('onboardingV2.doneProfile', 'Profil sozlamalari saqlandi'),
+                  t('onboardingV2.doneDashboard', 'Dashboard metrikalari tanlovingizga mos'),
+                  t('onboardingV2.doneTg', 'Telegram (ixtiyoriy)'),
+                ].map((line) => (
+                  <li key={line} className="flex items-center gap-2.5">
+                    <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#ecfccb] text-[#3f6212]">
+                      <Check className="h-3 w-3" aria-hidden="true" />
+                    </span>
+                    {line}
+                  </li>
+                ))}
               </ul>
               <div>
-                <label className="text-xs text-text-tertiary block mb-1">Telegram</label>
+                <label className="mb-1 block text-xs text-text-tertiary">Telegram</label>
                 <Input
                   value={state.telegram.replace(/^@/, '')}
                   onChange={(e) => setState((s) => ({ ...s, telegram: e.target.value }))}
@@ -430,32 +476,36 @@ export default function OnboardingPage() {
                   className="rounded-xl"
                 />
               </div>
-              <div className="rounded-xl border border-border bg-surface-2/40 p-3 text-xs text-text-secondary space-y-1">
-                <div>
-                  {t('onboardingV2.summaryBiz', 'Biznes')}: {state.businessType || '—'}
-                </div>
-                <div>
-                  {t('onboardingV2.summaryGoal', 'Maqsad')}: {state.goal || '—'}
-                </div>
-                <div>
-                  Pixel: {state.pixelMode || '—'} {state.pixelId ? `(${state.pixelId})` : ''}
-                </div>
-                <div>
-                  {t('onboardingV2.summaryBudget', 'Kunlik')}: {formatUzs(state.dailyBudgetUzs || 100_000)}
-                </div>
-              </div>
+              <dl className="space-y-1.5 rounded-xl bg-[#fafdf5] p-4 text-xs text-text-secondary ring-1 ring-inset ring-[#eef3e3]">
+                {[
+                  [t('onboardingV2.summaryBiz', 'Biznes'), state.businessType || '—'],
+                  [t('onboardingV2.summaryGoal', 'Maqsad'), state.goal || '—'],
+                  ['Pixel', `${state.pixelMode || '—'} ${state.pixelId ? `(${state.pixelId})` : ''}`.trim()],
+                  [t('onboardingV2.summaryBudget', 'Kunlik'), formatUzs(state.dailyBudgetUzs || 100_000)],
+                ].map(([label, value]) => (
+                  <div key={label} className="flex justify-between gap-3">
+                    <dt className="text-text-tertiary">{label}</dt>
+                    <dd className="font-medium text-text-primary">{value}</dd>
+                  </div>
+                ))}
+              </dl>
               {finishError && (
-                <p className="text-sm text-red-500 rounded-xl border border-red-200 bg-red-50 px-3 py-2">
+                <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-600 ring-1 ring-inset ring-red-200">
                   {finishError}
                 </p>
               )}
-              <Button className="w-full rounded-2xl py-6 text-lg font-semibold" onClick={() => void finish()} disabled={submitting}>
+              <button
+                type="button"
+                onClick={() => void finish()}
+                disabled={submitting}
+                className="inline-flex h-12 w-full items-center justify-center rounded-full bg-[#1b2e06] text-base font-medium text-white shadow-[0_1px_2px_rgba(27,46,6,0.18)] transition-all duration-200 hover:bg-[#243a12] hover:shadow-[0_4px_12px_-2px_rgba(27,46,6,0.28)] active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1b2e06]"
+              >
                 {submitting
                   ? t('onboardingV2.saving', 'Saqlanmoqda…')
                   : accessToken
                     ? t('onboardingV2.goDashboard', "Dashboard ga o'tish")
                     : t('onboardingV2.goRegister', "Ro'yxatdan o'tish")}
-              </Button>
+              </button>
               {!accessToken && (
                 <p className="text-center text-xs text-text-tertiary">
                   {t('onboardingV2.registerNote', 'Keyingi qadam — akkaunt yaratish.')}
@@ -463,6 +513,7 @@ export default function OnboardingPage() {
               )}
             </div>
           )}
+          </div>
         </div>
       </PublicContainer>
       <PublicFooter />
