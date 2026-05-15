@@ -5,8 +5,11 @@ export const dynamic = 'force-dynamic'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Bot,
+  Command as CommandIcon,
   Crosshair,
+  Download,
   Gauge,
+  Plus,
   SendHorizontal,
   Sparkles,
   Trash2,
@@ -19,8 +22,10 @@ import { Alert, Button, Card, Dialog } from '@/components/ui'
 import { Textarea } from '@/components/ui/Textarea'
 import { Spinner } from '@/components/ui/Spinner'
 import { cn } from '@/lib/utils'
+import { CommandPalette, type Command } from './_components/CommandPalette'
 import { MarkdownMessage } from './_components/MarkdownMessage'
 import { ThinkingDots } from './_components/ThinkingDots'
+import { VoiceInputButton } from './_components/VoiceInputButton'
 
 type ChatMessage = {
   id: string
@@ -168,6 +173,11 @@ export default function AiAssistantPage() {
   const [error, setError] = useState<string | null>(null)
   const [confirmBusy, setConfirmBusy] = useState(false)
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false)
+  const [paletteOpen, setPaletteOpen] = useState(false)
+  /** Interim voice transcript that hasn't been finalized yet — shown as a
+   * ghost suffix in the textarea so users can see what the recognizer is
+   * picking up before committing. */
+  const [voiceDraft, setVoiceDraft] = useState('')
 
   const scrollRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -227,6 +237,48 @@ export default function AiAssistantPage() {
       behavior: 'smooth',
     })
   }, [messages, loading, wizard.phase])
+
+  // Cmd/Ctrl+K opens the palette anywhere on the page. We deliberately skip
+  // this binding while a textarea/input is focused only for Cmd+L (clear).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const mod = e.metaKey || e.ctrlKey
+      if (!mod) return
+      if (e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        setPaletteOpen((open) => !open)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
+  const exportChat = useCallback(() => {
+    if (messages.length === 0) return
+    const header = [
+      `# AI Assistant — ${currentWorkspace?.name ?? 'Workspace'}`,
+      `_Exported ${new Date().toLocaleString()}_`,
+      '',
+      '---',
+      '',
+    ].join('\n')
+    const body = messages
+      .map((m) => {
+        if (m.role === 'system') return `> ${m.content}\n`
+        const author = m.role === 'user' ? '**You**' : `**AdSpectr · ${agentRole}**`
+        return `${author}\n\n${m.content}\n`
+      })
+      .join('\n---\n\n')
+    const blob = new Blob([header + body], { type: 'text/markdown;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `adspectr-chat-${new Date().toISOString().slice(0, 10)}.md`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }, [messages, currentWorkspace?.name, agentRole])
 
   const questionKeys = useMemo(() => {
     const base =
@@ -340,65 +392,81 @@ export default function AiAssistantPage() {
 
       setError(null)
       const userId = newId('u')
+      const assistantId = newId('a')
       const trimmedHistory = messages
         .filter((m) => m.role !== 'system')
         .slice(-HISTORY_TRIM)
         .map(({ role, content }) => ({ role: role as 'user' | 'assistant', content }))
 
-      setMessages((prev) => [...prev, { id: userId, role: 'user', content: trimmed }])
+      setMessages((prev) => [
+        ...prev,
+        { id: userId, role: 'user', content: trimmed },
+      ])
       setLoading(true)
 
-      let attempt = 0
-      while (true) {
-        try {
-          const { data } = await aiAgent.chat({
-            workspaceId,
-            message: trimmed,
-            history: trimmedHistory,
-            assistantPersona: agentRole,
-          })
-          const reply = typeof data?.reply === 'string' ? data.reply : ''
-          appendAssistant(
-            reply || t('aiAssistantPage.emptyReply', 'No reply received. Try again.'),
-          )
-          setInput('')
-          break
-        } catch (e: unknown) {
-          const status = extractStatus(e)
-          const isTransient = status !== null && status >= 500 && status < 600
-          if (isTransient && attempt < MAX_RETRIES) {
-            attempt += 1
-            await sleep(1000 * 2 ** (attempt - 1))
-            continue
-          }
-
-          let msg: string
-          if (isQuotaError(e)) {
-            msg = t(
-              'aiAssistantPage.quotaError',
-              'Bu workspace uchun AI kvotasi tugagan. Iltimos, plan yangilang yoki keyinroq qayta urinib ko\'ring.',
-            )
-          } else if (
-            e &&
-            typeof e === 'object' &&
-            'message' in e &&
-            typeof (e as { message: string }).message === 'string'
-          ) {
-            msg = (e as { message: string }).message
+      try {
+        let accumulated = ''
+        let placeholderInserted = false
+        for await (const delta of aiAgent.chatStream({
+          workspaceId,
+          message: trimmed,
+          history: trimmedHistory,
+          assistantPersona: agentRole,
+        })) {
+          accumulated += delta
+          if (!placeholderInserted) {
+            // Insert the assistant message on the first chunk so the
+            // thinking-dots indicator can disappear at the same time.
+            placeholderInserted = true
+            setLoading(false)
+            setMessages((prev) => [
+              ...prev,
+              { id: assistantId, role: 'assistant', content: accumulated },
+            ])
           } else {
-            msg = t(
-              'aiAssistantPage.sendError',
-              "Yordamchiga ulanib bo'lmadi. Internet aloqasini tekshirib qayta urining.",
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === assistantId ? { ...m, content: accumulated } : m,
+              ),
             )
           }
-          setError(msg)
-          setMessages((prev) => prev.filter((m) => m.id !== userId))
-          setInput(trimmed)
-          break
         }
+        if (!placeholderInserted) {
+          // Empty stream — surface a friendly message rather than a blank.
+          appendAssistant(
+            t('aiAssistantPage.emptyReply', 'No reply received. Try again.'),
+          )
+        }
+        setInput('')
+      } catch (e: unknown) {
+        let msg: string
+        if (isQuotaError(e)) {
+          msg = t(
+            'aiAssistantPage.quotaError',
+            'Bu workspace uchun AI kvotasi tugagan. Iltimos, plan yangilang yoki keyinroq qayta urinib ko\'ring.',
+          )
+        } else if (
+          e &&
+          typeof e === 'object' &&
+          'message' in e &&
+          typeof (e as { message: string }).message === 'string'
+        ) {
+          msg = (e as { message: string }).message
+        } else {
+          msg = t(
+            'aiAssistantPage.sendError',
+            "Yordamchiga ulanib bo'lmadi. Internet aloqasini tekshirib qayta urining.",
+          )
+        }
+        setError(msg)
+        setMessages((prev) =>
+          prev.filter((m) => m.id !== userId && m.id !== assistantId),
+        )
+        setInput(trimmed)
+      } finally {
+        setLoading(false)
+        textareaRef.current?.focus()
       }
-      setLoading(false)
-      textareaRef.current?.focus()
     },
     [workspaceId, loading, messages, t, appendAssistant, agentRole],
   )
@@ -522,6 +590,79 @@ export default function AiAssistantPage() {
     void submitText(input)
   }
 
+  const handleVoiceTranscript = useCallback(
+    (text: string, isFinal: boolean) => {
+      if (isFinal) {
+        setInput((prev) => (prev ? `${prev.trimEnd()} ${text}` : text))
+        setVoiceDraft('')
+      } else {
+        setVoiceDraft(text)
+      }
+    },
+    [],
+  )
+
+  const commands: Command[] = useMemo(
+    () => [
+      {
+        id: 'new-chat',
+        label: 'Yangi suhbat',
+        hint: 'Joriy suhbatni tozalab boshqasini boshlash',
+        icon: <Plus className="h-3.5 w-3.5" />,
+        disabled: messages.length === 0,
+        run: () => setClearConfirmOpen(true),
+      },
+      {
+        id: 'guided-setup',
+        label: 'Guided setup (5 savol)',
+        hint: 'Targetolog yoki optimizator rolini sozlash',
+        icon: <Wand2 className="h-3.5 w-3.5" />,
+        disabled: wizard.phase !== 'idle' && wizard.phase !== 'done',
+        run: () => startAgentWizard(),
+      },
+      {
+        id: 'persona-target',
+        label: 'Rolni almashtirish: Targetolog',
+        hint: 'Auditoriya, joylashuv, voronka',
+        icon: <Crosshair className="h-3.5 w-3.5" />,
+        disabled: agentRole === 'targetologist',
+        run: () => handleSelectRole('targetologist'),
+      },
+      {
+        id: 'persona-optimizer',
+        label: 'Rolni almashtirish: Optimizator',
+        hint: 'Stavkalar, byudjetlar, masshtab',
+        icon: <Gauge className="h-3.5 w-3.5" />,
+        disabled: agentRole === 'optimizer',
+        run: () => handleSelectRole('optimizer'),
+      },
+      {
+        id: 'export-md',
+        label: 'Suhbatni Markdown sifatida yuklab olish',
+        hint: '.md fayl sifatida saqlanadi',
+        icon: <Download className="h-3.5 w-3.5" />,
+        disabled: messages.length === 0,
+        run: exportChat,
+      },
+      {
+        id: 'clear',
+        label: 'Suhbatni tozalash',
+        hint: 'Barcha xabarlarni o\'chirish (tasdiq so\'raladi)',
+        icon: <Trash2 className="h-3.5 w-3.5" />,
+        disabled: messages.length === 0,
+        run: () => setClearConfirmOpen(true),
+      },
+    ],
+    [
+      messages.length,
+      wizard.phase,
+      agentRole,
+      startAgentWizard,
+      handleSelectRole,
+      exportChat,
+    ],
+  )
+
   const inputLocked = wizard.phase === 'awaiting_confirm' || confirmBusy
   const assistantBadge =
     agentRole === 'optimizer'
@@ -576,20 +717,43 @@ export default function AiAssistantPage() {
               {t('aiAssistantPage.agentRoleOptTitle', 'Optimizator')}
             </button>
           </div>
+          <button
+            type="button"
+            onClick={() => setPaletteOpen(true)}
+            className="hidden h-8 items-center gap-1.5 rounded-lg border border-border bg-surface-2 px-2.5 text-xs text-text-tertiary transition-colors hover:bg-surface md:flex"
+            title="Buyruqlar palitrasi (⌘K)"
+          >
+            <CommandIcon className="h-3.5 w-3.5" />
+            <kbd className="font-mono text-[10px]">⌘K</kbd>
+          </button>
           {workspaceId && messages.length > 0 && (
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              onClick={() => setClearConfirmOpen(true)}
-              className="gap-1.5"
-              aria-label={t('aiAssistantPage.clearChat', 'Clear chat')}
-            >
-              <Trash2 className="h-4 w-4" aria-hidden />
-              <span className="hidden sm:inline">
-                {t('aiAssistantPage.clearChat', 'Tozalash')}
-              </span>
-            </Button>
+            <>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={exportChat}
+                className="gap-1.5"
+                aria-label="Export chat"
+                title="Suhbatni .md fayl sifatida yuklab olish"
+              >
+                <Download className="h-4 w-4" aria-hidden />
+                <span className="hidden lg:inline">Export</span>
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={() => setClearConfirmOpen(true)}
+                className="gap-1.5"
+                aria-label={t('aiAssistantPage.clearChat', 'Clear chat')}
+              >
+                <Trash2 className="h-4 w-4" aria-hidden />
+                <span className="hidden sm:inline">
+                  {t('aiAssistantPage.clearChat', 'Tozalash')}
+                </span>
+              </Button>
+            </>
           )}
         </div>
       </div>
@@ -805,7 +969,8 @@ export default function AiAssistantPage() {
           )}
         >
           <div className="flex flex-col gap-3 md:flex-row md:items-stretch">
-            <Textarea
+            <div className="relative flex-1">
+              <Textarea
               ref={textareaRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -826,7 +991,7 @@ export default function AiAssistantPage() {
               disabled={loading || inputLocked}
               readOnly={wizard.phase === 'awaiting_confirm'}
               className={cn(
-                'min-h-[3.5rem] flex-1 resize-none rounded-2xl border-border/90 transition-all',
+                'min-h-[3.5rem] w-full resize-none rounded-2xl border-border/90 pr-12 transition-all',
                 'focus:border-brand-mid/60 focus:shadow-[0_0_0_3px_rgba(94,234,118,0.12)] focus:ring-0',
               )}
               onKeyDown={(e) => {
@@ -836,6 +1001,19 @@ export default function AiAssistantPage() {
                 }
               }}
             />
+              <div className="absolute right-2 top-2">
+                <VoiceInputButton
+                  onTranscript={handleVoiceTranscript}
+                  disabled={loading || inputLocked}
+                  lang="uz-UZ"
+                />
+              </div>
+              {voiceDraft && (
+                <p className="mt-1 px-2 text-xs italic text-text-tertiary">
+                  🎤 {voiceDraft}
+                </p>
+              )}
+            </div>
             <Button
               type="submit"
               disabled={loading || !input.trim() || inputLocked}
@@ -860,6 +1038,12 @@ export default function AiAssistantPage() {
           </p>
         </form>
       </Card>
+
+      <CommandPalette
+        open={paletteOpen}
+        onClose={() => setPaletteOpen(false)}
+        commands={commands}
+      />
 
       {/* Clear-chat confirmation dialog */}
       <Dialog

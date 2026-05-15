@@ -280,6 +280,62 @@ export const aiAgent = {
     history?: { role: 'user' | 'assistant'; content: string }[]
     assistantPersona?: 'targetologist' | 'optimizer' | 'general'
   }) => apiClient.post<{ reply: string }>('/ai-agent/chat', body),
+  /**
+   * Streaming chat. Returns an AsyncIterable that yields content deltas as
+   * the model produces them; resolves once the server emits `{done:true}`.
+   * Errors raised by the server arrive as `{error: "..."}` and throw.
+   */
+  chatStream: async function* (body: {
+    workspaceId: string
+    message: string
+    history?: { role: 'user' | 'assistant'; content: string }[]
+    assistantPersona?: 'targetologist' | 'optimizer' | 'general'
+  }): AsyncGenerator<string, void, void> {
+    const token = getAccessToken()
+    const response = await fetch(buildUrl('/ai-agent/chat/stream'), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'text/event-stream',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify(body),
+    })
+    if (!response.ok || !response.body) {
+      const text = await response.text().catch(() => '')
+      throw new Error(text || `chat_stream_failed_${response.status}`)
+    }
+
+    const reader = response.body.getReader()
+    const decoder = new TextDecoder()
+    let buffer = ''
+
+    while (true) {
+      const { value, done } = await reader.read()
+      if (done) break
+      buffer += decoder.decode(value, { stream: true })
+      // SSE events are separated by a blank line ("\n\n").
+      const events = buffer.split('\n\n')
+      buffer = events.pop() ?? ''
+      for (const ev of events) {
+        const line = ev.split('\n').find((l) => l.startsWith('data:'))
+        if (!line) continue
+        const raw = line.slice(5).trim()
+        if (!raw) continue
+        try {
+          const parsed = JSON.parse(raw) as
+            | { delta: string }
+            | { done: true }
+            | { error: string }
+          if ('error' in parsed) throw new Error(parsed.error)
+          if ('done' in parsed) return
+          if ('delta' in parsed && parsed.delta) yield parsed.delta
+        } catch (e: any) {
+          if (e instanceof Error && e.message !== 'Unexpected token') throw e
+        }
+      }
+    }
+  },
   /** Multi-competitor portfolio (names + links); same payload can be forwarded to Manus later */
   competitorAnalysisBatch: (body: Record<string, unknown>) =>
     apiClient.post('/ai-agent/competitor-analysis-batch', body),

@@ -1,10 +1,85 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { Check, Copy } from 'lucide-react'
+import {
+  ArrowRight,
+  BarChart3,
+  Check,
+  Copy,
+  Megaphone,
+  Rocket,
+  Settings,
+  Target,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
+
+/**
+ * Action-chip routes the AI can request. The model is told (via the system
+ * prompt) it may include `[action:<id>]` markers inline; the parser pulls
+ * them out and renders chips at the bottom of the message.
+ */
+const ACTION_ROUTES: Record<
+  string,
+  { label: string; icon: React.ReactNode; href: string }
+> = {
+  'ad-launcher': {
+    label: 'Ad Launcher',
+    icon: <Rocket className="h-3.5 w-3.5" />,
+    href: '/ad-launcher',
+  },
+  campaigns: {
+    label: 'Kampaniyalar',
+    icon: <Megaphone className="h-3.5 w-3.5" />,
+    href: '/campaigns',
+  },
+  reports: {
+    label: 'Hisobotlar',
+    icon: <BarChart3 className="h-3.5 w-3.5" />,
+    href: '/reports',
+  },
+  'meta-audit': {
+    label: 'Meta Audit',
+    icon: <Target className="h-3.5 w-3.5" />,
+    href: '/meta-audit',
+  },
+  'creative-hub': {
+    label: 'Creative Hub',
+    icon: <Target className="h-3.5 w-3.5" />,
+    href: '/creative-hub',
+  },
+  settings: {
+    label: 'Sozlamalar',
+    icon: <Settings className="h-3.5 w-3.5" />,
+    href: '/settings',
+  },
+}
+
+/**
+ * Strips `[action:foo]` and `[action:foo|Custom Label]` tokens out of the
+ * message body and returns the cleaned text plus a deduplicated action list.
+ */
+function extractActions(content: string): {
+  text: string
+  actions: { id: string; label: string }[]
+} {
+  const re = /\[action:([a-z][a-z0-9-]*)(?:\|([^\]]+))?\]/gi
+  const seen = new Set<string>()
+  const actions: { id: string; label: string }[] = []
+  let cleaned = content
+  let match: RegExpExecArray | null
+  while ((match = re.exec(content)) !== null) {
+    const id = match[1].toLowerCase()
+    if (!seen.has(id) && ACTION_ROUTES[id]) {
+      seen.add(id)
+      actions.push({ id, label: match[2]?.trim() || ACTION_ROUTES[id].label })
+    }
+  }
+  cleaned = content.replace(re, '').replace(/\n{3,}/g, '\n\n').trim()
+  return { text: cleaned, actions }
+}
 
 function CodeBlock({ language, code }: { language: string; code: string }) {
   const [copied, setCopied] = useState(false)
@@ -53,9 +128,14 @@ function CodeBlock({ language, code }: { language: string; code: string }) {
 
 /**
  * Renders assistant messages as Markdown (GFM dialect) with custom code blocks.
- * User messages should stay plain text — this component is only used for AI replies.
+ * Also lifts inline `[action:foo]` markers out of the prose and shows them as
+ * navigation chips beneath the message. User messages stay plain text — this
+ * component is only used for AI replies.
  */
 export function MarkdownMessage({ content }: { content: string }) {
+  const router = useRouter()
+  const { text, actions } = extractActions(content)
+
   return (
     <div
       className={cn(
@@ -82,7 +162,7 @@ export function MarkdownMessage({ content }: { content: string }) {
         remarkPlugins={[remarkGfm]}
         components={{
           code({ inline, className, children, ...rest }: any) {
-            const text = String(children ?? '').replace(/\n$/, '')
+            const codeText = String(children ?? '').replace(/\n$/, '')
             if (inline) {
               return (
                 <code className={className} {...rest}>
@@ -91,7 +171,7 @@ export function MarkdownMessage({ content }: { content: string }) {
               )
             }
             const match = /language-(\w+)/.exec(className || '')
-            return <CodeBlock language={match?.[1] ?? ''} code={text} />
+            return <CodeBlock language={match?.[1] ?? ''} code={codeText} />
           },
           a({ children, href, ...rest }) {
             return (
@@ -107,8 +187,33 @@ export function MarkdownMessage({ content }: { content: string }) {
           },
         }}
       >
-        {content}
+        {text}
       </ReactMarkdown>
+
+      {actions.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-1.5 border-t border-border/40 pt-3 dark:border-brand-mid/15">
+          {actions.map((a) => {
+            const route = ACTION_ROUTES[a.id]
+            if (!route) return null
+            return (
+              <button
+                key={a.id}
+                type="button"
+                onClick={() => router.push(route.href)}
+                className={cn(
+                  'group flex items-center gap-1.5 rounded-full border border-brand-mid/30 bg-brand-mid/5 px-3 py-1 text-xs font-medium text-brand-mid transition-all',
+                  'hover:-translate-y-0.5 hover:bg-brand-mid/10 hover:shadow-sm',
+                  'dark:border-brand-lime/30 dark:bg-brand-lime/5 dark:text-brand-lime dark:hover:bg-brand-lime/10',
+                )}
+              >
+                {route.icon}
+                <span>{a.label}</span>
+                <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+              </button>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }

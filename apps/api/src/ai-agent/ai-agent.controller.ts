@@ -7,7 +7,9 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  Res,
 } from "@nestjs/common";
+import type { Response } from "express";
 import {
   ApiTags,
   ApiBearerAuth,
@@ -148,6 +150,48 @@ export class AiAgentController {
     },
   ) {
     return this.aiAgentService.chat(dto);
+  }
+
+  @Post("chat/stream")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: "Streaming chat — Server-Sent Events; same payload as /chat",
+    description:
+      "Each event has the shape `data: {\"delta\":\"...\"}` followed by a " +
+      "final `data: {\"done\":true}`. Errors are sent as `data: {\"error\":\"...\"}` " +
+      "and the connection is closed.",
+  })
+  async chatStream(
+    @Body()
+    dto: {
+      workspaceId: string;
+      message: string;
+      history?: { role: "user" | "assistant"; content: string }[];
+      assistantPersona?: "targetologist" | "optimizer" | "general";
+    },
+    @Res() res: Response,
+  ) {
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache, no-transform");
+    res.setHeader("Connection", "keep-alive");
+    res.setHeader("X-Accel-Buffering", "no");
+    // Flush headers immediately so the browser opens the stream right away.
+    (res as any).flushHeaders?.();
+
+    const send = (payload: object) => {
+      res.write(`data: ${JSON.stringify(payload)}\n\n`);
+    };
+
+    try {
+      for await (const delta of this.aiAgentService.chatStream(dto)) {
+        send({ delta });
+      }
+      send({ done: true });
+    } catch (err: any) {
+      send({ error: err?.message ?? "stream_failed" });
+    } finally {
+      res.end();
+    }
   }
 
   @Post("wizard/ad-copy")
