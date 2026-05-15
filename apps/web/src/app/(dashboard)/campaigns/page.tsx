@@ -179,7 +179,7 @@ export default function CampaignsPage() {
       </div>
 
       <div className="rounded-2xl border border-border/70 bg-white/85 p-4 shadow-sm backdrop-blur-sm dark:bg-slate-900/70">
-        <AdsManagerPanel />
+        <AdsManagerPanel workspaceId={currentWorkspace?.id} />
       </div>
 
       <div className="rounded-2xl border border-border/70 bg-white/85 p-4 shadow-sm backdrop-blur-sm dark:bg-slate-900/70">

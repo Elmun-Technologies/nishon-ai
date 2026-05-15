@@ -305,6 +305,8 @@ export const campaigns = {
     apiClient.post(`/campaigns/workspace/${workspaceId}`, dto),
   updateStatus: (id: string, status: string) =>
     apiClient.patch(`/campaigns/${id}/status`, { status }),
+  updateBudget: (id: string, dailyBudget: number) =>
+    apiClient.patch(`/campaigns/${id}/budget`, { dailyBudget }),
   delete: (id: string) =>
     apiRequest('DELETE', `/campaigns/${id}`),
 }
