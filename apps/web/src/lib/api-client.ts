@@ -448,6 +448,13 @@ export type LaunchAudienceConfig = {
   location?: string
 }
 
+export type LaunchTargeting = {
+  countries: string[]
+  ageMin: number
+  ageMax: number
+  genders?: number[]
+}
+
 export type CreateLaunchJobInput = {
   workspaceId: string
   platform: 'meta' | 'google' | string
@@ -457,6 +464,8 @@ export type CreateLaunchJobInput = {
   splitByFunnelStage?: boolean
   sourceCampaignIds?: string[]
   audiences: LaunchAudienceConfig[]
+  targeting?: LaunchTargeting
+  copyCreatives?: boolean
 }
 
 export type LaunchJob = {

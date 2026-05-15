@@ -156,10 +156,12 @@ Demo mode: agar autentifikatsiya tokeni `demo-` bilan boshlansa, Ad Launcher moc
 
 ## 8. Ma'lum cheklovlar / TODO
 
-- `MetaConnector.createAd()` mavjud (`meta.connector.ts:330+`), lekin Ad Launcher MVP'da chaqirilmaydi. Source kampaniyadan kreativ nusxalash uchun keyingi PR.
-- AdSet targeting hozir default: `countries: ['UZ']`, age 18-65. Frontend'dan targeting kiritish keyingi iteratsiyada.
-- `splitByFunnelStage` flag DTO'ga keladi, lekin orchestrator har audience uchun alohida AdSet yaratadi — flag amalda har doim "true" kabi ishlaydi.
-- Google Ads launch ishlaydi, lekin connector qo'lda tekshirilmagan.
+- ✅ Source kampaniyadan creative nusxalash — endi ishlaydi (`MetaConnector.getCampaignAds()` + `createAdFromExistingCreative()`)
+- ✅ Targeting (mamlakat, yosh, jins) frontend'dan keladi
+- ✅ `launch_jobs` jadvali uchun migration mavjud
+- `splitByFunnelStage` flag DTO'ga keladi, lekin orchestrator har doim har audience uchun alohida AdSet yaratadi — flag amalda har doim "true" kabi ishlaydi.
+- Google Ads launch kod jihatdan ishlaydi, lekin real Google Ads sandbox bilan qo'lda tekshirilmagan.
+- TikTok/Yandex launch — connector stub'lar mavjud, lekin orchestrator hozir faqat Meta va Google'ni qabul qiladi.
 
 ---
 

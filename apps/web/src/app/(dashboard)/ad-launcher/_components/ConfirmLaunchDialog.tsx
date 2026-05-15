@@ -88,6 +88,23 @@ export function ConfirmLaunchDialog({ ctl }: { ctl: AdLauncherController }) {
                 </span>
               </div>
             )}
+            <div className="flex items-start justify-between gap-4">
+              <span className="text-sm text-text-tertiary">Targeting</span>
+              <span className="text-right text-sm font-semibold text-text-primary">
+                {cfg.targeting.countries.join(', ')} · {cfg.targeting.ageMin}-{cfg.targeting.ageMax}{' '}
+                yosh
+                {cfg.targeting.genders.length > 0 &&
+                  ` · ${cfg.targeting.genders.map((g) => (g === 1 ? 'Erkak' : 'Ayol')).join(', ')}`}
+              </span>
+            </div>
+            <div className="flex items-start justify-between gap-4">
+              <span className="text-sm text-text-tertiary">Kreativlar</span>
+              <span className="text-right text-sm font-semibold text-text-primary">
+                {cfg.copyCreatives
+                  ? `${ctl.selectedCampaigns.length} manbadan nusxalanadi`
+                  : 'Bo\'sh adset (keyin qo\'shasiz)'}
+              </span>
+            </div>
           </div>
         </div>
       </div>

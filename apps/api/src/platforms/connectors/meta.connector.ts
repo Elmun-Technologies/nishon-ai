@@ -289,6 +289,56 @@ export class MetaConnector {
     );
   }
 
+  // ─── ADS ─────────────────────────────────────────────────────────────────
+
+  /**
+   * List ads under a campaign, returning the `creative.id` for each.
+   * Used by the Ad Launcher to copy the existing creatives from the
+   * "source" campaign onto the freshly created ad set(s).
+   */
+  async getCampaignAds(
+    campaignId: string,
+    accessToken: string,
+  ): Promise<Array<{ id: string; name: string; creativeId: string | null; status: string }>> {
+    const data = await this.apiGet<{ data: any[] }>(
+      `${META_BASE_URL}/${campaignId}/ads`,
+      {
+        access_token: accessToken,
+        fields: "id,name,status,creative{id}",
+        limit: "50",
+      },
+    );
+    return (data.data ?? []).map((ad) => ({
+      id: String(ad.id),
+      name: String(ad.name ?? ad.id),
+      creativeId: ad?.creative?.id ? String(ad.creative.id) : null,
+      status: String(ad.status ?? "UNKNOWN"),
+    }));
+  }
+
+  /**
+   * Create an ad on Meta by reusing an existing creative (by id).
+   * This is how the Ad Launcher copies the creative from a source campaign
+   * onto a newly-created ad set — Meta lets multiple ads reference the
+   * same creative object.
+   */
+  async createAdFromExistingCreative(
+    adAccountId: string,
+    accessToken: string,
+    params: { adSetId: string; name: string; existingCreativeId: string },
+  ): Promise<{ id: string }> {
+    return this.apiPost<{ id: string }>(
+      `${META_BASE_URL}/${adAccountId}/ads`,
+      {
+        access_token: accessToken,
+        name: params.name,
+        adset_id: params.adSetId,
+        creative: JSON.stringify({ creative_id: params.existingCreativeId }),
+        status: "PAUSED",
+      },
+    );
+  }
+
   // ─── INSIGHTS (METRICS) ───────────────────────────────────────────────────
 
   /**

@@ -57,12 +57,24 @@ export type AudiencePresetId =
   | 'retargeting'
   | 'retention'
 
+export type TargetingConfig = {
+  /** ISO 3166-1 alpha-2 codes (UZ, RU, KZ, US...) */
+  countries: string[]
+  ageMin: number
+  ageMax: number
+  /** Meta encoding: 1=male, 2=female, empty=all */
+  genders: number[]
+}
+
 export type LaunchConfig = {
   objective: LaunchObjective
   budgetType: 'ABO' | 'CBO'
   dailyBudget: number
   audiences: AudiencePresetId[]
   splitByFunnelStage: boolean
+  targeting: TargetingConfig
+  /** When true, copy creatives from the selected source campaigns onto the new ad sets. */
+  copyCreatives: boolean
 }
 
 export type LaunchPhase =

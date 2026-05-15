@@ -2,10 +2,12 @@ import {
   IsArray,
   IsBoolean,
   IsIn,
+  IsInt,
   IsNumber,
   IsOptional,
   IsString,
   IsUUID,
+  Max,
   Min,
   ValidateNested,
 } from "class-validator";
@@ -23,6 +25,27 @@ class AudienceConfigDto {
   location?: string;
 }
 
+class TargetingDto {
+  @IsArray()
+  @IsString({ each: true })
+  countries: string[];
+
+  @IsInt()
+  @Min(13)
+  @Max(65)
+  ageMin: number;
+
+  @IsInt()
+  @Min(13)
+  @Max(65)
+  ageMax: number;
+
+  @IsOptional()
+  @IsArray()
+  @IsInt({ each: true })
+  genders?: number[];
+}
+
 export class CreateLaunchJobDto {
   @IsUUID()
   workspaceId: string;
@@ -36,9 +59,14 @@ export class CreateLaunchJobDto {
   @IsIn(["ABO", "CBO"])
   budgetType: "ABO" | "CBO";
 
+  /**
+   * Optional for backward compatibility with older clients; the orchestrator
+   * falls back to a safe default ($20) when missing.
+   */
+  @IsOptional()
   @IsNumber()
   @Min(1)
-  dailyBudget: number;
+  dailyBudget?: number;
 
   @IsOptional()
   @IsBoolean()
@@ -53,4 +81,13 @@ export class CreateLaunchJobDto {
   @ValidateNested({ each: true })
   @Type(() => AudienceConfigDto)
   audiences: AudienceConfigDto[];
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => TargetingDto)
+  targeting?: TargetingDto;
+
+  @IsOptional()
+  @IsBoolean()
+  copyCreatives?: boolean;
 }

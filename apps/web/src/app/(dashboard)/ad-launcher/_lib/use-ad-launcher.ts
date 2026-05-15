@@ -83,6 +83,13 @@ const DEFAULT_LAUNCH_CONFIG: LaunchConfig = {
   dailyBudget: 25,
   audiences: ['prospecting'],
   splitByFunnelStage: false,
+  targeting: {
+    countries: ['UZ'],
+    ageMin: 18,
+    ageMax: 65,
+    genders: [],
+  },
+  copyCreatives: true,
 }
 
 /** Sleep helper for simulating network timings in demo mode. */
@@ -367,6 +374,13 @@ export function useAdLauncher() {
         name: PRESET_NAME[preset],
         funnelStage: FUNNEL_STAGE_BY_PRESET[preset],
       })),
+      targeting: {
+        countries: launchConfig.targeting.countries,
+        ageMin: launchConfig.targeting.ageMin,
+        ageMax: launchConfig.targeting.ageMax,
+        genders: launchConfig.targeting.genders,
+      },
+      copyCreatives: launchConfig.copyCreatives,
     }
 
     setLaunchPhase({ state: 'creating_draft' })

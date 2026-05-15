@@ -62,6 +62,23 @@ const OBJECTIVES: {
 
 const BUDGET_PRESETS = [10, 25, 50, 100, 200]
 
+const COUNTRY_OPTIONS: { code: string; label: string }[] = [
+  { code: 'UZ', label: 'O\'zbekiston' },
+  { code: 'KZ', label: 'Qozog\'iston' },
+  { code: 'RU', label: 'Rossiya' },
+  { code: 'KG', label: 'Qirg\'iziston' },
+  { code: 'TJ', label: 'Tojikiston' },
+  { code: 'TM', label: 'Turkmaniston' },
+  { code: 'TR', label: 'Turkiya' },
+  { code: 'US', label: 'AQSh' },
+]
+
+const GENDER_OPTIONS: { id: number | 'all'; label: string }[] = [
+  { id: 'all', label: 'Hammasi' },
+  { id: 1, label: 'Erkak' },
+  { id: 2, label: 'Ayol' },
+]
+
 const AUDIENCE_PRESETS: {
   id: AudiencePresetId
   emoji: string
@@ -386,6 +403,171 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
               Har bir guruh uchun <strong>alohida adset</strong> yaratish (tavsiya etiladi)
             </label>
           )}
+        </section>
+
+        {/* 4 — Targeting */}
+        <section className="p-5">
+          <SectionHeader
+            num={4}
+            title="Targeting — kimga ko'rsatish"
+            subtitle="Davlat, yosh va jins. Meta shu chegaralarda reklama tarqatadi."
+          />
+          <div className="mt-4 space-y-4">
+            {/* Countries */}
+            <div>
+              <p className="mb-2 text-xs font-semibold text-text-tertiary">Davlatlar</p>
+              <div className="flex flex-wrap gap-2">
+                {COUNTRY_OPTIONS.map((c) => {
+                  const on = cfg.targeting.countries.includes(c.code)
+                  return (
+                    <button
+                      key={c.code}
+                      type="button"
+                      aria-pressed={on}
+                      disabled={isBusy || isDone}
+                      onClick={() => {
+                        const next = on
+                          ? cfg.targeting.countries.filter((x) => x !== c.code)
+                          : [...cfg.targeting.countries, c.code]
+                        ctl.updateLaunchConfig({
+                          targeting: { ...cfg.targeting, countries: next.length ? next : [c.code] },
+                        })
+                      }}
+                      className={cn(
+                        'rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50',
+                        on
+                          ? 'border-primary bg-primary/10 text-primary'
+                          : 'border-border bg-surface-2 text-text-secondary hover:border-primary/40',
+                      )}
+                    >
+                      {c.label}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Age range */}
+            <div>
+              <p className="mb-2 text-xs font-semibold text-text-tertiary">Yosh oralig'i</p>
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 items-center gap-2 rounded-lg border border-border bg-surface-2 px-3 dark:bg-surface">
+                  <span className="text-xs text-text-tertiary">dan</span>
+                  <input
+                    type="number"
+                    min={13}
+                    max={65}
+                    disabled={isBusy || isDone}
+                    value={cfg.targeting.ageMin}
+                    onChange={(e) => {
+                      const v = Math.max(13, Math.min(65, Number(e.target.value) || 18))
+                      ctl.updateLaunchConfig({
+                        targeting: {
+                          ...cfg.targeting,
+                          ageMin: v,
+                          ageMax: Math.max(v, cfg.targeting.ageMax),
+                        },
+                      })
+                    }}
+                    className="w-14 bg-transparent text-sm tabular-nums outline-none"
+                  />
+                </div>
+                <div className="flex h-9 items-center gap-2 rounded-lg border border-border bg-surface-2 px-3 dark:bg-surface">
+                  <span className="text-xs text-text-tertiary">gacha</span>
+                  <input
+                    type="number"
+                    min={13}
+                    max={65}
+                    disabled={isBusy || isDone}
+                    value={cfg.targeting.ageMax}
+                    onChange={(e) => {
+                      const v = Math.max(13, Math.min(65, Number(e.target.value) || 65))
+                      ctl.updateLaunchConfig({
+                        targeting: {
+                          ...cfg.targeting,
+                          ageMax: Math.max(cfg.targeting.ageMin, v),
+                        },
+                      })
+                    }}
+                    className="w-14 bg-transparent text-sm tabular-nums outline-none"
+                  />
+                </div>
+                <span className="text-xs text-text-tertiary">yosh</span>
+              </div>
+            </div>
+
+            {/* Genders */}
+            <div>
+              <p className="mb-2 text-xs font-semibold text-text-tertiary">Jins</p>
+              <div className="flex gap-2">
+                {GENDER_OPTIONS.map((g) => {
+                  const isAll = g.id === 'all'
+                  const on = isAll
+                    ? cfg.targeting.genders.length === 0
+                    : cfg.targeting.genders.includes(g.id as number)
+                  return (
+                    <button
+                      key={String(g.id)}
+                      type="button"
+                      aria-pressed={on}
+                      disabled={isBusy || isDone}
+                      onClick={() => {
+                        if (isAll) {
+                          ctl.updateLaunchConfig({
+                            targeting: { ...cfg.targeting, genders: [] },
+                          })
+                          return
+                        }
+                        const gid = g.id as number
+                        const next = cfg.targeting.genders.includes(gid)
+                          ? cfg.targeting.genders.filter((x) => x !== gid)
+                          : [...cfg.targeting.genders, gid]
+                        ctl.updateLaunchConfig({
+                          targeting: { ...cfg.targeting, genders: next },
+                        })
+                      }}
+                      className={cn(
+                        'rounded-lg border px-4 py-1.5 text-xs font-medium transition-colors disabled:opacity-50',
+                        on
+                          ? 'border-primary bg-primary/10 text-primary'
+                          : 'border-border bg-surface-2 text-text-secondary hover:border-primary/40',
+                      )}
+                    >
+                      {g.label}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 5 — Creative copying */}
+        <section className="p-5">
+          <SectionHeader
+            num={5}
+            title="Reklama kreativlari"
+            subtitle="Tanlangan manba kampaniyalardan kreativlarni yangi adset'larga ko'chirish"
+          />
+          <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-xl border border-border bg-surface-2 p-3">
+            <input
+              type="checkbox"
+              disabled={isBusy || isDone}
+              checked={cfg.copyCreatives}
+              onChange={(e) => ctl.updateLaunchConfig({ copyCreatives: e.target.checked })}
+              className="mt-0.5 h-4 w-4 rounded border-border text-primary"
+            />
+            <span className="min-w-0 flex-1">
+              <span className="block text-sm font-semibold text-text-primary">
+                Manba kampaniyadagi reklamalarni nusxalash
+              </span>
+              <span className="mt-0.5 block text-xs leading-relaxed text-text-tertiary">
+                Belgilangach, tanlangan {ctl.selectedCampaigns.length} kampaniya ichidagi har bir
+                kreativ yangi adset'larda paydo bo'ladi. Aks holda adset bo'sh — keyinroq Meta'da
+                qo'lda kreativ qo'shasiz.
+              </span>
+            </span>
+          </label>
         </section>
       </div>
 
