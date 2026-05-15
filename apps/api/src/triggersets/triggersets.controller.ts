@@ -19,6 +19,17 @@ export class TriggersetController {
     return this.service.findAll(workspaceId, req.user.id);
   }
 
+  @Get("summary")
+  @ApiOperation({ summary: "Daily/total counts of automation actions for a workspace" })
+  getSummary(
+    @Request() req: any,
+    @Query("workspaceId") workspaceId: string,
+    @Query("days") days?: string,
+  ) {
+    const window = days ? Math.max(1, Math.min(60, parseInt(days, 10))) : 14;
+    return this.service.getSummary(workspaceId, req.user.id, window);
+  }
+
   @Get(":id")
   @ApiOperation({ summary: "Get a triggerset by ID" })
   @ApiParam({ name: "id", description: "Triggerset UUID" })

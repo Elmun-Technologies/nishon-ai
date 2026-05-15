@@ -500,9 +500,41 @@ export const meta = {
   }) => apiClient.post<{ success: boolean; id: string }>('/meta/audiences/lookalike', body),
 }
 
+export type TriggersetItem = {
+  id: string
+  name: string
+  enabled: boolean
+  lastRunStatus: 'success' | 'failed' | 'no_match' | 'skipped' | null
+  lastRunAt: string | null
+  totalFires: number
+  conditions: any[]
+  actions: any[]
+  workspaceId: string
+  createdAt: string
+  updatedAt: string
+}
+
+export type AutomationSummary = {
+  totals: { start: number; pause: number; up: number; down: number }
+  trends: { start: number; pause: number; up: number; down: number }
+  daily: Array<{
+    date: string
+    start: number
+    pause: number
+    up: number
+    down: number
+  }>
+}
+
 export const triggersets = {
   list: (workspaceId: string) =>
-    apiClient.get(`/triggersets?workspaceId=${encodeURIComponent(workspaceId)}`),
+    apiClient.get<TriggersetItem[]>(
+      `/triggersets?workspaceId=${encodeURIComponent(workspaceId)}`,
+    ),
+  summary: (workspaceId: string, days = 14) =>
+    apiClient.get<AutomationSummary>(
+      `/triggersets/summary?workspaceId=${encodeURIComponent(workspaceId)}&days=${days}`,
+    ),
   get: (id: string) => apiClient.get(`/triggersets/${id}`),
   create: (workspaceId: string, dto: any) =>
     apiClient.post(`/triggersets?workspaceId=${encodeURIComponent(workspaceId)}`, dto),
