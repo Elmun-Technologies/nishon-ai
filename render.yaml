@@ -45,8 +45,12 @@ services:
       - key: ENCRYPTION_KEY
         sync: false
 
-      # ── OpenAI ─────────────────────────────────────────────────────────────
+      # ── AI Provider ────────────────────────────────────────────────────────
+      - key: AI_PROVIDER
+        value: openai
       - key: OPENAI_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
         sync: false
 
       # ── Google OAuth (Sign-In) ─────────────────────────────────────────────

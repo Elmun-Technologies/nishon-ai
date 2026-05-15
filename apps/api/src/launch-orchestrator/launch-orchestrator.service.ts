@@ -123,7 +123,9 @@ export class LaunchOrchestratorService {
       this.config.get<string>("ENCRYPTION_KEY"),
     );
     const accessToken = decrypt(account.accessToken, encryptionKey);
-    const name = `Launch ${job.id.slice(0, 8)} - ${payload.objective}`;
+    const objective = payload.objective || "OUTCOME_SALES";
+    const dailyBudget = Number(payload.dailyBudget) > 0 ? Number(payload.dailyBudget) : 20;
+    const name = `Launch ${job.id.slice(0, 8)} - ${objective}`;
 
     if (normalizedPlatform === Platform.META) {
       const created = await this.metaConnector.createCampaign(
@@ -131,16 +133,65 @@ export class LaunchOrchestratorService {
         accessToken,
         {
           name,
-          objective: "OUTCOME_SALES",
+          objective,
           status: "PAUSED",
-          dailyBudget: 20,
+          dailyBudget,
           specialAdCategories: [],
         },
       );
+
+      // For ABO (Ad-Set Budget Optimization) split the daily budget across
+      // ad sets — one per audience. For CBO the campaign owns the budget
+      // and ad sets share it, so a small floor per ad set is fine.
+      const audiences = Array.isArray(payload.audiences) ? payload.audiences : [];
+      const perAdSetBudget =
+        payload.budgetType === "ABO" && audiences.length > 0
+          ? Math.max(1, Math.round(dailyBudget / audiences.length))
+          : Math.max(1, dailyBudget);
+
+      const adSetIds: string[] = [];
+      const adSetErrors: Array<{ audience: string; error: string }> = [];
+
+      for (const audience of audiences) {
+        try {
+          const adSet = await this.metaConnector.createAdSet(
+            account.externalAccountId,
+            accessToken,
+            {
+              campaignId: created.id,
+              name: `${audience.name} — ${audience.funnelStage}`,
+              dailyBudget: perAdSetBudget,
+              billingEvent: "IMPRESSIONS",
+              optimizationGoal:
+                audience.funnelStage === "retargeting" ||
+                audience.funnelStage === "retention"
+                  ? "OFFSITE_CONVERSIONS"
+                  : "LINK_CLICKS",
+              targeting: {
+                ageMin: 18,
+                ageMax: 65,
+                geoLocations: { countries: ["UZ"] },
+              },
+            },
+          );
+          adSetIds.push(adSet.id);
+        } catch (err: any) {
+          adSetErrors.push({
+            audience: audience.name,
+            error: err?.message || "ad_set_creation_failed",
+          });
+        }
+      }
+
       return {
         platform: Platform.META,
         campaignId: created.id,
         accountId: account.externalAccountId,
+        adSetIds,
+        adSetErrors,
+        objective,
+        dailyBudget,
+        sourceCampaignIds: payload.sourceCampaignIds ?? [],
       };
     }
 
@@ -151,7 +202,7 @@ export class LaunchOrchestratorService {
         {
           name,
           advertisingChannelType: "SEARCH",
-          dailyBudgetUsd: 20,
+          dailyBudgetUsd: dailyBudget,
           status: "PAUSED",
         },
       );
@@ -160,6 +211,8 @@ export class LaunchOrchestratorService {
         campaignId: created.id,
         budgetId: created.budgetId,
         accountId: account.externalAccountId,
+        objective,
+        dailyBudget,
       };
     }
 

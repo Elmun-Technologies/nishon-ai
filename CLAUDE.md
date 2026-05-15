@@ -25,26 +25,41 @@ pnpm --filter api dev   # Faqat backend
 
 ---
 
-## Joriy holat (so'nggi yangilash: 2026-05-11)
+## Joriy holat (so'nggi yangilash: 2026-05-15)
 
 **Asosiy branch:** `main`
-**Faol branch:** `claude/review-project-status-Ccbxh`
+**Faol branch:** `claude/setup-mvp-ads-Rivx6`
 
-### Bajarilgan va production-ga merged bo'lgan ishlar (PR merged):
-- Landing page qayta dizayni (PR #87–#97)
-- Ad Launcher 3-bosqichli flow
-- Marketplace (mutaxassislar bozori)
-- Portfolio Gamification (badge, level, leaderboard)
+### MVP fokus
+**Ad Launcher (3-bosqichli flow) production deploy.**
+Qolgan modullar (Marketplace, Portfolio, AmoCRM, Fraud, AI Agents va h.k.) kodda turaveradi, lekin MVP launch va sinov diqqati Ad Launcher'ga qaratiladi.
+
+Batafsil deploy qadamlari: `DEPLOY.md`.
+
+### Bajarilgan va production-ga merged bo'lgan ishlar:
+- Landing page qayta dizayni
+- Ad Launcher 3-bosqichli flow (frontend)
+- Marketplace, Portfolio Gamification, AmoCRM, Fraud detection
 - i18n (Uzbek/Russian/English)
-- AmoCRM integration (OAuth, sync, ROAS hisoblash)
-- Fraud detection
-- Creative Hub, Meta Audit, Reporting, Budget pages qayta dizayni
-- Retargeting worker
+- Retargeting worker, Creative Hub, Meta Audit, Reporting, Budget pages
 
-### Hozir nima ishlashim kerak?
-> **Bu bo'limni har sessiya boshida tekshir va yangilash.**
+### Bu sessiyada qilingan ishlar (claude/setup-mvp-ads-Rivx6):
+- ✅ `pnpm install` — barcha bog'liqliklar o'rnatildi
+- ✅ Lokal `.env` shabloni (random JWT/ENCRYPTION secret'lar bilan)
+- ✅ `pnpm --filter api build` va `pnpm --filter web build` — har ikkalasi muvaffaqiyatli
+- ✅ **Bug tuzatildi:** `launch-orchestrator.service.ts` endi `payload.objective`, `payload.dailyBudget`, `payload.audiences` qiymatlarini Meta'ga to'g'ri uzatadi (oldin hardcoded edi)
+- ✅ Har audience uchun alohida Meta AdSet yaratiladi (ABO uchun budget bo'linadi)
+- ✅ `CreateLaunchJobDto`'ga `dailyBudget` va `sourceCampaignIds` qo'shildi
+- ✅ `render.yaml`'ga `AI_PROVIDER` va `ANTHROPIC_API_KEY` qo'shildi
+- ✅ `DEPLOY.md` — Render + Vercel + Meta App qadam-baqadam yo'riqnomasi
 
-- [ ] Hali aniqlanmadi — foydalanuvchi ko'rsatmasi kutilmoqda
+### Keyingi qadamlar (MVP ishga tushirish uchun):
+- [ ] Render.com'da Postgres + Redis + API web service yaratish
+- [ ] Vercel'da web frontend deploy
+- [ ] Meta for Developers'da App yaratish va credentials Render'ga qo'shish
+- [ ] OAuth callback URL'ni Meta App'ga ro'yxatdan o'tkazish
+- [ ] Birinchi sinov: register → workspace → Meta connect → Ad Launcher → real launch
+- [ ] Keyingi iteratsiya: source kampaniyadan kreativ nusxalash (`MetaConnector.createAd()`)
 
 ---
 

@@ -1,4 +1,14 @@
-import { IsArray, IsBoolean, IsIn, IsOptional, IsString, IsUUID, ValidateNested } from "class-validator";
+import {
+  IsArray,
+  IsBoolean,
+  IsIn,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Min,
+  ValidateNested,
+} from "class-validator";
 import { Type } from "class-transformer";
 
 class AudienceConfigDto {
@@ -26,9 +36,18 @@ export class CreateLaunchJobDto {
   @IsIn(["ABO", "CBO"])
   budgetType: "ABO" | "CBO";
 
+  @IsNumber()
+  @Min(1)
+  dailyBudget: number;
+
   @IsOptional()
   @IsBoolean()
   splitByFunnelStage?: boolean;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  sourceCampaignIds?: string[];
 
   @IsArray()
   @ValidateNested({ each: true })
