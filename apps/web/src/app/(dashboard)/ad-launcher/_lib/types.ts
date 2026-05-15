@@ -77,12 +77,24 @@ export type LaunchConfig = {
   copyCreatives: boolean
 }
 
+export type LaunchResultSummary = {
+  campaignId?: string
+  accountId?: string
+  adSetIds?: string[]
+  adIds?: string[]
+  sourceCreativeCount?: number
+  objective?: string
+  dailyBudget?: number
+  adSetErrors?: Array<{ audience: string; error: string }>
+  adErrors?: Array<{ adSetId: string; creativeId: string; error: string }>
+}
+
 export type LaunchPhase =
   | { state: 'idle' }
   | { state: 'creating_draft' }
   | { state: 'validating'; jobId: string }
   | { state: 'launching'; jobId: string }
-  | { state: 'success'; jobId: string; metaCampaignId?: string }
+  | { state: 'success'; jobId: string; metaCampaignId?: string; result?: LaunchResultSummary }
   | { state: 'error'; message: string; jobId?: string }
 
 export type HistoryItem = {
@@ -93,5 +105,9 @@ export type HistoryItem = {
   budgetType: 'CBO' | 'ABO'
   createdAt: string
   metaCampaignId?: string
+  /** Number of ad sets created on Meta when the launch succeeded. */
+  adSetCount?: number
+  /** Number of ads created on Meta when the launch succeeded. */
+  adCount?: number
   error?: string | null
 }

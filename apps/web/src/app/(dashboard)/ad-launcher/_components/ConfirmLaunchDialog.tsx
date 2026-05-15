@@ -25,6 +25,15 @@ export function ConfirmLaunchDialog({ ctl }: { ctl: AdLauncherController }) {
   const cfg = ctl.launchConfig
   const currency = ctl.selectedAccount?.currency ?? 'USD'
 
+  // Resource counts that the orchestrator will produce.
+  const audienceCount = cfg.audiences.length
+  const sourceAdCount = ctl.selectedCampaigns.length
+  const adsCount = cfg.copyCreatives ? audienceCount * sourceAdCount : 0
+  const perAdSetBudget =
+    cfg.budgetType === 'ABO' && audienceCount > 0
+      ? Math.max(1, Math.round(cfg.dailyBudget / audienceCount))
+      : cfg.dailyBudget
+
   return (
     <Dialog
       open={ctl.confirmOpen}
@@ -40,6 +49,37 @@ export function ConfirmLaunchDialog({ ctl }: { ctl: AdLauncherController }) {
               ? 'Demo rejimda — haqiqiy kampaniya yaratilmaydi, faqat flow sinab ko\'riladi.'
               : 'Meta\'da yangi kampaniya yaratiladi. Dastlab to\'xtatilgan (PAUSED) holatda bo\'ladi — siz o\'zingiz faollashtirasiz.'}
           </p>
+        </div>
+
+        {/* Concrete resource breakdown */}
+        <div className="rounded-xl border border-primary/25 bg-primary/5 p-4">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-primary">
+            Meta'da quyidagilar yaratiladi
+          </p>
+          <div className="grid grid-cols-3 gap-2 text-center">
+            <div className="rounded-lg border border-primary/20 bg-surface p-2">
+              <p className="text-2xl font-bold text-text-primary tabular-nums">1</p>
+              <p className="text-[10px] uppercase tracking-wide text-text-tertiary">Campaign</p>
+            </div>
+            <div className="rounded-lg border border-primary/20 bg-surface p-2">
+              <p className="text-2xl font-bold text-text-primary tabular-nums">
+                {audienceCount}
+              </p>
+              <p className="text-[10px] uppercase tracking-wide text-text-tertiary">Ad Set</p>
+              {cfg.budgetType === 'ABO' && audienceCount > 0 && (
+                <p className="mt-0.5 text-[10px] text-text-tertiary">
+                  ${perAdSetBudget}/kun har biri
+                </p>
+              )}
+            </div>
+            <div className="rounded-lg border border-primary/20 bg-surface p-2">
+              <p className="text-2xl font-bold text-text-primary tabular-nums">{adsCount}</p>
+              <p className="text-[10px] uppercase tracking-wide text-text-tertiary">Reklama</p>
+              {!cfg.copyCreatives && (
+                <p className="mt-0.5 text-[10px] text-text-tertiary">bo'sh</p>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Summary */}

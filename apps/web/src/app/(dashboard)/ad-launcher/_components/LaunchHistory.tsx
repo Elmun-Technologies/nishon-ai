@@ -95,19 +95,37 @@ export function LaunchHistory({ ctl }: { ctl: AdLauncherController }) {
                   <p className="truncate font-medium text-text-primary">
                     {objectiveShort(h.objective)} · {h.budgetType}
                   </p>
-                  <p className="truncate text-text-tertiary">
-                    {h.status === 'failed' ? (
+                  {h.status === 'failed' ? (
+                    <p className="truncate text-text-tertiary">
                       <span className="inline-flex items-center gap-1 text-rose-600 dark:text-rose-400">
                         <AlertCircle className="h-3 w-3" />
                         {h.error ?? t('adLauncher.historyFailed', 'Failed')}
                       </span>
-                    ) : (
-                      <>
+                    </p>
+                  ) : (
+                    <>
+                      <p className="truncate text-text-tertiary">
                         {h.audiences.length} {t('adLauncher.historyAuds', 'auditoriya')} ·{' '}
                         {timeAgo(h.createdAt, t)}
-                      </>
-                    )}
-                  </p>
+                      </p>
+                      {h.status === 'launched' && (h.adSetCount != null || h.adCount != null) && (
+                        <p className="mt-0.5 truncate text-[10px] text-text-tertiary">
+                          {h.adSetCount ?? 0} adset · {h.adCount ?? 0} reklama
+                          {h.metaCampaignId && (
+                            <a
+                              href={`https://business.facebook.com/adsmanager/manage/campaigns?selected_campaign_ids=${encodeURIComponent(h.metaCampaignId)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="ml-1.5 text-brand-mid hover:underline dark:text-brand-lime"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              ↗ Meta
+                            </a>
+                          )}
+                        </p>
+                      )}
+                    </>
+                  )}
                 </div>
               </li>
             )
