@@ -12,6 +12,7 @@ import { MetaInsight } from "./entities/meta-insight.entity";
 import { ConnectedAccount } from "../platforms/entities/connected-account.entity";
 import { Workspace } from "../workspaces/entities/workspace.entity";
 import { AnalyticsModule } from "../analytics/analytics.module";
+import { PlatformsModule } from "../platforms/platforms.module";
 
 /**
  * MetaModule owns everything related to the Meta Ads Graph API integration:
@@ -30,6 +31,7 @@ import { AnalyticsModule } from "../analytics/analytics.module";
   imports: [
     HttpModule,
     AnalyticsModule,
+    PlatformsModule,
     TypeOrmModule.forFeature([
       MetaAdAccount,
       MetaCampaignSync,

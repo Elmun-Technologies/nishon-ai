@@ -289,6 +289,86 @@ export class MetaConnector {
     );
   }
 
+  // ─── CUSTOM AUDIENCES ────────────────────────────────────────────────────
+
+  /**
+   * List Custom Audiences (and Lookalikes — Meta returns them in the same
+   * collection) for a given ad account. Used by the /audiences page so users
+   * see what they actually have on Meta instead of a hardcoded preset list.
+   */
+  async getCustomAudiences(
+    adAccountId: string,
+    accessToken: string,
+  ): Promise<
+    Array<{
+      id: string;
+      name: string;
+      description: string | null;
+      subtype: string;
+      approximateCount: number | null;
+      deliveryStatus: string | null;
+      timeCreated: string | null;
+    }>
+  > {
+    const data = await this.apiGet<{ data: any[] }>(
+      `${META_BASE_URL}/${adAccountId}/customaudiences`,
+      {
+        access_token: accessToken,
+        fields:
+          "id,name,description,subtype,approximate_count_lower_bound,approximate_count_upper_bound,delivery_status,time_created",
+        limit: "100",
+      },
+    );
+    return (data.data ?? []).map((a) => {
+      const lower = Number(a.approximate_count_lower_bound ?? 0);
+      const upper = Number(a.approximate_count_upper_bound ?? 0);
+      const approx = upper > 0 ? Math.round((lower + upper) / 2) : null;
+      return {
+        id: String(a.id),
+        name: String(a.name ?? a.id),
+        description: a.description ? String(a.description) : null,
+        subtype: String(a.subtype ?? "CUSTOM"),
+        approximateCount: approx,
+        deliveryStatus: a.delivery_status?.description ?? null,
+        timeCreated: a.time_created ?? null,
+      };
+    });
+  }
+
+  /**
+   * Create a Lookalike Audience from an existing source audience id.
+   * Meta returns the new audience id immediately; the population status is
+   * surfaced through `delivery_status` on subsequent list calls.
+   */
+  async createLookalikeAudience(
+    adAccountId: string,
+    accessToken: string,
+    params: {
+      name: string;
+      sourceAudienceId: string;
+      /** ISO 3166-1 alpha-2 country code (e.g. "US", "UZ"). */
+      country: string;
+      /** Ratio between 0.01 and 0.20 (1% — 20%). Smaller = higher fidelity. */
+      ratio: number;
+    },
+  ): Promise<{ id: string }> {
+    const ratio = Math.max(0.01, Math.min(0.2, Number(params.ratio) || 0.01));
+    return this.apiPost<{ id: string }>(
+      `${META_BASE_URL}/${adAccountId}/customaudiences`,
+      {
+        access_token: accessToken,
+        name: params.name,
+        subtype: "LOOKALIKE",
+        origin_audience_id: params.sourceAudienceId,
+        lookalike_spec: JSON.stringify({
+          type: "similarity",
+          country: params.country,
+          ratio,
+        }),
+      },
+    );
+  }
+
   // ─── ADS ─────────────────────────────────────────────────────────────────
 
   /**

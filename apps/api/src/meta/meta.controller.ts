@@ -38,6 +38,7 @@ import { Workspace } from "../workspaces/entities/workspace.entity";
 import { User } from "../users/entities/user.entity";
 import { ConversionAnalyticsService } from "../analytics/conversion-analytics.service";
 import { extractMetaAccessToken } from "./meta-token.util";
+import { MetaConnector } from "../platforms/connectors/meta.connector";
 
 // Maps the user-facing range shorthand to Meta's date_preset values
 const RANGE_TO_DATE_PRESET: Record<string, string> = {
@@ -76,6 +77,7 @@ export class MetaController {
     private readonly insightRepo: Repository<MetaInsight>,
     @InjectRepository(Workspace)
     private readonly workspaceRepo: Repository<Workspace>,
+    private readonly metaConnector: MetaConnector,
   ) {}
 
   // ─── Passthrough Graph API endpoints ────────────────────────────────────────
@@ -813,5 +815,105 @@ export class MetaController {
   /** Resolves a Meta access token from the Authorization header or cookie. */
   private extractMetaToken(authorization?: string, req?: Request): string {
     return extractMetaAccessToken(authorization, req);
+  }
+
+  // ─── Custom Audiences ──────────────────────────────────────────────────────
+
+  @Get("audiences")
+  @ApiOperation({
+    summary: "List Custom & Lookalike Audiences for a workspace",
+    description:
+      "Reads the workspace's stored Meta access token, then lists every " +
+      "audience across all ad accounts linked to the workspace.",
+  })
+  @ApiQuery({ name: "workspaceId", description: "AdSpectr workspace UUID" })
+  async getAudiences(
+    @Query("workspaceId") workspaceId: string | undefined,
+    @Req() req: Request,
+  ) {
+    if (!workspaceId) {
+      throw new BadRequestException("workspaceId query parameter is required");
+    }
+    await this.assertWorkspaceOwnership(workspaceId, this.getRequestUserId(req));
+
+    const accessToken = await this.metaSyncService.resolveAccessToken(workspaceId);
+    if (!accessToken) {
+      return { success: true, connected: false, audiences: [] };
+    }
+
+    const adAccounts = await this.adAccountRepo.find({ where: { workspaceId } });
+    if (adAccounts.length === 0) {
+      return { success: true, connected: true, audiences: [] };
+    }
+
+    const all = await Promise.all(
+      adAccounts.map(async (acc) => {
+        try {
+          const audiences = await this.metaConnector.getCustomAudiences(
+            acc.id,
+            accessToken,
+          );
+          return audiences.map((a) => ({ ...a, accountId: acc.id }));
+        } catch (err: any) {
+          this.logger.warn({
+            message: "Failed to list custom audiences",
+            adAccount: acc.id,
+            error: err?.message,
+          });
+          return [];
+        }
+      }),
+    );
+
+    return {
+      success: true,
+      connected: true,
+      audiences: all.flat(),
+    };
+  }
+
+  @Post("audiences/lookalike")
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    summary: "Create a Lookalike Audience from an existing source audience",
+  })
+  async createLookalike(
+    @Body()
+    body: {
+      workspaceId: string;
+      adAccountId: string;
+      name: string;
+      sourceAudienceId: string;
+      country: string;
+      ratio: number;
+    },
+    @Req() req: Request,
+  ) {
+    if (!body.workspaceId || !body.adAccountId || !body.sourceAudienceId) {
+      throw new BadRequestException(
+        "workspaceId, adAccountId and sourceAudienceId are required",
+      );
+    }
+    await this.assertWorkspaceOwnership(
+      body.workspaceId,
+      this.getRequestUserId(req),
+    );
+
+    const accessToken = await this.metaSyncService.resolveAccessToken(body.workspaceId);
+    if (!accessToken) {
+      throw new BadRequestException("Meta account is not connected for this workspace");
+    }
+
+    const created = await this.metaConnector.createLookalikeAudience(
+      body.adAccountId,
+      accessToken,
+      {
+        name: body.name,
+        sourceAudienceId: body.sourceAudienceId,
+        country: body.country,
+        ratio: body.ratio,
+      },
+    );
+    return { success: true, id: created.id };
   }
 }

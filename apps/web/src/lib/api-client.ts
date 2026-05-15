@@ -475,6 +475,29 @@ export const meta = {
     ),
   setTags: (campaignId: string, workspaceId: string, tags: string[]) =>
     apiClient.post(`/meta/campaigns/${campaignId}/tags?workspaceId=${encodeURIComponent(workspaceId)}`, { tags }),
+  audiences: (workspaceId: string) =>
+    apiClient.get<{
+      success: boolean
+      connected: boolean
+      audiences: Array<{
+        id: string
+        name: string
+        description: string | null
+        subtype: string
+        approximateCount: number | null
+        deliveryStatus: string | null
+        timeCreated: string | null
+        accountId: string
+      }>
+    }>(`/meta/audiences?workspaceId=${encodeURIComponent(workspaceId)}`),
+  createLookalike: (body: {
+    workspaceId: string
+    adAccountId: string
+    name: string
+    sourceAudienceId: string
+    country: string
+    ratio: number
+  }) => apiClient.post<{ success: boolean; id: string }>('/meta/audiences/lookalike', body),
 }
 
 export const triggersets = {
