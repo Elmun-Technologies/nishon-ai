@@ -1,0 +1,125 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Ad Account ──────────────────────────────────────────────────────────────
+
+model AdAccount {
+  id           String    @id @default(cuid())
+  workspaceId  String
+  provider     String    // 'meta' | 'google'
+  externalId   String    // Meta: act_xxx
+  name         String
+  currency     String    @default("USD")
+  timezone     String?
+  accessToken  String    // AES-256-GCM encrypted: iv:data:tag (hex)
+  tokenExpiry  DateTime?
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  campaigns    Campaign[]
+  insights     InsightDaily[]
+
+  @@unique([workspaceId, provider, externalId])
+  @@index([workspaceId])
+
+  @@map("p_ad_accounts")
+}
+
+// ─── Campaign ────────────────────────────────────────────────────────────────
+
+model Campaign {
+  id          String   @id  // Meta campaign ID (external)
+  adAccountId String
+  workspaceId String
+  name        String
+  status      String   @default("UNKNOWN")
+  objective   String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  adAccount   AdAccount   @relation(fields: [adAccountId], references: [id], onDelete: Cascade)
+  adSets      AdSet[]
+  insights    InsightDaily[]
+
+  @@index([workspaceId])
+  @@index([adAccountId])
+
+  @@map("p_campaigns")
+}
+
+// ─── Ad Set ──────────────────────────────────────────────────────────────────
+
+model AdSet {
+  id          String   @id  // Meta ad set ID
+  campaignId  String
+  workspaceId String
+  name        String
+  status      String   @default("UNKNOWN")
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  campaign    Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  ads         Ad[]
+
+  @@index([campaignId])
+  @@index([workspaceId])
+
+  @@map("p_ad_sets")
+}
+
+// ─── Ad ──────────────────────────────────────────────────────────────────────
+
+model Ad {
+  id          String   @id  // Meta ad ID
+  adSetId     String
+  workspaceId String
+  name        String
+  status      String   @default("UNKNOWN")
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  adSet       AdSet    @relation(fields: [adSetId], references: [id], onDelete: Cascade)
+
+  @@index([adSetId])
+  @@index([workspaceId])
+
+  @@map("p_ads")
+}
+
+// ─── Daily Insights ──────────────────────────────────────────────────────────
+
+model InsightDaily {
+  id          String   @id @default(cuid())
+  workspaceId String
+  adAccountId String
+  campaignId  String
+
+  date        DateTime @db.Date
+  spend       Float    @default(0)
+  clicks      Int      @default(0)
+  impressions Int      @default(0)
+  purchases   Int      @default(0)
+  revenue     Float    @default(0)  // purchase conversion value
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  adAccount   AdAccount @relation(fields: [adAccountId], references: [id], onDelete: Cascade)
+  campaign    Campaign  @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, campaignId, date])
+  @@index([workspaceId, date])
+  @@index([campaignId])
+
+  @@map("p_insight_daily")
+}
