@@ -455,8 +455,39 @@ export const meta = {
     apiClient.get(`/meta/dashboard?workspaceId=${encodeURIComponent(workspaceId)}`),
   sync: (workspaceId: string) =>
     apiClient.post('/meta/sync', { workspaceId }),
-  topAds: (workspaceId: string, limit = 5) =>
-    apiClient.get(`/meta/top-ads?workspaceId=${encodeURIComponent(workspaceId)}&limit=${limit}`),
+  topAds: (
+    workspaceId: string,
+    options: {
+      limit?: number
+      days?: number
+      sort?: 'ctr' | 'spend' | 'clicks' | 'impressions' | 'conversions' | 'roas'
+      status?: 'ACTIVE' | 'PAUSED' | 'ALL'
+    } = {},
+  ) => {
+    const params = new URLSearchParams({ workspaceId })
+    if (options.limit) params.set('limit', String(options.limit))
+    if (options.days) params.set('days', String(options.days))
+    if (options.sort) params.set('sort', options.sort)
+    if (options.status) params.set('status', options.status)
+    return apiClient.get<
+      Array<{
+        campaignId: string
+        name: string
+        status: string
+        objective: string | null
+        spend: number
+        clicks: number
+        impressions: number
+        conversions: number
+        revenue: number
+        ctr: number
+        cpc: number
+        roas: number
+        format: 'video' | 'carousel' | 'image'
+        trend: number[]
+      }>
+    >(`/meta/top-ads?${params.toString()}`)
+  },
   reporting: (workspaceId: string, days = 30) =>
     apiClient.get(`/meta/reporting?workspaceId=${encodeURIComponent(workspaceId)}&days=${days}`),
   exportReporting: (workspaceId: string, days = 30) =>
