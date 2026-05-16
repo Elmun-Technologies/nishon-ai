@@ -39,6 +39,7 @@ import { User } from "../users/entities/user.entity";
 import { ConversionAnalyticsService } from "../analytics/conversion-analytics.service";
 import { extractMetaAccessToken } from "./meta-token.util";
 import { MetaConnector } from "../platforms/connectors/meta.connector";
+import { MetaAuditService } from "./meta-audit.service";
 
 // Maps the user-facing range shorthand to Meta's date_preset values
 const RANGE_TO_DATE_PRESET: Record<string, string> = {
@@ -78,6 +79,7 @@ export class MetaController {
     @InjectRepository(Workspace)
     private readonly workspaceRepo: Repository<Workspace>,
     private readonly metaConnector: MetaConnector,
+    private readonly metaAuditService: MetaAuditService,
   ) {}
 
   // ─── Passthrough Graph API endpoints ────────────────────────────────────────
@@ -815,6 +817,39 @@ export class MetaController {
   /** Resolves a Meta access token from the Authorization header or cookie. */
   private extractMetaToken(authorization?: string, req?: Request): string {
     return extractMetaAccessToken(authorization, req);
+  }
+
+  // ─── 360° Audit ────────────────────────────────────────────────────────────
+
+  @Get("audit")
+  @ApiOperation({
+    summary: "Run a 360° audit on the workspace's Meta data",
+    description:
+      "Reads cached MetaInsight + MetaCampaignSync rows and returns a " +
+      "deterministic audit report: overall score, findings list, " +
+      "per-campaign health, top spenders, and zero-result campaigns. " +
+      "No live Meta API calls — needs the sync worker to have run.",
+  })
+  @ApiQuery({ name: "workspaceId" })
+  @ApiQuery({ name: "days", required: false, description: "Lookback window (default 30)" })
+  async runAudit(
+    @Query("workspaceId") workspaceId: string | undefined,
+    @Query("days") days: string | undefined,
+    @Req() req: Request,
+  ) {
+    if (!workspaceId) {
+      throw new BadRequestException("workspaceId is required");
+    }
+    await this.assertWorkspaceOwnership(workspaceId, this.getRequestUserId(req));
+
+    const window = days ? Math.max(1, Math.min(180, parseInt(days, 10))) : 30;
+    const report = await this.metaAuditService.runAudit(workspaceId, window);
+
+    // Surface whether Meta is connected at all so the frontend can swap
+    // between the "Connect Meta" CTA and the real report without
+    // pinging a second endpoint.
+    const adAccountCount = await this.adAccountRepo.count({ where: { workspaceId } });
+    return { connected: adAccountCount > 0, report };
   }
 
   // ─── Custom Audiences ──────────────────────────────────────────────────────

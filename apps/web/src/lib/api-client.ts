@@ -475,6 +475,58 @@ export const meta = {
     ),
   setTags: (campaignId: string, workspaceId: string, tags: string[]) =>
     apiClient.post(`/meta/campaigns/${campaignId}/tags?workspaceId=${encodeURIComponent(workspaceId)}`, { tags }),
+  audit: (workspaceId: string, days = 30) =>
+    apiClient.get<{
+      connected: boolean
+      report: {
+        score: number
+        scoreLabel: 'excellent' | 'good' | 'fair' | 'poor'
+        generatedAt: string
+        windowDays: number
+        totals: {
+          spend: number
+          impressions: number
+          clicks: number
+          conversions: number
+          revenue: number
+          avgCtr: number
+          avgCpc: number
+          avgRoas: number
+          activeCampaigns: number
+          pausedCampaigns: number
+          totalCampaigns: number
+        }
+        findings: Array<{
+          id: string
+          severity: 'critical' | 'warning' | 'info' | 'good'
+          category: 'spend' | 'performance' | 'audience' | 'creative' | 'structure' | 'delivery'
+          title: string
+          detail: string
+          fix?: string
+          campaignId?: string
+        }>
+        campaigns: Array<{
+          id: string
+          name: string
+          status: string
+          objective: string | null
+          adAccountId: string
+          spend: number
+          impressions: number
+          clicks: number
+          conversions: number
+          revenue: number
+          ctr: number
+          cpc: number
+          roas: number
+          health: number
+          flags: string[]
+        }>
+        spendByObjective: Array<{ objective: string; spend: number; share: number }>
+        topSpenders: Array<any>
+        zeroResultCampaigns: Array<any>
+      }
+    }>(`/meta/audit?workspaceId=${encodeURIComponent(workspaceId)}&days=${days}`),
   audiences: (workspaceId: string) =>
     apiClient.get<{
       success: boolean

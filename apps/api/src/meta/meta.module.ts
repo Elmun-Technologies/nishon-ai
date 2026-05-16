@@ -6,6 +6,7 @@ import { MetaAdsService } from "./meta-ads.service";
 import { MetaSyncService } from "./meta-sync.service";
 import { MetaAiEngineService } from "./meta-ai-engine.service";
 import { MetaCronService } from "./meta-cron.service";
+import { MetaAuditService } from "./meta-audit.service";
 import { MetaAdAccount } from "./entities/meta-ad-account.entity";
 import { MetaCampaignSync } from "./entities/meta-campaign-sync.entity";
 import { MetaInsight } from "./entities/meta-insight.entity";
@@ -41,7 +42,7 @@ import { PlatformsModule } from "../platforms/platforms.module";
     ]),
   ],
   controllers: [MetaController],
-  providers: [MetaAdsService, MetaSyncService, MetaAiEngineService, MetaCronService],
-  exports: [MetaAdsService, MetaSyncService, MetaAiEngineService],
+  providers: [MetaAdsService, MetaSyncService, MetaAiEngineService, MetaCronService, MetaAuditService],
+  exports: [MetaAdsService, MetaSyncService, MetaAiEngineService, MetaAuditService],
 })
 export class MetaModule {}
