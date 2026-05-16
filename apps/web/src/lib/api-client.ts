@@ -280,6 +280,62 @@ export const aiAgent = {
     history?: { role: 'user' | 'assistant'; content: string }[]
     assistantPersona?: 'targetologist' | 'optimizer' | 'general'
   }) => apiClient.post<{ reply: string }>('/ai-agent/chat', body),
+  /**
+   * Streaming chat. Returns an AsyncIterable that yields content deltas as
+   * the model produces them; resolves once the server emits `{done:true}`.
+   * Errors raised by the server arrive as `{error: "..."}` and throw.
+   */
+  chatStream: async function* (body: {
+    workspaceId: string
+    message: string
+    history?: { role: 'user' | 'assistant'; content: string }[]
+    assistantPersona?: 'targetologist' | 'optimizer' | 'general'
+  }): AsyncGenerator<string, void, void> {
+    const token = getAccessToken()
+    const response = await fetch(buildUrl('/ai-agent/chat/stream'), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'text/event-stream',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify(body),
+    })
+    if (!response.ok || !response.body) {
+      const text = await response.text().catch(() => '')
+      throw new Error(text || `chat_stream_failed_${response.status}`)
+    }
+
+    const reader = response.body.getReader()
+    const decoder = new TextDecoder()
+    let buffer = ''
+
+    while (true) {
+      const { value, done } = await reader.read()
+      if (done) break
+      buffer += decoder.decode(value, { stream: true })
+      // SSE events are separated by a blank line ("\n\n").
+      const events = buffer.split('\n\n')
+      buffer = events.pop() ?? ''
+      for (const ev of events) {
+        const line = ev.split('\n').find((l) => l.startsWith('data:'))
+        if (!line) continue
+        const raw = line.slice(5).trim()
+        if (!raw) continue
+        try {
+          const parsed = JSON.parse(raw) as
+            | { delta: string }
+            | { done: true }
+            | { error: string }
+          if ('error' in parsed) throw new Error(parsed.error)
+          if ('done' in parsed) return
+          if ('delta' in parsed && parsed.delta) yield parsed.delta
+        } catch (e: any) {
+          if (e instanceof Error && e.message !== 'Unexpected token') throw e
+        }
+      }
+    }
+  },
   /** Multi-competitor portfolio (names + links); same payload can be forwarded to Manus later */
   competitorAnalysisBatch: (body: Record<string, unknown>) =>
     apiClient.post('/ai-agent/competitor-analysis-batch', body),
@@ -305,6 +361,8 @@ export const campaigns = {
     apiClient.post(`/campaigns/workspace/${workspaceId}`, dto),
   updateStatus: (id: string, status: string) =>
     apiClient.patch(`/campaigns/${id}/status`, { status }),
+  updateBudget: (id: string, dailyBudget: number) =>
+    apiClient.patch(`/campaigns/${id}/budget`, { dailyBudget }),
   delete: (id: string) =>
     apiRequest('DELETE', `/campaigns/${id}`),
 }
@@ -397,8 +455,39 @@ export const meta = {
     apiClient.get(`/meta/dashboard?workspaceId=${encodeURIComponent(workspaceId)}`),
   sync: (workspaceId: string) =>
     apiClient.post('/meta/sync', { workspaceId }),
-  topAds: (workspaceId: string, limit = 5) =>
-    apiClient.get(`/meta/top-ads?workspaceId=${encodeURIComponent(workspaceId)}&limit=${limit}`),
+  topAds: (
+    workspaceId: string,
+    options: {
+      limit?: number
+      days?: number
+      sort?: 'ctr' | 'spend' | 'clicks' | 'impressions' | 'conversions' | 'roas'
+      status?: 'ACTIVE' | 'PAUSED' | 'ALL'
+    } = {},
+  ) => {
+    const params = new URLSearchParams({ workspaceId })
+    if (options.limit) params.set('limit', String(options.limit))
+    if (options.days) params.set('days', String(options.days))
+    if (options.sort) params.set('sort', options.sort)
+    if (options.status) params.set('status', options.status)
+    return apiClient.get<
+      Array<{
+        campaignId: string
+        name: string
+        status: string
+        objective: string | null
+        spend: number
+        clicks: number
+        impressions: number
+        conversions: number
+        revenue: number
+        ctr: number
+        cpc: number
+        roas: number
+        format: 'video' | 'carousel' | 'image'
+        trend: number[]
+      }>
+    >(`/meta/top-ads?${params.toString()}`)
+  },
   reporting: (workspaceId: string, days = 30) =>
     apiClient.get(`/meta/reporting?workspaceId=${encodeURIComponent(workspaceId)}&days=${days}`),
   exportReporting: (workspaceId: string, days = 30) =>
@@ -417,11 +506,148 @@ export const meta = {
     ),
   setTags: (campaignId: string, workspaceId: string, tags: string[]) =>
     apiClient.post(`/meta/campaigns/${campaignId}/tags?workspaceId=${encodeURIComponent(workspaceId)}`, { tags }),
+  audit: (workspaceId: string, days = 30, withAiSummary = false) =>
+    apiClient.get<{
+      connected: boolean
+      report: {
+        score: number
+        scoreLabel: 'excellent' | 'good' | 'fair' | 'poor'
+        generatedAt: string
+        windowDays: number
+        totals: {
+          spend: number
+          impressions: number
+          clicks: number
+          conversions: number
+          revenue: number
+          avgCtr: number
+          avgCpc: number
+          avgRoas: number
+          activeCampaigns: number
+          pausedCampaigns: number
+          totalCampaigns: number
+        }
+        priorTotals: {
+          spend: number
+          revenue: number
+          conversions: number
+          avgCtr: number
+          avgCpc: number
+          avgRoas: number
+        }
+        deltas: {
+          spend: number
+          revenue: number
+          ctr: number
+          cpc: number
+          roas: number
+          conversions: number
+          spendPct: number | null
+          revenuePct: number | null
+          ctrPct: number | null
+          roasPct: number | null
+          conversionsPct: number | null
+        }
+        findings: Array<{
+          id: string
+          severity: 'critical' | 'warning' | 'info' | 'good'
+          category: 'spend' | 'performance' | 'audience' | 'creative' | 'structure' | 'delivery'
+          title: string
+          detail: string
+          fix?: string
+          campaignId?: string
+        }>
+        campaigns: Array<{
+          id: string
+          name: string
+          status: string
+          objective: string | null
+          adAccountId: string
+          spend: number
+          impressions: number
+          clicks: number
+          conversions: number
+          revenue: number
+          ctr: number
+          cpc: number
+          roas: number
+          health: number
+          flags: string[]
+        }>
+        spendByObjective: Array<{ objective: string; spend: number; share: number }>
+        topSpenders: Array<any>
+        zeroResultCampaigns: Array<any>
+        aiSummary: string | null
+      }
+    }>(
+      `/meta/audit?workspaceId=${encodeURIComponent(workspaceId)}&days=${days}${withAiSummary ? '&ai=1' : ''}`,
+    ),
+  pauseLosingCampaigns: (workspaceId: string, days = 30) =>
+    apiClient.post<{
+      paused: string[]
+      failed: Array<{ id: string; error: string }>
+      totalCandidates: number
+    }>('/meta/audit/pause-losing', { workspaceId, days }),
+  audiences: (workspaceId: string) =>
+    apiClient.get<{
+      success: boolean
+      connected: boolean
+      audiences: Array<{
+        id: string
+        name: string
+        description: string | null
+        subtype: string
+        approximateCount: number | null
+        deliveryStatus: string | null
+        timeCreated: string | null
+        accountId: string
+      }>
+    }>(`/meta/audiences?workspaceId=${encodeURIComponent(workspaceId)}`),
+  createLookalike: (body: {
+    workspaceId: string
+    adAccountId: string
+    name: string
+    sourceAudienceId: string
+    country: string
+    ratio: number
+  }) => apiClient.post<{ success: boolean; id: string }>('/meta/audiences/lookalike', body),
+}
+
+export type TriggersetItem = {
+  id: string
+  name: string
+  enabled: boolean
+  lastRunStatus: 'success' | 'failed' | 'no_match' | 'skipped' | null
+  lastRunAt: string | null
+  totalFires: number
+  conditions: any[]
+  actions: any[]
+  workspaceId: string
+  createdAt: string
+  updatedAt: string
+}
+
+export type AutomationSummary = {
+  totals: { start: number; pause: number; up: number; down: number }
+  trends: { start: number; pause: number; up: number; down: number }
+  daily: Array<{
+    date: string
+    start: number
+    pause: number
+    up: number
+    down: number
+  }>
 }
 
 export const triggersets = {
   list: (workspaceId: string) =>
-    apiClient.get(`/triggersets?workspaceId=${encodeURIComponent(workspaceId)}`),
+    apiClient.get<TriggersetItem[]>(
+      `/triggersets?workspaceId=${encodeURIComponent(workspaceId)}`,
+    ),
+  summary: (workspaceId: string, days = 14) =>
+    apiClient.get<AutomationSummary>(
+      `/triggersets/summary?workspaceId=${encodeURIComponent(workspaceId)}&days=${days}`,
+    ),
   get: (id: string) => apiClient.get(`/triggersets/${id}`),
   create: (workspaceId: string, dto: any) =>
     apiClient.post(`/triggersets?workspaceId=${encodeURIComponent(workspaceId)}`, dto),
@@ -448,6 +674,13 @@ export type LaunchAudienceConfig = {
   location?: string
 }
 
+export type LaunchTargeting = {
+  countries: string[]
+  ageMin: number
+  ageMax: number
+  genders?: number[]
+}
+
 export type CreateLaunchJobInput = {
   workspaceId: string
   platform: 'meta' | 'google' | string
@@ -457,6 +690,8 @@ export type CreateLaunchJobInput = {
   splitByFunnelStage?: boolean
   sourceCampaignIds?: string[]
   audiences: LaunchAudienceConfig[]
+  targeting?: LaunchTargeting
+  copyCreatives?: boolean
 }
 
 export type LaunchJob = {

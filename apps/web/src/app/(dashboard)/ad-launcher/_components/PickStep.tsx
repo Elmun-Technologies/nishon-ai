@@ -9,6 +9,7 @@ import {
   ArrowUpDown,
   Inbox,
   Search,
+  Sparkles,
 } from 'lucide-react'
 import { Button } from '@/components/ui'
 import { useI18n } from '@/i18n/use-i18n'
@@ -16,6 +17,12 @@ import { cn } from '@/lib/utils'
 import { TableSkeleton } from './TableSkeleton'
 import type { AdLauncherController } from '../_lib/use-ad-launcher'
 import type { CampaignRow, SortKey } from '../_lib/types'
+
+const HEALTH_TOOLTIPS: Record<CampaignRow['aiHealth'], string> = {
+  GOOD: 'CTR yuqori, CPC past — yaxshi ishlayapti. Masshtablash uchun ideal manba.',
+  AVERAGE: "O'rtacha. Test uchun yaroqli, lekin avval kuchli manbalarni sinab ko'ring.",
+  BAD: 'CTR past yoki CPC haddan tashqari yuqori. Manba sifatida tavsiya etilmaydi.',
+}
 
 function fmtMoney(n: number, currency = 'USD') {
   if (!isFinite(n) || n === 0) return '—'
@@ -106,6 +113,41 @@ export function PickStep({ ctl }: { ctl: AdLauncherController }) {
   const someChecked = ctl.selectedIds.size > 0 && !allChecked
   const showSkeleton = ctl.loading && ctl.filteredCampaigns.length === 0
 
+  // AI recommendation: in the current filtered list, which ads are
+  // active + rated GOOD with a SCALE action — the safest bets to copy.
+  const aiRecommended = useMemo(
+    () =>
+      ctl.filteredCampaigns.filter(
+        (c) =>
+          c.status === 'ACTIVE' && c.aiHealth === 'GOOD' && c.aiAction === 'SCALE',
+      ),
+    [ctl.filteredCampaigns],
+  )
+
+  const selectAiRecommended = () => {
+    aiRecommended.forEach((row) => {
+      if (!ctl.selectedIds.has(row.id)) ctl.toggleSelect(row.id)
+    })
+  }
+
+  // Rolling stats for the current selection — gives instant signal on the
+  // quality of the picked source ads before continuing to the launch step.
+  const selectionStats = useMemo(() => {
+    const rows = ctl.selectedCampaigns
+    if (rows.length === 0) return null
+    const totalSpend = rows.reduce((s, r) => s + (r.spend || 0), 0)
+    const totalClicks = rows.reduce((s, r) => s + (r.clicks || 0), 0)
+    const totalImpr = rows.reduce((s, r) => s + (r.impressions || 0), 0)
+    const avgCtr = totalImpr > 0 ? (totalClicks / totalImpr) * 100 : 0
+    const avgCpc = totalClicks > 0 ? totalSpend / totalClicks : 0
+    const breakdown = {
+      good: rows.filter((r) => r.aiHealth === 'GOOD').length,
+      average: rows.filter((r) => r.aiHealth === 'AVERAGE').length,
+      bad: rows.filter((r) => r.aiHealth === 'BAD').length,
+    }
+    return { totalSpend, avgCtr, avgCpc, breakdown }
+  }, [ctl.selectedCampaigns])
+
   return (
     <div className="animate-in fade-in slide-in-from-bottom-1 space-y-4 duration-300">
       <header>
@@ -122,31 +164,72 @@ export function PickStep({ ctl }: { ctl: AdLauncherController }) {
         </p>
       </header>
 
-      {/* Search */}
-      <div className="flex items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2 shadow-sm transition-colors focus-within:border-primary/60">
-        <Search className="h-4 w-4 text-text-tertiary" />
-        <input
-          value={ctl.search}
-          onChange={(e) => ctl.setSearch(e.target.value)}
-          placeholder={t('adLauncher.searchPlaceholder', 'Nom yoki ID bo\'yicha qidirish...')}
-          className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-text-tertiary"
-        />
-        {ctl.search && (
+      {/* Search + quick AI pick */}
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-1 min-w-[260px] items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2 shadow-sm transition-colors focus-within:border-primary/60">
+          <Search className="h-4 w-4 text-text-tertiary" />
+          <input
+            value={ctl.search}
+            onChange={(e) => ctl.setSearch(e.target.value)}
+            placeholder={t('adLauncher.searchPlaceholder', 'Nom yoki ID bo\'yicha qidirish...')}
+            className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-text-tertiary"
+          />
+          {ctl.search && (
+            <button
+              type="button"
+              onClick={() => ctl.setSearch('')}
+              className="text-xs text-text-tertiary hover:text-text-primary"
+            >
+              ×
+            </button>
+          )}
+          <span className="text-xs text-text-tertiary">
+            {t('adLauncher.foundCount', '{{n}} ta topildi').replace(
+              '{{n}}',
+              String(ctl.filteredCampaigns.length),
+            )}
+          </span>
+        </div>
+        {aiRecommended.length > 0 && (
           <button
             type="button"
-            onClick={() => ctl.setSearch('')}
-            className="text-xs text-text-tertiary hover:text-text-primary"
+            onClick={selectAiRecommended}
+            className={cn(
+              'group flex items-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/8 px-3 py-2 text-xs font-semibold text-emerald-700 transition-all dark:text-emerald-400',
+              'hover:-translate-y-0.5 hover:bg-emerald-500/15 hover:shadow-sm',
+            )}
+            title="ACTIVE + GOOD + SCALE bahosini olgan reklamalarni tanlash"
           >
-            ×
+            <Sparkles className="h-3.5 w-3.5" />
+            AI tavsiyasini tanlash · {aiRecommended.length}
           </button>
         )}
-        <span className="text-xs text-text-tertiary">
-          {t('adLauncher.foundCount', '{{n}} ta topildi').replace(
-            '{{n}}',
-            String(ctl.filteredCampaigns.length),
-          )}
-        </span>
       </div>
+
+      {/* Selection rolling stats */}
+      {selectionStats && (
+        <div className="rounded-xl border border-primary/20 bg-primary/5 px-3 py-2.5 text-xs">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5">
+            <span className="font-semibold text-text-primary">
+              {ctl.selectedCampaigns.length} ta manba reklamasi
+            </span>
+            <span className="text-text-secondary">
+              Sarf <span className="font-semibold text-text-primary tabular-nums">{fmtMoney(selectionStats.totalSpend, currency)}</span>
+            </span>
+            <span className="text-text-secondary">
+              CTR <span className="font-semibold text-text-primary tabular-nums">{fmtPct(selectionStats.avgCtr)}</span>
+            </span>
+            <span className="text-text-secondary">
+              CPC <span className="font-semibold text-text-primary tabular-nums">{fmtMoney(selectionStats.avgCpc, currency)}</span>
+            </span>
+            <span className="ml-auto flex items-center gap-1.5 text-text-tertiary">
+              {selectionStats.breakdown.good > 0 && <span className="text-emerald-600 dark:text-emerald-400">● {selectionStats.breakdown.good} good</span>}
+              {selectionStats.breakdown.average > 0 && <span className="text-amber-600 dark:text-amber-400">● {selectionStats.breakdown.average} avg</span>}
+              {selectionStats.breakdown.bad > 0 && <span className="text-rose-600 dark:text-rose-400">● {selectionStats.breakdown.bad} bad</span>}
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Table */}
       {showSkeleton ? (
@@ -247,7 +330,7 @@ export function PickStep({ ctl }: { ctl: AdLauncherController }) {
                             'inline-flex rounded-full px-2 py-0.5 text-[11px] font-semibold',
                             HEALTH_STYLE[row.aiHealth],
                           )}
-                          title={row.aiReason}
+                          title={row.aiReason || HEALTH_TOOLTIPS[row.aiHealth]}
                         >
                           {row.aiHealth} · {row.aiAction}
                         </span>

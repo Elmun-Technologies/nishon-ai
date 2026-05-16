@@ -227,8 +227,9 @@ export class MetaSyncService {
    * Tokens are stored AES-256-CBC encrypted when ENCRYPTION_KEY is set.
    * Falls back to returning the raw value so existing plain-text tokens
    * still work during the encryption migration window.
+   * Public — reused by the /meta/audiences endpoint.
    */
-  private async resolveAccessToken(workspaceId: string): Promise<string | null> {
+  async resolveAccessToken(workspaceId: string): Promise<string | null> {
     const account = await this.connectedAccountRepo.findOne({
       where: { workspaceId, platform: Platform.META, isActive: true },
       order: { createdAt: "DESC" },

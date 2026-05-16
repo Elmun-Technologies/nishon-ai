@@ -87,6 +87,16 @@ export class CampaignsService {
     return this.campaignRepo.save(campaign);
   }
 
+  async updateBudget(
+    id: string,
+    userId: string,
+    dailyBudget: number,
+  ): Promise<Campaign> {
+    const campaign = await this.findOne(id, userId);
+    campaign.dailyBudget = dailyBudget;
+    return this.campaignRepo.save(campaign);
+  }
+
   async delete(id: string, userId: string): Promise<void> {
     const campaign = await this.findOne(id, userId);
     await this.campaignRepo.remove(campaign);

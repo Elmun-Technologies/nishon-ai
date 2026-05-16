@@ -66,14 +66,6 @@ const MODULES = [
     status: 'active' as const,
   },
   {
-    name: 'Audience Story',
-    href: '/audiences/story',
-    description: "Auditoriya personalar va mijoz yo'li",
-    icon: Users,
-    category: 'Auditoriya',
-    status: 'active' as const,
-  },
-  {
     name: 'Marketplace',
     href: '/marketplace',
     description: "Sertifikatlangan mutaxassislar bilan bog'lanish",
@@ -175,7 +167,6 @@ const POPULAR_LINKS = [
   { title: 'Hisobot', href: '/reporting', desc: 'Real-time analitika', category: 'Analitika', keywords: 'reporting meta analitika' },
   { title: 'Hisobot quruvchi', href: '/reports', desc: 'Drag & drop dashboard', category: 'Analitika', keywords: 'dashboard drag metrics shablon' },
   { title: 'Ad Library', href: '/ad-library', desc: 'Raqib reklamalari tadqiqoti', category: 'Tadqiqot', keywords: 'raqib reklama meta library' },
-  { title: 'Audience Story', href: '/audiences/story', desc: 'Auditoriya personas', category: 'Auditoriya', keywords: 'persona journey auditoriya' },
   { title: "Hujjatlar", href: '/docs', desc: "To'liq qo'llanma", category: 'Docs', keywords: "docs qo'llanma hujjat" },
 ]
 

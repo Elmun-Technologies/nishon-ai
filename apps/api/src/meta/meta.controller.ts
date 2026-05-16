@@ -38,6 +38,8 @@ import { Workspace } from "../workspaces/entities/workspace.entity";
 import { User } from "../users/entities/user.entity";
 import { ConversionAnalyticsService } from "../analytics/conversion-analytics.service";
 import { extractMetaAccessToken } from "./meta-token.util";
+import { MetaConnector } from "../platforms/connectors/meta.connector";
+import { MetaAuditService } from "./meta-audit.service";
 
 // Maps the user-facing range shorthand to Meta's date_preset values
 const RANGE_TO_DATE_PRESET: Record<string, string> = {
@@ -76,6 +78,8 @@ export class MetaController {
     private readonly insightRepo: Repository<MetaInsight>,
     @InjectRepository(Workspace)
     private readonly workspaceRepo: Repository<Workspace>,
+    private readonly metaConnector: MetaConnector,
+    private readonly metaAuditService: MetaAuditService,
   ) {}
 
   // ─── Passthrough Graph API endpoints ────────────────────────────────────────
@@ -314,55 +318,145 @@ export class MetaController {
   // ─── Top performing campaigns ────────────────────────────────────────────────
 
   @Get("top-ads")
-  @ApiOperation({ summary: "Get top performing campaigns by CTR for a workspace" })
-  @ApiQuery({ name: "workspaceId", description: "AdSpectr workspace UUID" })
-  @ApiQuery({ name: "limit", required: false, description: "Number of results (default 5)" })
+  @ApiOperation({
+    summary: "Top performing campaigns by CTR with conversions, trend, and format detection",
+    description:
+      "Returns the top N campaigns from cached insights, ranked by CTR " +
+      "(default) or any metric the caller chooses. Each row includes a " +
+      "daily-spend trend for the lookback window plus a derived format " +
+      "label inferred from the campaign name.",
+  })
+  @ApiQuery({ name: "workspaceId" })
+  @ApiQuery({ name: "limit", required: false, description: "Number of results (default 10)" })
+  @ApiQuery({ name: "days", required: false, description: "Lookback window in days (default 30)" })
+  @ApiQuery({
+    name: "sort",
+    required: false,
+    description: "ctr | spend | clicks | impressions | conversions | roas (default ctr)",
+  })
+  @ApiQuery({
+    name: "status",
+    required: false,
+    description: "ACTIVE | PAUSED | ALL (default ALL)",
+  })
   async topAds(
     @Query("workspaceId") workspaceId: string | undefined,
-    @Query("limit") limit = "5",
+    @Query("limit") limit = "10",
+    @Query("days") days = "30",
+    @Query("sort") sort = "ctr",
+    @Query("status") status = "ALL",
     @Req() req: Request,
   ) {
     if (!workspaceId) throw new BadRequestException("workspaceId is required");
     await this.assertWorkspaceOwnership(workspaceId, this.getRequestUserId(req));
 
+    const windowDays = Math.min(Math.max(parseInt(days, 10) || 30, 1), 180);
     const since = new Date();
-    since.setDate(since.getDate() - 30);
-    const n = Math.min(parseInt(limit) || 5, 20);
+    since.setUTCHours(0, 0, 0, 0);
+    since.setUTCDate(since.getUTCDate() - windowDays);
+    const n = Math.min(parseInt(limit, 10) || 10, 50);
 
-    // Aggregate by campaign: sum spend/clicks/impressions, avg CTR
+    const sortMap: Record<string, string> = {
+      ctr: '"ctr"',
+      spend: '"spend"',
+      clicks: '"clicks"',
+      impressions: '"impressions"',
+      conversions: '"conversions"',
+      roas: '"roas"',
+    };
+    const orderCol = sortMap[sort] ?? '"ctr"';
+
     const rows = await this.insightRepo
-      .createQueryBuilder("insight")
-      .where("insight.workspaceId = :wid", { wid: workspaceId })
-      .andWhere("insight.date >= :since", { since })
+      .createQueryBuilder("i")
+      .where("i.workspaceId = :wid", { wid: workspaceId })
+      .andWhere("i.date >= :since", { since })
       .select([
-        "insight.campaignId AS campaignId",
-        'COALESCE(SUM(insight.spend), 0) AS "spend"',
-        'COALESCE(SUM(insight.clicks), 0) AS "clicks"',
-        'COALESCE(SUM(insight.impressions), 0) AS "impressions"',
-        'CASE WHEN SUM(insight.impressions) > 0 THEN ROUND(SUM(insight.clicks)::numeric / SUM(insight.impressions) * 100, 2) ELSE 0 END AS "ctr"',
+        "i.campaignId AS campaignId",
+        'COALESCE(SUM(i.spend), 0) AS "spend"',
+        'COALESCE(SUM(i.clicks), 0) AS "clicks"',
+        'COALESCE(SUM(i.impressions), 0) AS "impressions"',
+        'COALESCE(SUM(i.conversions), 0) AS "conversions"',
+        'COALESCE(SUM(i.conversionValue), 0) AS "revenue"',
+        'CASE WHEN SUM(i.impressions) > 0 THEN ROUND(SUM(i.clicks)::numeric / SUM(i.impressions) * 100, 2) ELSE 0 END AS "ctr"',
+        'CASE WHEN SUM(i.clicks) > 0 THEN ROUND(SUM(i.spend)::numeric / SUM(i.clicks), 4) ELSE 0 END AS "cpc"',
+        'CASE WHEN SUM(i.spend) > 0 THEN ROUND(SUM(i.conversionValue)::numeric / SUM(i.spend), 2) ELSE 0 END AS "roas"',
       ])
-      .groupBy("insight.campaignId")
-      .having("SUM(insight.impressions) > 0")
-      .orderBy('"ctr"', "DESC")
+      .groupBy("i.campaignId")
+      .having("SUM(i.impressions) > 0")
+      .orderBy(orderCol, "DESC")
       .limit(n)
       .getRawMany();
 
-    // Enrich with campaign names
-    const campaignIds = rows.map((r) => r.campaignId);
+    const campaignIds = rows.map((r) => r.campaignid ?? r.campaignId);
     const campaigns = campaignIds.length
       ? await this.campaignRepo.find({ where: campaignIds.map((id) => ({ id })) })
       : [];
     const campaignMap = Object.fromEntries(campaigns.map((c) => [c.id, c]));
 
-    return rows.map((r) => ({
-      campaignId:  r.campaignId,
-      name:        campaignMap[r.campaignId]?.name ?? r.campaignId,
-      status:      campaignMap[r.campaignId]?.status ?? "UNKNOWN",
-      spend:       parseFloat(r.spend) || 0,
-      clicks:      parseInt(r.clicks) || 0,
-      impressions: parseInt(r.impressions) || 0,
-      ctr:         parseFloat(r.ctr) || 0,
-    }));
+    // Per-day spend series so the frontend can render a real sparkline.
+    const dailyRows = campaignIds.length
+      ? await this.insightRepo
+          .createQueryBuilder("i")
+          .where("i.workspaceId = :wid", { wid: workspaceId })
+          .andWhere("i.date >= :since", { since })
+          .andWhere("i.campaignId IN (:...ids)", { ids: campaignIds })
+          .select([
+            "i.campaignId AS campaignId",
+            "CAST(i.date AS date) AS day",
+            'COALESCE(SUM(i.spend), 0) AS "spend"',
+          ])
+          .groupBy("i.campaignId, CAST(i.date AS date)")
+          .orderBy('"day"', "ASC")
+          .getRawMany()
+      : [];
+
+    const trendByCampaign = new Map<string, number[]>();
+    for (const r of dailyRows) {
+      const id = r.campaignid ?? r.campaignId;
+      const list = trendByCampaign.get(id) ?? [];
+      list.push(parseFloat(r.spend) || 0);
+      trendByCampaign.set(id, list);
+    }
+
+    // Format inference from campaign name — the cached campaign sync rows
+    // don't store the creative format directly, so we infer it from naming
+    // conventions advertisers normally follow. UI is forgiving: this is a
+    // hint, not a contract.
+    const inferFormat = (name: string): "video" | "carousel" | "image" => {
+      const n = (name || "").toLowerCase();
+      if (/video|reel|story|tiktok|vsl/.test(n)) return "video";
+      if (/carousel|catalog|dpa|collection/.test(n)) return "carousel";
+      return "image";
+    };
+
+    let filtered = rows;
+    if (status === "ACTIVE" || status === "PAUSED") {
+      filtered = rows.filter((r) => {
+        const id = r.campaignid ?? r.campaignId;
+        return campaignMap[id]?.status === status;
+      });
+    }
+
+    return filtered.map((r) => {
+      const id = r.campaignid ?? r.campaignId;
+      const c = campaignMap[id];
+      return {
+        campaignId: id,
+        name: c?.name ?? id,
+        status: c?.status ?? "UNKNOWN",
+        objective: c?.objective ?? null,
+        spend: parseFloat(r.spend) || 0,
+        clicks: parseInt(r.clicks, 10) || 0,
+        impressions: parseInt(r.impressions, 10) || 0,
+        conversions: parseInt(r.conversions, 10) || 0,
+        revenue: parseFloat(r.revenue) || 0,
+        ctr: parseFloat(r.ctr) || 0,
+        cpc: parseFloat(r.cpc) || 0,
+        roas: parseFloat(r.roas) || 0,
+        format: inferFormat(c?.name ?? ""),
+        trend: trendByCampaign.get(id) ?? [],
+      };
+    });
   }
 
   // ─── Reporting (hierarchical Account → Campaign) ─────────────────────────────
@@ -813,5 +907,187 @@ export class MetaController {
   /** Resolves a Meta access token from the Authorization header or cookie. */
   private extractMetaToken(authorization?: string, req?: Request): string {
     return extractMetaAccessToken(authorization, req);
+  }
+
+  // ─── 360° Audit ────────────────────────────────────────────────────────────
+
+  @Get("audit")
+  @ApiOperation({
+    summary: "Run a 360° audit on the workspace's Meta data",
+    description:
+      "Reads cached MetaInsight + MetaCampaignSync rows and returns a " +
+      "deterministic audit report: overall score, findings list, " +
+      "per-campaign health, top spenders, zero-result campaigns, plus " +
+      "period-over-period deltas. Optional AI executive summary when " +
+      "withAiSummary=true.",
+  })
+  @ApiQuery({ name: "workspaceId" })
+  @ApiQuery({ name: "days", required: false, description: "Lookback window (default 30)" })
+  @ApiQuery({ name: "ai", required: false, description: "Set to 1 to include AI executive summary" })
+  async runAudit(
+    @Query("workspaceId") workspaceId: string | undefined,
+    @Query("days") days: string | undefined,
+    @Query("ai") ai: string | undefined,
+    @Req() req: Request,
+  ) {
+    if (!workspaceId) {
+      throw new BadRequestException("workspaceId is required");
+    }
+    await this.assertWorkspaceOwnership(workspaceId, this.getRequestUserId(req));
+
+    const window = days ? Math.max(1, Math.min(180, parseInt(days, 10))) : 30;
+    const report = await this.metaAuditService.runAudit(workspaceId, window, {
+      withAiSummary: ai === "1" || ai === "true",
+    });
+
+    // Surface whether Meta is connected at all so the frontend can swap
+    // between the "Connect Meta" CTA and the real report without
+    // pinging a second endpoint.
+    const adAccountCount = await this.adAccountRepo.count({ where: { workspaceId } });
+    return { connected: adAccountCount > 0, report };
+  }
+
+  @Post("audit/pause-losing")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: "One-click fix: pause all campaigns flagged as losing money",
+    description:
+      "Walks the same audit findings as GET /meta/audit and pauses every " +
+      "Adspectr-side campaign with the LOSING_ROAS flag via Meta API. " +
+      "Returns the list of paused campaign ids and any failures.",
+  })
+  async pauseLosingCampaigns(
+    @Body() body: { workspaceId: string; days?: number },
+    @Req() req: Request,
+  ) {
+    if (!body.workspaceId) {
+      throw new BadRequestException("workspaceId is required");
+    }
+    await this.assertWorkspaceOwnership(body.workspaceId, this.getRequestUserId(req));
+
+    const accessToken = await this.metaSyncService.resolveAccessToken(body.workspaceId);
+    if (!accessToken) {
+      throw new BadRequestException("Meta account is not connected for this workspace");
+    }
+
+    const report = await this.metaAuditService.runAudit(
+      body.workspaceId,
+      body.days ?? 30,
+    );
+    const targets = report.campaigns.filter((c) =>
+      c.flags.includes("LOSING_ROAS") && c.status === "ACTIVE",
+    );
+
+    const paused: string[] = [];
+    const failed: Array<{ id: string; error: string }> = [];
+    for (const c of targets) {
+      try {
+        await this.metaConnector.pauseCampaign(c.id, accessToken);
+        paused.push(c.id);
+      } catch (e: any) {
+        failed.push({ id: c.id, error: e?.message ?? "pause_failed" });
+      }
+    }
+    return { paused, failed, totalCandidates: targets.length };
+  }
+
+  // ─── Custom Audiences ──────────────────────────────────────────────────────
+
+  @Get("audiences")
+  @ApiOperation({
+    summary: "List Custom & Lookalike Audiences for a workspace",
+    description:
+      "Reads the workspace's stored Meta access token, then lists every " +
+      "audience across all ad accounts linked to the workspace.",
+  })
+  @ApiQuery({ name: "workspaceId", description: "AdSpectr workspace UUID" })
+  async getAudiences(
+    @Query("workspaceId") workspaceId: string | undefined,
+    @Req() req: Request,
+  ) {
+    if (!workspaceId) {
+      throw new BadRequestException("workspaceId query parameter is required");
+    }
+    await this.assertWorkspaceOwnership(workspaceId, this.getRequestUserId(req));
+
+    const accessToken = await this.metaSyncService.resolveAccessToken(workspaceId);
+    if (!accessToken) {
+      return { success: true, connected: false, audiences: [] };
+    }
+
+    const adAccounts = await this.adAccountRepo.find({ where: { workspaceId } });
+    if (adAccounts.length === 0) {
+      return { success: true, connected: true, audiences: [] };
+    }
+
+    const all = await Promise.all(
+      adAccounts.map(async (acc) => {
+        try {
+          const audiences = await this.metaConnector.getCustomAudiences(
+            acc.id,
+            accessToken,
+          );
+          return audiences.map((a) => ({ ...a, accountId: acc.id }));
+        } catch (err: any) {
+          this.logger.warn({
+            message: "Failed to list custom audiences",
+            adAccount: acc.id,
+            error: err?.message,
+          });
+          return [];
+        }
+      }),
+    );
+
+    return {
+      success: true,
+      connected: true,
+      audiences: all.flat(),
+    };
+  }
+
+  @Post("audiences/lookalike")
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    summary: "Create a Lookalike Audience from an existing source audience",
+  })
+  async createLookalike(
+    @Body()
+    body: {
+      workspaceId: string;
+      adAccountId: string;
+      name: string;
+      sourceAudienceId: string;
+      country: string;
+      ratio: number;
+    },
+    @Req() req: Request,
+  ) {
+    if (!body.workspaceId || !body.adAccountId || !body.sourceAudienceId) {
+      throw new BadRequestException(
+        "workspaceId, adAccountId and sourceAudienceId are required",
+      );
+    }
+    await this.assertWorkspaceOwnership(
+      body.workspaceId,
+      this.getRequestUserId(req),
+    );
+
+    const accessToken = await this.metaSyncService.resolveAccessToken(body.workspaceId);
+    if (!accessToken) {
+      throw new BadRequestException("Meta account is not connected for this workspace");
+    }
+
+    const created = await this.metaConnector.createLookalikeAudience(
+      body.adAccountId,
+      accessToken,
+      {
+        name: body.name,
+        sourceAudienceId: body.sourceAudienceId,
+        country: body.country,
+        ratio: body.ratio,
+      },
+    );
+    return { success: true, id: created.id };
   }
 }

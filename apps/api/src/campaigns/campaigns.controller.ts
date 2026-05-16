@@ -67,6 +67,20 @@ export class CampaignsController {
     return this.campaignsService.updateStatus(id, req.user.id, body.status);
   }
 
+  @Patch(":id/budget")
+  @ApiOperation({ summary: "Update the campaign daily budget (USD)" })
+  async updateBudget(
+    @Request() req: any,
+    @Param("id") id: string,
+    @Body() body: { dailyBudget: number },
+  ) {
+    return this.campaignsService.updateBudget(
+      id,
+      req.user.id,
+      Number(body.dailyBudget),
+    );
+  }
+
   @Delete(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: "Delete a campaign" })

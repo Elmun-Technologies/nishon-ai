@@ -83,6 +83,13 @@ const DEFAULT_LAUNCH_CONFIG: LaunchConfig = {
   dailyBudget: 25,
   audiences: ['prospecting'],
   splitByFunnelStage: false,
+  targeting: {
+    countries: ['UZ'],
+    ageMin: 18,
+    ageMax: 65,
+    genders: [],
+  },
+  copyCreatives: true,
 }
 
 /** Sleep helper for simulating network timings in demo mode. */
@@ -267,18 +274,23 @@ export function useAdLauncher() {
       }
       if (!workspaceId) return
       const res = await launchOrchestrator.list(workspaceId)
-      const list = (res.data ?? []).slice(0, 5).map((j) => ({
-        id: j.id,
-        status: j.status,
-        objective: String((j.payload as any)?.objective ?? '—'),
-        audiences: Array.isArray((j.payload as any)?.audiences)
-          ? (j.payload as any).audiences.map((a: any) => a?.funnelStage ?? '').filter(Boolean)
-          : [],
-        budgetType: ((j.payload as any)?.budgetType ?? 'CBO') as 'CBO' | 'ABO',
-        createdAt: j.createdAt,
-        metaCampaignId: j.payload?.launchResult?.campaignId,
-        error: j.error,
-      }))
+      const list = (res.data ?? []).slice(0, 5).map((j) => {
+        const lr = (j.payload as any)?.launchResult
+        return {
+          id: j.id,
+          status: j.status,
+          objective: String((j.payload as any)?.objective ?? '—'),
+          audiences: Array.isArray((j.payload as any)?.audiences)
+            ? (j.payload as any).audiences.map((a: any) => a?.funnelStage ?? '').filter(Boolean)
+            : [],
+          budgetType: ((j.payload as any)?.budgetType ?? 'CBO') as 'CBO' | 'ABO',
+          createdAt: j.createdAt,
+          metaCampaignId: lr?.campaignId,
+          adSetCount: Array.isArray(lr?.adSetIds) ? lr.adSetIds.length : undefined,
+          adCount: Array.isArray(lr?.adIds) ? lr.adIds.length : undefined,
+          error: j.error,
+        }
+      })
       setHistory(list)
     } catch (err: unknown) {
       if (isDemoApiError(err)) {
@@ -367,6 +379,13 @@ export function useAdLauncher() {
         name: PRESET_NAME[preset],
         funnelStage: FUNNEL_STAGE_BY_PRESET[preset],
       })),
+      targeting: {
+        countries: launchConfig.targeting.countries,
+        ageMin: launchConfig.targeting.ageMin,
+        ageMax: launchConfig.targeting.ageMax,
+        genders: launchConfig.targeting.genders,
+      },
+      copyCreatives: launchConfig.copyCreatives,
     }
 
     setLaunchPhase({ state: 'creating_draft' })
@@ -393,10 +412,12 @@ export function useAdLauncher() {
         })
         return
       }
+      const launchResult = launched.data.payload?.launchResult as any
       setLaunchPhase({
         state: 'success',
         jobId,
-        metaCampaignId: launched.data.payload?.launchResult?.campaignId,
+        metaCampaignId: launchResult?.campaignId,
+        result: launchResult,
       })
       // Refresh history so the new job appears in the side widget.
       void loadHistory()

@@ -62,6 +62,23 @@ const OBJECTIVES: {
 
 const BUDGET_PRESETS = [10, 25, 50, 100, 200]
 
+const COUNTRY_OPTIONS: { code: string; label: string }[] = [
+  { code: 'UZ', label: 'O\'zbekiston' },
+  { code: 'KZ', label: 'Qozog\'iston' },
+  { code: 'RU', label: 'Rossiya' },
+  { code: 'KG', label: 'Qirg\'iziston' },
+  { code: 'TJ', label: 'Tojikiston' },
+  { code: 'TM', label: 'Turkmaniston' },
+  { code: 'TR', label: 'Turkiya' },
+  { code: 'US', label: 'AQSh' },
+]
+
+const GENDER_OPTIONS: { id: number | 'all'; label: string }[] = [
+  { id: 'all', label: 'Hammasi' },
+  { id: 1, label: 'Erkak' },
+  { id: 2, label: 'Ayol' },
+]
+
 const AUDIENCE_PRESETS: {
   id: AudiencePresetId
   emoji: string
@@ -94,10 +111,22 @@ const AUDIENCE_PRESETS: {
   },
 ]
 
-const LAUNCH_STEPS: { key: string; label: string }[] = [
-  { key: 'creating_draft', label: 'Kampaniya tayyorlanmoqda...' },
-  { key: 'validating', label: 'Meta bilan tekshirilmoqda...' },
-  { key: 'launching', label: 'Meta\'ga yuborilmoqda...' },
+const LAUNCH_STEPS: { key: string; label: string; sub: string }[] = [
+  {
+    key: 'creating_draft',
+    label: 'Launch job yaratilmoqda',
+    sub: "Bizning serverda kampaniya konfiguratsiyasi saqlanmoqda",
+  },
+  {
+    key: 'validating',
+    label: 'Validatsiyadan o\'tmoqda',
+    sub: "Auditoriya, byudjet va targeting tekshirilmoqda",
+  },
+  {
+    key: 'launching',
+    label: 'Meta API\'ga yuborilmoqda',
+    sub: "Campaign + AdSets + Ads yaratilmoqda",
+  },
 ]
 
 function launchErrorMessage(code: string): string {
@@ -166,6 +195,16 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
     cfg.audiences.length > 0 &&
     cfg.dailyBudget >= 1
 
+  // What will actually be created on Meta when "Launch" fires.
+  // The orchestrator: 1 Campaign + N AdSets (one per audience) + (copyCreatives ? M Ads : 0).
+  const audienceCount = cfg.audiences.length
+  const sourceAdCount = ctl.selectedCampaigns.length
+  const willCreateAds = cfg.copyCreatives ? audienceCount * sourceAdCount : 0
+  const perAdSetBudget =
+    cfg.budgetType === 'ABO' && audienceCount > 0
+      ? Math.max(1, Math.round(cfg.dailyBudget / audienceCount))
+      : cfg.dailyBudget
+
   return (
     <div className="animate-in fade-in slide-in-from-bottom-1 space-y-4 duration-300">
       <header>
@@ -174,6 +213,58 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
           Quyidagi 3 ta savolga javob bering — kampaniya avtomatik yaratiladi.
         </p>
       </header>
+
+      {/* Nima yaratiladi — preview of what the orchestrator will produce */}
+      {!isDone && (
+        <div className="rounded-xl border border-primary/25 bg-gradient-to-br from-primary/8 to-primary/3 px-4 py-3">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+              Meta'da nima yaratiladi
+            </p>
+            {audienceCount === 0 && (
+              <span className="text-[11px] text-amber-700 dark:text-amber-400">
+                ⓘ Avval auditoriya tanlang
+              </span>
+            )}
+          </div>
+          <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div>
+              <p className="text-[10px] uppercase tracking-wide text-text-tertiary">Campaign</p>
+              <p className="text-base font-bold text-text-primary tabular-nums">1</p>
+              <p className="text-[10px] text-text-tertiary truncate">
+                {cfg.objective.replace('OUTCOME_', '').toLowerCase()}
+              </p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wide text-text-tertiary">Ad Set</p>
+              <p className="text-base font-bold text-text-primary tabular-nums">
+                {audienceCount || '—'}
+              </p>
+              <p className="text-[10px] text-text-tertiary">
+                {cfg.budgetType === 'ABO'
+                  ? `${perAdSetBudget} ${currency}/kun har biri`
+                  : `${cfg.dailyBudget} ${currency}/kun (CBO)`}
+              </p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wide text-text-tertiary">Reklama</p>
+              <p className="text-base font-bold text-text-primary tabular-nums">
+                {willCreateAds || '—'}
+              </p>
+              <p className="text-[10px] text-text-tertiary">
+                {cfg.copyCreatives
+                  ? `${sourceAdCount} kreativ × ${audienceCount || 0} adset`
+                  : "Bo'sh adset (keyin qo'shasiz)"}
+              </p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wide text-text-tertiary">Holat</p>
+              <p className="text-base font-bold text-text-primary">PAUSED</p>
+              <p className="text-[10px] text-text-tertiary">Meta'da qo'lda yoqasiz</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Tanlangan reklamalar */}
       <div className="flex items-center justify-between rounded-xl border border-border bg-surface-2 px-4 py-3">
@@ -387,6 +478,171 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
             </label>
           )}
         </section>
+
+        {/* 4 — Targeting */}
+        <section className="p-5">
+          <SectionHeader
+            num={4}
+            title="Targeting — kimga ko'rsatish"
+            subtitle="Davlat, yosh va jins. Meta shu chegaralarda reklama tarqatadi."
+          />
+          <div className="mt-4 space-y-4">
+            {/* Countries */}
+            <div>
+              <p className="mb-2 text-xs font-semibold text-text-tertiary">Davlatlar</p>
+              <div className="flex flex-wrap gap-2">
+                {COUNTRY_OPTIONS.map((c) => {
+                  const on = cfg.targeting.countries.includes(c.code)
+                  return (
+                    <button
+                      key={c.code}
+                      type="button"
+                      aria-pressed={on}
+                      disabled={isBusy || isDone}
+                      onClick={() => {
+                        const next = on
+                          ? cfg.targeting.countries.filter((x) => x !== c.code)
+                          : [...cfg.targeting.countries, c.code]
+                        ctl.updateLaunchConfig({
+                          targeting: { ...cfg.targeting, countries: next.length ? next : [c.code] },
+                        })
+                      }}
+                      className={cn(
+                        'rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50',
+                        on
+                          ? 'border-primary bg-primary/10 text-primary'
+                          : 'border-border bg-surface-2 text-text-secondary hover:border-primary/40',
+                      )}
+                    >
+                      {c.label}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Age range */}
+            <div>
+              <p className="mb-2 text-xs font-semibold text-text-tertiary">Yosh oralig'i</p>
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 items-center gap-2 rounded-lg border border-border bg-surface-2 px-3 dark:bg-surface">
+                  <span className="text-xs text-text-tertiary">dan</span>
+                  <input
+                    type="number"
+                    min={13}
+                    max={65}
+                    disabled={isBusy || isDone}
+                    value={cfg.targeting.ageMin}
+                    onChange={(e) => {
+                      const v = Math.max(13, Math.min(65, Number(e.target.value) || 18))
+                      ctl.updateLaunchConfig({
+                        targeting: {
+                          ...cfg.targeting,
+                          ageMin: v,
+                          ageMax: Math.max(v, cfg.targeting.ageMax),
+                        },
+                      })
+                    }}
+                    className="w-14 bg-transparent text-sm tabular-nums outline-none"
+                  />
+                </div>
+                <div className="flex h-9 items-center gap-2 rounded-lg border border-border bg-surface-2 px-3 dark:bg-surface">
+                  <span className="text-xs text-text-tertiary">gacha</span>
+                  <input
+                    type="number"
+                    min={13}
+                    max={65}
+                    disabled={isBusy || isDone}
+                    value={cfg.targeting.ageMax}
+                    onChange={(e) => {
+                      const v = Math.max(13, Math.min(65, Number(e.target.value) || 65))
+                      ctl.updateLaunchConfig({
+                        targeting: {
+                          ...cfg.targeting,
+                          ageMax: Math.max(cfg.targeting.ageMin, v),
+                        },
+                      })
+                    }}
+                    className="w-14 bg-transparent text-sm tabular-nums outline-none"
+                  />
+                </div>
+                <span className="text-xs text-text-tertiary">yosh</span>
+              </div>
+            </div>
+
+            {/* Genders */}
+            <div>
+              <p className="mb-2 text-xs font-semibold text-text-tertiary">Jins</p>
+              <div className="flex gap-2">
+                {GENDER_OPTIONS.map((g) => {
+                  const isAll = g.id === 'all'
+                  const on = isAll
+                    ? cfg.targeting.genders.length === 0
+                    : cfg.targeting.genders.includes(g.id as number)
+                  return (
+                    <button
+                      key={String(g.id)}
+                      type="button"
+                      aria-pressed={on}
+                      disabled={isBusy || isDone}
+                      onClick={() => {
+                        if (isAll) {
+                          ctl.updateLaunchConfig({
+                            targeting: { ...cfg.targeting, genders: [] },
+                          })
+                          return
+                        }
+                        const gid = g.id as number
+                        const next = cfg.targeting.genders.includes(gid)
+                          ? cfg.targeting.genders.filter((x) => x !== gid)
+                          : [...cfg.targeting.genders, gid]
+                        ctl.updateLaunchConfig({
+                          targeting: { ...cfg.targeting, genders: next },
+                        })
+                      }}
+                      className={cn(
+                        'rounded-lg border px-4 py-1.5 text-xs font-medium transition-colors disabled:opacity-50',
+                        on
+                          ? 'border-primary bg-primary/10 text-primary'
+                          : 'border-border bg-surface-2 text-text-secondary hover:border-primary/40',
+                      )}
+                    >
+                      {g.label}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 5 — Creative copying */}
+        <section className="p-5">
+          <SectionHeader
+            num={5}
+            title="Reklama kreativlari"
+            subtitle="Tanlangan manba kampaniyalardan kreativlarni yangi adset'larga ko'chirish"
+          />
+          <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-xl border border-border bg-surface-2 p-3">
+            <input
+              type="checkbox"
+              disabled={isBusy || isDone}
+              checked={cfg.copyCreatives}
+              onChange={(e) => ctl.updateLaunchConfig({ copyCreatives: e.target.checked })}
+              className="mt-0.5 h-4 w-4 rounded border-border text-primary"
+            />
+            <span className="min-w-0 flex-1">
+              <span className="block text-sm font-semibold text-text-primary">
+                Manba kampaniyadagi reklamalarni nusxalash
+              </span>
+              <span className="mt-0.5 block text-xs leading-relaxed text-text-tertiary">
+                Belgilangach, tanlangan {ctl.selectedCampaigns.length} kampaniya ichidagi har bir
+                kreativ yangi adset'larda paydo bo'ladi. Aks holda adset bo'sh — keyinroq Meta'da
+                qo'lda kreativ qo'shasiz.
+              </span>
+            </span>
+          </label>
+        </section>
       </div>
 
       {/* Launch progress */}
@@ -397,10 +653,10 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
               const done = i < currentLaunchStepIndex
               const active = i === currentLaunchStepIndex
               return (
-                <div key={s.key} className="flex items-center gap-3">
+                <div key={s.key} className="flex items-start gap-3">
                   <span
                     className={cn(
-                      'flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs',
+                      'mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs',
                       done && 'bg-emerald-500 text-white',
                       active && 'bg-primary text-brand-ink',
                       !done && !active && 'bg-border text-text-tertiary',
@@ -408,16 +664,21 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
                   >
                     {done ? <CheckCircle2 className="h-3.5 w-3.5" /> : active ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : i + 1}
                   </span>
-                  <span
-                    className={cn(
-                      'text-sm',
-                      active && 'font-medium text-text-primary',
-                      done && 'text-text-secondary line-through',
-                      !done && !active && 'text-text-tertiary',
+                  <div className="min-w-0 flex-1">
+                    <p
+                      className={cn(
+                        'text-sm',
+                        active && 'font-semibold text-text-primary',
+                        done && 'text-text-secondary',
+                        !done && !active && 'text-text-tertiary',
+                      )}
+                    >
+                      {s.label}
+                    </p>
+                    {active && (
+                      <p className="mt-0.5 text-[11px] text-text-tertiary">{s.sub}</p>
                     )}
-                  >
-                    {s.label}
-                  </span>
+                  </div>
                 </div>
               )
             })}
@@ -472,19 +733,75 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400">
               <CheckCircle2 className="h-5 w-5" />
             </span>
-            <div className="flex-1">
-              <h3 className="text-base font-semibold text-emerald-900 dark:text-emerald-200">
-                Kampaniya yaratildi!
-              </h3>
-              <p className="mt-0.5 text-sm text-emerald-800/85 dark:text-emerald-200/80">
-                Meta'da <strong>PAUSED</strong> holatda turibdi — siz u yerda ko'rib, faollashtirish tugmasini bosasiz.
-              </p>
+            <div className="flex-1 space-y-3">
+              <div>
+                <h3 className="text-base font-semibold text-emerald-900 dark:text-emerald-200">
+                  Kampaniya yaratildi!
+                </h3>
+                <p className="mt-0.5 text-sm text-emerald-800/85 dark:text-emerald-200/80">
+                  Meta'da <strong>PAUSED</strong> holatda turibdi — siz u yerda ko'rib, faollashtirish tugmasini bosasiz.
+                </p>
+              </div>
+
+              {/* Real result summary: counts + Meta deeplink */}
+              {phase.result && (
+                <div className="grid grid-cols-3 gap-2 rounded-lg border border-emerald-300/30 bg-white/60 p-3 text-xs dark:border-emerald-500/20 dark:bg-emerald-500/5">
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wide text-emerald-800/60 dark:text-emerald-300/60">Campaign</p>
+                    <p className="font-bold text-emerald-900 dark:text-emerald-100">1</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wide text-emerald-800/60 dark:text-emerald-300/60">Ad Set</p>
+                    <p className="font-bold text-emerald-900 dark:text-emerald-100">
+                      {phase.result.adSetIds?.length ?? 0}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wide text-emerald-800/60 dark:text-emerald-300/60">Reklama</p>
+                    <p className="font-bold text-emerald-900 dark:text-emerald-100">
+                      {phase.result.adIds?.length ?? 0}
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {phase.metaCampaignId && (
-                <p className="mt-2 inline-flex items-center gap-1 rounded-md bg-emerald-500/15 px-2 py-1 text-xs text-emerald-900 dark:text-emerald-200">
-                  Meta ID: <code className="font-mono">{phase.metaCampaignId}</code>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/15 px-2 py-1 text-xs text-emerald-900 dark:text-emerald-200">
+                    Meta ID: <code className="font-mono">{phase.metaCampaignId}</code>
+                  </span>
+                  <a
+                    href={`https://business.facebook.com/adsmanager/manage/campaigns?selected_campaign_ids=${encodeURIComponent(phase.metaCampaignId)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs font-medium text-emerald-800 hover:underline dark:text-emerald-300"
+                  >
+                    Meta Ads Manager'da ochish
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                </div>
+              )}
+
+              {/* Partial failure warnings (some ad sets / ads couldn't be created) */}
+              {phase.result?.adSetErrors && phase.result.adSetErrors.length > 0 && (
+                <div className="rounded-md border border-amber-300/40 bg-amber-50/50 px-3 py-2 text-xs text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
+                  <p className="font-semibold">{phase.result.adSetErrors.length} ta adset yaratilmadi:</p>
+                  <ul className="mt-1 list-disc pl-4">
+                    {phase.result.adSetErrors.slice(0, 3).map((e, i) => (
+                      <li key={i}>
+                        {e.audience}: {e.error}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {phase.result?.adErrors && phase.result.adErrors.length > 0 && (
+                <p className="text-xs text-amber-700 dark:text-amber-300">
+                  ⚠ {phase.result.adErrors.length} ta reklama nusxalanmadi. Meta Ads Manager'da qo'lda qo'shishingiz mumkin.
                 </p>
               )}
-              <div className="mt-3 flex flex-wrap gap-2">
+
+              <div className="flex flex-wrap gap-2 pt-1">
                 <Link href="/campaigns">
                   <Button size="sm">
                     Kampaniyalarni ko'rish

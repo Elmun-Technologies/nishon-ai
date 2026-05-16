@@ -10,7 +10,6 @@ import { useI18n } from '@/i18n/use-i18n'
 const PAGE_TITLES: Record<string, { titleKey: string; titleFallback: string; subtitleKey: string; subtitleFallback: string }> = {
   '/dashboard':            { titleKey: 'navigation.dashboard', titleFallback: 'Dashboard', subtitleKey: 'header.dashboardSubtitle', subtitleFallback: 'Overview of your advertising performance' },
   '/campaigns':            { titleKey: 'navigation.campaigns', titleFallback: 'Campaigns', subtitleKey: 'header.campaignsSubtitle', subtitleFallback: 'All campaigns managed by AdSpectr' },
-  '/audiences/story':      { titleKey: 'audienceStory.pageTitle', titleFallback: 'Audience Story', subtitleKey: 'header.audienceStorySubtitle', subtitleFallback: 'Persona narrative, journey, interests, creative fit, and competitor timing' },
   '/audiences/studio':     { titleKey: 'audiences.studioTitle', titleFallback: 'Audience Studio', subtitleKey: 'header.audienceStudioSubtitle', subtitleFallback: 'Performance table and audience mixer' },
   '/audiences':            { titleKey: 'navigation.audiences', titleFallback: 'Audiences', subtitleKey: 'header.audiencesSubtitle', subtitleFallback: 'Build and launch full-funnel audiences' },
   '/ai-decisions':         { titleKey: 'navigation.aiDecisions', titleFallback: 'AI Decisions', subtitleKey: 'header.aiDecisionsSubtitle', subtitleFallback: 'Every action the AI has taken — with full reasoning' },
@@ -60,7 +59,6 @@ export default function Header() {
     pathname.startsWith('/automation/wizard') ||
     pathname === '/ad-launcher' ||
     pathname === '/audiences/studio' ||
-    pathname === '/audiences/story' ||
     pathname === '/settings' ||
     pathname.startsWith('/settings/workspace') ||
     pathname === '/create-agent' ||

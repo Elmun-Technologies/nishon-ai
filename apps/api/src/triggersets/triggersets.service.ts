@@ -42,6 +42,109 @@ export class TriggersetService {
     });
   }
 
+  /**
+   * Aggregate counts of the actions automations have taken over the lookback
+   * window: how many campaigns were started, paused, scaled up, scaled down.
+   * Backs the four "summary" KPI cards on /automation. Returns the daily
+   * series too so the page can render the activity chart.
+   */
+  async getSummary(
+    workspaceId: string,
+    userId: string,
+    days = 14,
+  ): Promise<{
+    totals: { start: number; pause: number; up: number; down: number };
+    trends: { start: number; pause: number; up: number; down: number };
+    daily: Array<{
+      date: string;
+      start: number;
+      pause: number;
+      up: number;
+      down: number;
+    }>;
+  }> {
+    await this.assertOwnership(workspaceId, userId);
+
+    const since = new Date();
+    since.setUTCHours(0, 0, 0, 0);
+    since.setUTCDate(since.getUTCDate() - (days - 1));
+
+    const priorSince = new Date(since);
+    priorSince.setUTCDate(priorSince.getUTCDate() - days);
+
+    // Pull every log in the union window so we can compute current-period
+    // totals plus the period-over-period trend in one query.
+    const logs = await this.logRepo
+      .createQueryBuilder("log")
+      .innerJoin("log.triggerset", "ts")
+      .where("ts.workspaceId = :wid", { wid: workspaceId })
+      .andWhere("log.ranAt >= :priorSince", { priorSince })
+      .select(["log.ranAt AS ranAt", "log.actionsApplied AS actionsApplied"])
+      .getRawMany();
+
+    const empty = () => ({ start: 0, pause: 0, up: 0, down: 0 });
+    const totals = empty();
+    const prior = empty();
+    const dailyMap = new Map<string, ReturnType<typeof empty>>();
+
+    const classify = (
+      type: string,
+    ): "start" | "pause" | "up" | "down" | null => {
+      const t = (type || "").toLowerCase();
+      if (/start|resume|activate|launch/.test(t)) return "start";
+      if (/pause|stop|disable/.test(t)) return "pause";
+      if (/(budget|bid).*(up|increase|raise|scale)/.test(t)) return "up";
+      if (/scale_?up|increase/.test(t)) return "up";
+      if (/(budget|bid).*(down|decrease|lower)/.test(t)) return "down";
+      if (/scale_?down|decrease/.test(t)) return "down";
+      return null;
+    };
+
+    for (const row of logs) {
+      const ranAt: Date = row.ranat instanceof Date ? row.ranat : new Date(row.ranat ?? row.ranAt);
+      const isCurrent = ranAt >= since;
+      const actions = Array.isArray(row.actionsapplied)
+        ? row.actionsapplied
+        : Array.isArray(row.actionsApplied)
+          ? row.actionsApplied
+          : [];
+      for (const a of actions) {
+        const bucket = classify(a?.type);
+        if (!bucket) continue;
+        if (isCurrent) {
+          totals[bucket] += 1;
+          const dayKey = ranAt.toISOString().slice(0, 10);
+          const dayRow = dailyMap.get(dayKey) ?? empty();
+          dayRow[bucket] += 1;
+          dailyMap.set(dayKey, dayRow);
+        } else {
+          prior[bucket] += 1;
+        }
+      }
+    }
+
+    // Build a full daily series so the chart can render without gaps.
+    const daily: Array<{ date: string; start: number; pause: number; up: number; down: number }> = [];
+    for (let i = 0; i < days; i += 1) {
+      const d = new Date(since);
+      d.setUTCDate(d.getUTCDate() + i);
+      const key = d.toISOString().slice(0, 10);
+      const row = dailyMap.get(key) ?? empty();
+      daily.push({ date: key, ...row });
+    }
+
+    return {
+      totals,
+      trends: {
+        start: totals.start - prior.start,
+        pause: totals.pause - prior.pause,
+        up: totals.up - prior.up,
+        down: totals.down - prior.down,
+      },
+      daily,
+    };
+  }
+
   async findOne(id: string, userId: string): Promise<Triggerset> {
     const ts = await this.triggersetRepo.findOne({ where: { id } });
     if (!ts) throw new NotFoundException("Triggerset not found");

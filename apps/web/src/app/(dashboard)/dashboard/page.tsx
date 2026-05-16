@@ -357,7 +357,7 @@ export default function DashboardPage() {
     { href: '/launch',          icon: Rocket,          label: t('dashboard.dashboardHome.actionLaunch',   '🚀 Yangi kampaniya') },
     { href: '/reports',         icon: FileText,         label: t('dashboard.dashboardHome.actionReport',   '📊 Hisobot') },
     { href: '/ad-library',      icon: ScanSearch,       label: t('dashboard.dashboardHome.actionIdea',     '💡 Ideyalar') },
-    { href: '/audiences/story', icon: BookHeart,        label: t('dashboard.dashboardHome.actionAudience', '👥 Auditoriya') },
+    { href: '/audiences',       icon: BookHeart,        label: t('dashboard.dashboardHome.actionAudience', '👥 Auditoriya') },
     { href: '/triggersets',     icon: Zap,              label: t('dashboard.dashboardHome.actionTrigger',  '⚡ Triggerlar') },
     { href: '/ai-decisions',    icon: Brain,            label: t('dashboard.dashboardHome.actionAi',       '🤖 AI qarorlar') },
   ]

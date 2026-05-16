@@ -25,8 +25,12 @@ export function DemoBanner() {
           <p className="text-xs text-amber-800/85 dark:text-amber-200/80">
             {t(
               'adLauncher.demoBannerBody',
-              'Siz to\'liq flow\'ni sinab ko\'rishingiz mumkin. Yakuniy launch faqat haqiqiy hisob bilan ishlaydi.',
+              "Quyidagi reklamalar va metrikalar misol uchun. Real launch tugmasi bosilganda hech narsa Meta'ga yuborilmaydi.",
             )}
+          </p>
+          <p className="mt-1 text-[11px] text-amber-800/70 dark:text-amber-200/60">
+            Haqiqiy ishlash uchun: <strong>Ro&apos;yxatdan o&apos;ting</strong> → workspace yarating →
+            Meta hisobini ulang → Ad Launcher real kampaniyalaringizni ko&apos;rsatadi.
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-2">

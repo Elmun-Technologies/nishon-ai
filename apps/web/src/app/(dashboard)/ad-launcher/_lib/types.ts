@@ -57,12 +57,36 @@ export type AudiencePresetId =
   | 'retargeting'
   | 'retention'
 
+export type TargetingConfig = {
+  /** ISO 3166-1 alpha-2 codes (UZ, RU, KZ, US...) */
+  countries: string[]
+  ageMin: number
+  ageMax: number
+  /** Meta encoding: 1=male, 2=female, empty=all */
+  genders: number[]
+}
+
 export type LaunchConfig = {
   objective: LaunchObjective
   budgetType: 'ABO' | 'CBO'
   dailyBudget: number
   audiences: AudiencePresetId[]
   splitByFunnelStage: boolean
+  targeting: TargetingConfig
+  /** When true, copy creatives from the selected source campaigns onto the new ad sets. */
+  copyCreatives: boolean
+}
+
+export type LaunchResultSummary = {
+  campaignId?: string
+  accountId?: string
+  adSetIds?: string[]
+  adIds?: string[]
+  sourceCreativeCount?: number
+  objective?: string
+  dailyBudget?: number
+  adSetErrors?: Array<{ audience: string; error: string }>
+  adErrors?: Array<{ adSetId: string; creativeId: string; error: string }>
 }
 
 export type LaunchPhase =
@@ -70,7 +94,7 @@ export type LaunchPhase =
   | { state: 'creating_draft' }
   | { state: 'validating'; jobId: string }
   | { state: 'launching'; jobId: string }
-  | { state: 'success'; jobId: string; metaCampaignId?: string }
+  | { state: 'success'; jobId: string; metaCampaignId?: string; result?: LaunchResultSummary }
   | { state: 'error'; message: string; jobId?: string }
 
 export type HistoryItem = {
@@ -81,5 +105,9 @@ export type HistoryItem = {
   budgetType: 'CBO' | 'ABO'
   createdAt: string
   metaCampaignId?: string
+  /** Number of ad sets created on Meta when the launch succeeded. */
+  adSetCount?: number
+  /** Number of ads created on Meta when the launch succeeded. */
+  adCount?: number
   error?: string | null
 }

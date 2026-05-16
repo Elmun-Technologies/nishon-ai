@@ -123,7 +123,19 @@ export class LaunchOrchestratorService {
       this.config.get<string>("ENCRYPTION_KEY"),
     );
     const accessToken = decrypt(account.accessToken, encryptionKey);
-    const name = `Launch ${job.id.slice(0, 8)} - ${payload.objective}`;
+    const objective = payload.objective || "OUTCOME_SALES";
+    const dailyBudget = Number(payload.dailyBudget) > 0 ? Number(payload.dailyBudget) : 20;
+    const name = `Launch ${job.id.slice(0, 8)} - ${objective}`;
+    const targeting = payload.targeting ?? {
+      countries: ["UZ"],
+      ageMin: 18,
+      ageMax: 65,
+      genders: [],
+    };
+    const sourceCampaignIds = Array.isArray(payload.sourceCampaignIds)
+      ? payload.sourceCampaignIds
+      : [];
+    const copyCreatives = payload.copyCreatives !== false && sourceCampaignIds.length > 0;
 
     if (normalizedPlatform === Platform.META) {
       const created = await this.metaConnector.createCampaign(
@@ -131,16 +143,112 @@ export class LaunchOrchestratorService {
         accessToken,
         {
           name,
-          objective: "OUTCOME_SALES",
+          objective,
           status: "PAUSED",
-          dailyBudget: 20,
+          dailyBudget,
           specialAdCategories: [],
         },
       );
+
+      // For ABO (Ad-Set Budget Optimization) split the daily budget across
+      // ad sets — one per audience. For CBO the campaign owns the budget
+      // and ad sets share it, so a small floor per ad set is fine.
+      const audiences = Array.isArray(payload.audiences) ? payload.audiences : [];
+      const perAdSetBudget =
+        payload.budgetType === "ABO" && audiences.length > 0
+          ? Math.max(1, Math.round(dailyBudget / audiences.length))
+          : Math.max(1, dailyBudget);
+
+      // Fetch creative ids from source campaigns once, up-front, so each ad
+      // set can receive a copy of every creative.
+      const sourceCreativeIds: string[] = [];
+      if (copyCreatives) {
+        for (const sourceId of sourceCampaignIds) {
+          try {
+            const ads = await this.metaConnector.getCampaignAds(sourceId, accessToken);
+            for (const ad of ads) {
+              if (ad.creativeId) sourceCreativeIds.push(ad.creativeId);
+            }
+          } catch {
+            // Non-fatal: continue with whatever creatives we already gathered.
+          }
+        }
+      }
+
+      const adSetIds: string[] = [];
+      const adIds: string[] = [];
+      const adSetErrors: Array<{ audience: string; error: string }> = [];
+      const adErrors: Array<{ adSetId: string; creativeId: string; error: string }> = [];
+
+      for (const audience of audiences) {
+        let adSetId: string;
+        try {
+          const adSet = await this.metaConnector.createAdSet(
+            account.externalAccountId,
+            accessToken,
+            {
+              campaignId: created.id,
+              name: `${audience.name} — ${audience.funnelStage}`,
+              dailyBudget: perAdSetBudget,
+              billingEvent: "IMPRESSIONS",
+              optimizationGoal:
+                audience.funnelStage === "retargeting" ||
+                audience.funnelStage === "retention"
+                  ? "OFFSITE_CONVERSIONS"
+                  : "LINK_CLICKS",
+              targeting: {
+                ageMin: targeting.ageMin,
+                ageMax: targeting.ageMax,
+                genders: targeting.genders?.length ? targeting.genders : undefined,
+                geoLocations: { countries: targeting.countries },
+              },
+            },
+          );
+          adSetId = adSet.id;
+          adSetIds.push(adSetId);
+        } catch (err: any) {
+          adSetErrors.push({
+            audience: audience.name,
+            error: err?.message || "ad_set_creation_failed",
+          });
+          continue;
+        }
+
+        for (const creativeId of sourceCreativeIds) {
+          try {
+            const ad = await this.metaConnector.createAdFromExistingCreative(
+              account.externalAccountId,
+              accessToken,
+              {
+                adSetId,
+                name: `${audience.name} — creative ${creativeId.slice(-6)}`,
+                existingCreativeId: creativeId,
+              },
+            );
+            adIds.push(ad.id);
+          } catch (err: any) {
+            adErrors.push({
+              adSetId,
+              creativeId,
+              error: err?.message || "ad_creation_failed",
+            });
+          }
+        }
+      }
+
       return {
         platform: Platform.META,
         campaignId: created.id,
         accountId: account.externalAccountId,
+        adSetIds,
+        adIds,
+        adSetErrors,
+        adErrors,
+        objective,
+        dailyBudget,
+        targeting,
+        sourceCampaignIds,
+        sourceCreativeCount: sourceCreativeIds.length,
       };
     }
 
@@ -151,7 +259,7 @@ export class LaunchOrchestratorService {
         {
           name,
           advertisingChannelType: "SEARCH",
-          dailyBudgetUsd: 20,
+          dailyBudgetUsd: dailyBudget,
           status: "PAUSED",
         },
       );
@@ -160,6 +268,8 @@ export class LaunchOrchestratorService {
         campaignId: created.id,
         budgetId: created.budgetId,
         accountId: account.externalAccountId,
+        objective,
+        dailyBudget,
       };
     }
 

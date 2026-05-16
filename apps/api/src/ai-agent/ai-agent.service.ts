@@ -169,6 +169,19 @@ You have knowledge about Meta Ads (Facebook/Instagram), campaign budgets, CTR, R
 Answer in the same language the user writes in (Uzbek, Russian, or English).
 Be concise, practical, and friendly. When giving advice, use concrete numbers from context if available.
 If asked about a specific campaign or metric, explain what it means and what actions to take.
+
+When suggesting that the user navigate somewhere in the app, append an action
+marker on its own line at the end of the relevant paragraph. The frontend
+turns these into clickable chips. Use them sparingly — at most 2 per reply,
+only when navigation is the natural next step. Available markers:
+  [action:ad-launcher]    → opens the 3-step Ad Launcher
+  [action:campaigns]      → opens the Campaigns list / Ads Manager
+  [action:reports]        → opens the Reports page
+  [action:meta-audit]     → opens the Meta Audit page
+  [action:creative-hub]   → opens the Creative Hub
+  [action:settings]       → opens workspace settings (Meta connection, etc.)
+
+You may also provide a custom label like [action:ad-launcher|Yangi kampaniya yaratish].
 ${persona ? `\n${persona}\n` : ""}
 Workspace ID for this conversation: ${dto.workspaceId}`;
 
@@ -189,6 +202,53 @@ Workspace ID for this conversation: ${dto.workspaceId}`;
     });
 
     return { reply: result.content };
+  }
+
+  /**
+   * Streaming version of chat() — same prompt, same persona, but yields
+   * content chunks as the model produces them. Drives the SSE endpoint
+   * for the live "typing" UI on the AI Assistant page.
+   */
+  async *chatStream(dto: {
+    workspaceId: string;
+    message: string;
+    history?: { role: "user" | "assistant"; content: string }[];
+    assistantPersona?: "targetologist" | "optimizer" | "general";
+  }): AsyncGenerator<string, void, void> {
+    const persona =
+      dto.assistantPersona === "optimizer"
+        ? `Primary persona for this thread: ADS OPTIMIZER. Prioritize bid strategies, budget pacing, A/B testing cadence, creative performance diagnostics, scaling rules, and guardrails before spend changes. Still stay within platform safety and never promise unauthorized account actions.`
+        : dto.assistantPersona === "targetologist"
+          ? `Primary persona for this thread: TARGETOLOGIST (media buyer focused on targeting). Prioritize audiences, placements, geo/demographics, interest layering, exclusions, funnel structure, and measurement for targeting decisions. Still stay within platform safety and never promise unauthorized account actions.`
+          : "";
+
+    const systemPrompt = `You are AdSpectr — a helpful advertising assistant for the AdSpectr platform.
+Answer in the same language the user writes in (Uzbek, Russian, or English).
+Be concise, practical, and friendly. When giving advice, use concrete numbers from context if available.
+
+When suggesting that the user navigate somewhere in the app, append an action
+marker on its own line at the end of the relevant paragraph. The frontend
+turns these into clickable chips. Use them sparingly — at most 2 per reply.
+Available markers: [action:ad-launcher] [action:campaigns] [action:reports]
+[action:meta-audit] [action:creative-hub] [action:settings].
+${persona ? `\n${persona}\n` : ""}
+Workspace ID for this conversation: ${dto.workspaceId}`;
+
+    const historyText = (dto.history || [])
+      .slice(-6)
+      .map((m) => `${m.role === "user" ? "User" : "Assistant"}: ${m.content}`)
+      .join("\n");
+
+    const userPrompt = historyText
+      ? `Previous conversation:\n${historyText}\n\nUser: ${dto.message}`
+      : dto.message;
+
+    yield* this.aiClient.completeStream(userPrompt, systemPrompt, {
+      taskType: "chat",
+      agentName: "ChatWidget",
+      temperature: 0.65,
+      maxTokens: 900,
+    });
   }
 
   /**

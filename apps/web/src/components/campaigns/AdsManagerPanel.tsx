@@ -1,10 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { ReactNode } from "react";
+import { Link2, Loader2, Plug, RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { DateRangeFilter } from "@/components/filters/DateRangeFilter";
+import { campaigns as campaignsApi, meta as metaApi } from "@/lib/api-client";
+import { connectMeta } from "@/lib/meta";
+import { useAdsManagerData, type AdsManagerRow } from "./_lib/use-ads-manager-data";
+import { Sparkline } from "./_components/Sparkline";
 
 interface AssetRow {
   id: string;
@@ -190,7 +195,11 @@ const ONE_CLICK_TEMPLATES = [
   },
 ] as const;
 
-export function AdsManagerPanel() {
+export interface AdsManagerPanelProps {
+  workspaceId?: string;
+}
+
+export function AdsManagerPanel({ workspaceId }: AdsManagerPanelProps = {}) {
   const [activeTab, setActiveTab] =
     useState<(typeof INSIGHT_TABS)[number]>("Meta Dashboard");
   const [showSmartFilter, setShowSmartFilter] = useState(false);
@@ -227,22 +236,133 @@ export function AdsManagerPanel() {
     "Lookalike %" | "Recency" | "Lookalike & Recency"
   >("Lookalike %");
 
+  // Real data wired in: Adspectr campaigns + Meta dashboard metrics + per-day
+  // spend for the sparkline. Falls back to SAMPLE_ROWS only when no workspace
+  // is selected (e.g. the marketing landing using this component standalone).
+  const data = useAdsManagerData(workspaceId, dateRange);
+  const liveRows = data.rows;
+  const useLiveData = Boolean(workspaceId);
+  const tableRows: AdsManagerRow[] | typeof SAMPLE_ROWS = useLiveData
+    ? liveRows
+    : SAMPLE_ROWS;
+
   const selectedRows = useMemo(
-    () => SAMPLE_ROWS.filter((row) => selected.includes(row.id)),
-    [selected],
+    () => tableRows.filter((row) => selected.includes(row.id)),
+    [selected, tableRows],
   );
 
-  const allSelected = selected.length === SAMPLE_ROWS.length;
+  const allSelected =
+    tableRows.length > 0 && selected.length === tableRows.length;
+
   const visibleRows = useMemo(() => {
-    if (assetScope === "campaigns") return SAMPLE_ROWS;
+    if (assetScope === "campaigns") return tableRows;
     if (assetScope === "ad_sets") {
-      return SAMPLE_ROWS.map((row) => ({ ...row, name: `${row.name} / Ad set` }));
+      return tableRows.map((row: any) => ({
+        ...row,
+        name: `${row.name} / Ad set`,
+      }));
     }
     if (assetScope === "ads") {
-      return SAMPLE_ROWS.map((row) => ({ ...row, name: `${row.name} / Creative` }));
+      return tableRows.map((row: any) => ({
+        ...row,
+        name: `${row.name} / Creative`,
+      }));
     }
-    return SAMPLE_ROWS;
-  }, [assetScope]);
+    return tableRows;
+  }, [assetScope, tableRows]);
+
+  // Funnel split computed from real spend; renders as percentages of total.
+  const funnelStages = useMemo(() => {
+    if (!useLiveData) {
+      return [
+        { key: "prospecting", label: "Acquisition Prospecting", pct: 60, amount: 0 },
+        { key: "reengagement", label: "Acquisition Re-Engagement", pct: 20, amount: 0 },
+        { key: "retargeting", label: "Retargeting", pct: 15, amount: 0 },
+        { key: "retention", label: "Retention", pct: 5, amount: 0 },
+      ];
+    }
+    const total = data.totalSpend || 1;
+    const split = data.spendByFunnel;
+    return [
+      { key: "prospecting", label: "Acquisition Prospecting", amount: split.prospecting, pct: Math.round((split.prospecting / total) * 100) },
+      { key: "reengagement", label: "Acquisition Re-Engagement", amount: split.reengagement, pct: Math.round((split.reengagement / total) * 100) },
+      { key: "retargeting", label: "Retargeting", amount: split.retargeting, pct: Math.round((split.retargeting / total) * 100) },
+      { key: "retention", label: "Retention", amount: split.retention, pct: Math.round((split.retention / total) * 100) },
+    ];
+  }, [useLiveData, data.totalSpend, data.spendByFunnel]);
+
+  const [budgetValue, setBudgetValue] = useState<string>("");
+  const [bidDelta, setBidDelta] = useState<string>("10");
+  const [actionBusy, setActionBusy] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+
+  const onApplySetBudget = useCallback(async () => {
+    const amount = Number(budgetValue);
+    if (!amount || amount <= 0 || selectedRows.length === 0) return;
+    setActionBusy(true);
+    setActionError(null);
+    try {
+      // We can only mutate Adspectr-side campaigns. Pure Meta-only rows
+      // (no internal UUID) need to go through Meta Marketing API — surface
+      // those that were skipped so the user knows.
+      const internalRows = selectedRows.filter(
+        (r: any) => typeof r.id === "string" && /^[0-9a-f-]{36}$/i.test(r.id),
+      );
+      await Promise.all(
+        internalRows.map((r: any) =>
+          campaignsApi.updateBudget(r.id, amount).catch(() => null),
+        ),
+      );
+      const skipped = selectedRows.length - internalRows.length;
+      if (skipped > 0) {
+        setActionError(
+          `${skipped} Meta-only ${skipped === 1 ? "kampaniya" : "kampaniya"} o'zgartirilmadi. Ad Launcher orqali yaratilgan kampaniyalarni o'zgartira olamiz.`,
+        );
+      } else {
+        setShowSetBudget(false);
+      }
+      setBudgetValue("");
+      data.refetch();
+    } catch (e: any) {
+      setActionError(e?.message ?? "set_budget_failed");
+    } finally {
+      setActionBusy(false);
+    }
+  }, [budgetValue, selectedRows, data]);
+
+  const onApplyDecreaseBid = useCallback(async () => {
+    const pct = Math.max(1, Math.min(100, Number(bidDelta) || 10));
+    if (selectedRows.length === 0) return;
+    setActionBusy(true);
+    setActionError(null);
+    try {
+      // "Decrease bid" maps to lowering the daily budget by the given
+      // percentage on each selected Adspectr campaign. True bid strategy
+      // changes require a Meta Marketing API call we haven't wired yet.
+      const internalRows = selectedRows.filter(
+        (r: any) => typeof r.id === "string" && /^[0-9a-f-]{36}$/i.test(r.id),
+      );
+      await Promise.all(
+        internalRows.map((r: any) => {
+          const next = Math.max(1, Math.round(r.budget * (1 - pct / 100)));
+          return campaignsApi.updateBudget(r.id, next).catch(() => null);
+        }),
+      );
+      const skipped = selectedRows.length - internalRows.length;
+      if (skipped > 0) {
+        setActionError(
+          `${skipped} Meta-only kampaniya o'zgartirilmadi. Ad Launcher orqali yaratilgan kampaniyalarda budget kamaytirildi.`,
+        );
+      } else {
+        setShowDecreaseBid(false);
+      }
+      data.refetch();
+    } catch (e: any) {
+      setActionError(e?.message ?? "decrease_bid_failed");
+    } finally {
+      setActionBusy(false);
+    }
+  }, [bidDelta, selectedRows, data]);
 
   return (
     <Card className="border-border">
@@ -268,21 +388,69 @@ export function AdsManagerPanel() {
             Ads Manager 2.0
           </h2>
           <div className="flex flex-wrap items-center gap-2 justify-end">
-            <button className="px-4 py-2 rounded-lg border border-border text-sm bg-surface">
-              Filter Data
-            </button>
+            {useLiveData && (
+              <button
+                onClick={() => data.refetch()}
+                disabled={data.loading}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border text-sm bg-surface hover:bg-surface-2 disabled:opacity-50"
+                title="Yangilash"
+              >
+                <RefreshCcw
+                  className={`h-4 w-4 ${data.loading ? "animate-spin" : ""}`}
+                />
+                <span className="hidden sm:inline">Yangilash</span>
+              </button>
+            )}
             <button
               onClick={() => setShowSmartFilter(true)}
-              className="px-4 py-2 rounded-lg border border-border text-sm bg-surface"
+              className="px-4 py-2 rounded-lg border border-border text-sm bg-surface hover:bg-surface-2"
             >
               Smart Filter
             </button>
-            <button className="px-4 py-2 rounded-lg border border-border text-sm bg-surface">
-              Export PDF
+            <button
+              onClick={() => {
+                // Export current rows as CSV — works fully client-side, no
+                // backend roundtrip needed.
+                const rows = [
+                  ["Kampaniya", "Status", "Sarflandi", "ROAS", "CPP", "Funnel"],
+                  ...visibleRows.map((r: any) => [
+                    r.name,
+                    r.status ?? "",
+                    Math.round(r.amountSpent ?? 0).toString(),
+                    Number(r.roas ?? 0).toFixed(2),
+                    r.costPerPurchase == null
+                      ? ""
+                      : Number(r.costPerPurchase).toFixed(2),
+                    r.funnelStage ?? "",
+                  ]),
+                ];
+                const csv = rows
+                  .map((row) =>
+                    row
+                      .map((cell) => {
+                        const v = String(cell).replace(/"/g, '""');
+                        return /[",\n]/.test(v) ? `"${v}"` : v;
+                      })
+                      .join(","),
+                  )
+                  .join("\n");
+                const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `ads-manager-${new Date().toISOString().slice(0, 10)}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+              }}
+              className="px-4 py-2 rounded-lg border border-border text-sm bg-surface hover:bg-surface-2"
+            >
+              Export CSV
             </button>
             <button
               onClick={() => setShowAutoReporting(true)}
-              className="px-4 py-2 rounded-lg border border-border text-sm bg-surface"
+              className="px-4 py-2 rounded-lg border border-border text-sm bg-surface hover:bg-surface-2"
             >
               Automated Reporting
             </button>
@@ -356,7 +524,7 @@ export function AdsManagerPanel() {
                         checked={allSelected}
                         onChange={() =>
                           setSelected(
-                            allSelected ? [] : SAMPLE_ROWS.map((r) => r.id),
+                            allSelected ? [] : tableRows.map((r: any) => r.id),
                           )
                         }
                       />
@@ -379,86 +547,171 @@ export function AdsManagerPanel() {
                   </tr>
                 </thead>
                 <tbody>
-                  {visibleRows.map((row) => (
-                    <tr key={row.id} className="border-t border-border">
-                      <td className="p-3">
-                        <input
-                          type="checkbox"
-                          checked={selected.includes(row.id)}
-                          onChange={() =>
-                            setSelected((prev) =>
-                              prev.includes(row.id)
-                                ? prev.filter((x) => x !== row.id)
-                                : [...prev, row.id],
-                            )
-                          }
-                        />
-                      </td>
-                      <td className="p-3">{row.name}</td>
-                      <td className="p-3">
-                        <button
-                          onClick={() => setShowAiSettings(true)}
-                          className="px-2 py-1 rounded-full text-xs bg-indigo-500/10 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400"
-                        >
-                          AI Bidding
-                        </button>
-                      </td>
-                      <td className="p-3 relative">
-                        <button
-                          type="button"
-                          onMouseEnter={() => setHoveredAction(row.id)}
-                          onMouseLeave={() => setHoveredAction(null)}
-                          className="rounded-md border border-border px-2 py-1 text-xs text-text-secondary"
-                        >
-                          View
-                        </button>
-                        {hoveredAction === row.id && (
-                          <div className="absolute z-10 mt-2 w-64 rounded-lg border border-border bg-surface p-3 shadow-xl">
-                            <p className="text-xs text-text-secondary">
-                              Abbosxon turned on campaign.
-                            </p>
-                            <p className="mt-1 text-xs text-text-tertiary">
-                              10:33 | 03/24/2026 | Asia/Tashkent
-                            </p>
-                          </div>
-                        )}
-                      </td>
-                      <td className="p-3">
-                        <div className="h-6 w-24 rounded bg-gradient-to-r from-indigo-500/20 to-transparent" />
-                      </td>
-                      <td className="p-3">${row.amountSpent}</td>
-                      <td className="p-3">{row.roas}</td>
-                      <td className="p-3">£{row.cpc}</td>
-                    </tr>
-                  ))}
-                  {visibleRows.length === 0 && (
+                  {data.loading && useLiveData && (
                     <tr>
-                      <td colSpan={8} className="p-8 text-center text-text-tertiary">
-                        No data found
+                      <td colSpan={8} className="p-12 text-center">
+                        <Loader2 className="mx-auto h-5 w-5 animate-spin text-text-tertiary" />
+                        <p className="mt-2 text-xs text-text-tertiary">
+                          Kampaniya ma'lumotlari yuklanmoqda…
+                        </p>
                       </td>
                     </tr>
                   )}
+                  {!data.loading &&
+                    useLiveData &&
+                    visibleRows.length === 0 &&
+                    !data.needsMetaConnect && (
+                      <tr>
+                        <td colSpan={8} className="p-10 text-center text-text-tertiary">
+                          <p className="text-sm">
+                            Bu workspace'da hali kampaniya yo'q.
+                          </p>
+                          <p className="mt-1 text-xs">
+                            Ad Launcher orqali birinchi kampaniyangizni yarating.
+                          </p>
+                        </td>
+                      </tr>
+                    )}
+                  {!data.loading && useLiveData && data.needsMetaConnect && (
+                    <tr>
+                      <td colSpan={8} className="p-10 text-center">
+                        <div className="mx-auto flex max-w-md flex-col items-center gap-3">
+                          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-mid/15">
+                            <Plug className="h-6 w-6 text-brand-mid dark:text-brand-lime" />
+                          </span>
+                          <p className="text-sm font-semibold text-text-primary">
+                            Meta hisobini ulang
+                          </p>
+                          <p className="text-xs text-text-tertiary">
+                            Real kampaniyalar va metrikalar uchun avval Meta Business
+                            hisobini ulashingiz kerak.
+                          </p>
+                          {workspaceId && (
+                            <Button
+                              size="sm"
+                              onClick={() => connectMeta(workspaceId)}
+                              className="gap-1.5"
+                            >
+                              <Link2 className="h-4 w-4" />
+                              Meta'ni ulash
+                            </Button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                  {visibleRows.map((row: any) => {
+                    const cpp = useLiveData
+                      ? row.costPerPurchase
+                      : (row as any).cpc;
+                    const optimization = useLiveData
+                      ? row.optimization ?? "AI Bidding"
+                      : "AI Bidding";
+                    return (
+                      <tr key={row.id} className="border-t border-border">
+                        <td className="p-3">
+                          <input
+                            type="checkbox"
+                            checked={selected.includes(row.id)}
+                            onChange={() =>
+                              setSelected((prev) =>
+                                prev.includes(row.id)
+                                  ? prev.filter((x) => x !== row.id)
+                                  : [...prev, row.id],
+                              )
+                            }
+                          />
+                        </td>
+                        <td className="p-3">
+                          <div className="flex flex-col">
+                            <span className="font-medium text-text-primary">
+                              {row.name}
+                            </span>
+                            {useLiveData && row.status && (
+                              <span className="mt-0.5 text-[10px] uppercase tracking-wide text-text-tertiary">
+                                {row.status}
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="p-3">
+                          <button
+                            onClick={() => setShowAiSettings(true)}
+                            className="px-2 py-1 rounded-full text-xs bg-indigo-500/10 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400"
+                          >
+                            {optimization}
+                          </button>
+                        </td>
+                        <td className="p-3 relative">
+                          <button
+                            type="button"
+                            onMouseEnter={() => setHoveredAction(row.id)}
+                            onMouseLeave={() => setHoveredAction(null)}
+                            className="rounded-md border border-border px-2 py-1 text-xs text-text-secondary"
+                          >
+                            View
+                          </button>
+                          {hoveredAction === row.id && (
+                            <div className="absolute z-10 mt-2 w-64 rounded-lg border border-border bg-surface p-3 shadow-xl">
+                              <p className="text-xs text-text-secondary">
+                                {useLiveData
+                                  ? "Hali audit log mavjud emas."
+                                  : "Abbosxon turned on campaign."}
+                              </p>
+                              {!useLiveData && (
+                                <p className="mt-1 text-xs text-text-tertiary">
+                                  10:33 | 03/24/2026 | Asia/Tashkent
+                                </p>
+                              )}
+                            </div>
+                          )}
+                        </td>
+                        <td className="p-3">
+                          {useLiveData &&
+                          Array.isArray(row.spendSeries) &&
+                          row.spendSeries.length > 1 ? (
+                            <span className="text-indigo-500 dark:text-indigo-400">
+                              <Sparkline values={row.spendSeries} />
+                            </span>
+                          ) : (
+                            <div className="h-6 w-24 rounded bg-gradient-to-r from-indigo-500/20 to-transparent" />
+                          )}
+                        </td>
+                        <td className="p-3">${Math.round(row.amountSpent)}</td>
+                        <td className="p-3">{Number(row.roas ?? 0).toFixed(2)}</td>
+                        <td className="p-3">
+                          {cpp == null ? "—" : `$${Number(cpp).toFixed(2)}`}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
 
             <div className="grid md:grid-cols-4 gap-3">
-              {[
-                { stage: "Acquisition Prospecting", budget: "60%" },
-                { stage: "Acquisition Re-Engagement", budget: "20%" },
-                { stage: "Retargeting", budget: "15%" },
-                { stage: "Retention", budget: "5%" },
-              ].map((stage) => (
+              {funnelStages.map((stage) => (
                 <div
-                  key={stage.stage}
+                  key={stage.key}
                   className="rounded-xl border border-border p-4 bg-surface-2"
                 >
-                  <p className="text-sm text-text-tertiary">{stage.stage}</p>
+                  <p className="text-sm text-text-tertiary">{stage.label}</p>
                   <p className="text-2xl font-bold text-indigo-700 dark:text-indigo-400 mt-2">
-                    {stage.budget}
+                    {stage.pct}%
                   </p>
+                  {useLiveData && (
+                    <p className="mt-1 text-xs text-text-tertiary">
+                      ${Math.round(stage.amount)} sarflandi
+                    </p>
+                  )}
                 </div>
               ))}
+              {useLiveData && data.totalSpend === 0 && (
+                <p className="md:col-span-4 text-center text-xs text-text-tertiary">
+                  Hozircha sarflar yo'q — funnel taqsimoti kampaniyalar harajat
+                  qila boshlagach hisoblanadi.
+                </p>
+              )}
             </div>
 
             <div className="flex justify-end gap-2">
@@ -484,6 +737,12 @@ export function AdsManagerPanel() {
 
         {activeTab === "Targeting Insights" && (
           <div className="space-y-4">
+            {useLiveData && (
+              <div className="rounded-lg border border-dashed border-amber-300/50 bg-amber-50/50 px-3 py-2 text-xs text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
+                ⚠️ Quyidagi ma'lumotlar demo — bu tab uchun real Meta targeting
+                insights endpointi keyingi iteratsiyada qo'shiladi.
+              </div>
+            )}
             <div className="rounded-xl border border-border p-4">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold">Top Landing Pages</h3>
@@ -657,6 +916,12 @@ export function AdsManagerPanel() {
 
         {activeTab === "Auction Analytics" && (
           <div className="space-y-4">
+            {useLiveData && (
+              <div className="rounded-lg border border-dashed border-amber-300/50 bg-amber-50/50 px-3 py-2 text-xs text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
+                ⚠️ Quyidagi ma'lumotlar demo — auction analytics uchun Meta API
+                ulanishi keyingi iteratsiyada.
+              </div>
+            )}
             <div className="rounded-xl border border-border p-4">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold">Placement & Device</h3>
@@ -860,6 +1125,12 @@ export function AdsManagerPanel() {
 
         {activeTab === "Geo & Demo Insights" && (
           <div className="space-y-4">
+            {useLiveData && (
+              <div className="rounded-lg border border-dashed border-amber-300/50 bg-amber-50/50 px-3 py-2 text-xs text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
+                ⚠️ Quyidagi ma'lumotlar demo — geo va demografik insights keyingi
+                iteratsiyada real Meta breakdown endpointiga ulanadi.
+              </div>
+            )}
             <div className="rounded-xl border border-border p-4 bg-surface-2">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold">Geo & Demo Insights</h3>
@@ -988,6 +1259,13 @@ export function AdsManagerPanel() {
 
         {activeTab === "Creative Insights" && (
           <div className="space-y-4">
+            {useLiveData && (
+              <div className="rounded-lg border border-dashed border-amber-300/50 bg-amber-50/50 px-3 py-2 text-xs text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
+                ⚠️ Quyidagi ma'lumotlar demo — creative performance breakdown
+                Top Ads sahifasida real ma'lumotlar bilan ishlamoqda. Bu yerda
+                ham yaqin orada ulanadi.
+              </div>
+            )}
             <div className="rounded-xl border border-border p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -1297,6 +1575,12 @@ export function AdsManagerPanel() {
           </div>
         )}
 
+        {activeTab === "Ad Copy Insights" && useLiveData && (
+          <div className="rounded-lg border border-dashed border-amber-300/50 bg-amber-50/50 px-3 py-2 text-xs text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
+            ⚠️ Quyidagi ma'lumotlar demo — ad copy insights keyingi iteratsiyada
+            real Meta ads + AI tahlili bilan to'ldiriladi.
+          </div>
+        )}
         {activeTab === "Ad Copy Insights" && (
           <div className="space-y-4">
             <div className="rounded-xl border border-border p-4">
@@ -1603,17 +1887,52 @@ export function AdsManagerPanel() {
       </div>
 
       {showSetBudget && (
-        <ModalShell title="Set Budget" onClose={() => setShowSetBudget(false)}>
-          <p>
-            This action will set the daily budget of the{" "}
-            {selectedRows.length || 1} selected asset.
+        <ModalShell
+          title="Kunlik byudjetni o'zgartirish"
+          onClose={() => {
+            setShowSetBudget(false);
+            setActionError(null);
+          }}
+        >
+          <p className="text-sm text-text-secondary">
+            {selectedRows.length} ta tanlangan kampaniyaga yangi kunlik byudjet
+            o'rnatiladi.
           </p>
+          <div className="mt-4">
+            <label className="text-xs font-medium text-text-tertiary">
+              Yangi kunlik byudjet (USD)
+            </label>
+            <input
+              type="number"
+              min={1}
+              value={budgetValue}
+              onChange={(e) => setBudgetValue(e.target.value)}
+              placeholder="masalan, 25"
+              className="mt-1 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm"
+            />
+          </div>
+          {actionError && (
+            <div className="mt-3 rounded-md border border-amber-300/50 bg-amber-50 p-2 text-xs text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
+              {actionError}
+            </div>
+          )}
           <div className="mt-6 flex justify-end gap-2">
-            <Button variant="secondary" onClick={() => setShowSetBudget(false)}>
-              Cancel
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setShowSetBudget(false);
+                setActionError(null);
+              }}
+              disabled={actionBusy}
+            >
+              Bekor qilish
             </Button>
-            <Button onClick={() => setShowSetBudget(false)}>
-              Yes, confirm
+            <Button
+              onClick={onApplySetBudget}
+              disabled={actionBusy || !budgetValue || Number(budgetValue) <= 0}
+            >
+              {actionBusy && <Loader2 className="h-4 w-4 animate-spin" />}
+              O'zgartirish
             </Button>
           </div>
         </ModalShell>
@@ -1621,22 +1940,48 @@ export function AdsManagerPanel() {
 
       {showDecreaseBid && (
         <ModalShell
-          title="Decrease Bid"
-          onClose={() => setShowDecreaseBid(false)}
+          title="Bid pasaytirish"
+          onClose={() => {
+            setShowDecreaseBid(false);
+            setActionError(null);
+          }}
         >
-          <p>
-            This action will decrease the bid for the {selectedRows.length || 1}{" "}
-            selected ad set(s).
+          <p className="text-sm text-text-secondary">
+            {selectedRows.length} ta tanlangan kampaniyaning kunlik byudjeti
+            tanlangan foizga kamaytiriladi.
           </p>
+          <div className="mt-4">
+            <label className="text-xs font-medium text-text-tertiary">
+              Pasaytirish foizi (%)
+            </label>
+            <input
+              type="number"
+              min={1}
+              max={100}
+              value={bidDelta}
+              onChange={(e) => setBidDelta(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm"
+            />
+          </div>
+          {actionError && (
+            <div className="mt-3 rounded-md border border-amber-300/50 bg-amber-50 p-2 text-xs text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
+              {actionError}
+            </div>
+          )}
           <div className="mt-6 flex justify-end gap-2">
             <Button
               variant="secondary"
-              onClick={() => setShowDecreaseBid(false)}
+              onClick={() => {
+                setShowDecreaseBid(false);
+                setActionError(null);
+              }}
+              disabled={actionBusy}
             >
-              Cancel
+              Bekor qilish
             </Button>
-            <Button onClick={() => setShowDecreaseBid(false)}>
-              Yes, confirm
+            <Button onClick={onApplyDecreaseBid} disabled={actionBusy}>
+              {actionBusy && <Loader2 className="h-4 w-4 animate-spin" />}
+              Pasaytirish
             </Button>
           </div>
         </ModalShell>

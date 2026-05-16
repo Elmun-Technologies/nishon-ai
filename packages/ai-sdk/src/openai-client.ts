@@ -135,6 +135,109 @@ export class AdSpectrAiClient {
   }
 
   /**
+   * Streaming completion. Yields content chunks as the model produces them.
+   * Used to power SSE endpoints that drive a live "typing" UI. Errors and
+   * empty responses raise — there is no retry layer here, callers that need
+   * resilience should wrap the iterator themselves.
+   */
+  async *completeStream(
+    prompt: string,
+    systemPrompt: string,
+    options: CompleteOptions = {},
+  ): AsyncGenerator<string, void, void> {
+    const { model, maxTokens, temperature } = this.resolveOptions(options)
+
+    if (this.provider === 'anthropic') {
+      yield* this.streamAnthropic(prompt, systemPrompt, model, maxTokens, temperature)
+      return
+    }
+    if (!this.openai) {
+      throw new Error('OpenAI-compatible client is not initialized.')
+    }
+    yield* this.streamOpenAi(prompt, systemPrompt, model, maxTokens, temperature)
+  }
+
+  private async *streamOpenAi(
+    prompt: string,
+    systemPrompt: string,
+    model: string,
+    maxTokens: number,
+    temperature: number,
+  ): AsyncGenerator<string, void, void> {
+    if (!this.openai) throw new Error('OpenAI client is not initialized.')
+    const stream = await this.openai.chat.completions.create({
+      model,
+      temperature,
+      max_tokens: maxTokens,
+      stream: true,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: prompt },
+      ],
+    })
+    for await (const chunk of stream as any) {
+      const delta = chunk?.choices?.[0]?.delta?.content
+      if (typeof delta === 'string' && delta.length > 0) yield delta
+    }
+  }
+
+  private async *streamAnthropic(
+    prompt: string,
+    systemPrompt: string,
+    model: string,
+    maxTokens: number,
+    temperature: number,
+  ): AsyncGenerator<string, void, void> {
+    const response = await fetch(`${this.anthropicBaseUrl}/messages`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': this.apiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model,
+        system: systemPrompt,
+        max_tokens: maxTokens,
+        temperature,
+        stream: true,
+        messages: [{ role: 'user', content: prompt }],
+      }),
+    })
+    if (!response.ok || !response.body) {
+      const text = await response.text()
+      throw new Error(`Anthropic stream error ${response.status}: ${text.slice(0, 200)}`)
+    }
+
+    const reader = response.body.getReader()
+    const decoder = new TextDecoder()
+    let buffer = ''
+    while (true) {
+      const { value, done } = await reader.read()
+      if (done) break
+      buffer += decoder.decode(value, { stream: true })
+      // Anthropic SSE delivers `event:` and `data:` line pairs separated by
+      // blank lines. We only care about content_block_delta payloads.
+      const events = buffer.split('\n\n')
+      buffer = events.pop() ?? ''
+      for (const ev of events) {
+        const dataLine = ev.split('\n').find((l) => l.startsWith('data:'))
+        if (!dataLine) continue
+        const payload = dataLine.slice(5).trim()
+        if (!payload || payload === '[DONE]') continue
+        try {
+          const parsed = JSON.parse(payload)
+          if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
+            yield parsed.delta.text as string
+          }
+        } catch {
+          // Ignore malformed events — Anthropic occasionally sends comment lines.
+        }
+      }
+    }
+  }
+
+  /**
    * JSON completion. Expects the model to return valid JSON and parses it.
    * Strips markdown code-fences automatically.
    * When using OpenAI, enables JSON mode (`response_format: json_object`)

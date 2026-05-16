@@ -6,12 +6,14 @@ import { MetaAdsService } from "./meta-ads.service";
 import { MetaSyncService } from "./meta-sync.service";
 import { MetaAiEngineService } from "./meta-ai-engine.service";
 import { MetaCronService } from "./meta-cron.service";
+import { MetaAuditService } from "./meta-audit.service";
 import { MetaAdAccount } from "./entities/meta-ad-account.entity";
 import { MetaCampaignSync } from "./entities/meta-campaign-sync.entity";
 import { MetaInsight } from "./entities/meta-insight.entity";
 import { ConnectedAccount } from "../platforms/entities/connected-account.entity";
 import { Workspace } from "../workspaces/entities/workspace.entity";
 import { AnalyticsModule } from "../analytics/analytics.module";
+import { PlatformsModule } from "../platforms/platforms.module";
 
 /**
  * MetaModule owns everything related to the Meta Ads Graph API integration:
@@ -30,6 +32,7 @@ import { AnalyticsModule } from "../analytics/analytics.module";
   imports: [
     HttpModule,
     AnalyticsModule,
+    PlatformsModule,
     TypeOrmModule.forFeature([
       MetaAdAccount,
       MetaCampaignSync,
@@ -39,7 +42,7 @@ import { AnalyticsModule } from "../analytics/analytics.module";
     ]),
   ],
   controllers: [MetaController],
-  providers: [MetaAdsService, MetaSyncService, MetaAiEngineService, MetaCronService],
-  exports: [MetaAdsService, MetaSyncService, MetaAiEngineService],
+  providers: [MetaAdsService, MetaSyncService, MetaAiEngineService, MetaCronService, MetaAuditService],
+  exports: [MetaAdsService, MetaSyncService, MetaAiEngineService, MetaAuditService],
 })
 export class MetaModule {}
