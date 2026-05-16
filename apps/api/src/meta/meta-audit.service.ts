@@ -1,6 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
+import { ConfigService } from "@nestjs/config";
+import {
+  createAdSpectrAiClientFromEnv,
+  isAiClientConfigured,
+} from "@adspectr/ai-sdk";
+import type { AdSpectrAiClient } from "@adspectr/ai-sdk";
 import { MetaInsight } from "./entities/meta-insight.entity";
 import { MetaCampaignSync } from "./entities/meta-campaign-sync.entity";
 import { MetaAdAccount } from "./entities/meta-ad-account.entity";
@@ -45,6 +51,21 @@ export interface AuditCampaignRow {
   flags: string[];
 }
 
+export interface MetaAuditDeltas {
+  spend: number;
+  revenue: number;
+  ctr: number;
+  cpc: number;
+  roas: number;
+  conversions: number;
+  /** Percent change vs prior period (-100..+inf). null when prior was 0. */
+  spendPct: number | null;
+  revenuePct: number | null;
+  ctrPct: number | null;
+  roasPct: number | null;
+  conversionsPct: number | null;
+}
+
 export interface MetaAuditReport {
   /** Overall account health 0–100. */
   score: number;
@@ -64,11 +85,23 @@ export interface MetaAuditReport {
     pausedCampaigns: number;
     totalCampaigns: number;
   };
+  /** Same-shape totals for the period immediately before the audit window. */
+  priorTotals: {
+    spend: number;
+    revenue: number;
+    conversions: number;
+    avgCtr: number;
+    avgCpc: number;
+    avgRoas: number;
+  };
+  deltas: MetaAuditDeltas;
   findings: AuditFinding[];
   campaigns: AuditCampaignRow[];
   spendByObjective: Array<{ objective: string; spend: number; share: number }>;
   topSpenders: AuditCampaignRow[];
   zeroResultCampaigns: AuditCampaignRow[];
+  /** Optional AI-generated 2-3 paragraph executive summary (Uzbek). */
+  aiSummary: string | null;
 }
 
 /**
@@ -85,6 +118,8 @@ export interface MetaAuditReport {
  */
 @Injectable()
 export class MetaAuditService {
+  private readonly aiClient: AdSpectrAiClient | null;
+
   constructor(
     @InjectRepository(MetaInsight)
     private readonly insightRepo: Repository<MetaInsight>,
@@ -92,14 +127,27 @@ export class MetaAuditService {
     private readonly campaignRepo: Repository<MetaCampaignSync>,
     @InjectRepository(MetaAdAccount)
     private readonly accountRepo: Repository<MetaAdAccount>,
-  ) {}
+    private readonly config: ConfigService,
+  ) {
+    // AI is optional — when no provider key is configured we skip the
+    // executive summary and the rest of the audit still works.
+    this.aiClient = isAiClientConfigured((k) => this.config.get<string>(k))
+      ? createAdSpectrAiClientFromEnv((k) => this.config.get<string>(k))
+      : null;
+  }
 
-  async runAudit(workspaceId: string, days = 30): Promise<MetaAuditReport> {
+  async runAudit(
+    workspaceId: string,
+    days = 30,
+    options: { withAiSummary?: boolean } = {},
+  ): Promise<MetaAuditReport> {
     const since = new Date();
     since.setUTCHours(0, 0, 0, 0);
     since.setUTCDate(since.getUTCDate() - days);
+    const priorSince = new Date(since);
+    priorSince.setUTCDate(priorSince.getUTCDate() - days);
 
-    // Aggregate per-campaign metrics from cached insights.
+    // Aggregate per-campaign metrics from cached insights for the current period.
     const insightRows = await this.insightRepo
       .createQueryBuilder("i")
       .where("i.workspaceId = :wid", { wid: workspaceId })
@@ -114,6 +162,33 @@ export class MetaAuditService {
       ])
       .groupBy("i.campaignId")
       .getRawMany();
+
+    // Workspace-level totals for the prior period (no per-campaign join needed —
+    // we only want aggregate deltas to render the period comparison).
+    const priorRow = await this.insightRepo
+      .createQueryBuilder("i")
+      .where("i.workspaceId = :wid", { wid: workspaceId })
+      .andWhere("i.date >= :priorSince", { priorSince })
+      .andWhere("i.date < :since", { since })
+      .select([
+        'COALESCE(SUM(i.spend), 0) AS "spend"',
+        'COALESCE(SUM(i.impressions), 0) AS "impressions"',
+        'COALESCE(SUM(i.clicks), 0) AS "clicks"',
+        'COALESCE(SUM(i.conversions), 0) AS "conversions"',
+        'COALESCE(SUM(i.conversionValue), 0) AS "revenue"',
+      ])
+      .getRawOne();
+    const prior = {
+      spend: parseFloat(priorRow?.spend ?? 0) || 0,
+      impressions: parseInt(priorRow?.impressions ?? 0, 10) || 0,
+      clicks: parseInt(priorRow?.clicks ?? 0, 10) || 0,
+      conversions: parseInt(priorRow?.conversions ?? 0, 10) || 0,
+      revenue: parseFloat(priorRow?.revenue ?? 0) || 0,
+    };
+    const priorCtr =
+      prior.impressions > 0 ? (prior.clicks / prior.impressions) * 100 : 0;
+    const priorCpc = prior.clicks > 0 ? prior.spend / prior.clicks : 0;
+    const priorRoas = prior.spend > 0 ? prior.revenue / prior.spend : 0;
 
     const byCampaign = new Map<
       string,
@@ -373,7 +448,21 @@ export class MetaAuditService {
 
     const score = computeOverallScore(findings, campaigns);
 
-    return {
+    const deltas: MetaAuditDeltas = {
+      spend: round2(totals.spend - prior.spend),
+      revenue: round2(totals.revenue - prior.revenue),
+      ctr: round2(avgCtr - priorCtr),
+      cpc: round2(avgCpc - priorCpc),
+      roas: round2(avgRoas - priorRoas),
+      conversions: totals.conversions - prior.conversions,
+      spendPct: pctDelta(totals.spend, prior.spend),
+      revenuePct: pctDelta(totals.revenue, prior.revenue),
+      ctrPct: pctDelta(avgCtr, priorCtr),
+      roasPct: pctDelta(avgRoas, priorRoas),
+      conversionsPct: pctDelta(totals.conversions, prior.conversions),
+    };
+
+    const report: MetaAuditReport = {
       score,
       scoreLabel:
         score >= 85 ? "excellent" : score >= 70 ? "good" : score >= 50 ? "fair" : "poor",
@@ -392,13 +481,82 @@ export class MetaAuditService {
         pausedCampaigns: pausedCount,
         totalCampaigns: campaigns.length,
       },
+      priorTotals: {
+        spend: round2(prior.spend),
+        revenue: round2(prior.revenue),
+        conversions: prior.conversions,
+        avgCtr: round2(priorCtr),
+        avgCpc: round2(priorCpc),
+        avgRoas: round2(priorRoas),
+      },
+      deltas,
       findings,
       campaigns,
       spendByObjective,
       topSpenders,
       zeroResultCampaigns,
+      aiSummary: null,
     };
+
+    if (options.withAiSummary && this.aiClient && campaigns.length > 0) {
+      try {
+        report.aiSummary = await this.generateAiSummary(report);
+      } catch {
+        // Non-fatal: an AI summary failure should never break the audit.
+      }
+    }
+
+    return report;
   }
+
+  private async generateAiSummary(report: MetaAuditReport): Promise<string> {
+    if (!this.aiClient) return "";
+    const { totals, deltas, score, findings, topSpenders } = report;
+    const topCrit = findings.filter((f) => f.severity === "critical").slice(0, 3);
+    const topWins = findings.filter((f) => f.severity === "good").slice(0, 2);
+
+    const briefing = [
+      `Account health score: ${score}/100 (${report.scoreLabel}).`,
+      `Period: ${report.windowDays} days. Spend $${totals.spend.toFixed(0)}, revenue $${totals.revenue.toFixed(0)}, ROAS ${totals.avgRoas.toFixed(2)}x, ${totals.conversions} conversions.`,
+      deltas.spendPct != null
+        ? `Vs prior ${report.windowDays}d: spend ${signed(deltas.spendPct)}%, revenue ${signed(deltas.revenuePct ?? 0)}%, ROAS ${signed(deltas.roasPct ?? 0)}%.`
+        : "",
+      topSpenders[0]
+        ? `Top spender: "${topSpenders[0].name}" — $${topSpenders[0].spend.toFixed(0)}, ROAS ${topSpenders[0].roas.toFixed(2)}x.`
+        : "",
+      topCrit.length > 0
+        ? `Critical issues: ${topCrit.map((f) => f.title).join("; ")}.`
+        : "",
+      topWins.length > 0
+        ? `Wins: ${topWins.map((f) => f.title).join("; ")}.`
+        : "",
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    const systemPrompt = `You are AdSpectr, a senior Meta Ads strategist.
+Write a 2-3 paragraph Uzbek-language executive summary of the account audit below.
+Be specific: cite the numbers and named campaigns from the briefing.
+Open with the headline takeaway, then the two most important actions to take this week.
+Avoid filler. No greetings, no headings, just plain paragraphs.`;
+
+    const result = await this.aiClient.complete(briefing, systemPrompt, {
+      taskType: "chat",
+      agentName: "MetaAudit",
+      temperature: 0.5,
+      maxTokens: 450,
+    });
+    return result.content.trim();
+  }
+}
+
+function signed(n: number): string {
+  return n >= 0 ? `+${n.toFixed(0)}` : `${n.toFixed(0)}`;
+}
+
+function pctDelta(current: number, prior: number): number | null {
+  if (!isFinite(prior) || prior === 0) return null;
+  return round2(((current - prior) / prior) * 100);
 }
 
 function round2(n: number): number {

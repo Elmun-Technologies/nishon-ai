@@ -827,14 +827,17 @@ export class MetaController {
     description:
       "Reads cached MetaInsight + MetaCampaignSync rows and returns a " +
       "deterministic audit report: overall score, findings list, " +
-      "per-campaign health, top spenders, and zero-result campaigns. " +
-      "No live Meta API calls — needs the sync worker to have run.",
+      "per-campaign health, top spenders, zero-result campaigns, plus " +
+      "period-over-period deltas. Optional AI executive summary when " +
+      "withAiSummary=true.",
   })
   @ApiQuery({ name: "workspaceId" })
   @ApiQuery({ name: "days", required: false, description: "Lookback window (default 30)" })
+  @ApiQuery({ name: "ai", required: false, description: "Set to 1 to include AI executive summary" })
   async runAudit(
     @Query("workspaceId") workspaceId: string | undefined,
     @Query("days") days: string | undefined,
+    @Query("ai") ai: string | undefined,
     @Req() req: Request,
   ) {
     if (!workspaceId) {
@@ -843,13 +846,59 @@ export class MetaController {
     await this.assertWorkspaceOwnership(workspaceId, this.getRequestUserId(req));
 
     const window = days ? Math.max(1, Math.min(180, parseInt(days, 10))) : 30;
-    const report = await this.metaAuditService.runAudit(workspaceId, window);
+    const report = await this.metaAuditService.runAudit(workspaceId, window, {
+      withAiSummary: ai === "1" || ai === "true",
+    });
 
     // Surface whether Meta is connected at all so the frontend can swap
     // between the "Connect Meta" CTA and the real report without
     // pinging a second endpoint.
     const adAccountCount = await this.adAccountRepo.count({ where: { workspaceId } });
     return { connected: adAccountCount > 0, report };
+  }
+
+  @Post("audit/pause-losing")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: "One-click fix: pause all campaigns flagged as losing money",
+    description:
+      "Walks the same audit findings as GET /meta/audit and pauses every " +
+      "Adspectr-side campaign with the LOSING_ROAS flag via Meta API. " +
+      "Returns the list of paused campaign ids and any failures.",
+  })
+  async pauseLosingCampaigns(
+    @Body() body: { workspaceId: string; days?: number },
+    @Req() req: Request,
+  ) {
+    if (!body.workspaceId) {
+      throw new BadRequestException("workspaceId is required");
+    }
+    await this.assertWorkspaceOwnership(body.workspaceId, this.getRequestUserId(req));
+
+    const accessToken = await this.metaSyncService.resolveAccessToken(body.workspaceId);
+    if (!accessToken) {
+      throw new BadRequestException("Meta account is not connected for this workspace");
+    }
+
+    const report = await this.metaAuditService.runAudit(
+      body.workspaceId,
+      body.days ?? 30,
+    );
+    const targets = report.campaigns.filter((c) =>
+      c.flags.includes("LOSING_ROAS") && c.status === "ACTIVE",
+    );
+
+    const paused: string[] = [];
+    const failed: Array<{ id: string; error: string }> = [];
+    for (const c of targets) {
+      try {
+        await this.metaConnector.pauseCampaign(c.id, accessToken);
+        paused.push(c.id);
+      } catch (e: any) {
+        failed.push({ id: c.id, error: e?.message ?? "pause_failed" });
+      }
+    }
+    return { paused, failed, totalCandidates: targets.length };
   }
 
   // ─── Custom Audiences ──────────────────────────────────────────────────────

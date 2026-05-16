@@ -475,7 +475,7 @@ export const meta = {
     ),
   setTags: (campaignId: string, workspaceId: string, tags: string[]) =>
     apiClient.post(`/meta/campaigns/${campaignId}/tags?workspaceId=${encodeURIComponent(workspaceId)}`, { tags }),
-  audit: (workspaceId: string, days = 30) =>
+  audit: (workspaceId: string, days = 30, withAiSummary = false) =>
     apiClient.get<{
       connected: boolean
       report: {
@@ -495,6 +495,27 @@ export const meta = {
           activeCampaigns: number
           pausedCampaigns: number
           totalCampaigns: number
+        }
+        priorTotals: {
+          spend: number
+          revenue: number
+          conversions: number
+          avgCtr: number
+          avgCpc: number
+          avgRoas: number
+        }
+        deltas: {
+          spend: number
+          revenue: number
+          ctr: number
+          cpc: number
+          roas: number
+          conversions: number
+          spendPct: number | null
+          revenuePct: number | null
+          ctrPct: number | null
+          roasPct: number | null
+          conversionsPct: number | null
         }
         findings: Array<{
           id: string
@@ -525,8 +546,17 @@ export const meta = {
         spendByObjective: Array<{ objective: string; spend: number; share: number }>
         topSpenders: Array<any>
         zeroResultCampaigns: Array<any>
+        aiSummary: string | null
       }
-    }>(`/meta/audit?workspaceId=${encodeURIComponent(workspaceId)}&days=${days}`),
+    }>(
+      `/meta/audit?workspaceId=${encodeURIComponent(workspaceId)}&days=${days}${withAiSummary ? '&ai=1' : ''}`,
+    ),
+  pauseLosingCampaigns: (workspaceId: string, days = 30) =>
+    apiClient.post<{
+      paused: string[]
+      failed: Array<{ id: string; error: string }>
+      totalCandidates: number
+    }>('/meta/audit/pause-losing', { workspaceId, days }),
   audiences: (workspaceId: string) =>
     apiClient.get<{
       success: boolean

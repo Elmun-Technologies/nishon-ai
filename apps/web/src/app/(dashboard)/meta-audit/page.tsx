@@ -4,10 +4,12 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   AlertCircle,
   AlertTriangle,
-  ArrowRight,
+  ArrowDown,
+  ArrowUp,
   CheckCircle2,
   ChevronDown,
   ChevronUp,
+  Download,
   Info,
   Link2,
   Loader2,
@@ -17,6 +19,7 @@ import {
   Sparkles,
   Target,
   TrendingUp,
+  Wand2,
 } from 'lucide-react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { useI18n } from '@/i18n/use-i18n'
@@ -153,29 +156,97 @@ export default function MetaAuditPage() {
 
   const [days, setDays] = useState(30)
   const [loading, setLoading] = useState(true)
+  const [aiLoading, setAiLoading] = useState(false)
+  const [pauseLoading, setPauseLoading] = useState(false)
+  const [pauseResult, setPauseResult] = useState<string | null>(null)
   const [connected, setConnected] = useState(true)
   const [report, setReport] = useState<AuditReport | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [severityFilter, setSeverityFilter] = useState<'all' | Finding['severity']>('all')
   const [expandedFinding, setExpandedFinding] = useState<string | null>(null)
 
-  const load = useCallback(async () => {
-    if (!workspaceId) {
-      setLoading(false)
-      return
-    }
-    setLoading(true)
-    setError(null)
+  const load = useCallback(
+    async (opts: { withAi?: boolean } = {}) => {
+      if (!workspaceId) {
+        setLoading(false)
+        return
+      }
+      if (opts.withAi) setAiLoading(true)
+      else setLoading(true)
+      setError(null)
+      try {
+        const { data } = await metaApi.audit(workspaceId, days, opts.withAi)
+        setConnected(data.connected)
+        setReport(data.report)
+      } catch (e: any) {
+        setError(e?.message ?? 'Audit yuklanmadi')
+      } finally {
+        setLoading(false)
+        setAiLoading(false)
+      }
+    },
+    [workspaceId, days],
+  )
+
+  const pauseLosingNow = useCallback(async () => {
+    if (!workspaceId || !report) return
+    setPauseLoading(true)
+    setPauseResult(null)
     try {
-      const { data } = await metaApi.audit(workspaceId, days)
-      setConnected(data.connected)
-      setReport(data.report)
+      const { data } = await metaApi.pauseLosingCampaigns(workspaceId, days)
+      setPauseResult(
+        data.paused.length > 0
+          ? `${data.paused.length} ta kampaniya pauza qilindi${data.failed.length > 0 ? ` · ${data.failed.length} ta xato` : ''}.`
+          : data.totalCandidates === 0
+            ? "Pauza qilish uchun kampaniya topilmadi."
+            : `Hech qaysi kampaniya pauza qilinmadi (${data.failed.length} ta xato).`,
+      )
+      void load()
     } catch (e: any) {
-      setError(e?.message ?? "Audit yuklanmadi")
+      setPauseResult(e?.message ?? "Pauza qilib bo'lmadi")
     } finally {
-      setLoading(false)
+      setPauseLoading(false)
     }
-  }, [workspaceId, days])
+  }, [workspaceId, report, days, load])
+
+  const exportCsv = useCallback(() => {
+    if (!report) return
+    const rows: (string | number)[][] = [
+      ['Kampaniya', 'Holat', 'Maqsad', 'Sarf', 'Daromad', 'CTR', 'CPC', 'ROAS', 'Konv.', 'Salomatlik', 'Belgilar'],
+      ...report.campaigns.map((c) => [
+        c.name,
+        c.status,
+        c.objective ?? '',
+        c.spend,
+        c.revenue,
+        c.ctr,
+        c.cpc,
+        c.roas,
+        c.conversions,
+        c.health,
+        c.flags.join('|'),
+      ]),
+    ]
+    const csv = rows
+      .map((r) =>
+        r
+          .map((cell) => {
+            const v = String(cell ?? '').replace(/"/g, '""')
+            return /[",\n]/.test(v) ? `"${v}"` : v
+          })
+          .join(','),
+      )
+      .join('\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `meta-audit-${new Date().toISOString().slice(0, 10)}.csv`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }, [report])
 
   useEffect(() => {
     void load()
@@ -213,15 +284,27 @@ export default function MetaAuditPage() {
               <option value={60}>So&apos;nggi 60 kun</option>
               <option value={90}>So&apos;nggi 90 kun</option>
             </select>
+            {report && report.campaigns.length > 0 && (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={exportCsv}
+                className="gap-1.5"
+                title="Auditni CSV sifatida yuklab olish"
+              >
+                <Download className="h-4 w-4" />
+                <span className="hidden md:inline">CSV</span>
+              </Button>
+            )}
             <Button
               variant="secondary"
               size="sm"
-              onClick={load}
+              onClick={() => load()}
               disabled={loading}
               className="gap-1.5"
             >
               <RefreshCcw className={loading ? 'h-4 w-4 animate-spin' : 'h-4 w-4'} />
-              Audit qayta o&apos;tkazish
+              Qayta o&apos;tkazish
             </Button>
           </div>
         }
@@ -299,16 +382,37 @@ export default function MetaAuditPage() {
               </div>
 
               <div className="grid flex-1 grid-cols-2 gap-3 sm:grid-cols-4">
-                <StatBlock label="Sarflandi" value={fmtUsd(report.totals.spend)} />
-                <StatBlock label="Daromad" value={fmtUsd(report.totals.revenue)} />
+                <StatBlock
+                  label="Sarflandi"
+                  value={fmtUsd(report.totals.spend)}
+                  deltaPct={report.deltas.spendPct}
+                />
+                <StatBlock
+                  label="Daromad"
+                  value={fmtUsd(report.totals.revenue)}
+                  deltaPct={report.deltas.revenuePct}
+                  upIsGood
+                />
                 <StatBlock
                   label="ROAS"
                   value={report.totals.avgRoas > 0 ? `${report.totals.avgRoas.toFixed(2)}x` : '—'}
                   positive={report.totals.avgRoas >= 1}
+                  deltaPct={report.deltas.roasPct}
+                  upIsGood
                 />
-                <StatBlock label="Konversiyalar" value={String(report.totals.conversions)} />
+                <StatBlock
+                  label="Konversiyalar"
+                  value={String(report.totals.conversions)}
+                  deltaPct={report.deltas.conversionsPct}
+                  upIsGood
+                />
                 <StatBlock label="Bosishlar" value={report.totals.clicks.toLocaleString()} />
-                <StatBlock label="CTR" value={fmtPct(report.totals.avgCtr)} />
+                <StatBlock
+                  label="CTR"
+                  value={fmtPct(report.totals.avgCtr)}
+                  deltaPct={report.deltas.ctrPct}
+                  upIsGood
+                />
                 <StatBlock label="CPC" value={fmtUsd(report.totals.avgCpc)} />
                 <StatBlock
                   label="Kampaniyalar"
@@ -316,7 +420,96 @@ export default function MetaAuditPage() {
                 />
               </div>
             </div>
+            {report.priorTotals.spend > 0 && (
+              <p className="mt-3 text-[11px] text-text-tertiary">
+                Solishtirilmoqda: oxirgi {report.windowDays} kun vs avvalgi {report.windowDays} kun
+                (${report.priorTotals.spend.toFixed(0)} sarf, ROAS {report.priorTotals.avgRoas.toFixed(2)}x)
+              </p>
+            )}
           </Card>
+
+          {/* AI executive summary */}
+          {report.aiSummary ? (
+            <Card>
+              <div className="flex items-start gap-3">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-mid to-brand-lime text-brand-ink">
+                  <Sparkles className="h-4 w-4" />
+                </span>
+                <div className="flex-1">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
+                    AI xulosa
+                  </p>
+                  <div className="mt-1.5 space-y-2 text-sm leading-relaxed text-text-secondary whitespace-pre-wrap">
+                    {report.aiSummary}
+                  </div>
+                </div>
+              </div>
+            </Card>
+          ) : (
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-dashed border-border bg-surface-2/40 px-4 py-3">
+              <div className="flex items-center gap-3">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-mid/15">
+                  <Wand2 className="h-4 w-4 text-brand-mid dark:text-brand-lime" />
+                </span>
+                <div>
+                  <p className="text-sm font-medium text-text-primary">
+                    AI xulosa olish
+                  </p>
+                  <p className="text-xs text-text-tertiary">
+                    Audit natijasini o&apos;zbekcha 2-3 paragrafda tushuntirib beraman
+                  </p>
+                </div>
+              </div>
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => load({ withAi: true })}
+                disabled={aiLoading}
+                className="gap-1.5"
+              >
+                {aiLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Sparkles className="h-4 w-4" />
+                )}
+                {aiLoading ? 'Yozilmoqda…' : 'Generatsiya qilish'}
+              </Button>
+            </div>
+          )}
+
+          {/* One-click fix: pause losing campaigns */}
+          {report.campaigns.some((c) => c.flags.includes('LOSING_ROAS') && c.status === 'ACTIVE') && (
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-rose-300/50 bg-rose-50/60 px-4 py-3 dark:border-rose-500/30 dark:bg-rose-500/5">
+              <div className="flex items-start gap-3">
+                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-rose-500/15 text-rose-600 dark:text-rose-400">
+                  <AlertCircle className="h-4 w-4" />
+                </span>
+                <div>
+                  <p className="text-sm font-semibold text-rose-900 dark:text-rose-200">
+                    {report.campaigns.filter((c) => c.flags.includes('LOSING_ROAS') && c.status === 'ACTIVE').length}{' '}
+                    ta aktiv kampaniyada ROAS &lt; 1 — har kuni zarar
+                  </p>
+                  <p className="mt-0.5 text-xs text-rose-800/85 dark:text-rose-300/80">
+                    Bir bosishda hammasini Meta&apos;da pauza qilamiz. Keyin sababini tahlil qilib qayta yoqasiz.
+                  </p>
+                  {pauseResult && (
+                    <p className="mt-1.5 text-xs font-medium text-rose-900 dark:text-rose-200">
+                      ✓ {pauseResult}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <Button
+                size="sm"
+                onClick={pauseLosingNow}
+                disabled={pauseLoading}
+                className="gap-1.5 bg-rose-600 hover:bg-rose-700"
+              >
+                {pauseLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+                Hammasini pauza qilish
+              </Button>
+            </div>
+          )}
 
           {/* Severity filter chips */}
           <div className="flex flex-wrap items-center gap-2">
@@ -537,24 +730,57 @@ function StatBlock({
   label,
   value,
   positive,
+  deltaPct,
+  upIsGood,
 }: {
   label: string
   value: string
   positive?: boolean
+  /** Period-over-period delta as a percentage. Null when prior is 0. */
+  deltaPct?: number | null
+  /** Whether an upward move is the "good" direction for this metric. */
+  upIsGood?: boolean
 }) {
+  // For metrics like CPC, an upward move is bad; CPC is treated as the
+  // default direction (upIsGood = false).
+  const isGood =
+    deltaPct == null || deltaPct === 0
+      ? null
+      : upIsGood
+        ? deltaPct > 0
+        : deltaPct < 0
   return (
     <div className="rounded-lg border border-border bg-surface-2 p-2.5">
       <p className="text-[10px] uppercase tracking-wide text-text-tertiary">{label}</p>
-      <p
-        className={cn(
-          'mt-0.5 text-base font-bold tabular-nums',
-          positive === true && 'text-emerald-600 dark:text-emerald-400',
-          positive === false && 'text-rose-600 dark:text-rose-400',
-          positive === undefined && 'text-text-primary',
+      <div className="mt-0.5 flex items-baseline gap-1.5">
+        <p
+          className={cn(
+            'text-base font-bold tabular-nums',
+            positive === true && 'text-emerald-600 dark:text-emerald-400',
+            positive === false && 'text-rose-600 dark:text-rose-400',
+            positive === undefined && 'text-text-primary',
+          )}
+        >
+          {value}
+        </p>
+        {deltaPct != null && deltaPct !== 0 && (
+          <span
+            className={cn(
+              'inline-flex items-center text-[10px] font-semibold tabular-nums',
+              isGood === true && 'text-emerald-600 dark:text-emerald-400',
+              isGood === false && 'text-rose-600 dark:text-rose-400',
+            )}
+            title={`${deltaPct > 0 ? '+' : ''}${deltaPct.toFixed(1)}% vs avvalgi davr`}
+          >
+            {deltaPct > 0 ? (
+              <ArrowUp className="h-2.5 w-2.5" />
+            ) : (
+              <ArrowDown className="h-2.5 w-2.5" />
+            )}
+            {Math.abs(deltaPct).toFixed(0)}%
+          </span>
         )}
-      >
-        {value}
-      </p>
+      </div>
     </div>
   )
 }
