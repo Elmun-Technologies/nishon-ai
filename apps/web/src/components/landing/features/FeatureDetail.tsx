@@ -5,35 +5,16 @@ import { ArrowLeft, ArrowRight, ArrowUpRight, CheckCircle2, Plus, Sparkles } fro
 import { PublicContainer } from '@/components/public/PublicLayout'
 import { LandingButton } from '@/components/landing/ui/LandingButton'
 import { LandingCard } from '@/components/landing/ui/LandingCard'
-import { LaunchFlowDemo } from './animations/LaunchFlowDemo'
-import { AiDecisionFeedDemo } from './animations/AiDecisionFeedDemo'
-import { AnalyticsDashboardDemo } from './animations/AnalyticsDashboardDemo'
-import { WorkspaceOrgDemo } from './animations/WorkspaceOrgDemo'
+import { FeatureAnim } from './animations/registry'
 import {
   FEATURE_CATEGORY_LABEL,
   FEATURE_CONTENT,
-  type CategoryId,
   type FeatureContent,
 } from './feature-content'
 import { FEATURE_ICONS } from './feature-icons'
 
 interface FeatureDetailProps {
   feature: FeatureContent
-}
-
-function CategoryAnimation({ category, header }: { category: CategoryId; header: string }) {
-  switch (category) {
-    case 'execution':
-      return <LaunchFlowDemo />
-    case 'aiOpt':
-      return <AiDecisionFeedDemo headerLabel={header} />
-    case 'analytics':
-      return <AnalyticsDashboardDemo />
-    case 'governance':
-      return <WorkspaceOrgDemo />
-    default:
-      return null
-  }
 }
 
 export function FeatureDetail({ feature }: FeatureDetailProps) {
@@ -107,7 +88,7 @@ export function FeatureDetail({ feature }: FeatureDetailProps) {
             </div>
 
             <div>
-              <CategoryAnimation category={feature.category} header={feature.mockHeader} />
+              <FeatureAnim slug={feature.slug} />
             </div>
           </div>
         </PublicContainer>
