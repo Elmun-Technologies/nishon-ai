@@ -1,5 +1,6 @@
 'use client'
 
+import { useMemo } from 'react'
 import Link from 'next/link'
 import {
   Activity,
@@ -14,14 +15,11 @@ import {
 import { PageHeader } from '@/components/ui/PageHeader'
 import { PLATFORM_AGENTS } from '@/lib/ai-agents/platform-agents'
 import { AgentAvatar } from './_components/AgentAvatar'
+import { DemoBanner } from './_components/DemoBanner'
 import { EcosystemFlow } from './_components/EcosystemFlow'
 import { MetricTile } from './_components/MetricTile'
-import {
-  DEMO_MY_AGENTS,
-  getApprovalRate,
-  getPendingRecommendations,
-  getTotalImpactUsd,
-} from './_lib/mock-data'
+import { useAgents } from './_lib/use-agents'
+import { useWorkspaceStore } from '@/stores/workspace.store'
 
 const PLATFORM_AGENT_VISUAL: Record<string, { emoji: string; accent: string }> = {
   media_buyer: { emoji: '📊', accent: '#0284c7' },
@@ -30,10 +28,32 @@ const PLATFORM_AGENT_VISUAL: Record<string, { emoji: string; accent: string }> =
 }
 
 export default function AiAgentsHubPage() {
-  const activeAgentsCount = DEMO_MY_AGENTS.filter((a) => a.status === 'active').length
-  const totalImpact = getTotalImpactUsd()
-  const approvalRate = getApprovalRate()
-  const pendingCount = getPendingRecommendations().length
+  const { currentWorkspace } = useWorkspaceStore()
+  const { agents, isDemo, optimize, optimizing } = useAgents()
+
+  const activeAgentsCount = useMemo(
+    () => agents.filter((a) => a.status === 'active').length,
+    [agents],
+  )
+  const totalImpact = useMemo(
+    () => agents.reduce((s, a) => s + a.impactUsd, 0),
+    [agents],
+  )
+  const approvalRate = useMemo(() => {
+    const total = agents.reduce((s, a) => s + a.recommendationsCount, 0)
+    const approved = agents.reduce((s, a) => s + a.approvedCount, 0)
+    if (total === 0) return 0
+    return Math.round((approved / total) * 100)
+  }, [agents])
+  const pendingCount = useMemo(
+    () =>
+      agents.reduce(
+        (s, a) =>
+          s + a.recent.filter((r) => r.approvalStatus === 'pending').length,
+        0,
+      ),
+    [agents],
+  )
 
   return (
     <div className="mx-auto max-w-6xl space-y-8 p-6">
@@ -72,7 +92,15 @@ export default function AiAgentsHubPage() {
         }
       />
 
-      {/* Live metrics */}
+      {isDemo && (
+        <DemoBanner
+          onOptimize={() => void optimize()}
+          optimizing={optimizing}
+          hasWorkspace={!!currentWorkspace?.id}
+        />
+      )}
+
+      {/* Live KPIs */}
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <MetricTile
           label="Aktiv agentlar"
@@ -83,8 +111,8 @@ export default function AiAgentsHubPage() {
         <MetricTile
           label="Jami foyda"
           value={`+$${totalImpact.toLocaleString('uz-UZ')}`}
-          delta="bu oy"
-          deltaDirection="up"
+          delta={isDemo ? 'demo' : 'bu oy'}
+          deltaDirection={isDemo ? 'neutral' : 'up'}
           icon={DollarSign}
           accent="#0284c7"
         />
@@ -95,9 +123,9 @@ export default function AiAgentsHubPage() {
           accent="#7c3aed"
         />
         <MetricTile
-          label="Kutilayotgan tavsiyalar"
+          label="Kutilayotgan"
           value={String(pendingCount)}
-          delta={pendingCount > 0 ? "Ko'rib chiqing" : 'Bo\'sh'}
+          delta={pendingCount > 0 ? "Ko'rib chiqing" : "Bo'sh"}
           deltaDirection={pendingCount > 0 ? 'up' : 'neutral'}
           icon={Sparkles}
           accent="#d97706"
