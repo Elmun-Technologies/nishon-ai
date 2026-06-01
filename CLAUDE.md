@@ -25,10 +25,10 @@ pnpm --filter api dev   # Faqat backend
 
 ---
 
-## Joriy holat (so'nggi yangilash: 2026-05-15)
+## Joriy holat (so'nggi yangilash: 2026-06-01)
 
 **Asosiy branch:** `main`
-**Faol branch:** `claude/setup-mvp-ads-Rivx6`
+**Faol branch:** `claude/hopeful-rubin-vTmX2` (Launch refactor — Phase 1)
 
 ### MVP fokus
 **Ad Launcher (3-bosqichli flow) production deploy.**
@@ -43,7 +43,23 @@ Batafsil deploy qadamlari: `DEPLOY.md`.
 - i18n (Uzbek/Russian/English)
 - Retargeting worker, Creative Hub, Meta Audit, Reporting, Budget pages
 
-### Bu sessiyada qilingan ishlar (claude/setup-mvp-ads-Rivx6):
+### Bu sessiyada qilingan ishlar (claude/hopeful-rubin-vTmX2 — Launch refactor Phase 1):
+- ✅ `/launch/page.tsx` 1610 → 34 qator — boshqaruvchi orchestrator
+- ✅ `_lib/` — `types.ts`, `meta-objectives.ts`, `utils.ts` (parsePositiveNumber, formatMoneyUsd, estimateAudienceReach), `use-launch-wizard.ts` (yagona state hook)
+- ✅ `_components/` — `LaunchHub`, `ModePicker`, `PlatformGlyph`, `ProgressRibbon` (clickable, step nomlari bilan), `SummaryPanel` (jonli sticky panel), `WizardHeader`, `StepFooter`
+- ✅ `_components/meta/` — ObjectiveStep, SettingsStep, AudienceStep, BudgetStep, CreativeStep, ReviewStep, MetaSummary, MetaWizard
+- ✅ `_components/google/GoogleWizard.tsx` va `_components/yandex/YandexWizard.tsx` — eski mantiq saqlangan
+- ✅ **Yangi UX qo'shimchalari:**
+  - SummaryPanel — har wizard stepda jonli xulasa (Meta uchun)
+  - ProgressRibbon — bosib steplar orasida sakrash (reachable steplar uchun)
+  - AudienceStep'da davlat chiplari + reach estimate (heuristic, taxminiy)
+  - BudgetStep'da Tezkor presetlar (Test/Standard/Masshtab) + duration chips
+  - CreativeStep'da live preview + Creative Hub link
+  - ObjectiveStep'da AI tavsiya hinti (Leads)
+- ✅ `pnpm --filter web build` — muvaffaqiyatli, `/launch` 19 kB
+- ✅ ESLint toza, `pnpm i18n:check` 2356 leaf key (3 tilda) saqlangan
+
+### Oldingi sessiyada (claude/setup-mvp-ads-Rivx6):
 - ✅ `pnpm install` — barcha bog'liqliklar o'rnatildi
 - ✅ Lokal `.env` shabloni (random JWT/ENCRYPTION secret'lar bilan)
 - ✅ `pnpm --filter api build` va `pnpm --filter web build` — har ikkalasi muvaffaqiyatli
