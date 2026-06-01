@@ -2,162 +2,132 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Check, ChevronLeft } from 'lucide-react'
-import { PublicContainer, PublicFooter, PublicNavbar } from '@/components/public/PublicLayout'
-import { useI18n } from '@/i18n/use-i18n'
+import { ArrowRight, ChevronLeft } from 'lucide-react'
 import { Input } from '@/components/ui'
-import { cn } from '@/lib/utils'
-import { getAccessToken } from '@/lib/auth-storage'
-import {
-  type BusinessTypeV2,
-  type GoalV2,
-  type OnboardingV2State,
-  type PixelModeV2,
-  clearOnboardingV2,
-  finalizeForRegister,
-  loadOnboardingV2,
-  saveOnboardingV2,
-  setFirstCampaignBanner,
-} from '@/lib/onboarding-v2'
 import { useWorkspaceStore } from '@/stores/workspace.store'
-
-const TOTAL = 6
-
-const BIZ: { id: BusinessTypeV2; emoji: string; labelUz: string }[] = [
-  { id: 'shop', emoji: '🛍️', labelUz: "Do'kon (kiyim, aksessuar)" },
-  { id: 'course', emoji: '🎓', labelUz: 'Kurs / Ta‘lim' },
-  { id: 'restaurant', emoji: '🍔', labelUz: 'Restoran / Kafe' },
-  { id: 'service', emoji: '💼', labelUz: 'Xizmat' },
-  { id: 'other', emoji: '📦', labelUz: 'Boshqa' },
-]
-
-const GOALS: { id: GoalV2; titleUz: string; subUz: string }[] = [
-  { id: 'sales', titleUz: 'Savdo oshirish', subUz: 'Dashboardda asosiy metrika — savdo / ROAS' },
-  { id: 'leads', titleUz: "Lead yig'ish", subUz: 'Dashboardda birinchi — ariza / lead' },
-  { id: 'awareness', titleUz: 'Brand awareness', subUz: 'Dashboardda birinchi — qamrov va eslash' },
-]
-
-function formatUzs(n: number) {
-  return new Intl.NumberFormat('uz-UZ').format(n) + " so'm"
-}
-
-function estimatedReach(dailyUzs: number) {
-  return Math.max(1000, Math.round(dailyUzs / 3.33))
-}
-
-function looksLikeMetaPixelId(s: string) {
-  const t = s.replace(/\s/g, '')
-  return /^\d{8,20}$/.test(t)
-}
-
-function ensureComplete(s: OnboardingV2State): OnboardingV2State {
-  const pixelMode = (s.pixelMode || 'skipped') as PixelModeV2
-  const pixelId =
-    pixelMode === 'has_pixel' && s.pixelId?.trim() && looksLikeMetaPixelId(s.pixelId) ? s.pixelId.trim() : null
-  return {
-    ...s,
-    businessType: (s.businessType || 'other') as BusinessTypeV2,
-    goal: (s.goal || 'sales') as GoalV2,
-    pixelMode,
-    pixelId,
-    dailyBudgetUzs: s.dailyBudgetUzs >= 50_000 && s.dailyBudgetUzs <= 500_000 ? s.dailyBudgetUzs : 100_000,
-    telegram: s.telegram.trim().replace(/^@+/, '') ? `@${s.telegram.trim().replace(/^@+/, '')}` : '',
-  }
-}
-
-function BigChoice({
-  selected,
-  onClick,
-  children,
-  className,
-}: {
-  selected: boolean
-  onClick: () => void
-  children: React.ReactNode
-  className?: string
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={selected}
-      className={cn(
-        'w-full rounded-2xl px-5 py-4 text-left text-base font-medium tracking-tight transition-all duration-200',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1b2e06]/30 focus-visible:ring-offset-2',
-        'active:scale-[0.99]',
-        selected
-          ? 'bg-[#1b2e06] text-white shadow-[0_8px_24px_-12px_rgba(27,46,6,0.45)] ring-1 ring-inset ring-[#1b2e06]'
-          : 'bg-white text-text-primary ring-1 ring-inset ring-[#e6efd9] hover:bg-[#fafdf5] hover:ring-[#cfe8c0] shadow-[0_1px_2px_rgba(27,46,6,0.04)]',
-        className,
-      )}
-    >
-      {children}
-    </button>
-  )
-}
+import { getAccessToken } from '@/lib/auth-storage'
+import type { ChannelKey } from '@/lib/pre-auth-onboarding'
+import { AllocationCards, AllocationOverview } from './_components/AllocationCards'
+import { BudgetInput } from './_components/BudgetInput'
+import { BotMessage, TypingIndicator, UserReply } from './_components/ChatBubble'
+import { ChatShell, MessageGroup } from './_components/ChatShell'
+import { ChoiceCard, QuickReplies } from './_components/QuickReplies'
+import {
+  allocateBudget,
+  formatUzs,
+  formatUzsFull,
+} from './_lib/budget-allocator'
+import {
+  clearState,
+  finalizeForLoggedIn,
+  finalizeForRegister,
+  loadState,
+  saveState,
+} from './_lib/persistence'
+import {
+  CHANNEL_LABELS,
+  CJM_LABELS,
+  DEFAULT_STATE,
+  STAGE_IDS,
+  VERTICAL_LABELS,
+  type BusinessVertical,
+  type CjmStage,
+  type ConversationalOnboardingState,
+  type CustomerAge,
+  type GeoRegion,
+} from './_lib/types'
 
 export default function OnboardingPage() {
-  const { t } = useI18n()
   const router = useRouter()
   const accessToken = useWorkspaceStore((s) => s.accessToken)
   const setCurrentWorkspace = useWorkspaceStore((s) => s.setCurrentWorkspace)
 
-  const [state, setState] = useState<OnboardingV2State>(() => ({
-    ...loadOnboardingV2(),
-  }))
+  const [state, setState] = useState<ConversationalOnboardingState>(DEFAULT_STATE)
   const [hydrated, setHydrated] = useState(false)
-  const [pixelInput, setPixelInput] = useState('')
-  const [pixelError, setPixelError] = useState('')
+  const [showTyping, setShowTyping] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [finishError, setFinishError] = useState('')
 
   useEffect(() => {
-    const d = loadOnboardingV2()
-    setState(d)
-    if (d.pixelId) setPixelInput(d.pixelId)
+    setState(loadState())
     setHydrated(true)
   }, [])
 
   useEffect(() => {
-    if (!hydrated) return
-    saveOnboardingV2(state)
+    if (hydrated) saveState(state)
   }, [state, hydrated])
 
-  const pct = useMemo(() => Math.round(((state.step + 1) / TOTAL) * 100), [state.step])
+  const totalStages = STAGE_IDS.length
+  const progressPercent = (state.stage / (totalStages - 1)) * 100
 
-  const go = useCallback((step: number) => {
-    setState((s) => ({ ...s, step: Math.max(0, Math.min(5, step)) }))
-  }, [])
-
-  const skipStep = useCallback(() => {
-    go(state.step + 1)
-  }, [go, state.step])
+  const setStage = useCallback((next: number) => {
+    setShowTyping(true)
+    setTimeout(() => {
+      setShowTyping(false)
+      setState((s) => ({ ...s, stage: Math.max(0, Math.min(totalStages - 1, next)) }))
+    }, 350)
+  }, [totalStages])
 
   const back = useCallback(() => {
-    go(state.step - 1)
-  }, [go, state.step])
+    if (state.stage > 0) setState((s) => ({ ...s, stage: s.stage - 1 }))
+  }, [state.stage])
 
-  const finish = useCallback(async () => {
-    const ready = ensureComplete({ ...state, pixelId: state.pixelMode === 'has_pixel' ? pixelInput : state.pixelId })
+  const handleVerticalPick = (v: BusinessVertical) => {
+    setState((s) => ({ ...s, vertical: v }))
+    setStage(3)
+  }
+
+  const handleCjmPick = (c: CjmStage) => {
+    setState((s) => ({ ...s, cjm: c }))
+    setStage(4)
+  }
+
+  const toggleGeo = (g: GeoRegion) => {
+    setState((s) => ({
+      ...s,
+      geos: s.geos.includes(g) ? s.geos.filter((x) => x !== g) : [...s.geos, g],
+    }))
+  }
+
+  const toggleAge = (a: CustomerAge) => {
+    setState((s) => ({
+      ...s,
+      ageRanges: s.ageRanges.includes(a)
+        ? s.ageRanges.filter((x) => x !== a)
+        : [...s.ageRanges, a],
+    }))
+  }
+
+  const toggleTouchpoint = (t: ChannelKey) => {
+    setState((s) => ({
+      ...s,
+      touchpoints: s.touchpoints.includes(t)
+        ? s.touchpoints.filter((x) => x !== t)
+        : [...s.touchpoints, t],
+    }))
+  }
+
+  /** Computed budget allocation (recomputes when inputs change). */
+  const allocationResult = useMemo(() => {
+    if (!state.cjm || !state.vertical) return null
+    return allocateBudget({
+      cjm: state.cjm,
+      vertical: state.vertical,
+      touchpoints: state.touchpoints,
+      monthlyBudgetUzs: state.monthlyBudgetUzs,
+    })
+  }, [state.cjm, state.vertical, state.touchpoints, state.monthlyBudgetUzs])
+
+  const handleFinish = useCallback(async () => {
     setSubmitting(true)
-    setPixelError('')
     setFinishError('')
 
-    if (ready.pixelMode === 'has_pixel' && ready.pixelId == null) {
-      setPixelError(t('onboardingV2.pixelInvalid', 'Pixel ID noto‘g‘ri — faqat raqam, 8–20 belgi.'))
-      setSubmitting(false)
-      go(3)
-      return
+    // Lock in the AI allocation if user hasn't customized it.
+    if (allocationResult) {
+      setState((s) => ({ ...s, allocation: allocationResult.percent, allocationApproved: true }))
     }
 
-    const body = {
-      businessType: ready.businessType,
-      goal: ready.goal,
-      pixelId: ready.pixelId,
-      pixelMode: ready.pixelMode,
-      dailyBudget: ready.dailyBudgetUzs,
-      telegram: ready.telegram,
-    }
+    const ready = { ...state, allocation: allocationResult?.percent ?? {}, allocationApproved: true }
 
     try {
       if (accessToken) {
@@ -168,307 +138,414 @@ export default function OnboardingPage() {
           method: 'POST',
           headers,
           credentials: 'include',
-          body: JSON.stringify(body),
+          body: JSON.stringify({
+            businessType: mapVerticalToBusinessType(ready.vertical || 'other'),
+            goal: mapCjmToGoal(ready.cjm || 'conversion'),
+            pixelId: null,
+            pixelMode: 'skipped',
+            dailyBudget: Math.round(ready.monthlyBudgetUzs / 30),
+            telegram: ready.telegram,
+          }),
         })
         if (res.ok) {
-          const data = await res.json().catch(() => ({})) as { workspace?: any }
+          const data = (await res.json().catch(() => ({}))) as { workspace?: any }
           if (data.workspace) setCurrentWorkspace(data.workspace)
         }
-        // Workspace creation may fail on first deploy (DB migration pending) — still
-        // navigate to dashboard so the user isn't stuck. They can set up workspace later.
-        setFirstCampaignBanner()
-        clearOnboardingV2()
+        finalizeForLoggedIn()
         router.push('/dashboard')
       } else {
         finalizeForRegister(ready)
         router.push('/register')
       }
     } catch (e: unknown) {
-      setFinishError(e instanceof Error ? e.message : "Xatolik yuz berdi. Qayta urinib ko'ring.")
+      setFinishError(
+        e instanceof Error ? e.message : "Xatolik yuz berdi. Qayta urinib ko'ring.",
+      )
       setSubmitting(false)
     }
-  }, [accessToken, go, router, setCurrentWorkspace, state, pixelInput, t])
-
-  const skipAll = useCallback(() => {
-    setState((prev) => {
-      const merged = ensureComplete({
-        ...prev,
-        businessType: (prev.businessType || 'other') as BusinessTypeV2,
-        goal: (prev.goal || 'sales') as GoalV2,
-        pixelMode: (prev.pixelMode || 'skipped') as PixelModeV2,
-      })
-      return { ...merged, step: 5 }
-    })
-  }, [])
+  }, [accessToken, allocationResult, router, setCurrentWorkspace, state])
 
   if (!hydrated) {
     return (
-      <div className="min-h-[50vh] flex items-center justify-center text-text-secondary text-sm">
-        {t('onboardingV2.loading', 'Yuklanmoqda…')}
+      <div className="flex min-h-screen items-center justify-center text-sm text-text-secondary">
+        Yuklanmoqda…
       </div>
     )
   }
 
   return (
-    <div className="relative isolate flex min-h-screen flex-col overflow-hidden bg-white">
+    <div className="relative isolate min-h-screen bg-white pb-6">
       <div
-        aria-hidden="true"
+        aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[420px] bg-[radial-gradient(80%_70%_at_50%_0%,#ecfccb_0%,transparent_60%)]"
       />
-      <PublicNavbar />
-      <PublicContainer className="flex-1 py-10 md:py-16">
-        <div className="mx-auto w-full max-w-lg">
-          <div className="rounded-3xl bg-white p-6 ring-1 ring-inset ring-[#e6efd9] shadow-[0_1px_2px_rgba(27,46,6,0.04),0_24px_48px_-24px_rgba(27,46,6,0.18)] md:p-8">
-            {/* Progress */}
-            <div className="mb-6">
-              <div
-                className="mb-2 flex justify-between text-[11px] font-semibold uppercase tracking-[0.14em] text-text-tertiary"
-                aria-hidden="true"
-              >
-                <span>
-                  {t('onboardingV2.stepOf', '{n}-qadam').replace('{n}', String(state.step + 1))} / {TOTAL}
-                </span>
-                <span className="tabular-nums">{pct}%</span>
-              </div>
-              <div
-                className="h-1.5 overflow-hidden rounded-full bg-[#eef3e3]"
-                role="progressbar"
-                aria-valuenow={pct}
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-label={`${t('onboardingV2.stepOf', '{n}-qadam').replace('{n}', String(state.step + 1))} / ${TOTAL}`}
-              >
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-[#3f6212] via-[#65a30d] to-[#a3e635] transition-[width] duration-300"
-                  style={{ width: `${pct}%` }}
-                />
-              </div>
-            </div>
+      <header className="flex items-center justify-between px-4 py-3 md:px-6">
+        <button
+          type="button"
+          onClick={() => {
+            if (confirm("Onboarding'ni qaytadan boshlamoqchimisiz?")) {
+              clearState()
+              setState(DEFAULT_STATE)
+            }
+          }}
+          className="text-xs text-text-tertiary underline-offset-2 hover:text-text-secondary hover:underline"
+        >
+          Qaytadan boshlash
+        </button>
+        {state.stage > 0 && (
+          <button
+            type="button"
+            onClick={back}
+            className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-sm font-medium text-text-secondary transition-colors hover:bg-[#f4f9ea] hover:text-text-primary"
+          >
+            <ChevronLeft className="h-4 w-4" aria-hidden />
+            Orqaga
+          </button>
+        )}
+      </header>
 
-            <div className="mb-5 flex items-center justify-between gap-2">
-              {state.step > 0 ? (
+      <ChatShell progressPercent={progressPercent}>
+        {/* Stage 0: Greeting */}
+        {state.stage >= 0 && (
+          <MessageGroup>
+            <BotMessage>
+              <p className="font-semibold">Salom! 👋</p>
+              <p className="mt-1">
+                Men Nishon AI — sizning reklama maslahatchingiz. Bir necha savolda sizga
+                eng to'g'ri reklama strategiyasini tuzib beraman:
+              </p>
+              <ul className="mt-2 ml-4 list-disc text-sm text-text-secondary">
+                <li>Maqsadingizni aniqlaymiz (CJM)</li>
+                <li>Mijozlaringizni topamiz</li>
+                <li>Byudjetni kanallar bo'yicha taqsimlaymiz</li>
+              </ul>
+            </BotMessage>
+            {state.stage === 0 && (
+              <div className="pl-10">
                 <button
                   type="button"
-                  onClick={back}
-                  className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-sm font-medium text-text-secondary transition-colors hover:bg-[#f4f9ea] hover:text-text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1b2e06]"
+                  onClick={() => setStage(1)}
+                  className="inline-flex items-center gap-2 rounded-full bg-[#1b2e06] px-5 py-3 text-sm font-semibold text-white shadow-[0_8px_24px_-12px_rgba(27,46,6,0.5)] transition-all hover:bg-[#243a12] active:scale-[0.98]"
                 >
-                  <ChevronLeft className="h-4 w-4" aria-hidden="true" />
-                  {t('onboardingV2.back', 'Orqaga')}
+                  Boshlash
+                  <ArrowRight className="h-4 w-4" aria-hidden />
                 </button>
-              ) : (
-                <span />
-              )}
-              {state.step < 5 && (
-                <div className="flex items-center gap-3">
+              </div>
+            )}
+          </MessageGroup>
+        )}
+
+        {/* Stage 1: Business Name */}
+        {state.stage >= 1 && (
+          <MessageGroup>
+            <BotMessage>
+              Birinchi savol — <strong>biznesingiz nomi</strong> qanday? (Ixtiyoriy)
+            </BotMessage>
+            {state.businessName && state.stage > 1 && (
+              <UserReply>{state.businessName}</UserReply>
+            )}
+            {state.stage === 1 && (
+              <div className="pl-10 pt-1">
+                <Input
+                  value={state.businessName}
+                  onChange={(e) => setState((s) => ({ ...s, businessName: e.target.value }))}
+                  placeholder="Masalan: Asaxiy Shop, English Tutor, Cafe Bismi…"
+                  className="rounded-2xl"
+                />
+                <div className="mt-3 flex gap-2">
                   <button
                     type="button"
-                    onClick={skipAll}
-                    className="text-xs text-text-tertiary underline-offset-2 hover:text-text-secondary hover:underline"
+                    onClick={() => setStage(2)}
+                    className="rounded-full bg-[#1b2e06] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_24px_-12px_rgba(27,46,6,0.5)] transition-all hover:bg-[#243a12] active:scale-[0.98]"
                   >
-                    {t('onboardingV2.skipAll', "Hammasini o'tkazish")}
+                    Davom etish
                   </button>
                   <button
                     type="button"
-                    onClick={skipStep}
-                    className="rounded-full px-2.5 py-1 text-sm font-medium text-[#3f6212] hover:bg-[#f4f9ea] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1b2e06]"
+                    onClick={() => setStage(2)}
+                    className="rounded-full px-4 py-2.5 text-sm text-text-tertiary hover:text-text-secondary"
                   >
-                    {t('onboardingV2.skip', "O'tkazib yuborish")}
+                    O'tkazib yuborish
                   </button>
                 </div>
-              )}
-            </div>
-
-          {/* Step 0 */}
-          {state.step === 0 && (
-            <div className="space-y-6 pt-2 text-center">
-              <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#1b2e06] text-[#d9f99d] shadow-[0_8px_24px_-12px_rgba(27,46,6,0.45)]">
-                <span className="text-lg font-bold">A</span>
               </div>
-              <h1 className="text-balance text-2xl font-medium tracking-tight text-text-primary md:text-3xl md:leading-[1.15]">
-                {t('onboardingV2.welcomeTitle', "3 daqiqada birinchi kampaniyangizni yoqamiz")}
-              </h1>
-              <p className="text-pretty text-sm text-text-secondary md:text-base">
-                {t('onboardingV2.welcomeSub', '5 qisqa qadam — har biri bitta savol, katta tugmalar.')}
-              </p>
-              <button
-                type="button"
-                onClick={() => go(1)}
-                className="inline-flex h-12 w-full items-center justify-center rounded-full bg-[#1b2e06] text-base font-medium text-white shadow-[0_1px_2px_rgba(27,46,6,0.18)] transition-all duration-200 hover:bg-[#243a12] hover:shadow-[0_4px_12px_-2px_rgba(27,46,6,0.28)] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1b2e06]"
-              >
-                {t('onboardingV2.start', 'Boshlash')}
-              </button>
-            </div>
-          )}
+            )}
+          </MessageGroup>
+        )}
 
-          {/* Step 1 — biznes */}
-          {state.step === 1 && (
-            <div className="space-y-4">
-              <h2 className="text-xl font-medium tracking-tight text-text-primary md:text-2xl">{t('onboardingV2.whoTitle', 'Siz kimsiz?')}</h2>
-              <p className="text-sm text-text-secondary">{t('onboardingV2.whoSub', 'Biznes turi — shablon va filtrlar keyinroq moslashadi.')}</p>
-              <div className="grid gap-3">
-                {BIZ.map((b) => (
-                  <BigChoice
-                    key={b.id}
-                    selected={state.businessType === b.id}
-                    onClick={() => {
-                      setState((s) => ({ ...s, businessType: b.id }))
-                      go(2)
+        {/* Stage 2: Business Vertical */}
+        {state.stage >= 2 && (
+          <MessageGroup>
+            <BotMessage>Biznesingiz qaysi yo'nalishda?</BotMessage>
+            {state.vertical && state.stage > 2 && (
+              <UserReply>
+                {VERTICAL_LABELS[state.vertical].emoji}{' '}
+                {VERTICAL_LABELS[state.vertical].title}
+              </UserReply>
+            )}
+            {state.stage === 2 && (
+              <div className="space-y-2 pl-10 pt-1">
+                {(Object.keys(VERTICAL_LABELS) as BusinessVertical[]).map((v) => (
+                  <ChoiceCard
+                    key={v}
+                    option={{
+                      id: v,
+                      label: VERTICAL_LABELS[v].title,
+                      emoji: VERTICAL_LABELS[v].emoji,
                     }}
-                  >
-                    <span className="mr-2">{b.emoji}</span>
-                    {b.labelUz}
-                  </BigChoice>
+                    selected={state.vertical === v}
+                    onClick={() => handleVerticalPick(v)}
+                  />
                 ))}
               </div>
-            </div>
-          )}
+            )}
+          </MessageGroup>
+        )}
 
-          {/* Step 2 — maqsad */}
-          {state.step === 2 && (
-            <div className="space-y-4">
-              <h2 className="text-xl font-medium tracking-tight text-text-primary md:text-2xl">{t('onboardingV2.goalTitle', 'Nima sotmoqchisiz?')}</h2>
-              <div className="grid gap-3">
-                {GOALS.map((g) => (
-                  <BigChoice
-                    key={g.id}
-                    selected={state.goal === g.id}
-                    onClick={() => {
-                      setState((s) => ({ ...s, goal: g.id }))
-                      go(3)
+        {/* Stage 3: CJM Goal */}
+        {state.stage >= 3 && (
+          <MessageGroup>
+            <BotMessage>
+              <p>
+                Reklamadan <strong>asosiy maqsadingiz</strong> nima?
+              </p>
+              <p className="mt-1 text-xs text-text-tertiary">
+                Bu CJM bosqichi — mijoz yo'lining qaysi qismini optimizatsiya qilamiz
+              </p>
+            </BotMessage>
+            {state.cjm && state.stage > 3 && (
+              <UserReply>
+                {CJM_LABELS[state.cjm].emoji} {CJM_LABELS[state.cjm].title}
+              </UserReply>
+            )}
+            {state.stage === 3 && (
+              <div className="space-y-2 pl-10 pt-1">
+                {(Object.keys(CJM_LABELS) as CjmStage[]).map((c) => (
+                  <ChoiceCard
+                    key={c}
+                    option={{
+                      id: c,
+                      label: CJM_LABELS[c].title,
+                      emoji: CJM_LABELS[c].emoji,
+                      description: CJM_LABELS[c].desc,
                     }}
+                    selected={state.cjm === c}
+                    onClick={() => handleCjmPick(c)}
+                  />
+                ))}
+              </div>
+            )}
+          </MessageGroup>
+        )}
+
+        {/* Stage 4: Geo + Age */}
+        {state.stage >= 4 && (
+          <MessageGroup>
+            <BotMessage>
+              Mijozlaringiz <strong>qayerda</strong> va <strong>qanday yoshda</strong>?
+            </BotMessage>
+            {state.stage > 4 && (
+              <UserReply>
+                {state.geos.join(', ')}
+                {state.ageRanges.length > 0 ? ` · ${state.ageRanges.join(', ')}` : ''}
+              </UserReply>
+            )}
+            {state.stage === 4 && (
+              <div className="space-y-4 pl-10 pt-1">
+                <div>
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-tertiary">
+                    📍 Geografiya (bir nechta tanlash mumkin)
+                  </p>
+                  <QuickReplies
+                    options={[
+                      { id: 'UZ', label: 'O\'zbekiston' },
+                      { id: 'KZ', label: 'Qozog\'iston' },
+                      { id: 'RU', label: 'Rossiya' },
+                      { id: 'KG', label: "Qirg'iziston" },
+                      { id: 'TJ', label: 'Tojikiston' },
+                      { id: 'OTHER', label: 'Boshqa' },
+                    ]}
+                    selected={state.geos}
+                    onSelect={toggleGeo}
+                    multi
+                  />
+                </div>
+                <div>
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-tertiary">
+                    🎂 Yosh oraliqlari
+                  </p>
+                  <QuickReplies
+                    options={[
+                      { id: '18-24', label: '18–24' },
+                      { id: '25-34', label: '25–34' },
+                      { id: '35-44', label: '35–44' },
+                      { id: '45-54', label: '45–54' },
+                      { id: '55+', label: '55+' },
+                    ]}
+                    selected={state.ageRanges}
+                    onSelect={toggleAge}
+                    multi
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setStage(5)}
+                  disabled={state.geos.length === 0}
+                  className="rounded-full bg-[#1b2e06] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_24px_-12px_rgba(27,46,6,0.5)] transition-all hover:bg-[#243a12] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Davom etish
+                </button>
+              </div>
+            )}
+          </MessageGroup>
+        )}
+
+        {/* Stage 5: Touchpoints */}
+        {state.stage >= 5 && (
+          <MessageGroup>
+            <BotMessage>
+              <p>Mijozlaringiz vaqtini <strong>qayerda</strong> o'tkazadi?</p>
+              <p className="mt-1 text-xs text-text-tertiary">
+                Bilmasangiz o'tkazib yuboring — AI o'zi tahlil qiladi
+              </p>
+            </BotMessage>
+            {state.stage > 5 && state.touchpoints.length > 0 && (
+              <UserReply>
+                {state.touchpoints.map((t) => CHANNEL_LABELS[t].title).join(', ')}
+              </UserReply>
+            )}
+            {state.stage > 5 && state.touchpoints.length === 0 && (
+              <UserReply>O'tkazib yuborildi (AI tanlasin)</UserReply>
+            )}
+            {state.stage === 5 && (
+              <div className="space-y-3 pl-10 pt-1">
+                <QuickReplies
+                  options={(Object.keys(CHANNEL_LABELS) as ChannelKey[]).map((k) => ({
+                    id: k,
+                    label: CHANNEL_LABELS[k].title,
+                    emoji: CHANNEL_LABELS[k].emoji,
+                  }))}
+                  selected={state.touchpoints}
+                  onSelect={toggleTouchpoint}
+                  multi
+                />
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setStage(6)}
+                    className="rounded-full bg-[#1b2e06] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_24px_-12px_rgba(27,46,6,0.5)] transition-all hover:bg-[#243a12] active:scale-[0.98]"
                   >
-                    <div>
-                      <div>{g.titleUz}</div>
-                      <div className="text-xs font-normal text-text-tertiary mt-1">{g.subUz}</div>
-                    </div>
-                  </BigChoice>
-                ))}
+                    Davom etish
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setState((s) => ({ ...s, touchpoints: [] }))
+                      setStage(6)
+                    }}
+                    className="rounded-full px-4 py-2.5 text-sm text-text-tertiary hover:text-text-secondary"
+                  >
+                    O'tkazib yuborish
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </MessageGroup>
+        )}
 
-          {/* Step 3 — pixel */}
-          {state.step === 3 && (
-            <div className="space-y-4">
-              <h2 className="text-xl font-medium tracking-tight text-text-primary md:text-2xl">{t('onboardingV2.pixelTitle', 'Meta Pixel')}</h2>
-              <p className="text-sm text-text-secondary">
-                {t(
-                  'onboardingV2.pixelHint',
-                  "Ko'pchilik hozir o'tkazadi — bu normal. Pixel siz ham boshlash mumkin, ma'lumot kamroq bo'ladi.",
+        {/* Stage 6: Budget */}
+        {state.stage >= 6 && (
+          <MessageGroup>
+            <BotMessage>
+              Endi eng asosiy — <strong>oylik reklama byudjetingiz</strong> qancha?
+            </BotMessage>
+            {state.stage > 6 && (
+              <UserReply>{formatUzs(state.monthlyBudgetUzs)}/oy</UserReply>
+            )}
+            {state.stage === 6 && (
+              <div className="space-y-3 pl-10 pt-1">
+                <BudgetInput
+                  valueUzs={state.monthlyBudgetUzs}
+                  onChange={(n) => setState((s) => ({ ...s, monthlyBudgetUzs: n }))}
+                  estimatedReach={
+                    allocationResult ? allocationResult.totalReach : Math.round(state.monthlyBudgetUzs / 15)
+                  }
+                />
+                <button
+                  type="button"
+                  onClick={() => setStage(7)}
+                  className="rounded-full bg-[#1b2e06] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_24px_-12px_rgba(27,46,6,0.5)] transition-all hover:bg-[#243a12] active:scale-[0.98]"
+                >
+                  Taqsimlashni ko'rsatish
+                </button>
+              </div>
+            )}
+          </MessageGroup>
+        )}
+
+        {/* Stage 7: AI Allocation — the magic step */}
+        {state.stage >= 7 && allocationResult && (
+          <MessageGroup>
+            <BotMessage>
+              <p>
+                Ajoyib! Sizning <strong>{formatUzsFull(state.monthlyBudgetUzs)}</strong>{' '}
+                oylik byudjetingizni{' '}
+                <strong>{state.cjm ? CJM_LABELS[state.cjm].title.toLowerCase() : ''}</strong>{' '}
+                maqsadi uchun shunday taqsimlash tavsiya etiladi:
+              </p>
+            </BotMessage>
+            {state.stage === 7 && (
+              <div className="space-y-4 pl-10 pt-1">
+                <div className="rounded-2xl bg-white p-4 ring-1 ring-inset ring-[#e6efd9] shadow-[0_1px_3px_rgba(27,46,6,0.05)]">
+                  <AllocationOverview result={allocationResult} />
+                </div>
+                {state.cjm && (
+                  <AllocationCards result={allocationResult} cjm={state.cjm} />
                 )}
-              </p>
-              <div className="grid gap-3">
-                <BigChoice
-                  selected={state.pixelMode === 'has_pixel'}
-                  onClick={() => setState((s) => ({ ...s, pixelMode: 'has_pixel' }))}
-                >
-                  {t('onboardingV2.pixelHas', 'Pixel bor — ID kiritaman')}
-                </BigChoice>
-                {state.pixelMode === 'has_pixel' && (
-                  <div className="rounded-xl border border-border bg-surface p-3 space-y-2">
-                    <label className="text-xs text-text-tertiary">Pixel ID</label>
-                    <Input
-                      value={pixelInput}
-                      onChange={(e) => {
-                        setPixelInput(e.target.value)
-                        setState((s) => ({ ...s, pixelId: e.target.value.trim() || null }))
-                      }}
-                      placeholder="123456789012345"
-                      inputMode="numeric"
-                      className="font-mono"
-                    />
-                    {pixelError ? <p className="text-xs text-red-500">{pixelError}</p> : null}
-                  </div>
-                )}
-                <BigChoice
-                  selected={state.pixelMode === 'help'}
-                  onClick={() => setState((s) => ({ ...s, pixelMode: 'help', pixelId: null }))}
-                >
-                  <div>
-                    <div>{t('onboardingV2.pixelHelp', "Yo'rdam — video + mutaxassis ($5)")}</div>
-                    <p className="text-xs font-normal text-text-tertiary mt-1">
-                      {t('onboardingV2.pixelHelpSub', 'Qisqa video (~45 s), keyin mutaxassis ulab beradi.')}
-                    </p>
-                  </div>
-                </BigChoice>
-                <BigChoice
-                  selected={state.pixelMode === 'skipped'}
-                  onClick={() => setState((s) => ({ ...s, pixelMode: 'skipped', pixelId: null }))}
-                >
-                  {t('onboardingV2.pixelSkip', "Hozir o'tkazib yuborish — keyin eslatamiz")}
-                </BigChoice>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setStage(8)}
+                    className="rounded-full bg-[#1b2e06] px-5 py-3 text-sm font-semibold text-white shadow-[0_8px_24px_-12px_rgba(27,46,6,0.5)] transition-all hover:bg-[#243a12] active:scale-[0.98]"
+                  >
+                    Roziman, davom
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setStage(6)}
+                    className="rounded-full px-4 py-3 text-sm text-text-tertiary hover:text-text-secondary"
+                  >
+                    Byudjet'ni o'zgartirish
+                  </button>
+                </div>
               </div>
-              <button
-                type="button"
-                onClick={() => go(4)}
-                disabled={!state.pixelMode}
-                className="inline-flex h-11 w-full items-center justify-center rounded-full bg-[#1b2e06] text-sm font-medium text-white shadow-[0_1px_2px_rgba(27,46,6,0.18)] transition-all duration-200 hover:bg-[#243a12] hover:shadow-[0_4px_12px_-2px_rgba(27,46,6,0.28)] active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1b2e06]"
-              >
-                {t('onboardingV2.continue', 'Davom etish')}
-              </button>
-            </div>
-          )}
+            )}
+            {state.stage > 7 && (
+              <UserReply>Roziman ✓</UserReply>
+            )}
+          </MessageGroup>
+        )}
 
-          {/* Step 4 — budget */}
-          {state.step === 4 && (
-            <div className="space-y-5">
-              <h2 className="text-xl font-medium tracking-tight text-text-primary md:text-2xl">
-                {t('onboardingV2.budgetTitle', "Kuniga qancha sarflaysiz?")}
-              </h2>
-              <p className="text-3xl font-semibold tabular-nums tracking-tight text-[#3f6212] md:text-4xl">
-                {formatUzs(state.dailyBudgetUzs)}
-              </p>
-              <input
-                type="range"
-                min={50_000}
-                max={500_000}
-                step={10_000}
-                value={state.dailyBudgetUzs}
-                onChange={(e) => setState((s) => ({ ...s, dailyBudgetUzs: Number(e.target.value) }))}
-                aria-label={t('onboardingV2.budgetTitle', "Kuniga qancha sarflaysiz?")}
-                className="h-2 w-full cursor-pointer accent-[#65a30d]"
-              />
-              <div className="flex justify-between text-xs text-text-tertiary tabular-nums">
-                <span>50 000</span>
-                <span>500 000</span>
-              </div>
-              <p className="rounded-xl bg-[#fafdf5] px-4 py-3 text-sm text-text-secondary ring-1 ring-inset ring-[#eef3e3]">
-                {t('onboardingV2.budgetReach', 'Taxminan {n} kishi ko‘radi')
-                  .replace('{n}', new Intl.NumberFormat('uz-UZ').format(estimatedReach(state.dailyBudgetUzs)))}
-              </p>
-              <p className="text-xs text-text-tertiary">{t('onboardingV2.budgetTip', "Boshlash uchun 100 000 so'm tavsiya etiladi.")}</p>
-              <button
-                type="button"
-                onClick={() => go(5)}
-                className="inline-flex h-11 w-full items-center justify-center rounded-full bg-[#1b2e06] text-sm font-medium text-white shadow-[0_1px_2px_rgba(27,46,6,0.18)] transition-all duration-200 hover:bg-[#243a12] hover:shadow-[0_4px_12px_-2px_rgba(27,46,6,0.28)] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1b2e06]"
-              >
-                {t('onboardingV2.continue', 'Davom etish')}
-              </button>
-            </div>
-          )}
-
-          {/* Step 5 — tayyor */}
-          {state.step === 5 && (
-            <div className="space-y-6">
-              <h2 className="text-xl font-medium tracking-tight text-text-primary md:text-2xl">
-                {t('onboardingV2.doneTitle', 'Tayyor')}
-              </h2>
-              <ul className="space-y-2.5 text-sm text-text-secondary">
-                {[
-                  t('onboardingV2.doneProfile', 'Profil sozlamalari saqlandi'),
-                  t('onboardingV2.doneDashboard', 'Dashboard metrikalari tanlovingizga mos'),
-                  t('onboardingV2.doneTg', 'Telegram (ixtiyoriy)'),
-                ].map((line) => (
-                  <li key={line} className="flex items-center gap-2.5">
-                    <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#ecfccb] text-[#3f6212]">
-                      <Check className="h-3 w-3" aria-hidden="true" />
-                    </span>
-                    {line}
-                  </li>
-                ))}
+        {/* Stage 8: Connect / Finish */}
+        {state.stage >= 8 && allocationResult && (
+          <MessageGroup>
+            <BotMessage>
+              <p>Tayyor! Quyidagilar saqlandi:</p>
+              <ul className="mt-2 space-y-1 text-sm">
+                <li>✓ Biznes profili</li>
+                <li>✓ Maqsad: {state.cjm ? CJM_LABELS[state.cjm].title : ''}</li>
+                <li>✓ Oylik byudjet: {formatUzsFull(state.monthlyBudgetUzs)}</li>
+                <li>✓ Kanal taqsimoti tayyor</li>
               </ul>
-              <div>
-                <label className="mb-1 block text-xs text-text-tertiary">Telegram</label>
+              <p className="mt-2 text-xs text-text-tertiary">
+                Dashboard'da reklama hisoblaringizni ulashingiz mumkin (Meta, Google, va h.k.)
+              </p>
+            </BotMessage>
+            <div className="space-y-3 pl-10 pt-1">
+              <div className="rounded-2xl bg-white p-4 ring-1 ring-inset ring-[#e6efd9]">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-tertiary">
+                  Telegram bildirishnomalari (ixtiyoriy)
+                </p>
                 <Input
                   value={state.telegram.replace(/^@/, '')}
                   onChange={(e) => setState((s) => ({ ...s, telegram: e.target.value }))}
@@ -476,19 +553,6 @@ export default function OnboardingPage() {
                   className="rounded-xl"
                 />
               </div>
-              <dl className="space-y-1.5 rounded-xl bg-[#fafdf5] p-4 text-xs text-text-secondary ring-1 ring-inset ring-[#eef3e3]">
-                {[
-                  [t('onboardingV2.summaryBiz', 'Biznes'), state.businessType || '—'],
-                  [t('onboardingV2.summaryGoal', 'Maqsad'), state.goal || '—'],
-                  ['Pixel', `${state.pixelMode || '—'} ${state.pixelId ? `(${state.pixelId})` : ''}`.trim()],
-                  [t('onboardingV2.summaryBudget', 'Kunlik'), formatUzs(state.dailyBudgetUzs || 100_000)],
-                ].map(([label, value]) => (
-                  <div key={label} className="flex justify-between gap-3">
-                    <dt className="text-text-tertiary">{label}</dt>
-                    <dd className="font-medium text-text-primary">{value}</dd>
-                  </div>
-                ))}
-              </dl>
               {finishError && (
                 <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-600 ring-1 ring-inset ring-red-200">
                   {finishError}
@@ -496,27 +560,54 @@ export default function OnboardingPage() {
               )}
               <button
                 type="button"
-                onClick={() => void finish()}
+                onClick={() => void handleFinish()}
                 disabled={submitting}
-                className="inline-flex h-12 w-full items-center justify-center rounded-full bg-[#1b2e06] text-base font-medium text-white shadow-[0_1px_2px_rgba(27,46,6,0.18)] transition-all duration-200 hover:bg-[#243a12] hover:shadow-[0_4px_12px_-2px_rgba(27,46,6,0.28)] active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1b2e06]"
+                className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#1b2e06] text-base font-semibold text-white shadow-[0_8px_24px_-12px_rgba(27,46,6,0.5)] transition-all hover:bg-[#243a12] active:scale-[0.98] disabled:opacity-50"
               >
                 {submitting
-                  ? t('onboardingV2.saving', 'Saqlanmoqda…')
+                  ? 'Saqlanmoqda…'
                   : accessToken
-                    ? t('onboardingV2.goDashboard', "Dashboard ga o'tish")
-                    : t('onboardingV2.goRegister', "Ro'yxatdan o'tish")}
+                    ? 'Dashboard ga o\'tish'
+                    : "Ro'yxatdan o'tish"}
+                <ArrowRight className="h-4 w-4" aria-hidden />
               </button>
-              {!accessToken && (
-                <p className="text-center text-xs text-text-tertiary">
-                  {t('onboardingV2.registerNote', 'Keyingi qadam — akkaunt yaratish.')}
-                </p>
-              )}
             </div>
-          )}
-          </div>
-        </div>
-      </PublicContainer>
-      <PublicFooter />
+          </MessageGroup>
+        )}
+
+        {showTyping && <TypingIndicator />}
+      </ChatShell>
     </div>
   )
+}
+
+function mapVerticalToBusinessType(v: BusinessVertical | ''): string {
+  switch (v) {
+    case 'ecommerce':
+      return 'shop'
+    case 'local':
+      return 'restaurant'
+    case 'education':
+      return 'course'
+    case 'service':
+      return 'service'
+    case 'realestate':
+      return 'service'
+    default:
+      return 'other'
+  }
+}
+
+function mapCjmToGoal(c: CjmStage | ''): string {
+  switch (c) {
+    case 'awareness':
+      return 'awareness'
+    case 'consideration':
+      return 'leads'
+    case 'conversion':
+    case 'retention':
+      return 'sales'
+    default:
+      return 'sales'
+  }
 }
