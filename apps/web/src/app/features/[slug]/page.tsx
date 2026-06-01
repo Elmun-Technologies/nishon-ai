@@ -30,6 +30,7 @@ export function generateMetadata({ params }: RouteParams): Metadata {
     metadataBase: new URL(SITE_URL),
     title,
     description: feature.seoDescription,
+    keywords: feature.keywords,
     alternates: {
       canonical: `/features/${feature.slug}`,
       languages: {

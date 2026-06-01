@@ -1,39 +1,24 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowLeft, ArrowRight, ArrowUpRight, CheckCircle2, Plus, Sparkles } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ArrowUpRight, Plus, Sparkles } from 'lucide-react'
 import { PublicContainer } from '@/components/public/PublicLayout'
 import { LandingButton } from '@/components/landing/ui/LandingButton'
-import { LandingCard } from '@/components/landing/ui/LandingCard'
-import { LaunchFlowDemo } from './animations/LaunchFlowDemo'
-import { AiDecisionFeedDemo } from './animations/AiDecisionFeedDemo'
-import { AnalyticsDashboardDemo } from './animations/AnalyticsDashboardDemo'
-import { WorkspaceOrgDemo } from './animations/WorkspaceOrgDemo'
+import { FeatureAnim } from './animations/registry'
+import { ProblemSection } from './sections/ProblemSection'
+import { ValuePropsSection } from './sections/ValuePropsSection'
+import { ComparisonSection } from './sections/ComparisonSection'
+import { UseCasesSection } from './sections/UseCasesSection'
+import { MetricsShowcase } from './sections/MetricsShowcase'
 import {
   FEATURE_CATEGORY_LABEL,
   FEATURE_CONTENT,
-  type CategoryId,
   type FeatureContent,
 } from './feature-content'
 import { FEATURE_ICONS } from './feature-icons'
 
 interface FeatureDetailProps {
   feature: FeatureContent
-}
-
-function CategoryAnimation({ category, header }: { category: CategoryId; header: string }) {
-  switch (category) {
-    case 'execution':
-      return <LaunchFlowDemo />
-    case 'aiOpt':
-      return <AiDecisionFeedDemo headerLabel={header} />
-    case 'analytics':
-      return <AnalyticsDashboardDemo />
-    case 'governance':
-      return <WorkspaceOrgDemo />
-    default:
-      return null
-  }
 }
 
 export function FeatureDetail({ feature }: FeatureDetailProps) {
@@ -107,11 +92,14 @@ export function FeatureDetail({ feature }: FeatureDetailProps) {
             </div>
 
             <div>
-              <CategoryAnimation category={feature.category} header={feature.mockHeader} />
+              <FeatureAnim slug={feature.slug} />
             </div>
           </div>
         </PublicContainer>
       </section>
+
+      {/* ─── PROBLEM HOOK (optional) ─────────────────────────────────────── */}
+      {feature.problemHook ? <ProblemSection hook={feature.problemHook} /> : null}
 
       {/* ─── BULLETS ─────────────────────────────────────────────────────── */}
       <section aria-label="Возможности модуля" className="bg-white py-20 md:py-24">
@@ -131,6 +119,24 @@ export function FeatureDetail({ feature }: FeatureDetailProps) {
           </div>
         </PublicContainer>
       </section>
+
+      {/* ─── VALUE PROPS (optional) ───────────────────────────────────────── */}
+      {feature.valueProps && feature.valueProps.length > 0 ? (
+        <ValuePropsSection
+          eyebrow="Что вы получаете"
+          title={`Почему ${feature.hero.title} меняет правила игры`}
+          items={feature.valueProps}
+        />
+      ) : null}
+
+      {/* ─── COMPARISON (optional) ────────────────────────────────────────── */}
+      {feature.comparison ? (
+        <ComparisonSection
+          title={feature.comparison.title}
+          description={feature.comparison.description}
+          rows={feature.comparison.rows}
+        />
+      ) : null}
 
       {/* ─── HOW IT WORKS ─────────────────────────────────────────────────── */}
       <section
@@ -170,6 +176,24 @@ export function FeatureDetail({ feature }: FeatureDetailProps) {
           </ol>
         </PublicContainer>
       </section>
+
+      {/* ─── USE CASES (optional) ─────────────────────────────────────────── */}
+      {feature.useCases && feature.useCases.cases.length > 0 ? (
+        <UseCasesSection
+          title={feature.useCases.title}
+          description={feature.useCases.description}
+          cases={feature.useCases.cases}
+        />
+      ) : null}
+
+      {/* ─── METRICS (optional) ───────────────────────────────────────────── */}
+      {feature.metrics && feature.metrics.items.length > 0 ? (
+        <MetricsShowcase
+          title={feature.metrics.title}
+          description={feature.metrics.description}
+          metrics={feature.metrics.items}
+        />
+      ) : null}
 
       {/* ─── FAQ ──────────────────────────────────────────────────────────── */}
       <section aria-labelledby="feature-faq-heading" className="bg-white py-20 md:py-24">
