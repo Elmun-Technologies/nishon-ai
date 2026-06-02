@@ -57,7 +57,7 @@ export class MarketplaceContactService {
   async contactSpecialist(
     slug: string,
     dto: ContactSpecialistDto,
-    requestingUserId?: string,
+    _requestingUserId?: string,
   ): Promise<ContactResult> {
     // 1. Find specialist
     const profile = await this.profileRepo.findOne({

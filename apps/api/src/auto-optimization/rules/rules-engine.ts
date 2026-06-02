@@ -59,7 +59,7 @@ export function runRulesEngine(
   const opportunities: Opportunity[] = [];
 
   const allAds     = campaign.adSets.flatMap(s => s.ads);
-  const totalAds   = allAds.length;
+  const _totalAds   = allAds.length;
 
   // ── Campaign-level rules ──────────────────────────────────────────────────
 

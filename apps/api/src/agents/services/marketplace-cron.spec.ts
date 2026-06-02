@@ -35,7 +35,7 @@ describe("MarketplaceCronService", () => {
   let metaSync: MetaPerformanceSyncService;
   let googleSync: GooglePerformanceSyncService;
   let yandexSync: YandexPerformanceSyncService;
-  let fraudDetection: FraudDetectionService;
+  let _fraudDetection: FraudDetectionService;
 
   beforeEach(async () => {
     // Mock repositories and services
@@ -112,7 +112,7 @@ describe("MarketplaceCronService", () => {
     yandexSync = module.get<YandexPerformanceSyncService>(
       YandexPerformanceSyncService,
     );
-    fraudDetection = module.get<FraudDetectionService>(FraudDetectionService);
+    _fraudDetection = module.get<FraudDetectionService>(FraudDetectionService);
   });
 
   afterEach(() => {

@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsEnum, IsNumber, IsOptional, IsDate, IsBoolean, IsArray, IsObject, ValidateNested, Min, Max, IsUrl, IsEmail, IsIn } from 'class-validator';
+import { IsString, IsNotEmpty, IsEnum, IsNumber, IsOptional, IsDate, IsBoolean, IsArray, IsObject, ValidateNested, Min, Max, IsUrl, IsEmail as _IsEmail, IsIn } from 'class-validator';
 import { Type } from 'class-transformer';
 
 // Enums inline to avoid import issues

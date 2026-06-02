@@ -8,7 +8,7 @@ import { MetaConnector } from "./meta.connector";
 describe("MetaConnector", () => {
   let connector: MetaConnector;
   let httpService: jest.Mocked<HttpService>;
-  let configService: jest.Mocked<ConfigService>;
+  let _configService: jest.Mocked<ConfigService>;
 
   beforeEach(async () => {
     const mockHttp = {
@@ -37,7 +37,7 @@ describe("MetaConnector", () => {
 
     connector = module.get<MetaConnector>(MetaConnector);
     httpService = module.get(HttpService);
-    configService = module.get(ConfigService);
+    _configService = module.get(ConfigService);
   });
 
   describe("getOAuthUrl", () => {

@@ -9,6 +9,7 @@ import { WorkspaceMember } from "../workspace-members/entities/workspace-member.
 import { Workspace } from "../workspaces/entities/workspace.entity";
 import { MetaConnector } from "../platforms/connectors/meta.connector";
 import { GoogleConnector } from "../platforms/connectors/google.connector";
+import * as cryptoUtil from "../common/crypto.util";
 
 /**
  * These tests cover the core regression: before this PR, the orchestrator
@@ -23,7 +24,7 @@ describe("LaunchOrchestratorService", () => {
   let workspaceRepo: { findOne: jest.Mock };
   let memberRepo: { findOne: jest.Mock };
   let metaConnector: jest.Mocked<MetaConnector>;
-  let googleConnector: jest.Mocked<GoogleConnector>;
+  let _googleConnector: jest.Mocked<GoogleConnector>;
 
   const userId = "00000000-0000-0000-0000-000000000001";
   const workspaceId = "00000000-0000-0000-0000-000000000002";
@@ -69,10 +70,10 @@ describe("LaunchOrchestratorService", () => {
     // Stub decryption — the real implementation requires a 32-byte key and
     // a specific AES-GCM payload format we do not need in unit tests.
     jest
-      .spyOn(require("../common/crypto.util"), "decrypt")
+      .spyOn(cryptoUtil, "decrypt")
       .mockReturnValue("plain-token");
     jest
-      .spyOn(require("../common/crypto.util"), "resolveEncryptionKey")
+      .spyOn(cryptoUtil, "resolveEncryptionKey")
       .mockReturnValue("0".repeat(32));
 
     const module: TestingModule = await Test.createTestingModule({
@@ -90,7 +91,7 @@ describe("LaunchOrchestratorService", () => {
 
     service = module.get(LaunchOrchestratorService);
     metaConnector = module.get(MetaConnector);
-    googleConnector = module.get(GoogleConnector);
+    _googleConnector = module.get(GoogleConnector);
   });
 
   afterEach(() => jest.restoreAllMocks());

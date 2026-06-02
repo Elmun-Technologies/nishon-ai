@@ -6,7 +6,7 @@ import {
   UpdateDateColumn,
   Index,
 } from 'typeorm'
-import { IntegrationConfig as IIntegrationConfig } from '../types/integration.types'
+import { IntegrationConfig as _IIntegrationConfig } from '../types/integration.types'
 
 @Entity('integration_configs')
 @Index(['connectionId'])

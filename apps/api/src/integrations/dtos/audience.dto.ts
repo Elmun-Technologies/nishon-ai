@@ -1,5 +1,5 @@
-import { IsString, IsEnum, IsOptional, IsObject, IsNumber, ValidateNested } from 'class-validator'
-import { Type } from 'class-transformer'
+import { IsString, IsEnum, IsOptional, IsObject, IsNumber as _IsNumber, ValidateNested as _ValidateNested } from 'class-validator'
+import { Type as _Type } from 'class-transformer'
 
 // ─────────────────────────────────────────────────────────────────────────
 // Audience Segment DTOs

@@ -297,7 +297,7 @@ export class DecisionLoopService {
     advertiserId: string,
     accessToken: string,
     newBudgetUsd: number,
-    account: ConnectedAccount,
+    _account: ConnectedAccount,
   ): Promise<void> {
     if (platform === Platform.META) {
       await this.metaConnector.updateCampaignBudget(externalId, accessToken, newBudgetUsd);

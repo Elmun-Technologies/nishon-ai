@@ -88,7 +88,7 @@ export class MarketplacePerformanceService {
 
     const totalViews = profile.pageViewCount ?? 0;
     const totalCampaigns = metrics.reduce((s, m) => s + m.campaignsCount, 0);
-    const totalSpend = metrics.reduce((s, m) => s + Number(m.totalSpend ?? 0), 0);
+    const _totalSpend = metrics.reduce((s, m) => s + Number(m.totalSpend ?? 0), 0);
 
     // Trend = difference between most recent month and previous month (%)
     const viewsTrend = this.calcTrend(

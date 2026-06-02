@@ -15,12 +15,12 @@ import { NotFoundException } from "@nestjs/common";
 describe("MarketplaceSearchService", () => {
   let service: MarketplaceSearchService;
   let agentProfileRepository: Repository<AgentProfile>;
-  let agentCertificationRepository: Repository<AgentCertification>;
-  let agentLanguageRepository: Repository<AgentLanguage>;
+  let _agentCertificationRepository: Repository<AgentCertification>;
+  let _agentLanguageRepository: Repository<AgentLanguage>;
   let agentGeographicCoverageRepository: Repository<AgentGeographicCoverage>;
   let agentPlatformMetricsRepository: Repository<AgentPlatformMetrics>;
-  let agentReviewRepository: Repository<AgentReview>;
-  let agentHistoricalPerformanceRepository: Repository<AgentHistoricalPerformance>;
+  let _agentReviewRepository: Repository<AgentReview>;
+  let _agentHistoricalPerformanceRepository: Repository<AgentHistoricalPerformance>;
   let marketplaceCertificationRepository: Repository<MarketplaceCertification>;
 
   const mockAgentProfile: Partial<AgentProfile> = {
@@ -118,10 +118,10 @@ describe("MarketplaceSearchService", () => {
     agentProfileRepository = module.get<Repository<AgentProfile>>(
       getRepositoryToken(AgentProfile),
     );
-    agentCertificationRepository = module.get<Repository<AgentCertification>>(
+    _agentCertificationRepository = module.get<Repository<AgentCertification>>(
       getRepositoryToken(AgentCertification),
     );
-    agentLanguageRepository = module.get<Repository<AgentLanguage>>(
+    _agentLanguageRepository = module.get<Repository<AgentLanguage>>(
       getRepositoryToken(AgentLanguage),
     );
     agentGeographicCoverageRepository =
@@ -132,10 +132,10 @@ describe("MarketplaceSearchService", () => {
       module.get<Repository<AgentPlatformMetrics>>(
         getRepositoryToken(AgentPlatformMetrics),
       );
-    agentReviewRepository = module.get<Repository<AgentReview>>(
+    _agentReviewRepository = module.get<Repository<AgentReview>>(
       getRepositoryToken(AgentReview),
     );
-    agentHistoricalPerformanceRepository =
+    _agentHistoricalPerformanceRepository =
       module.get<Repository<AgentHistoricalPerformance>>(
         getRepositoryToken(AgentHistoricalPerformance),
       );

@@ -7,7 +7,7 @@
  * after tests. All fixtures use transactions for isolation.
  */
 
-import { Repository, DataSource } from "typeorm";
+import { Repository as _Repository, DataSource } from "typeorm";
 import { JwtService } from "@nestjs/jwt";
 import { v4 as uuidv4 } from "uuid";
 
@@ -222,7 +222,7 @@ export class MarketplaceFixtures {
     agentProfileId: string,
     overrides: Partial<TestSyncLog> = {},
   ): Promise<TestSyncLog> {
-    const now = new Date();
+    const _now = new Date();
     const syncLog: TestSyncLog = {
       id: uuidv4(),
       agentProfileId,

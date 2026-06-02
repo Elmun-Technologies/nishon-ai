@@ -9,7 +9,7 @@ import { ConnectedAccount } from "../platforms/entities/connected-account.entity
 import { MetaConnector } from "../platforms/connectors/meta.connector";
 import { GoogleConnector } from "../platforms/connectors/google.connector";
 import { TiktokConnector } from "../platforms/connectors/tiktok.connector";
-import { AutopilotMode, AiDecisionAction, Platform, CampaignStatus } from "@adspectr/shared";
+import { AutopilotMode, AiDecisionAction, Platform, CampaignStatus as _CampaignStatus } from "@adspectr/shared";
 
 const mockCompleteJson = jest.fn();
 
@@ -147,7 +147,7 @@ describe("DecisionLoopService", () => {
         nextReviewIn: "2h",
       });
 
-      const result = await service.runForWorkspace("ws-1");
+      const _result = await service.runForWorkspace("ws-1");
       // no_action decisions are skipped
       expect(decisionRepo.save).not.toHaveBeenCalled();
     });

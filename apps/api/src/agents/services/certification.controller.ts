@@ -10,8 +10,8 @@ import {
   UseGuards,
   Request,
   ForbiddenException,
-  Inject,
-  forwardRef,
+  Inject as _Inject,
+  forwardRef as _forwardRef,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
@@ -72,7 +72,7 @@ export class CertificationController {
   @UseGuards(JwtAuthGuard, AdminGuard)
   async createCertification(
     @Body() data: CreateCertificationDTO,
-    @Request() req: any,
+    @Request() _req: any,
   ): Promise<CertificationDetailDTO> {
     return this.certService.createCertification(data);
   }

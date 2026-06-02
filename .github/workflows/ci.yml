@@ -43,10 +43,11 @@ jobs:
       - name: Build
         run: pnpm --filter api build
 
-      # Lint debt is tracked but not yet blocking — see PLATFORM_RATING.
-      - name: Lint (non-blocking)
-        continue-on-error: true
-        run: pnpm --filter api lint
+      # API source is lint-error-free. We deliberately use `lint:check` (no
+      # --fix) so CI never silently rewrites prettier whitespace across
+      # ~190 files; warnings are visible but don't fail the build.
+      - name: Lint
+        run: pnpm --filter api lint:check
 
   web:
     name: Web · lint + i18n + build

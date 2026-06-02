@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, MoreThan, MoreThanOrEqual } from 'typeorm';
+import { Repository, MoreThan as _MoreThan, MoreThanOrEqual } from 'typeorm';
 import { AgentProfile } from '../entities/agent-profile.entity';
 import { AgentPlatformMetrics } from '../entities/agent-platform-metrics.entity';
 import { AgentPerformanceSyncLog } from '../entities/agent-performance-sync-log.entity';
@@ -255,10 +255,10 @@ export class FraudDetectionService {
    * Rule: Spend spike > 50% MoM = WARNING
    */
   private checkSpendSpike(
-    agentId: string,
-    metrics: MetricsData,
-    platform: string,
-    failedChecks: FailedCheck[],
+    _agentId: string,
+    _metrics: MetricsData,
+    _platform: string,
+    _failedChecks: FailedCheck[],
   ): void {
     // This check requires historical data, so it's async
     // The async version will be called in verify()

@@ -13,6 +13,7 @@ import {
   Logger,
   Query,
 } from '@nestjs/common'
+import * as crypto from 'crypto'
 import { IntegrationService } from './services/integration.service'
 import {
   CreateIntegrationAuthDto,
@@ -67,9 +68,9 @@ export class IntegrationsController {
   @HttpCode(200)
   getAuthorizationUrl(
     @Param('key') key: string,
-    @Req() req: any
+    @Req() _req: any
   ): { authUrl: string; state: string } {
-    const state = require('crypto').randomBytes(32).toString('hex')
+    const state = crypto.randomBytes(32).toString('hex')
 
     // Store state in session/cache (implement as needed)
     // await this.stateCache.set(state, { workspaceId, expiresIn: 5 * 60 * 1000 })
@@ -190,7 +191,7 @@ export class IntegrationsController {
     @Body() dto: SaveConfigurationDto,
     @Req() req: any
   ): Promise<{ success: boolean; message: string }> {
-    const workspaceId = req.workspace?.id
+    const _workspaceId = req.workspace?.id
 
     try {
       await this.integrationService.saveConfiguration(connectionId, dto as any)
@@ -387,7 +388,7 @@ export class IntegrationsController {
   async listAudienceSegments(
     @Param('connectionId') connectionId: string,
     @Query('platform') platform?: string,
-    @Req() req?: any,
+    @Req() _req?: any,
   ): Promise<ListAudienceSegmentsResponseDto> {
     const segments = await this.audienceSegmentService.listSegments(
       connectionId,

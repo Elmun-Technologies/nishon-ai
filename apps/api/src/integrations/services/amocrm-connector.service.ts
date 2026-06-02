@@ -289,7 +289,7 @@ export class AmoCRMConnectorService {
         )
       } catch (error) {
         // Add error for entire batch
-        for (const contact of batch) {
+        for (const _contact of batch) {
           results.push({
             id: 0,
             error: error.message,
@@ -330,7 +330,7 @@ export class AmoCRMConnectorService {
         )
       } catch (error) {
         // Add error for entire batch
-        for (const lead of batch) {
+        for (const _lead of batch) {
           results.push({
             id: 0,
             error: error.message,

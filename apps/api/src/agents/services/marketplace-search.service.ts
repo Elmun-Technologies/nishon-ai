@@ -8,10 +8,10 @@ import { InjectRepository } from "@nestjs/typeorm";
 import {
   Repository,
   SelectQueryBuilder,
-  Between,
-  In,
-  IsNull,
-  Not,
+  Between as _Between,
+  In as _In,
+  IsNull as _IsNull,
+  Not as _Not,
 } from "typeorm";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { AgentProfile } from "../entities/agent-profile.entity";
@@ -697,7 +697,7 @@ export class MarketplaceSearchService {
    */
   async getSpecialistPerformance(
     slug: string,
-    period: "month" | "quarter" | "year" = "year",
+    _period: "month" | "quarter" | "year" = "year",
   ): Promise<SpecialistPerformance> {
     const specialist = await this.agentProfileRepository.findOne({
       where: { slug, isPublished: true },

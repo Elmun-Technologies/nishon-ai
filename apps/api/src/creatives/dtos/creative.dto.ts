@@ -1,4 +1,4 @@
-import { IsString, IsEnum, IsOptional, IsObject, IsArray, IsNumber } from 'class-validator'
+import { IsString, IsEnum, IsOptional, IsObject as _IsObject, IsArray as _IsArray, IsNumber } from 'class-validator'
 
 export class CreateImageCreativeDto {
   @IsString()
