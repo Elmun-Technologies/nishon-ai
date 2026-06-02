@@ -11,8 +11,10 @@ import { Button } from '@/components/ui/Button'
 import { MetricLibrary } from '@/components/reports/MetricLibrary'
 import { GridCanvas } from '@/components/reports/GridCanvas'
 import {
+  CATEGORY_LABELS,
   DEFAULT_DASHBOARD_WIDGET_IDS,
   MAX_REPORT_WIDGETS,
+  getMetricById,
   reportTemplates,
   type ReportPersona,
   type ReportTemplateKey,
@@ -146,6 +148,52 @@ export default function ReportsBuilderPage() {
     }
   }
 
+  /**
+   * Export the current report layout as a CSV (the selected metrics, their
+   * category, type, and formula). This is the report *spec* — live metric
+   * values fill in once a Meta/Google account is connected. Generated fully
+   * client-side, so it works today with no backend.
+   */
+  function handleExportCsv() {
+    const esc = (v: string) => `"${String(v).replace(/"/g, '""')}"`
+    const header = ['#', 'Metrika', 'Kategoriya', 'Turi', 'Formula']
+    const rows = widgetIds.map((id, i) => {
+      const m = getMetricById(id)
+      return [
+        String(i + 1),
+        m?.label ?? id,
+        m ? CATEGORY_LABELS[m.category] : '',
+        m?.type ?? '',
+        m?.formula ?? '',
+      ]
+    })
+    // A small meta block so the file is self-describing.
+    const meta = [
+      ['Nishon AI — Report spec'],
+      ['Persona', persona],
+      ['Davr', filters.range],
+      ['Platforma', filters.platform],
+      ['Metrikalar soni', String(widgetIds.length)],
+      ['Yaratilgan', new Date().toISOString()],
+      [],
+    ]
+    const csv = [
+      ...meta.map((r) => r.map(esc).join(',')),
+      header.map(esc).join(','),
+      ...rows.map((r) => r.map(esc).join(',')),
+    ].join('\n')
+
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `nishon-report-${persona}-${filters.range}-${new Date().toISOString().slice(0, 10)}.csv`
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    URL.revokeObjectURL(url)
+  }
+
   const widgetProgress = (widgetIds.length / MAX_REPORT_WIDGETS) * 100
 
   if (!hydrated) {
@@ -173,7 +221,7 @@ export default function ReportsBuilderPage() {
 
       <PreviewBanner
         title="Report builder — preview rejimida"
-        body="Layout, persona va metrika tanlovi ishlaydi va workspace bo'yicha saqlanadi. PDF/CSV eksport va share link yaqin yangilanishlarda real bo'ladi."
+        body="Layout, persona, metrika tanlovi va CSV eksport ishlaydi (workspace bo'yicha saqlanadi). Jonli metrika qiymatlari Meta/Google ulangach to'ladi; PDF va share-link yaqin yangilanishlarda."
       />
 
       {/* ── Persona segmented control ── */}
@@ -370,16 +418,20 @@ export default function ReportsBuilderPage() {
           <div className="bg-white rounded-xl shadow-sm border border-border p-3 space-y-2">
             <p className="text-xs font-semibold text-text-primary">Actions</p>
             <div className="flex flex-col gap-1.5">
-              <Link
-                href="/reporting"
+              <button
+                type="button"
+                onClick={handleExportCsv}
+                disabled={widgetIds.length === 0}
+                title={widgetIds.length === 0 ? 'Avval metrika qo\'shing' : 'CSV yuklab olish'}
                 className={cn(
-                  'inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium transition-all',
-                  'bg-surface-2 hover:bg-white border border-border hover:border-emerald-300 text-text-primary w-full',
+                  'inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium transition-all w-full',
+                  'bg-surface-2 hover:bg-white border border-border hover:border-emerald-300 text-text-primary',
+                  'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-surface-2 disabled:hover:border-border',
                 )}
               >
                 <FileDown className="w-3.5 h-3.5 text-text-tertiary" />
-                📤 Export
-              </Link>
+                📤 CSV eksport ({widgetIds.length})
+              </button>
               <Button
                 type="button"
                 variant="secondary"
