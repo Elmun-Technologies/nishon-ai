@@ -675,7 +675,8 @@ export class MetaController {
       .getRawMany();
 
     // Normalise to four buckets used in Smartly's Learning Monitor
-    let active = 0, learning = 0, limited = 0, paused = 0;
+    let active = 0, learning = 0, paused = 0;
+    const limited = 0;
     for (const r of rows) {
       const s = (r.status as string).toUpperCase();
       const n = parseInt(r.cnt, 10) || 0;

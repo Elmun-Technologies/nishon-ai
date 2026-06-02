@@ -201,8 +201,9 @@ export function buildAgentsFromDecisions(decisions: ApiAiDecision[]): MyAgent[] 
 
 /** Fetch decisions for a workspace and map them to the UI agents model. */
 export async function fetchAgentsForWorkspace(workspaceId: string): Promise<MyAgent[]> {
-  const decisions = (await aiDecisions.list(workspaceId)) as ApiAiDecision[]
-  return buildAgentsFromDecisions(decisions ?? [])
+  const res = await aiDecisions.list(workspaceId)
+  const decisions = ((res.data ?? []) as ApiAiDecision[])
+  return buildAgentsFromDecisions(decisions)
 }
 
 /** Approve a pending recommendation (decision). */

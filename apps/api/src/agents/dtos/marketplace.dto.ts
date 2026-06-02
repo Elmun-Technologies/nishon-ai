@@ -13,16 +13,16 @@ import {
   Max,
   IsUrl,
   IsEmail,
-  IsIn,
+  IsIn as _IsIn,
   Length,
   MaxLength,
-  MinLength,
+  MinLength as _MinLength,
   ArrayMinSize,
-  ArrayMaxSize,
+  ArrayMaxSize as _ArrayMaxSize,
   IsUUID,
   IsPhoneNumber,
 } from 'class-validator';
-import { Type, Exclude, Transform } from 'class-transformer';
+import { Type, Exclude as _Exclude, Transform as _Transform } from 'class-transformer';
 
 // ==================== ENUMS ====================
 

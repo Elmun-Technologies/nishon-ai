@@ -26,6 +26,7 @@ const mockSyncResult = {
   fraudRiskScore: 15,
   errors: [],
   warnings: [],
+  currencyExchangeRates: {},
 };
 
 describe("MarketplaceCronService", () => {
@@ -34,7 +35,7 @@ describe("MarketplaceCronService", () => {
   let metaSync: MetaPerformanceSyncService;
   let googleSync: GooglePerformanceSyncService;
   let yandexSync: YandexPerformanceSyncService;
-  let fraudDetection: FraudDetectionService;
+  let _fraudDetection: FraudDetectionService;
 
   beforeEach(async () => {
     // Mock repositories and services
@@ -111,7 +112,7 @@ describe("MarketplaceCronService", () => {
     yandexSync = module.get<YandexPerformanceSyncService>(
       YandexPerformanceSyncService,
     );
-    fraudDetection = module.get<FraudDetectionService>(FraudDetectionService);
+    _fraudDetection = module.get<FraudDetectionService>(FraudDetectionService);
   });
 
   afterEach(() => {
@@ -122,8 +123,8 @@ describe("MarketplaceCronService", () => {
     it("should sync all platforms for all workspaces", async () => {
       // Arrange
       const mockWorkspaces: Workspace[] = [
-        { id: "ws-1", name: "Workspace 1", isActive: true } as Workspace,
-        { id: "ws-2", name: "Workspace 2", isActive: true } as Workspace,
+        { id: "ws-1", name: "Workspace 1", isActive: true } as unknown as Workspace,
+        { id: "ws-2", name: "Workspace 2", isActive: true } as unknown as Workspace,
       ];
 
       jest.spyOn(workspaceRepo, "find").mockResolvedValue(mockWorkspaces);
@@ -169,7 +170,7 @@ describe("MarketplaceCronService", () => {
     it("should continue syncing other platforms if one fails", async () => {
       // Arrange
       const mockWorkspaces: Workspace[] = [
-        { id: "ws-1", name: "Workspace 1", isActive: true } as Workspace,
+        { id: "ws-1", name: "Workspace 1", isActive: true } as unknown as Workspace,
       ];
 
       jest.spyOn(workspaceRepo, "find").mockResolvedValue(mockWorkspaces);
@@ -194,8 +195,8 @@ describe("MarketplaceCronService", () => {
     it("should continue with next workspace if one fails", async () => {
       // Arrange
       const mockWorkspaces: Workspace[] = [
-        { id: "ws-1", name: "Workspace 1", isActive: true } as Workspace,
-        { id: "ws-2", name: "Workspace 2", isActive: true } as Workspace,
+        { id: "ws-1", name: "Workspace 1", isActive: true } as unknown as Workspace,
+        { id: "ws-2", name: "Workspace 2", isActive: true } as unknown as Workspace,
       ];
 
       jest.spyOn(workspaceRepo, "find").mockResolvedValue(mockWorkspaces);
@@ -223,7 +224,7 @@ describe("MarketplaceCronService", () => {
     it("should collect metrics from all platforms", async () => {
       // Arrange
       const mockWorkspaces: Workspace[] = [
-        { id: "ws-1", name: "Workspace 1", isActive: true } as Workspace,
+        { id: "ws-1", name: "Workspace 1", isActive: true } as unknown as Workspace,
       ];
 
       jest.spyOn(workspaceRepo, "find").mockResolvedValue(mockWorkspaces);
@@ -256,7 +257,7 @@ describe("MarketplaceCronService", () => {
     it("should perform deep validation with 90-day lookback", async () => {
       // Arrange
       const mockWorkspaces: Workspace[] = [
-        { id: "ws-1", name: "Workspace 1", isActive: true } as Workspace,
+        { id: "ws-1", name: "Workspace 1", isActive: true } as unknown as Workspace,
       ];
 
       jest.spyOn(workspaceRepo, "find").mockResolvedValue(mockWorkspaces);
@@ -291,7 +292,7 @@ describe("MarketplaceCronService", () => {
     it("should use force refresh and 90-day lookback for deep validation", async () => {
       // Arrange
       const mockWorkspaces: Workspace[] = [
-        { id: "ws-1", name: "Workspace 1", isActive: true } as Workspace,
+        { id: "ws-1", name: "Workspace 1", isActive: true } as unknown as Workspace,
       ];
 
       jest.spyOn(workspaceRepo, "find").mockResolvedValue(mockWorkspaces);
@@ -319,8 +320,8 @@ describe("MarketplaceCronService", () => {
     it("should process multiple workspaces independently", async () => {
       // Arrange
       const mockWorkspaces: Workspace[] = [
-        { id: "ws-1", name: "Workspace 1", isActive: true } as Workspace,
-        { id: "ws-2", name: "Workspace 2", isActive: true } as Workspace,
+        { id: "ws-1", name: "Workspace 1", isActive: true } as unknown as Workspace,
+        { id: "ws-2", name: "Workspace 2", isActive: true } as unknown as Workspace,
       ];
 
       jest.spyOn(workspaceRepo, "find").mockResolvedValue(mockWorkspaces);
@@ -345,9 +346,9 @@ describe("MarketplaceCronService", () => {
     it("should process multiple workspaces with full refresh", async () => {
       // Arrange
       const mockWorkspaces: Workspace[] = [
-        { id: "ws-1", name: "Workspace 1", isActive: true } as Workspace,
-        { id: "ws-2", name: "Workspace 2", isActive: true } as Workspace,
-        { id: "ws-3", name: "Workspace 3", isActive: true } as Workspace,
+        { id: "ws-1", name: "Workspace 1", isActive: true } as unknown as Workspace,
+        { id: "ws-2", name: "Workspace 2", isActive: true } as unknown as Workspace,
+        { id: "ws-3", name: "Workspace 3", isActive: true } as unknown as Workspace,
       ];
 
       jest.spyOn(workspaceRepo, "find").mockResolvedValue(mockWorkspaces);
@@ -387,7 +388,7 @@ describe("MarketplaceCronService", () => {
     it("should handle all three platforms failing for a workspace", async () => {
       // Arrange
       const mockWorkspaces: Workspace[] = [
-        { id: "ws-1", name: "Workspace 1", isActive: true } as Workspace,
+        { id: "ws-1", name: "Workspace 1", isActive: true } as unknown as Workspace,
       ];
 
       jest.spyOn(workspaceRepo, "find").mockResolvedValue(mockWorkspaces);
@@ -426,7 +427,7 @@ describe("MarketplaceCronService", () => {
     it("should aggregate records synced across all results", async () => {
       // Arrange
       const mockWorkspaces: Workspace[] = [
-        { id: "ws-1", name: "Workspace 1", isActive: true } as Workspace,
+        { id: "ws-1", name: "Workspace 1", isActive: true } as unknown as Workspace,
       ];
 
       jest.spyOn(workspaceRepo, "find").mockResolvedValue(mockWorkspaces);

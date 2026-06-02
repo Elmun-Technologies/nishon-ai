@@ -9,7 +9,7 @@ import {
 } from '../entities'
 import {
   AmoCRMDeal,
-  SyncEventType,
+  SyncEventType as _SyncEventType,
   SyncStatus,
 } from '../types/integration.types'
 import { AmoCRMConnectorService } from './amocrm-connector.service'
@@ -288,7 +288,7 @@ export class DealPullSyncService {
   /**
    * Get campaign ad spend (would connect to campaigns table)
    */
-  private async getCampaignAdSpend(campaignId: string): Promise<number> {
+  private async getCampaignAdSpend(_campaignId: string): Promise<number> {
     // TODO: Implement query to get ad spend from campaigns table
     // For now, return placeholder
     return 0

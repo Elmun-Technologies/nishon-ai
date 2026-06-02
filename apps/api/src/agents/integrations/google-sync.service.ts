@@ -3,10 +3,10 @@ import {
   Logger,
   BadRequestException,
   NotFoundException,
-  InternalServerErrorException,
+  InternalServerErrorException as _InternalServerErrorException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, DataSource, Between } from "typeorm";
+import { Repository, DataSource, Between as _Between } from "typeorm";
 import { ConfigService } from "@nestjs/config";
 import { HttpService } from "@nestjs/axios";
 import { firstValueFrom } from "rxjs";
@@ -608,8 +608,8 @@ export class GooglePerformanceSyncService {
     agentProfileId: string,
     rows: GooglePerformanceRow[],
     forceRefresh: boolean,
-    startDate: Date,
-    endDate: Date,
+    _startDate: Date,
+    _endDate: Date,
   ): Promise<{ inserted: number; updated: number }> {
     // Group by month for aggregation
     const byMonth = new Map<string, GooglePerformanceRow[]>();
@@ -617,7 +617,7 @@ export class GooglePerformanceSyncService {
     for (const row of rows) {
       // Create first-day-of-month date for aggregationPeriod
       const monthKey = `${row.date.getFullYear()}-${String(row.date.getMonth() + 1).padStart(2, "0")}`;
-      const aggregationPeriod = new Date(row.date.getFullYear(), row.date.getMonth(), 1);
+      const _aggregationPeriod = new Date(row.date.getFullYear(), row.date.getMonth(), 1);
 
       if (!byMonth.has(monthKey)) {
         byMonth.set(monthKey, []);
@@ -666,7 +666,7 @@ export class GooglePerformanceSyncService {
     let inserted = 0;
     let updated = 0;
 
-    const result = await this.dataSource.transaction(async (em) => {
+    const _result = await this.dataSource.transaction(async (em) => {
       for (const metric of aggregatedMetrics) {
         // Delete existing if forceRefresh is true
         if (forceRefresh) {
@@ -742,7 +742,7 @@ export class GooglePerformanceSyncService {
 
     // Calculate aggregated stats (across all platforms)
     let totalSpend = 0;
-    let totalRevenue = 0;
+    let _totalRevenue = 0;
     let roasSum = 0;
     let cpaSum = 0;
     let roasCount = 0;
@@ -751,7 +751,7 @@ export class GooglePerformanceSyncService {
 
     for (const metric of metrics) {
       totalSpend += Number(metric.totalSpend);
-      totalRevenue += Number(metric.totalRevenue);
+      _totalRevenue += Number(metric.totalRevenue);
       totalCampaigns += metric.campaignsCount;
 
       if (metric.avgRoas !== null) {

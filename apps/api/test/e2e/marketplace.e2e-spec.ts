@@ -757,7 +757,7 @@ describe("Marketplace E2E Tests", () => {
 
     describe("POST /admin/specialists/:id/sync-performance", () => {
       it("should sync Meta platform performance data", async () => {
-        const connectedAccount = await fixtures.createTestConnectedAccount(
+        const _connectedAccount = await fixtures.createTestConnectedAccount(
           testSpecialist.id,
           "meta",
         );
@@ -774,7 +774,7 @@ describe("Marketplace E2E Tests", () => {
       });
 
       it("should sync Google platform performance data", async () => {
-        const connectedAccount = await fixtures.createTestConnectedAccount(
+        const _connectedAccount = await fixtures.createTestConnectedAccount(
           testSpecialist.id,
           "google",
         );
@@ -790,7 +790,7 @@ describe("Marketplace E2E Tests", () => {
       });
 
       it("should sync Yandex platform performance data", async () => {
-        const connectedAccount = await fixtures.createTestConnectedAccount(
+        const _connectedAccount = await fixtures.createTestConnectedAccount(
           testSpecialist.id,
           "yandex",
         );
@@ -806,7 +806,7 @@ describe("Marketplace E2E Tests", () => {
       });
 
       it("should support force refresh flag", async () => {
-        const connectedAccount = await fixtures.createTestConnectedAccount(
+        const _connectedAccount = await fixtures.createTestConnectedAccount(
           testSpecialist.id,
           "meta",
         );
@@ -862,7 +862,7 @@ describe("Marketplace E2E Tests", () => {
       });
 
       it("should include synced count in response", async () => {
-        const connectedAccount = await fixtures.createTestConnectedAccount(
+        const _connectedAccount = await fixtures.createTestConnectedAccount(
           testSpecialist.id,
           "meta",
         );
@@ -878,7 +878,7 @@ describe("Marketplace E2E Tests", () => {
       });
 
       it("should include nextSync date in response", async () => {
-        const connectedAccount = await fixtures.createTestConnectedAccount(
+        const _connectedAccount = await fixtures.createTestConnectedAccount(
           testSpecialist.id,
           "meta",
         );
@@ -895,7 +895,7 @@ describe("Marketplace E2E Tests", () => {
 
       it("should handle sync errors gracefully", async () => {
         // Create connected account with invalid token
-        const connectedAccount = await fixtures.createTestConnectedAccount(
+        const _connectedAccount = await fixtures.createTestConnectedAccount(
           testSpecialist.id,
           "meta",
           { accessToken: "invalid_token" },
@@ -969,7 +969,7 @@ describe("Marketplace E2E Tests", () => {
         expect(response.body.dryRun).toBe(true);
 
         // Verify data was not persisted
-        const checkResponse = await request(app.getHttpServer())
+        const _checkResponse = await request(app.getHttpServer())
           .get(`/marketplace/specialists/${testSpecialist.slug}`)
           .expect(200);
 
@@ -1274,7 +1274,7 @@ describe("Marketplace E2E Tests", () => {
 
     describe("Transaction Rollback on Error", () => {
       it("should rollback database changes on validation error", async () => {
-        const response = await request(app.getHttpServer())
+        const _response = await request(app.getHttpServer())
           .post("/marketplace/my-profile/specialists")
           .set("Authorization", `Bearer ${authToken}`)
           .send({
@@ -1294,9 +1294,9 @@ describe("Marketplace E2E Tests", () => {
 
       it("should rollback on authorization error", async () => {
         const otherWorkspace = await fixtures.createTestWorkspace();
-        const otherUser = await fixtures.createTestUser(otherWorkspace.id);
+        const _otherUser = await fixtures.createTestUser(otherWorkspace.id);
 
-        const response = await request(app.getHttpServer())
+        const _response = await request(app.getHttpServer())
           .patch(`/marketplace/my-profile/specialists/${testSpecialist.id}`)
           .set("Authorization", `Bearer ${authToken}`)
           .send({ displayName: "Hacked Name" })

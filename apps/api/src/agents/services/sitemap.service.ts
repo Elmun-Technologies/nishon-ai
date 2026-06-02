@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import * as fs from 'fs'
 import * as path from 'path'
-import * as zlib from 'zlib'
+import * as _zlib from 'zlib'
 import { AgentProfile } from '../entities/agent-profile.entity'
 
 /**

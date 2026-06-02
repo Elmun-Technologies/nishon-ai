@@ -4,7 +4,7 @@ import { Repository } from 'typeorm'
 import { SegmentMember, AudienceSync } from '../entities'
 import { AmoCRMConnectorService } from './amocrm-connector.service'
 
-interface PlatformAudienceConfig {
+interface _PlatformAudienceConfig {
   platform: 'meta' | 'google' | 'tiktok' | 'yandex'
   audienceId: string
   connectionId: string
@@ -182,7 +182,7 @@ export class PlatformAudienceService {
   // ─────────────────────────────────────────────────────────────────
   // Meta/Facebook Implementation
 
-  private async createMetaAudience(config: any): Promise<{ audienceId: string; url: string }> {
+  private async createMetaAudience(_config: any): Promise<{ audienceId: string; url: string }> {
     // In real implementation, would call Meta API
     // For now, return mock data
     const audienceId = `meta_${Date.now()}`
@@ -195,7 +195,7 @@ export class PlatformAudienceService {
   private async addMetaMembers(
     audienceId: string,
     members: SyncMember[],
-    connectionId: string,
+    _connectionId: string,
   ): Promise<{ added: number; failed: number }> {
     // Would integrate with Meta Conversion API
     // For now, simulate success
@@ -205,7 +205,7 @@ export class PlatformAudienceService {
   private async removeMetaMembers(
     audienceId: string,
     members: SyncMember[],
-    connectionId: string,
+    _connectionId: string,
   ): Promise<{ removed: number; failed: number }> {
     // Would call Meta API to remove
     return { removed: members.length, failed: 0 }
@@ -213,8 +213,8 @@ export class PlatformAudienceService {
 
   private async updateMetaAudienceMetadata(
     audienceId: string,
-    metadata: { name?: string; description?: string },
-    connectionId: string,
+    _metadata: { name?: string; description?: string },
+    _connectionId: string,
   ): Promise<void> {
     // Would call Meta API
     this.logger.log(`Updated Meta audience ${audienceId} metadata`)
@@ -223,7 +223,7 @@ export class PlatformAudienceService {
   // ─────────────────────────────────────────────────────────────────
   // Google Implementation
 
-  private async createGoogleAudience(config: any): Promise<{ audienceId: string; url: string }> {
+  private async createGoogleAudience(_config: any): Promise<{ audienceId: string; url: string }> {
     const audienceId = `google_${Date.now()}`
     return {
       audienceId,
@@ -234,7 +234,7 @@ export class PlatformAudienceService {
   private async addGoogleMembers(
     audienceId: string,
     members: SyncMember[],
-    connectionId: string,
+    _connectionId: string,
   ): Promise<{ added: number; failed: number }> {
     // Would integrate with Google Ads API
     return { added: members.length, failed: 0 }
@@ -242,8 +242,8 @@ export class PlatformAudienceService {
 
   private async updateGoogleAudienceMetadata(
     audienceId: string,
-    metadata: { name?: string; description?: string },
-    connectionId: string,
+    _metadata: { name?: string; description?: string },
+    _connectionId: string,
   ): Promise<void> {
     this.logger.log(`Updated Google audience ${audienceId} metadata`)
   }
@@ -251,7 +251,7 @@ export class PlatformAudienceService {
   // ─────────────────────────────────────────────────────────────────
   // TikTok Implementation
 
-  private async createTikTokAudience(config: any): Promise<{ audienceId: string; url: string }> {
+  private async createTikTokAudience(_config: any): Promise<{ audienceId: string; url: string }> {
     const audienceId = `tiktok_${Date.now()}`
     return {
       audienceId,
@@ -262,7 +262,7 @@ export class PlatformAudienceService {
   private async addTikTokMembers(
     audienceId: string,
     members: SyncMember[],
-    connectionId: string,
+    _connectionId: string,
   ): Promise<{ added: number; failed: number }> {
     // Would integrate with TikTok Ads API
     return { added: members.length, failed: 0 }
@@ -271,7 +271,7 @@ export class PlatformAudienceService {
   // ─────────────────────────────────────────────────────────────────
   // Yandex Implementation
 
-  private async createYandexAudience(config: any): Promise<{ audienceId: string; url: string }> {
+  private async createYandexAudience(_config: any): Promise<{ audienceId: string; url: string }> {
     const audienceId = `yandex_${Date.now()}`
     return {
       audienceId,
@@ -282,7 +282,7 @@ export class PlatformAudienceService {
   private async addYandexMembers(
     audienceId: string,
     members: SyncMember[],
-    connectionId: string,
+    _connectionId: string,
   ): Promise<{ added: number; failed: number }> {
     // Would integrate with Yandex Ads API
     return { added: members.length, failed: 0 }

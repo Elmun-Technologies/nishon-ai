@@ -1,9 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowLeft, ArrowRight, ArrowUpRight, Plus, Sparkles } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ArrowUpRight, CheckCircle2, Plus, Sparkles } from 'lucide-react'
 import { PublicContainer } from '@/components/public/PublicLayout'
 import { LandingButton } from '@/components/landing/ui/LandingButton'
+import { LandingCard } from '@/components/landing/ui/LandingCard'
 import { FeatureAnim } from './animations/registry'
 import { ProblemSection } from './sections/ProblemSection'
 import { ValuePropsSection } from './sections/ValuePropsSection'

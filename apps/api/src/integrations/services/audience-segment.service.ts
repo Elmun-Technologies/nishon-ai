@@ -179,7 +179,7 @@ export class AudienceSegmentService {
     }
 
     try {
-      const result = await this.contactSyncService.syncAudienceSegment(segmentId, incremental)
+      const _result = await this.contactSyncService.syncAudienceSegment(segmentId, incremental)
 
       return {
         syncId: segment.id,

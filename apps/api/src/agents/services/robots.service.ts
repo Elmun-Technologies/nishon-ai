@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common'
 import * as fs from 'fs'
 import * as path from 'path'
-import * as zlib from 'zlib'
+import * as _zlib from 'zlib'
 
 /**
  * Robots.txt rule configuration
@@ -195,7 +195,7 @@ Sitemap: ${this.baseUrl}/sitemaps/sitemap-index.xml
     const errors: string[] = []
     const lines = content.split('\n')
 
-    let currentUserAgent: string | null = null
+    let _currentUserAgent: string | null = null
     let lineNumber = 0
 
     for (const line of lines) {
@@ -219,7 +219,7 @@ Sitemap: ${this.baseUrl}/sitemaps/sitemap-index.xml
 
       // Track current user agent
       if (keyLower === 'user-agent') {
-        currentUserAgent = value
+        _currentUserAgent = value
       }
 
       // Validate specific rules

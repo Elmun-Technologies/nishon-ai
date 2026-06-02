@@ -1,0 +1,7 @@
+# TypeORM migrations are essentially generated SQL DDL — running them
+# through prettier produces noisy diffs without improving readability.
+src/database/migrations/
+
+# Build output and dependencies.
+dist/
+node_modules/

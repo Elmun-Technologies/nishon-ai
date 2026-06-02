@@ -341,7 +341,7 @@ export class CreativeService {
     return this.creativeRepository.save(creative)
   }
 
-  async getPerformance(creativeId: string, days: number = 30) {
+  async getPerformance(creativeId: string, _days: number = 30) {
     return this.performanceRepository.find({
       where: { creativeId },
       order: { date: 'DESC' },

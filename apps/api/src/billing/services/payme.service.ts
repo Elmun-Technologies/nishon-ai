@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository, Between } from 'typeorm'
-import { PaymeTransaction, PaymeTransactionState } from '../entities/payme-transaction.entity'
+import { PaymeTransaction, PaymeTransactionState as _PaymeTransactionState } from '../entities/payme-transaction.entity'
 import { BillingInvoice } from '../entities/billing-invoice.entity'
 import { User, UserPlan } from '../../users/entities/user.entity'
 import { getPlanPriceTiyin, tiyinToUzs } from '../../config/plan-pricing.config'
@@ -64,6 +64,20 @@ export class PaymeService {
     if (!this.merchantId || !this.merchantKey) {
       this.logger.warn('PAYME_MERCHANT_ID or PAYME_MERCHANT_KEY not set — Payme integration disabled')
     }
+  }
+
+  /**
+   * Whether Payme merchant credentials are configured. When false, the
+   * frontend should show an "ulanmagan" state instead of redirecting users
+   * to a checkout that cannot complete.
+   */
+  isConfigured(): boolean {
+    return Boolean(this.merchantId && this.merchantKey)
+  }
+
+  /** Whether the merchant runs against Payme's test (sandbox) host. */
+  isTest(): boolean {
+    return this.isTestMode
   }
 
   // ─── Auth ──────────────────────────────────────────────────────────────────

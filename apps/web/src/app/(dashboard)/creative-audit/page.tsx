@@ -105,7 +105,7 @@ export default function CreativeAuditPage() {
         throw new Error(json.message || 'Tahlil xatosi')
       }
       const { ok: _ok, message: _m, visionRaw: _v, ...rest } = json as Record<string, unknown>
-      setResult(rest as CreativeAuditResult)
+      setResult(rest as unknown as CreativeAuditResult)
       setStep('score')
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Xato')

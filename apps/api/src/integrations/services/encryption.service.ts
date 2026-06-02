@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import * as crypto from 'crypto'
@@ -25,15 +24,15 @@ export class EncryptionService {
   encrypt(plaintext: string): string {
     try {
       const iv = crypto.randomBytes(16) // 128-bit IV for GCM
-      // @ts-ignore
+      // @ts-expect-error - crypto algorithm/key/iv union typing differs across @types/node versions
       const cipher = crypto.createCipheriv(this.algorithm, this.encryptionKey, iv)
 
-      // @ts-ignore
       const encrypted = Buffer.concat([
+        // @ts-expect-error - Buffer/Uint8Array type drift between @types/node versions
         cipher.update(plaintext, 'utf8'),
+        // @ts-expect-error - Buffer/Uint8Array type drift between @types/node versions
         cipher.final(),
       ])
-      // @ts-ignore
       const authTag = cipher.getAuthTag()
 
       // Format: iv:authTag:encryptedData (all hex)
@@ -59,14 +58,15 @@ export class EncryptionService {
       const authTag = Buffer.from(parts[1], 'hex')
       const encryptedData = Buffer.from(parts[2], 'hex')
 
-      // @ts-ignore
+      // @ts-expect-error - crypto algorithm/key/iv union typing differs across @types/node versions
       const decipher = crypto.createDecipheriv(this.algorithm, this.encryptionKey, iv)
-      // @ts-ignore
+      // @ts-expect-error - Buffer/ArrayBufferView type drift between @types/node versions
       decipher.setAuthTag(authTag)
 
-      // @ts-ignore
       const decrypted = Buffer.concat([
+        // @ts-expect-error - Buffer/Uint8Array type drift between @types/node versions
         decipher.update(encryptedData),
+        // @ts-expect-error - Buffer/Uint8Array type drift between @types/node versions
         decipher.final(),
       ])
 
@@ -100,8 +100,8 @@ export class EncryptionService {
         .digest('hex')
 
       // Constant-time comparison to prevent timing attacks
-      // @ts-ignore
       return crypto.timingSafeEqual(
+        // @ts-expect-error - Buffer/ArrayBufferView type drift between @types/node versions
         Buffer.from(signature),
         Buffer.from(expectedSignature)
       )

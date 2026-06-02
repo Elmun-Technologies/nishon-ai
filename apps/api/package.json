@@ -23,7 +23,8 @@
     "migration:generate": "pnpm exec typeorm migration:generate -d dist/database/database.providers.js",
     "migration:run": "pnpm exec typeorm migration:run -d dist/database/database.providers.js",
     "migration:revert": "pnpm exec typeorm migration:revert -d dist/database/database.providers.js",
-    "seed": "ts-node -r tsconfig-paths/register src/database/seed.ts"
+    "seed": "ts-node -r tsconfig-paths/register src/database/seed.ts",
+    "lint:check": "eslint \"{src,apps,libs,test}/**/*.ts\""
   },
   "dependencies": {
     "@nestjs/axios": "^3.0.1",

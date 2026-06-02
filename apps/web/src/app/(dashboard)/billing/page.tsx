@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/Card'
 import { Input } from '@/components/ui'
 import { Alert } from '@/components/ui'
 import { cn } from '@/lib/utils'
+import { billing } from '@/lib/api-client'
 import {
   SUBSCRIPTION_PLANS,
   formatUzs,
@@ -59,9 +60,28 @@ export default function BillingPage() {
   const [amountTiyin, setAmountTiyin] = useState<number | null>(null)
   const [busy, setBusy] = useState(false)
   const [toast, setToast] = useState('')
+  // null = unknown (still loading), true/false = backend answer.
+  const [paymeConfigured, setPaymeConfigured] = useState<boolean | null>(null)
 
   useEffect(() => {
     setSub(loadLocalSubscription())
+  }, [])
+
+  // Ask the backend whether Payme is actually wired up, so we can route the
+  // user to a real checkout instead of a demo when credentials exist.
+  useEffect(() => {
+    let cancelled = false
+    billing
+      .subscriptionConfig()
+      .then((res) => {
+        if (!cancelled) setPaymeConfigured(Boolean(res.data?.paymeConfigured))
+      })
+      .catch(() => {
+        if (!cancelled) setPaymeConfigured(false)
+      })
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   const currentPlan = getPlan(sub.planId)
@@ -82,6 +102,44 @@ export default function BillingPage() {
       if (!checkoutPlan || checkoutPlan === 'free') return
       setBusy(true)
       setToast('')
+
+      // ── Payme: real backend order → hosted checkout redirect ──────────────
+      // When PAYME_MERCHANT_ID/KEY are configured the backend returns a real
+      // checkout.paycom.uz URL and we send the user there. Until then we say so
+      // honestly instead of faking a success.
+      if (method === 'payme') {
+        if (!currentWorkspace?.id) {
+          setToast(t('billing.noWorkspace', 'Avval workspace tanlang.'))
+          setBusy(false)
+          return
+        }
+        try {
+          const { data } = await billing.createOrder({
+            workspaceId: currentWorkspace.id,
+            targetPlan: checkoutPlan,
+          })
+          setOrderId(data.orderId)
+          setAmountTiyin(data.amountTiyin ?? null)
+          if (data.paymeConfigured && data.paymeUrl) {
+            // Hand off to Payme's hosted checkout.
+            window.location.href = data.paymeUrl
+            return
+          }
+          setToast(
+            t(
+              'billing.paymeNotConfigured',
+              "Payme hali ulanmagan — admin PAYME_MERCHANT_ID va PAYME_MERCHANT_KEY qo'shishi kerak. Buyurtma yaratildi; kalitlar qo'shilgach to'lov ishlaydi.",
+            ),
+          )
+        } catch (e: any) {
+          setToast(e?.message ?? t('billing.createFailed', 'Buyurtma yaratilmadi'))
+        } finally {
+          setBusy(false)
+        }
+        return
+      }
+
+      // ── Click / Uzum: still demo-stubbed via local route ─────────────────
       try {
         const res = await fetch('/api/billing/create', {
           method: 'POST',
@@ -100,23 +158,14 @@ export default function BillingPage() {
         }
         setOrderId(data.orderId)
         setAmountTiyin(data.amountTiyin ?? null)
-        if (method === 'payme') {
-          setToast(
-            t(
-              'billing.paymeHint',
-              "Payme: checkout merchant URL ulanishi kerak. Hozir demo — «To'lov qabul qilindi» bosing.",
-            ),
-          )
-        } else {
-          setToast(t('billing.clickHint', "Click: webhook ulanadi. Demo — «To'lov qabul qilindi»."))
-        }
+        setToast(t('billing.clickHint', "Click/Uzum webhook ulanadi (demo). «To'lov qabul qilindi» bosing."))
       } catch {
         setToast(t('billing.networkError', 'Tarmoq xatosi'))
       } finally {
         setBusy(false)
       }
     },
-    [checkoutPlan, t],
+    [checkoutPlan, currentWorkspace?.id, t],
   )
 
   const confirmDemoPayment = useCallback(async () => {
@@ -353,7 +402,7 @@ export default function BillingPage() {
                 ) : (
                   <Button
                     className="w-full rounded-xl"
-                    variant={sub.planId === p.id ? 'secondary' : 'default'}
+                    variant={sub.planId === p.id ? 'secondary' : 'primary'}
                     onClick={() => openCheckout(p.id)}
                     disabled={sub.planId === p.id}
                   >
@@ -449,7 +498,7 @@ export default function BillingPage() {
               </Button>
             </div>
             {orderId ? (
-              <Button className="w-full mt-4 rounded-xl" variant="default" disabled={busy} onClick={() => void confirmDemoPayment()}>
+              <Button className="w-full mt-4 rounded-xl" variant="primary" disabled={busy} onClick={() => void confirmDemoPayment()}>
                 {t('billing.demoPaid', "To'lov qabul qilindi (demo)")}
               </Button>
             ) : null}

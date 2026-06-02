@@ -1,7 +1,7 @@
-import { Injectable, BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common'
+import { Injectable, BadRequestException, NotFoundException, ForbiddenException as _ForbiddenException } from '@nestjs/common'
 import { Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
-import { AxiosInstance } from 'axios'
+import { AxiosInstance as _AxiosInstance } from 'axios'
 import {
   IntegrationConnection as IIntegrationConnection,
   IntegrationConfigEntity,
@@ -10,7 +10,7 @@ import {
 import {
   IntegrationStatus,
   IntegrationHealthStatus,
-  IntegrationPermission,
+  IntegrationPermission as _IntegrationPermission,
   OAuthCallbackData,
   IntegrationConfig as IIntegrationConfig,
   ConversionEvent,
@@ -416,7 +416,7 @@ export class IntegrationService {
    * Disconnect integration
    */
   async disconnect(connectionId: string, workspaceId: string): Promise<void> {
-    const connection = await this.getConnectionWithTokens(connectionId, workspaceId)
+    const _connection = await this.getConnectionWithTokens(connectionId, workspaceId)
 
     // Delete connection and related configs/logs
     await this.connectionRepository.delete(connectionId)
@@ -489,7 +489,7 @@ export class IntegrationService {
     offset: number = 0
   ): Promise<{ logs: SyncLog[]; total: number }> {
     // Verify connection exists in workspace
-    const connection = await this.getConnectionWithTokens(connectionId, workspaceId)
+    const _connection = await this.getConnectionWithTokens(connectionId, workspaceId)
 
     const [logs, total] = await this.syncLogRepository.findAndCount({
       where: { connectionId },

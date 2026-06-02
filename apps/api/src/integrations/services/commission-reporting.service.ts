@@ -78,7 +78,7 @@ export class CommissionReportingService {
     },
   ): Promise<CommissionSummary> {
     try {
-      let query = this.specialistCommissionRepository.createQueryBuilder('commission')
+      const query = this.specialistCommissionRepository.createQueryBuilder('commission')
       query.where('commission.workspaceId = :workspaceId', { workspaceId })
 
       if (filters?.specialistId) {

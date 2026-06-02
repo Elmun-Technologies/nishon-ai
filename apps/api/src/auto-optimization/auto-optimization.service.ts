@@ -15,10 +15,10 @@ import type {
   ActionType,
   RuleAnalysisResult,
   AiOptimizationSuggestion,
-  ScoredAction,
+  ScoredAction as _ScoredAction,
   OptimizationMode,
   GovernedAction,
-  GovernanceSummary,
+  GovernanceSummary as _GovernanceSummary,
 } from './types/optimization.types';
 
 /**

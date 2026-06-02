@@ -5,8 +5,20 @@ import type { LandingPageSpec, LandingSection } from '@/lib/site-generator/types
 import { cn } from '@/lib/utils'
 import { Star } from 'lucide-react'
 
-function SectionBlock({ children, className }: { children: ReactNode; className?: string }) {
-  return <section className={cn('px-4 py-8', className)}>{children}</section>
+function SectionBlock({
+  children,
+  className,
+  id,
+}: {
+  children: ReactNode
+  className?: string
+  id?: string
+}) {
+  return (
+    <section id={id} className={cn('px-4 py-8', className)}>
+      {children}
+    </section>
+  )
 }
 
 function renderSection(s: LandingSection) {

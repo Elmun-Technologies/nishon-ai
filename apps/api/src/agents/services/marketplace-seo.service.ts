@@ -348,7 +348,7 @@ export class MarketplaceSeoService {
     return this.truncate(descriptions[language] || descriptions.en, 160)
   }
 
-  private generateSpecialistKeywords(profile: AgentProfile, language: string): string[] {
+  private generateSpecialistKeywords(profile: AgentProfile, _language: string): string[] {
     const keywords: string[] = []
 
     // Add platform-specific keywords
@@ -386,7 +386,7 @@ export class MarketplaceSeoService {
     return [...new Set(keywords)].slice(0, 10)
   }
 
-  private generateSearchKeywords(filters: Record<string, any>, language: string): string[] {
+  private generateSearchKeywords(filters: Record<string, any>, _language: string): string[] {
     const keywords: string[] = []
 
     if (filters.platforms && Array.isArray(filters.platforms)) {
@@ -539,7 +539,7 @@ export class MarketplaceSeoService {
     }
   }
 
-  private generatePersonSchema(data: Record<string, any>, baseUrl: string): Record<string, any> {
+  private generatePersonSchema(data: Record<string, any>, _baseUrl: string): Record<string, any> {
     return {
       '@context': 'https://schema.org',
       '@type': 'Person',

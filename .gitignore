@@ -69,6 +69,11 @@ pids
 .next
 out
 
+# Playwright
+test-results/
+playwright-report/
+.playwright/
+
 # Nuxt.js build / generate output
 .nuxt
 dist

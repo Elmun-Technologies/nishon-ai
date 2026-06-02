@@ -226,10 +226,24 @@ export const billing = {
     },
   ) => apiClient.patch(`/billing/workspaces/${workspaceId}/contact`, body),
   getPlans: () => apiClient.get('/billing/subscription/plans'),
+  /** Whether Payme is wired up (merchant credentials set) + test mode. */
+  subscriptionConfig: () =>
+    apiClient.get<{ paymeConfigured: boolean; paymeTestMode: boolean }>(
+      '/billing/subscription/config',
+    ),
   createOrder: (body: { workspaceId: string; targetPlan: string }) =>
-    apiClient.post('/billing/subscription/order', body),
+    apiClient.post<{
+      orderId: string
+      paymeUrl: string
+      paymeConfigured: boolean
+      amountTiyin: number
+      amountUzs: number
+      targetPlan: string
+    }>('/billing/subscription/order', body),
   getOrderStatus: (orderId: string) =>
-    apiClient.get(`/billing/subscription/order/${orderId}/status`),
+    apiClient.get<{ orderId: string; state: number; paid: boolean }>(
+      `/billing/subscription/order/${orderId}/status`,
+    ),
 }
 
 export const mcpCredentials = {
@@ -292,7 +306,7 @@ export const aiAgent = {
     assistantPersona?: 'targetologist' | 'optimizer' | 'general'
   }): AsyncGenerator<string, void, void> {
     const token = getAccessToken()
-    const response = await fetch(buildUrl('/ai-agent/chat/stream'), {
+    const response = await fetch(toUrl('/ai-agent/chat/stream'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

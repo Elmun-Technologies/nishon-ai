@@ -312,7 +312,7 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!currentWorkspace?.id) return
     let cancelled = false
-    metaApi.topAds(currentWorkspace.id, 5)
+    metaApi.topAds(currentWorkspace.id, { limit: 5 })
       .then((res) => { if (!cancelled) setTopAds((res.data as TopAd[]) ?? []) })
       .catch(() => { if (!cancelled) setTopAds([]) })
     return () => { cancelled = true }

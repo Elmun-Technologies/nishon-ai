@@ -44,6 +44,20 @@ export class SubscriptionController {
   }
 
   /**
+   * GET /billing/subscription/config
+   * Lets the frontend know whether Payme is wired up before it offers a
+   * checkout, so it can show an honest "not connected yet" state instead of
+   * a redirect that can't complete.
+   */
+  @Get('config')
+  getConfig() {
+    return {
+      paymeConfigured: this.paymeService.isConfigured(),
+      paymeTestMode: this.paymeService.isTest(),
+    }
+  }
+
+  /**
    * POST /billing/subscription/order
    * Create a payment order and get Payme checkout URL.
    */
@@ -72,6 +86,7 @@ export class SubscriptionController {
     return {
       orderId,
       paymeUrl,
+      paymeConfigured: this.paymeService.isConfigured(),
       amountTiyin: amount,
       amountUzs: amount / 100,
       targetPlan,

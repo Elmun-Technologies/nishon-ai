@@ -26,7 +26,7 @@ describe('FraudDetectionService', () => {
     avgRoas: 4.5,
     avgCpa: 8.2,
     avgCtr: 2.5,
-    conversionCount: 100,
+    conversionCount: 25, // 25 / 500 clicks = 5% conversion rate (realistic, under the 15% meta threshold)
     totalRevenue: 22500,
     clicks: 500,
     impressions: 10000,

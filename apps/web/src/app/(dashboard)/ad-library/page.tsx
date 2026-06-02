@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ScanSearch, TrendingUp } from 'lucide-react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { useI18n } from '@/i18n/use-i18n'
-import { PageHeader } from '@/components/ui'
+import { ComingSoonBadge, PageHeader } from '@/components/ui'
 import { Alert } from '@/components/ui/Alert'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
@@ -121,7 +121,12 @@ export default function AdLibraryPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-6 pb-10">
       <PageHeader
-        title={t('navigation.adLibrary', 'Ad Library')}
+        title={
+          <span className="inline-flex items-center gap-2">
+            {t('navigation.adLibrary', 'Ad Library')}
+            <ComingSoonBadge label="Preview" />
+          </span>
+        }
         subtitle={t(
           'adLibrary.subtitle',
           'Raqiblar va trendlar: mock UZ data. Keyin Meta Ad Library API (ads_archive) ulanadi.',

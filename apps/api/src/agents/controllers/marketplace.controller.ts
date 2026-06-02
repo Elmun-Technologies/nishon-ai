@@ -22,7 +22,7 @@ import {
   ApiQuery,
   ApiParam,
 } from "@nestjs/swagger";
-import { AuthGuard } from "@nestjs/passport";
+import { AuthGuard as _AuthGuard } from "@nestjs/passport";
 import { IsOptional, IsString, IsNumber, IsArray, IsEmail, IsEnum, Min, Max } from "class-validator";
 import { Type } from "class-transformer";
 
@@ -33,7 +33,7 @@ import { MarketplaceContactService } from "../services/marketplace-contact.servi
 import { MarketplacePerformanceService } from "../services/marketplace-performance.service";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { AdminGuard } from "../../common/guards/admin.guard";
-import { SyncPerformanceDto, VerifyPerformanceDto, SyncStatusDto } from "../dtos/marketplace.dto";
+import { SyncPerformanceDto, VerifyPerformanceDto, SyncStatusDto as _SyncStatusDto } from "../dtos/marketplace.dto";
 
 // ─── QUERY DTOs ───────────────────────────────────────────────────────────────
 

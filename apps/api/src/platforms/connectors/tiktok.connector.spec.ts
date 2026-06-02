@@ -1,7 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { ConfigService } from "@nestjs/config";
 import { HttpService } from "@nestjs/axios";
-import { of, throwError } from "rxjs";
+import { of, throwError as _throwError } from "rxjs";
 import { BadRequestException } from "@nestjs/common";
 import { TiktokConnector } from "./tiktok.connector";
 

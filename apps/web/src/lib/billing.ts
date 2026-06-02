@@ -60,7 +60,7 @@ export function parseStripeRentalActivation(payload: StripeRentalWebhookPayload)
     listingId: md.listingId,
     businessWorkspaceId: md.businessWorkspaceId,
     connectAccountId: md.targetologistConnectAccountId,
-    amountTotal: obj.amount_total,
+    amountTotal: obj?.amount_total,
   }
 }
 
