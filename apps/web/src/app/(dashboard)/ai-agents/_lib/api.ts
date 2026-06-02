@@ -206,14 +206,20 @@ export async function fetchAgentsForWorkspace(workspaceId: string): Promise<MyAg
   return buildAgentsFromDecisions(decisions)
 }
 
-/** Approve a pending recommendation (decision). */
+/**
+ * Approve a pending recommendation. Routes through `/ai-agent/decisions/:id/approve`,
+ * which actually EXECUTES the action on the connected platform (via the
+ * decision loop → connector), not just `/ai-decisions/:id/approve` which only
+ * flips the DB flag. The human click is the approval gate; execution only
+ * happens for decisions tied to a real campaign + connected account.
+ */
 export async function approveRecommendation(id: string): Promise<void> {
-  await aiDecisions.approve(id)
+  await aiAgent.approveDecision(id)
 }
 
-/** Reject a pending recommendation. */
+/** Reject a pending recommendation (no execution). */
 export async function rejectRecommendation(id: string): Promise<void> {
-  await aiDecisions.reject(id)
+  await aiAgent.rejectDecision(id)
 }
 
 /** Trigger a new optimization loop — AI re-analyzes the workspace and produces new decisions. */
