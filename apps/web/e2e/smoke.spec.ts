@@ -57,3 +57,52 @@ test('robots.txt and sitemap.xml are served', async ({ request }) => {
   const sitemap = await request.get('/sitemap.xml')
   expect(sitemap.status()).toBe(200)
 })
+
+// All 21 SEO feature-detail pages (added in #115). Keep this list in sync with
+// FEATURE_CONTENT slugs — a broken slug or a render-throw shows up as non-200.
+const FEATURE_SLUGS = [
+  'launch-wizard',
+  'campaign-manager',
+  'audience-builder',
+  'retargeting',
+  'ai-decisions',
+  'auto-optimization',
+  'creative-scorer',
+  'budget-optimization',
+  'simulation',
+  'roi-calculator',
+  'performance-analytics',
+  'reporting',
+  'competitor-intel',
+  'automation-rules',
+  'top-ads',
+  'workspace-team',
+  'ad-accounts',
+  'products-plans',
+  'payments-invoices',
+  'mcp-credentials',
+  'help-center',
+]
+
+test.describe('feature detail pages (SEO)', () => {
+  for (const slug of FEATURE_SLUGS) {
+    test(`/features/${slug} → 200`, async ({ request }) => {
+      const res = await request.get(`/features/${slug}`)
+      expect(res.status(), `/features/${slug} should render`).toBe(200)
+    })
+  }
+
+  test('unknown feature slug → 404', async ({ request }) => {
+    const res = await request.get('/features/this-slug-does-not-exist')
+    expect(res.status()).toBe(404)
+  })
+})
+
+test.describe('public marketplace', () => {
+  for (const path of ['/marketplace', '/marketplace/leaderboard', '/marketplace/portfolio']) {
+    test(`${path} → 200`, async ({ request }) => {
+      const res = await request.get(path)
+      expect(res.status(), `${path} should render`).toBe(200)
+    })
+  }
+})
