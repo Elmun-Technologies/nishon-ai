@@ -25,16 +25,47 @@ pnpm --filter api dev   # Faqat backend
 
 ---
 
-## Joriy holat (so'nggi yangilash: 2026-06-01)
+## Joriy holat (so'nggi yangilash: 2026-06-02)
 
 **Asosiy branch:** `main`
-**Faol branch:** `claude/hopeful-rubin-vTmX2` (Launch refactor — Phase 1)
+**Faol branch:** `claude/hopeful-rubin-vTmX2`
 
 ### MVP fokus
 **Ad Launcher (3-bosqichli flow) production deploy.**
 Qolgan modullar (Marketplace, Portfolio, AmoCRM, Fraud, AI Agents va h.k.) kodda turaveradi, lekin MVP launch va sinov diqqati Ad Launcher'ga qaratiladi.
 
 Batafsil deploy qadamlari: `DEPLOY.md`.
+
+### 2026-06-02 sessiyasi — sifat sprinti + feature ulanishlar (10 PR merged)
+- **#113** Launch refactor: 1610 → 34 qator orchestrator + `_components/`
+- **#114** Dashboard freeze fix (effect cleanup, startTransition)
+- **#115** 21 ta unique feature animatsiya + SEO sahifalar
+- **#116** Conversational onboarding (CJM + AI byudjet taqsimlash)
+- **#117** AI Agents redizayn (My Agents, runtime dashboard)
+- **#118** AI Agents frontend → real `AiDecisions` backend
+- **#119** `/launch` → real `launch-orchestrator` + inline Meta creative
+- **#120** Sifat sprinti: testlar 84/87→**120/120**, GitHub Actions CI (yo'q edi),
+  yashirin TS xatolar 27→**0** (`ignoreBuildErrors` o'chirildi), 4 real prod bug,
+  4 mock sahifaga halol "Preview" badge, 14 Playwright smoke test, Payme checkout
+  real backend'ga ulandi, API lint 135→**0**
+- **#121** AI Agents approve → real platform bajarish (loop yopildi)
+- **#122** Reports — real client-side CSV eksport
+
+**Loyiha bahosi: 7.2 → ~8.6 / 10.**
+
+### CI/CD (yangi — #120)
+`.github/workflows/ci.yml` — har PR'da:
+- api: `test` (120/120) + `build` + `lint:check` (0 error)
+- web: `lint` + `i18n:check` + `tsc` + `build` + `test:e2e` (14 smoke)
+- `prettier/prettier` = warning (style debt, bloklamaydi)
+
+### 10/10 ga qolgan ish (credential yoki katta feature kerak)
+- [ ] **To'lov live** — Render env: `PAYME_MERCHANT_ID` + `PAYME_MERCHANT_KEY`
+  (webhook: `/billing/payme`). Kod tayyor (#120), faqat kalit kutadi.
+- [ ] **Ad Library** — Meta `ads_archive` API (META_APP_ID/SECRET kerak)
+- [ ] **Simulation** — real Meta tarixiy data (connected account kerak)
+- [ ] **Reports PDF** — client-side PDF generatsiya (CSV tayyor)
+- [ ] **prettier churn** — `pnpm --filter api lint` (--fix) bir martalik formatlash
 
 ### Bajarilgan va production-ga merged bo'lgan ishlar:
 - Landing page qayta dizayni
