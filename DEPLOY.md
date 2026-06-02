@@ -73,6 +73,16 @@ META_CALLBACK_URL=https://<api-domain>/platforms/meta/callback
 OPENAI_API_KEY=<optional, AI insights uchun>
 ```
 
+**Payme to'lov (ixtiyoriy — qo'shilmasa billing "ulanmagan" deb ko'rsatadi):**
+```
+PAYME_MERCHANT_ID=<Payme kabinetdan merchant ID>
+PAYME_MERCHANT_KEY=<Payme merchant key (Paycom parol)>
+PAYME_MERCHANT_TEST_KEY=<sandbox test key, ixtiyoriy>
+PAYME_TEST_MODE=true   # sandbox uchun; prod'da false yoki olib tashlang
+```
+> Payme merchant kabinetida webhook (endpoint) URL: `https://<api-domain>/billing/payme`.
+> Kalitlar qo'shilgach `/billing` sahifasidagi Payme tugmasi avtomatik real checkout'ga ulanadi — kod o'zgartirish shart emas.
+
 **Render avtomatik (render.yaml'dan):**
 ```
 NODE_ENV=production

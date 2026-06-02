@@ -66,6 +66,20 @@ export class PaymeService {
     }
   }
 
+  /**
+   * Whether Payme merchant credentials are configured. When false, the
+   * frontend should show an "ulanmagan" state instead of redirecting users
+   * to a checkout that cannot complete.
+   */
+  isConfigured(): boolean {
+    return Boolean(this.merchantId && this.merchantKey)
+  }
+
+  /** Whether the merchant runs against Payme's test (sandbox) host. */
+  isTest(): boolean {
+    return this.isTestMode
+  }
+
   // ─── Auth ──────────────────────────────────────────────────────────────────
 
   /**
