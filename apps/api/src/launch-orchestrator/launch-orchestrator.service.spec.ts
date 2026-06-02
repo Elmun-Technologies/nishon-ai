@@ -64,6 +64,7 @@ describe("LaunchOrchestratorService", () => {
         .fn()
         .mockResolvedValue([{ id: "ad_a", name: "A", creativeId: "cr_1", status: "ACTIVE" }]),
       createAdFromExistingCreative: jest.fn().mockResolvedValue({ id: "ad_new" }),
+      createAdCreative: jest.fn().mockResolvedValue({ id: "cr_inline" }),
     };
     const mockGoogle = { createCampaign: jest.fn() };
 
@@ -228,6 +229,48 @@ describe("LaunchOrchestratorService", () => {
       expect(metaConnector.createAdFromExistingCreative).toHaveBeenCalledTimes(2);
       const savedResult = (result.payload as any).launchResult;
       expect(savedResult.sourceCreativeCount).toBe(2);
+      expect(savedResult.adIds).toEqual(["ad_new", "ad_new"]);
+    });
+
+    it("builds one inline creative and attaches it to every ad set", async () => {
+      launchRepo.findOne.mockResolvedValue(
+        jobWith({
+          workspaceId,
+          platform: "meta",
+          objective: "OUTCOME_LEADS",
+          budgetType: "CBO",
+          dailyBudget: 30,
+          audiences: [
+            { name: "A", funnelStage: "acquisition_prospecting" },
+            { name: "B", funnelStage: "retargeting" },
+          ],
+          copyCreatives: false,
+          creative: {
+            pageId: "page_123",
+            message: "Bahor aksiyasi",
+            linkUrl: "https://shop.uz/spring",
+            callToActionType: "SHOP_NOW",
+          },
+        }),
+      );
+
+      const result = await service.launch("job-1", userId);
+
+      // Inline creative is created exactly once, then reused per ad set.
+      expect(metaConnector.createAdCreative).toHaveBeenCalledTimes(1);
+      const [, , creativeParams] = metaConnector.createAdCreative.mock.calls[0];
+      expect(creativeParams).toMatchObject({
+        pageId: "page_123",
+        linkUrl: "https://shop.uz/spring",
+        callToActionType: "SHOP_NOW",
+      });
+      // No source-campaign copy path was taken.
+      expect(metaConnector.getCampaignAds).not.toHaveBeenCalled();
+      // 2 ad sets × 1 inline creative = 2 ads, each from the inline creative id.
+      expect(metaConnector.createAdFromExistingCreative).toHaveBeenCalledTimes(2);
+      const firstAd = metaConnector.createAdFromExistingCreative.mock.calls[0][2];
+      expect(firstAd.existingCreativeId).toBe("cr_inline");
+      const savedResult = (result.payload as any).launchResult;
       expect(savedResult.adIds).toEqual(["ad_new", "ad_new"]);
     });
 
