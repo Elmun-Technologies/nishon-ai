@@ -84,3 +84,10 @@ jobs:
 
       - name: Build
         run: pnpm --filter web build
+
+      # Smoke tests use Playwright's request API only (no browser download),
+      # so they run on the build output started via `next start`.
+      - name: Smoke tests (e2e)
+        run: pnpm --filter web test:e2e
+        env:
+          CI: 'true'
