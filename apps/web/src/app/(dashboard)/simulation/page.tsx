@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useWorkspaceStore } from '@/stores/workspace.store'
+import { ComingSoonBadge } from '@/components/ui'
 
 export const dynamic = 'force-dynamic'
 
@@ -81,8 +82,14 @@ export default function SimulationPage() {
   return (
     <div className="space-y-6 max-w-5xl">
       <div>
-        <h1 className="text-2xl font-bold text-text-primary mb-1">Simulation & Forecast</h1>
-        <p className="text-text-tertiary text-sm">Byudjetingizni o\"zgartirsa qanday natijalar bo'lishini oldindan ko\"ring</p>
+        <h1 className="mb-1 inline-flex items-center gap-2 text-2xl font-bold text-text-primary">
+          Simulation & Forecast
+          <ComingSoonBadge label="Preview" />
+        </h1>
+        <p className="text-text-tertiary text-sm">
+          Byudjetingizni o&apos;zgartirsa qanday natijalar bo&apos;lishini oldindan ko&apos;ring (demo
+          modeli — real Meta tarixi keyingi yangilanishlarda)
+        </p>
       </div>
 
       <div className="flex items-start gap-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl px-5 py-4">

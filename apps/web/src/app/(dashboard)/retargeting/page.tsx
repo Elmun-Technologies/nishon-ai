@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { Plus, Users, Megaphone, TrendingUp, Play, Pause, ArrowRight } from 'lucide-react'
 import { useI18n } from '@/i18n/use-i18n'
-import { PageHeader } from '@/components/ui'
+import { ComingSoonBadge, PageHeader } from '@/components/ui'
 import { Alert } from '@/components/ui/Alert'
 import { useAudienceStore } from '@/stores/audience.store'
 import { useRetargetingStore } from '@/stores/retargeting.store'
@@ -98,7 +98,12 @@ export default function RetargetingPage() {
   return (
     <div className="space-y-6 max-w-6xl">
       <PageHeader
-        title={t('navigation.retargeting', 'Retargeting')}
+        title={
+          <span className="inline-flex items-center gap-2">
+            {t('navigation.retargeting', 'Retargeting')}
+            <ComingSoonBadge label="Preview" />
+          </span>
+        }
         subtitle={t(
           'retargeting.subtitle',
           'Plan funnel audiences and retargeting campaigns from one place.',
@@ -116,7 +121,18 @@ export default function RetargetingPage() {
         }
       />
 
-      <Alert variant="info">{t('retargeting.demoNotice', 'Sample data for layout review.')}</Alert>
+      <Alert variant="info">
+        <span className="text-sm">
+          {t(
+            'retargeting.demoNotice',
+            'Funnel rejasi va auditoriya planeri — preview. Bugun real ishlaydigan retargeting:',
+          )}{' '}
+          <Link href="/retarget" className="font-semibold underline underline-offset-2">
+            /retarget
+          </Link>{' '}
+          (CRM signal + Meta publisher).
+        </span>
+      </Alert>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         {stats.map((stat) => (

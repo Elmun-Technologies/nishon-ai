@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { CalendarClock, ChevronDown, FileDown, Info, Link2 } from 'lucide-react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { useI18n } from '@/i18n/use-i18n'
-import { PageHeader } from '@/components/ui'
+import { ComingSoonBadge, PageHeader, PreviewBanner } from '@/components/ui'
 import { Dialog } from '@/components/ui/Dialog'
 import { Button } from '@/components/ui/Button'
 import { MetricLibrary } from '@/components/reports/MetricLibrary'
@@ -159,11 +159,21 @@ export default function ReportsBuilderPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-4 pb-10">
       <PageHeader
-        title={t('navigation.reportBuilder', 'Report builder')}
+        title={
+          <span className="inline-flex items-center gap-2">
+            {t('navigation.reportBuilder', 'Report builder')}
+            <ComingSoonBadge label="Preview" />
+          </span>
+        }
         subtitle={t(
           'reports.builderSubtitle',
           "Avval nima ko'rish kerak — keyin drag-and-drop. Layout workspace bo'yicha saqlanadi.",
         )}
+      />
+
+      <PreviewBanner
+        title="Report builder — preview rejimida"
+        body="Layout, persona va metrika tanlovi ishlaydi va workspace bo'yicha saqlanadi. PDF/CSV eksport va share link yaqin yangilanishlarda real bo'ladi."
       />
 
       {/* ── Persona segmented control ── */}
