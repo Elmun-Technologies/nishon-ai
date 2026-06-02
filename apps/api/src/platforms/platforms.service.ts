@@ -3,6 +3,7 @@ import {
   Logger,
   NotFoundException,
   BadRequestException,
+  ForbiddenException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -172,14 +173,33 @@ export class PlatformsService {
    * List Facebook Pages the workspace's connected Meta account has access to.
    * Required before launching a new ad — every Meta creative needs a Page.
    */
+  /**
+   * Verify the requesting user owns the workspace before exposing or mutating
+   * its platform connections. Without this, any authenticated user could read
+   * another workspace's connected ad accounts / Page names or disconnect them
+   * just by passing a different workspaceId (IDOR). Mirrors the owner check
+   * used in CampaignsService / AiDecisionsService.
+   */
+  private async assertWorkspaceOwner(workspaceId: string, userId: string): Promise<void> {
+    const workspace = await this.workspaceRepo.findOne({ where: { id: workspaceId } });
+    if (!workspace) throw new NotFoundException("Workspace not found");
+    if (workspace.userId !== userId) throw new ForbiddenException("Access denied");
+  }
+
   async getMetaPages(
     workspaceId: string,
+    userId: string,
   ): Promise<Array<{ id: string; name: string; category?: string }>> {
+    await this.assertWorkspaceOwner(workspaceId, userId);
     const { token } = await this.getDecryptedToken(workspaceId, Platform.META);
     return this.metaConnector.getPages(token);
   }
 
-  async getConnectedAccounts(workspaceId: string): Promise<ConnectedAccount[]> {
+  async getConnectedAccounts(
+    workspaceId: string,
+    userId: string,
+  ): Promise<ConnectedAccount[]> {
+    await this.assertWorkspaceOwner(workspaceId, userId);
     return this.accountRepo.find({
       where: { workspaceId },
       // Never return the tokens — even encrypted ones
@@ -198,7 +218,9 @@ export class PlatformsService {
   async disconnectAccount(
     workspaceId: string,
     accountId: string,
+    userId: string,
   ): Promise<void> {
+    await this.assertWorkspaceOwner(workspaceId, userId);
     const account = await this.accountRepo.findOne({
       where: { id: accountId, workspaceId },
     });

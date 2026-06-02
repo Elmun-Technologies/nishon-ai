@@ -226,8 +226,11 @@ export class PlatformsController {
   @ApiOperation({
     summary: "Get all connected platform accounts for a workspace",
   })
-  async getConnectedAccounts(@Param("workspaceId") workspaceId: string) {
-    return this.platformsService.getConnectedAccounts(workspaceId);
+  async getConnectedAccounts(
+    @Param("workspaceId") workspaceId: string,
+    @Request() req: any,
+  ) {
+    return this.platformsService.getConnectedAccounts(workspaceId, req.user.id);
   }
 
   @Get("meta/pages/:workspaceId")
@@ -237,8 +240,11 @@ export class PlatformsController {
     summary:
       "List Facebook Pages the workspace's connected Meta account has access to",
   })
-  async getMetaPages(@Param("workspaceId") workspaceId: string) {
-    return this.platformsService.getMetaPages(workspaceId);
+  async getMetaPages(
+    @Param("workspaceId") workspaceId: string,
+    @Request() req: any,
+  ) {
+    return this.platformsService.getMetaPages(workspaceId, req.user.id);
   }
 
   @Delete("accounts/:workspaceId/:accountId")
@@ -249,7 +255,8 @@ export class PlatformsController {
   async disconnectAccount(
     @Param("workspaceId") workspaceId: string,
     @Param("accountId") accountId: string,
+    @Request() req: any,
   ) {
-    return this.platformsService.disconnectAccount(workspaceId, accountId);
+    return this.platformsService.disconnectAccount(workspaceId, accountId, req.user.id);
   }
 }

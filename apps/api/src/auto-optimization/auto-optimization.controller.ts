@@ -5,10 +5,12 @@ import {
   Param,
   Body,
   Query,
+  Req,
   UseGuards,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import type { Request } from 'express';
 import {
   ApiTags,
   ApiBearerAuth,
@@ -52,8 +54,9 @@ export class AutoOptimizationController {
   async run(
     @Param('workspaceId') workspaceId: string,
     @Body() dto: RunOptimizationDto,
+    @Req() req: Request,
   ) {
-    return this.autoOpt.runOptimization(workspaceId, dto);
+    return this.autoOpt.runOptimization(workspaceId, dto, (req.user as any).id);
   }
 
   /**
@@ -72,8 +75,9 @@ export class AutoOptimizationController {
   })
   async history(
     @Param('workspaceId') workspaceId: string,
+    @Req() req: Request,
     @Query('limit') limit?: number,
   ) {
-    return this.autoOpt.getHistory(workspaceId, limit ? Number(limit) : 10);
+    return this.autoOpt.getHistory(workspaceId, (req.user as any).id, limit ? Number(limit) : 10);
   }
 }
