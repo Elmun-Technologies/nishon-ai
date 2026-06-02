@@ -168,6 +168,17 @@ export class PlatformsService {
     };
   }
 
+  /**
+   * List Facebook Pages the workspace's connected Meta account has access to.
+   * Required before launching a new ad — every Meta creative needs a Page.
+   */
+  async getMetaPages(
+    workspaceId: string,
+  ): Promise<Array<{ id: string; name: string; category?: string }>> {
+    const { token } = await this.getDecryptedToken(workspaceId, Platform.META);
+    return this.metaConnector.getPages(token);
+  }
+
   async getConnectedAccounts(workspaceId: string): Promise<ConnectedAccount[]> {
     return this.accountRepo.find({
       where: { workspaceId },

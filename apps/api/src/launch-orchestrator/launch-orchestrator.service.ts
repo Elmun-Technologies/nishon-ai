@@ -1,5 +1,6 @@
 import {
   Injectable,
+  Logger,
   NotFoundException,
   BadRequestException,
   ForbiddenException,
@@ -19,6 +20,8 @@ import { Workspace } from "../workspaces/entities/workspace.entity";
 
 @Injectable()
 export class LaunchOrchestratorService {
+  private readonly logger = new Logger(LaunchOrchestratorService.name);
+
   constructor(
     @InjectRepository(LaunchJob)
     private readonly launchRepo: Repository<LaunchJob>,
@@ -159,8 +162,10 @@ export class LaunchOrchestratorService {
           ? Math.max(1, Math.round(dailyBudget / audiences.length))
           : Math.max(1, dailyBudget);
 
-      // Fetch creative ids from source campaigns once, up-front, so each ad
-      // set can receive a copy of every creative.
+      // Resolve the creative ids each ad set will receive. Two paths:
+      // 1. `copyCreatives` mode — pull creatives from source campaign(s)
+      // 2. Inline creative — build a single new creative from the user's
+      //    payload (text + url + CTA on a Page) and reuse it across ad sets
       const sourceCreativeIds: string[] = [];
       if (copyCreatives) {
         for (const sourceId of sourceCampaignIds) {
@@ -172,6 +177,27 @@ export class LaunchOrchestratorService {
           } catch {
             // Non-fatal: continue with whatever creatives we already gathered.
           }
+        }
+      } else if (payload.creative && payload.creative.pageId && payload.creative.linkUrl) {
+        try {
+          const created = await this.metaConnector.createAdCreative(
+            account.externalAccountId,
+            accessToken,
+            {
+              name: `${name} — creative`,
+              pageId: payload.creative.pageId,
+              message: payload.creative.message || "",
+              linkUrl: payload.creative.linkUrl,
+              headline: payload.creative.headline,
+              description: payload.creative.description,
+              callToActionType: payload.creative.callToActionType,
+            },
+          );
+          if (created.id) sourceCreativeIds.push(created.id);
+        } catch (err: any) {
+          this.logger.warn(
+            `Failed to create inline creative for job ${job.id}: ${err?.message}`,
+          );
         }
       }
 

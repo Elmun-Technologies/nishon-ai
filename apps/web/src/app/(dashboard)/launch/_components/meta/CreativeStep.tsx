@@ -1,16 +1,61 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { ExternalLink } from 'lucide-react'
+import { AlertCircle, ExternalLink, Facebook } from 'lucide-react'
 import { Input, Textarea } from '@/components/ui'
 import { WizardStepCard } from '@/components/launch/wizard-shell'
 import { useI18n } from '@/i18n/use-i18n'
+import { platforms } from '@/lib/api-client'
+import { useWorkspaceStore } from '@/stores/workspace.store'
+import { cn } from '@/lib/utils'
 import type { LaunchWizardCtl } from '../../_lib/use-launch-wizard'
 import { StepFooter } from '../StepFooter'
 
 export function CreativeStep({ ctl }: { ctl: LaunchWizardCtl }) {
   const { t } = useI18n()
   const lt = (path: string, fallback: string) => t(`launchWizard.${path}`, fallback)
+  const { currentWorkspace } = useWorkspaceStore()
+  const [pages, setPages] = useState<Array<{ id: string; name: string }>>([])
+  const [pagesLoading, setPagesLoading] = useState(false)
+  const [pagesError, setPagesError] = useState('')
+
+  useEffect(() => {
+    if (!currentWorkspace?.id) return
+    let cancelled = false
+    setPagesLoading(true)
+    setPagesError('')
+    platforms
+      .getMetaPages(currentWorkspace.id)
+      .then((res) => {
+        if (cancelled) return
+        const list = (res.data ?? []).map((p) => ({ id: p.id, name: p.name }))
+        setPages(list)
+        // Auto-select first Page if user hasn't picked one yet.
+        if (!ctl.metaData.pageId && list.length > 0) {
+          ctl.setMetaData((d) => ({ ...d, pageId: list[0].id }))
+        }
+      })
+      .catch((err: any) => {
+        if (cancelled) return
+        // Don't surface 404/no-account errors loudly — the user simply
+        // hasn't connected Meta yet. They can still continue without a
+        // Page (campaign + adset will be created, ad will be empty).
+        const msg = err?.response?.data?.message || err?.message || ''
+        if (/No active|not connected|404/i.test(msg)) {
+          setPagesError('')
+        } else {
+          setPagesError(msg)
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setPagesLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentWorkspace?.id])
 
   return (
     <WizardStepCard>
@@ -32,6 +77,71 @@ export function CreativeStep({ ctl }: { ctl: LaunchWizardCtl }) {
           <ExternalLink className="h-3.5 w-3.5" aria-hidden />
           Creative Hub&apos;da yangi kreativ yarating
         </Link>
+
+        {/* Facebook Page selector — required for new ad creative */}
+        <div className="space-y-2">
+          <label
+            className="block text-sm font-medium text-text-secondary"
+            htmlFor="meta-page"
+          >
+            <span className="inline-flex items-center gap-1.5">
+              <Facebook className="h-3.5 w-3.5 text-[#0866FF]" aria-hidden />
+              Facebook Page <span className="text-rose-500">*</span>
+            </span>
+          </label>
+          {pagesLoading ? (
+            <div className="h-11 animate-pulse rounded-lg bg-surface-2/60" />
+          ) : pages.length === 0 ? (
+            <div className="flex items-start gap-2 rounded-xl border border-amber-500/30 bg-amber-50 p-3 dark:border-amber-500/40 dark:bg-amber-500/10">
+              <AlertCircle
+                className="mt-0.5 h-4 w-4 shrink-0 text-amber-700 dark:text-amber-400"
+                aria-hidden
+              />
+              <div className="min-w-0 text-xs leading-relaxed text-amber-900 dark:text-amber-100">
+                <p className="font-semibold">Facebook Page topilmadi</p>
+                <p className="mt-0.5 text-amber-800 dark:text-amber-200/80">
+                  Meta hisobingiz ulanmagan yoki Page tug&apos;mish ruxsati berilmagan.
+                  Reklama hozir ko&apos;rinmaydi — keyin Meta&apos;da qo&apos;shasiz.
+                </p>
+                <Link
+                  href="/settings/meta"
+                  className="mt-1.5 inline-flex items-center gap-1 font-semibold text-amber-900 underline-offset-2 hover:underline dark:text-amber-100"
+                >
+                  Meta&apos;ni sozlash
+                  <ExternalLink className="h-3 w-3" aria-hidden />
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <select
+              id="meta-page"
+              value={ctl.metaData.pageId}
+              onChange={(e) =>
+                ctl.setMetaData((d) => ({ ...d, pageId: e.target.value }))
+              }
+              className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/15"
+            >
+              <option value="">Page tanlang…</option>
+              {pages.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
+          )}
+          {pagesError && (
+            <p
+              className={cn(
+                'text-xs',
+                /No active|not connected/i.test(pagesError)
+                  ? 'text-text-tertiary'
+                  : 'text-rose-600',
+              )}
+            >
+              {pagesError}
+            </p>
+          )}
+        </div>
 
         <Input
           label={lt('meta.creativeUrl', 'URL')}

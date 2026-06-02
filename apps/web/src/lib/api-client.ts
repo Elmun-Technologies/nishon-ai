@@ -380,6 +380,14 @@ export const platforms = {
   getAccounts: (workspaceId: string) =>
     apiClient.get(`/platforms/accounts/${workspaceId}`),
   /**
+   * List Facebook Pages the workspace's connected Meta account has access to.
+   * Required before launching a new ad (every Meta creative needs a Page).
+   */
+  getMetaPages: (workspaceId: string) =>
+    apiClient.get<Array<{ id: string; name: string; category?: string }>>(
+      `/platforms/meta/pages/${workspaceId}`,
+    ),
+  /**
    * Returns the redirect URL for starting Meta OAuth.
    * Use: window.location.href = platforms.connectMetaUrl(workspaceId)
    * Or simply use connectMeta() from lib/meta.ts which handles this correctly.
@@ -681,6 +689,15 @@ export type LaunchTargeting = {
   genders?: number[]
 }
 
+export type LaunchCreativePayload = {
+  pageId: string
+  message: string
+  linkUrl: string
+  headline?: string
+  description?: string
+  callToActionType?: 'LEARN_MORE' | 'SHOP_NOW' | 'SIGN_UP' | 'CONTACT_US' | 'GET_OFFER'
+}
+
 export type CreateLaunchJobInput = {
   workspaceId: string
   platform: 'meta' | 'google' | string
@@ -692,6 +709,8 @@ export type CreateLaunchJobInput = {
   audiences: LaunchAudienceConfig[]
   targeting?: LaunchTargeting
   copyCreatives?: boolean
+  /** Inline creative for brand-new ads (not copying from a source campaign). */
+  creative?: LaunchCreativePayload
 }
 
 export type LaunchJob = {

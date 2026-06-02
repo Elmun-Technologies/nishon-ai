@@ -230,6 +230,17 @@ export class PlatformsController {
     return this.platformsService.getConnectedAccounts(workspaceId);
   }
 
+  @Get("meta/pages/:workspaceId")
+  @UseGuards(AuthGuard("jwt"))
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary:
+      "List Facebook Pages the workspace's connected Meta account has access to",
+  })
+  async getMetaPages(@Param("workspaceId") workspaceId: string) {
+    return this.platformsService.getMetaPages(workspaceId);
+  }
+
   @Delete("accounts/:workspaceId/:accountId")
   @UseGuards(AuthGuard("jwt"))
   @ApiBearerAuth()
