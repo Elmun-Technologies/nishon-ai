@@ -166,6 +166,18 @@ export default function BudgetPage() {
   const [editBusy, setEditBusy] = useState(false)
   const [editError, setEditError] = useState<string | null>(null)
 
+  // Derived series — declared before any early return so hook order stays stable
+  // across renders (React rules-of-hooks).
+  const dailySpendSeries = useMemo(
+    () =>
+      data.forecast
+        ? data.forecast.daily
+            .slice(0, data.forecast.daysElapsed)
+            .map((d) => d.spend)
+        : [],
+    [data.forecast],
+  )
+
   const strategy = currentWorkspace?.aiStrategy
   const allocation: Record<string, number> = strategy?.budgetAllocation ?? {}
   const totalBudget = currentWorkspace?.monthlyBudget ?? 0
@@ -248,15 +260,6 @@ export default function BudgetPage() {
 
   // ── Forecast / sparkline derived from real data ────────────────────────
   const dailyBudget = totalBudget / 30
-  const dailySpendSeries = useMemo(
-    () =>
-      data.forecast
-        ? data.forecast.daily
-            .slice(0, data.forecast.daysElapsed)
-            .map((d) => d.spend)
-        : [],
-    [data.forecast],
-  )
 
   // ── Platform allocation: real AI strategy if present, otherwise the
   //     campaign-side spend breakdown from /workspaces/:id/performance.

@@ -89,6 +89,7 @@ describe('CertificationService', () => {
     platformMetrics: [],
     historicalPerformance: [],
     syncLogs: [],
+    fraudAudits: [],
   };
 
   const mockAgentCertification: AgentCertification = {
@@ -113,7 +114,9 @@ describe('CertificationService', () => {
         {
           provide: getRepositoryToken(AgentCertification),
           useValue: {
-            find: jest.fn(),
+            // Default to an empty list so certification-level recalculation
+            // (which calls find()) doesn't crash when a test doesn't set it.
+            find: jest.fn().mockResolvedValue([]),
             findOne: jest.fn(),
             findAndCount: jest.fn(),
             create: jest.fn(),
@@ -263,13 +266,14 @@ describe('CertificationService', () => {
 
   describe('verifyCertification', () => {
     it('should successfully approve certification', async () => {
-      const approvedCert = { ...mockAgentCertification };
+      // Fresh copy so this test doesn't mutate the shared fixture for others.
       jest
         .spyOn(agentCertRepository, 'findOne')
-        .mockResolvedValue(mockAgentCertification);
+        .mockResolvedValue({ ...mockAgentCertification });
+      // Echo the entity the service mutated, mirroring real repository.save().
       jest
         .spyOn(agentCertRepository, 'save')
-        .mockResolvedValue(approvedCert);
+        .mockImplementation((e) => Promise.resolve(e as AgentCertification));
       jest
         .spyOn(agentProfileRepository, 'findOne')
         .mockResolvedValue(mockAgentProfile);
@@ -288,13 +292,12 @@ describe('CertificationService', () => {
     });
 
     it('should successfully reject certification', async () => {
-      const rejectedCert = { ...mockAgentCertification };
       jest
         .spyOn(agentCertRepository, 'findOne')
-        .mockResolvedValue(mockAgentCertification);
+        .mockResolvedValue({ ...mockAgentCertification });
       jest
         .spyOn(agentCertRepository, 'save')
-        .mockResolvedValue(rejectedCert);
+        .mockImplementation((e) => Promise.resolve(e as AgentCertification));
       jest
         .spyOn(agentProfileRepository, 'findOne')
         .mockResolvedValue(mockAgentProfile);

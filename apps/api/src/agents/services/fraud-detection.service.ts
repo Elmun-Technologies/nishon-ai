@@ -603,6 +603,10 @@ export class FraudDetectionService {
       this.logger.error(
         `Failed to update fraud risk score for agent ${agentId}: ${error.message}`,
       );
+      // Re-throw so verify() can return a cautious (fail-closed) result. If we
+      // cannot persist the fraud score the datastore is unhealthy, and a fraud
+      // check that silently "passes" in that state is worse than blocking.
+      throw error;
     }
   }
 

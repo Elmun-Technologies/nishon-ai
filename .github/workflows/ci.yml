@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# Cancel superseded runs on the same ref to save minutes.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api:
+    name: API · test + build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8.15.5
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build workspace packages
+        run: |
+          pnpm --filter @adspectr/shared build
+          pnpm --filter @adspectr/ai-sdk build
+
+      - name: Unit tests
+        run: pnpm --filter api test
+
+      - name: Build
+        run: pnpm --filter api build
+
+      # Lint debt is tracked but not yet blocking — see PLATFORM_RATING.
+      - name: Lint (non-blocking)
+        continue-on-error: true
+        run: pnpm --filter api lint
+
+  web:
+    name: Web · lint + i18n + build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8.15.5
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build workspace packages
+        run: |
+          pnpm --filter @adspectr/shared build
+          pnpm --filter @adspectr/ai-sdk build
+
+      - name: Lint
+        run: pnpm --filter web lint
+
+      - name: i18n key parity (uz/ru/en)
+        run: pnpm --filter web i18n:check
+
+      - name: Build
+        run: pnpm --filter web build
+
+      # Type errors are currently masked by next.config ignoreBuildErrors.
+      # Surfaced here (non-blocking) so the remaining debt is visible in CI.
+      - name: Typecheck (non-blocking)
+        continue-on-error: true
+        run: pnpm --filter web exec tsc --noEmit
