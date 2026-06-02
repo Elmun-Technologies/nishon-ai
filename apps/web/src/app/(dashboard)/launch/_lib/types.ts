@@ -37,6 +37,8 @@ export interface MetaData {
   creativeUrl: string
   creativeText: string
   ctaButton: MetaCtaButton | string
+  /** Selected Facebook Page id — required for new ad creative. */
+  pageId: string
   abTestEnabled: boolean
   abTestType: MetaAbTestType
   abTestDuration: number

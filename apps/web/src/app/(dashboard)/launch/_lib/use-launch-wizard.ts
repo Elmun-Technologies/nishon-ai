@@ -2,7 +2,11 @@
 
 import { useCallback, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { campaigns as campaignsApi } from '@/lib/api-client'
+import {
+  campaigns as campaignsApi,
+  launchOrchestrator,
+  type CreateLaunchJobInput,
+} from '@/lib/api-client'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import type {
   GoogleData,
@@ -28,6 +32,7 @@ const INITIAL_META_DATA: MetaData = {
   creativeUrl: '',
   creativeText: '',
   ctaButton: 'learn_more',
+  pageId: '',
   abTestEnabled: false,
   abTestType: 'creative',
   abTestDuration: 7,
@@ -150,32 +155,105 @@ export function useLaunchWizard() {
     setError('')
     const nameTrim = metaData.name.trim()
     if (!nameTrim) {
-      setError('Enter a campaign name.')
+      setError("Kampaniya nomini kiriting.")
       setSaving(false)
       return
     }
     const daily = parsePositiveNumber(metaData.dailyBudget)
     if (!daily) {
-      setError('Enter a valid daily budget.')
+      setError("To'g'ri kunlik byudjet kiriting.")
       setSaving(false)
       return
     }
     if (metaData.minAge >= metaData.maxAge) {
-      setError('Invalid age range.')
+      setError("Yosh oralig'i noto'g'ri.")
       setSaving(false)
       return
     }
+    if (!currentWorkspace?.id) {
+      setError('Avval workspace tanlang.')
+      setSaving(false)
+      return
+    }
+
+    const objectiveMap: Record<string, string> = {
+      awareness: 'OUTCOME_AWARENESS',
+      traffic: 'OUTCOME_TRAFFIC',
+      engagement: 'OUTCOME_ENGAGEMENT',
+      leads: 'OUTCOME_LEADS',
+      app_promotion: 'OUTCOME_APP_PROMOTION',
+      sales: 'OUTCOME_SALES',
+    }
+    const metaObjective = objectiveMap[metaData.objective || 'leads'] ?? 'OUTCOME_LEADS'
+
+    const payload: CreateLaunchJobInput = {
+      workspaceId: currentWorkspace.id,
+      platform: 'meta',
+      objective: metaObjective,
+      budgetType: 'CBO',
+      dailyBudget: daily,
+      audiences: [
+        {
+          name: `${nameTrim} — Asosiy`,
+          funnelStage: 'acquisition_prospecting',
+          location: metaData.location,
+        },
+      ],
+      targeting: {
+        countries: [metaData.location],
+        ageMin: metaData.minAge,
+        ageMax: metaData.maxAge,
+      },
+      copyCreatives: false,
+    }
+
+    // Inline creative — only if the user supplied URL + a Page id.
+    if (metaData.pageId && metaData.creativeUrl.trim()) {
+      const ctaMap: Record<string, NonNullable<CreateLaunchJobInput['creative']>['callToActionType']> = {
+        learn_more: 'LEARN_MORE',
+        contact_us: 'CONTACT_US',
+        shop_now: 'SHOP_NOW',
+        sign_up: 'SIGN_UP',
+      }
+      payload.creative = {
+        pageId: metaData.pageId,
+        message: metaData.creativeText || nameTrim,
+        linkUrl: metaData.creativeUrl.trim(),
+        callToActionType: ctaMap[metaData.ctaButton] ?? 'LEARN_MORE',
+      }
+    }
+
     try {
-      await campaignsApi.create(currentWorkspace?.id ?? '', {
-        name: nameTrim,
-        platform: 'meta',
-        objective: metaData.objective || 'leads',
-        dailyBudget: daily,
-        totalBudget: daily * metaData.campaignDuration,
-      })
+      const draft = await launchOrchestrator.draft(payload)
+      const jobId = draft.data.id
+      const validated = await launchOrchestrator.validate(jobId)
+      if (validated.data.status === 'failed') {
+        setError(validated.data.error ?? "Validatsiya muvaffaqiyatsiz")
+        setSaving(false)
+        return
+      }
+      const launched = await launchOrchestrator.launch(jobId)
+      if (launched.data.status === 'failed') {
+        setError(launched.data.error ?? "Meta'ga yuborishda xato")
+        setSaving(false)
+        return
+      }
+      // Mirror to internal campaigns table (non-fatal — orchestrator already
+      // created the real Meta campaign).
+      try {
+        await campaignsApi.create(currentWorkspace.id, {
+          name: nameTrim,
+          platform: 'meta',
+          objective: metaData.objective || 'leads',
+          dailyBudget: daily,
+          totalBudget: daily * metaData.campaignDuration,
+        })
+      } catch {
+        // Ignore — the real campaign exists on Meta; internal mirror is best-effort.
+      }
       router.push('/campaigns')
     } catch (err: any) {
-      setError(err?.message || 'Error creating campaign')
+      setError(err?.message || "Kampaniya yaratishda xato")
     } finally {
       setSaving(false)
     }

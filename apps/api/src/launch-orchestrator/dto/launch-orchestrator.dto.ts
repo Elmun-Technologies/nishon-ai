@@ -46,6 +46,34 @@ class TargetingDto {
   genders?: number[];
 }
 
+/**
+ * Inline creative payload — used when launching a brand-new ad (not copying
+ * from a source campaign). Requires a Facebook Page id so the creative can
+ * be attached.
+ */
+class CreativePayloadDto {
+  @IsString()
+  pageId: string;
+
+  @IsString()
+  message: string;
+
+  @IsString()
+  linkUrl: string;
+
+  @IsOptional()
+  @IsString()
+  headline?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsIn(["LEARN_MORE", "SHOP_NOW", "SIGN_UP", "CONTACT_US", "GET_OFFER"])
+  callToActionType?: string;
+}
+
 export class CreateLaunchJobDto {
   @IsUUID()
   workspaceId: string;
@@ -90,4 +118,14 @@ export class CreateLaunchJobDto {
   @IsOptional()
   @IsBoolean()
   copyCreatives?: boolean;
+
+  /**
+   * Inline creative — required when not copying creatives from a source campaign
+   * and the user wants the launch to produce real Meta ads (not just empty
+   * ad sets).
+   */
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => CreativePayloadDto)
+  creative?: CreativePayloadDto;
 }
