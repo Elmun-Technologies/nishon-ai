@@ -79,11 +79,8 @@ jobs:
       - name: i18n key parity (uz/ru/en)
         run: pnpm --filter web i18n:check
 
+      - name: Typecheck
+        run: pnpm --filter web exec tsc --noEmit
+
       - name: Build
         run: pnpm --filter web build
-
-      # Type errors are currently masked by next.config ignoreBuildErrors.
-      # Surfaced here (non-blocking) so the remaining debt is visible in CI.
-      - name: Typecheck (non-blocking)
-        continue-on-error: true
-        run: pnpm --filter web exec tsc --noEmit

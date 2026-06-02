@@ -228,7 +228,7 @@ export default function TelegramSettingsPage() {
                 <div>
                   <p className="font-medium text-text-primary">{t('settingsTelegram.connected', 'Ulangan')}</p>
                   <p className="text-sm text-text-tertiary font-mono">
-                    chat_id: {currentWorkspace.telegramChatId ?? '—'}
+                    chat_id: {currentWorkspace?.telegramChatId ?? '—'}
                   </p>
                 </div>
               </div>

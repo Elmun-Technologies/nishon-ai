@@ -15,6 +15,8 @@ interface User {
 
 interface Workspace {
   id: string
+  /** Owner user id — returned by the API, used for ownership checks. */
+  userId?: string
   name: string
   industry: string
   monthlyBudget: number

@@ -253,6 +253,31 @@ export default function SettingsPage() {
   const [saved, setSaved] = useState(false)
   const [saveError, setSaveError] = useState('')
 
+  // Recent settings changes — last 10, newest first.
+  type SettingsHistoryItem = {
+    id: string
+    setting: string
+    previous: string
+    current: string
+    timestamp: Date
+  }
+  const [settingsHistory, setSettingsHistory] = useState<SettingsHistoryItem[]>([])
+  const addToHistory = (setting: string, previous: string, current: string) => {
+    if (previous === current) return
+    setSettingsHistory((prev) =>
+      [
+        {
+          id: `${Date.now()}-${setting}`,
+          setting,
+          previous,
+          current,
+          timestamp: new Date(),
+        },
+        ...prev,
+      ].slice(0, 10),
+    )
+  }
+
   // Notifications
   const [emailNotifs, setEmailNotifs] = useState(true)
   const [weeklyReport, setWeeklyReport] = useState(true)

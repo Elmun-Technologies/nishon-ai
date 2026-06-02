@@ -292,7 +292,7 @@ export const aiAgent = {
     assistantPersona?: 'targetologist' | 'optimizer' | 'general'
   }): AsyncGenerator<string, void, void> {
     const token = getAccessToken()
-    const response = await fetch(buildUrl('/ai-agent/chat/stream'), {
+    const response = await fetch(toUrl('/ai-agent/chat/stream'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

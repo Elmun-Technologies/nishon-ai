@@ -353,7 +353,7 @@ export default function BillingPage() {
                 ) : (
                   <Button
                     className="w-full rounded-xl"
-                    variant={sub.planId === p.id ? 'secondary' : 'default'}
+                    variant={sub.planId === p.id ? 'secondary' : 'primary'}
                     onClick={() => openCheckout(p.id)}
                     disabled={sub.planId === p.id}
                   >
@@ -449,7 +449,7 @@ export default function BillingPage() {
               </Button>
             </div>
             {orderId ? (
-              <Button className="w-full mt-4 rounded-xl" variant="default" disabled={busy} onClick={() => void confirmDemoPayment()}>
+              <Button className="w-full mt-4 rounded-xl" variant="primary" disabled={busy} onClick={() => void confirmDemoPayment()}>
                 {t('billing.demoPaid', "To'lov qabul qilindi (demo)")}
               </Button>
             ) : null}
