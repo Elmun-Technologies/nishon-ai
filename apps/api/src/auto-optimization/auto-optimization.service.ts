@@ -1,4 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { OptimizerAgentService } from './optimizer-agent.service';
@@ -48,12 +53,28 @@ export class AutoOptimizationService {
     private readonly workspaceRepo: Repository<Workspace>,
   ) {}
 
+  /**
+   * Ensure the requesting user owns the workspace before running optimization
+   * (which spends OpenAI budget and writes decisions) or reading its history.
+   * Without it, any authenticated user could trigger paid AI work on, or read
+   * the optimization history of, a workspace they don't own (IDOR). Matches the
+   * owner check in CampaignsService / AiDecisionsService. The 2-hourly cron uses
+   * a separate code path (AiAgentService.runOptimizationLoop) and is unaffected.
+   */
+  private async assertWorkspaceOwner(workspaceId: string, userId: string): Promise<void> {
+    const workspace = await this.workspaceRepo.findOne({ where: { id: workspaceId } });
+    if (!workspace) throw new NotFoundException('Workspace not found');
+    if (workspace.userId !== userId) throw new ForbiddenException('Access denied');
+  }
+
   // ─── Main entry point ──────────────────────────────────────────────────────
 
   async runOptimization(
     workspaceId: string,
     dto: RunOptimizationDto,
+    userId: string,
   ): Promise<OptimizationReport> {
+    await this.assertWorkspaceOwner(workspaceId, userId);
     const startTime = Date.now();
     const { performance: campaign, mode, goal, constraints } = dto;
 
@@ -210,7 +231,8 @@ export class AutoOptimizationService {
   // ─── History query ─────────────────────────────────────────────────────────
 
   /** Return the last N optimization runs for a workspace (for dashboard/audit) */
-  async getHistory(workspaceId: string, limit = 10): Promise<OptimizationRun[]> {
+  async getHistory(workspaceId: string, userId: string, limit = 10): Promise<OptimizationRun[]> {
+    await this.assertWorkspaceOwner(workspaceId, userId);
     return this.runRepo.find({
       where:  { workspaceId },
       order:  { createdAt: 'DESC' },
