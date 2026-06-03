@@ -59,12 +59,7 @@ export function generateMetadata({ params }: RouteParams): Metadata {
 
 export default function FeatureDetailPage({ params }: RouteParams) {
   const f = getFeatureContent(params.slug)
-  if (!f) {
-    notFound()
-    // notFound() throws — this line is never reached but satisfies TS narrowing
-    // when the build environment lacks @types/next.
-    return null as never
-  }
+  if (!f) notFound()
 
   const url = `${SITE_URL}/features/${f.slug}`
   const structuredData = {

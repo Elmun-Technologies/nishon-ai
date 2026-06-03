@@ -25,10 +25,27 @@ pnpm --filter api dev   # Faqat backend
 
 ---
 
-## Joriy holat (so'nggi yangilash: 2026-06-02)
+## Joriy holat (so'nggi yangilash: 2026-06-03)
 
 **Asosiy branch:** `main`
-**Faol branch:** `claude/hopeful-rubin-vTmX2`
+**Faol branch:** `claude/hopeful-rubin-vTmX2` — 10/10 sprint davom etmoqda (PR #131)
+
+### 2026-06-03 sessiyasi — 10/10 sprint (faol PR #131)
+- ✅ **Qadam 2: cheap strict TS flags** — `noFallthroughCasesInSwitch`,
+  `noImplicitOverride`, `forceConsistentCasingInFileNames` API+web ikkalasiga,
+  web qo'shimcha `allowUnreachableCode: false`. 0 ta xato.
+- ✅ **Qadam 3: web unit testlar 12 → 97** (+85) — `lib/utils` (13),
+  `reporting-export` (6), `local-subscription` (5), `validation` (35),
+  `api-error` (9), `date-range` (7), `subscription-plans` (8).
+- ✅ **Qadam 4: backend service specs 152 → 262** (+110, 6 ta service) —
+  `AiDecisionsService` (11), `CampaignsService` (17), `TeamInvitesService` (25),
+  `WorkspacesService` (19), `AuthService` (23 — auth-core: bcrypt 12 rounds,
+  email-enumeration safety, refresh-token bcrypt-hashed, JWT secret fail-closed),
+  `BillingService` (15 — read/write gate + "exactly one default card" invariant).
+- ✅ **Qadam 5: CI hardening** — `.github/workflows/ci.yml`'da top-level
+  `permissions: contents: read` (default-deny GITHUB_TOKEN); `.github/dependabot.yml`
+  weekly grouped bumps (dev+prod, monthly actions). Dependency-review action
+  o'chirildi (Dependency graph feature flip kerak edi).
 
 ### MVP fokus
 **Ad Launcher (3-bosqichli flow) production deploy.**

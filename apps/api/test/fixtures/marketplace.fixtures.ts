@@ -18,6 +18,9 @@ interface TestUser {
   firstName: string;
   lastName: string;
   workspaceId: string;
+  /** Some marketplace admin endpoints look at this — kept on the test
+   *  fixture so e2e admin scenarios compile under stricter tsc options. */
+  isAdmin?: boolean;
 }
 
 interface TestWorkspace {
