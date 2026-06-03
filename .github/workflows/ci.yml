@@ -11,6 +11,12 @@ concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# Default-deny GITHUB_TOKEN: jobs that need extra access opt in locally.
+# This is the GitHub-recommended hardening — limits blast radius if any
+# third-party action turns out to be compromised.
+permissions:
+  contents: read
+
 jobs:
   api:
     name: API · test + build

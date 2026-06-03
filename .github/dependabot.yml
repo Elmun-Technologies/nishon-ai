@@ -1,0 +1,29 @@
+# Dependabot config: weekly bumps for npm + actions, grouped to avoid
+# 50-PR noise storms. Security updates still come in immediately and
+# unbatched per Dependabot policy.
+version: 2
+
+updates:
+  # Monorepo lockfile — all workspaces share one pnpm-lock.yaml.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      # Bundle non-major dev-time deps in a single weekly PR.
+      dev-dependencies:
+        dependency-type: development
+        update-types: [minor, patch]
+      # Bundle non-major runtime deps in a single weekly PR.
+      production-dependencies:
+        dependency-type: production
+        update-types: [minor, patch]
+
+  # GitHub Actions referenced from .github/workflows/*.yml.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 3

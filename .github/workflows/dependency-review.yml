@@ -1,0 +1,24 @@
+name: Dependency review
+
+# Fails a PR that introduces a dependency with a known vulnerability,
+# an incompatible license, or a downgrade. Runs only on PRs because it
+# diffs base...head — there is nothing to compare on a push to main.
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write # write a summary comment with the diff
+
+jobs:
+  review:
+    name: Review dependency diff
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/dependency-review-action@v4
+        with:
+          # Block any new dep with a high or critical CVE.
+          fail-on-severity: high
+          comment-summary-in-pr: on-failure
