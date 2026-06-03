@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "openai": "^4.0.0",
-    "axios": "^1.6.0"
+    "axios": "^1.17.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
