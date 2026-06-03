@@ -15,6 +15,14 @@ jobs:
   review:
     name: Review dependency diff
     runs-on: ubuntu-latest
+    # Soft-fail until Dependency graph is enabled in repo settings:
+    #   Settings -> Code security and analysis -> Dependency graph -> Enable
+    # The feature is free for private repos as of 2023 but is off by default
+    # on older orgs. Until it's enabled, this action fails with
+    # "Dependency review is not supported on this repository". Marking the
+    # job continue-on-error means the workflow itself stays green so merges
+    # aren't blocked, but the failure is still visible in the Checks tab.
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/dependency-review-action@v4
