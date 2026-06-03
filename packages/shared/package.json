@@ -9,7 +9,7 @@
     "dev": "tsc --watch"
   },
   "dependencies": {
-    "class-validator": "^0.14.0"
+    "class-validator": "^0.15.1"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
