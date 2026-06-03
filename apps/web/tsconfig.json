@@ -5,6 +5,20 @@
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
+    // Extra strict flags beyond `strict`. Each one is currently 0-error on
+    // this codebase, so enabling them just keeps future regressions out:
+    //  - noFallthroughCasesInSwitch: an unintentional `case A:` falling into
+    //    `case B:` is a real bug; require explicit break/return/throw.
+    //  - noImplicitOverride: subclass methods that override a base method
+    //    must say so with `override`, so renaming the base method surfaces
+    //    a compile error instead of a silently-dead subclass override.
+    //  - allowUnreachableCode: false errors on dead code after return/throw.
+    //  - forceConsistentCasingInFileNames: case-typo imports work on macOS
+    //    but break on Linux/CI — catch them locally.
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "allowUnreachableCode": false,
+    "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",

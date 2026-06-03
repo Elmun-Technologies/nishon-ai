@@ -12,11 +12,23 @@
     "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
+    // Heritage from `nest new` — keep these off until we're ready for a
+    // strictness pass. The strict-but-cheap flags below come on now because
+    // the codebase is currently 0-error under them.
     "strictNullChecks": false,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false,
+    // Enabled at 0 errors so future regressions can't sneak back in:
+    //  - forceConsistentCasingInFileNames: case-typo imports work on macOS
+    //    but break on Linux/CI — catch them locally.
+    //  - noFallthroughCasesInSwitch: an unintentional `case A:` falling
+    //    into `case B:` is a real bug; require explicit break/return/throw.
+    //  - noImplicitOverride: subclass methods that override a base method
+    //    must say `override`, so renaming the base surfaces a compile error
+    //    instead of a silently-dead subclass override.
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
     "paths": {
       "@adspectr/shared": ["../../packages/shared/src"],
       "@adspectr/ai-sdk": ["../../packages/ai-sdk/src"]
