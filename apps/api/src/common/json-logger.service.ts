@@ -88,16 +88,22 @@ export class JsonLoggerService implements LoggerService {
       const payload = message as Record<string, unknown>;
       const rawMessage = payload.message;
       return {
-        message: typeof rawMessage === "string" ? rawMessage : JSON.stringify(payload),
+        message:
+          typeof rawMessage === "string" ? rawMessage : JSON.stringify(payload),
         requestId:
           typeof payload.requestId === "string" ? payload.requestId : undefined,
         path: typeof payload.path === "string" ? payload.path : undefined,
         method: typeof payload.method === "string" ? payload.method : undefined,
         statusCode:
-          typeof payload.statusCode === "number" ? payload.statusCode : undefined,
+          typeof payload.statusCode === "number"
+            ? payload.statusCode
+            : undefined,
         durationMs:
-          typeof payload.durationMs === "number" ? payload.durationMs : undefined,
-        context: typeof payload.context === "string" ? payload.context : undefined,
+          typeof payload.durationMs === "number"
+            ? payload.durationMs
+            : undefined,
+        context:
+          typeof payload.context === "string" ? payload.context : undefined,
         stack: typeof payload.stack === "string" ? payload.stack : undefined,
       };
     }

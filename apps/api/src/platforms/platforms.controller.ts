@@ -93,7 +93,9 @@ export class PlatformsController {
   @Get("google/connect/:workspaceId")
   @UseGuards(AuthGuard("jwt"))
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Start Google Ads OAuth flow — redirects user to Google" })
+  @ApiOperation({
+    summary: "Start Google Ads OAuth flow — redirects user to Google",
+  })
   @Redirect()
   connectGoogle(@Param("workspaceId") workspaceId: string) {
     const url = this.platformsService.getGoogleOAuthUrl(workspaceId);
@@ -113,22 +115,33 @@ export class PlatformsController {
       return { success: false, error: "User denied Google Ads permissions" };
     }
 
-    const result = await this.platformsService.handleGoogleCallback(code, state);
+    const result = await this.platformsService.handleGoogleCallback(
+      code,
+      state,
+    );
 
     return {
       success: true,
       workspaceId: result.workspaceId,
       accounts: result.accounts,
-      message: "Select a customer account using POST /platforms/google/select-account",
+      message:
+        "Select a customer account using POST /platforms/google/select-account",
     };
   }
 
   @Post("google/select-account")
   @UseGuards(AuthGuard("jwt"))
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Select which Google Ads customer account to use after OAuth" })
+  @ApiOperation({
+    summary: "Select which Google Ads customer account to use after OAuth",
+  })
   async selectGoogleAccount(
-    @Body() body: { workspaceId: string; customerId: string; customerName: string },
+    @Body()
+    body: {
+      workspaceId: string;
+      customerId: string;
+      customerName: string;
+    },
   ) {
     return this.platformsService.selectGoogleCustomer(
       body.workspaceId,
@@ -142,7 +155,9 @@ export class PlatformsController {
   @Get("tiktok/connect/:workspaceId")
   @UseGuards(AuthGuard("jwt"))
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Start TikTok Ads OAuth flow — redirects user to TikTok" })
+  @ApiOperation({
+    summary: "Start TikTok Ads OAuth flow — redirects user to TikTok",
+  })
   @Redirect()
   connectTiktok(@Param("workspaceId") workspaceId: string) {
     const url = this.platformsService.getTiktokOAuthUrl(workspaceId);
@@ -162,7 +177,10 @@ export class PlatformsController {
       return { success: false, error: "User denied TikTok Ads permissions" };
     }
 
-    const result = await this.platformsService.handleTiktokCallback(code, state);
+    const result = await this.platformsService.handleTiktokCallback(
+      code,
+      state,
+    );
 
     return {
       success: true,
@@ -257,6 +275,10 @@ export class PlatformsController {
     @Param("accountId") accountId: string,
     @Request() req: any,
   ) {
-    return this.platformsService.disconnectAccount(workspaceId, accountId, req.user.id);
+    return this.platformsService.disconnectAccount(
+      workspaceId,
+      accountId,
+      req.user.id,
+    );
   }
 }

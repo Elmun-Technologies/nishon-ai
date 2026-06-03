@@ -4,106 +4,106 @@ import {
   Column,
   CreateDateColumn,
   Index,
-} from 'typeorm'
-import { SyncEventType, SyncStatus } from '../types/integration.types'
+} from "typeorm";
+import { SyncEventType, SyncStatus } from "../types/integration.types";
 
-@Entity('sync_logs')
-@Index(['connectionId', 'createdAt'])
-@Index(['connectionId', 'event'])
-@Index(['status'])
+@Entity("sync_logs")
+@Index(["connectionId", "createdAt"])
+@Index(["connectionId", "event"])
+@Index(["status"])
 export class SyncLog {
-  @PrimaryGeneratedColumn('uuid')
-  id: string
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
   /**
    * Reference to IntegrationConnection
    */
   @Column()
   @Index()
-  connectionId: string
+  connectionId: string;
 
   /**
    * Type of sync event
    */
   @Column({
-    type: 'enum',
+    type: "enum",
     enum: SyncEventType,
   })
-  event: SyncEventType
+  event: SyncEventType;
 
   /**
    * Sync status
    */
   @Column({
-    type: 'enum',
+    type: "enum",
     enum: SyncStatus,
     default: SyncStatus.PENDING,
   })
-  status: SyncStatus
+  status: SyncStatus;
 
   /**
    * Number of records processed
    */
   @Column({ default: 0 })
-  recordsProcessed: number
+  recordsProcessed: number;
 
   /**
    * Number of records skipped (duplicates, invalid, etc)
    */
   @Column({ default: 0 })
-  recordsSkipped: number
+  recordsSkipped: number;
 
   /**
    * Number of records that failed
    */
   @Column({ default: 0 })
-  recordsFailed: number
+  recordsFailed: number;
 
   /**
    * Error message if sync failed
    */
-  @Column({ nullable: true, type: 'text' })
-  errorMessage: string
+  @Column({ nullable: true, type: "text" })
+  errorMessage: string;
 
   /**
    * Error stack trace for debugging
    */
-  @Column({ nullable: true, type: 'text' })
-  errorStack: string
+  @Column({ nullable: true, type: "text" })
+  errorStack: string;
 
   /**
    * Additional metadata
    */
-  @Column('jsonb', { nullable: true })
+  @Column("jsonb", { nullable: true })
   metadata: {
-    duration_ms?: number
-    sample_data?: any
-    api_calls_made?: number
-    retry_count?: number
-    batch_number?: number
-    webhook_id?: string
-    [key: string]: any
-  }
+    duration_ms?: number;
+    sample_data?: any;
+    api_calls_made?: number;
+    retry_count?: number;
+    batch_number?: number;
+    webhook_id?: string;
+    [key: string]: any;
+  };
 
   /**
    * Triggered by (manual, scheduled, webhook)
    */
   @Column({
-    type: 'enum',
-    enum: ['manual', 'scheduled', 'webhook'],
-    default: 'scheduled',
+    type: "enum",
+    enum: ["manual", "scheduled", "webhook"],
+    default: "scheduled",
   })
-  triggeredBy: 'manual' | 'scheduled' | 'webhook'
+  triggeredBy: "manual" | "scheduled" | "webhook";
 
   /**
    * User ID if triggered manually
    */
   @Column({ nullable: true })
-  triggeredByUserId: string
+  triggeredByUserId: string;
 
   /**
    * Audit field
    */
   @CreateDateColumn()
-  createdAt: Date
+  createdAt: Date;
 }

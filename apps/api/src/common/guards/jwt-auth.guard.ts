@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { Injectable } from "@nestjs/common";
+import { AuthGuard } from "@nestjs/passport";
 
 /**
  * JwtAuthGuard — protects routes that require a valid JWT token.
@@ -13,4 +13,4 @@ import { AuthGuard } from '@nestjs/passport';
  * On failure: 401 Unauthorized is returned automatically by Passport
  */
 @Injectable()
-export class JwtAuthGuard extends AuthGuard('jwt') {}
+export class JwtAuthGuard extends AuthGuard("jwt") {}

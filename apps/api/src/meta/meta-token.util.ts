@@ -2,7 +2,10 @@ import { UnauthorizedException } from "@nestjs/common";
 import type { Request } from "express";
 
 /** Meta Ads Graph chaqiruvlari uchun token (MetaController bilan bir xil qoida). */
-export function extractMetaAccessToken(authorization?: string, req?: Request): string {
+export function extractMetaAccessToken(
+  authorization?: string,
+  req?: Request,
+): string {
   const dedicated = req?.headers["x-meta-access-token"];
   const fromHeader = Array.isArray(dedicated) ? dedicated[0] : dedicated;
   if (typeof fromHeader === "string" && fromHeader.trim().length > 15) {

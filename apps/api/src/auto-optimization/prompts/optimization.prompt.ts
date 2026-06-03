@@ -2,7 +2,7 @@ import type {
   CampaignPerformance,
   OptimizationGoal,
   RuleAnalysisResult,
-} from '../types/optimization.types';
+} from "../types/optimization.types";
 
 // ─── System prompt ────────────────────────────────────────────────────────────
 
@@ -34,44 +34,57 @@ export function buildOptimizerPrompt(
   const goalBlock = goal
     ? [
         `Type: ${goal.type}`,
-        goal.targetRoas  != null ? `Target ROAS: ${goal.targetRoas}x`   : null,
-        goal.targetCpa   != null ? `Target CPA: $${goal.targetCpa}`      : null,
-        goal.targetCtr   != null ? `Target CTR: ${goal.targetCtr}%`      : null,
-      ].filter(Boolean).join(' | ')
-    : 'Not specified — optimize for overall efficiency';
+        goal.targetRoas != null ? `Target ROAS: ${goal.targetRoas}x` : null,
+        goal.targetCpa != null ? `Target CPA: $${goal.targetCpa}` : null,
+        goal.targetCtr != null ? `Target CTR: ${goal.targetCtr}%` : null,
+      ]
+        .filter(Boolean)
+        .join(" | ")
+    : "Not specified — optimize for overall efficiency";
 
-  const adSetRows = campaign.adSets.map(s => {
-    const adRows = s.ads.map(a =>
-      `    • "${a.adName}" [${a.adId}]` +
-      ` spend=$${a.spend} ctr=${a.ctr}% cpc=$${a.cpc}` +
-      ` freq=${a.frequency} conv=${a.conversions}` +
-      (a.cpa     != null ? ` cpa=$${a.cpa}`       : '') +
-      ` roas=${a.roas}x` +
-      (a.hookRate != null ? ` hook=${a.hookRate}%` : '') +
-      (a.holdRate != null ? ` hold=${a.holdRate}%` : '') +
-      (a.creative?.headline ? ` headline="${a.creative.headline}"` : '')
-    ).join('\n');
+  const adSetRows = campaign.adSets
+    .map((s) => {
+      const adRows = s.ads
+        .map(
+          (a) =>
+            `    • "${a.adName}" [${a.adId}]` +
+            ` spend=$${a.spend} ctr=${a.ctr}% cpc=$${a.cpc}` +
+            ` freq=${a.frequency} conv=${a.conversions}` +
+            (a.cpa != null ? ` cpa=$${a.cpa}` : "") +
+            ` roas=${a.roas}x` +
+            (a.hookRate != null ? ` hook=${a.hookRate}%` : "") +
+            (a.holdRate != null ? ` hold=${a.holdRate}%` : "") +
+            (a.creative?.headline ? ` headline="${a.creative.headline}"` : ""),
+        )
+        .join("\n");
 
-    return (
-      `  AdSet: "${s.adSetName}" [${s.adSetId}]\n` +
-      `  spend=$${s.spend} ctr=${s.ctr}% cpc=$${s.cpc}` +
-      ` conv=${s.conversions} roas=${s.roas}x` +
-      (s.cpa != null ? ` cpa=$${s.cpa}` : '') + '\n' +
-      adRows
-    );
-  }).join('\n\n');
+      return (
+        `  AdSet: "${s.adSetName}" [${s.adSetId}]\n` +
+        `  spend=$${s.spend} ctr=${s.ctr}% cpc=$${s.cpc}` +
+        ` conv=${s.conversions} roas=${s.roas}x` +
+        (s.cpa != null ? ` cpa=$${s.cpa}` : "") +
+        "\n" +
+        adRows
+      );
+    })
+    .join("\n\n");
 
   const problemBlock = ruleAnalysis.problems.length
     ? ruleAnalysis.problems
-        .map(p => `  [${p.severity.toUpperCase()}] ${p.type} | ${p.targetType} ${p.targetId} | ${p.message}`)
-        .join('\n')
-    : '  None detected by rules engine';
+        .map(
+          (p) =>
+            `  [${p.severity.toUpperCase()}] ${p.type} | ${p.targetType} ${p.targetId} | ${p.message}`,
+        )
+        .join("\n")
+    : "  None detected by rules engine";
 
   const opportunityBlock = ruleAnalysis.opportunities.length
     ? ruleAnalysis.opportunities
-        .map(o => `  ${o.type} | ${o.targetType} ${o.targetId} | ${o.message}`)
-        .join('\n')
-    : '  None detected';
+        .map(
+          (o) => `  ${o.type} | ${o.targetType} ${o.targetId} | ${o.message}`,
+        )
+        .join("\n")
+    : "  None detected";
 
   return `
 CAMPAIGN GOAL: ${goalBlock}
@@ -81,15 +94,15 @@ Name:       ${campaign.campaignName}
 Platform:   ${campaign.platform}  |  Objective: ${campaign.objective}
 Budget:     $${campaign.dailyBudget}/day  |  Total spend: $${campaign.spend}
 Performance: CTR=${campaign.ctr}%  CPC=$${campaign.cpc}  ROAS=${campaign.roas}x
-             Impressions=${campaign.impressions}  Conversions=${campaign.conversions}${campaign.cpa != null ? `  CPA=$${campaign.cpa}` : ''}
+             Impressions=${campaign.impressions}  Conversions=${campaign.conversions}${campaign.cpa != null ? `  CPA=$${campaign.cpa}` : ""}
 
 ─── AD SETS & ADS ────────────────────────────────────────────────────────────
 ${adSetRows}
 
 ─── RULE-BASED PRE-ANALYSIS ──────────────────────────────────────────────────
 Data quality: ${ruleAnalysis.dataQuality}  |  Confidence: ${Math.round(ruleAnalysis.confidence * 100)}%
-Winners (high performers): ${ruleAnalysis.winners.join(', ') || 'none'}
-Losers  (poor performers): ${ruleAnalysis.losers.join(', ') || 'none'}
+Winners (high performers): ${ruleAnalysis.winners.join(", ") || "none"}
+Losers  (poor performers): ${ruleAnalysis.losers.join(", ") || "none"}
 
 Problems detected:
 ${problemBlock}
@@ -157,9 +170,12 @@ export function buildCreativeRefreshPrompt(
   existingCreatives: Array<{ headline?: string; primaryText?: string }>,
 ): string {
   const existingBlock = existingCreatives
-    .filter(c => c.headline || c.primaryText)
-    .map((c, i) => `  ${i + 1}. Headline: "${c.headline ?? 'N/A'}" | Text: "${c.primaryText ?? 'N/A'}"`)
-    .join('\n');
+    .filter((c) => c.headline || c.primaryText)
+    .map(
+      (c, i) =>
+        `  ${i + 1}. Headline: "${c.headline ?? "N/A"}" | Text: "${c.primaryText ?? "N/A"}"`,
+    )
+    .join("\n");
 
   return `
 Campaign: "${campaignName}" on ${platform} (objective: ${objective})
@@ -168,7 +184,7 @@ PROBLEM WITH EXISTING CREATIVES:
 ${problemDescription}
 
 EXISTING CREATIVE COPY (do not replicate, use as reference only):
-${existingBlock || '  None provided'}
+${existingBlock || "  None provided"}
 
 Generate 3 replacement creative concepts. Each concept must be distinctly
 different in angle, hook, and tone.

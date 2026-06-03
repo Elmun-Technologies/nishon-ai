@@ -15,7 +15,9 @@ export class McpAuthGuard implements CanActivate {
     const req = context.switchToHttp().getRequest<Request>();
 
     const clientId = req.headers["x-mcp-client-id"] as string | undefined;
-    const clientSecret = req.headers["x-mcp-client-secret"] as string | undefined;
+    const clientSecret = req.headers["x-mcp-client-secret"] as
+      | string
+      | undefined;
 
     // Also support HTTP Basic auth: Authorization: Basic base64(clientId:clientSecret)
     let resolvedId = clientId;
@@ -38,9 +40,14 @@ export class McpAuthGuard implements CanActivate {
       );
     }
 
-    const ctx = await this.mcpService.validateCredential(resolvedId, resolvedSecret);
+    const ctx = await this.mcpService.validateCredential(
+      resolvedId,
+      resolvedSecret,
+    );
     if (!ctx) {
-      throw new UnauthorizedException("Noto'g'ri yoki muddati o'tgan MCP credentials");
+      throw new UnauthorizedException(
+        "Noto'g'ri yoki muddati o'tgan MCP credentials",
+      );
     }
 
     (req as any).mcpContext = ctx;

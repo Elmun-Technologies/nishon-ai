@@ -63,7 +63,9 @@ export class CampaignSyncProcessor {
   ) {
     const key = this.config.get<string>("ENCRYPTION_KEY", "");
     if (!key || key.length !== 32) {
-      this.logger.error("ENCRYPTION_KEY is not set or is not 32 characters — token decryption will fail");
+      this.logger.error(
+        "ENCRYPTION_KEY is not set or is not 32 characters — token decryption will fail",
+      );
     }
     this.encryptionKey = key;
   }
@@ -71,14 +73,18 @@ export class CampaignSyncProcessor {
   @Process("sync-campaign-metrics")
   async handleCampaignSync(job: Job<CampaignSyncJobData>): Promise<void> {
     const { workspaceId, platform, campaignId } = job.data;
-    this.logger.log(`Syncing ${platform} metrics for workspace: ${workspaceId}`);
+    this.logger.log(
+      `Syncing ${platform} metrics for workspace: ${workspaceId}`,
+    );
 
     const account = await this.accountRepo.findOne({
       where: { workspaceId, platform: platform as Platform, isActive: true },
     });
 
     if (!account) {
-      this.logger.warn(`No active ${platform} account for workspace ${workspaceId}`);
+      this.logger.warn(
+        `No active ${platform} account for workspace ${workspaceId}`,
+      );
       return;
     }
 
@@ -90,15 +96,26 @@ export class CampaignSyncProcessor {
       if (platform === Platform.META) {
         await this.syncMeta(account, accessToken, since, until, campaignId);
       } else if (platform === Platform.GOOGLE) {
-        const refreshToken = account.refreshToken ? this.decrypt(account.refreshToken) : null;
-        await this.syncGoogle(account, accessToken, refreshToken, since, until, campaignId);
+        const refreshToken = account.refreshToken
+          ? this.decrypt(account.refreshToken)
+          : null;
+        await this.syncGoogle(
+          account,
+          accessToken,
+          refreshToken,
+          since,
+          until,
+          campaignId,
+        );
       } else if (platform === Platform.TIKTOK) {
         await this.syncTiktok(account, accessToken, since, until, campaignId);
       } else if (platform === Platform.YANDEX) {
         await this.syncYandex(account, accessToken, since, until);
       }
 
-      this.logger.log(`Sync complete for ${platform} — workspace: ${workspaceId}`);
+      this.logger.log(
+        `Sync complete for ${platform} — workspace: ${workspaceId}`,
+      );
     } catch (error: any) {
       this.logger.error(
         `Sync failed for ${platform} workspace ${workspaceId}: ${error.message}`,
@@ -151,7 +168,17 @@ export class CampaignSyncProcessor {
         since,
         until,
         level: campaignId ? "campaign" : "ad",
-        fields: ["impressions", "clicks", "spend", "actions", "action_values", "ctr", "cpm", "reach", "ad_id"],
+        fields: [
+          "impressions",
+          "clicks",
+          "spend",
+          "actions",
+          "action_values",
+          "ctr",
+          "cpm",
+          "reach",
+          "ad_id",
+        ],
       },
     );
 
@@ -181,21 +208,27 @@ export class CampaignSyncProcessor {
 
       const actions = insight.actions ?? [];
       const conversions = actions
-        .filter((a: any) => a.action_type === "offsite_conversion.fb_pixel_purchase")
+        .filter(
+          (a: any) => a.action_type === "offsite_conversion.fb_pixel_purchase",
+        )
         .reduce((sum: number, a: any) => sum + parseInt(a.value || "0"), 0);
 
       const actionValues = insight.action_values ?? [];
       const revenue = actionValues
-        .filter((a: any) => a.action_type === "offsite_conversion.fb_pixel_purchase")
+        .filter(
+          (a: any) => a.action_type === "offsite_conversion.fb_pixel_purchase",
+        )
         .reduce((sum: number, a: any) => sum + parseFloat(a.value || "0"), 0);
 
-      metrics.push(this.buildMetric(adId, insight.date_start, {
-        impressions: insight.impressions,
-        clicks: insight.clicks,
-        spend: insight.spend,
-        conversions,
-        revenue,
-      }));
+      metrics.push(
+        this.buildMetric(adId, insight.date_start, {
+          impressions: insight.impressions,
+          clicks: insight.clicks,
+          spend: insight.spend,
+          conversions,
+          revenue,
+        }),
+      );
     }
 
     await this.batchUpsertMetrics(metrics);
@@ -210,9 +243,14 @@ export class CampaignSyncProcessor {
     campaignId?: string,
   ): Promise<void> {
     let token = accessToken;
-    if (account.tokenExpiresAt && new Date() >= account.tokenExpiresAt && refreshToken) {
+    if (
+      account.tokenExpiresAt &&
+      new Date() >= account.tokenExpiresAt &&
+      refreshToken
+    ) {
       try {
-        const refreshed = await this.googleConnector.refreshAccessToken(refreshToken);
+        const refreshed =
+          await this.googleConnector.refreshAccessToken(refreshToken);
         token = refreshed.accessToken;
         await this.accountRepo.update(account.id, {
           accessToken: this.encrypt(token),
@@ -245,13 +283,15 @@ export class CampaignSyncProcessor {
 
       for (const adSet of matched.adSets ?? []) {
         for (const ad of adSet.ads ?? []) {
-          metrics.push(this.buildMetric(ad.id, row.date, {
-            impressions: row.impressions,
-            clicks: row.clicks,
-            spend: row.costMicros / 1_000_000,
-            conversions: row.conversions,
-            revenue: row.conversionValue ?? 0,
-          }));
+          metrics.push(
+            this.buildMetric(ad.id, row.date, {
+              impressions: row.impressions,
+              clicks: row.clicks,
+              spend: row.costMicros / 1_000_000,
+              conversions: row.conversions,
+              revenue: row.conversionValue ?? 0,
+            }),
+          );
         }
       }
     }
@@ -268,12 +308,16 @@ export class CampaignSyncProcessor {
   ): Promise<void> {
     const advertiserId = account.externalAccountId;
 
-    const rows = await this.tiktokConnector.getInsights(advertiserId, accessToken, {
-      since,
-      until,
-      campaignId,
-      level: "CAMPAIGN",
-    });
+    const rows = await this.tiktokConnector.getInsights(
+      advertiserId,
+      accessToken,
+      {
+        since,
+        until,
+        campaignId,
+        level: "CAMPAIGN",
+      },
+    );
 
     const campaigns = await this.campaignRepo.find({
       where: { workspaceId: account.workspaceId, platform: Platform.TIKTOK },
@@ -289,13 +333,15 @@ export class CampaignSyncProcessor {
 
       for (const adSet of matched.adSets ?? []) {
         for (const ad of adSet.ads ?? []) {
-          metrics.push(this.buildMetric(ad.id, row.date, {
-            impressions: row.impressions,
-            clicks: row.clicks,
-            spend: row.spend,
-            conversions: row.conversions,
-            revenue: 0,
-          }));
+          metrics.push(
+            this.buildMetric(ad.id, row.date, {
+              impressions: row.impressions,
+              clicks: row.clicks,
+              spend: row.spend,
+              conversions: row.conversions,
+              revenue: 0,
+            }),
+          );
         }
       }
     }
@@ -311,10 +357,14 @@ export class CampaignSyncProcessor {
   ): Promise<void> {
     const accountLogin = account.externalAccountId;
 
-    const rows = await this.yandexConnector.getInsights(accessToken, accountLogin, {
-      since,
-      until,
-    });
+    const rows = await this.yandexConnector.getInsights(
+      accessToken,
+      accountLogin,
+      {
+        since,
+        until,
+      },
+    );
 
     const campaigns = await this.campaignRepo.find({
       where: { workspaceId: account.workspaceId, platform: Platform.YANDEX },
@@ -330,13 +380,15 @@ export class CampaignSyncProcessor {
 
       for (const adSet of matched.adSets ?? []) {
         for (const ad of adSet.ads ?? []) {
-          metrics.push(this.buildMetric(ad.id, row.date, {
-            impressions: row.impressions,
-            clicks: row.clicks,
-            spend: row.cost,
-            conversions: row.conversions,
-            revenue: 0,
-          }));
+          metrics.push(
+            this.buildMetric(ad.id, row.date, {
+              impressions: row.impressions,
+              clicks: row.clicks,
+              spend: row.cost,
+              conversions: row.conversions,
+              revenue: 0,
+            }),
+          );
         }
       }
     }
@@ -349,12 +401,20 @@ export class CampaignSyncProcessor {
   private buildMetric(
     adId: string,
     date: string,
-    data: { impressions: number; clicks: number; spend: number; conversions: number; revenue: number },
+    data: {
+      impressions: number;
+      clicks: number;
+      spend: number;
+      conversions: number;
+      revenue: number;
+    },
   ): MetricPayload {
-    const ctr = data.impressions > 0 ? (data.clicks / data.impressions) * 100 : 0;
+    const ctr =
+      data.impressions > 0 ? (data.clicks / data.impressions) * 100 : 0;
     const cpa = data.conversions > 0 ? data.spend / data.conversions : 0;
     const roas = data.spend > 0 ? data.revenue / data.spend : 0;
-    const cpm = data.impressions > 0 ? (data.spend / data.impressions) * 1000 : 0;
+    const cpm =
+      data.impressions > 0 ? (data.spend / data.impressions) * 1000 : 0;
 
     return {
       adId,
@@ -384,7 +444,17 @@ export class CampaignSyncProcessor {
       .into(PerformanceMetric)
       .values(metrics)
       .orUpdate(
-        ["impressions", "clicks", "spend", "conversions", "revenue", "ctr", "cpa", "roas", "cpm"],
+        [
+          "impressions",
+          "clicks",
+          "spend",
+          "conversions",
+          "revenue",
+          "ctr",
+          "cpa",
+          "roas",
+          "cpm",
+        ],
         ["ad_id", "recorded_at"],
       )
       .execute();
@@ -401,7 +471,11 @@ export class CampaignSyncProcessor {
     if (!ivHex || !encrypted) throw new Error("Invalid encrypted token format");
 
     const iv = new Uint8Array(Buffer.from(ivHex, "hex"));
-    const decipher = crypto.createDecipheriv("aes-256-cbc", this.encryptionKey, iv);
+    const decipher = crypto.createDecipheriv(
+      "aes-256-cbc",
+      this.encryptionKey,
+      iv,
+    );
     let decrypted = decipher.update(encrypted, "hex", "utf8");
     decrypted += decipher.final("utf8");
     return decrypted;

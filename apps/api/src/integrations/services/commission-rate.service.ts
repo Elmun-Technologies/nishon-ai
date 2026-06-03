@@ -1,24 +1,24 @@
-import { Injectable, Logger } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, LessThanOrEqual, MoreThanOrEqual, IsNull } from 'typeorm'
-import { CommissionRate } from '../entities'
+import { Injectable, Logger } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository, LessThanOrEqual, MoreThanOrEqual, IsNull } from "typeorm";
+import { CommissionRate } from "../entities";
 
 interface CreateRateInput {
-  workspaceId: string
-  connectionId?: string
-  specialistTier: 'junior' | 'senior' | 'manager'
-  baseRate: number
-  performanceBonus?: boolean
-  performanceBonusRate?: number
-  minDealValueForBonus?: number
-  effectiveFrom: Date
-  effectiveTo?: Date
-  notes?: string
+  workspaceId: string;
+  connectionId?: string;
+  specialistTier: "junior" | "senior" | "manager";
+  baseRate: number;
+  performanceBonus?: boolean;
+  performanceBonusRate?: number;
+  minDealValueForBonus?: number;
+  effectiveFrom: Date;
+  effectiveTo?: Date;
+  notes?: string;
 }
 
 @Injectable()
 export class CommissionRateService {
-  private readonly logger = new Logger(CommissionRateService.name)
+  private readonly logger = new Logger(CommissionRateService.name);
 
   constructor(
     @InjectRepository(CommissionRate)
@@ -30,7 +30,7 @@ export class CommissionRateService {
    */
   async getRate(
     workspaceId: string,
-    specialistTier: 'junior' | 'senior' | 'manager',
+    specialistTier: "junior" | "senior" | "manager",
     date: Date = new Date(),
   ): Promise<CommissionRate | null> {
     const rate = await this.commissionRateRepository.findOne({
@@ -50,10 +50,10 @@ export class CommissionRateService {
           isActive: true,
         },
       ],
-      order: { effectiveFrom: 'DESC' },
-    })
+      order: { effectiveFrom: "DESC" },
+    });
 
-    return rate || null
+    return rate || null;
   }
 
   /**
@@ -68,12 +68,12 @@ export class CommissionRateService {
           specialistTier: input.specialistTier,
           effectiveFrom: input.effectiveFrom,
         },
-      })
+      });
 
       if (existing) {
         throw new Error(
           `Rate already exists for tier ${input.specialistTier} effective ${input.effectiveFrom}`,
-        )
+        );
       }
 
       // If effectiveTo not provided, end the previous active rate
@@ -85,21 +85,23 @@ export class CommissionRateService {
             isActive: true,
             effectiveTo: IsNull(),
           },
-          order: { effectiveFrom: 'DESC' },
-        })
+          order: { effectiveFrom: "DESC" },
+        });
 
         if (previousRate) {
-          previousRate.effectiveTo = new Date(input.effectiveFrom.getTime() - 1)
-          previousRate.isActive = false
-          await this.commissionRateRepository.save(previousRate)
+          previousRate.effectiveTo = new Date(
+            input.effectiveFrom.getTime() - 1,
+          );
+          previousRate.isActive = false;
+          await this.commissionRateRepository.save(previousRate);
         }
       }
 
-      const rate = this.commissionRateRepository.create(input)
-      return this.commissionRateRepository.save(rate)
+      const rate = this.commissionRateRepository.create(input);
+      return this.commissionRateRepository.save(rate);
     } catch (error) {
-      this.logger.error(`Failed to create rate: ${error.message}`)
-      throw error
+      this.logger.error(`Failed to create rate: ${error.message}`);
+      throw error;
     }
   }
 
@@ -109,22 +111,22 @@ export class CommissionRateService {
   async updateRate(
     rateId: string,
     updates: {
-      baseRate?: number
-      performanceBonusRate?: number
-      effectiveTo?: Date
-      notes?: string
+      baseRate?: number;
+      performanceBonusRate?: number;
+      effectiveTo?: Date;
+      notes?: string;
     },
   ): Promise<CommissionRate> {
     const rate = await this.commissionRateRepository.findOne({
       where: { id: rateId },
-    })
+    });
 
     if (!rate) {
-      throw new Error(`Rate not found: ${rateId}`)
+      throw new Error(`Rate not found: ${rateId}`);
     }
 
-    Object.assign(rate, updates)
-    return this.commissionRateRepository.save(rate)
+    Object.assign(rate, updates);
+    return this.commissionRateRepository.save(rate);
   }
 
   /**
@@ -134,14 +136,17 @@ export class CommissionRateService {
     workspaceId: string,
     activeOnly: boolean = false,
   ): Promise<CommissionRate[]> {
-    const query = this.commissionRateRepository.createQueryBuilder('rate')
-    query.where('rate.workspaceId = :workspaceId', { workspaceId })
+    const query = this.commissionRateRepository.createQueryBuilder("rate");
+    query.where("rate.workspaceId = :workspaceId", { workspaceId });
 
     if (activeOnly) {
-      query.andWhere('rate.isActive = true')
+      query.andWhere("rate.isActive = true");
     }
 
-    return query.orderBy('rate.specialistTier', 'ASC').addOrderBy('rate.effectiveFrom', 'DESC').getMany()
+    return query
+      .orderBy("rate.specialistTier", "ASC")
+      .addOrderBy("rate.effectiveFrom", "DESC")
+      .getMany();
   }
 
   /**
@@ -149,15 +154,15 @@ export class CommissionRateService {
    */
   async getHistory(
     workspaceId: string,
-    specialistTier: 'junior' | 'senior' | 'manager',
+    specialistTier: "junior" | "senior" | "manager",
   ): Promise<CommissionRate[]> {
     return this.commissionRateRepository.find({
       where: {
         workspaceId,
         specialistTier,
       },
-      order: { effectiveFrom: 'DESC' },
-    })
+      order: { effectiveFrom: "DESC" },
+    });
   }
 
   /**
@@ -166,28 +171,28 @@ export class CommissionRateService {
   async deactivateRate(rateId: string): Promise<CommissionRate> {
     const rate = await this.commissionRateRepository.findOne({
       where: { id: rateId },
-    })
+    });
 
     if (!rate) {
-      throw new Error(`Rate not found: ${rateId}`)
+      throw new Error(`Rate not found: ${rateId}`);
     }
 
-    rate.isActive = false
-    rate.effectiveTo = new Date()
+    rate.isActive = false;
+    rate.effectiveTo = new Date();
 
-    return this.commissionRateRepository.save(rate)
+    return this.commissionRateRepository.save(rate);
   }
 
   /**
    * Get default rates for workspace (initial setup)
    */
   async initializeDefaultRates(workspaceId: string): Promise<CommissionRate[]> {
-    const now = new Date()
+    const now = new Date();
 
     const defaultRates = [
       {
         workspaceId,
-        specialistTier: 'junior' as const,
+        specialistTier: "junior" as const,
         baseRate: 5.0,
         performanceBonus: true,
         performanceBonusRate: 2.0,
@@ -197,7 +202,7 @@ export class CommissionRateService {
       },
       {
         workspaceId,
-        specialistTier: 'senior' as const,
+        specialistTier: "senior" as const,
         baseRate: 8.5,
         performanceBonus: true,
         performanceBonusRate: 3.0,
@@ -207,7 +212,7 @@ export class CommissionRateService {
       },
       {
         workspaceId,
-        specialistTier: 'manager' as const,
+        specialistTier: "manager" as const,
         baseRate: 12.0,
         performanceBonus: true,
         performanceBonusRate: 4.0,
@@ -215,10 +220,12 @@ export class CommissionRateService {
         effectiveFrom: now,
         isActive: true,
       },
-    ]
+    ];
 
-    const saved = await this.commissionRateRepository.save(defaultRates)
-    this.logger.log(`Initialized default commission rates for workspace ${workspaceId}`)
-    return saved
+    const saved = await this.commissionRateRepository.save(defaultRates);
+    this.logger.log(
+      `Initialized default commission rates for workspace ${workspaceId}`,
+    );
+    return saved;
   }
 }

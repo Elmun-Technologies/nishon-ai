@@ -124,25 +124,21 @@ describe("MarketplaceSearchService", () => {
     _agentLanguageRepository = module.get<Repository<AgentLanguage>>(
       getRepositoryToken(AgentLanguage),
     );
-    agentGeographicCoverageRepository =
-      module.get<Repository<AgentGeographicCoverage>>(
-        getRepositoryToken(AgentGeographicCoverage),
-      );
-    agentPlatformMetricsRepository =
-      module.get<Repository<AgentPlatformMetrics>>(
-        getRepositoryToken(AgentPlatformMetrics),
-      );
+    agentGeographicCoverageRepository = module.get<
+      Repository<AgentGeographicCoverage>
+    >(getRepositoryToken(AgentGeographicCoverage));
+    agentPlatformMetricsRepository = module.get<
+      Repository<AgentPlatformMetrics>
+    >(getRepositoryToken(AgentPlatformMetrics));
     _agentReviewRepository = module.get<Repository<AgentReview>>(
       getRepositoryToken(AgentReview),
     );
-    _agentHistoricalPerformanceRepository =
-      module.get<Repository<AgentHistoricalPerformance>>(
-        getRepositoryToken(AgentHistoricalPerformance),
-      );
-    marketplaceCertificationRepository =
-      module.get<Repository<MarketplaceCertification>>(
-        getRepositoryToken(MarketplaceCertification),
-      );
+    _agentHistoricalPerformanceRepository = module.get<
+      Repository<AgentHistoricalPerformance>
+    >(getRepositoryToken(AgentHistoricalPerformance));
+    marketplaceCertificationRepository = module.get<
+      Repository<MarketplaceCertification>
+    >(getRepositoryToken(MarketplaceCertification));
   });
 
   describe("searchSpecialists", () => {
@@ -354,9 +350,9 @@ describe("MarketplaceSearchService", () => {
         .spyOn(agentProfileRepository, "createQueryBuilder")
         .mockReturnValue(mockQueryBuilder as any);
 
-      await expect(
-        service.getSpecialistDetail("non-existent"),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.getSpecialistDetail("non-existent")).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -377,9 +373,7 @@ describe("MarketplaceSearchService", () => {
         .spyOn(agentPlatformMetricsRepository, "createQueryBuilder")
         .mockReturnValue(mockMetricsQueryBuilder as any);
 
-      const result = await service.getSpecialistPerformance(
-        "test-specialist",
-      );
+      const result = await service.getSpecialistPerformance("test-specialist");
 
       expect(result).toBeDefined();
       expect(result.slug).toBe("test-specialist");
@@ -387,9 +381,7 @@ describe("MarketplaceSearchService", () => {
     });
 
     it("should throw NotFoundException if specialist not found", async () => {
-      jest
-        .spyOn(agentProfileRepository, "findOne")
-        .mockResolvedValue(null);
+      jest.spyOn(agentProfileRepository, "findOne").mockResolvedValue(null);
 
       await expect(
         service.getSpecialistPerformance("non-existent"),
@@ -418,9 +410,7 @@ describe("MarketplaceSearchService", () => {
     });
 
     it("should throw NotFoundException if agent not found", async () => {
-      jest
-        .spyOn(agentProfileRepository, "findOne")
-        .mockResolvedValue(null);
+      jest.spyOn(agentProfileRepository, "findOne").mockResolvedValue(null);
 
       await expect(
         service.updateSearchKeywords("non-existent"),

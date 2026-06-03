@@ -1,8 +1,14 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { ConfigService } from "@nestjs/config";
-import { BadRequestException, InternalServerErrorException } from "@nestjs/common";
-import { StrategyEngineService, StrategyInput } from "./strategy-engine.service";
+import {
+  BadRequestException,
+  InternalServerErrorException,
+} from "@nestjs/common";
+import {
+  StrategyEngineService,
+  StrategyInput,
+} from "./strategy-engine.service";
 import { Workspace } from "../workspaces/entities/workspace.entity";
 
 // Shared mock for completeJson so tests can change its behavior
@@ -108,7 +114,9 @@ describe("StrategyEngineService", () => {
       const result = await service.generateForWorkspace("ws-1");
 
       expect(result).toBeDefined();
-      expect(result.summary).toBe("Strong potential in local e-commerce market");
+      expect(result.summary).toBe(
+        "Strong potential in local e-commerce market",
+      );
       expect(result.generatedAt).toBeInstanceOf(Date);
       expect(workspaceRepo.update).toHaveBeenCalledWith(
         "ws-1",
@@ -119,9 +127,9 @@ describe("StrategyEngineService", () => {
     it("should throw NotFoundException when workspace does not exist", async () => {
       workspaceRepo.findOne.mockResolvedValue(null);
 
-      await expect(service.generateForWorkspace("non-existent")).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(
+        service.generateForWorkspace("non-existent"),
+      ).rejects.toThrow(BadRequestException);
     });
 
     it("should throw InternalServerErrorException when AI call fails", async () => {
@@ -155,7 +163,10 @@ describe("StrategyEngineService", () => {
 
       const result = await service.generateStrategy(input);
 
-      const total = Object.values(result.budgetAllocation).reduce((a, b) => a + b, 0);
+      const total = Object.values(result.budgetAllocation).reduce(
+        (a, b) => a + b,
+        0,
+      );
       expect(Math.abs(total - 100)).toBeLessThanOrEqual(3); // within rounding margin
     });
 

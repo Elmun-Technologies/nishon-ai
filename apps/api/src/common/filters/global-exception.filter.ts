@@ -38,7 +38,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const err = exception instanceof Error ? exception : undefined;
     const driverMsg =
       err && "driverError" in err
-        ? String((err as { driverError?: { message?: string } }).driverError?.message ?? "")
+        ? String(
+            (err as { driverError?: { message?: string } }).driverError
+              ?.message ?? "",
+          )
         : "";
 
     if (!isHttpException || status >= 500) {

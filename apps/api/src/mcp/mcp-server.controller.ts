@@ -97,7 +97,11 @@ export class McpServerController {
             return this.rpcError(id, -32602, `Noma'lum tool: ${toolName}`);
           }
 
-          const toolResult = await this.toolsService.callTool(toolName, toolArgs, ctx);
+          const toolResult = await this.toolsService.callTool(
+            toolName,
+            toolArgs,
+            ctx,
+          );
           return this.rpcResult(id, toolResult);
         }
 

@@ -41,7 +41,9 @@ export class MetaCronService {
       const workspaceIds = [...new Set(accounts.map((a) => a.workspaceId))];
 
       if (workspaceIds.length === 0) {
-        this.logger.log("Auto-sync skipped — no active Meta integrations found");
+        this.logger.log(
+          "Auto-sync skipped — no active Meta integrations found",
+        );
         return;
       }
 
@@ -63,7 +65,7 @@ export class MetaCronService {
           });
 
           // Notify frontend in real-time
-          this.eventsGateway.emitToWorkspace(workspaceId, 'meta_synced', {
+          this.eventsGateway.emitToWorkspace(workspaceId, "meta_synced", {
             workspaceId,
             campaignsSynced: result.campaignsSynced,
             timestamp: new Date().toISOString(),

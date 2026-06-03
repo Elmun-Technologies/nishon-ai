@@ -19,7 +19,12 @@ import * as cryptoUtil from "../common/crypto.util";
  */
 describe("LaunchOrchestratorService", () => {
   let service: LaunchOrchestratorService;
-  let launchRepo: { findOne: jest.Mock; save: jest.Mock; create: jest.Mock; find: jest.Mock };
+  let launchRepo: {
+    findOne: jest.Mock;
+    save: jest.Mock;
+    create: jest.Mock;
+    find: jest.Mock;
+  };
   let accountRepo: { findOne: jest.Mock };
   let workspaceRepo: { findOne: jest.Mock };
   let memberRepo: { findOne: jest.Mock };
@@ -62,17 +67,19 @@ describe("LaunchOrchestratorService", () => {
       createAdSet: jest.fn().mockResolvedValue({ id: "adset_1" }),
       getCampaignAds: jest
         .fn()
-        .mockResolvedValue([{ id: "ad_a", name: "A", creativeId: "cr_1", status: "ACTIVE" }]),
-      createAdFromExistingCreative: jest.fn().mockResolvedValue({ id: "ad_new" }),
+        .mockResolvedValue([
+          { id: "ad_a", name: "A", creativeId: "cr_1", status: "ACTIVE" },
+        ]),
+      createAdFromExistingCreative: jest
+        .fn()
+        .mockResolvedValue({ id: "ad_new" }),
       createAdCreative: jest.fn().mockResolvedValue({ id: "cr_inline" }),
     };
     const mockGoogle = { createCampaign: jest.fn() };
 
     // Stub decryption — the real implementation requires a 32-byte key and
     // a specific AES-GCM payload format we do not need in unit tests.
-    jest
-      .spyOn(cryptoUtil, "decrypt")
-      .mockReturnValue("plain-token");
+    jest.spyOn(cryptoUtil, "decrypt").mockReturnValue("plain-token");
     jest
       .spyOn(cryptoUtil, "resolveEncryptionKey")
       .mockReturnValue("0".repeat(32));
@@ -81,7 +88,10 @@ describe("LaunchOrchestratorService", () => {
       providers: [
         LaunchOrchestratorService,
         { provide: getRepositoryToken(LaunchJob), useValue: launchRepo },
-        { provide: getRepositoryToken(ConnectedAccount), useValue: accountRepo },
+        {
+          provide: getRepositoryToken(ConnectedAccount),
+          useValue: accountRepo,
+        },
         { provide: getRepositoryToken(WorkspaceMember), useValue: memberRepo },
         { provide: getRepositoryToken(Workspace), useValue: workspaceRepo },
         { provide: ConfigService, useValue: mockConfig },
@@ -205,9 +215,7 @@ describe("LaunchOrchestratorService", () => {
           objective: "OUTCOME_SALES",
           budgetType: "CBO",
           dailyBudget: 40,
-          audiences: [
-            { name: "A", funnelStage: "acquisition_prospecting" },
-          ],
+          audiences: [{ name: "A", funnelStage: "acquisition_prospecting" }],
           sourceCampaignIds: ["src_camp_1", "src_camp_2"],
           copyCreatives: true,
         }),
@@ -226,7 +234,9 @@ describe("LaunchOrchestratorService", () => {
 
       expect(metaConnector.getCampaignAds).toHaveBeenCalledTimes(2);
       // 1 ad set × 2 non-null creatives
-      expect(metaConnector.createAdFromExistingCreative).toHaveBeenCalledTimes(2);
+      expect(metaConnector.createAdFromExistingCreative).toHaveBeenCalledTimes(
+        2,
+      );
       const savedResult = (result.payload as any).launchResult;
       expect(savedResult.sourceCreativeCount).toBe(2);
       expect(savedResult.adIds).toEqual(["ad_new", "ad_new"]);
@@ -267,8 +277,11 @@ describe("LaunchOrchestratorService", () => {
       // No source-campaign copy path was taken.
       expect(metaConnector.getCampaignAds).not.toHaveBeenCalled();
       // 2 ad sets × 1 inline creative = 2 ads, each from the inline creative id.
-      expect(metaConnector.createAdFromExistingCreative).toHaveBeenCalledTimes(2);
-      const firstAd = metaConnector.createAdFromExistingCreative.mock.calls[0][2];
+      expect(metaConnector.createAdFromExistingCreative).toHaveBeenCalledTimes(
+        2,
+      );
+      const firstAd =
+        metaConnector.createAdFromExistingCreative.mock.calls[0][2];
       expect(firstAd.existingCreativeId).toBe("cr_inline");
       const savedResult = (result.payload as any).launchResult;
       expect(savedResult.adIds).toEqual(["ad_new", "ad_new"]);

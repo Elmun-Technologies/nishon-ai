@@ -22,7 +22,13 @@ import { QUEUE_NAMES } from "./queue.constants";
 @Module({
   imports: [
     ConfigModule,
-    TypeOrmModule.forFeature([Workspace, Campaign, AiDecision, PerformanceMetric, ConnectedAccount]),
+    TypeOrmModule.forFeature([
+      Workspace,
+      Campaign,
+      AiDecision,
+      PerformanceMetric,
+      ConnectedAccount,
+    ]),
     HttpModule,
     // Register Bull queues — each connects to Redis automatically
     BullModule.forRootAsync({

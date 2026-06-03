@@ -34,8 +34,13 @@ export class RetargetRedisService implements OnApplicationShutdown {
 
   async setTelegramChatId(phoneDigits: string, chatId: string): Promise<void> {
     const client = await this.getClient();
-    await client.set(this.telegramKey(phoneDigits), chatId, { EX: TELEGRAM_LINK_TTL_SEC });
-    this.logger.log({ message: "Telegram chat_id Redis ga yozildi", phoneDigits });
+    await client.set(this.telegramKey(phoneDigits), chatId, {
+      EX: TELEGRAM_LINK_TTL_SEC,
+    });
+    this.logger.log({
+      message: "Telegram chat_id Redis ga yozildi",
+      phoneDigits,
+    });
   }
 
   async getTelegramChatId(phoneDigits: string): Promise<string | null> {
@@ -49,7 +54,10 @@ export class RetargetRedisService implements OnApplicationShutdown {
     const client = await this.getClient();
     const map = new Map<string, string>();
     try {
-      for await (const key of client.scanIterator({ MATCH: `${TELEGRAM_LINK_PREFIX}*`, COUNT: 200 })) {
+      for await (const key of client.scanIterator({
+        MATCH: `${TELEGRAM_LINK_PREFIX}*`,
+        COUNT: 200,
+      })) {
         const raw = await client.get(key);
         if (!raw) continue;
         const phone = key.slice(TELEGRAM_LINK_PREFIX.length);
@@ -61,7 +69,10 @@ export class RetargetRedisService implements OnApplicationShutdown {
     return map;
   }
 
-  async setSignal(phoneDigits: string, payload: RetargetSignalPayload): Promise<void> {
+  async setSignal(
+    phoneDigits: string,
+    payload: RetargetSignalPayload,
+  ): Promise<void> {
     const client = await this.getClient();
     const key = this.keyForPhone(phoneDigits);
     await client.set(key, JSON.stringify(payload), { EX: THIRTY_DAYS_SEC });
@@ -78,11 +89,16 @@ export class RetargetRedisService implements OnApplicationShutdown {
     }
   }
 
-  async listAllSignals(): Promise<Array<{ phone: string; payload: RetargetSignalPayload }>> {
+  async listAllSignals(): Promise<
+    Array<{ phone: string; payload: RetargetSignalPayload }>
+  > {
     const client = await this.getClient();
     const out: Array<{ phone: string; payload: RetargetSignalPayload }> = [];
     try {
-      for await (const key of client.scanIterator({ MATCH: `${RETARGET_KEY_PREFIX}*`, COUNT: 200 })) {
+      for await (const key of client.scanIterator({
+        MATCH: `${RETARGET_KEY_PREFIX}*`,
+        COUNT: 200,
+      })) {
         const raw = await client.get(key);
         if (!raw) continue;
         try {

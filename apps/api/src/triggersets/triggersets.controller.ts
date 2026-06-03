@@ -1,8 +1,23 @@
 import {
-  Controller, Get, Post, Patch, Delete, Body, Param,
-  Query, UseGuards, Request, HttpCode, HttpStatus,
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+  Request,
+  HttpCode,
+  HttpStatus,
 } from "@nestjs/common";
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiParam } from "@nestjs/swagger";
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+} from "@nestjs/swagger";
 import { AuthGuard } from "@nestjs/passport";
 import { TriggersetService, CreateTriggersetDto } from "./triggersets.service";
 
@@ -20,7 +35,9 @@ export class TriggersetController {
   }
 
   @Get("summary")
-  @ApiOperation({ summary: "Daily/total counts of automation actions for a workspace" })
+  @ApiOperation({
+    summary: "Daily/total counts of automation actions for a workspace",
+  })
   getSummary(
     @Request() req: any,
     @Query("workspaceId") workspaceId: string,
@@ -63,7 +80,11 @@ export class TriggersetController {
 
   @Get(":id/logs")
   @ApiOperation({ summary: "Get run history for a triggerset" })
-  getLogs(@Request() req: any, @Param("id") id: string, @Query("limit") limit?: string) {
+  getLogs(
+    @Request() req: any,
+    @Param("id") id: string,
+    @Query("limit") limit?: string,
+  ) {
     return this.service.getLogs(id, req.user.id, limit ? parseInt(limit) : 20);
   }
 

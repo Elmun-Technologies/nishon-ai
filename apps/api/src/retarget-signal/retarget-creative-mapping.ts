@@ -63,13 +63,23 @@ function norm(s: string): string {
 /**
  * `productId` masalan: "Krossovka Nike", "Sumka Zara", "Soat Casio"
  */
-export function resolveRetargetCreativeMapping(productId?: string | null): RetargetCreativeRule {
+export function resolveRetargetCreativeMapping(
+  productId?: string | null,
+): RetargetCreativeRule {
   const p = norm(productId || "");
   if (!p) return RULE_DEFAULT;
-  if (p.includes("krossovka") || p.includes("cross") || p.includes("krosovka")) return RULE_KROSSOVKA;
-  if (p.includes("sumka") || p.includes("bag") || p.includes("zara")) return RULE_SUMKA;
-  if (p.includes("soat") || p.includes("casio") || p.includes("watch")) return RULE_SOAT;
+  if (p.includes("krossovka") || p.includes("cross") || p.includes("krosovka"))
+    return RULE_KROSSOVKA;
+  if (p.includes("sumka") || p.includes("bag") || p.includes("zara"))
+    return RULE_SUMKA;
+  if (p.includes("soat") || p.includes("casio") || p.includes("watch"))
+    return RULE_SOAT;
   return RULE_DEFAULT;
 }
 
-export const RETARGET_MAPPING_KEYS = [RULE_KROSSOVKA.key, RULE_SUMKA.key, RULE_SOAT.key, RULE_DEFAULT.key] as const;
+export const RETARGET_MAPPING_KEYS = [
+  RULE_KROSSOVKA.key,
+  RULE_SUMKA.key,
+  RULE_SOAT.key,
+  RULE_DEFAULT.key,
+] as const;

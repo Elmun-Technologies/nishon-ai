@@ -6,11 +6,11 @@ import { UserPlan } from "../users/entities/user.entity";
  */
 export interface PlanLimits {
   maxWorkspaces: number;
-  maxCampaigns: number;        // per workspace
+  maxCampaigns: number; // per workspace
   maxConnectedAccounts: number; // per workspace
-  canHireAgents: boolean;       // access to marketplace
+  canHireAgents: boolean; // access to marketplace
   canCreateAgentProfile: boolean; // can list themselves as targetologist
-  canBuildAiAgent: boolean;     // can create custom AI agent
+  canBuildAiAgent: boolean; // can create custom AI agent
   aiStrategyGenerations: number; // per month (-1 = unlimited)
   landingPageGenerations: number; // per month (-1 = unlimited)
 }

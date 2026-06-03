@@ -47,7 +47,7 @@ export type MetaCampaign = {
 
 export type MetaInsightRow = {
   campaignId: string;
-  date: string;          // YYYY-MM-DD
+  date: string; // YYYY-MM-DD
   spend: number;
   impressions: number;
   clicks: number;
@@ -177,7 +177,8 @@ export class MetaAdsService {
     }>(
       `${GRAPH_BASE}/${accountPath}/insights`,
       {
-        fields: "campaign_id,date_start,spend,impressions,clicks,ctr,cpc,actions,action_value",
+        fields:
+          "campaign_id,date_start,spend,impressions,clicks,ctr,cpc,actions,action_value",
         level: "campaign",
         date_preset: datePreset,
         time_increment: 1, // daily breakdown — one row per campaign per day
@@ -197,7 +198,9 @@ export class MetaAdsService {
       let conversions = 0;
       if (row.actions && Array.isArray(row.actions)) {
         const purchaseAction = row.actions.find(
-          (a) => a.action_type === "purchase" || a.action_type === "offsite_conversion.fb_pixel_purchase",
+          (a) =>
+            a.action_type === "purchase" ||
+            a.action_type === "offsite_conversion.fb_pixel_purchase",
         );
         if (purchaseAction) {
           conversions = parseInt(purchaseAction.value, 10) || 0;

@@ -1,4 +1,9 @@
-import { Injectable, Logger, BadRequestException, InternalServerErrorException } from "@nestjs/common";
+import {
+  Injectable,
+  Logger,
+  BadRequestException,
+  InternalServerErrorException,
+} from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -45,7 +50,7 @@ export interface StrategyResult {
     emoji: string;
     percentage: number;
     monthlyAmount: number;
-    priority: 'primary' | 'secondary' | 'optional';
+    priority: "primary" | "secondary" | "optional";
     rationale: string;
     tactics: string[];
     expectedResult: string;
@@ -116,7 +121,9 @@ export class StrategyEngineService {
         );
       }
     } else {
-      this.logger.warn("AI provider API key is not configured — AI strategy generation will be unavailable");
+      this.logger.warn(
+        "AI provider API key is not configured — AI strategy generation will be unavailable",
+      );
     }
   }
 
@@ -163,7 +170,8 @@ export class StrategyEngineService {
         error: err?.message,
       });
       throw new InternalServerErrorException(
-        err?.message || "AI strategiya yaratishda xatolik yuz berdi. Qayta urinib ko'ring.",
+        err?.message ||
+          "AI strategiya yaratishda xatolik yuz berdi. Qayta urinib ko'ring.",
       );
     }
 
@@ -185,7 +193,9 @@ export class StrategyEngineService {
    */
   async generateStrategy(input: StrategyInput): Promise<StrategyResult> {
     if (!this.aiClient) {
-      throw new BadRequestException("AI features are not available: API key is not configured");
+      throw new BadRequestException(
+        "AI features are not available: API key is not configured",
+      );
     }
 
     const prompt = buildStrategyPrompt(input);
@@ -198,8 +208,8 @@ export class StrategyEngineService {
       prompt,
       STRATEGY_SYSTEM_PROMPT,
       {
-        taskType: 'strategy',
-        agentName: 'StrategyEngine',
+        taskType: "strategy",
+        agentName: "StrategyEngine",
         temperature: 0.4, // Lower = more consistent, professional output
       },
     );

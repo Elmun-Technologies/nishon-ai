@@ -76,7 +76,9 @@ export class LandingPagesController {
   @Patch(":id")
   @UseGuards(AuthGuard("jwt"))
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Update landing page content, settings, or pixel IDs" })
+  @ApiOperation({
+    summary: "Update landing page content, settings, or pixel IDs",
+  })
   @ApiParam({ name: "id", description: "Landing page UUID" })
   async update(
     @Param("id") id: string,
@@ -101,10 +103,7 @@ export class LandingPagesController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: "Toggle publish/unpublish landing page" })
   @ApiParam({ name: "id", description: "Landing page UUID" })
-  async togglePublish(
-    @Param("id") id: string,
-    @Request() req: any,
-  ) {
+  async togglePublish(@Param("id") id: string, @Request() req: any) {
     return this.service.togglePublish(id, req.user.id);
   }
 }

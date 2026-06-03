@@ -4,74 +4,74 @@ import {
   Column,
   CreateDateColumn,
   Index,
-} from 'typeorm'
+} from "typeorm";
 
 /**
  * Links individual contacts from AmoCRM to audience segments
  * Used for tracking membership and incremental sync operations
  */
-@Entity('segment_members')
-@Index(['segmentId', 'amoCrmContactId'])
-@Index(['amoCrmContactId'])
-@Index(['email'])
-@Index(['phone'])
-@Index(['syncStatus'])
+@Entity("segment_members")
+@Index(["segmentId", "amoCrmContactId"])
+@Index(["amoCrmContactId"])
+@Index(["email"])
+@Index(["phone"])
+@Index(["syncStatus"])
 export class SegmentMember {
-  @PrimaryGeneratedColumn('uuid')
-  id: string
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
   /**
    * Reference to AudienceSegment
    */
   @Column()
   @Index()
-  segmentId: string
+  segmentId: string;
 
   /**
    * AmoCRM contact ID
    */
   @Column()
-  amoCrmContactId: number
+  amoCrmContactId: number;
 
   /**
    * Contact email (used for syncing to platforms)
    */
   @Column({ nullable: true })
   @Index()
-  email: string
+  email: string;
 
   /**
    * Contact phone (alternative identifier for some platforms)
    */
   @Column({ nullable: true })
   @Index()
-  phone: string
+  phone: string;
 
   /**
    * When contact was added to segment
    */
   @CreateDateColumn()
-  addedAt: Date
+  addedAt: Date;
 
   /**
    * When contact was removed from segment (null if still member)
    */
   @Column({ nullable: true })
-  removedAt: Date
+  removedAt: Date;
 
   /**
    * Sync status for this membership
    */
   @Column({
-    type: 'enum',
-    enum: ['pending', 'synced', 'failed'],
-    default: 'pending',
+    type: "enum",
+    enum: ["pending", "synced", "failed"],
+    default: "pending",
   })
-  syncStatus: 'pending' | 'synced' | 'failed'
+  syncStatus: "pending" | "synced" | "failed";
 
   /**
    * Error message if sync failed for this contact
    */
   @Column({ nullable: true })
-  syncErrorMessage: string
+  syncErrorMessage: string;
 }

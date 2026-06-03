@@ -39,7 +39,10 @@ export class AiAgentController {
   @ApiOperation({
     summary: "Generate platform-specific ad scripts after onboarding",
   })
-  async generateScripts(@Param("workspaceId") workspaceId: string, @Body() dto: any) {
+  async generateScripts(
+    @Param("workspaceId") workspaceId: string,
+    @Body() dto: any,
+  ) {
     return this.aiAgentService.generateAdScripts(workspaceId, dto);
   }
 
@@ -113,7 +116,7 @@ export class AiAgentController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: "Score a creative using GPT-4o Vision" })
   async scoreCreative(@Body() dto: any) {
-    return this.aiAgentService.scoreCreative(dto)
+    return this.aiAgentService.scoreCreative(dto);
   }
 
   @Post("workspaces/:workspaceId/pipeline")
@@ -125,7 +128,10 @@ export class AiAgentController {
       "Each step is independent — partial results are returned if any step fails.",
   })
   @ApiParam({ name: "workspaceId", description: "Workspace UUID" })
-  @ApiResponse({ status: 200, description: "Pipeline result with per-step outputs and error map" })
+  @ApiResponse({
+    status: 200,
+    description: "Pipeline result with per-step outputs and error map",
+  })
   async runPipeline(
     @Param("workspaceId") workspaceId: string,
     @Body() dto: Omit<CampaignPipelineInput, "workspaceId">,
@@ -157,8 +163,8 @@ export class AiAgentController {
   @ApiOperation({
     summary: "Streaming chat — Server-Sent Events; same payload as /chat",
     description:
-      "Each event has the shape `data: {\"delta\":\"...\"}` followed by a " +
-      "final `data: {\"done\":true}`. Errors are sent as `data: {\"error\":\"...\"}` " +
+      'Each event has the shape `data: {"delta":"..."}` followed by a ' +
+      'final `data: {"done":true}`. Errors are sent as `data: {"error":"..."}` ' +
       "and the connection is closed.",
   })
   async chatStream(

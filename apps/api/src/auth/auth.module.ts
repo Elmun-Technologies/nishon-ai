@@ -33,7 +33,14 @@ import { Workspace } from "../workspaces/entities/workspace.entity";
     }),
   ],
   controllers: [AuthController, MetaAuthController],
-  providers: [AuthService, JwtStrategy, LocalStrategy, GoogleStrategy, FacebookStrategy, MetaOAuthService],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    LocalStrategy,
+    GoogleStrategy,
+    FacebookStrategy,
+    MetaOAuthService,
+  ],
   exports: [AuthService, JwtModule],
 })
 export class AuthModule {}

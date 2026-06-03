@@ -30,7 +30,12 @@ export class AgentReview {
   @Column({ length: 100, name: "author_name" })
   authorName: string;
 
-  @Column({ type: "varchar", length: 100, nullable: true, name: "author_company" })
+  @Column({
+    type: "varchar",
+    length: 100,
+    nullable: true,
+    name: "author_company",
+  })
   authorCompany: string | null;
 
   @Column({ type: "smallint" })

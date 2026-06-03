@@ -1,216 +1,224 @@
-import { IsString, IsEmail, IsOptional, IsNumber, IsObject, IsArray, ValidateNested } from 'class-validator'
-import { Type } from 'class-transformer'
+import {
+  IsString,
+  IsEmail,
+  IsOptional,
+  IsNumber,
+  IsObject,
+  IsArray,
+  ValidateNested,
+} from "class-validator";
+import { Type } from "class-transformer";
 
 export class CreateIntegrationAuthDto {
   @IsString()
-  code: string
+  code: string;
 
   @IsString()
-  state: string
+  state: string;
 
   @IsString()
-  redirectUri: string
+  redirectUri: string;
 }
 
 export class FieldMappingDto {
   @IsString()
-  nishonField: string
+  nishonField: string;
 
   @IsString()
-  crmField: string
-
-  @IsOptional()
-  @IsString()
-  transform?: string
+  crmField: string;
 
   @IsOptional()
   @IsString()
-  dataType?: 'string' | 'number' | 'date' | 'boolean'
+  transform?: string;
+
+  @IsOptional()
+  @IsString()
+  dataType?: "string" | "number" | "date" | "boolean";
 }
 
 export class SyncSettingsDto {
   @IsOptional()
-  enabled?: boolean
+  enabled?: boolean;
 
   @IsString()
-  frequency: 'real-time' | '15min' | '30min' | 'hourly' | 'daily'
+  frequency: "real-time" | "15min" | "30min" | "hourly" | "daily";
 
   @IsOptional()
   @IsNumber()
-  lookbackDays?: number
+  lookbackDays?: number;
 
   @IsOptional()
   @IsNumber()
-  batchSize?: number
+  batchSize?: number;
 
   @IsOptional()
   @IsNumber()
-  timeoutMs?: number
+  timeoutMs?: number;
 }
 
 export class SaveConfigurationDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => FieldMappingDto)
-  fieldMappings: FieldMappingDto[]
+  fieldMappings: FieldMappingDto[];
 
   @ValidateNested()
   @Type(() => SyncSettingsDto)
-  syncSettings: SyncSettingsDto
+  syncSettings: SyncSettingsDto;
 
   @IsOptional()
-  webhookEnabled?: boolean
+  webhookEnabled?: boolean;
 
   @IsOptional()
   @IsObject()
-  customFields?: Record<string, any>
+  customFields?: Record<string, any>;
 }
 
 export class ConversionEventDto {
   @IsString()
-  id: string
+  id: string;
 
   @IsEmail()
-  email: string
+  email: string;
 
   @IsOptional()
   @IsString()
-  phone?: string
+  phone?: string;
 
   @IsOptional()
   @IsString()
-  name?: string
+  name?: string;
 
   @IsString()
-  campaignId: string
+  campaignId: string;
 
   @IsString()
-  campaignName: string
+  campaignName: string;
 
   @IsString()
-  platform: 'meta' | 'google' | 'tiktok' | 'yandex'
+  platform: "meta" | "google" | "tiktok" | "yandex";
 
   @IsOptional()
   @IsString()
-  adSetId?: string
+  adSetId?: string;
 
   @IsString()
-  conversionType: string
+  conversionType: string;
 
   @IsNumber()
-  conversionValue: number
+  conversionValue: number;
 
   @IsString()
-  conversionCurrency: string
+  conversionCurrency: string;
 
   @IsString()
-  conversionTimestamp: string // ISO date string
+  conversionTimestamp: string; // ISO date string
 
   @IsOptional()
   @IsString()
-  sourceUrl?: string
+  sourceUrl?: string;
 
   @IsOptional()
   @IsObject()
-  metadata?: Record<string, any>
+  metadata?: Record<string, any>;
 }
 
 export class SyncConversionDto {
   @ValidateNested()
   @Type(() => ConversionEventDto)
-  conversion: ConversionEventDto
+  conversion: ConversionEventDto;
 }
 
 export class BatchSyncConversionsDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => ConversionEventDto)
-  conversions: ConversionEventDto[]
+  conversions: ConversionEventDto[];
 }
 
 export class IntegrationConnectionResponseDto {
-  id: string
-  integrationKey: string
-  externalAccountId: string
-  status: string
-  isActive: boolean
-  lastSyncedAt?: Date
-  connectedAt: Date
-  updatedAt: Date
+  id: string;
+  integrationKey: string;
+  externalAccountId: string;
+  status: string;
+  isActive: boolean;
+  lastSyncedAt?: Date;
+  connectedAt: Date;
+  updatedAt: Date;
 }
 
 export class IntegrationHealthStatusDto {
-  connectionId: string
-  integrationKey: string
-  status: string
-  lastSyncedAt?: Date
-  lastError?: string
-  errorCount: number
-  syncSuccessRate: number
-  nextScheduledSync?: Date
-  webhookLastReceived?: Date
-  metadata?: Record<string, any>
+  connectionId: string;
+  integrationKey: string;
+  status: string;
+  lastSyncedAt?: Date;
+  lastError?: string;
+  errorCount: number;
+  syncSuccessRate: number;
+  nextScheduledSync?: Date;
+  webhookLastReceived?: Date;
+  metadata?: Record<string, any>;
 }
 
 export class SyncLogEntryDto {
-  id: string
-  connectionId: string
-  event: string
-  status: string
-  recordsProcessed: number
-  recordsSkipped: number
-  recordsFailed: number
-  errorMessage?: string
-  metadata?: Record<string, any>
-  triggeredBy: string
-  createdAt: Date
+  id: string;
+  connectionId: string;
+  event: string;
+  status: string;
+  recordsProcessed: number;
+  recordsSkipped: number;
+  recordsFailed: number;
+  errorMessage?: string;
+  metadata?: Record<string, any>;
+  triggeredBy: string;
+  createdAt: Date;
 }
 
 export class SyncLogsResponseDto {
-  logs: SyncLogEntryDto[]
-  total: number
+  logs: SyncLogEntryDto[];
+  total: number;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Deal Sync DTOs
 
 export class DealSyncResultDto {
-  dealsProcessed: number
-  dealsWithRoas: number
-  dealsFailed: number
-  totalRevenue: number
-  aggregateRoas: number | null
+  dealsProcessed: number;
+  dealsWithRoas: number;
+  dealsFailed: number;
+  totalRevenue: number;
+  aggregateRoas: number | null;
 }
 
 export class PlatformRevenueDto {
-  revenue: number
-  spend: number
-  roas: number | null
-  dealCount: number
+  revenue: number;
+  spend: number;
+  roas: number | null;
+  dealCount: number;
 }
 
 export class RevenueAttributionDto {
-  totalRevenue: number
-  totalSpend: number
-  roas: number | null
-  dealCount: number
-  conversionCount: number
+  totalRevenue: number;
+  totalSpend: number;
+  roas: number | null;
+  dealCount: number;
+  conversionCount: number;
   byPlatform: {
-    meta: PlatformRevenueDto
-    google: PlatformRevenueDto
-    tiktok: PlatformRevenueDto
-    yandex: PlatformRevenueDto
-  }
+    meta: PlatformRevenueDto;
+    google: PlatformRevenueDto;
+    tiktok: PlatformRevenueDto;
+    yandex: PlatformRevenueDto;
+  };
 }
 
 export class RevenueTrendDto {
-  date: Date
-  revenue: number
-  deals: number
-  roas: number | null
+  date: Date;
+  revenue: number;
+  deals: number;
+  roas: number | null;
 }
 
 export class RevenueTrendsResponseDto {
-  trends: RevenueTrendDto[]
-  period: number
+  trends: RevenueTrendDto[];
+  period: number;
 }

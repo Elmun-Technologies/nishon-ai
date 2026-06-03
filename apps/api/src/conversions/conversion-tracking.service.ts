@@ -6,7 +6,11 @@ import {
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, Between, LessThanOrEqual } from "typeorm";
-import { ConversionEvent, ConversionEventType, ConversionSource } from "./entities/conversion-event.entity";
+import {
+  ConversionEvent,
+  ConversionEventType,
+  ConversionSource,
+} from "./entities/conversion-event.entity";
 
 export interface IngestConversionEventDto {
   campaignId: string;
@@ -169,7 +173,10 @@ export class ConversionTrackingService {
    * Delete old conversion events (retention policy).
    * Call this periodically to clean up old data.
    */
-  async deleteOldEvents(workspaceId: string, beforeDate: Date): Promise<number> {
+  async deleteOldEvents(
+    workspaceId: string,
+    beforeDate: Date,
+  ): Promise<number> {
     const result = await this.conversionEventRepo.delete({
       workspaceId,
       timestamp: LessThanOrEqual(beforeDate),
@@ -209,10 +216,7 @@ export class ConversionTrackingService {
     });
 
     // Group by date (YYYY-MM-DD)
-    const trendMap: Record<
-      string,
-      { conversions: number; value: number }
-    > = {};
+    const trendMap: Record<string, { conversions: number; value: number }> = {};
 
     events.forEach((event) => {
       const dateKey = event.timestamp.toISOString().split("T")[0];

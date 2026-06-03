@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
+import { MigrationInterface, QueryRunner, TableColumn } from "typeorm";
 
 /**
  * Adds trial_ends_at for time-boxed product demos (FREE plan).
@@ -6,21 +6,21 @@ import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
  */
 export class AddUserTrialEndsAt1745070000000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    if (await queryRunner.hasTable('users')) {
-      const hasTrial = await queryRunner.hasColumn('users', 'trial_ends_at');
+    if (await queryRunner.hasTable("users")) {
+      const hasTrial = await queryRunner.hasColumn("users", "trial_ends_at");
       if (!hasTrial) {
         await queryRunner.addColumn(
-          'users',
+          "users",
           new TableColumn({
-            name: 'trial_ends_at',
-            type: 'timestamp',
+            name: "trial_ends_at",
+            type: "timestamp",
             isNullable: true,
           }),
         );
       }
     }
 
-    if (await queryRunner.hasTable('users')) {
+    if (await queryRunner.hasTable("users")) {
       await queryRunner.query(`
       UPDATE "users"
       SET "trial_ends_at" = NOW() + INTERVAL '7 days'
@@ -30,8 +30,8 @@ export class AddUserTrialEndsAt1745070000000 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    if (await queryRunner.hasColumn('users', 'trial_ends_at')) {
-      await queryRunner.dropColumn('users', 'trial_ends_at');
+    if (await queryRunner.hasColumn("users", "trial_ends_at")) {
+      await queryRunner.dropColumn("users", "trial_ends_at");
     }
   }
 }

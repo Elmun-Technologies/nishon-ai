@@ -390,10 +390,9 @@ export class MarketplaceFixtures {
       for (const table of deletionOrder) {
         const ids = this.createdIds.get(table) || [];
         if (ids.length > 0) {
-          await queryRunner.query(
-            `DELETE FROM "${table}" WHERE id = ANY($1)`,
-            [ids],
-          );
+          await queryRunner.query(`DELETE FROM "${table}" WHERE id = ANY($1)`, [
+            ids,
+          ]);
         }
       }
 

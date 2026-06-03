@@ -12,7 +12,13 @@ import {
 import { Workspace } from "../../workspaces/entities/workspace.entity";
 import { AdSet } from "../../ad-sets/entities/ad-set.entity";
 import { AiDecision } from "../../ai-decisions/entities/ai-decision.entity";
-import { Platform, CampaignStatus, CampaignObjective, BudgetType, CampaignCurrency } from "@adspectr/shared";
+import {
+  Platform,
+  CampaignStatus,
+  CampaignObjective,
+  BudgetType,
+  CampaignCurrency,
+} from "@adspectr/shared";
 import type { CampaignSchedule } from "@adspectr/shared";
 
 /**
@@ -58,7 +64,11 @@ export class Campaign {
   @Column({ type: "enum", enum: BudgetType, default: BudgetType.DAILY })
   budgetType: BudgetType;
 
-  @Column({ type: "enum", enum: CampaignCurrency, default: CampaignCurrency.USD })
+  @Column({
+    type: "enum",
+    enum: CampaignCurrency,
+    default: CampaignCurrency.USD,
+  })
   currency: CampaignCurrency;
 
   /** Display schedule: { always: true } or { always: false, hours: [9,10,...] } */

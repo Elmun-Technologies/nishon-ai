@@ -45,7 +45,9 @@ export class PlatformsService {
     // Encryption key must be exactly 32 chars for AES-256
     const key = this.config.get<string>("ENCRYPTION_KEY", "");
     if (key.length !== 32) {
-      this.logger.warn("ENCRYPTION_KEY is not set or not 32 characters - platform token encryption will be unavailable");
+      this.logger.warn(
+        "ENCRYPTION_KEY is not set or not 32 characters - platform token encryption will be unavailable",
+      );
       this.encryptionKey = "00000000000000000000000000000000";
     } else {
       this.encryptionKey = key;
@@ -180,10 +182,16 @@ export class PlatformsService {
    * just by passing a different workspaceId (IDOR). Mirrors the owner check
    * used in CampaignsService / AiDecisionsService.
    */
-  private async assertWorkspaceOwner(workspaceId: string, userId: string): Promise<void> {
-    const workspace = await this.workspaceRepo.findOne({ where: { id: workspaceId } });
+  private async assertWorkspaceOwner(
+    workspaceId: string,
+    userId: string,
+  ): Promise<void> {
+    const workspace = await this.workspaceRepo.findOne({
+      where: { id: workspaceId },
+    });
     if (!workspace) throw new NotFoundException("Workspace not found");
-    if (workspace.userId !== userId) throw new ForbiddenException("Access denied");
+    if (workspace.userId !== userId)
+      throw new ForbiddenException("Access denied");
   }
 
   async getMetaPages(
@@ -250,13 +258,16 @@ export class PlatformsService {
       throw new BadRequestException("Invalid state parameter");
     }
 
-    const workspace = await this.workspaceRepo.findOne({ where: { id: workspaceId } });
+    const workspace = await this.workspaceRepo.findOne({
+      where: { id: workspaceId },
+    });
     if (!workspace) throw new NotFoundException("Workspace not found");
 
     const { accessToken, refreshToken, expiresAt } =
       await this.googleConnector.exchangeCodeForToken(code);
 
-    const accounts = await this.googleConnector.getAccessibleCustomers(accessToken);
+    const accounts =
+      await this.googleConnector.getAccessibleCustomers(accessToken);
     const encryptedToken = this.encrypt(accessToken);
     const encryptedRefresh = this.encrypt(refreshToken);
 
@@ -268,7 +279,8 @@ export class PlatformsService {
         accessToken: encryptedToken,
         refreshToken: encryptedRefresh,
         externalAccountId: accounts[0]?.id ?? "pending",
-        externalAccountName: accounts[0]?.descriptiveName ?? "Google Ads Account",
+        externalAccountName:
+          accounts[0]?.descriptiveName ?? "Google Ads Account",
         isActive: accounts.length > 0,
         tokenExpiresAt: expiresAt,
         trackingStartedAt: accounts.length > 0 ? new Date() : null,
@@ -291,7 +303,9 @@ export class PlatformsService {
     });
 
     if (!account) {
-      throw new NotFoundException("No Google Ads account connected. Please reconnect.");
+      throw new NotFoundException(
+        "No Google Ads account connected. Please reconnect.",
+      );
     }
 
     account.externalAccountId = customerId;
@@ -324,13 +338,16 @@ export class PlatformsService {
       throw new BadRequestException("Invalid state parameter");
     }
 
-    const workspace = await this.workspaceRepo.findOne({ where: { id: workspaceId } });
+    const workspace = await this.workspaceRepo.findOne({
+      where: { id: workspaceId },
+    });
     if (!workspace) throw new NotFoundException("Workspace not found");
 
     const { accessToken, advertiserId, expiresAt } =
       await this.tiktokConnector.exchangeCodeForToken(code);
 
-    const accounts = await this.tiktokConnector.getAdvertiserAccounts(accessToken);
+    const accounts =
+      await this.tiktokConnector.getAdvertiserAccounts(accessToken);
     const encryptedToken = this.encrypt(accessToken);
 
     await this.accountRepo.save(
@@ -432,7 +449,11 @@ export class PlatformsService {
     }
 
     const iv = new Uint8Array(Buffer.from(ivHex, "hex"));
-    const decipher = crypto.createDecipheriv("aes-256-cbc", this.encryptionKey, iv);
+    const decipher = crypto.createDecipheriv(
+      "aes-256-cbc",
+      this.encryptionKey,
+      iv,
+    );
 
     let decrypted = decipher.update(encrypted, "hex", "utf8");
     decrypted += decipher.final("utf8");

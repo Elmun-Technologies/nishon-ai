@@ -40,7 +40,9 @@ export class MetaOAuthService {
 
     // Encode workspace + redirectTo in state so they survive the Meta round-trip
     const statePayload: MetaOAuthState = { workspaceId, redirectTo };
-    const state = Buffer.from(JSON.stringify(statePayload), "utf8").toString("base64");
+    const state = Buffer.from(JSON.stringify(statePayload), "utf8").toString(
+      "base64",
+    );
 
     const params = new URLSearchParams({
       client_id: clientId,
@@ -69,7 +71,9 @@ export class MetaOAuthService {
   /** Decodes the base64 state string back to a typed object. Returns null on failure. */
   decodeState(state: string): MetaOAuthState | null {
     try {
-      return JSON.parse(Buffer.from(state, "base64").toString("utf8")) as MetaOAuthState;
+      return JSON.parse(
+        Buffer.from(state, "base64").toString("utf8"),
+      ) as MetaOAuthState;
     } catch {
       return null;
     }
@@ -115,7 +119,10 @@ export class MetaOAuthService {
     const explicit = this.config.get<string>("META_CALLBACK_URL", "").trim();
     if (explicit) return explicit;
 
-    const apiBase = this.config.get<string>("API_BASE_URL", "").trim().replace(/\/$/, "");
+    const apiBase = this.config
+      .get<string>("API_BASE_URL", "")
+      .trim()
+      .replace(/\/$/, "");
     if (apiBase) return `${apiBase}/meta/callback`;
 
     this.logger.warn(

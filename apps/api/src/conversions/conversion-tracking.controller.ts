@@ -27,7 +27,10 @@ import { Request } from "express";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { ConversionTrackingService } from "./conversion-tracking.service";
-import { ConversionEventType, ConversionSource } from "./entities/conversion-event.entity";
+import {
+  ConversionEventType,
+  ConversionSource,
+} from "./entities/conversion-event.entity";
 import { Workspace } from "../workspaces/entities/workspace.entity";
 import { User } from "../users/entities/user.entity";
 
@@ -46,14 +49,23 @@ export class ConversionTrackingController {
 
   private getRequestUserId(req: Request): string {
     const user = (req as any).user as User | undefined;
-    if (!user?.id) throw new UnauthorizedException("Authenticated user not found in request");
+    if (!user?.id)
+      throw new UnauthorizedException(
+        "Authenticated user not found in request",
+      );
     return user.id;
   }
 
-  private async assertWorkspaceOwnership(workspaceId: string, userId: string): Promise<void> {
-    const workspace = await this.workspaceRepo.findOne({ where: { id: workspaceId } });
+  private async assertWorkspaceOwnership(
+    workspaceId: string,
+    userId: string,
+  ): Promise<void> {
+    const workspace = await this.workspaceRepo.findOne({
+      where: { id: workspaceId },
+    });
     if (!workspace) throw new ForbiddenException("Workspace not found");
-    if (workspace.userId !== userId) throw new ForbiddenException("You do not own this workspace");
+    if (workspace.userId !== userId)
+      throw new ForbiddenException("You do not own this workspace");
   }
 
   @Post("track")
@@ -66,7 +78,8 @@ export class ConversionTrackingController {
   async trackConversion(
     @Req() req: Request,
     @Query("workspaceId") workspaceId: string,
-    @Body() dto: {
+    @Body()
+    dto: {
       campaignId: string;
       eventType: ConversionEventType;
       value?: number;
@@ -77,19 +90,26 @@ export class ConversionTrackingController {
       timestamp?: string;
     },
   ) {
-    if (!workspaceId) throw new BadRequestException("workspaceId query parameter is required");
-    await this.assertWorkspaceOwnership(workspaceId, this.getRequestUserId(req));
+    if (!workspaceId)
+      throw new BadRequestException("workspaceId query parameter is required");
+    await this.assertWorkspaceOwnership(
+      workspaceId,
+      this.getRequestUserId(req),
+    );
 
-    const event = await this.conversionTrackingService.ingestConversionEvent(workspaceId, {
-      campaignId: dto.campaignId,
-      eventType: dto.eventType,
-      value: dto.value,
-      currency: dto.currency,
-      source: dto.source,
-      userId: dto.userId,
-      metadata: dto.metadata,
-      timestamp: dto.timestamp ? new Date(dto.timestamp) : new Date(),
-    });
+    const event = await this.conversionTrackingService.ingestConversionEvent(
+      workspaceId,
+      {
+        campaignId: dto.campaignId,
+        eventType: dto.eventType,
+        value: dto.value,
+        currency: dto.currency,
+        source: dto.source,
+        userId: dto.userId,
+        metadata: dto.metadata,
+        timestamp: dto.timestamp ? new Date(dto.timestamp) : new Date(),
+      },
+    );
 
     return { success: true, event };
   }
@@ -113,11 +133,15 @@ export class ConversionTrackingController {
     @Query("impressions") impressions?: string,
   ) {
     if (!workspaceId) throw new BadRequestException("workspaceId is required");
-    await this.assertWorkspaceOwnership(workspaceId, this.getRequestUserId(req));
+    await this.assertWorkspaceOwnership(
+      workspaceId,
+      this.getRequestUserId(req),
+    );
 
     const start = new Date(startDate + "T00:00:00Z");
     const end = new Date(endDate + "T23:59:59Z");
-    if (start > end) throw new BadRequestException("startDate must be before endDate");
+    if (start > end)
+      throw new BadRequestException("startDate must be before endDate");
 
     const metrics = await this.conversionTrackingService.getConversionMetrics(
       workspaceId,
@@ -144,12 +168,20 @@ export class ConversionTrackingController {
     @Query("days") daysStr?: string,
   ) {
     if (!workspaceId) throw new BadRequestException("workspaceId is required");
-    await this.assertWorkspaceOwnership(workspaceId, this.getRequestUserId(req));
+    await this.assertWorkspaceOwnership(
+      workspaceId,
+      this.getRequestUserId(req),
+    );
 
     const days = daysStr ? parseInt(daysStr) : 7;
-    if (days < 1 || days > 365) throw new BadRequestException("days must be between 1 and 365");
+    if (days < 1 || days > 365)
+      throw new BadRequestException("days must be between 1 and 365");
 
-    const trend = await this.conversionTrackingService.getConversionTrend(workspaceId, campaignId, days);
+    const trend = await this.conversionTrackingService.getConversionTrend(
+      workspaceId,
+      campaignId,
+      days,
+    );
     return { success: true, campaignId, days, trend };
   }
 
@@ -172,22 +204,35 @@ export class ConversionTrackingController {
     @Query("offset") offsetStr?: string,
   ) {
     if (!workspaceId) throw new BadRequestException("workspaceId is required");
-    await this.assertWorkspaceOwnership(workspaceId, this.getRequestUserId(req));
+    await this.assertWorkspaceOwnership(
+      workspaceId,
+      this.getRequestUserId(req),
+    );
 
     const start = new Date(startDate + "T00:00:00Z");
     const end = new Date(endDate + "T23:59:59Z");
     const limit = limitStr ? parseInt(limitStr) : 100;
     const offset = offsetStr ? parseInt(offsetStr) : 0;
 
-    const { events, total } = await this.conversionTrackingService.getConversionEvents(
-      workspaceId,
+    const { events, total } =
+      await this.conversionTrackingService.getConversionEvents(
+        workspaceId,
+        campaignId,
+        start,
+        end,
+        limit,
+        offset,
+      );
+
+    return {
+      success: true,
       campaignId,
-      start,
-      end,
+      startDate,
+      endDate,
       limit,
       offset,
-    );
-
-    return { success: true, campaignId, startDate, endDate, limit, offset, total, events };
+      total,
+      events,
+    };
   }
 }

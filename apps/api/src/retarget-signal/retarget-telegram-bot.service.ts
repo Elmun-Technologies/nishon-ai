@@ -53,6 +53,9 @@ export class RetargetTelegramBotService {
         },
       }),
     );
-    this.logger.log({ message: "Telegram retarget xabar yuborildi", chatId: input.chatId });
+    this.logger.log({
+      message: "Telegram retarget xabar yuborildi",
+      chatId: input.chatId,
+    });
   }
 }

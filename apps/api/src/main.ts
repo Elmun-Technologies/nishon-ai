@@ -38,7 +38,10 @@ async function bootstrap() {
 
   const nodeEnv = configService.get<string>("NODE_ENV", "development");
   const port = Number(configService.get<string>("PORT", "3001"));
-  const apiBaseUrl = configService.get<string>("API_BASE_URL", `http://0.0.0.0:${port}`);
+  const apiBaseUrl = configService.get<string>(
+    "API_BASE_URL",
+    `http://0.0.0.0:${port}`,
+  );
   const frontendOrigins = configService
     .get<string>("FRONTEND_URL", "")
     .split(",")
@@ -48,7 +51,9 @@ async function bootstrap() {
   const wildcardOrigins = frontendOrigins
     .filter((origin) => origin.startsWith("*."))
     .map((origin) => origin.slice(1)); // ".vercel.app"
-  const exactOrigins = frontendOrigins.filter((origin) => !origin.startsWith("*."));
+  const exactOrigins = frontendOrigins.filter(
+    (origin) => !origin.startsWith("*."),
+  );
 
   // Enable CORS
   app.enableCors({
@@ -57,7 +62,9 @@ async function bootstrap() {
       if (!origin) return callback(null, true);
       if (exactOrigins.includes(origin)) return callback(null, true);
 
-      const matchesWildcard = wildcardOrigins.some((wildcard) => origin.endsWith(wildcard));
+      const matchesWildcard = wildcardOrigins.some((wildcard) =>
+        origin.endsWith(wildcard),
+      );
       if (matchesWildcard) return callback(null, true);
 
       return callback(new Error(`CORS blocked for origin: ${origin}`), false);
@@ -130,7 +137,10 @@ async function bootstrap() {
           BEGIN ALTER TABLE "workspaces" ADD COLUMN "user_id"              UUID         NULL;                       EXCEPTION WHEN OTHERS THEN NULL; END;
         END $$;
       `);
-      logger.log({ message: "workspaces schema repair: OK", context: "Bootstrap" });
+      logger.log({
+        message: "workspaces schema repair: OK",
+        context: "Bootstrap",
+      });
 
       // ── connected_accounts ─────────────────────────────────────────────────
       await dataSource.query(`
@@ -142,7 +152,10 @@ async function bootstrap() {
           BEGIN ALTER TABLE "connected_accounts" ADD COLUMN "updated_at"           TIMESTAMP    NOT NULL DEFAULT NOW(); EXCEPTION WHEN OTHERS THEN NULL; END;
         END $$;
       `);
-      logger.log({ message: "connected_accounts schema repair: OK", context: "Bootstrap" });
+      logger.log({
+        message: "connected_accounts schema repair: OK",
+        context: "Bootstrap",
+      });
 
       // ── budgets ────────────────────────────────────────────────────────────
       await dataSource.query(`
@@ -154,7 +167,10 @@ async function bootstrap() {
           BEGIN ALTER TABLE "budgets" ADD COLUMN "workspace_id"    UUID         NULL;                        EXCEPTION WHEN OTHERS THEN NULL; END;
         END $$;
       `);
-      logger.log({ message: "budgets schema repair: OK", context: "Bootstrap" });
+      logger.log({
+        message: "budgets schema repair: OK",
+        context: "Bootstrap",
+      });
 
       // ── campaigns ──────────────────────────────────────────────────────────
       await dataSource.query(`
@@ -171,7 +187,10 @@ async function bootstrap() {
           BEGIN ALTER TABLE "campaigns" ADD COLUMN "updated_at"   TIMESTAMP     NOT NULL DEFAULT NOW();  EXCEPTION WHEN OTHERS THEN NULL; END;
         END $$;
       `);
-      logger.log({ message: "campaigns schema repair: OK", context: "Bootstrap" });
+      logger.log({
+        message: "campaigns schema repair: OK",
+        context: "Bootstrap",
+      });
 
       // ── ai_decisions ───────────────────────────────────────────────────────
       await dataSource.query(`
@@ -187,8 +206,10 @@ async function bootstrap() {
           BEGIN ALTER TABLE "ai_decisions" ADD COLUMN "created_at"        TIMESTAMP    NOT NULL DEFAULT NOW(); EXCEPTION WHEN OTHERS THEN NULL; END;
         END $$;
       `);
-      logger.log({ message: "ai_decisions schema repair: OK", context: "Bootstrap" });
-
+      logger.log({
+        message: "ai_decisions schema repair: OK",
+        context: "Bootstrap",
+      });
     } catch (e) {
       logger.error({
         message: "schema repair failed — login or workspaces may break",
@@ -207,12 +228,10 @@ async function bootstrap() {
   logger.log({ message: "Startup complete", context: "Bootstrap" });
   logger.log({ message: `Environment: ${nodeEnv}`, context: "Bootstrap" });
   logger.log({ message: `API base URL: ${apiBaseUrl}`, context: "Bootstrap" });
-  logger.log(
-    {
-      message: `CORS origins: ${frontendOrigins.length > 0 ? frontendOrigins.join(", ") : "all"}`,
-      context: "Bootstrap",
-    },
-  );
+  logger.log({
+    message: `CORS origins: ${frontendOrigins.length > 0 ? frontendOrigins.join(", ") : "all"}`,
+    context: "Bootstrap",
+  });
   logger.log({
     message: `Database: ${isDatabaseConnected ? "connected" : "not connected"}`,
     context: "Bootstrap",
@@ -221,10 +240,16 @@ async function bootstrap() {
     message: `Redis: configured (${redisHost}:${redisPort})`,
     context: "Bootstrap",
   });
-  logger.log({ message: `Swagger documentation: ${apiBaseUrl}/api`, context: "Bootstrap" });
+  logger.log({
+    message: `Swagger documentation: ${apiBaseUrl}/api`,
+    context: "Bootstrap",
+  });
 
   const gracefulShutdown = async (signal: string) => {
-    logger.log({ message: `Received ${signal}, starting graceful shutdown`, context: "Bootstrap" });
+    logger.log({
+      message: `Received ${signal}, starting graceful shutdown`,
+      context: "Bootstrap",
+    });
     await app.close();
     logger.log({ message: "Graceful shutdown complete", context: "Bootstrap" });
     process.exit(0);

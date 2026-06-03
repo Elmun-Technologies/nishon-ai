@@ -55,7 +55,10 @@ export class AuthController {
   ) {}
 
   private frontendUrl(): string {
-    const raw = this.config.get<string>("FRONTEND_URL", "http://localhost:3000");
+    const raw = this.config.get<string>(
+      "FRONTEND_URL",
+      "http://localhost:3000",
+    );
     return pickPrimaryFrontendUrl(raw, "http://localhost:3000");
   }
 
@@ -145,7 +148,9 @@ export class AuthController {
         error: "oauth_failed",
         detail: String(payload._oauthError),
       });
-      return res.redirect(`${frontendUrl}/auth/google/callback?${params.toString()}`);
+      return res.redirect(
+        `${frontendUrl}/auth/google/callback?${params.toString()}`,
+      );
     }
 
     const auth = payload as AuthResponseDto | undefined;
@@ -154,12 +159,16 @@ export class AuthController {
         error: "oauth_incomplete",
         detail: "Missing tokens after Google sign-in — check API logs.",
       });
-      return res.redirect(`${frontendUrl}/auth/google/callback?${params.toString()}`);
+      return res.redirect(
+        `${frontendUrl}/auth/google/callback?${params.toString()}`,
+      );
     }
 
     const { accessToken, refreshToken } = auth;
     const params = new URLSearchParams({ accessToken, refreshToken });
-    return res.redirect(`${frontendUrl}/auth/google/callback?${params.toString()}`);
+    return res.redirect(
+      `${frontendUrl}/auth/google/callback?${params.toString()}`,
+    );
   }
 
   // ─── Facebook OAuth ─────────────────────────────────────────────────────────
@@ -181,7 +190,9 @@ export class AuthController {
         error: "oauth_failed",
         detail: String(payload._oauthError),
       });
-      return res.redirect(`${frontendUrl}/auth/google/callback?${params.toString()}`);
+      return res.redirect(
+        `${frontendUrl}/auth/google/callback?${params.toString()}`,
+      );
     }
 
     const auth = payload as AuthResponseDto | undefined;
@@ -190,7 +201,9 @@ export class AuthController {
         error: "oauth_incomplete",
         detail: "Missing tokens after Facebook sign-in — check API logs.",
       });
-      return res.redirect(`${frontendUrl}/auth/google/callback?${params.toString()}`);
+      return res.redirect(
+        `${frontendUrl}/auth/google/callback?${params.toString()}`,
+      );
     }
 
     const { accessToken, refreshToken } = auth;

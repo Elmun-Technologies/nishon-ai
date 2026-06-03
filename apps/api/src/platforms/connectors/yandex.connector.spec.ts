@@ -134,9 +134,7 @@ describe("YandexConnector", () => {
         "Total\tTotal\t1000\t55\t92.15\t4\t5.5",
       ].join("\n");
 
-      httpService.post.mockReturnValue(
-        of({ status: 200, data: tsv } as any),
-      );
+      httpService.post.mockReturnValue(of({ status: 200, data: tsv } as any));
 
       const results = await connector.getInsights("token-1", "login-1", {
         since: "2026-03-01",
@@ -156,9 +154,7 @@ describe("YandexConnector", () => {
     });
 
     it("returns an empty array when reports API request fails", async () => {
-      httpService.post.mockReturnValue(
-        throwError(() => new Error("timeout")),
-      );
+      httpService.post.mockReturnValue(throwError(() => new Error("timeout")));
 
       const results = await connector.getInsights("token-1", "login-1");
 

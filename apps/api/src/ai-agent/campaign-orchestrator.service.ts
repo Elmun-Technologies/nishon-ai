@@ -3,7 +3,10 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Workspace } from "../workspaces/entities/workspace.entity";
 import { AiDecision } from "../ai-decisions/entities/ai-decision.entity";
-import { StrategyEngineService, StrategyResult } from "./strategy-engine.service";
+import {
+  StrategyEngineService,
+  StrategyResult,
+} from "./strategy-engine.service";
 import { DecisionLoopService } from "./decision-loop.service";
 import { AiAgentService } from "./ai-agent.service";
 
@@ -11,40 +14,40 @@ import { AiAgentService } from "./ai-agent.service";
 
 export interface CampaignPipelineInput {
   /** Workspace to run the pipeline for */
-  workspaceId: string
+  workspaceId: string;
   /**
    * Ad platforms to generate scripts for (e.g. ['meta', 'tiktok']).
    * Defaults to the platforms from the generated strategy.
    */
-  platforms?: string[]
+  platforms?: string[];
   /**
    * Optional creative asset to score.
    * When provided, the scoring step runs after script generation.
    */
   creative?: {
-    imageBase64: string
-    mimeType: string
-    platform: string
-    creativeType: string
-    goal: string
-  }
+    imageBase64: string;
+    mimeType: string;
+    platform: string;
+    creativeType: string;
+    goal: string;
+  };
   /**
    * Whether to run the optimization (decision) loop as the last step.
    * Defaults to false so the pipeline can be used before any campaigns exist.
    */
-  runOptimization?: boolean
+  runOptimization?: boolean;
 }
 
 export interface CampaignPipelineResult {
-  workspaceId: string
+  workspaceId: string;
   /** Steps that completed without error */
-  completedSteps: string[]
+  completedSteps: string[];
   /** Per-step error messages for steps that failed */
-  errors: Record<string, string>
-  strategy: StrategyResult | null
-  scripts: any | null
-  creativeScore: any | null
-  decisions: AiDecision[]
+  errors: Record<string, string>;
+  strategy: StrategyResult | null;
+  scripts: any | null;
+  creativeScore: any | null;
+  decisions: AiDecision[];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -100,63 +103,76 @@ export class CampaignOrchestratorService {
 
     // ── Step 1: Strategy ─────────────────────────────────────────────────────
     try {
-      result.strategy = await this.strategyEngine.generateForWorkspace(workspaceId);
+      result.strategy =
+        await this.strategyEngine.generateForWorkspace(workspaceId);
       result.completedSteps.push("strategy");
     } catch (err: any) {
       result.errors["strategy"] = err?.message ?? String(err);
-      this.logger.warn(`Pipeline [${workspaceId}] strategy step failed: ${result.errors["strategy"]}`);
+      this.logger.warn(
+        `Pipeline [${workspaceId}] strategy step failed: ${result.errors["strategy"]}`,
+      );
     }
 
     // ── Step 2: Ad Scripts ───────────────────────────────────────────────────
     // Scripts are most valuable when aligned with the strategy, but we still
     // attempt generation even if strategy failed (uses workspace data directly).
     try {
-      const workspace = await this.workspaceRepo.findOne({ where: { id: workspaceId } });
+      const workspace = await this.workspaceRepo.findOne({
+        where: { id: workspaceId },
+      });
       if (!workspace) {
         throw new Error(`Workspace ${workspaceId} not found`);
       }
 
-      const platforms =
-        input.platforms ??
-        (result.strategy?.recommendedPlatforms ?? ["meta"]);
+      const platforms = input.platforms ??
+        result.strategy?.recommendedPlatforms ?? ["meta"];
 
       const scriptDto = {
-        businessName:       workspace.name,
-        industry:           workspace.industry,
+        businessName: workspace.name,
+        industry: workspace.industry,
         productDescription: workspace.productDescription,
-        targetAudience:     workspace.targetAudience,
-        goal:               workspace.goal,
-        monthlyBudget:      Number(workspace.monthlyBudget),
-        targetLocation:     workspace.targetLocation
+        targetAudience: workspace.targetAudience,
+        goal: workspace.goal,
+        monthlyBudget: Number(workspace.monthlyBudget),
+        targetLocation: workspace.targetLocation
           ? [workspace.targetLocation]
           : ["Uzbekistan"],
         platforms,
         strategy: result.strategy ?? undefined,
       };
 
-      result.scripts = await this.aiAgentService.generateAdScripts(workspaceId, scriptDto);
+      result.scripts = await this.aiAgentService.generateAdScripts(
+        workspaceId,
+        scriptDto,
+      );
       result.completedSteps.push("scripts");
     } catch (err: any) {
       result.errors["scripts"] = err?.message ?? String(err);
-      this.logger.warn(`Pipeline [${workspaceId}] scripts step failed: ${result.errors["scripts"]}`);
+      this.logger.warn(
+        `Pipeline [${workspaceId}] scripts step failed: ${result.errors["scripts"]}`,
+      );
     }
 
     // ── Step 3: Creative Scoring (optional) ──────────────────────────────────
     if (input.creative) {
       try {
-        const workspace = await this.workspaceRepo.findOne({ where: { id: workspaceId } });
+        const workspace = await this.workspaceRepo.findOne({
+          where: { id: workspaceId },
+        });
         result.creativeScore = await this.aiAgentService.scoreCreative({
           ...input.creative,
           workspaceContext: {
-            name:           workspace?.name,
-            industry:       workspace?.industry,
+            name: workspace?.name,
+            industry: workspace?.industry,
             targetAudience: workspace?.targetAudience,
           },
         });
         result.completedSteps.push("creativeScore");
       } catch (err: any) {
         result.errors["creativeScore"] = err?.message ?? String(err);
-        this.logger.warn(`Pipeline [${workspaceId}] creative scoring failed: ${result.errors["creativeScore"]}`);
+        this.logger.warn(
+          `Pipeline [${workspaceId}] creative scoring failed: ${result.errors["creativeScore"]}`,
+        );
       }
     }
 
@@ -167,16 +183,18 @@ export class CampaignOrchestratorService {
         result.completedSteps.push("optimization");
       } catch (err: any) {
         result.errors["optimization"] = err?.message ?? String(err);
-        this.logger.warn(`Pipeline [${workspaceId}] optimization step failed: ${result.errors["optimization"]}`);
+        this.logger.warn(
+          `Pipeline [${workspaceId}] optimization step failed: ${result.errors["optimization"]}`,
+        );
       }
     }
 
     const durationMs = Date.now() - pipelineStart;
     this.logger.log(
       `Pipeline finished for workspace: ${workspaceId} | ` +
-      `steps=${result.completedSteps.join(",")} | ` +
-      `errors=${Object.keys(result.errors).length} | ` +
-      `duration=${durationMs}ms`,
+        `steps=${result.completedSteps.join(",")} | ` +
+        `errors=${Object.keys(result.errors).length} | ` +
+        `duration=${durationMs}ms`,
     );
 
     return result;

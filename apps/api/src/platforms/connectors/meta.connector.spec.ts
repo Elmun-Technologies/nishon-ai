@@ -71,9 +71,14 @@ describe("MetaConnector", () => {
         }),
       };
 
-      const badConnector = new (MetaConnector as any)(badConfigMock, httpService);
+      const badConnector = new (MetaConnector as any)(
+        badConfigMock,
+        httpService,
+      );
 
-      expect(() => badConnector.getOAuthUrl("ws-1")).toThrow(BadRequestException);
+      expect(() => badConnector.getOAuthUrl("ws-1")).toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -123,8 +128,18 @@ describe("MetaConnector", () => {
       const mockData = {
         data: {
           data: [
-            { id: "act_123", name: "My Business", currency: "USD", account_status: 1 },
-            { id: "act_456", name: "Client Account", currency: "EUR", account_status: 1 },
+            {
+              id: "act_123",
+              name: "My Business",
+              currency: "USD",
+              account_status: 1,
+            },
+            {
+              id: "act_456",
+              name: "Client Account",
+              currency: "EUR",
+              account_status: 1,
+            },
           ],
         },
       };

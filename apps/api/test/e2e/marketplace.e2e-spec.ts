@@ -142,7 +142,9 @@ describe("Marketplace E2E Tests", () => {
         if (response.body.specialists.length > 0) {
           response.body.specialists.forEach((specialist: any) => {
             expect(
-              specialist.platforms.some((p: string) => ["meta", "google"].includes(p)),
+              specialist.platforms.some((p: string) =>
+                ["meta", "google"].includes(p),
+              ),
             ).toBe(true);
           });
         }
@@ -365,11 +367,15 @@ describe("Marketplace E2E Tests", () => {
 
       it("should cache filter options efficiently", async () => {
         const start = Date.now();
-        await request(app.getHttpServer()).get("/marketplace/filters").expect(200);
+        await request(app.getHttpServer())
+          .get("/marketplace/filters")
+          .expect(200);
         const first = Date.now() - start;
 
         const start2 = Date.now();
-        await request(app.getHttpServer()).get("/marketplace/filters").expect(200);
+        await request(app.getHttpServer())
+          .get("/marketplace/filters")
+          .expect(200);
         const second = Date.now() - start2;
 
         // Second call should be faster (cached)
@@ -396,7 +402,9 @@ describe("Marketplace E2E Tests", () => {
         expect(response.body.platforms).toEqual(testSpecialist.platforms);
         expect(response.body.niches).toEqual(testSpecialist.niches);
         expect(response.body.monthlyRate).toBe(testSpecialist.monthlyRate);
-        expect(response.body.commissionRate).toBe(testSpecialist.commissionRate);
+        expect(response.body.commissionRate).toBe(
+          testSpecialist.commissionRate,
+        );
       });
 
       it("should include certifications in response", async () => {
@@ -685,7 +693,8 @@ describe("Marketplace E2E Tests", () => {
       });
 
       it("should reject tokens with invalid signature", async () => {
-        const invalidToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.invalid.invalid";
+        const invalidToken =
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.invalid.invalid";
         const response = await request(app.getHttpServer())
           .get(`/marketplace/my-profile/specialists/${testSpecialist.id}`)
           .set("Authorization", `Bearer ${invalidToken}`)
@@ -700,7 +709,9 @@ describe("Marketplace E2E Tests", () => {
         // Create specialist in different workspace
         const otherWorkspace = await fixtures.createTestWorkspace();
         const otherUser = await fixtures.createTestUser(otherWorkspace.id);
-        const otherSpecialist = await fixtures.createTestSpecialist(otherUser.id);
+        const otherSpecialist = await fixtures.createTestSpecialist(
+          otherUser.id,
+        );
 
         // Try to access with current user's token
         const response = await request(app.getHttpServer())
@@ -751,7 +762,9 @@ describe("Marketplace E2E Tests", () => {
 
     beforeEach(async () => {
       // Create admin user
-      adminUser = await fixtures.createTestUser(testWorkspace.id, { isAdmin: true });
+      adminUser = await fixtures.createTestUser(testWorkspace.id, {
+        isAdmin: true,
+      });
       adminToken = fixtures.generateAuthToken(adminUser.id, testWorkspace.id);
     });
 
@@ -763,7 +776,9 @@ describe("Marketplace E2E Tests", () => {
         );
 
         const response = await request(app.getHttpServer())
-          .post(`/marketplace/admin/specialists/${testSpecialist.id}/sync-performance`)
+          .post(
+            `/marketplace/admin/specialists/${testSpecialist.id}/sync-performance`,
+          )
           .set("Authorization", `Bearer ${adminToken}`)
           .send({ platform: "meta" })
           .expect(200);
@@ -780,7 +795,9 @@ describe("Marketplace E2E Tests", () => {
         );
 
         const response = await request(app.getHttpServer())
-          .post(`/marketplace/admin/specialists/${testSpecialist.id}/sync-performance`)
+          .post(
+            `/marketplace/admin/specialists/${testSpecialist.id}/sync-performance`,
+          )
           .set("Authorization", `Bearer ${adminToken}`)
           .send({ platform: "google" })
           .expect(200);
@@ -796,7 +813,9 @@ describe("Marketplace E2E Tests", () => {
         );
 
         const response = await request(app.getHttpServer())
-          .post(`/marketplace/admin/specialists/${testSpecialist.id}/sync-performance`)
+          .post(
+            `/marketplace/admin/specialists/${testSpecialist.id}/sync-performance`,
+          )
           .set("Authorization", `Bearer ${adminToken}`)
           .send({ platform: "yandex" })
           .expect(200);
@@ -812,7 +831,9 @@ describe("Marketplace E2E Tests", () => {
         );
 
         const response = await request(app.getHttpServer())
-          .post(`/marketplace/admin/specialists/${testSpecialist.id}/sync-performance`)
+          .post(
+            `/marketplace/admin/specialists/${testSpecialist.id}/sync-performance`,
+          )
           .set("Authorization", `Bearer ${adminToken}`)
           .send({ platform: "meta", forceRefresh: true })
           .expect(200);
@@ -833,7 +854,9 @@ describe("Marketplace E2E Tests", () => {
 
       it("should return 400 if no connected account", async () => {
         const response = await request(app.getHttpServer())
-          .post(`/marketplace/admin/specialists/${testSpecialist.id}/sync-performance`)
+          .post(
+            `/marketplace/admin/specialists/${testSpecialist.id}/sync-performance`,
+          )
           .set("Authorization", `Bearer ${adminToken}`)
           .send({ platform: "meta" })
           .expect(400);
@@ -843,7 +866,9 @@ describe("Marketplace E2E Tests", () => {
 
       it("should require admin role", async () => {
         const response = await request(app.getHttpServer())
-          .post(`/marketplace/admin/specialists/${testSpecialist.id}/sync-performance`)
+          .post(
+            `/marketplace/admin/specialists/${testSpecialist.id}/sync-performance`,
+          )
           .set("Authorization", `Bearer ${authToken}`) // Non-admin token
           .send({ platform: "meta" })
           .expect(403);
@@ -853,7 +878,9 @@ describe("Marketplace E2E Tests", () => {
 
       it("should reject invalid platform", async () => {
         const response = await request(app.getHttpServer())
-          .post(`/marketplace/admin/specialists/${testSpecialist.id}/sync-performance`)
+          .post(
+            `/marketplace/admin/specialists/${testSpecialist.id}/sync-performance`,
+          )
           .set("Authorization", `Bearer ${adminToken}`)
           .send({ platform: "invalid_platform" })
           .expect(400);
@@ -868,7 +895,9 @@ describe("Marketplace E2E Tests", () => {
         );
 
         const response = await request(app.getHttpServer())
-          .post(`/marketplace/admin/specialists/${testSpecialist.id}/sync-performance`)
+          .post(
+            `/marketplace/admin/specialists/${testSpecialist.id}/sync-performance`,
+          )
           .set("Authorization", `Bearer ${adminToken}`)
           .send({ platform: "meta" })
           .expect(200);
@@ -884,7 +913,9 @@ describe("Marketplace E2E Tests", () => {
         );
 
         const response = await request(app.getHttpServer())
-          .post(`/marketplace/admin/specialists/${testSpecialist.id}/sync-performance`)
+          .post(
+            `/marketplace/admin/specialists/${testSpecialist.id}/sync-performance`,
+          )
           .set("Authorization", `Bearer ${adminToken}`)
           .send({ platform: "meta" })
           .expect(200);
@@ -902,7 +933,9 @@ describe("Marketplace E2E Tests", () => {
         );
 
         const response = await request(app.getHttpServer())
-          .post(`/marketplace/admin/specialists/${testSpecialist.id}/sync-performance`)
+          .post(
+            `/marketplace/admin/specialists/${testSpecialist.id}/sync-performance`,
+          )
           .set("Authorization", `Bearer ${adminToken}`)
           .send({ platform: "meta" })
           .expect(500);
@@ -921,7 +954,9 @@ describe("Marketplace E2E Tests", () => {
     let caseStudy: any;
 
     beforeEach(async () => {
-      const adminUser = await fixtures.createTestUser(testWorkspace.id, { isAdmin: true });
+      const adminUser = await fixtures.createTestUser(testWorkspace.id, {
+        isAdmin: true,
+      });
       adminToken = fixtures.generateAuthToken(adminUser.id, testWorkspace.id);
       caseStudy = await fixtures.createTestCaseStudy(testSpecialist.id);
     });
@@ -929,7 +964,9 @@ describe("Marketplace E2E Tests", () => {
     describe("POST /admin/specialists/:id/verify-performance", () => {
       it("should verify performance data", async () => {
         const response = await request(app.getHttpServer())
-          .post(`/marketplace/admin/specialists/${testSpecialist.id}/verify-performance`)
+          .post(
+            `/marketplace/admin/specialists/${testSpecialist.id}/verify-performance`,
+          )
           .set("Authorization", `Bearer ${adminToken}`)
           .send({
             caseStudyId: caseStudy.id,
@@ -943,7 +980,9 @@ describe("Marketplace E2E Tests", () => {
 
       it("should reject case study", async () => {
         const response = await request(app.getHttpServer())
-          .post(`/marketplace/admin/specialists/${testSpecialist.id}/verify-performance`)
+          .post(
+            `/marketplace/admin/specialists/${testSpecialist.id}/verify-performance`,
+          )
           .set("Authorization", `Bearer ${adminToken}`)
           .send({
             caseStudyId: caseStudy.id,
@@ -956,7 +995,9 @@ describe("Marketplace E2E Tests", () => {
 
       it("should support dry-run mode (no data persisted)", async () => {
         const response = await request(app.getHttpServer())
-          .post(`/marketplace/admin/specialists/${testSpecialist.id}/verify-performance`)
+          .post(
+            `/marketplace/admin/specialists/${testSpecialist.id}/verify-performance`,
+          )
           .set("Authorization", `Bearer ${adminToken}`)
           .send({
             caseStudyId: caseStudy.id,
@@ -978,7 +1019,9 @@ describe("Marketplace E2E Tests", () => {
 
       it("should include fraud detection result", async () => {
         const response = await request(app.getHttpServer())
-          .post(`/marketplace/admin/specialists/${testSpecialist.id}/verify-performance`)
+          .post(
+            `/marketplace/admin/specialists/${testSpecialist.id}/verify-performance`,
+          )
           .set("Authorization", `Bearer ${adminToken}`)
           .send({
             caseStudyId: caseStudy.id,
@@ -987,7 +1030,9 @@ describe("Marketplace E2E Tests", () => {
           .expect(200);
 
         expect(response.body.fraudRiskLevel).toBeDefined();
-        expect(["low", "medium", "high"]).toContain(response.body.fraudRiskLevel);
+        expect(["low", "medium", "high"]).toContain(
+          response.body.fraudRiskLevel,
+        );
       });
 
       it("should return 404 for non-existent specialist", async () => {
@@ -1002,7 +1047,9 @@ describe("Marketplace E2E Tests", () => {
 
       it("should return 400 if caseStudyId missing", async () => {
         const response = await request(app.getHttpServer())
-          .post(`/marketplace/admin/specialists/${testSpecialist.id}/verify-performance`)
+          .post(
+            `/marketplace/admin/specialists/${testSpecialist.id}/verify-performance`,
+          )
           .set("Authorization", `Bearer ${adminToken}`)
           .send({})
           .expect(400);
@@ -1012,7 +1059,9 @@ describe("Marketplace E2E Tests", () => {
 
       it("should require admin role", async () => {
         const response = await request(app.getHttpServer())
-          .post(`/marketplace/admin/specialists/${testSpecialist.id}/verify-performance`)
+          .post(
+            `/marketplace/admin/specialists/${testSpecialist.id}/verify-performance`,
+          )
           .set("Authorization", `Bearer ${authToken}`)
           .send({ caseStudyId: caseStudy.id })
           .expect(403);
@@ -1030,7 +1079,9 @@ describe("Marketplace E2E Tests", () => {
     let adminToken: string;
 
     beforeEach(async () => {
-      const adminUser = await fixtures.createTestUser(testWorkspace.id, { isAdmin: true });
+      const adminUser = await fixtures.createTestUser(testWorkspace.id, {
+        isAdmin: true,
+      });
       adminToken = fixtures.generateAuthToken(adminUser.id, testWorkspace.id);
     });
 
@@ -1320,22 +1371,29 @@ describe("Marketplace E2E Tests", () => {
     let adminToken: string;
 
     beforeEach(async () => {
-      const adminUser = await fixtures.createTestUser(testWorkspace.id, { isAdmin: true });
+      const adminUser = await fixtures.createTestUser(testWorkspace.id, {
+        isAdmin: true,
+      });
       adminToken = fixtures.generateAuthToken(adminUser.id, testWorkspace.id);
     });
 
     describe("Fraud Risk Assessment", () => {
       it("should flag unusually high ROAS as suspicious", async () => {
-        const suspiciousCase = await fixtures.createTestCaseStudy(testSpecialist.id, {
-          metrics: {
-            spend: 1000,
-            revenue: 1000000, // 1000x ROAS - clearly fraudulent
-            roas: 1000,
+        const suspiciousCase = await fixtures.createTestCaseStudy(
+          testSpecialist.id,
+          {
+            metrics: {
+              spend: 1000,
+              revenue: 1000000, // 1000x ROAS - clearly fraudulent
+              roas: 1000,
+            },
           },
-        });
+        );
 
         const response = await request(app.getHttpServer())
-          .post(`/marketplace/admin/specialists/${testSpecialist.id}/verify-performance`)
+          .post(
+            `/marketplace/admin/specialists/${testSpecialist.id}/verify-performance`,
+          )
           .set("Authorization", `Bearer ${adminToken}`)
           .send({ caseStudyId: suspiciousCase.id })
           .expect(200);
@@ -1344,17 +1402,22 @@ describe("Marketplace E2E Tests", () => {
       });
 
       it("should flag impossible metrics (CPA > Revenue Per Conversion)", async () => {
-        const suspiciousCase = await fixtures.createTestCaseStudy(testSpecialist.id, {
-          metrics: {
-            conversions: 100,
-            spend: 100000,
-            cpa: 1000, // CPA is higher than reasonable ROI
-            revenue: 50000,
+        const suspiciousCase = await fixtures.createTestCaseStudy(
+          testSpecialist.id,
+          {
+            metrics: {
+              conversions: 100,
+              spend: 100000,
+              cpa: 1000, // CPA is higher than reasonable ROI
+              revenue: 50000,
+            },
           },
-        });
+        );
 
         const response = await request(app.getHttpServer())
-          .post(`/marketplace/admin/specialists/${testSpecialist.id}/verify-performance`)
+          .post(
+            `/marketplace/admin/specialists/${testSpecialist.id}/verify-performance`,
+          )
           .set("Authorization", `Bearer ${adminToken}`)
           .send({ caseStudyId: suspiciousCase.id })
           .expect(200);
@@ -1363,15 +1426,20 @@ describe("Marketplace E2E Tests", () => {
       });
 
       it("should flag missing metrics as medium risk", async () => {
-        const incompleteCase = await fixtures.createTestCaseStudy(testSpecialist.id, {
-          metrics: {
-            spend: 10000,
-            // Missing revenue and other metrics
+        const incompleteCase = await fixtures.createTestCaseStudy(
+          testSpecialist.id,
+          {
+            metrics: {
+              spend: 10000,
+              // Missing revenue and other metrics
+            },
           },
-        });
+        );
 
         const response = await request(app.getHttpServer())
-          .post(`/marketplace/admin/specialists/${testSpecialist.id}/verify-performance`)
+          .post(
+            `/marketplace/admin/specialists/${testSpecialist.id}/verify-performance`,
+          )
           .set("Authorization", `Bearer ${adminToken}`)
           .send({ caseStudyId: incompleteCase.id })
           .expect(200);
@@ -1496,12 +1564,18 @@ describe("Marketplace E2E Tests", () => {
           .expect(200);
 
         // If both pages have items, verify ordering is consistent
-        if (page1.body.specialists.length > 0 && page2.body.specialists.length > 0) {
-          const lastOfPage1 = page1.body.specialists[page1.body.specialists.length - 1];
+        if (
+          page1.body.specialists.length > 0 &&
+          page2.body.specialists.length > 0
+        ) {
+          const lastOfPage1 =
+            page1.body.specialists[page1.body.specialists.length - 1];
           const firstOfPage2 = page2.body.specialists[0];
 
           // Rating should be in descending order (or same)
-          expect(lastOfPage1.rating).toBeGreaterThanOrEqual(firstOfPage2.rating);
+          expect(lastOfPage1.rating).toBeGreaterThanOrEqual(
+            firstOfPage2.rating,
+          );
         }
       });
     });
@@ -1521,12 +1595,19 @@ describe("Marketplace E2E Tests", () => {
       expect(createdAt.getUTCFullYear).toBeDefined(); // Valid date
 
       // Verify it's in ISO 8601 format (UTC)
-      expect(response.body.createdAt).toMatch(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
+      expect(response.body.createdAt).toMatch(
+        /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/,
+      );
     });
 
     it("should handle sync scheduling in UTC", async () => {
-      const adminUser = await fixtures.createTestUser(testWorkspace.id, { isAdmin: true });
-      const adminToken = fixtures.generateAuthToken(adminUser.id, testWorkspace.id);
+      const adminUser = await fixtures.createTestUser(testWorkspace.id, {
+        isAdmin: true,
+      });
+      const adminToken = fixtures.generateAuthToken(
+        adminUser.id,
+        testWorkspace.id,
+      );
 
       const response = await request(app.getHttpServer())
         .get("/marketplace/admin/specialists/sync-status")

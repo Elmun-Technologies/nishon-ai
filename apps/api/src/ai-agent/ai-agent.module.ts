@@ -16,7 +16,12 @@ import { PlatformsModule } from "../platforms/platforms.module";
 @Module({
   imports: [
     ConfigModule,
-    TypeOrmModule.forFeature([Workspace, AiDecision, Campaign, ConnectedAccount]),
+    TypeOrmModule.forFeature([
+      Workspace,
+      AiDecision,
+      Campaign,
+      ConnectedAccount,
+    ]),
     // AiDecision is needed by AiAgentService (approveDecision/rejectDecision)
     WorkspacesModule,
     PlatformsModule,

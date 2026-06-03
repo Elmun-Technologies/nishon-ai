@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "pnpm --filter @adspectr/shared build && pnpm --filter @adspectr/ai-sdk build && NODE_OPTIONS='--max-old-space-size=2048' nest build",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "format": "prettier --write \"{src,test}/**/*.ts\"",
     "start": "nest start",
     "dev": "npm run start:dev",
     "start:dev": "nest start --watch",

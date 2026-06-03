@@ -98,7 +98,11 @@ export class YandexConnector {
     const { access_token, refresh_token, expires_in } = response.data;
     const expiresAt = new Date(Date.now() + expires_in * 1000);
 
-    return { accessToken: access_token, refreshToken: refresh_token, expiresAt };
+    return {
+      accessToken: access_token,
+      refreshToken: refresh_token,
+      expiresAt,
+    };
   }
 
   /**
@@ -218,15 +222,19 @@ export class YandexConnector {
     dailyBudgetAmount: number,
   ): Promise<void> {
     await this.jsonRpc(accessToken, "campaigns", "update", {
-      Campaigns: [{
-        Id: Number(campaignId),
-        DailyBudget: {
-          Amount: Math.round(dailyBudgetAmount * 1_000_000),
-          Mode: "STANDARD",
+      Campaigns: [
+        {
+          Id: Number(campaignId),
+          DailyBudget: {
+            Amount: Math.round(dailyBudgetAmount * 1_000_000),
+            Mode: "STANDARD",
+          },
         },
-      }],
+      ],
     });
-    this.logger.log(`Yandex Direct budget updated: ${campaignId} → ${dailyBudgetAmount}`);
+    this.logger.log(
+      `Yandex Direct budget updated: ${campaignId} → ${dailyBudgetAmount}`,
+    );
   }
 
   /**
@@ -240,15 +248,17 @@ export class YandexConnector {
     accessToken: string,
     accountLogin: string,
     params?: { since?: string; until?: string; campaignIds?: string[] },
-  ): Promise<Array<{
-    campaignId: string;
-    date: string;
-    impressions: number;
-    clicks: number;
-    cost: number;
-    conversions: number;
-    ctr: number;
-  }>> {
+  ): Promise<
+    Array<{
+      campaignId: string;
+      date: string;
+      impressions: number;
+      clicks: number;
+      cost: number;
+      conversions: number;
+      ctr: number;
+    }>
+  > {
     this.logger.log(`Fetching Yandex Direct insights for: ${accountLogin}`);
 
     const selection: Record<string, any> = {
@@ -258,11 +268,13 @@ export class YandexConnector {
     };
 
     if (params?.campaignIds?.length) {
-      selection.Filter = [{
-        Field: "CampaignId",
-        Operator: "IN",
-        Values: params.campaignIds,
-      }];
+      selection.Filter = [
+        {
+          Field: "CampaignId",
+          Operator: "IN",
+          Values: params.campaignIds,
+        },
+      ];
     }
 
     const reportBody = JSON.stringify({
@@ -294,20 +306,16 @@ export class YandexConnector {
 
       while (!tsvData && attempts < 10) {
         const response = await firstValueFrom(
-          this.http.post(
-            `${this.apiBase}/reports`,
-            reportBody,
-            {
-              headers: {
-                Authorization: `Bearer ${accessToken}`,
-                "Client-Login": accountLogin,
-                "Accept-Language": "ru",
-                "processingMode": "auto",
-                "returnMoneyInMicros": "false",
-              },
-              responseType: "text",
+          this.http.post(`${this.apiBase}/reports`, reportBody, {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              "Client-Login": accountLogin,
+              "Accept-Language": "ru",
+              processingMode: "auto",
+              returnMoneyInMicros: "false",
             },
-          ),
+            responseType: "text",
+          }),
         );
 
         if (response.status === 200) {
@@ -317,13 +325,17 @@ export class YandexConnector {
           await new Promise((resolve) => setTimeout(resolve, 5000));
           attempts++;
         } else {
-          this.logger.warn(`Yandex report unexpected status: ${response.status}`);
+          this.logger.warn(
+            `Yandex report unexpected status: ${response.status}`,
+          );
           return [];
         }
       }
 
       if (!tsvData) {
-        this.logger.warn("Yandex report not ready after polling — returning empty");
+        this.logger.warn(
+          "Yandex report not ready after polling — returning empty",
+        );
         return [];
       }
 
@@ -348,10 +360,12 @@ export class YandexConnector {
     this.logger.log(`Uploading image to Yandex Direct: ${filename}`);
 
     const response = await this.jsonRpc(accessToken, "adimages", "add", {
-      AdImages: [{
-        ImageData: imageBase64,
-        Name: filename,
-      }],
+      AdImages: [
+        {
+          ImageData: imageBase64,
+          Name: filename,
+        },
+      ],
     });
 
     const imageHash = response.AddResults?.[0]?.AdImageHash;
@@ -406,7 +420,9 @@ export class YandexConnector {
     } catch (error: any) {
       if (error instanceof BadRequestException) throw error;
       const detail = error.response?.data?.error?.error_detail || error.message;
-      this.logger.error(`Yandex Direct JSON-RPC error [${service}.${method}]: ${detail}`);
+      this.logger.error(
+        `Yandex Direct JSON-RPC error [${service}.${method}]: ${detail}`,
+      );
       throw new BadRequestException(`Yandex Direct request failed: ${detail}`);
     }
   }
@@ -428,7 +444,9 @@ export class YandexConnector {
     if (lines.length < 2) return [];
 
     // Skip the report name line (first line) and use second line as header
-    const headerLine = lines.find((l) => l.includes("Date") || l.includes("CampaignId"));
+    const headerLine = lines.find(
+      (l) => l.includes("Date") || l.includes("CampaignId"),
+    );
     if (!headerLine) return [];
 
     const headers = headerLine.split("\t").map((h) => h.trim().toLowerCase());
@@ -441,7 +459,9 @@ export class YandexConnector {
       if (cols.length < 3) continue;
 
       const row: Record<string, string> = {};
-      headers.forEach((h, i) => { row[h] = cols[i]?.trim() ?? ""; });
+      headers.forEach((h, i) => {
+        row[h] = cols[i]?.trim() ?? "";
+      });
 
       // Skip totals row
       if (row["date"] === "Total" || row["campaignid"] === "Total") continue;

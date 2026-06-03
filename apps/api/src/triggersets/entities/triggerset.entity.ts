@@ -23,24 +23,36 @@ import { Workspace } from "../../workspaces/entities/workspace.entity";
  */
 
 export type TriggerCondition = {
-  metric: 'ctr' | 'cpc' | 'roas' | 'spend' | 'impressions' | 'clicks' | 'conversions';
-  operator: 'gt' | 'lt' | 'gte' | 'lte' | 'eq';
+  metric:
+    | "ctr"
+    | "cpc"
+    | "roas"
+    | "spend"
+    | "impressions"
+    | "clicks"
+    | "conversions";
+  operator: "gt" | "lt" | "gte" | "lte" | "eq";
   value: number;
   /** How many consecutive days the condition must hold before firing */
   windowDays: number;
   /** Apply to: 'campaign' | 'adset' | 'workspace' */
-  dimension: 'campaign' | 'workspace';
+  dimension: "campaign" | "workspace";
 };
 
 export type TriggerAction = {
-  type: 'pause_campaign' | 'increase_budget' | 'decrease_budget' | 'notify_telegram' | 'notify_email';
+  type:
+    | "pause_campaign"
+    | "increase_budget"
+    | "decrease_budget"
+    | "notify_telegram"
+    | "notify_email";
   /** For budget actions: % change (e.g. 20 = +20%) */
   value?: number;
   /** For notify: custom message template */
   message?: string;
 };
 
-export type TriggerRunStatus = 'success' | 'failed' | 'no_match' | 'skipped';
+export type TriggerRunStatus = "success" | "failed" | "no_match" | "skipped";
 
 @Entity("triggersets")
 export class Triggerset {

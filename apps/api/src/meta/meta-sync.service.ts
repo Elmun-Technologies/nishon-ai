@@ -157,7 +157,10 @@ export class MetaSyncService {
       result.accountsSynced++;
 
       // ── 3b: Fetch & upsert campaigns ──────────────────────────────────────
-      const campaigns = await this.metaApi.getCampaigns(account.id, accessToken);
+      const campaigns = await this.metaApi.getCampaigns(
+        account.id,
+        accessToken,
+      );
 
       if (campaigns.length > 0) {
         const campaignRows = campaigns.map((c) => ({
@@ -179,7 +182,10 @@ export class MetaSyncService {
       }
 
       // ── 3c: Fetch & upsert insights ───────────────────────────────────────
-      const insightRows = await this.metaApi.getInsights(account.id, accessToken);
+      const insightRows = await this.metaApi.getInsights(
+        account.id,
+        accessToken,
+      );
 
       if (insightRows.length > 0) {
         // Build a set of valid campaign IDs so we don't insert orphan insights

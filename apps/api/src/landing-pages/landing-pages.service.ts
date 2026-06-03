@@ -35,7 +35,8 @@ function approxBytesFromBase64(b64: string): number {
 function unwrapVisionRow(raw: unknown): { visualSummary?: string } {
   if (raw && typeof raw === "object") {
     const o = raw as Record<string, unknown>;
-    if (typeof o.visualSummary === "string") return { visualSummary: o.visualSummary };
+    if (typeof o.visualSummary === "string")
+      return { visualSummary: o.visualSummary };
     const c = o.content as Record<string, unknown> | undefined;
     if (c && typeof c === "object" && typeof c.visualSummary === "string") {
       return { visualSummary: c.visualSummary };
@@ -72,7 +73,9 @@ export class LandingPagesService {
       try {
         this.aiClient = createAdSpectrAiClientFromEnv(get);
       } catch (e: any) {
-        this.logger.warn(`AI client init failed — landing page AI disabled: ${e?.message ?? e}`);
+        this.logger.warn(
+          `AI client init failed — landing page AI disabled: ${e?.message ?? e}`,
+        );
       }
     }
   }
@@ -96,7 +99,9 @@ export class LandingPagesService {
     }
 
     if (!this.aiClient) {
-      throw new BadRequestException("AI funksiyalar mavjud emas: API key sozlanmagan");
+      throw new BadRequestException(
+        "AI funksiyalar mavjud emas: API key sozlanmagan",
+      );
     }
 
     const strategy = workspace.aiStrategy as any;
@@ -122,7 +127,8 @@ export class LandingPagesService {
       }
     }
 
-    const templateId = (dto.templateId as LandingPageTemplateId | undefined) || undefined;
+    const templateId =
+      (dto.templateId as LandingPageTemplateId | undefined) || undefined;
 
     const prompt = buildLandingPagePrompt({
       businessName: workspace.name,
@@ -158,7 +164,10 @@ export class LandingPagesService {
         },
       );
     } catch (err: any) {
-      this.logger.error({ message: "Landing page AI generation failed", error: err?.message });
+      this.logger.error({
+        message: "Landing page AI generation failed",
+        error: err?.message,
+      });
       throw new InternalServerErrorException(
         "Landing page yaratishda xatolik. Qayta urinib ko'ring.",
       );
@@ -186,7 +195,10 @@ export class LandingPagesService {
   /**
    * Get the landing page for a workspace (auth-required).
    */
-  async findByWorkspace(workspaceId: string, userId: string): Promise<LandingPage | null> {
+  async findByWorkspace(
+    workspaceId: string,
+    userId: string,
+  ): Promise<LandingPage | null> {
     const workspace = await this.workspaceRepo.findOne({
       where: { id: workspaceId, userId },
     });
@@ -210,7 +222,9 @@ export class LandingPagesService {
     }
 
     // Increment view count async (don't await)
-    this.landingPageRepo.increment({ id: page.id }, "viewCount", 1).catch(() => {});
+    this.landingPageRepo
+      .increment({ id: page.id }, "viewCount", 1)
+      .catch(() => {});
 
     return page;
   }
@@ -288,10 +302,18 @@ export class LandingPagesService {
     return summaries;
   }
 
-  private async findOwnedPage(id: string, userId: string): Promise<LandingPage> {
+  private async findOwnedPage(
+    id: string,
+    userId: string,
+  ): Promise<LandingPage> {
     const page = await this.landingPageRepo
       .createQueryBuilder("lp")
-      .innerJoin("workspaces", "ws", "ws.id = lp.workspace_id AND ws.user_id = :userId", { userId })
+      .innerJoin(
+        "workspaces",
+        "ws",
+        "ws.id = lp.workspace_id AND ws.user_id = :userId",
+        { userId },
+      )
       .where("lp.id = :id", { id })
       .getOne();
 

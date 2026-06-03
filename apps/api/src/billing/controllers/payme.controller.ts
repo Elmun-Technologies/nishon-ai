@@ -6,8 +6,8 @@ import {
   HttpCode,
   Logger,
   UnauthorizedException,
-} from '@nestjs/common'
-import { PaymeService } from '../services/payme.service'
+} from "@nestjs/common";
+import { PaymeService } from "../services/payme.service";
 
 /**
  * Payme Merchant API webhook endpoint.
@@ -18,9 +18,9 @@ import { PaymeService } from '../services/payme.service'
  *
  * NO JWT guard — this is called by Payme servers, authenticated via Basic Auth.
  */
-@Controller('billing/payme')
+@Controller("billing/payme")
 export class PaymeController {
-  private readonly logger = new Logger(PaymeController.name)
+  private readonly logger = new Logger(PaymeController.name);
 
   constructor(private readonly paymeService: PaymeService) {}
 
@@ -28,16 +28,16 @@ export class PaymeController {
   @HttpCode(200)
   async handleWebhook(
     @Body() body: any,
-    @Headers('authorization') authHeader: string,
+    @Headers("authorization") authHeader: string,
   ): Promise<Record<string, any>> {
     // Verify Payme Basic Auth
     if (!this.paymeService.verifyAuth(authHeader)) {
-      this.logger.warn(`Payme auth failed from webhook`)
-      throw new UnauthorizedException('Invalid credentials')
+      this.logger.warn(`Payme auth failed from webhook`);
+      throw new UnauthorizedException("Invalid credentials");
     }
 
-    this.logger.log(`Payme request: method=${body.method}, id=${body.id}`)
+    this.logger.log(`Payme request: method=${body.method}, id=${body.id}`);
 
-    return this.paymeService.handleRequest(body)
+    return this.paymeService.handleRequest(body);
   }
 }

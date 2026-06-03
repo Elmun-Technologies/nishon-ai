@@ -11,7 +11,13 @@ import { Workspace } from "../workspaces/entities/workspace.entity";
 @Module({
   imports: [
     ConfigModule,
-    TypeOrmModule.forFeature([Triggerset, TriggerLog, MetaInsight, MetaCampaignSync, Workspace]),
+    TypeOrmModule.forFeature([
+      Triggerset,
+      TriggerLog,
+      MetaInsight,
+      MetaCampaignSync,
+      Workspace,
+    ]),
   ],
   controllers: [TriggersetController],
   providers: [TriggersetService],

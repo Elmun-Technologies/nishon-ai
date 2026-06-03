@@ -23,7 +23,16 @@ import {
   ApiParam,
 } from "@nestjs/swagger";
 import { AuthGuard as _AuthGuard } from "@nestjs/passport";
-import { IsOptional, IsString, IsNumber, IsArray, IsEmail, IsEnum, Min, Max } from "class-validator";
+import {
+  IsOptional,
+  IsString,
+  IsNumber,
+  IsArray,
+  IsEmail,
+  IsEnum,
+  Min,
+  Max,
+} from "class-validator";
 import { Type } from "class-transformer";
 
 import { MarketplaceAdminService } from "../services/marketplace-admin.service";
@@ -33,7 +42,11 @@ import { MarketplaceContactService } from "../services/marketplace-contact.servi
 import { MarketplacePerformanceService } from "../services/marketplace-performance.service";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { AdminGuard } from "../../common/guards/admin.guard";
-import { SyncPerformanceDto, VerifyPerformanceDto, SyncStatusDto as _SyncStatusDto } from "../dtos/marketplace.dto";
+import {
+  SyncPerformanceDto,
+  VerifyPerformanceDto,
+  SyncStatusDto as _SyncStatusDto,
+} from "../dtos/marketplace.dto";
 
 // ─── QUERY DTOs ───────────────────────────────────────────────────────────────
 
@@ -44,23 +57,39 @@ class SearchSpecialistsQueryDto {
   @IsOptional() @IsArray() certifications?: string[];
   @IsOptional() @IsArray() languages?: string[];
   @IsOptional() @IsArray() countries?: string[];
-  @IsOptional() @Type(() => Number) @IsNumber() @Min(0) @Max(5) minRating?: number;
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  @Max(5)
+  minRating?: number;
   @IsOptional() @Type(() => Number) @IsNumber() @Min(0) minExperience?: number;
   @IsOptional() @Type(() => Number) @IsNumber() @Min(0) minRoas?: number;
-  @IsOptional() @IsEnum(["rating", "roas", "experience", "price", "trending"]) sortBy?: string = "rating";
+  @IsOptional()
+  @IsEnum(["rating", "roas", "experience", "price", "trending"])
+  sortBy?: string = "rating";
   @IsOptional() @Type(() => Number) @IsNumber() @Min(1) page?: number = 1;
-  @IsOptional() @Type(() => Number) @IsNumber() @Min(1) @Max(100) pageSize?: number = 20;
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(1)
+  @Max(100)
+  pageSize?: number = 20;
 }
 
 class PerformanceQueryDto {
-  @IsOptional() @IsEnum(["1m", "3m", "6m", "12m", "all"]) period?: string = "3m";
-  @IsOptional() @IsEnum(["meta", "google", "yandex", "all"]) platform?: string = "all";
+  @IsOptional() @IsEnum(["1m", "3m", "6m", "12m", "all"]) period?: string =
+    "3m";
+  @IsOptional() @IsEnum(["meta", "google", "yandex", "all"]) platform?: string =
+    "all";
 }
 
 class ContactSpecialistDto {
   @IsEmail() email: string;
   @IsString() message: string;
-  @IsOptional() @IsEnum(["email", "phone", "message"]) preferredContactMethod?: string = "email";
+  @IsOptional()
+  @IsEnum(["email", "phone", "message"])
+  preferredContactMethod?: string = "email";
   @IsOptional() @IsString() phone?: string;
 }
 
@@ -75,7 +104,8 @@ class CreateSpecialistProfileDto {
   @IsOptional() @IsArray() countries?: string[];
   @IsOptional() @Type(() => Number) @IsNumber() monthlyRate?: number = 0;
   @IsOptional() @Type(() => Number) @IsNumber() commissionRate?: number = 0;
-  @IsOptional() @IsString() pricingModel?: "fixed" | "commission" | "hybrid" = "commission";
+  @IsOptional() @IsString() pricingModel?: "fixed" | "commission" | "hybrid" =
+    "commission";
   @IsOptional() @IsString() avatar?: string;
   @IsOptional() @IsString() location?: string;
   @IsOptional() @IsString() responseTime?: string;
@@ -194,8 +224,16 @@ export class MarketplaceController {
   @Get("specialists/:slug/performance")
   @ApiOperation({ summary: "Get specialist performance" })
   @ApiParam({ name: "slug", description: "Specialist slug" })
-  @ApiQuery({ name: "period", required: false, enum: ["1m", "3m", "6m", "12m", "all"] })
-  @ApiQuery({ name: "platform", required: false, enum: ["meta", "google", "yandex", "all"] })
+  @ApiQuery({
+    name: "period",
+    required: false,
+    enum: ["1m", "3m", "6m", "12m", "all"],
+  })
+  @ApiQuery({
+    name: "platform",
+    required: false,
+    enum: ["meta", "google", "yandex", "all"],
+  })
   async getSpecialistPerformance(
     @Param("slug") slug: string,
     @Query() query: PerformanceQueryDto,
@@ -203,10 +241,17 @@ export class MarketplaceController {
     if (!slug?.trim()) throw new BadRequestException("Invalid specialist slug");
     // Map frontend period format to service format
     const periodMap: Record<string, "month" | "quarter" | "year"> = {
-      "1m": "month", "3m": "quarter", "6m": "quarter", "12m": "year", "all": "year",
+      "1m": "month",
+      "3m": "quarter",
+      "6m": "quarter",
+      "12m": "year",
+      all: "year",
     };
     const mappedPeriod = periodMap[query.period ?? "3m"] ?? "quarter";
-    return this.marketplaceSearchService.getSpecialistPerformance(slug, mappedPeriod);
+    return this.marketplaceSearchService.getSpecialistPerformance(
+      slug,
+      mappedPeriod,
+    );
   }
 
   /**
@@ -223,7 +268,8 @@ export class MarketplaceController {
     @Request() req?: any,
   ) {
     if (!slug?.trim()) throw new BadRequestException("Invalid specialist slug");
-    if (!dto.email || !dto.message) throw new BadRequestException("Email and message are required");
+    if (!dto.email || !dto.message)
+      throw new BadRequestException("Email and message are required");
     return this.marketplaceContactService.contactSpecialist(
       slug,
       dto as any,
@@ -257,11 +303,17 @@ export class MarketplaceController {
   @ApiBearerAuth()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: "Create specialist profile" })
-  async createSpecialistProfile(@Body() dto: CreateSpecialistProfileDto, @Request() req: any) {
+  async createSpecialistProfile(
+    @Body() dto: CreateSpecialistProfileDto,
+    @Request() req: any,
+  ) {
     if (!dto.displayName || !dto.title) {
       throw new BadRequestException("displayName and title are required");
     }
-    return this.marketplaceProfileService.createProfile(req.user.id, dto as any);
+    return this.marketplaceProfileService.createProfile(
+      req.user.id,
+      dto as any,
+    );
   }
 
   /**
@@ -278,7 +330,11 @@ export class MarketplaceController {
     @Request() req: any,
   ) {
     if (!id?.trim()) throw new BadRequestException("Invalid specialist ID");
-    return this.marketplaceProfileService.updateProfile(id, req.user.id, dto as any);
+    return this.marketplaceProfileService.updateProfile(
+      id,
+      req.user.id,
+      dto as any,
+    );
   }
 
   /**
@@ -297,9 +353,15 @@ export class MarketplaceController {
   ) {
     if (!id?.trim()) throw new BadRequestException("Invalid specialist ID");
     if (!dto.title || !dto.industry || !dto.platform) {
-      throw new BadRequestException("title, industry, and platform are required");
+      throw new BadRequestException(
+        "title, industry, and platform are required",
+      );
     }
-    const caseStudy = await this.marketplaceProfileService.addCaseStudy(id, req.user.id, dto as any);
+    const caseStudy = await this.marketplaceProfileService.addCaseStudy(
+      id,
+      req.user.id,
+      dto as any,
+    );
     return {
       id: caseStudy.id,
       status: "pending_review" as const,
@@ -318,14 +380,22 @@ export class MarketplaceController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: "Get specialist analytics" })
-  @ApiQuery({ name: "period", required: false, enum: ["7d", "30d", "90d", "all"] })
+  @ApiQuery({
+    name: "period",
+    required: false,
+    enum: ["7d", "30d", "90d", "all"],
+  })
   async getAnalytics(
     @Param("id") id: string,
     @Query("period") period: string = "30d",
     @Request() req: any,
   ) {
     if (!id?.trim()) throw new BadRequestException("Invalid specialist ID");
-    return this.marketplacePerformanceService.getAnalytics(id, req.user.id, period);
+    return this.marketplacePerformanceService.getAnalytics(
+      id,
+      req.user.id,
+      period,
+    );
   }
 
   // ═════════════════════════════════════════════════════════════════════════
@@ -349,10 +419,21 @@ export class MarketplaceController {
     if (!dto.platform) throw new BadRequestException("platform is required");
     const workspaceId = req.user?.workspaceId;
     try {
-      return await this.marketplaceAdminService.syncPerformance(id, dto.platform, dto.force ?? false, workspaceId);
+      return await this.marketplaceAdminService.syncPerformance(
+        id,
+        dto.platform,
+        dto.force ?? false,
+        workspaceId,
+      );
     } catch (err: any) {
-      if (err instanceof NotFoundException || err instanceof BadRequestException) throw err;
-      throw new InternalServerErrorException(err?.message ?? `Failed to sync performance for specialist ${id}`);
+      if (
+        err instanceof NotFoundException ||
+        err instanceof BadRequestException
+      )
+        throw err;
+      throw new InternalServerErrorException(
+        err?.message ?? `Failed to sync performance for specialist ${id}`,
+      );
     }
   }
 
@@ -364,12 +445,21 @@ export class MarketplaceController {
   @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: "Verify performance data" })
-  async verifyPerformance(@Param("id") id: string, @Body() dto: VerifyPerformanceDto) {
+  async verifyPerformance(
+    @Param("id") id: string,
+    @Body() dto: VerifyPerformanceDto,
+  ) {
     if (!id?.trim()) throw new BadRequestException("Invalid specialist ID");
     const status = dto.verified ? "verified" : "rejected";
     const score = dto.fraudRiskLevel ?? 0;
     const fraudRiskLevel =
-      score <= 0.25 ? "low" : score <= 0.5 ? "medium" : score <= 0.75 ? "high" : "critical";
+      score <= 0.25
+        ? "low"
+        : score <= 0.5
+          ? "medium"
+          : score <= 0.75
+            ? "high"
+            : "critical";
     return { status, fraudRiskLevel };
   }
 
@@ -380,18 +470,30 @@ export class MarketplaceController {
   @UseGuards(JwtAuthGuard, AdminGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: "Get sync status" })
-  @ApiQuery({ name: "status", required: false, enum: ["pending", "in_progress", "completed", "failed"] })
+  @ApiQuery({
+    name: "status",
+    required: false,
+    enum: ["pending", "in_progress", "completed", "failed"],
+  })
   @ApiQuery({ name: "limit", required: false, type: Number })
-  async getSyncStatus(@Query("status") status?: string, @Query("limit") limit?: string) {
+  async getSyncStatus(
+    @Query("status") status?: string,
+    @Query("limit") limit?: string,
+  ) {
     const validStatuses = ["pending", "in_progress", "completed", "failed"];
     if (status && !validStatuses.includes(status)) {
-      throw new BadRequestException(`Invalid status. Use: ${validStatuses.join(", ")}`);
+      throw new BadRequestException(
+        `Invalid status. Use: ${validStatuses.join(", ")}`,
+      );
     }
     const parsedLimit = limit ? parseInt(limit, 10) : 100;
     if (isNaN(parsedLimit) || parsedLimit < 1 || parsedLimit > 1000) {
       throw new BadRequestException("limit must be between 1 and 1000");
     }
-    return this.marketplaceAdminService.getSyncStatus(status as any, parsedLimit);
+    return this.marketplaceAdminService.getSyncStatus(
+      status as any,
+      parsedLimit,
+    );
   }
 
   /**
@@ -404,7 +506,8 @@ export class MarketplaceController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: "Create certification type" })
   async createCertification(@Body() dto: CreateCertificationDto) {
-    if (!dto.name || !dto.issuer) throw new BadRequestException("name and issuer are required");
+    if (!dto.name || !dto.issuer)
+      throw new BadRequestException("name and issuer are required");
     const cert = await this.marketplaceAdminService.createCertification({
       name: dto.name,
       issuer: dto.issuer,
@@ -431,7 +534,13 @@ export class MarketplaceController {
     @Request() req: any,
   ) {
     if (!id?.trim()) throw new BadRequestException("Invalid specialist ID");
-    if (!certId?.trim()) throw new BadRequestException("Invalid certification ID");
-    return this.marketplaceAdminService.verifyCertification(id, certId, dto as any, req.user.id);
+    if (!certId?.trim())
+      throw new BadRequestException("Invalid certification ID");
+    return this.marketplaceAdminService.verifyCertification(
+      id,
+      certId,
+      dto as any,
+      req.user.id,
+    );
   }
 }

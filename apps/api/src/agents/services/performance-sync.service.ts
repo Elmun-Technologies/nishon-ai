@@ -1,17 +1,22 @@
-import { Injectable, Logger, NotFoundException, BadRequestException as _BadRequestException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository, In } from 'typeorm';
-import { ConfigService } from '@nestjs/config';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  BadRequestException as _BadRequestException,
+} from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { DataSource, Repository, In } from "typeorm";
+import { ConfigService } from "@nestjs/config";
 
-import { AgentProfile } from '../entities/agent-profile.entity';
-import { AgentPlatformMetrics } from '../entities/agent-platform-metrics.entity';
-import { AgentHistoricalPerformance } from '../entities/agent-historical-performance.entity';
-import { AgentPerformanceSyncLog } from '../entities/agent-performance-sync-log.entity';
-import { ServiceEngagement } from '../entities/service-engagement.entity';
-import { ConnectedAccount } from '../../platforms/entities/connected-account.entity';
-import { MetaPerformanceSyncService } from '../integrations/meta-sync.service';
-import { GooglePerformanceSyncService } from '../integrations/google-sync.service';
-import { YandexPerformanceSyncService } from '../integrations/yandex-sync.service';
+import { AgentProfile } from "../entities/agent-profile.entity";
+import { AgentPlatformMetrics } from "../entities/agent-platform-metrics.entity";
+import { AgentHistoricalPerformance } from "../entities/agent-historical-performance.entity";
+import { AgentPerformanceSyncLog } from "../entities/agent-performance-sync-log.entity";
+import { ServiceEngagement } from "../entities/service-engagement.entity";
+import { ConnectedAccount } from "../../platforms/entities/connected-account.entity";
+import { MetaPerformanceSyncService } from "../integrations/meta-sync.service";
+import { GooglePerformanceSyncService } from "../integrations/google-sync.service";
+import { YandexPerformanceSyncService } from "../integrations/yandex-sync.service";
 
 /**
  * PerformanceSyncService handles real-time syncing of agent ad account performance data.
@@ -26,7 +31,7 @@ export interface SyncOptions {
   /** Skip cache; force full re-sync */
   forceSync?: boolean;
   /** Only sync specific platforms; default syncs all connected */
-  platformsToSync?: ('meta' | 'google' | 'yandex')[];
+  platformsToSync?: ("meta" | "google" | "yandex")[];
 }
 
 export interface SyncResult {
@@ -109,7 +114,9 @@ export class PerformanceSyncService {
 
     try {
       // Step 1: Validate agent exists
-      const agent = await this.agentProfileRepo.findOne({ where: { id: agentId } });
+      const agent = await this.agentProfileRepo.findOne({
+        where: { id: agentId },
+      });
       if (!agent) {
         throw new NotFoundException(`Agent ${agentId} not found`);
       }
@@ -117,41 +124,52 @@ export class PerformanceSyncService {
       // Create sync log
       const syncLog = this.syncLogRepo.create({
         agentProfileId: agentId,
-        syncType: 'manual',
-        status: 'in_progress',
+        syncType: "manual",
+        status: "in_progress",
         startedAt: new Date(),
       });
       const savedLog = await this.syncLogRepo.save(syncLog);
 
       // Step 2: Get agent's active engagements (connected workspaces)
       const engagements = await this.engagementRepo.find({
-        where: { agentProfileId: agentId, status: 'active' },
-        relations: ['workspace'],
+        where: { agentProfileId: agentId, status: "active" },
+        relations: ["workspace"],
       });
 
       if (engagements.length === 0) {
         this.logger.warn(`Agent ${agentId} has no active engagements`);
-        result.errors.push('No active service engagements found');
+        result.errors.push("No active service engagements found");
       }
 
       // Step 3: Collect all connected accounts across workspaces
       const workspaceIds = engagements.map((e) => e.workspace.id);
-      const connectedAccounts = workspaceIds.length > 0
-        ? await this.connectedAccountRepo.find({
-            where: { workspaceId: In(workspaceIds), isActive: true },
-          })
-        : [];
+      const connectedAccounts =
+        workspaceIds.length > 0
+          ? await this.connectedAccountRepo.find({
+              where: { workspaceId: In(workspaceIds), isActive: true },
+            })
+          : [];
 
       if (connectedAccounts.length === 0 && workspaceIds.length > 0) {
         this.logger.warn(`Agent ${agentId} has no connected ad accounts`);
-        result.errors.push('No connected ad accounts found');
+        result.errors.push("No connected ad accounts found");
       }
 
       // Step 4: Group accounts by platform and sync each
-      const platformsToSync = options.platformsToSync || ['meta', 'google', 'yandex'];
-      const hasMeta = connectedAccounts.some((a) => a.platform === 'meta') && platformsToSync.includes('meta');
-      const hasGoogle = connectedAccounts.some((a) => a.platform === 'google') && platformsToSync.includes('google');
-      const hasYandex = connectedAccounts.some((a) => a.platform === 'yandex') && platformsToSync.includes('yandex');
+      const platformsToSync = options.platformsToSync || [
+        "meta",
+        "google",
+        "yandex",
+      ];
+      const hasMeta =
+        connectedAccounts.some((a) => a.platform === "meta") &&
+        platformsToSync.includes("meta");
+      const hasGoogle =
+        connectedAccounts.some((a) => a.platform === "google") &&
+        platformsToSync.includes("google");
+      const hasYandex =
+        connectedAccounts.some((a) => a.platform === "yandex") &&
+        platformsToSync.includes("yandex");
 
       const syncConfig = {
         dayLookback: 30,
@@ -165,13 +183,20 @@ export class PerformanceSyncService {
 
         if (hasMeta) {
           try {
-            const metaResult = await this.metaSyncService.syncSpecialistMetrics(agentId, wsId, syncConfig);
+            const metaResult = await this.metaSyncService.syncSpecialistMetrics(
+              agentId,
+              wsId,
+              syncConfig,
+            );
             result.recordsSynced += metaResult.campaignsSynced;
-            result.metricsStored += metaResult.metricsInserted + metaResult.metricsUpdated;
-            if (!result.platformsProcessed.includes('meta')) result.platformsProcessed.push('meta');
-            if (metaResult.errors.length > 0) result.errors.push(...metaResult.errors);
+            result.metricsStored +=
+              metaResult.metricsInserted + metaResult.metricsUpdated;
+            if (!result.platformsProcessed.includes("meta"))
+              result.platformsProcessed.push("meta");
+            if (metaResult.errors.length > 0)
+              result.errors.push(...metaResult.errors);
           } catch (err: any) {
-            const msg = `Meta sync failed for workspace ${wsId}: ${err?.message || 'unknown'}`;
+            const msg = `Meta sync failed for workspace ${wsId}: ${err?.message || "unknown"}`;
             this.logger.error(msg);
             result.errors.push(msg);
           }
@@ -179,13 +204,21 @@ export class PerformanceSyncService {
 
         if (hasGoogle) {
           try {
-            const googleResult = await this.googleSyncService.syncSpecialistMetrics(agentId, wsId, syncConfig);
+            const googleResult =
+              await this.googleSyncService.syncSpecialistMetrics(
+                agentId,
+                wsId,
+                syncConfig,
+              );
             result.recordsSynced += googleResult.campaignsSynced;
-            result.metricsStored += googleResult.metricsInserted + googleResult.metricsUpdated;
-            if (!result.platformsProcessed.includes('google')) result.platformsProcessed.push('google');
-            if (googleResult.errors.length > 0) result.errors.push(...googleResult.errors);
+            result.metricsStored +=
+              googleResult.metricsInserted + googleResult.metricsUpdated;
+            if (!result.platformsProcessed.includes("google"))
+              result.platformsProcessed.push("google");
+            if (googleResult.errors.length > 0)
+              result.errors.push(...googleResult.errors);
           } catch (err: any) {
-            const msg = `Google sync failed for workspace ${wsId}: ${err?.message || 'unknown'}`;
+            const msg = `Google sync failed for workspace ${wsId}: ${err?.message || "unknown"}`;
             this.logger.error(msg);
             result.errors.push(msg);
           }
@@ -193,13 +226,21 @@ export class PerformanceSyncService {
 
         if (hasYandex) {
           try {
-            const yandexResult = await this.yandexSyncService.syncSpecialistMetrics(agentId, wsId, syncConfig);
+            const yandexResult =
+              await this.yandexSyncService.syncSpecialistMetrics(
+                agentId,
+                wsId,
+                syncConfig,
+              );
             result.recordsSynced += yandexResult.campaignsSynced;
-            result.metricsStored += yandexResult.metricsInserted + yandexResult.metricsUpdated;
-            if (!result.platformsProcessed.includes('yandex')) result.platformsProcessed.push('yandex');
-            if (yandexResult.errors.length > 0) result.errors.push(...yandexResult.errors);
+            result.metricsStored +=
+              yandexResult.metricsInserted + yandexResult.metricsUpdated;
+            if (!result.platformsProcessed.includes("yandex"))
+              result.platformsProcessed.push("yandex");
+            if (yandexResult.errors.length > 0)
+              result.errors.push(...yandexResult.errors);
           } catch (err: any) {
-            const msg = `Yandex sync failed for workspace ${wsId}: ${err?.message || 'unknown'}`;
+            const msg = `Yandex sync failed for workspace ${wsId}: ${err?.message || "unknown"}`;
             this.logger.error(msg);
             result.errors.push(msg);
           }
@@ -210,12 +251,15 @@ export class PerformanceSyncService {
       const storedMetrics = await this.readCurrentMonthMetrics(agentId);
 
       // Step 7: Aggregate and cache stats on profile
-      const cachedStats = await this.aggregateAndCacheStats(agent, storedMetrics);
+      const cachedStats = await this.aggregateAndCacheStats(
+        agent,
+        storedMetrics,
+      );
 
       // Step 8: Update agent profile
       await this.agentProfileRepo.update(agentId, {
         lastPerformanceSync: new Date(),
-        performanceSyncStatus: result.errors.length === 0 ? 'healthy' : 'stale',
+        performanceSyncStatus: result.errors.length === 0 ? "healthy" : "stale",
         cachedStats,
       });
 
@@ -226,7 +270,7 @@ export class PerformanceSyncService {
       await this.logSync(agentId, result, savedLog.id);
 
       this.logger.log({
-        message: 'Performance sync completed',
+        message: "Performance sync completed",
         agentId,
         success: result.success,
         metricsStored: result.metricsStored,
@@ -237,8 +281,8 @@ export class PerformanceSyncService {
       return result;
     } catch (err: any) {
       result.syncDuration = Date.now() - startTime;
-      result.errors.push(err?.message || 'Unexpected error during sync');
-      this.logger.error('Sync failed', err);
+      result.errors.push(err?.message || "Unexpected error during sync");
+      this.logger.error("Sync failed", err);
       return result;
     }
   }
@@ -247,9 +291,15 @@ export class PerformanceSyncService {
    * Read current month's platform metrics from DB.
    * These were persisted by the individual sync services.
    */
-  private async readCurrentMonthMetrics(agentId: string): Promise<PlatformMetrics[]> {
+  private async readCurrentMonthMetrics(
+    agentId: string,
+  ): Promise<PlatformMetrics[]> {
     const today = new Date();
-    const aggregationPeriod = new Date(today.getFullYear(), today.getMonth(), 1);
+    const aggregationPeriod = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      1,
+    );
 
     const rows = await this.platformMetricsRepo.find({
       where: { agentProfileId: agentId, aggregationPeriod },
@@ -277,37 +327,59 @@ export class PerformanceSyncService {
     allMetrics: PlatformMetrics[],
   ): Promise<AggregatedStats> {
     const today = new Date();
-    const yearMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+    const yearMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
 
     // Calculate aggregated KPIs across all platforms
     const totalSpend = allMetrics.reduce((sum, m) => sum + m.totalSpend, 0);
-    const totalConversions = allMetrics.reduce((sum, m) => sum + m.conversions, 0);
+    const totalConversions = allMetrics.reduce(
+      (sum, m) => sum + m.conversions,
+      0,
+    );
     const totalRevenue = allMetrics.reduce((sum, m) => sum + m.revenue, 0);
-    const totalCampaigns = allMetrics.reduce((sum, m) => sum + m.campaignCount, 0);
+    const totalCampaigns = allMetrics.reduce(
+      (sum, m) => sum + m.campaignCount,
+      0,
+    );
 
     // ROAS = totalRevenue / totalSpend
-    const avgRoas = totalSpend > 0 ? parseFloat((totalRevenue / totalSpend).toFixed(2)) : 0;
+    const avgRoas =
+      totalSpend > 0 ? parseFloat((totalRevenue / totalSpend).toFixed(2)) : 0;
 
     // CPA = totalSpend / totalConversions
-    const avgCpa = totalConversions > 0 ? parseFloat((totalSpend / totalConversions).toFixed(2)) : 0;
+    const avgCpa =
+      totalConversions > 0
+        ? parseFloat((totalSpend / totalConversions).toFixed(2))
+        : 0;
 
     // Weighted average CTR across platforms
-    const avgCtr = allMetrics.length > 0
-      ? parseFloat(
-          (allMetrics.reduce((sum, m) => sum + (m.avgCtr || 0), 0) / allMetrics.length).toFixed(3),
-        )
-      : 0;
+    const avgCtr =
+      allMetrics.length > 0
+        ? parseFloat(
+            (
+              allMetrics.reduce((sum, m) => sum + (m.avgCtr || 0), 0) /
+              allMetrics.length
+            ).toFixed(3),
+          )
+        : 0;
 
     // Best ROAS among individual platforms
-    const bestROAS = allMetrics.length > 0
-      ? parseFloat(Math.max(...allMetrics.map((m) => m.avgRoas || 0)).toFixed(2))
-      : 0;
+    const bestROAS =
+      allMetrics.length > 0
+        ? parseFloat(
+            Math.max(...allMetrics.map((m) => m.avgRoas || 0)).toFixed(2),
+          )
+        : 0;
 
     // Success rate: % of campaigns with ROAS > 1 (profitable)
     // Approximation: if overall ROAS > 1, most campaigns are profitable
-    const successRate = avgRoas > 0
-      ? parseFloat(Math.min(100, Math.max(0, (avgRoas / (avgRoas + 1)) * 100)).toFixed(1))
-      : 0;
+    const successRate =
+      avgRoas > 0
+        ? parseFloat(
+            Math.min(100, Math.max(0, (avgRoas / (avgRoas + 1)) * 100)).toFixed(
+              1,
+            ),
+          )
+        : 0;
 
     // Active campaigns: query from DB for actual count
     const activeCampaigns = await this.getActiveCampaignCount(agent.id);
@@ -341,7 +413,10 @@ export class PerformanceSyncService {
     };
 
     if (existing) {
-      await this.historicalPerformanceRepo.update({ id: existing.id }, histData);
+      await this.historicalPerformanceRepo.update(
+        { id: existing.id },
+        histData,
+      );
     } else {
       await this.historicalPerformanceRepo.save(
         this.historicalPerformanceRepo.create({
@@ -368,7 +443,7 @@ export class PerformanceSyncService {
            AND apm.campaigns_count > 0`,
         [agentId],
       );
-      return parseInt(result?.[0]?.count || '0', 10);
+      return parseInt(result?.[0]?.count || "0", 10);
     } catch {
       return 0;
     }
@@ -388,9 +463,10 @@ export class PerformanceSyncService {
         await this.syncLogRepo.update(
           { id: logId },
           {
-            status: result.success ? 'completed' : 'failed',
+            status: result.success ? "completed" : "failed",
             recordsSynced: result.recordsSynced,
-            errorMessage: result.errors.length > 0 ? result.errors.join('; ') : null,
+            errorMessage:
+              result.errors.length > 0 ? result.errors.join("; ") : null,
             completedAt: new Date(),
             nextSyncAt: this.calculateNextSyncTime(result.success),
           },
@@ -421,7 +497,7 @@ export class PerformanceSyncService {
   async getSyncHistory(agentId: string, limit: number = 10) {
     return this.syncLogRepo.find({
       where: { agentProfileId: agentId },
-      order: { createdAt: 'DESC' },
+      order: { createdAt: "DESC" },
       take: limit,
     });
   }
@@ -431,7 +507,11 @@ export class PerformanceSyncService {
    */
   async getCurrentMetrics(agentId: string): Promise<AgentPlatformMetrics[]> {
     const today = new Date();
-    const aggregationPeriod = new Date(today.getFullYear(), today.getMonth(), 1);
+    const aggregationPeriod = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      1,
+    );
 
     return this.platformMetricsRepo.find({
       where: { agentProfileId: agentId, aggregationPeriod },
@@ -442,15 +522,16 @@ export class PerformanceSyncService {
    * Get historical performance data for an agent (yearly breakdown).
    */
   async getHistoricalPerformance(agentId: string, year?: number) {
-    const query = this.historicalPerformanceRepo.createQueryBuilder('hp')
-      .where('hp.agentProfileId = :agentId', { agentId });
+    const query = this.historicalPerformanceRepo
+      .createQueryBuilder("hp")
+      .where("hp.agentProfileId = :agentId", { agentId });
 
     if (year) {
-      query.andWhere('hp.yearMonth LIKE :yearPattern', {
+      query.andWhere("hp.yearMonth LIKE :yearPattern", {
         yearPattern: `${year}-%`,
       });
     }
 
-    return query.orderBy('hp.yearMonth', 'ASC').getMany();
+    return query.orderBy("hp.yearMonth", "ASC").getMany();
   }
 }

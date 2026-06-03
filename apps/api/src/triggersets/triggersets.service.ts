@@ -1,8 +1,18 @@
-import { Injectable, Logger, NotFoundException, ForbiddenException } from "@nestjs/common";
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  ForbiddenException,
+} from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { ConfigService } from "@nestjs/config";
-import { Triggerset, TriggerLog, TriggerCondition, TriggerAction } from "./entities/triggerset.entity";
+import {
+  Triggerset,
+  TriggerLog,
+  TriggerCondition,
+  TriggerAction,
+} from "./entities/triggerset.entity";
 import { MetaInsight } from "../meta/entities/meta-insight.entity";
 import { MetaCampaignSync } from "../meta/entities/meta-campaign-sync.entity";
 import { Workspace } from "../workspaces/entities/workspace.entity";
@@ -101,7 +111,10 @@ export class TriggersetService {
     };
 
     for (const row of logs) {
-      const ranAt: Date = row.ranat instanceof Date ? row.ranat : new Date(row.ranat ?? row.ranAt);
+      const ranAt: Date =
+        row.ranat instanceof Date
+          ? row.ranat
+          : new Date(row.ranat ?? row.ranAt);
       const isCurrent = ranAt >= since;
       const actions = Array.isArray(row.actionsapplied)
         ? row.actionsapplied
@@ -124,7 +137,13 @@ export class TriggersetService {
     }
 
     // Build a full daily series so the chart can render without gaps.
-    const daily: Array<{ date: string; start: number; pause: number; up: number; down: number }> = [];
+    const daily: Array<{
+      date: string;
+      start: number;
+      pause: number;
+      up: number;
+      down: number;
+    }> = [];
     for (let i = 0; i < days; i += 1) {
       const d = new Date(since);
       d.setUTCDate(d.getUTCDate() + i);
@@ -152,13 +171,25 @@ export class TriggersetService {
     return ts;
   }
 
-  async create(workspaceId: string, userId: string, dto: CreateTriggersetDto): Promise<Triggerset> {
+  async create(
+    workspaceId: string,
+    userId: string,
+    dto: CreateTriggersetDto,
+  ): Promise<Triggerset> {
     await this.assertOwnership(workspaceId, userId);
-    const ts = this.triggersetRepo.create({ ...dto, workspaceId, enabled: dto.enabled ?? true });
+    const ts = this.triggersetRepo.create({
+      ...dto,
+      workspaceId,
+      enabled: dto.enabled ?? true,
+    });
     return this.triggersetRepo.save(ts);
   }
 
-  async update(id: string, userId: string, patch: Partial<CreateTriggersetDto & { enabled: boolean }>): Promise<Triggerset> {
+  async update(
+    id: string,
+    userId: string,
+    patch: Partial<CreateTriggersetDto & { enabled: boolean }>,
+  ): Promise<Triggerset> {
     const ts = await this.findOne(id, userId);
     Object.assign(ts, patch);
     return this.triggersetRepo.save(ts);
@@ -185,7 +216,9 @@ export class TriggersetService {
    * Called by cron every 30 minutes.
    */
   async runAll(): Promise<void> {
-    const triggersets = await this.triggersetRepo.find({ where: { enabled: true } });
+    const triggersets = await this.triggersetRepo.find({
+      where: { enabled: true },
+    });
     this.logger.log(`Running ${triggersets.length} enabled triggersets`);
 
     for (const ts of triggersets) {
@@ -212,7 +245,13 @@ export class TriggersetService {
       }
 
       if (matchedItems.length === 0) {
-        return await this.saveLog(ts.id, "no_match", matchedItems, actionsApplied, null);
+        return await this.saveLog(
+          ts.id,
+          "no_match",
+          matchedItems,
+          actionsApplied,
+          null,
+        );
       }
 
       // Execute actions for matched items
@@ -229,12 +268,24 @@ export class TriggersetService {
       ts.totalFires += matchedItems.length;
       await this.triggersetRepo.save(ts);
 
-      return await this.saveLog(ts.id, "success", matchedItems, actionsApplied, null);
+      return await this.saveLog(
+        ts.id,
+        "success",
+        matchedItems,
+        actionsApplied,
+        null,
+      );
     } catch (err) {
       ts.lastRunStatus = "failed";
       ts.lastRunAt = new Date();
       await this.triggersetRepo.save(ts);
-      return await this.saveLog(ts.id, "failed", matchedItems, actionsApplied, err.message);
+      return await this.saveLog(
+        ts.id,
+        "failed",
+        matchedItems,
+        actionsApplied,
+        err.message,
+      );
     }
   }
 
@@ -300,13 +351,22 @@ export class TriggersetService {
     }
   }
 
-  private compare(value: number, op: TriggerCondition["operator"], threshold: number): boolean {
+  private compare(
+    value: number,
+    op: TriggerCondition["operator"],
+    threshold: number,
+  ): boolean {
     switch (op) {
-      case "gt":  return value > threshold;
-      case "lt":  return value < threshold;
-      case "gte": return value >= threshold;
-      case "lte": return value <= threshold;
-      case "eq":  return Math.abs(value - threshold) < 0.0001;
+      case "gt":
+        return value > threshold;
+      case "lt":
+        return value < threshold;
+      case "gte":
+        return value >= threshold;
+      case "lte":
+        return value <= threshold;
+      case "eq":
+        return Math.abs(value - threshold) < 0.0001;
     }
   }
 
@@ -320,7 +380,9 @@ export class TriggersetService {
     switch (action.type) {
       case "pause_campaign": {
         // Log the intent — actual Meta API pause would require access token
-        this.logger.log(`[Triggerset ${ts.id}] Would pause campaign ${item.id}: ${item.name}`);
+        this.logger.log(
+          `[Triggerset ${ts.id}] Would pause campaign ${item.id}: ${item.name}`,
+        );
         return `Paused (logged)`;
       }
 
@@ -328,7 +390,9 @@ export class TriggersetService {
       case "decrease_budget": {
         const pct = action.value ?? 10;
         const dir = action.type === "increase_budget" ? "+" : "-";
-        this.logger.log(`[Triggerset ${ts.id}] Would ${dir}${pct}% budget for campaign ${item.id}`);
+        this.logger.log(
+          `[Triggerset ${ts.id}] Would ${dir}${pct}% budget for campaign ${item.id}`,
+        );
         return `Budget ${dir}${pct}% (logged)`;
       }
 
@@ -342,13 +406,19 @@ export class TriggersetService {
         if (!botToken || !chatId) return "Telegram not configured";
 
         const msg = action.message
-          ? action.message.replace("{name}", item.name).replace("{value}", String(item.metricValue))
+          ? action.message
+              .replace("{name}", item.name)
+              .replace("{value}", String(item.metricValue))
           : `⚡ <b>Triggerset: ${ts.name}</b>\n📢 <b>${item.name}</b>\nQiymat: ${item.metricValue.toFixed(2)}`;
 
         await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ chat_id: chatId, text: msg, parse_mode: "HTML" }),
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: msg,
+            parse_mode: "HTML",
+          }),
         });
         return "Telegram notification sent";
       }
@@ -365,12 +435,24 @@ export class TriggersetService {
     actionsApplied: TriggerLog["actionsApplied"],
     errorMessage: string | null,
   ): Promise<TriggerLog> {
-    const log = this.logRepo.create({ triggersetId, status, matchedItems, actionsApplied, errorMessage });
+    const log = this.logRepo.create({
+      triggersetId,
+      status,
+      matchedItems,
+      actionsApplied,
+      errorMessage,
+    });
     return this.logRepo.save(log);
   }
 
-  private async assertOwnership(workspaceId: string, userId: string): Promise<void> {
-    const ws = await this.workspaceRepo.findOne({ where: { id: workspaceId }, select: ["id", "userId"] });
+  private async assertOwnership(
+    workspaceId: string,
+    userId: string,
+  ): Promise<void> {
+    const ws = await this.workspaceRepo.findOne({
+      where: { id: workspaceId },
+      select: ["id", "userId"],
+    });
     if (!ws) throw new NotFoundException("Workspace not found");
     if (ws.userId !== userId) throw new ForbiddenException("Access denied");
   }

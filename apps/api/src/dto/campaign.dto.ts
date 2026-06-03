@@ -1,36 +1,52 @@
-import { IsString, IsNotEmpty, IsEnum, IsNumber, IsOptional, IsDate, IsBoolean, IsArray, IsObject, ValidateNested, Min, Max, IsUrl, IsEmail as _IsEmail, IsIn } from 'class-validator';
-import { Type } from 'class-transformer';
+import {
+  IsString,
+  IsNotEmpty,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsDate,
+  IsBoolean,
+  IsArray,
+  IsObject,
+  ValidateNested,
+  Min,
+  Max,
+  IsUrl,
+  IsEmail as _IsEmail,
+  IsIn,
+} from "class-validator";
+import { Type } from "class-transformer";
 
 // Enums inline to avoid import issues
 export enum CampaignObjective {
-  LEADS = 'leads',
-  TRAFFIC = 'traffic',
-  SALES = 'sales',
-  AWARENESS = 'awareness'
+  LEADS = "leads",
+  TRAFFIC = "traffic",
+  SALES = "sales",
+  AWARENESS = "awareness",
 }
 
 export enum BudgetType {
-  DAILY = 'daily',
-  WEEKLY = 'weekly'
+  DAILY = "daily",
+  WEEKLY = "weekly",
 }
 
 export enum Scenario {
-  ALL = 'all',
-  NEW = 'new'
+  ALL = "all",
+  NEW = "new",
 }
 
 export enum Platform {
-  META = 'meta',
-  GOOGLE = 'google',
-  YANDEX = 'yandex',
-  TELEGRAM = 'telegram'
+  META = "meta",
+  GOOGLE = "google",
+  YANDEX = "yandex",
+  TELEGRAM = "telegram",
 }
 
 export enum BiddingStrategy {
-  MAXIMIZE_CLICKS = 'maximize_clicks',
-  MAXIMIZE_CONVERSIONS = 'maximize_conversions',
-  TARGET_CPC = 'target_cpc',
-  TARGET_ROAS = 'target_roas'
+  MAXIMIZE_CLICKS = "maximize_clicks",
+  MAXIMIZE_CONVERSIONS = "maximize_conversions",
+  TARGET_CPC = "target_cpc",
+  TARGET_ROAS = "target_roas",
 }
 
 // Base DTOs
@@ -88,8 +104,8 @@ export class BidAdjustmentsDto {
 }
 
 export class GeoTargetingDto {
-  @IsEnum(['list', 'map'])
-  mode: 'list' | 'map';
+  @IsEnum(["list", "map"])
+  mode: "list" | "map";
 
   @IsOptional()
   @IsArray()
@@ -112,8 +128,8 @@ export class KeywordDto {
   @IsString()
   phrase: string;
 
-  @IsEnum(['broad', 'phrase', 'exact'])
-  match_type: 'broad' | 'phrase' | 'exact';
+  @IsEnum(["broad", "phrase", "exact"])
+  match_type: "broad" | "phrase" | "exact";
 
   @IsOptional()
   @IsNumber()
@@ -134,13 +150,13 @@ export class InterestDto {
   @IsString()
   interest_id?: string;
 
-  @IsEnum(['meta', 'google', 'yandex', 'telegram'])
+  @IsEnum(["meta", "google", "yandex", "telegram"])
   platform: Platform;
 }
 
 export class RetargetingRuleDto {
-  @IsEnum(['buyers', 'abandoned_cart', 'frequent_buyers', 'lookalike'])
-  rule_type: 'buyers' | 'abandoned_cart' | 'frequent_buyers' | 'lookalike';
+  @IsEnum(["buyers", "abandoned_cart", "frequent_buyers", "lookalike"])
+  rule_type: "buyers" | "abandoned_cart" | "frequent_buyers" | "lookalike";
 
   @IsOptional()
   @IsObject()
@@ -184,8 +200,8 @@ export class CreativeDto {
 }
 
 export class ExtensionDto {
-  @IsEnum(['sitelink', 'callout', 'promo'])
-  extension_type: 'sitelink' | 'callout' | 'promo';
+  @IsEnum(["sitelink", "callout", "promo"])
+  extension_type: "sitelink" | "callout" | "promo";
 
   @IsNotEmpty()
   @IsObject()
@@ -217,7 +233,7 @@ export class CreateCampaignDto {
   budget_type: BudgetType;
 
   @IsString()
-  @IsIn(['USD', 'EUR', 'RUB', 'UZS'])
+  @IsIn(["USD", "EUR", "RUB", "UZS"])
   currency: string;
 
   @IsDate()
@@ -234,8 +250,8 @@ export class CreateCampaignDto {
   always_on?: boolean;
 
   @IsOptional()
-  @IsEnum(['manual', 'ai_optimized'])
-  autopilot_mode?: 'manual' | 'ai_optimized';
+  @IsEnum(["manual", "ai_optimized"])
+  autopilot_mode?: "manual" | "ai_optimized";
 
   @IsOptional()
   @IsEnum(BiddingStrategy)
@@ -264,7 +280,7 @@ export class CreateCampaignDto {
 
 export class UpdateCampaignDto extends CreateCampaignDto {
   @IsOptional()
-  @IsEnum(['draft', 'active', 'paused', 'completed', 'deleted'])
+  @IsEnum(["draft", "active", "paused", "completed", "deleted"])
   status?: string;
 }
 
@@ -279,7 +295,7 @@ export class CreateAdGroupDto {
   scenario: Scenario;
 
   @IsOptional()
-  @IsEnum(['active', 'paused', 'deleted'])
+  @IsEnum(["active", "paused", "deleted"])
   status?: string;
 
   @IsOptional()
@@ -326,8 +342,8 @@ export class CreateKeywordDto {
   @Max(500)
   phrase: string;
 
-  @IsEnum(['broad', 'phrase', 'exact'])
-  match_type: 'broad' | 'phrase' | 'exact';
+  @IsEnum(["broad", "phrase", "exact"])
+  match_type: "broad" | "phrase" | "exact";
 
   @IsOptional()
   @IsNumber()
@@ -341,7 +357,7 @@ export class CreateKeywordDto {
 
 export class UpdateKeywordDto extends CreateKeywordDto {
   @IsOptional()
-  @IsEnum(['active', 'paused', 'deleted'])
+  @IsEnum(["active", "paused", "deleted"])
   status?: string;
 }
 
@@ -380,13 +396,13 @@ export class CreateCreativeDto {
 
 export class UpdateCreativeDto extends CreateCreativeDto {
   @IsOptional()
-  @IsEnum(['active', 'paused', 'deleted'])
+  @IsEnum(["active", "paused", "deleted"])
   status?: string;
 }
 
 export class CreateExtensionDto {
-  @IsEnum(['sitelink', 'callout', 'promo'])
-  extension_type: 'sitelink' | 'callout' | 'promo';
+  @IsEnum(["sitelink", "callout", "promo"])
+  extension_type: "sitelink" | "callout" | "promo";
 
   @IsNotEmpty()
   @IsObject()
@@ -403,7 +419,7 @@ export class UpdateExtensionDto extends CreateExtensionDto {}
 
 export class CampaignQueryDto {
   @IsOptional()
-  @IsEnum(['draft', 'active', 'paused', 'completed', 'deleted'])
+  @IsEnum(["draft", "active", "paused", "completed", "deleted"])
   status?: string;
 
   @IsOptional()
@@ -411,7 +427,7 @@ export class CampaignQueryDto {
   objective?: CampaignObjective;
 
   @IsOptional()
-  @IsEnum(['manual', 'ai_optimized'])
+  @IsEnum(["manual", "ai_optimized"])
   autopilot_mode?: string;
 
   @IsOptional()
@@ -441,11 +457,11 @@ export class CampaignQueryDto {
 
   @IsOptional()
   @IsString()
-  sort?: string = 'created_at';
+  sort?: string = "created_at";
 
   @IsOptional()
-  @IsEnum(['ASC', 'DESC'])
-  order?: 'ASC' | 'DESC' = 'DESC';
+  @IsEnum(["ASC", "DESC"])
+  order?: "ASC" | "DESC" = "DESC";
 }
 
 export class PerformanceQueryDto {
@@ -460,12 +476,12 @@ export class PerformanceQueryDto {
   end_date?: Date;
 
   @IsOptional()
-  @IsEnum(['meta', 'google', 'yandex', 'telegram'])
+  @IsEnum(["meta", "google", "yandex", "telegram"])
   platform?: Platform;
 
   @IsOptional()
   @IsString()
-  group_by?: 'day' | 'week' | 'month' = 'day';
+  group_by?: "day" | "week" | "month" = "day";
 }
 
 // AI DTOs
@@ -487,7 +503,7 @@ export class AdCopyRequestDto {
   @IsEnum(CampaignObjective)
   objective: CampaignObjective;
 
-  @IsEnum(['meta', 'google', 'yandex', 'telegram'])
+  @IsEnum(["meta", "google", "yandex", "telegram"])
   platform: Platform;
 }
 
@@ -500,11 +516,11 @@ export class KeywordRequestDto {
   @IsString()
   niche?: string;
 
-  @IsEnum(['meta', 'google', 'yandex', 'telegram'])
+  @IsEnum(["meta", "google", "yandex", "telegram"])
   platform: Platform;
 
-  @IsEnum(['broad', 'phrase', 'exact'])
-  match_type: 'broad' | 'phrase' | 'exact';
+  @IsEnum(["broad", "phrase", "exact"])
+  match_type: "broad" | "phrase" | "exact";
 }
 
 export class BudgetOptimizationRequestDto {
@@ -525,7 +541,7 @@ export class BudgetOptimizationRequestDto {
   budget: number;
 
   @IsString()
-  @IsIn(['USD', 'EUR', 'RUB', 'UZS'])
+  @IsIn(["USD", "EUR", "RUB", "UZS"])
   currency: string;
 }
 
@@ -547,7 +563,7 @@ export class ImagePromptRequestDto {
   @IsString({ each: true })
   keywords?: string[];
 
-  @IsEnum(['meta', 'google', 'yandex', 'telegram'])
+  @IsEnum(["meta", "google", "yandex", "telegram"])
   platform: Platform;
 }
 
@@ -645,66 +661,71 @@ export class AIRecommendationDto {
 
 export const validateCampaignName = (name: string): string[] => {
   const errors: string[] = [];
-  
+
   if (name.length < 3) {
-    errors.push('Campaign name must be at least 3 characters long');
+    errors.push("Campaign name must be at least 3 characters long");
   }
-  
+
   if (name.length > 100) {
-    errors.push('Campaign name must not exceed 100 characters');
+    errors.push("Campaign name must not exceed 100 characters");
   }
-  
+
   if (!/^[a-zA-Z0-9\s\-_]+$/.test(name)) {
-    errors.push('Campaign name can only contain letters, numbers, spaces, hyphens, and underscores');
+    errors.push(
+      "Campaign name can only contain letters, numbers, spaces, hyphens, and underscores",
+    );
   }
-  
+
   return errors;
 };
 
 export const validateBudget = (budget: number, currency: string): string[] => {
   const errors: string[] = [];
-  
+
   if (budget <= 0) {
-    errors.push('Budget must be greater than 0');
+    errors.push("Budget must be greater than 0");
   }
-  
+
   const maxBudgets = {
     USD: 1000000,
     EUR: 1000000,
     RUB: 100000000,
-    UZS: 10000000000
+    UZS: 10000000000,
   };
-  
+
   if (budget > (maxBudgets[currency as keyof typeof maxBudgets] || 1000000)) {
     errors.push(`Budget exceeds maximum limit for ${currency}`);
   }
-  
+
   return errors;
 };
 
-export const validatePlatformConstraints = (platform: Platform, data: any): string[] => {
+export const validatePlatformConstraints = (
+  platform: Platform,
+  data: any,
+): string[] => {
   const errors: string[] = [];
-  
-  if (platform === 'google') {
+
+  if (platform === "google") {
     if (data.headline && data.headline.length > 30) {
-      errors.push('Google headline must not exceed 30 characters');
+      errors.push("Google headline must not exceed 30 characters");
     }
     if (data.description && data.description.length > 90) {
-      errors.push('Google description must not exceed 90 characters');
+      errors.push("Google description must not exceed 90 characters");
     }
   }
-  
-  if (platform === 'yandex') {
+
+  if (platform === "yandex") {
     if (data.headline && data.headline.length > 56) {
-      errors.push('Yandex headline must not exceed 56 characters');
+      errors.push("Yandex headline must not exceed 56 characters");
     }
   }
-  
-  if (platform === 'meta') {
+
+  if (platform === "meta") {
     if (data.primary_text && data.primary_text.length > 125) {
-      errors.push('Meta primary text must not exceed 125 characters');
+      errors.push("Meta primary text must not exceed 125 characters");
     }
   }
-  
+
   return errors;
 };

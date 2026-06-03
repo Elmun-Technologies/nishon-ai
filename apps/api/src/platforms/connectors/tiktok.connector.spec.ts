@@ -80,7 +80,9 @@ describe("TiktokConnector", () => {
         of({ data: { code: 40001, message: "Invalid app" } } as any),
       );
 
-      await expect(connector.exchangeCodeForToken("code")).rejects.toThrow(BadRequestException);
+      await expect(connector.exchangeCodeForToken("code")).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -127,7 +129,10 @@ describe("TiktokConnector", () => {
             data: {
               list: [
                 {
-                  dimensions: { campaign_id: "999", stat_time_day: "2024-01-15" },
+                  dimensions: {
+                    campaign_id: "999",
+                    stat_time_day: "2024-01-15",
+                  },
                   metrics: {
                     impressions: "8000",
                     clicks: "400",

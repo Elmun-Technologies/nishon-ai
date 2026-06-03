@@ -4,60 +4,73 @@ import {
   Column,
   CreateDateColumn,
   Index,
-} from 'typeorm'
+} from "typeorm";
 
 /**
  * Audit trail for commission calculations and changes
  * Tracks all modifications to specialist commissions
  */
-@Entity('commission_logs')
-@Index(['commissionId', 'createdAt'])
-@Index(['action'])
+@Entity("commission_logs")
+@Index(["commissionId", "createdAt"])
+@Index(["action"])
 export class CommissionLog {
-  @PrimaryGeneratedColumn('uuid')
-  id: string
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
   /**
    * Reference to SpecialistCommission
    */
   @Column()
   @Index()
-  commissionId: string
+  commissionId: string;
 
   /**
    * Action performed on the commission
    */
   @Column({
-    type: 'enum',
-    enum: ['calculated', 'approved', 'rejected', 'modified', 'paid', 'reversed'],
+    type: "enum",
+    enum: [
+      "calculated",
+      "approved",
+      "rejected",
+      "modified",
+      "paid",
+      "reversed",
+    ],
   })
-  action: 'calculated' | 'approved' | 'rejected' | 'modified' | 'paid' | 'reversed'
+  action:
+    | "calculated"
+    | "approved"
+    | "rejected"
+    | "modified"
+    | "paid"
+    | "reversed";
 
   /**
    * User who made the change
    */
   @Column()
-  changedBy: string
+  changedBy: string;
 
   /**
    * What changed (before/after values)
    */
-  @Column('jsonb')
+  @Column("jsonb")
   changesApplied: {
-    from?: Record<string, any>
-    to?: Record<string, any>
-    [key: string]: any
-  }
+    from?: Record<string, any>;
+    to?: Record<string, any>;
+    [key: string]: any;
+  };
 
   /**
    * Reason for the change
    */
   @Column({ nullable: true })
-  reason: string
+  reason: string;
 
   /**
    * When change was made
    */
   @CreateDateColumn()
-  createdAt: Date
+  createdAt: Date;
 }

@@ -30,14 +30,18 @@ export class TelegramWebhookController {
   @Post("webhook")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: "Telegram Bot webhook — /start phone=998… → Redis telegram:{phone}=chat_id",
-    description: "Query `secret` = TELEGRAM_WEBHOOK_SECRET (ixtiyoriy, tavsiya etiladi).",
+    summary:
+      "Telegram Bot webhook — /start phone=998… → Redis telegram:{phone}=chat_id",
+    description:
+      "Query `secret` = TELEGRAM_WEBHOOK_SECRET (ixtiyoriy, tavsiya etiladi).",
   })
   async webhook(
     @Query("secret") secret: string | undefined,
     @Body() update: Record<string, unknown>,
   ): Promise<{ ok: true }> {
-    const expected = this.config.get<string>("TELEGRAM_WEBHOOK_SECRET", "").trim();
+    const expected = this.config
+      .get<string>("TELEGRAM_WEBHOOK_SECRET", "")
+      .trim();
     if (expected && secret !== expected) {
       throw new UnauthorizedException("Noto‘g‘ri webhook secret");
     }
@@ -68,7 +72,11 @@ export class TelegramWebhookController {
         } catch (e) {
           this.logger.warn(`Telegram javob xatosi: ${(e as Error).message}`);
         }
-        this.logger.log({ message: "Telegram ↔ telefon bog‘landi", phone, chatId });
+        this.logger.log({
+          message: "Telegram ↔ telefon bog‘landi",
+          phone,
+          chatId,
+        });
       }
     }
 

@@ -1,6 +1,18 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Index,
+} from "typeorm";
 
-export type LaunchJobStatus = "draft" | "validated" | "launching" | "launched" | "failed";
+export type LaunchJobStatus =
+  | "draft"
+  | "validated"
+  | "launching"
+  | "launched"
+  | "failed";
 
 @Entity("launch_jobs")
 export class LaunchJob {

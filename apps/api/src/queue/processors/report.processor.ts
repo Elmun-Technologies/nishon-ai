@@ -171,7 +171,9 @@ export class ReportProcessor {
 
       if (!response.ok) {
         const errorBody = await response.text();
-        throw new Error(`Telegram API error: ${response.status} — ${errorBody}`);
+        throw new Error(
+          `Telegram API error: ${response.status} — ${errorBody}`,
+        );
       }
 
       this.logger.log(

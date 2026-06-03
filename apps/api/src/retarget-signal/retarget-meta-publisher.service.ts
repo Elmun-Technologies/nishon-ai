@@ -48,10 +48,15 @@ export class RetargetMetaPublisherService {
     }
 
     const act = this.toActId(input.adAccountId);
-    const link = (input.linkUrl || input.rule.linkUrl).trim() || "https://www.facebook.com/";
+    const link =
+      (input.linkUrl || input.rule.linkUrl).trim() ||
+      "https://www.facebook.com/";
     const dailyBudget = String(
       input.dailyBudget ??
-        (Number(this.config.get<string>("RETARGET_DEFAULT_DAILY_BUDGET", "50000")) || 50000),
+        (Number(
+          this.config.get<string>("RETARGET_DEFAULT_DAILY_BUDGET", "50000"),
+        ) ||
+          50000),
     );
     const short = input.phoneDigits.slice(-4);
     const audienceName = `${input.rule.adsetName} — ${short}`;
@@ -59,11 +64,19 @@ export class RetargetMetaPublisherService {
     const adsetName = `Retarget - ${input.rule.key} - ${short}`;
     const token = input.accessToken;
 
-    const audienceId = await this.createCustomAudience(act, audienceName, token);
+    const audienceId = await this.createCustomAudience(
+      act,
+      audienceName,
+      token,
+    );
     await this.addPhoneHashToAudience(audienceId, input.phoneDigits, token);
     await this.sleepForAudienceReady();
 
-    const campaignId = await this.createTrafficCampaign(act, campaignName, token);
+    const campaignId = await this.createTrafficCampaign(
+      act,
+      campaignName,
+      token,
+    );
     const adsetId = await this.createAdSet({
       act,
       name: adsetName,
@@ -126,11 +139,14 @@ export class RetargetMetaPublisherService {
     }
     body.set("access_token", accessToken);
     const res = await firstValueFrom(
-      this.http.post<Record<string, unknown> & { error?: { message?: string } }>(url, body.toString(), {
+      this.http.post<
+        Record<string, unknown> & { error?: { message?: string } }
+      >(url, body.toString(), {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
       }),
     ).catch((e: any) => {
-      const msg = e?.response?.data?.error?.message ?? e?.message ?? "Graph xato";
+      const msg =
+        e?.response?.data?.error?.message ?? e?.message ?? "Graph xato";
       throw new BadGatewayException(msg);
     });
     const data = res.data;
@@ -141,7 +157,11 @@ export class RetargetMetaPublisherService {
     return data;
   }
 
-  private async graphPost(path: string, fields: Record<string, string>, accessToken: string): Promise<string> {
+  private async graphPost(
+    path: string,
+    fields: Record<string, string>,
+    accessToken: string,
+  ): Promise<string> {
     const data = await this.graphPostRaw(path, fields, accessToken);
     const id = data?.id;
     if (typeof id !== "string" || !id.length) {
@@ -150,7 +170,11 @@ export class RetargetMetaPublisherService {
     return id;
   }
 
-  private async createCustomAudience(act: string, name: string, token: string): Promise<string> {
+  private async createCustomAudience(
+    act: string,
+    name: string,
+    token: string,
+  ): Promise<string> {
     return this.graphPost(
       `${act}/customaudiences`,
       {
@@ -163,7 +187,11 @@ export class RetargetMetaPublisherService {
     );
   }
 
-  private async addPhoneHashToAudience(audienceId: string, phoneDigits: string, token: string): Promise<void> {
+  private async addPhoneHashToAudience(
+    audienceId: string,
+    phoneDigits: string,
+    token: string,
+  ): Promise<void> {
     const hash = hashPhoneSha256ForMeta(phoneDigits);
     const payload = JSON.stringify({
       schema: ["PH"],
@@ -180,11 +208,17 @@ export class RetargetMetaPublisherService {
 
   /** Meta auditoriyani qayta ishlashi uchun qisqa kutish. */
   private async sleepForAudienceReady(): Promise<void> {
-    const ms = Number(this.config.get<string>("RETARGET_AUDIENCE_WAIT_MS", "3000"));
+    const ms = Number(
+      this.config.get<string>("RETARGET_AUDIENCE_WAIT_MS", "3000"),
+    );
     await new Promise((r) => setTimeout(r, Number.isFinite(ms) ? ms : 3000));
   }
 
-  private async createTrafficCampaign(act: string, name: string, token: string): Promise<string> {
+  private async createTrafficCampaign(
+    act: string,
+    name: string,
+    token: string,
+  ): Promise<string> {
     return this.graphPost(
       `${act}/campaigns`,
       {

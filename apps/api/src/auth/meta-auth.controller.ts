@@ -67,7 +67,11 @@ export class MetaAuthController {
     @Query("redirectTo") redirectTo: string | undefined,
     @Res() res: Response,
   ): void {
-    this.logger.log({ message: "/meta/connect hit", workspaceId, hasRedirectTo: Boolean(redirectTo) });
+    this.logger.log({
+      message: "/meta/connect hit",
+      workspaceId,
+      hasRedirectTo: Boolean(redirectTo),
+    });
 
     if (!workspaceId) {
       res.status(HttpStatus.BAD_REQUEST).json({
@@ -100,19 +104,29 @@ export class MetaAuthController {
     @Query("state") state: string | undefined,
     @Res() res: Response,
   ): Promise<void> {
-    this.logger.log({ message: "/meta/callback hit", hasCode: Boolean(code), error });
+    this.logger.log({
+      message: "/meta/callback hit",
+      hasCode: Boolean(code),
+      error,
+    });
 
     const frontendUrl = this.config.get<string>("FRONTEND_URL", "");
 
     // ── Meta denied (user cancelled) ──────────────────────────────────────────
     if (error) {
-      this.logger.warn({ message: "Meta OAuth denied by user", error, errorDescription });
+      this.logger.warn({
+        message: "Meta OAuth denied by user",
+        error,
+        errorDescription,
+      });
       this.redirectWithError(res, frontendUrl, "access_denied");
       return;
     }
 
     if (!code) {
-      this.logger.error({ message: "Meta callback received no code and no error" });
+      this.logger.error({
+        message: "Meta callback received no code and no error",
+      });
       res.status(HttpStatus.BAD_REQUEST).json({
         success: false,
         error: "Missing 'code' in Meta OAuth callback",
@@ -126,7 +140,9 @@ export class MetaAuthController {
     const redirectTo = decoded?.redirectTo;
 
     if (!workspaceId) {
-      this.logger.error({ message: "Meta callback: workspaceId missing from state" });
+      this.logger.error({
+        message: "Meta callback: workspaceId missing from state",
+      });
       res.status(HttpStatus.BAD_REQUEST).json({
         success: false,
         error: "Missing workspaceId in OAuth state — cannot identify tenant",
@@ -135,20 +151,32 @@ export class MetaAuthController {
     }
 
     // ── Verify workspace exists ───────────────────────────────────────────────
-    const workspace = await this.workspaceRepo.findOne({ where: { id: workspaceId } });
+    const workspace = await this.workspaceRepo.findOne({
+      where: { id: workspaceId },
+    });
     if (!workspace) {
-      this.logger.error({ message: "Meta callback: workspace not found", workspaceId });
-      throw new ForbiddenException("Invalid workspace — cannot associate Meta token");
+      this.logger.error({
+        message: "Meta callback: workspace not found",
+        workspaceId,
+      });
+      throw new ForbiddenException(
+        "Invalid workspace — cannot associate Meta token",
+      );
     }
 
     try {
       // ── Exchange code for token ───────────────────────────────────────────
-      const tokenResponse = await this.metaOAuthService.exchangeCodeForToken(code);
+      const tokenResponse =
+        await this.metaOAuthService.exchangeCodeForToken(code);
       const accessToken = tokenResponse.access_token;
 
       // ── Persist token to connected_accounts (upsert) ──────────────────────
       // This is what the cron auto-sync reads to find tokens per workspace.
-      await this.upsertConnectedAccount(workspaceId, accessToken, tokenResponse.expires_in);
+      await this.upsertConnectedAccount(
+        workspaceId,
+        accessToken,
+        tokenResponse.expires_in,
+      );
 
       this.logger.log({
         message: "Meta OAuth complete — token saved to connected_accounts",
@@ -165,7 +193,11 @@ export class MetaAuthController {
       });
 
       // ── Redirect back to frontend ─────────────────────────────────────────
-      const target = this.resolveRedirectTarget(redirectTo, frontendUrl, workspaceId);
+      const target = this.resolveRedirectTarget(
+        redirectTo,
+        frontendUrl,
+        workspaceId,
+      );
       if (target) {
         res.redirect(HttpStatus.FOUND, target);
       } else {
@@ -218,7 +250,7 @@ export class MetaAuthController {
         platform: Platform.META,
         accessToken: storedToken,
         refreshToken: null,
-        externalAccountId: "meta_oauth",   // updated to real ID on first sync
+        externalAccountId: "meta_oauth", // updated to real ID on first sync
         externalAccountName: "Meta Account", // updated to real name on first sync
         isActive: true,
         tokenExpiresAt,
@@ -253,9 +285,16 @@ export class MetaAuthController {
   }
 
   /** Redirects to the frontend with an error query param. */
-  private redirectWithError(res: Response, frontendUrl: string, error: string): void {
+  private redirectWithError(
+    res: Response,
+    frontendUrl: string,
+    error: string,
+  ): void {
     if (frontendUrl) {
-      res.redirect(HttpStatus.FOUND, `${frontendUrl}/settings/meta?error=${error}`);
+      res.redirect(
+        HttpStatus.FOUND,
+        `${frontendUrl}/settings/meta?error=${error}`,
+      );
     } else {
       res.status(HttpStatus.BAD_REQUEST).json({ success: false, error });
     }

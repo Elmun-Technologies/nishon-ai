@@ -1,8 +1,21 @@
-import { Body, Controller, Get, Param, Patch, Post, Req, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Req,
+  UseGuards,
+} from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { Request } from "express";
 import { BillingService } from "./billing.service";
-import { CreateInvoiceDto, CreatePaymentMethodDto, UpdateBillingContactDto } from "./dto/billing.dto";
+import {
+  CreateInvoiceDto,
+  CreatePaymentMethodDto,
+  UpdateBillingContactDto,
+} from "./dto/billing.dto";
 
 @Controller("billing")
 @UseGuards(AuthGuard("jwt"))
@@ -20,8 +33,14 @@ export class BillingController {
   }
 
   @Get("workspaces/:workspaceId/payment-methods")
-  listPaymentMethods(@Param("workspaceId") workspaceId: string, @Req() req: Request) {
-    return this.billingService.listPaymentMethods(workspaceId, (req.user as any).id);
+  listPaymentMethods(
+    @Param("workspaceId") workspaceId: string,
+    @Req() req: Request,
+  ) {
+    return this.billingService.listPaymentMethods(
+      workspaceId,
+      (req.user as any).id,
+    );
   }
 
   @Post("payment-methods")
@@ -35,12 +54,19 @@ export class BillingController {
     @Param("methodId") methodId: string,
     @Req() req: Request,
   ) {
-    return this.billingService.setDefaultPaymentMethod(workspaceId, methodId, (req.user as any).id);
+    return this.billingService.setDefaultPaymentMethod(
+      workspaceId,
+      methodId,
+      (req.user as any).id,
+    );
   }
 
   @Get("workspaces/:workspaceId/contact")
   getContact(@Param("workspaceId") workspaceId: string, @Req() req: Request) {
-    return this.billingService.getBillingContact(workspaceId, (req.user as any).id);
+    return this.billingService.getBillingContact(
+      workspaceId,
+      (req.user as any).id,
+    );
   }
 
   @Patch("workspaces/:workspaceId/contact")
@@ -49,6 +75,10 @@ export class BillingController {
     @Body() dto: UpdateBillingContactDto,
     @Req() req: Request,
   ) {
-    return this.billingService.updateBillingContact(workspaceId, (req.user as any).id, dto);
+    return this.billingService.updateBillingContact(
+      workspaceId,
+      (req.user as any).id,
+      dto,
+    );
   }
 }

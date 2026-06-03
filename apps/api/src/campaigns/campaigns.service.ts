@@ -71,7 +71,8 @@ export class CampaignsService {
       ...dto,
       workspaceId,
       // Map user-facing budget to dailyBudget for backward compat
-      dailyBudget: dto.budgetType === 'weekly' ? (dto.budget ?? 0) / 7 : (dto.budget ?? 0),
+      dailyBudget:
+        dto.budgetType === "weekly" ? (dto.budget ?? 0) / 7 : (dto.budget ?? 0),
       totalBudget: null,
     });
     return this.campaignRepo.save(campaign);

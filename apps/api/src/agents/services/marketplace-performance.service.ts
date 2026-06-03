@@ -3,12 +3,12 @@ import {
   Logger,
   NotFoundException,
   ForbiddenException,
-} from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { AgentProfile } from '../entities/agent-profile.entity';
-import { AgentPlatformMetrics } from '../entities/agent-platform-metrics.entity';
-import { AgentHistoricalPerformance } from '../entities/agent-historical-performance.entity';
+} from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { AgentProfile } from "../entities/agent-profile.entity";
+import { AgentPlatformMetrics } from "../entities/agent-platform-metrics.entity";
+import { AgentHistoricalPerformance } from "../entities/agent-historical-performance.entity";
 
 export interface AnalyticsResult {
   profileViews: number;
@@ -21,7 +21,12 @@ export interface AnalyticsResult {
   engagementTrend: number;
   conversion: number;
   conversionTrend: number;
-  timeline: Array<{ date: string; views: number; impressions: number; contacts: number }>;
+  timeline: Array<{
+    date: string;
+    views: number;
+    impressions: number;
+    contacts: number;
+  }>;
 }
 
 /**
@@ -58,29 +63,33 @@ export class MarketplacePerformanceService {
   async getAnalytics(
     profileId: string,
     userId: string,
-    period: string = '30d',
+    period: string = "30d",
   ): Promise<AnalyticsResult> {
     // Verify ownership
-    const profile = await this.profileRepo.findOne({ where: { id: profileId } });
-    if (!profile) throw new NotFoundException(`Specialist profile ${profileId} not found`);
-    if (profile.ownerId !== userId) throw new ForbiddenException('You do not have access to this profile');
+    const profile = await this.profileRepo.findOne({
+      where: { id: profileId },
+    });
+    if (!profile)
+      throw new NotFoundException(`Specialist profile ${profileId} not found`);
+    if (profile.ownerId !== userId)
+      throw new ForbiddenException("You do not have access to this profile");
 
     // Resolve how many months of history to pull
     const monthsBack = this.periodToMonths(period);
 
     // Pull platform metrics for the period
     const metrics = await this.metricsRepo
-      .createQueryBuilder('m')
-      .where('m.agentProfileId = :profileId', { profileId })
-      .orderBy('m.aggregationPeriod', 'DESC')
+      .createQueryBuilder("m")
+      .where("m.agentProfileId = :profileId", { profileId })
+      .orderBy("m.aggregationPeriod", "DESC")
       .limit(monthsBack)
       .getMany();
 
     // Pull historical performance
     const history = await this.historyRepo
-      .createQueryBuilder('h')
-      .where('h.agentProfileId = :profileId', { profileId })
-      .orderBy('h.yearMonth', 'DESC')
+      .createQueryBuilder("h")
+      .where("h.agentProfileId = :profileId", { profileId })
+      .orderBy("h.yearMonth", "DESC")
       .limit(monthsBack)
       .getMany();
 
@@ -88,7 +97,10 @@ export class MarketplacePerformanceService {
 
     const totalViews = profile.pageViewCount ?? 0;
     const totalCampaigns = metrics.reduce((s, m) => s + m.campaignsCount, 0);
-    const _totalSpend = metrics.reduce((s, m) => s + Number(m.totalSpend ?? 0), 0);
+    const _totalSpend = metrics.reduce(
+      (s, m) => s + Number(m.totalSpend ?? 0),
+      0,
+    );
 
     // Trend = difference between most recent month and previous month (%)
     const viewsTrend = this.calcTrend(
@@ -104,16 +116,22 @@ export class MarketplacePerformanceService {
 
     const contacts = 0; // Will be wired when ServiceEngagement query added
     const engagement = totalCampaigns;
-    const conversion = metrics.reduce((s, m) => s + Number(m.conversionCount ?? 0), 0);
+    const conversion = metrics.reduce(
+      (s, m) => s + Number(m.conversionCount ?? 0),
+      0,
+    );
 
     // ── Build timeline ──────────────────────────────────────────────────────
 
-    const timeline = history.slice(0, monthsBack).reverse().map((h) => ({
-      date: h.yearMonth,
-      views: Math.round(totalViews / Math.max(history.length, 1)),
-      impressions: 0,
-      contacts: 0,
-    }));
+    const timeline = history
+      .slice(0, monthsBack)
+      .reverse()
+      .map((h) => ({
+        date: h.yearMonth,
+        views: Math.round(totalViews / Math.max(history.length, 1)),
+        impressions: 0,
+        contacts: 0,
+      }));
 
     return {
       profileViews: totalViews,
@@ -137,11 +155,16 @@ export class MarketplacePerformanceService {
 
   private periodToMonths(period: string): number {
     switch (period) {
-      case '7d':  return 1;
-      case '30d': return 1;
-      case '90d': return 3;
-      case 'all': return 24;
-      default:    return 1;
+      case "7d":
+        return 1;
+      case "30d":
+        return 1;
+      case "90d":
+        return 3;
+      case "all":
+        return 24;
+      default:
+        return 1;
     }
   }
 

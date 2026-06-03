@@ -59,7 +59,12 @@ export class User {
   @Column({ default: false, name: "is_admin" })
   isAdmin: boolean;
 
-  @Column({ type: "text", nullable: true, select: false, name: "refresh_token" })
+  @Column({
+    type: "text",
+    nullable: true,
+    select: false,
+    name: "refresh_token",
+  })
   // Stores hashed refresh token in DB for invalidation on logout
   refreshToken: string | null;
 

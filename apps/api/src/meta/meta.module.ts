@@ -38,11 +38,22 @@ import { PlatformsModule } from "../platforms/platforms.module";
       MetaCampaignSync,
       MetaInsight,
       ConnectedAccount, // needed by MetaSyncService and MetaCronService to look up stored tokens
-      Workspace,        // needed by MetaController for workspace ownership validation
+      Workspace, // needed by MetaController for workspace ownership validation
     ]),
   ],
   controllers: [MetaController],
-  providers: [MetaAdsService, MetaSyncService, MetaAiEngineService, MetaCronService, MetaAuditService],
-  exports: [MetaAdsService, MetaSyncService, MetaAiEngineService, MetaAuditService],
+  providers: [
+    MetaAdsService,
+    MetaSyncService,
+    MetaAiEngineService,
+    MetaCronService,
+    MetaAuditService,
+  ],
+  exports: [
+    MetaAdsService,
+    MetaSyncService,
+    MetaAiEngineService,
+    MetaAuditService,
+  ],
 })
 export class MetaModule {}

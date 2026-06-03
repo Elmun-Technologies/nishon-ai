@@ -21,7 +21,11 @@ import { TelegramWebhookController } from "./telegram-webhook.controller";
       maxRedirects: 0,
     }),
   ],
-  controllers: [CrmController, RetargetDashboardController, TelegramWebhookController],
+  controllers: [
+    CrmController,
+    RetargetDashboardController,
+    TelegramWebhookController,
+  ],
   providers: [
     RetargetRedisService,
     RetargetMetaPublisherService,

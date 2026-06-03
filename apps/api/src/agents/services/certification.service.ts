@@ -6,12 +6,12 @@ import {
   ConflictException,
   ForbiddenException as _ForbiddenException,
   UnprocessableEntityException as _UnprocessableEntityException,
-} from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In as _In, MoreThan, IsNull as _IsNull } from 'typeorm';
-import { AgentCertification } from '../entities/agent-certification.entity';
-import { MarketplaceCertification } from '../entities/marketplace-certification.entity';
-import { AgentProfile } from '../entities/agent-profile.entity';
+} from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository, In as _In, MoreThan, IsNull as _IsNull } from "typeorm";
+import { AgentCertification } from "../entities/agent-certification.entity";
+import { MarketplaceCertification } from "../entities/marketplace-certification.entity";
+import { AgentProfile } from "../entities/agent-profile.entity";
 
 /**
  * Certification types for AdSpectr marketplace
@@ -83,7 +83,7 @@ export interface AgentCertificationDetailDTO {
   iconUrl: string;
   proofUrl: string | null;
   verified: boolean;
-  verificationStatus: 'pending_review' | 'approved' | 'rejected';
+  verificationStatus: "pending_review" | "approved" | "rejected";
   verifiedAt: Date | null;
   verifiedBy: string | null;
   expiresAt: Date | null;
@@ -111,47 +111,49 @@ export class CertificationService {
    */
   private readonly INITIAL_CERTIFICATIONS: CertificationTypeConfig[] = [
     {
-      name: 'Google Partner',
-      slug: 'google-partner',
+      name: "Google Partner",
+      slug: "google-partner",
       description:
-        'Certified Google Partner with proven expertise in Google Ads and Analytics.',
-      issuer: 'Google',
-      iconUrl: 'https://cdn.adspectr.com/certifications/google-partner.png',
-      badgeColor: '#4285F4',
+        "Certified Google Partner with proven expertise in Google Ads and Analytics.",
+      issuer: "Google",
+      iconUrl: "https://cdn.adspectr.com/certifications/google-partner.png",
+      badgeColor: "#4285F4",
     },
     {
-      name: 'Meta Blueprint Certified',
-      slug: 'meta-blueprint-certified',
-      description: 'Official Meta Blueprint certification for Meta Ads expertise.',
-      issuer: 'Meta',
-      iconUrl: 'https://cdn.adspectr.com/certifications/meta-blueprint.png',
-      badgeColor: '#1877F2',
-    },
-    {
-      name: 'Yandex Certified',
-      slug: 'yandex-certified',
+      name: "Meta Blueprint Certified",
+      slug: "meta-blueprint-certified",
       description:
-        'Official Yandex Direct certification demonstrating platform expertise.',
-      issuer: 'Yandex',
-      iconUrl: 'https://cdn.adspectr.com/certifications/yandex-certified.png',
-      badgeColor: '#FF0000',
+        "Official Meta Blueprint certification for Meta Ads expertise.",
+      issuer: "Meta",
+      iconUrl: "https://cdn.adspectr.com/certifications/meta-blueprint.png",
+      badgeColor: "#1877F2",
     },
     {
-      name: 'Performance Marketing Expert',
-      slug: 'performance-marketing-expert',
+      name: "Yandex Certified",
+      slug: "yandex-certified",
       description:
-        'Verified expertise in performance marketing and ROI optimization.',
-      issuer: 'AdSpectr',
-      iconUrl: 'https://cdn.adspectr.com/certifications/performance-expert.png',
-      badgeColor: '#8B5CF6',
+        "Official Yandex Direct certification demonstrating platform expertise.",
+      issuer: "Yandex",
+      iconUrl: "https://cdn.adspectr.com/certifications/yandex-certified.png",
+      badgeColor: "#FF0000",
     },
     {
-      name: 'AI Agent Developer',
-      slug: 'ai-agent-developer',
-      description: 'Certified developer proficient in creating and managing AI agents.',
-      issuer: 'AdSpectr',
-      iconUrl: 'https://cdn.adspectr.com/certifications/ai-developer.png',
-      badgeColor: '#06B6D4',
+      name: "Performance Marketing Expert",
+      slug: "performance-marketing-expert",
+      description:
+        "Verified expertise in performance marketing and ROI optimization.",
+      issuer: "AdSpectr",
+      iconUrl: "https://cdn.adspectr.com/certifications/performance-expert.png",
+      badgeColor: "#8B5CF6",
+    },
+    {
+      name: "AI Agent Developer",
+      slug: "ai-agent-developer",
+      description:
+        "Certified developer proficient in creating and managing AI agents.",
+      issuer: "AdSpectr",
+      iconUrl: "https://cdn.adspectr.com/certifications/ai-developer.png",
+      badgeColor: "#06B6D4",
     },
   ];
 
@@ -192,7 +194,7 @@ export class CertificationService {
       }
     } catch (error) {
       this.logger.error(
-        'Failed to initialize default certifications',
+        "Failed to initialize default certifications",
         error instanceof Error ? error.stack : String(error),
       );
       throw error;
@@ -208,7 +210,7 @@ export class CertificationService {
     try {
       const certs = await this.certRepository.find({
         where: { isActive: true },
-        order: { createdAt: 'ASC' },
+        order: { createdAt: "ASC" },
       });
 
       if (!includeStats) {
@@ -226,7 +228,7 @@ export class CertificationService {
             where: {
               certificationId: cert.id,
               verified: true,
-              verificationStatus: 'approved',
+              verificationStatus: "approved",
             },
           });
 
@@ -237,7 +239,7 @@ export class CertificationService {
       return certsWithStats;
     } catch (error) {
       this.logger.error(
-        'Failed to get certifications list',
+        "Failed to get certifications list",
         error instanceof Error ? error.stack : String(error),
       );
       throw error;
@@ -281,7 +283,7 @@ export class CertificationService {
         throw error;
       }
       this.logger.error(
-        'Failed to create certification',
+        "Failed to create certification",
         error instanceof Error ? error.stack : String(error),
       );
       throw error;
@@ -334,7 +336,7 @@ export class CertificationService {
 
       // Validate proof URL if provided
       if (proofUrl && !this.isValidUrl(proofUrl)) {
-        throw new BadRequestException('Invalid proof URL format');
+        throw new BadRequestException("Invalid proof URL format");
       }
 
       // Create agent certification record
@@ -343,7 +345,7 @@ export class CertificationService {
         certificationId: certificationId,
         proofUrl: proofUrl || null,
         verified: false,
-        verificationStatus: 'pending_review',
+        verificationStatus: "pending_review",
         verifiedAt: null,
         verifiedBy: null,
         expiresAt: null,
@@ -389,7 +391,7 @@ export class CertificationService {
       // Find agent certification
       const agentCert = await this.agentCertRepository.findOne({
         where: { id: agentCertId },
-        relations: ['agentProfile', 'certification'],
+        relations: ["agentProfile", "certification"],
       });
 
       if (!agentCert) {
@@ -400,15 +402,13 @@ export class CertificationService {
 
       // Validate expiration date if provided
       if (data.expiresAt && new Date(data.expiresAt) <= new Date()) {
-        throw new BadRequestException(
-          'Expiration date must be in the future',
-        );
+        throw new BadRequestException("Expiration date must be in the future");
       }
 
       // Update verification status
       if (data.verified) {
         agentCert.verified = true;
-        agentCert.verificationStatus = 'approved';
+        agentCert.verificationStatus = "approved";
         agentCert.verifiedAt = new Date();
         agentCert.verifiedBy = adminId;
         agentCert.expiresAt = data.expiresAt || null;
@@ -418,7 +418,7 @@ export class CertificationService {
         );
       } else {
         agentCert.verified = false;
-        agentCert.verificationStatus = 'rejected';
+        agentCert.verificationStatus = "rejected";
         agentCert.verifiedAt = new Date();
         agentCert.verifiedBy = adminId;
 
@@ -439,10 +439,7 @@ export class CertificationService {
       // Recalculate certification level
       await this.updateCertificationLevel(agentCert.agentProfileId);
 
-      return this.mapAgentCertificationToDTO(
-        updated,
-        agentCert.certification,
-      );
+      return this.mapAgentCertificationToDTO(updated, agentCert.certification);
     } catch (error) {
       if (
         error instanceof NotFoundException ||
@@ -476,8 +473,8 @@ export class CertificationService {
 
       const certs = await this.agentCertRepository.find({
         where: { agentProfileId: agentId },
-        relations: ['certification'],
-        order: { createdAt: 'DESC' },
+        relations: ["certification"],
+        order: { createdAt: "DESC" },
       });
 
       return certs.map((cert) =>
@@ -504,7 +501,7 @@ export class CertificationService {
     try {
       const agentCert = await this.agentCertRepository.findOne({
         where: { id: agentCertId },
-        relations: ['certification'],
+        relations: ["certification"],
       });
 
       if (!agentCert) {
@@ -513,7 +510,10 @@ export class CertificationService {
         );
       }
 
-      return this.mapAgentCertificationToDTO(agentCert, agentCert.certification);
+      return this.mapAgentCertificationToDTO(
+        agentCert,
+        agentCert.certification,
+      );
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
@@ -551,25 +551,25 @@ export class CertificationService {
 
       // No certifications
       if (certs.length === 0) {
-        agent.certificationLevel = 'unverified';
+        agent.certificationLevel = "unverified";
       } else {
         // Count verified vs self-declared
         const verifiedCount = certs.filter((c) => c.verified).length;
         const selfDeclaredCount = certs.filter(
-          (c) => !c.verified && c.verificationStatus === 'pending_review',
+          (c) => !c.verified && c.verificationStatus === "pending_review",
         ).length;
 
         if (verifiedCount >= 2 && agent.isProMember) {
           // Premium: 2+ verified certs AND pro member
-          agent.certificationLevel = 'premium';
+          agent.certificationLevel = "premium";
         } else if (verifiedCount >= 1) {
           // Verified: At least 1 verified cert
-          agent.certificationLevel = 'verified';
+          agent.certificationLevel = "verified";
         } else if (selfDeclaredCount > 0) {
           // Self-declared: Pending certs, none verified yet
-          agent.certificationLevel = 'self_declared';
+          agent.certificationLevel = "self_declared";
         } else {
-          agent.certificationLevel = 'unverified';
+          agent.certificationLevel = "unverified";
         }
       }
 
@@ -603,9 +603,9 @@ export class CertificationService {
   }> {
     try {
       const [certs, total] = await this.agentCertRepository.findAndCount({
-        where: { verificationStatus: 'pending_review' },
-        relations: ['agentProfile', 'certification'],
-        order: { createdAt: 'ASC' },
+        where: { verificationStatus: "pending_review" },
+        relations: ["agentProfile", "certification"],
+        order: { createdAt: "ASC" },
         take: limit,
         skip: offset,
       });
@@ -617,7 +617,7 @@ export class CertificationService {
       return { items, total };
     } catch (error) {
       this.logger.error(
-        'Failed to get pending certifications',
+        "Failed to get pending certifications",
         error instanceof Error ? error.stack : String(error),
       );
       throw error;
@@ -629,24 +629,24 @@ export class CertificationService {
    */
   async searchByAgentCertification(
     certificationId: string,
-    status?: 'approved' | 'rejected' | 'pending_review',
+    status?: "approved" | "rejected" | "pending_review",
   ): Promise<AgentProfile[]> {
     try {
       const query = this.agentCertRepository
-        .createQueryBuilder('ac')
-        .leftJoinAndSelect('ac.agentProfile', 'ap')
-        .where('ac.certification_id = :certificationId', { certificationId })
-        .andWhere('ac.verified = true');
+        .createQueryBuilder("ac")
+        .leftJoinAndSelect("ac.agentProfile", "ap")
+        .where("ac.certification_id = :certificationId", { certificationId })
+        .andWhere("ac.verified = true");
 
       if (status) {
-        query.andWhere('ac.verification_status = :status', { status });
+        query.andWhere("ac.verification_status = :status", { status });
       }
 
       const results = await query.getMany();
       return results.map((ac) => ac.agentProfile);
     } catch (error) {
       this.logger.error(
-        'Failed to search by certification',
+        "Failed to search by certification",
         error instanceof Error ? error.stack : String(error),
       );
       throw error;
@@ -690,9 +690,7 @@ export class CertificationService {
   /**
    * Get verification audit trail for a certification
    */
-  async getCertificationAuditTrail(
-    agentCertId: string,
-  ): Promise<{
+  async getCertificationAuditTrail(agentCertId: string): Promise<{
     certificationId: string;
     certificationName: string;
     agentId: string;
@@ -705,7 +703,7 @@ export class CertificationService {
     try {
       const agentCert = await this.agentCertRepository.findOne({
         where: { id: agentCertId },
-        relations: ['certification'],
+        relations: ["certification"],
       });
 
       if (!agentCert) {
@@ -757,22 +755,20 @@ export class CertificationService {
         // Mark as expired by setting verified to false
         for (const cert of toExpire) {
           cert.verified = false;
-          cert.verificationStatus = 'pending_review';
+          cert.verificationStatus = "pending_review";
           await this.agentCertRepository.save(cert);
 
           // Recalculate level
           await this.updateCertificationLevel(cert.agentProfileId);
         }
 
-        this.logger.log(
-          `Cleaned up ${toExpire.length} expired certifications`,
-        );
+        this.logger.log(`Cleaned up ${toExpire.length} expired certifications`);
       }
 
       return toExpire.length;
     } catch (error) {
       this.logger.error(
-        'Failed to cleanup expired certifications',
+        "Failed to cleanup expired certifications",
         error instanceof Error ? error.stack : String(error),
       );
       throw error;
@@ -863,7 +859,7 @@ export class CertificationService {
       // TODO: Send actual notification via email/Slack/webhook
     } catch (error) {
       this.logger.warn(
-        'Failed to send admin notification',
+        "Failed to send admin notification",
         error instanceof Error ? error.message : String(error),
       );
     }
@@ -879,7 +875,7 @@ export class CertificationService {
     approved: boolean,
   ): Promise<void> {
     try {
-      const status = approved ? 'APPROVED' : 'REJECTED';
+      const status = approved ? "APPROVED" : "REJECTED";
       this.logger.log(
         `[NOTIFICATION] Certification ${status}: ` +
           `Agent="${agent.displayName}", Cert="${cert.name}"`,
@@ -887,7 +883,7 @@ export class CertificationService {
       // TODO: Send actual notification via email/SMS/in-app
     } catch (error) {
       this.logger.warn(
-        'Failed to send agent notification',
+        "Failed to send agent notification",
         error instanceof Error ? error.message : String(error),
       );
     }

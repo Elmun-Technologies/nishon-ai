@@ -84,7 +84,10 @@ describe("AutoOptimizationService", () => {
     };
 
     it("runOptimization denies a non-owner with ForbiddenException", async () => {
-      workspaceRepoMock.findOne.mockResolvedValue({ id: "ws-1", userId: OWNER });
+      workspaceRepoMock.findOne.mockResolvedValue({
+        id: "ws-1",
+        userId: OWNER,
+      });
       await expect(
         service.runOptimization("ws-1", minimalDto, ATTACKER),
       ).rejects.toBeInstanceOf(ForbiddenException);
@@ -100,7 +103,10 @@ describe("AutoOptimizationService", () => {
     });
 
     it("getHistory denies a non-owner before any history read", async () => {
-      workspaceRepoMock.findOne.mockResolvedValue({ id: "ws-1", userId: OWNER });
+      workspaceRepoMock.findOne.mockResolvedValue({
+        id: "ws-1",
+        userId: OWNER,
+      });
       await expect(service.getHistory("ws-1", ATTACKER)).rejects.toBeInstanceOf(
         ForbiddenException,
       );
@@ -108,7 +114,10 @@ describe("AutoOptimizationService", () => {
     });
 
     it("getHistory lets the owner read", async () => {
-      workspaceRepoMock.findOne.mockResolvedValue({ id: "ws-1", userId: OWNER });
+      workspaceRepoMock.findOne.mockResolvedValue({
+        id: "ws-1",
+        userId: OWNER,
+      });
       runRepoMock.find.mockResolvedValue([]);
       await expect(service.getHistory("ws-1", OWNER)).resolves.toEqual([]);
       expect(runRepoMock.find).toHaveBeenCalled();

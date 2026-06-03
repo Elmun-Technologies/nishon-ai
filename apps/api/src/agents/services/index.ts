@@ -11,10 +11,10 @@ export {
   MetricsData,
   FraudSeverity,
   PlatformThresholds,
-} from './fraud-detection.service';
+} from "./fraud-detection.service";
 
 export {
   FraudDetectionAdminService,
   AdminFraudAction,
   FraudRiskAnalysis,
-} from './fraud-detection-admin.service';
+} from "./fraud-detection-admin.service";

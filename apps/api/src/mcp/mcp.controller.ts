@@ -35,20 +35,20 @@ export class McpController {
 
   @Get("credentials")
   @UseGuards(AuthGuard("jwt"))
-  list(
-    @Query() query: ListMcpCredentialsQueryDto,
-    @Req() req: Request,
-  ) {
-    return this.mcpService.listCredentials(query.workspaceId, (req.user as any).id);
+  list(@Query() query: ListMcpCredentialsQueryDto, @Req() req: Request) {
+    return this.mcpService.listCredentials(
+      query.workspaceId,
+      (req.user as any).id,
+    );
   }
 
   @Post("credentials")
   @UseGuards(AuthGuard("jwt"))
-  create(
-    @Body() dto: CreateMcpCredentialsDto,
-    @Req() req: Request,
-  ) {
-    return this.mcpService.createCredentials(dto.workspaceId, (req.user as any).id);
+  create(@Body() dto: CreateMcpCredentialsDto, @Req() req: Request) {
+    return this.mcpService.createCredentials(
+      dto.workspaceId,
+      (req.user as any).id,
+    );
   }
 
   @Delete("credentials/:id")
@@ -58,6 +58,10 @@ export class McpController {
     @Query() query: ListMcpCredentialsQueryDto,
     @Req() req: Request,
   ) {
-    return this.mcpService.revokeCredential(id, query.workspaceId, (req.user as any).id);
+    return this.mcpService.revokeCredential(
+      id,
+      query.workspaceId,
+      (req.user as any).id,
+    );
   }
 }

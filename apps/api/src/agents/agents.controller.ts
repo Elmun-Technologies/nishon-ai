@@ -11,7 +11,12 @@ import {
   HttpCode,
   HttpStatus,
 } from "@nestjs/common";
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiQuery } from "@nestjs/swagger";
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+} from "@nestjs/swagger";
 import { AuthGuard } from "@nestjs/passport";
 import { AgentsService } from "./agents.service";
 
@@ -23,12 +28,18 @@ export class AgentsController {
   // ── PUBLIC MARKETPLACE ──────────────────────────────────────────────────
 
   @Get()
-  @ApiOperation({ summary: "Public marketplace listing (agents + targetologists)" })
+  @ApiOperation({
+    summary: "Public marketplace listing (agents + targetologists)",
+  })
   @ApiQuery({ name: "type", enum: ["all", "human", "ai"], required: false })
   @ApiQuery({ name: "platform", required: false })
   @ApiQuery({ name: "niche", required: false })
   @ApiQuery({ name: "verified", required: false })
-  @ApiQuery({ name: "sortBy", enum: ["roas", "spend", "campaigns", "rating", "price"], required: false })
+  @ApiQuery({
+    name: "sortBy",
+    enum: ["roas", "spend", "campaigns", "rating", "price"],
+    required: false,
+  })
   @ApiQuery({ name: "limit", required: false })
   @ApiQuery({ name: "offset", required: false })
   listPublic(@Query() query: any) {
@@ -71,7 +82,9 @@ export class AgentsController {
   @Get("my-plan")
   @UseGuards(AuthGuard("jwt"))
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Get my subscription plan, limits, and current usage" })
+  @ApiOperation({
+    summary: "Get my subscription plan, limits, and current usage",
+  })
   getMyPlan(@Request() req: any) {
     return this.agentsService.getMyPlan(req.user.id);
   }
@@ -80,7 +93,9 @@ export class AgentsController {
   @UseGuards(AuthGuard("jwt"))
   @ApiBearerAuth()
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: "Create agent profile (targetologist or AI agent builder)" })
+  @ApiOperation({
+    summary: "Create agent profile (targetologist or AI agent builder)",
+  })
   create(@Request() req: any, @Body() dto: any) {
     return this.agentsService.create(req.user.id, dto);
   }
@@ -115,14 +130,22 @@ export class AgentsController {
     @Request() req: any,
     @Body() body: { notes?: string },
   ) {
-    return this.agentsService.hireAgent(workspaceId, agentId, req.user.id, body?.notes);
+    return this.agentsService.hireAgent(
+      workspaceId,
+      agentId,
+      req.user.id,
+      body?.notes,
+    );
   }
 
   @Get("engagement/workspace/:workspaceId")
   @UseGuards(AuthGuard("jwt"))
   @ApiBearerAuth()
   @ApiOperation({ summary: "Get current active engagement for workspace" })
-  getCurrentEngagement(@Param("workspaceId") workspaceId: string, @Request() req: any) {
+  getCurrentEngagement(
+    @Param("workspaceId") workspaceId: string,
+    @Request() req: any,
+  ) {
     return this.agentsService.getCurrentEngagement(workspaceId, req.user.id);
   }
 
@@ -130,7 +153,9 @@ export class AgentsController {
   @UseGuards(AuthGuard("jwt"))
   @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: "Cancel an engagement (switch back to self-service)" })
+  @ApiOperation({
+    summary: "Cancel an engagement (switch back to self-service)",
+  })
   cancelEngagement(@Param("id") id: string, @Request() req: any) {
     return this.agentsService.cancelEngagement(id, req.user.id);
   }
@@ -143,7 +168,13 @@ export class AgentsController {
   addReview(
     @Param("id") id: string,
     @Request() req: any,
-    @Body() dto: { rating: number; text: string; authorName: string; authorCompany?: string },
+    @Body()
+    dto: {
+      rating: number;
+      text: string;
+      authorName: string;
+      authorCompany?: string;
+    },
   ) {
     return this.agentsService.addReview(id, req.user.id, dto);
   }

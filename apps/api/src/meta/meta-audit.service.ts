@@ -298,7 +298,9 @@ export class MetaAuditService {
     }
 
     // 2. Zero-spend ACTIVE campaigns (delivery problem)
-    const stalled = campaigns.filter((c) => c.flags.includes("ACTIVE_NO_SPEND"));
+    const stalled = campaigns.filter((c) =>
+      c.flags.includes("ACTIVE_NO_SPEND"),
+    );
     if (stalled.length > 0) {
       findings.push({
         id: "active_no_spend",
@@ -330,7 +332,9 @@ export class MetaAuditService {
     }
 
     // 4. Zero-conversion big spenders
-    const noConv = campaigns.filter((c) => c.flags.includes("ZERO_CONVERSIONS"));
+    const noConv = campaigns.filter((c) =>
+      c.flags.includes("ZERO_CONVERSIONS"),
+    );
     if (noConv.length > 0) {
       findings.push({
         id: "zero_conversions",
@@ -353,7 +357,8 @@ export class MetaAuditService {
         severity: "warning",
         category: "creative",
         title: `${lowCtr.length} ta kampaniya CTR < 0.5%`,
-        detail: "Bu Meta benchmark'idan past. Yetkazib berish narxi oshib ketadi.",
+        detail:
+          "Bu Meta benchmark'idan past. Yetkazib berish narxi oshib ketadi.",
         fix: "Yangi hook'larni sinab ko'ring: video, UGC, before/after, mijoz odd-savol. Top reklamalardan boshlang.",
       });
     }
@@ -379,7 +384,8 @@ export class MetaAuditService {
         severity: "warning",
         category: "structure",
         title: "Hisobda atigi 1 ta kampaniya bor",
-        detail: "Meta algoritmi A/B test qiladigan boshqa variantsiz optimallasha olmaydi.",
+        detail:
+          "Meta algoritmi A/B test qiladigan boshqa variantsiz optimallasha olmaydi.",
         fix: "Hech bo'lmaganda 2-3 ta kampaniya: prospecting + retargeting + retention.",
       });
     }
@@ -438,7 +444,9 @@ export class MetaAuditService {
       }))
       .sort((a, b) => b.spend - a.spend);
 
-    const topSpenders = [...campaigns].sort((a, b) => b.spend - a.spend).slice(0, 5);
+    const topSpenders = [...campaigns]
+      .sort((a, b) => b.spend - a.spend)
+      .slice(0, 5);
     const zeroResultCampaigns = campaigns.filter(
       (c) =>
         c.flags.includes("ZERO_CLICKS") ||
@@ -465,7 +473,13 @@ export class MetaAuditService {
     const report: MetaAuditReport = {
       score,
       scoreLabel:
-        score >= 85 ? "excellent" : score >= 70 ? "good" : score >= 50 ? "fair" : "poor",
+        score >= 85
+          ? "excellent"
+          : score >= 70
+            ? "good"
+            : score >= 50
+              ? "fair"
+              : "poor",
       generatedAt: new Date().toISOString(),
       windowDays: days,
       totals: {
@@ -512,7 +526,9 @@ export class MetaAuditService {
   private async generateAiSummary(report: MetaAuditReport): Promise<string> {
     if (!this.aiClient) return "";
     const { totals, deltas, score, findings, topSpenders } = report;
-    const topCrit = findings.filter((f) => f.severity === "critical").slice(0, 3);
+    const topCrit = findings
+      .filter((f) => f.severity === "critical")
+      .slice(0, 3);
     const topWins = findings.filter((f) => f.severity === "good").slice(0, 2);
 
     const briefing = [

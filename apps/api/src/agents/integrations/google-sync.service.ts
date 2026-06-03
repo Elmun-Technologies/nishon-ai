@@ -197,7 +197,9 @@ export class GooglePerformanceSyncService {
 
     // Validate config
     if (pullConfig.dayLookback < 1 || pullConfig.dayLookback > 365) {
-      throw new BadRequestException("dayLookback must be between 1 and 365 days");
+      throw new BadRequestException(
+        "dayLookback must be between 1 and 365 days",
+      );
     }
 
     try {
@@ -207,7 +209,9 @@ export class GooglePerformanceSyncService {
       });
 
       if (!specialist) {
-        throw new NotFoundException(`Agent profile ${agentProfileId} not found`);
+        throw new NotFoundException(
+          `Agent profile ${agentProfileId} not found`,
+        );
       }
 
       result.agentDisplayName = specialist.displayName;
@@ -260,7 +264,9 @@ export class GooglePerformanceSyncService {
       );
 
       if (accountsWithMetrics.length === 0) {
-        result.warnings.push("No campaigns found in connected Google Ads accounts");
+        result.warnings.push(
+          "No campaigns found in connected Google Ads accounts",
+        );
         result.success = true;
         return result;
       }
@@ -290,7 +296,8 @@ export class GooglePerformanceSyncService {
         result.metricsInserted = persistResult.inserted;
         result.metricsUpdated = persistResult.updated;
         result.campaignsSynced = accountsWithMetrics.reduce(
-          (sum, acc) => sum + new Set(acc.performanceRows.map((r) => r.campaignId)).size,
+          (sum, acc) =>
+            sum + new Set(acc.performanceRows.map((r) => r.campaignId)).size,
           0,
         );
       }
@@ -390,7 +397,10 @@ export class GooglePerformanceSyncService {
    * Fetches all campaigns for a Google Ads customer.
    * Uses Google Ads API v15 customer.gaql search.
    */
-  private async getCampaigns(customerId: string, accessToken: string): Promise<any[]> {
+  private async getCampaigns(
+    customerId: string,
+    accessToken: string,
+  ): Promise<any[]> {
     try {
       const query = `
         SELECT campaign.id, campaign.name, campaign.status
@@ -407,7 +417,10 @@ export class GooglePerformanceSyncService {
             headers: {
               Authorization: `Bearer ${accessToken}`,
               "Content-Type": "application/json",
-              "developer-token": this.config.get<string>("GOOGLE_ADS_DEVELOPER_TOKEN", ""),
+              "developer-token": this.config.get<string>(
+                "GOOGLE_ADS_DEVELOPER_TOKEN",
+                "",
+              ),
             },
           },
         ),
@@ -469,7 +482,10 @@ export class GooglePerformanceSyncService {
             headers: {
               Authorization: `Bearer ${accessToken}`,
               "Content-Type": "application/json",
-              "developer-token": this.config.get<string>("GOOGLE_ADS_DEVELOPER_TOKEN", ""),
+              "developer-token": this.config.get<string>(
+                "GOOGLE_ADS_DEVELOPER_TOKEN",
+                "",
+              ),
             },
           },
         ),
@@ -555,31 +571,40 @@ export class GooglePerformanceSyncService {
       }
 
       if (row.conversions < 0) {
-        errors.push(`Campaign ${row.campaignId}: Negative conversions detected`);
+        errors.push(
+          `Campaign ${row.campaignId}: Negative conversions detected`,
+        );
         fraudRiskScore += 20;
       }
 
       // Check for unrealistic ROAS
       if (row.roas !== null && (row.roas < 0 || row.roas > 100)) {
-        errors.push(`Campaign ${row.campaignId}: ROAS ${row.roas.toFixed(2)} is unrealistic`);
+        errors.push(
+          `Campaign ${row.campaignId}: ROAS ${row.roas.toFixed(2)} is unrealistic`,
+        );
         fraudRiskScore += 15;
       }
 
       // Check for unrealistic CPA
       if (row.cpa !== null && (row.cpa < 0.01 || row.cpa > 10000)) {
-        errors.push(`Campaign ${row.campaignId}: CPA $${row.cpa.toFixed(2)} is unrealistic`);
+        errors.push(
+          `Campaign ${row.campaignId}: CPA $${row.cpa.toFixed(2)} is unrealistic`,
+        );
         fraudRiskScore += 10;
       }
     }
 
     // Additional: check if specialist's average ROAS would spike unrealistically
     if (specialist.cachedStats) {
-      const avgRoas = allRows
-        .filter((r) => r.roas !== null)
-        .reduce((sum, r) => sum + r.roas, 0) / Math.max(1, allRows.filter((r) => r.roas !== null).length);
+      const avgRoas =
+        allRows
+          .filter((r) => r.roas !== null)
+          .reduce((sum, r) => sum + r.roas, 0) /
+        Math.max(1, allRows.filter((r) => r.roas !== null).length);
 
       const historicalRoas = specialist.cachedStats.avgROAS;
-      const roasChange = Math.abs(avgRoas - historicalRoas) / Math.max(0.1, historicalRoas);
+      const roasChange =
+        Math.abs(avgRoas - historicalRoas) / Math.max(0.1, historicalRoas);
 
       if (roasChange > 2) {
         errors.push(
@@ -617,7 +642,11 @@ export class GooglePerformanceSyncService {
     for (const row of rows) {
       // Create first-day-of-month date for aggregationPeriod
       const monthKey = `${row.date.getFullYear()}-${String(row.date.getMonth() + 1).padStart(2, "0")}`;
-      const _aggregationPeriod = new Date(row.date.getFullYear(), row.date.getMonth(), 1);
+      const _aggregationPeriod = new Date(
+        row.date.getFullYear(),
+        row.date.getMonth(),
+        1,
+      );
 
       if (!byMonth.has(monthKey)) {
         byMonth.set(monthKey, []);
@@ -630,14 +659,25 @@ export class GooglePerformanceSyncService {
 
     for (const [monthKey, monthRows] of byMonth.entries()) {
       const totalSpend = monthRows.reduce((sum, r) => sum + r.spend, 0);
-      const totalImpressions = monthRows.reduce((sum, r) => sum + r.impressions, 0);
+      const totalImpressions = monthRows.reduce(
+        (sum, r) => sum + r.impressions,
+        0,
+      );
       const totalClicks = monthRows.reduce((sum, r) => sum + r.clicks, 0);
-      const totalConversions = monthRows.reduce((sum, r) => sum + r.conversions, 0);
-      const totalRevenue = monthRows.reduce((sum, r) => sum + r.conversionValue, 0);
+      const totalConversions = monthRows.reduce(
+        (sum, r) => sum + r.conversions,
+        0,
+      );
+      const totalRevenue = monthRows.reduce(
+        (sum, r) => sum + r.conversionValue,
+        0,
+      );
 
       // Calculate aggregated metrics
-      const avgCtr = totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
-      const avgCpa = totalConversions > 0 ? totalSpend / totalConversions : null;
+      const avgCtr =
+        totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
+      const avgCpa =
+        totalConversions > 0 ? totalSpend / totalConversions : null;
       const avgRoas = totalSpend > 0 ? totalRevenue / totalSpend : null;
 
       const aggregationPeriod = new Date(
@@ -678,17 +718,16 @@ export class GooglePerformanceSyncService {
         }
 
         // Upsert
-        const upsertResult = await em.upsert(
-          AgentPlatformMetrics,
-          metric,
-          {
-            conflictPaths: ["agentProfileId", "platform", "aggregationPeriod"],
-            skipUpdateIfNoValuesChanged: true,
-          },
-        );
+        const upsertResult = await em.upsert(AgentPlatformMetrics, metric, {
+          conflictPaths: ["agentProfileId", "platform", "aggregationPeriod"],
+          skipUpdateIfNoValuesChanged: true,
+        });
 
         // TypeORM upsert returns affected rows count
-        if (upsertResult.raw?.affectedRows === 1 && upsertResult.identifiers.length > 0) {
+        if (
+          upsertResult.raw?.affectedRows === 1 &&
+          upsertResult.identifiers.length > 0
+        ) {
           const existing = await em.findOne(AgentPlatformMetrics, {
             where: {
               agentProfileId,
@@ -846,7 +885,9 @@ export class GooglePerformanceSyncService {
 
     if (state) {
       // Remove timestamps older than 10 seconds
-      state.requestTimestamps = state.requestTimestamps.filter((ts) => now - ts < 10000);
+      state.requestTimestamps = state.requestTimestamps.filter(
+        (ts) => now - ts < 10000,
+      );
 
       // If we have 10 requests in the last 10 seconds, wait
       if (state.requestTimestamps.length >= 10) {
@@ -897,7 +938,9 @@ export class GooglePerformanceSyncService {
    * Looks up most recent active ConnectedAccount for Google platform and decrypts token if needed.
    * Attempts token refresh if token has expired.
    */
-  private async resolveAccessToken(workspaceId: string): Promise<string | null> {
+  private async resolveAccessToken(
+    workspaceId: string,
+  ): Promise<string | null> {
     const connectedAccount = await this.connectedAccountRepo.findOne({
       where: {
         workspaceId,
@@ -928,12 +971,21 @@ export class GooglePerformanceSyncService {
     }
 
     // Check if token is expired and attempt refresh
-    if (connectedAccount.tokenExpiresAt && connectedAccount.tokenExpiresAt < new Date()) {
+    if (
+      connectedAccount.tokenExpiresAt &&
+      connectedAccount.tokenExpiresAt < new Date()
+    ) {
       if (connectedAccount.refreshToken) {
         try {
           // Get client credentials from config (not stored in ConnectedAccount)
-          const clientId = this.config.get<string>("GOOGLE_OAUTH_CLIENT_ID", "");
-          const clientSecret = this.config.get<string>("GOOGLE_OAUTH_CLIENT_SECRET", "");
+          const clientId = this.config.get<string>(
+            "GOOGLE_OAUTH_CLIENT_ID",
+            "",
+          );
+          const clientSecret = this.config.get<string>(
+            "GOOGLE_OAUTH_CLIENT_SECRET",
+            "",
+          );
 
           const newToken = await this.refreshAccessToken(
             connectedAccount.refreshToken,
@@ -1006,7 +1058,9 @@ export class GooglePerformanceSyncService {
    * Gets list of Google Ads customer IDs connected to a workspace.
    * Fetches from ConnectedAccount records.
    */
-  private async getConnectedCustomerIds(workspaceId: string): Promise<string[]> {
+  private async getConnectedCustomerIds(
+    workspaceId: string,
+  ): Promise<string[]> {
     const connectedAccounts = await this.connectedAccountRepo.find({
       where: {
         workspaceId,
@@ -1047,7 +1101,11 @@ export class GooglePerformanceSyncService {
 
     for (const specialist of specialists) {
       try {
-        const result = await this.syncSpecialistMetrics(specialist.id, workspaceId, config);
+        const result = await this.syncSpecialistMetrics(
+          specialist.id,
+          workspaceId,
+          config,
+        );
         results.push(result);
       } catch (err: any) {
         this.logger.error({

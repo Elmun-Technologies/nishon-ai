@@ -21,41 +21,45 @@ import {
   ArrayMaxSize as _ArrayMaxSize,
   IsUUID,
   IsPhoneNumber,
-} from 'class-validator';
-import { Type, Exclude as _Exclude, Transform as _Transform } from 'class-transformer';
+} from "class-validator";
+import {
+  Type,
+  Exclude as _Exclude,
+  Transform as _Transform,
+} from "class-transformer";
 
 // ==================== ENUMS ====================
 
 export enum PricingModel {
-  FIXED = 'fixed',
-  COMMISSION = 'commission',
-  HYBRID = 'hybrid',
+  FIXED = "fixed",
+  COMMISSION = "commission",
+  HYBRID = "hybrid",
 }
 
 export enum SortBy {
-  RATING = 'rating',
-  ROAS = 'roas',
-  PRICE = 'price',
-  EXPERIENCE = 'experience',
+  RATING = "rating",
+  ROAS = "roas",
+  PRICE = "price",
+  EXPERIENCE = "experience",
 }
 
 export enum ContactMethod {
-  EMAIL = 'email',
-  TELEGRAM = 'telegram',
-  WHATSAPP = 'whatsapp',
+  EMAIL = "email",
+  TELEGRAM = "telegram",
+  WHATSAPP = "whatsapp",
 }
 
 export enum PlatformType {
-  META = 'meta',
-  GOOGLE = 'google',
-  YANDEX = 'yandex',
+  META = "meta",
+  GOOGLE = "google",
+  YANDEX = "yandex",
 }
 
 export enum VerificationLevel {
-  UNVERIFIED = 'unverified',
-  BASIC = 'basic',
-  ADVANCED = 'advanced',
-  EXPERT = 'expert',
+  UNVERIFIED = "unverified",
+  BASIC = "basic",
+  ADVANCED = "advanced",
+  EXPERT = "expert",
 }
 
 // ==================== REQUEST DTOs ====================
@@ -189,7 +193,7 @@ export class CreateSpecialistDto {
   @IsOptional()
   @IsString()
   @Length(3, 3)
-  currency?: string = 'USD';
+  currency?: string = "USD";
 
   @IsOptional()
   @IsArray()
@@ -444,8 +448,8 @@ export class SyncStatusDto {
   platform: PlatformType;
 
   @IsNotEmpty()
-  @IsEnum(['pending', 'in_progress', 'completed', 'failed'])
-  status: 'pending' | 'in_progress' | 'completed' | 'failed';
+  @IsEnum(["pending", "in_progress", "completed", "failed"])
+  status: "pending" | "in_progress" | "completed" | "failed";
 
   @IsOptional()
   @Type(() => Date)

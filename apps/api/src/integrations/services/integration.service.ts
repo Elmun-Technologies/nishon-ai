@@ -1,12 +1,17 @@
-import { Injectable, BadRequestException, NotFoundException, ForbiddenException as _ForbiddenException } from '@nestjs/common'
-import { Repository } from 'typeorm'
-import { InjectRepository } from '@nestjs/typeorm'
-import { AxiosInstance as _AxiosInstance } from 'axios'
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  ForbiddenException as _ForbiddenException,
+} from "@nestjs/common";
+import { Repository } from "typeorm";
+import { InjectRepository } from "@nestjs/typeorm";
+import { AxiosInstance as _AxiosInstance } from "axios";
 import {
   IntegrationConnection as IIntegrationConnection,
   IntegrationConfigEntity,
   SyncLog,
-} from '../entities'
+} from "../entities";
 import {
   IntegrationStatus,
   IntegrationHealthStatus,
@@ -14,11 +19,11 @@ import {
   OAuthCallbackData,
   IntegrationConfig as IIntegrationConfig,
   ConversionEvent,
-} from '../types/integration.types'
-import { EncryptionService } from './encryption.service'
-import { AmoCRMConnectorService } from './amocrm-connector.service'
-import { ConversionToLeadSyncService } from './conversion-to-lead-sync.service'
-import { DealPullSyncService } from './deal-pull-sync.service'
+} from "../types/integration.types";
+import { EncryptionService } from "./encryption.service";
+import { AmoCRMConnectorService } from "./amocrm-connector.service";
+import { ConversionToLeadSyncService } from "./conversion-to-lead-sync.service";
+import { DealPullSyncService } from "./deal-pull-sync.service";
 
 @Injectable()
 export class IntegrationService {
@@ -32,7 +37,7 @@ export class IntegrationService {
     private encryptionService: EncryptionService,
     private amoCrmConnector: AmoCRMConnectorService,
     private conversionToLeadSync: ConversionToLeadSyncService,
-    private dealPullSync: DealPullSyncService
+    private dealPullSync: DealPullSyncService,
   ) {}
 
   /**
@@ -40,10 +45,12 @@ export class IntegrationService {
    */
   getAuthorizationUrl(integrationKey: string, state: string): string {
     switch (integrationKey) {
-      case 'amocrm':
-        return this.amoCrmConnector.getAuthorizationUrl(state)
+      case "amocrm":
+        return this.amoCrmConnector.getAuthorizationUrl(state);
       default:
-        throw new BadRequestException(`Unsupported integration: ${integrationKey}`)
+        throw new BadRequestException(
+          `Unsupported integration: ${integrationKey}`,
+        );
     }
   }
 
@@ -54,30 +61,34 @@ export class IntegrationService {
     integrationKey: string,
     workspaceId: string,
     userId: string,
-    callbackData: OAuthCallbackData
+    callbackData: OAuthCallbackData,
   ): Promise<IIntegrationConnection> {
     // Validate integration type
-    if (integrationKey !== 'amocrm') {
-      throw new BadRequestException(`Unsupported integration: ${integrationKey}`)
+    if (integrationKey !== "amocrm") {
+      throw new BadRequestException(
+        `Unsupported integration: ${integrationKey}`,
+      );
     }
 
     // Extract subdomain from callback data
-    const subdomain = callbackData.redirectUri.split('://')[1]?.split('.')[0]
+    const subdomain = callbackData.redirectUri.split("://")[1]?.split(".")[0];
     if (!subdomain) {
-      throw new BadRequestException('Invalid subdomain in callback')
+      throw new BadRequestException("Invalid subdomain in callback");
     }
 
     // Exchange code for tokens
     const tokens = await this.amoCrmConnector.exchangeCodeForTokens(
       callbackData.code,
-      subdomain
-    )
+      subdomain,
+    );
 
     // Encrypt sensitive tokens
-    const encryptedAccessToken = this.encryptionService.encrypt(tokens.accessToken)
+    const encryptedAccessToken = this.encryptionService.encrypt(
+      tokens.accessToken,
+    );
     const encryptedRefreshToken = tokens.refreshToken
       ? this.encryptionService.encrypt(tokens.refreshToken)
-      : null
+      : null;
 
     // Check if connection already exists
     let connection = await this.connectionRepository.findOne({
@@ -86,16 +97,16 @@ export class IntegrationService {
         integrationKey,
         externalAccountId: tokens.subdomain,
       },
-    })
+    });
 
     if (connection) {
       // Update existing connection
-      connection.encryptedAccessToken = encryptedAccessToken
-      connection.encryptedRefreshToken = encryptedRefreshToken
-      connection.tokenExpiresAt = tokens.expiresAt
-      connection.status = IntegrationStatus.ACTIVE
-      connection.connectedByUserId = userId
-      connection.updatedAt = new Date()
+      connection.encryptedAccessToken = encryptedAccessToken;
+      connection.encryptedRefreshToken = encryptedRefreshToken;
+      connection.tokenExpiresAt = tokens.expiresAt;
+      connection.status = IntegrationStatus.ACTIVE;
+      connection.connectedByUserId = userId;
+      connection.updatedAt = new Date();
     } else {
       // Create new connection
       connection = this.connectionRepository.create({
@@ -108,10 +119,10 @@ export class IntegrationService {
         status: IntegrationStatus.ACTIVE,
         connectedByUserId: userId,
         isActive: true,
-      })
+      });
     }
 
-    return this.connectionRepository.save(connection)
+    return this.connectionRepository.save(connection);
   }
 
   /**
@@ -119,68 +130,73 @@ export class IntegrationService {
    */
   async getConnectionWithTokens(
     connectionId: string,
-    workspaceId: string
+    workspaceId: string,
   ): Promise<IIntegrationConnection> {
     const connection = await this.connectionRepository.findOne({
       where: { id: connectionId, workspaceId },
       select: [
-        'id',
-        'integrationKey',
-        'externalAccountId',
-        'encryptedAccessToken',
-        'encryptedRefreshToken',
-        'tokenExpiresAt',
-        'status',
-        'isActive',
-        'workspaceId',
+        "id",
+        "integrationKey",
+        "externalAccountId",
+        "encryptedAccessToken",
+        "encryptedRefreshToken",
+        "tokenExpiresAt",
+        "status",
+        "isActive",
+        "workspaceId",
       ],
-    })
+    });
 
     if (!connection) {
-      throw new NotFoundException('Integration connection not found')
+      throw new NotFoundException("Integration connection not found");
     }
 
-    return connection
+    return connection;
   }
 
   /**
    * Decrypt and refresh token if needed
    */
   async getValidAccessToken(
-    connection: IIntegrationConnection
+    connection: IIntegrationConnection,
   ): Promise<string> {
     try {
       // Check if token is expired
       if (connection.tokenExpiresAt && new Date() > connection.tokenExpiresAt) {
         // Refresh token
-        if (connection.encryptedRefreshToken && connection.integrationKey === 'amocrm') {
+        if (
+          connection.encryptedRefreshToken &&
+          connection.integrationKey === "amocrm"
+        ) {
           const refreshToken = this.encryptionService.decrypt(
-            connection.encryptedRefreshToken
-          )
+            connection.encryptedRefreshToken,
+          );
           const tokens = await this.amoCrmConnector.refreshToken(
             refreshToken,
-            connection.externalAccountId
-          )
+            connection.externalAccountId,
+          );
 
           // Update connection with new tokens
           connection.encryptedAccessToken = this.encryptionService.encrypt(
-            tokens.accessToken
-          )
+            tokens.accessToken,
+          );
           if (tokens.refreshToken) {
             connection.encryptedRefreshToken = this.encryptionService.encrypt(
-              tokens.refreshToken
-            )
+              tokens.refreshToken,
+            );
           }
-          connection.tokenExpiresAt = tokens.expiresAt
-          connection.status = IntegrationStatus.ACTIVE
-          await this.connectionRepository.save(connection)
+          connection.tokenExpiresAt = tokens.expiresAt;
+          connection.status = IntegrationStatus.ACTIVE;
+          await this.connectionRepository.save(connection);
         }
       }
 
       // Decrypt and return access token
-      return this.encryptionService.decrypt(connection.encryptedAccessToken)
+      return this.encryptionService.decrypt(connection.encryptedAccessToken);
     } catch (error) {
-      throw new BadRequestException(`Failed to get valid token: ${error.message}`)
+      throw new BadRequestException(
+        `Failed to get valid token: ${error.message}`,
+      );
     }
   }
 
@@ -189,11 +205,11 @@ export class IntegrationService {
    */
   async saveConfiguration(
     connectionId: string,
-    config: Partial<IIntegrationConfig>
+    config: Partial<IIntegrationConfig>,
   ): Promise<IntegrationConfigEntity> {
     let integrationConfig = await this.configRepository.findOne({
       where: { connectionId },
-    })
+    });
 
     if (!integrationConfig) {
       integrationConfig = this.configRepository.create({
@@ -201,42 +217,44 @@ export class IntegrationService {
         fieldMappings: config.fieldMappings || [],
         syncSettings: config.syncSettings || {
           enabled: true,
-          frequency: '30min',
+          frequency: "30min",
           batchSize: 100,
         },
         webhookEnabled: config.webhookEnabled ?? true,
-      })
+      });
     } else {
       if (config.fieldMappings) {
-        integrationConfig.fieldMappings = config.fieldMappings
+        integrationConfig.fieldMappings = config.fieldMappings;
       }
       if (config.syncSettings) {
         integrationConfig.syncSettings = {
           ...integrationConfig.syncSettings,
           ...config.syncSettings,
-        }
+        };
       }
       if (config.webhookEnabled !== undefined) {
-        integrationConfig.webhookEnabled = config.webhookEnabled
+        integrationConfig.webhookEnabled = config.webhookEnabled;
       }
     }
 
-    return this.configRepository.save(integrationConfig)
+    return this.configRepository.save(integrationConfig);
   }
 
   /**
    * Get integration configuration
    */
-  async getConfiguration(connectionId: string): Promise<IntegrationConfigEntity> {
+  async getConfiguration(
+    connectionId: string,
+  ): Promise<IntegrationConfigEntity> {
     const config = await this.configRepository.findOne({
       where: { connectionId },
-    })
+    });
 
     if (!config) {
-      throw new NotFoundException('Integration configuration not found')
+      throw new NotFoundException("Integration configuration not found");
     }
 
-    return config
+    return config;
   }
 
   /**
@@ -244,39 +262,46 @@ export class IntegrationService {
    */
   async testConnection(
     connectionId: string,
-    workspaceId: string
+    workspaceId: string,
   ): Promise<boolean> {
-    const connection = await this.getConnectionWithTokens(connectionId, workspaceId)
+    const connection = await this.getConnectionWithTokens(
+      connectionId,
+      workspaceId,
+    );
 
-    if (connection.integrationKey === 'amocrm') {
-      const accessToken = await this.getValidAccessToken(connection)
+    if (connection.integrationKey === "amocrm") {
+      const accessToken = await this.getValidAccessToken(connection);
       const client = this.amoCrmConnector.createClient(
         accessToken,
-        connection.externalAccountId
-      )
-      return this.amoCrmConnector.verifyConnection(client)
+        connection.externalAccountId,
+      );
+      return this.amoCrmConnector.verifyConnection(client);
     }
 
-    throw new BadRequestException(`Unsupported integration: ${connection.integrationKey}`)
+    throw new BadRequestException(
+      `Unsupported integration: ${connection.integrationKey}`,
+    );
   }
 
   /**
    * List connections for workspace
    */
-  async listConnections(workspaceId: string): Promise<IIntegrationConnection[]> {
+  async listConnections(
+    workspaceId: string,
+  ): Promise<IIntegrationConnection[]> {
     return this.connectionRepository.find({
       where: { workspaceId },
       select: [
-        'id',
-        'integrationKey',
-        'externalAccountId',
-        'status',
-        'isActive',
-        'lastSyncedAt',
-        'connectedAt',
-        'updatedAt',
+        "id",
+        "integrationKey",
+        "externalAccountId",
+        "status",
+        "isActive",
+        "lastSyncedAt",
+        "connectedAt",
+        "updatedAt",
       ],
-    })
+    });
   }
 
   /**
@@ -284,50 +309,56 @@ export class IntegrationService {
    */
   async getHealthStatus(
     connectionId: string,
-    workspaceId: string
+    workspaceId: string,
   ): Promise<IntegrationHealthStatus> {
-    const connection = await this.getConnectionWithTokens(connectionId, workspaceId)
+    const connection = await this.getConnectionWithTokens(
+      connectionId,
+      workspaceId,
+    );
 
     // Get recent sync logs
     const recentLogs = await this.syncLogRepository.find({
       where: { connectionId },
-      order: { createdAt: 'DESC' },
+      order: { createdAt: "DESC" },
       take: 100,
-    })
+    });
 
     // Calculate success rate
-    const successCount = recentLogs.filter((l) => l.status === 'success').length
-    const successRate = recentLogs.length > 0 ? (successCount / recentLogs.length) * 100 : 100
+    const successCount = recentLogs.filter(
+      (l) => l.status === "success",
+    ).length;
+    const successRate =
+      recentLogs.length > 0 ? (successCount / recentLogs.length) * 100 : 100;
 
     // Get next scheduled sync
     const config = await this.configRepository.findOne({
       where: { connectionId },
-    })
+    });
 
-    let nextScheduledSync: Date | undefined
+    let nextScheduledSync: Date | undefined;
     if (config?.syncSettings.enabled && connection.lastSyncedAt) {
-      const frequency = config.syncSettings.frequency
-      const nextSync = new Date(connection.lastSyncedAt)
+      const frequency = config.syncSettings.frequency;
+      const nextSync = new Date(connection.lastSyncedAt);
 
       switch (frequency) {
-        case 'real-time':
-          nextSync.setMinutes(nextSync.getMinutes() + 1)
-          break
-        case '15min':
-          nextSync.setMinutes(nextSync.getMinutes() + 15)
-          break
-        case '30min':
-          nextSync.setMinutes(nextSync.getMinutes() + 30)
-          break
-        case 'hourly':
-          nextSync.setHours(nextSync.getHours() + 1)
-          break
-        case 'daily':
-          nextSync.setDate(nextSync.getDate() + 1)
-          break
+        case "real-time":
+          nextSync.setMinutes(nextSync.getMinutes() + 1);
+          break;
+        case "15min":
+          nextSync.setMinutes(nextSync.getMinutes() + 15);
+          break;
+        case "30min":
+          nextSync.setMinutes(nextSync.getMinutes() + 30);
+          break;
+        case "hourly":
+          nextSync.setHours(nextSync.getHours() + 1);
+          break;
+        case "daily":
+          nextSync.setDate(nextSync.getDate() + 1);
+          break;
       }
 
-      nextScheduledSync = nextSync
+      nextScheduledSync = nextSync;
     }
 
     return {
@@ -345,7 +376,7 @@ export class IntegrationService {
         isActive: connection.isActive,
         connectedAt: connection.connectedAt,
       },
-    }
+    };
   }
 
   /**
@@ -354,27 +385,32 @@ export class IntegrationService {
   async syncConversionToLead(
     connectionId: string,
     workspaceId: string,
-    conversion: ConversionEvent
+    conversion: ConversionEvent,
   ): Promise<{ success: boolean; leadId?: number; error?: string }> {
-    const connection = await this.getConnectionWithTokens(connectionId, workspaceId)
-    const config = await this.getConfiguration(connectionId)
+    const connection = await this.getConnectionWithTokens(
+      connectionId,
+      workspaceId,
+    );
+    const config = await this.getConfiguration(connectionId);
 
-    if (connection.integrationKey !== 'amocrm') {
-      throw new BadRequestException('This integration does not support conversion syncing')
+    if (connection.integrationKey !== "amocrm") {
+      throw new BadRequestException(
+        "This integration does not support conversion syncing",
+      );
     }
 
-    const accessToken = await this.getValidAccessToken(connection)
+    const accessToken = await this.getValidAccessToken(connection);
     const client = this.amoCrmConnector.createClient(
       accessToken,
-      connection.externalAccountId
-    )
+      connection.externalAccountId,
+    );
 
     return this.conversionToLeadSync.syncConversionToLead(
       connectionId,
       client,
       conversion,
-      config.fieldMappings
-    )
+      config.fieldMappings,
+    );
   }
 
   /**
@@ -383,45 +419,53 @@ export class IntegrationService {
   async syncConversionsToLeads(
     connectionId: string,
     workspaceId: string,
-    conversions: ConversionEvent[]
+    conversions: ConversionEvent[],
   ): Promise<{
-    success: number
-    failed: number
-    skipped: number
-    errors: Array<{ conversionId: string; error: string }>
+    success: number;
+    failed: number;
+    skipped: number;
+    errors: Array<{ conversionId: string; error: string }>;
   }> {
-    const connection = await this.getConnectionWithTokens(connectionId, workspaceId)
-    const config = await this.getConfiguration(connectionId)
+    const connection = await this.getConnectionWithTokens(
+      connectionId,
+      workspaceId,
+    );
+    const config = await this.getConfiguration(connectionId);
 
-    if (connection.integrationKey !== 'amocrm') {
-      throw new BadRequestException('This integration does not support conversion syncing')
+    if (connection.integrationKey !== "amocrm") {
+      throw new BadRequestException(
+        "This integration does not support conversion syncing",
+      );
     }
 
-    const accessToken = await this.getValidAccessToken(connection)
+    const accessToken = await this.getValidAccessToken(connection);
     const client = this.amoCrmConnector.createClient(
       accessToken,
-      connection.externalAccountId
-    )
+      connection.externalAccountId,
+    );
 
     return this.conversionToLeadSync.syncConversionsToLeads(
       connectionId,
       client,
       conversions,
       config.fieldMappings,
-      config.syncSettings.batchSize || 100
-    )
+      config.syncSettings.batchSize || 100,
+    );
   }
 
   /**
    * Disconnect integration
    */
   async disconnect(connectionId: string, workspaceId: string): Promise<void> {
-    const _connection = await this.getConnectionWithTokens(connectionId, workspaceId)
+    const _connection = await this.getConnectionWithTokens(
+      connectionId,
+      workspaceId,
+    );
 
     // Delete connection and related configs/logs
-    await this.connectionRepository.delete(connectionId)
-    await this.configRepository.delete({ connectionId })
-    await this.syncLogRepository.delete({ connectionId })
+    await this.connectionRepository.delete(connectionId);
+    await this.configRepository.delete({ connectionId });
+    await this.syncLogRepository.delete({ connectionId });
   }
 
   /**
@@ -430,40 +474,48 @@ export class IntegrationService {
   async syncDealsAndCalculateRoas(
     connectionId: string,
     workspaceId: string,
-    lookbackDays: number = 90
+    lookbackDays: number = 90,
   ): Promise<{
-    dealsProcessed: number
-    dealsWithRoas: number
-    dealsFailed: number
-    totalRevenue: number
-    aggregateRoas: number | null
+    dealsProcessed: number;
+    dealsWithRoas: number;
+    dealsFailed: number;
+    totalRevenue: number;
+    aggregateRoas: number | null;
   }> {
-    const connection = await this.getConnectionWithTokens(connectionId, workspaceId)
+    const connection = await this.getConnectionWithTokens(
+      connectionId,
+      workspaceId,
+    );
 
-    if (connection.integrationKey !== 'amocrm') {
-      throw new BadRequestException('This integration does not support deal syncing')
+    if (connection.integrationKey !== "amocrm") {
+      throw new BadRequestException(
+        "This integration does not support deal syncing",
+      );
     }
 
-    const accessToken = await this.getValidAccessToken(connection)
+    const accessToken = await this.getValidAccessToken(connection);
     const client = this.amoCrmConnector.createClient(
       accessToken,
-      connection.externalAccountId
-    )
+      connection.externalAccountId,
+    );
 
     return this.dealPullSync.syncDealsAndCalculateRoas(
       connectionId,
       client,
-      lookbackDays
-    )
+      lookbackDays,
+    );
   }
 
   /**
    * Get revenue attribution data
    */
-  async getRevenueAttribution(connectionId: string, workspaceId: string): Promise<any> {
+  async getRevenueAttribution(
+    connectionId: string,
+    workspaceId: string,
+  ): Promise<any> {
     // Verify connection exists
-    await this.getConnectionWithTokens(connectionId, workspaceId)
-    return this.dealPullSync.getRevenueAttribution(connectionId)
+    await this.getConnectionWithTokens(connectionId, workspaceId);
+    return this.dealPullSync.getRevenueAttribution(connectionId);
   }
 
   /**
@@ -472,11 +524,11 @@ export class IntegrationService {
   async getRevenueTrends(
     connectionId: string,
     workspaceId: string,
-    days: number = 30
+    days: number = 30,
   ): Promise<any> {
     // Verify connection exists
-    await this.getConnectionWithTokens(connectionId, workspaceId)
-    return this.dealPullSync.getRevenueTrends(connectionId, days)
+    await this.getConnectionWithTokens(connectionId, workspaceId);
+    return this.dealPullSync.getRevenueTrends(connectionId, days);
   }
 
   /**
@@ -486,18 +538,21 @@ export class IntegrationService {
     connectionId: string,
     workspaceId: string,
     limit: number = 50,
-    offset: number = 0
+    offset: number = 0,
   ): Promise<{ logs: SyncLog[]; total: number }> {
     // Verify connection exists in workspace
-    const _connection = await this.getConnectionWithTokens(connectionId, workspaceId)
+    const _connection = await this.getConnectionWithTokens(
+      connectionId,
+      workspaceId,
+    );
 
     const [logs, total] = await this.syncLogRepository.findAndCount({
       where: { connectionId },
-      order: { createdAt: 'DESC' },
+      order: { createdAt: "DESC" },
       take: limit,
       skip: offset,
-    })
+    });
 
-    return { logs, total }
+    return { logs, total };
   }
 }
