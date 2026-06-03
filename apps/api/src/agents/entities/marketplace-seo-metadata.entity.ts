@@ -1,53 +1,60 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm'
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Index,
+} from "typeorm";
 
-@Entity('marketplace_seo_metadata')
-@Index(['slug'])
+@Entity("marketplace_seo_metadata")
+@Index(["slug"])
 export class MarketplaceSeoMetadata {
-  @PrimaryGeneratedColumn('uuid')
-  id: string
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
   @Column({ unique: true })
-  slug: string
+  slug: string;
 
   @Column({
-    type: 'enum',
-    enum: ['marketplace', 'specialist_profile', 'filter_results'],
+    type: "enum",
+    enum: ["marketplace", "specialist_profile", "filter_results"],
   })
-  pageType: 'marketplace' | 'specialist_profile' | 'filter_results'
+  pageType: "marketplace" | "specialist_profile" | "filter_results";
 
   @Column({ nullable: true })
-  resourceId: string
+  resourceId: string;
 
   @Column()
-  metaTitle: string
+  metaTitle: string;
 
   @Column()
-  metaDescription: string
+  metaDescription: string;
 
-  @Column({ type: 'simple-array', nullable: true })
-  keywords: string[]
-
-  @Column({ nullable: true })
-  canonicalUrl: string
+  @Column({ type: "simple-array", nullable: true })
+  keywords: string[];
 
   @Column({ nullable: true })
-  ogImageUrl: string
+  canonicalUrl: string;
 
   @Column({ nullable: true })
-  ogTitle: string
+  ogImageUrl: string;
 
   @Column({ nullable: true })
-  ogDescription: string
+  ogTitle: string;
 
-  @Column({ type: 'jsonb', nullable: true })
-  structuredData: Record<string, any>
+  @Column({ nullable: true })
+  ogDescription: string;
+
+  @Column({ type: "jsonb", nullable: true })
+  structuredData: Record<string, any>;
 
   @Column({ default: true })
-  isPublic: boolean
+  isPublic: boolean;
 
   @CreateDateColumn()
-  createdAt: Date
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date
+  updatedAt: Date;
 }

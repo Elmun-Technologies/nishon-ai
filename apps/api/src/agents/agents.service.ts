@@ -17,14 +17,21 @@ import { User } from "../users/entities/user.entity";
 import { getLimits } from "../config/plan-limits.config";
 
 function slugify(name: string): string {
-  return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
 }
 
 /** Postgres 42P01 — relation does not exist (e.g. migrations not applied). */
 function isMissingTableError(err: unknown, tableName: string): boolean {
-  const e = err as QueryFailedError & { driverError?: { code?: string; message?: string } };
+  const e = err as QueryFailedError & {
+    driverError?: { code?: string; message?: string };
+  };
   const code = e?.driverError?.code ?? (e as { code?: string }).code;
-  const message = String(e?.driverError?.message ?? (err instanceof Error ? err.message : ""));
+  const message = String(
+    e?.driverError?.message ?? (err instanceof Error ? err.message : ""),
+  );
   return code === "42P01" && message.includes(tableName);
 }
 
@@ -46,12 +53,33 @@ const ADSPECTR_BUILTIN_AI_AGENTS = [
     isVerified: true,
     isProMember: true,
     isFeatured: true,
-    niches: ["E-commerce", "Fashion", "Beauty & Cosmetics", "Food & Beverage", "Education", "Real Estate"],
+    niches: [
+      "E-commerce",
+      "Fashion",
+      "Beauty & Cosmetics",
+      "Food & Beverage",
+      "Education",
+      "Real Estate",
+    ],
     platforms: ["meta", "google", "yandex", "tiktok", "telegram"],
-    cachedStats: { avgROAS: 4.2, avgCPA: 8, avgCTR: 3.8, totalCampaigns: 847, activeCampaigns: 312, successRate: 89, totalSpendManaged: 1240000, bestROAS: 12.4 },
+    cachedStats: {
+      avgROAS: 4.2,
+      avgCPA: 8,
+      avgCTR: 3.8,
+      totalCampaigns: 847,
+      activeCampaigns: 312,
+      successRate: 89,
+      totalSpendManaged: 1240000,
+      bestROAS: 12.4,
+    },
     cachedRating: 4.9,
     cachedReviewCount: 247,
-    aiConfig: { defaultAutopilotMode: "FULL_AUTO", supportedPlatforms: ["meta", "google", "yandex", "tiktok"], minManagedBudget: 100, decisionFrequencyHours: 2 },
+    aiConfig: {
+      defaultAutopilotMode: "FULL_AUTO",
+      supportedPlatforms: ["meta", "google", "yandex", "tiktok"],
+      minManagedBudget: 100,
+      decisionFrequencyHours: 2,
+    },
     monthlyPerformance: [
       { month: "Sep", roas: 3.8, spend: 85000, campaigns: 42 },
       { month: "Okt", roas: 4.1, spend: 92000, campaigns: 48 },
@@ -79,10 +107,24 @@ const ADSPECTR_BUILTIN_AI_AGENTS = [
     isFeatured: true,
     niches: ["E-commerce", "Beauty & Cosmetics", "Fashion", "Food & Beverage"],
     platforms: ["meta"],
-    cachedStats: { avgROAS: 5.1, avgCPA: 6, avgCTR: 4.2, totalCampaigns: 520, activeCampaigns: 198, successRate: 91, totalSpendManaged: 780000, bestROAS: 14.2 },
+    cachedStats: {
+      avgROAS: 5.1,
+      avgCPA: 6,
+      avgCTR: 4.2,
+      totalCampaigns: 520,
+      activeCampaigns: 198,
+      successRate: 91,
+      totalSpendManaged: 780000,
+      bestROAS: 14.2,
+    },
     cachedRating: 4.8,
     cachedReviewCount: 183,
-    aiConfig: { defaultAutopilotMode: "FULL_AUTO", supportedPlatforms: ["meta"], minManagedBudget: 50, decisionFrequencyHours: 2 },
+    aiConfig: {
+      defaultAutopilotMode: "FULL_AUTO",
+      supportedPlatforms: ["meta"],
+      minManagedBudget: 50,
+      decisionFrequencyHours: 2,
+    },
     monthlyPerformance: [
       { month: "Sep", roas: 4.8, spend: 62000, campaigns: 28 },
       { month: "Okt", roas: 5.0, spend: 68000, campaigns: 32 },
@@ -110,10 +152,24 @@ const ADSPECTR_BUILTIN_AI_AGENTS = [
     isFeatured: false,
     niches: ["Real Estate", "B2B SaaS", "Finance", "Healthcare", "Education"],
     platforms: ["google", "yandex"],
-    cachedStats: { avgROAS: 3.8, avgCPA: 12, avgCTR: 5.1, totalCampaigns: 380, activeCampaigns: 142, successRate: 86, totalSpendManaged: 560000, bestROAS: 9.8 },
+    cachedStats: {
+      avgROAS: 3.8,
+      avgCPA: 12,
+      avgCTR: 5.1,
+      totalCampaigns: 380,
+      activeCampaigns: 142,
+      successRate: 86,
+      totalSpendManaged: 560000,
+      bestROAS: 9.8,
+    },
     cachedRating: 4.7,
     cachedReviewCount: 119,
-    aiConfig: { defaultAutopilotMode: "ASSISTED", supportedPlatforms: ["google", "yandex"], minManagedBudget: 100, decisionFrequencyHours: 4 },
+    aiConfig: {
+      defaultAutopilotMode: "ASSISTED",
+      supportedPlatforms: ["google", "yandex"],
+      minManagedBudget: 100,
+      decisionFrequencyHours: 4,
+    },
     monthlyPerformance: [
       { month: "Sep", roas: 3.4, spend: 44000, campaigns: 20 },
       { month: "Okt", roas: 3.6, spend: 48000, campaigns: 23 },
@@ -159,14 +215,22 @@ export class AgentsService implements OnModuleInit {
 
   /** Create AdSpectr's default AI agents if they don't exist */
   private async seedAdSpectrAgents() {
-    const existing = await this.agentRepo.count({ where: { ownerId: null, agentType: "ai" } });
+    const existing = await this.agentRepo.count({
+      where: { ownerId: null, agentType: "ai" },
+    });
     if (existing >= ADSPECTR_BUILTIN_AI_AGENTS.length) return;
 
     this.logger.log("Seeding AdSpectr default AI agents...");
     for (const data of ADSPECTR_BUILTIN_AI_AGENTS) {
-      const exists = await this.agentRepo.findOne({ where: { slug: data.slug } });
+      const exists = await this.agentRepo.findOne({
+        where: { slug: data.slug },
+      });
       if (!exists) {
-        const agent = this.agentRepo.create({ ...(data as any), agentType: "ai", ownerId: null });
+        const agent = this.agentRepo.create({
+          ...(data as any),
+          agentType: "ai",
+          ownerId: null,
+        });
         await this.agentRepo.save(agent);
       }
     }
@@ -216,20 +280,35 @@ export class AgentsService implements OnModuleInit {
     // Sort
     switch (query.sortBy) {
       case "roas":
-        qb.orderBy("(a.cached_stats->>'avgROAS')::decimal", "DESC", "NULLS LAST");
+        qb.orderBy(
+          "(a.cached_stats->>'avgROAS')::decimal",
+          "DESC",
+          "NULLS LAST",
+        );
         break;
       case "spend":
-        qb.orderBy("(a.cached_stats->>'totalSpendManaged')::decimal", "DESC", "NULLS LAST");
+        qb.orderBy(
+          "(a.cached_stats->>'totalSpendManaged')::decimal",
+          "DESC",
+          "NULLS LAST",
+        );
         break;
       case "campaigns":
-        qb.orderBy("(a.cached_stats->>'totalCampaigns')::int", "DESC", "NULLS LAST");
+        qb.orderBy(
+          "(a.cached_stats->>'totalCampaigns')::int",
+          "DESC",
+          "NULLS LAST",
+        );
         break;
       case "price":
         qb.orderBy("a.monthly_rate", "ASC");
         break;
       case "rating":
       default:
-        qb.orderBy("a.is_featured", "DESC").addOrderBy("a.cached_rating", "DESC");
+        qb.orderBy("a.is_featured", "DESC").addOrderBy(
+          "a.cached_rating",
+          "DESC",
+        );
     }
 
     const total = await qb.getCount();
@@ -242,7 +321,9 @@ export class AgentsService implements OnModuleInit {
   }
 
   async findBySlug(slug: string): Promise<AgentProfile | null> {
-    const agent = await this.agentRepo.findOne({ where: { slug, isPublished: true } });
+    const agent = await this.agentRepo.findOne({
+      where: { slug, isPublished: true },
+    });
     return agent;
   }
 
@@ -269,8 +350,12 @@ export class AgentsService implements OnModuleInit {
     if (!user) throw new NotFoundException("User topilmadi");
 
     const limits = getLimits(user.plan);
-    const workspaceCount = await this.workspaceRepo.count({ where: { userId } });
-    const agentProfileCount = await this.agentRepo.count({ where: { ownerId: userId } });
+    const workspaceCount = await this.workspaceRepo.count({
+      where: { userId },
+    });
+    const agentProfileCount = await this.agentRepo.count({
+      where: { ownerId: userId },
+    });
 
     return {
       plan: user.plan,
@@ -304,16 +389,21 @@ export class AgentsService implements OnModuleInit {
     const user = await this.userRepo.findOne({ where: { id: userId } });
     if (user) {
       const limits = getLimits(user.plan);
-      const canCreate = dto.agentType === "ai" ? limits.canBuildAiAgent : limits.canCreateAgentProfile;
+      const canCreate =
+        dto.agentType === "ai"
+          ? limits.canBuildAiAgent
+          : limits.canCreateAgentProfile;
       if (!canCreate) {
         const required = dto.agentType === "ai" ? "Pro" : "Growth";
         throw new ForbiddenException(
-          `${dto.agentType === "ai" ? "AI agent" : "Targetolog"} profil yaratish uchun kamida ${required} tarifi kerak. Hozirgi tarif: ${user.plan}.`
+          `${dto.agentType === "ai" ? "AI agent" : "Targetolog"} profil yaratish uchun kamida ${required} tarifi kerak. Hozirgi tarif: ${user.plan}.`,
         );
       }
     }
 
-    const slug = slugify(`${dto.displayName}-${Math.random().toString(36).slice(2, 6)}`);
+    const slug = slugify(
+      `${dto.displayName}-${Math.random().toString(36).slice(2, 6)}`,
+    );
     const agent = this.agentRepo.create({
       ...dto,
       slug,
@@ -328,7 +418,11 @@ export class AgentsService implements OnModuleInit {
     return this.agentRepo.save(agent);
   }
 
-  async update(id: string, userId: string, dto: Partial<AgentProfile>): Promise<AgentProfile> {
+  async update(
+    id: string,
+    userId: string,
+    dto: Partial<AgentProfile>,
+  ): Promise<AgentProfile> {
     const agent = await this.findOwned(id, userId);
     Object.assign(agent, dto);
     return this.agentRepo.save(agent);
@@ -357,15 +451,19 @@ export class AgentsService implements OnModuleInit {
       const limits = getLimits(user.plan);
       if (!limits.canHireAgents) {
         throw new ForbiddenException(
-          `Agent yollash uchun kamida Starter tarifi kerak. Hozirgi tarif: ${user.plan}. Yangilang.`
+          `Agent yollash uchun kamida Starter tarifi kerak. Hozirgi tarif: ${user.plan}. Yangilang.`,
         );
       }
     }
 
-    const workspace = await this.workspaceRepo.findOne({ where: { id: workspaceId, userId } });
+    const workspace = await this.workspaceRepo.findOne({
+      where: { id: workspaceId, userId },
+    });
     if (!workspace) throw new NotFoundException("Workspace topilmadi");
 
-    const agent = await this.agentRepo.findOne({ where: { id: agentProfileId, isPublished: true } });
+    const agent = await this.agentRepo.findOne({
+      where: { id: agentProfileId, isPublished: true },
+    });
     if (!agent) throw new NotFoundException("Agent topilmadi");
 
     // Cancel any existing active engagement
@@ -401,8 +499,13 @@ export class AgentsService implements OnModuleInit {
     return saved;
   }
 
-  async getCurrentEngagement(workspaceId: string, userId: string): Promise<ServiceEngagement | null> {
-    const workspace = await this.workspaceRepo.findOne({ where: { id: workspaceId, userId } });
+  async getCurrentEngagement(
+    workspaceId: string,
+    userId: string,
+  ): Promise<ServiceEngagement | null> {
+    const workspace = await this.workspaceRepo.findOne({
+      where: { id: workspaceId, userId },
+    });
     if (!workspace) throw new NotFoundException("Workspace topilmadi");
 
     return this.engagementRepo.findOne({
@@ -411,10 +514,18 @@ export class AgentsService implements OnModuleInit {
     });
   }
 
-  async cancelEngagement(id: string, userId: string): Promise<ServiceEngagement> {
+  async cancelEngagement(
+    id: string,
+    userId: string,
+  ): Promise<ServiceEngagement> {
     const engagement = await this.engagementRepo
       .createQueryBuilder("e")
-      .innerJoin("workspaces", "ws", "ws.id = e.workspace_id AND ws.user_id = :userId", { userId })
+      .innerJoin(
+        "workspaces",
+        "ws",
+        "ws.id = e.workspace_id AND ws.user_id = :userId",
+        { userId },
+      )
       .where("e.id = :id", { id })
       .getOne();
 
@@ -436,18 +547,32 @@ export class AgentsService implements OnModuleInit {
   async addReview(
     engagementId: string,
     userId: string,
-    dto: { rating: number; text: string; authorName: string; authorCompany?: string },
+    dto: {
+      rating: number;
+      text: string;
+      authorName: string;
+      authorCompany?: string;
+    },
   ): Promise<AgentReview> {
     const engagement = await this.engagementRepo
       .createQueryBuilder("e")
-      .innerJoin("workspaces", "ws", "ws.id = e.workspace_id AND ws.user_id = :userId", { userId })
+      .innerJoin(
+        "workspaces",
+        "ws",
+        "ws.id = e.workspace_id AND ws.user_id = :userId",
+        { userId },
+      )
       .where("e.id = :id", { id: engagementId })
       .getOne();
 
     if (!engagement) throw new NotFoundException("Engagement topilmadi");
-    if (engagement.isReviewed) throw new BadRequestException("Bu engagement uchun allaqachon sharh qoldirilgan");
+    if (engagement.isReviewed)
+      throw new BadRequestException(
+        "Bu engagement uchun allaqachon sharh qoldirilgan",
+      );
 
-    if (dto.rating < 1 || dto.rating > 5) throw new BadRequestException("Reyting 1-5 orasida bo'lishi kerak");
+    if (dto.rating < 1 || dto.rating > 5)
+      throw new BadRequestException("Reyting 1-5 orasida bo'lishi kerak");
 
     const review = this.reviewRepo.create({
       agentProfileId: engagement.agentProfileId,
@@ -514,7 +639,7 @@ export class AgentsService implements OnModuleInit {
           .where("ws.id IN (:...ids)", { ids: workspaceIds })
           .select([
             'COUNT(DISTINCT c.id) AS "totalCampaigns"',
-            'COUNT(DISTINCT CASE WHEN c.status = \'active\' THEN c.id END) AS "activeCampaigns"',
+            "COUNT(DISTINCT CASE WHEN c.status = 'active' THEN c.id END) AS \"activeCampaigns\"",
           ])
           .getRawOne();
 
@@ -541,8 +666,11 @@ export class AgentsService implements OnModuleInit {
   }
 
   private async findOwned(id: string, userId: string): Promise<AgentProfile> {
-    const agent = await this.agentRepo.findOne({ where: { id, ownerId: userId } });
-    if (!agent) throw new NotFoundException("Agent topilmadi yoki sizga tegishli emas");
+    const agent = await this.agentRepo.findOne({
+      where: { id, ownerId: userId },
+    });
+    if (!agent)
+      throw new NotFoundException("Agent topilmadi yoki sizga tegishli emas");
     return agent;
   }
 }

@@ -41,7 +41,9 @@ export class AiAgentService {
     @InjectRepository(AiDecision)
     private readonly decisionRepo: Repository<AiDecision>,
   ) {
-    this.aiClient = createAdSpectrAiClientFromEnv((k) => this.config.get<string>(k));
+    this.aiClient = createAdSpectrAiClientFromEnv((k) =>
+      this.config.get<string>(k),
+    );
   }
 
   /**
@@ -68,9 +70,14 @@ export class AiAgentService {
           accessToken: token,
         });
         if (!ads.length) continue;
-        lines.push(`\n【${term}】 — Ad Library: ${ads.length} ta natija (qisqa):`);
+        lines.push(
+          `\n【${term}】 — Ad Library: ${ads.length} ta natija (qisqa):`,
+        );
         for (const ad of ads.slice(0, 8)) {
-          const body = (ad.adCreativeBody || "").replace(/\s+/g, " ").trim().slice(0, 200);
+          const body = (ad.adCreativeBody || "")
+            .replace(/\s+/g, " ")
+            .trim()
+            .slice(0, 200);
           const cap = (ad.adCreativeLinkCaption || "").trim().slice(0, 80);
           lines.push(
             `- Sahifa: ${ad.pageName} | boshlangan: ${(ad.adDeliveryStartTime || "").slice(0, 10) || "?"}` +
@@ -79,7 +86,9 @@ export class AiAgentService {
           );
         }
       } catch (err: any) {
-        this.logger.debug(`Ad Library search skipped for "${term}": ${err?.message || err}`);
+        this.logger.debug(
+          `Ad Library search skipped for "${term}": ${err?.message || err}`,
+        );
       }
     }
     if (!lines.length) return "";
@@ -110,7 +119,9 @@ export class AiAgentService {
    * Only decisions with isApproved=null (pending) can be approved.
    */
   async approveDecision(decisionId: string): Promise<void> {
-    const decision = await this.decisionRepo.findOne({ where: { id: decisionId } });
+    const decision = await this.decisionRepo.findOne({
+      where: { id: decisionId },
+    });
     if (!decision) {
       throw new NotFoundException(`AI decision ${decisionId} not found`);
     }
@@ -130,12 +141,16 @@ export class AiAgentService {
    * Reject a pending AI decision — marks it as rejected without execution.
    */
   async rejectDecision(decisionId: string): Promise<void> {
-    const decision = await this.decisionRepo.findOne({ where: { id: decisionId } });
+    const decision = await this.decisionRepo.findOne({
+      where: { id: decisionId },
+    });
     if (!decision) {
       throw new NotFoundException(`AI decision ${decisionId} not found`);
     }
     if (decision.isExecuted) {
-      throw new BadRequestException("Cannot reject an already-executed decision");
+      throw new BadRequestException(
+        "Cannot reject an already-executed decision",
+      );
     }
 
     await this.decisionRepo.update(decisionId, {
@@ -256,9 +271,9 @@ Workspace ID for this conversation: ${dto.workspaceId}`;
    * Returns a rich JSON that the frontend renders as a comparison table.
    */
   async analyzeCompetitor(dto: {
-    workspaceId: string
-    competitor: { name: string; instagram: string; website: string }
-    businessContext: any
+    workspaceId: string;
+    competitor: { name: string; instagram: string; website: string };
+    businessContext: any;
   }): Promise<any> {
     const systemPrompt = `
 You are an expert digital marketing analyst who has audited 100+ businesses
@@ -427,7 +442,7 @@ RULES:
 - Be specific and realistic based on provided Instagram/website URLs
 - If data not available, make educated estimates based on industry
 - When a "Meta Marketing API — Ad Library" section appears in the user message, use it as evidence for active paid/social creative patterns; reconcile with URL-based notes.
-`
+`;
 
     const adLibraryAppendixSingle = await this.buildMetaAdLibraryAppendix([
       { name: dto.competitor.name },
@@ -437,36 +452,36 @@ RULES:
 Analyze this competitor vs our client:
 
 OUR CLIENT:
-- Business: ${dto.businessContext.name ?? 'Unknown'}
-- Industry: ${dto.businessContext.industry ?? 'Unknown'}
-- Description: ${dto.businessContext.productDescription ?? 'Not provided'}
-- Location: ${dto.businessContext.targetLocation ?? 'Uzbekistan'}
+- Business: ${dto.businessContext.name ?? "Unknown"}
+- Industry: ${dto.businessContext.industry ?? "Unknown"}
+- Description: ${dto.businessContext.productDescription ?? "Not provided"}
+- Location: ${dto.businessContext.targetLocation ?? "Uzbekistan"}
 - Monthly budget: $${dto.businessContext.monthlyBudget ?? 500}
-- Goal: ${dto.businessContext.goal ?? 'leads'}
-- Existing strategy summary: ${dto.businessContext.aiStrategy?.summary ?? 'Not generated'}
+- Goal: ${dto.businessContext.goal ?? "leads"}
+- Existing strategy summary: ${dto.businessContext.aiStrategy?.summary ?? "Not generated"}
 
 COMPETITOR:
 - Name: ${dto.competitor.name}
-- Instagram: ${dto.competitor.instagram || 'Not provided'}
-- Website: ${dto.competitor.website || 'Not provided'}
+- Instagram: ${dto.competitor.instagram || "Not provided"}
+- Website: ${dto.competitor.website || "Not provided"}
 ${adLibraryAppendixSingle}
 Please analyze both businesses across all 12 categories and 72 sub-parameters.
 Use the Instagram and website URLs to gather real insights about the competitor.
 Be specific, actionable, and write all notes in Uzbek language.
-`
+`;
 
     try {
       return await this.aiClient.completeJson(userPrompt, systemPrompt, {
-        taskType: 'competitor',
-        agentName: 'CompetitorAnalysis',
+        taskType: "competitor",
+        agentName: "CompetitorAnalysis",
         temperature: 0.3,
-      })
+      });
     } catch (err: any) {
-      const detail = err?.message || String(err)
-      this.logger.error(`Competitor analysis failed: ${detail}`)
+      const detail = err?.message || String(err);
+      this.logger.error(`Competitor analysis failed: ${detail}`);
       throw new InternalServerErrorException(
-        `AI tahlil amalga oshmadi: ${detail.slice(0, 200)}`
-      )
+        `AI tahlil amalga oshmadi: ${detail.slice(0, 200)}`,
+      );
     }
   }
 
@@ -475,31 +490,38 @@ Be specific, actionable, and write all notes in Uzbek language.
    * Intended for careful strategic review; can later be delegated to Manus with the same payload shape.
    */
   async analyzeCompetitorsBatch(dto: {
-    workspaceId: string
-    businessContext: Record<string, unknown>
-    competitors: Array<{ name: string; instagram?: string; website?: string; extraLinks?: string }>
+    workspaceId: string;
+    businessContext: Record<string, unknown>;
+    competitors: Array<{
+      name: string;
+      instagram?: string;
+      website?: string;
+      extraLinks?: string;
+    }>;
   }): Promise<Record<string, unknown>> {
-    const list = dto.competitors || []
+    const list = dto.competitors || [];
     if (list.length === 0) {
-      throw new BadRequestException("Kamida bitta raqobatchi kerak")
+      throw new BadRequestException("Kamida bitta raqobatchi kerak");
     }
     if (list.length > 12) {
-      throw new BadRequestException("Bir vaqtning o‘zida 12 tadan ortiq raqobatchi yuborilmaydi")
+      throw new BadRequestException(
+        "Bir vaqtning o‘zida 12 tadan ortiq raqobatchi yuborilmaydi",
+      );
     }
     for (let i = 0; i < list.length; i++) {
-      const c = list[i]
+      const c = list[i];
       if (!c?.name?.trim()) {
-        throw new BadRequestException(`Raqobatchi #${i + 1}: nom majburiy`)
+        throw new BadRequestException(`Raqobatchi #${i + 1}: nom majburiy`);
       }
       const hasLink = Boolean(
         (c.instagram && String(c.instagram).trim()) ||
-          (c.website && String(c.website).trim()) ||
-          (c.extraLinks && String(c.extraLinks).trim()),
-      )
+        (c.website && String(c.website).trim()) ||
+        (c.extraLinks && String(c.extraLinks).trim()),
+      );
       if (!hasLink) {
         throw new BadRequestException(
           `Raqobatchi "${c.name.trim()}": kamida bitta havola (Instagram, sayt yoki qo‘shimcha havolalar) kiriting`,
-        )
+        );
       }
     }
 
@@ -542,10 +564,10 @@ RULES:
 - 3-5 bullets max per strengths/weaknesses per competitor
 - Be specific when URLs/names suggest a category; otherwise say what is unknown
 - When a "Meta Marketing API — Ad Library" section is present in the user message, treat those rows as real public ad samples for the search term; align strength/threat notes with them where possible, and say when the Library returned nothing useful for a brand.
-`
+`;
 
-    const biz = dto.businessContext || {}
-    const adLibraryAppendix = await this.buildMetaAdLibraryAppendix(list)
+    const biz = dto.businessContext || {};
+    const adLibraryAppendix = await this.buildMetaAdLibraryAppendix(list);
     const competitorBlock = list
       .map(
         (c, idx) =>
@@ -554,7 +576,7 @@ RULES:
    - Website: ${(c.website || "").trim() || "yo'q"}
    - Qo'shimcha havolalar / izoh: ${(c.extraLinks || "").trim() || "yo'q"}`,
       )
-      .join("\n\n")
+      .join("\n\n");
 
     const userPrompt = `
 Workspace ID: ${dto.workspaceId}
@@ -573,25 +595,25 @@ RAQOBATCHILAR (${list.length} ta):
 ${competitorBlock}
 ${adLibraryAppendix}
 Barcha raqobatchilar bo'yicha portfolio tahlilini bering. JSON qaytaring.
-`
+`;
 
     try {
       return (await this.aiClient.completeJson(userPrompt, systemPrompt, {
         taskType: "competitor",
         agentName: "CompetitorPortfolioBatch",
         temperature: 0.25,
-      })) as Record<string, unknown>
+      })) as Record<string, unknown>;
     } catch (err: any) {
-      const detail = err?.message || String(err)
-      this.logger.error(`Competitor batch analysis failed: ${detail}`)
+      const detail = err?.message || String(err);
+      this.logger.error(`Competitor batch analysis failed: ${detail}`);
       throw new InternalServerErrorException(
         `Portfolio tahlili amalga oshmadi: ${detail.slice(0, 200)}`,
-      )
+      );
     }
   }
 
   async generateAdScripts(workspaceId: string, dto: any): Promise<any> {
-    const platforms: string[] = dto.platforms || ["meta"]
+    const platforms: string[] = dto.platforms || ["meta"];
 
     const systemPrompt = `
 You are an elite direct-response copywriter specializing in CIS markets
@@ -670,19 +692,20 @@ Only include platforms that are requested.
 Write ALL content in Uzbek language.
 Make scripts feel genuine and human, not robotic.
 Use specific details from the business context.
-`
+`;
 
     const platformDetails: Record<string, string> = {
       meta: "Meta: 3 video scripts (30 sec each, 9:16 vertical) + 7 banner copies",
-      google: "Google: 15 headlines (max 30 chars) + 4 descriptions (max 90 chars) for RSA",
+      google:
+        "Google: 15 headlines (max 30 chars) + 4 descriptions (max 90 chars) for RSA",
       tiktok: "TikTok: 3 UGC-style scripts (casual, authentic, 15-60 sec)",
       youtube: "YouTube: 1 skippable ad script (5-sec hook + 30-sec body)",
       telegram: "Telegram: 3 channel post ads with emojis and formatting",
-    }
+    };
 
     const requestedPlatformDetails = platforms
       .map((p) => platformDetails[p] || p)
-      .join("\n")
+      .join("\n");
 
     const userPrompt = `
 Generate ad scripts for these platforms:
@@ -709,22 +732,22 @@ CREATIVE GUIDELINES FROM STRATEGY:
 
 Write all scripts in Uzbek. Make them specific to this business.
 For video scripts, write exactly what the person says on camera or voiceover.
-`
+`;
 
     return this.aiClient.completeJson(userPrompt, systemPrompt, {
-      taskType: 'creative',
-      agentName: 'AdScriptWriter',
+      taskType: "creative",
+      agentName: "AdScriptWriter",
       temperature: 0.7,
-    })
+    });
   }
 
   async scoreCreative(dto: {
-    imageBase64: string
-    mimeType: string
-    platform: string
-    creativeType: string
-    goal: string
-    workspaceContext: any
+    imageBase64: string;
+    mimeType: string;
+    platform: string;
+    creativeType: string;
+    goal: string;
+    workspaceContext: any;
   }): Promise<any> {
     const systemPrompt = `
 You are an expert ad creative analyst with 15+ years experience
@@ -786,27 +809,27 @@ Verdict:
 
 platformFit: Rate how well this creative fits each platform 0-100.
 estimatedCtr: Estimate click-through rate based on creative quality.
-`
+`;
 
     const userMessage = `
 Analyze this ${dto.creativeType} creative for ${dto.platform} platform.
 
 Goal: ${dto.goal}
-Business: ${dto.workspaceContext?.name || 'Unknown'}
-Industry: ${dto.workspaceContext?.industry || 'Unknown'}
-Target audience: ${dto.workspaceContext?.targetAudience || 'General'}
+Business: ${dto.workspaceContext?.name || "Unknown"}
+Industry: ${dto.workspaceContext?.industry || "Unknown"}
+Target audience: ${dto.workspaceContext?.targetAudience || "General"}
 
 Please evaluate this creative image and provide scores for all 10 parameters.
 Write all feedback in Uzbek language.
-`
+`;
 
     return this.aiClient.completeVision(
       dto.imageBase64,
       dto.mimeType,
       userMessage,
       systemPrompt,
-      { taskType: 'vision', agentName: 'CreativeScorer' },
-    )
+      { taskType: "vision", agentName: "CreativeScorer" },
+    );
   }
 
   /**
@@ -814,23 +837,26 @@ Write all feedback in Uzbek language.
    * Returns platform-specific headlines and descriptions ready to use in the form.
    */
   async generateWizardAdCopy(dto: {
-    productName: string
-    benefits: string[]
-    objective: string
-    audience: string
-    platform: string
+    productName: string;
+    benefits: string[];
+    objective: string;
+    audience: string;
+    platform: string;
   }): Promise<{
-    headlines: string[]
-    descriptions: string[]
-    cta: string
-    primaryText?: string
+    headlines: string[];
+    descriptions: string[];
+    cta: string;
+    primaryText?: string;
   }> {
-    const charLimits: Record<string, { headline: number; description: number }> = {
+    const charLimits: Record<
+      string,
+      { headline: number; description: number }
+    > = {
       google: { headline: 30, description: 90 },
       yandex: { headline: 56, description: 81 },
       meta: { headline: 40, description: 125 },
-    }
-    const limits = charLimits[dto.platform] || charLimits.meta
+    };
+    const limits = charLimits[dto.platform] || charLimits.meta;
 
     const systemPrompt = `You are a professional ad copywriter.
 Generate ad copy for the given product and platform.
@@ -845,37 +871,40 @@ Rules:
 - Each headline must be max ${limits.headline} characters
 - Each description must be max ${limits.description} characters
 - Generate 5 headlines and 3 descriptions
-- Write in the same language as the product name (Uzbek/Russian/English)`
+- Write in the same language as the product name (Uzbek/Russian/English)`;
 
     const userMessage = `
 Platform: ${dto.platform}
 Product: ${dto.productName}
-Benefits: ${dto.benefits.join(', ')}
+Benefits: ${dto.benefits.join(", ")}
 Objective: ${dto.objective}
-Target audience: ${dto.audience}`
+Target audience: ${dto.audience}`;
 
     const result = await this.aiClient.completeJson<{
-      headlines: string[]
-      descriptions: string[]
-      cta: string
-      primaryText?: string
-    }>(userMessage, systemPrompt, { taskType: 'creative', agentName: 'WizardAdCopy' })
+      headlines: string[];
+      descriptions: string[];
+      cta: string;
+      primaryText?: string;
+    }>(userMessage, systemPrompt, {
+      taskType: "creative",
+      agentName: "WizardAdCopy",
+    });
 
-    return result
+    return result;
   }
 
   /**
    * Wizard: Generate keyword suggestions for the campaign wizard.
    */
   async generateWizardKeywords(dto: {
-    productName: string
-    niche: string
-    platform: string
-    matchType?: string
+    productName: string;
+    niche: string;
+    platform: string;
+    matchType?: string;
   }): Promise<{
-    keywords: string[]
-    negativeKeywords: string[]
-    matchTypes: Record<string, string>
+    keywords: string[];
+    negativeKeywords: string[];
+    matchTypes: Record<string, string>;
   }> {
     const systemPrompt = `You are a PPC keyword research expert.
 Generate keyword suggestions for the given product and niche.
@@ -889,18 +918,21 @@ Rules:
 - Generate 10-15 relevant keywords
 - Generate 5-8 negative keywords
 - Assign appropriate match types (broad/phrase/exact)
-- Write keywords in the same language as product name`
+- Write keywords in the same language as product name`;
 
     const userMessage = `
 Product: ${dto.productName}
 Niche: ${dto.niche}
 Platform: ${dto.platform}
-Preferred match type: ${dto.matchType || 'broad'}`
+Preferred match type: ${dto.matchType || "broad"}`;
 
     return this.aiClient.completeJson<{
-      keywords: string[]
-      negativeKeywords: string[]
-      matchTypes: Record<string, string>
-    }>(userMessage, systemPrompt, { taskType: 'creative', agentName: 'WizardKeywords' })
+      keywords: string[];
+      negativeKeywords: string[];
+      matchTypes: Record<string, string>;
+    }>(userMessage, systemPrompt, {
+      taskType: "creative",
+      agentName: "WizardKeywords",
+    });
   }
 }

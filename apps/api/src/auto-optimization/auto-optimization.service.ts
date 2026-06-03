@@ -3,17 +3,17 @@ import {
   Logger,
   ForbiddenException,
   NotFoundException,
-} from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { OptimizerAgentService } from './optimizer-agent.service';
-import { runRulesEngine } from './rules/rules-engine';
-import { scoreAndRankActions } from './action-scorer';
-import { governActions, SAFE_DEFAULTS } from './policy/action-policy';
-import type { WorkspacePolicy } from './policy/action-policy';
-import { OptimizationRun } from './entities/optimization-run.entity';
-import { Workspace } from '../workspaces/entities/workspace.entity';
-import { RunOptimizationDto } from './dto/run-optimization.dto';
+} from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { OptimizerAgentService } from "./optimizer-agent.service";
+import { runRulesEngine } from "./rules/rules-engine";
+import { scoreAndRankActions } from "./action-scorer";
+import { governActions, SAFE_DEFAULTS } from "./policy/action-policy";
+import type { WorkspacePolicy } from "./policy/action-policy";
+import { OptimizationRun } from "./entities/optimization-run.entity";
+import { Workspace } from "../workspaces/entities/workspace.entity";
+import { RunOptimizationDto } from "./dto/run-optimization.dto";
 import type {
   OptimizationReport,
   OptimizationAction,
@@ -24,7 +24,7 @@ import type {
   OptimizationMode,
   GovernedAction,
   GovernanceSummary as _GovernanceSummary,
-} from './types/optimization.types';
+} from "./types/optimization.types";
 
 /**
  * AutoOptimizationService — top-level orchestrator for the optimization pipeline.
@@ -61,10 +61,16 @@ export class AutoOptimizationService {
    * owner check in CampaignsService / AiDecisionsService. The 2-hourly cron uses
    * a separate code path (AiAgentService.runOptimizationLoop) and is unaffected.
    */
-  private async assertWorkspaceOwner(workspaceId: string, userId: string): Promise<void> {
-    const workspace = await this.workspaceRepo.findOne({ where: { id: workspaceId } });
-    if (!workspace) throw new NotFoundException('Workspace not found');
-    if (workspace.userId !== userId) throw new ForbiddenException('Access denied');
+  private async assertWorkspaceOwner(
+    workspaceId: string,
+    userId: string,
+  ): Promise<void> {
+    const workspace = await this.workspaceRepo.findOne({
+      where: { id: workspaceId },
+    });
+    if (!workspace) throw new NotFoundException("Workspace not found");
+    if (workspace.userId !== userId)
+      throw new ForbiddenException("Access denied");
   }
 
   // ─── Main entry point ──────────────────────────────────────────────────────
@@ -80,48 +86,51 @@ export class AutoOptimizationService {
 
     // Load workspace policy from DB — fall back to SAFE_DEFAULTS if not configured
     const ws = await this.workspaceRepo.findOne({ where: { id: workspaceId } });
-    const policy: WorkspacePolicy = (ws?.optimizationPolicy as WorkspacePolicy) ?? SAFE_DEFAULTS;
+    const policy: WorkspacePolicy =
+      (ws?.optimizationPolicy as WorkspacePolicy) ?? SAFE_DEFAULTS;
 
     this.logger.log(
       `[${workspaceId}] Optimization run started — campaign="${campaign.campaignName}"` +
-      ` platform=${campaign.platform} mode=${mode}`,
+        ` platform=${campaign.platform} mode=${mode}`,
     );
 
     const report: OptimizationReport = {
       workspaceId,
-      campaignId:          campaign.campaignId,
-      platform:            campaign.platform,
+      campaignId: campaign.campaignId,
+      platform: campaign.platform,
       mode,
-      completedSteps:      [],
-      errors:              {},
-      ruleAnalysis:        null,
-      aiSuggestion:        null,
-      rankedActions:       [],
-      governedActions:     [],
-      governanceSummary:   null,
-      autoAppliedActions:  [],
-      generatedCreatives:  null,
-      summary:             '',
+      completedSteps: [],
+      errors: {},
+      ruleAnalysis: null,
+      aiSuggestion: null,
+      rankedActions: [],
+      governedActions: [],
+      governanceSummary: null,
+      autoAppliedActions: [],
+      generatedCreatives: null,
+      summary: "",
       metadata: {
-        model:       'unknown',
-        tokensUsed:  0,
-        durationMs:  0,
-        runAt:       new Date(),
+        model: "unknown",
+        tokensUsed: 0,
+        durationMs: 0,
+        runAt: new Date(),
       },
     };
 
     // ── Step 1: Rule-based analysis ──────────────────────────────────────────
     try {
       report.ruleAnalysis = runRulesEngine(campaign, goal);
-      report.completedSteps.push('rule_analysis');
+      report.completedSteps.push("rule_analysis");
       this.logger.log(
         `[${workspaceId}] Rules: ${report.ruleAnalysis.problems.length} problems,` +
-        ` ${report.ruleAnalysis.opportunities.length} opportunities,` +
-        ` quality=${report.ruleAnalysis.dataQuality}`,
+          ` ${report.ruleAnalysis.opportunities.length} opportunities,` +
+          ` quality=${report.ruleAnalysis.dataQuality}`,
       );
     } catch (err: any) {
-      report.errors['rule_analysis'] = err?.message ?? String(err);
-      this.logger.warn(`[${workspaceId}] Rule analysis failed: ${report.errors['rule_analysis']}`);
+      report.errors["rule_analysis"] = err?.message ?? String(err);
+      this.logger.warn(
+        `[${workspaceId}] Rule analysis failed: ${report.errors["rule_analysis"]}`,
+      );
     }
 
     // ── Step 2: AI analysis ──────────────────────────────────────────────────
@@ -132,15 +141,17 @@ export class AutoOptimizationService {
         report.ruleAnalysis ?? this.emptyRuleResult(),
         goal,
       );
-      report.completedSteps.push('ai_analysis');
-      report.metadata.model = 'gpt-4o-mini';
+      report.completedSteps.push("ai_analysis");
+      report.metadata.model = "gpt-4o-mini";
       this.logger.log(
         `[${workspaceId}] AI: ${report.aiSuggestion.actions.length} actions suggested,` +
-        ` health=${report.aiSuggestion.overallHealthScore}`,
+          ` health=${report.aiSuggestion.overallHealthScore}`,
       );
     } catch (err: any) {
-      report.errors['ai_analysis'] = err?.message ?? String(err);
-      this.logger.warn(`[${workspaceId}] AI analysis failed: ${report.errors['ai_analysis']}`);
+      report.errors["ai_analysis"] = err?.message ?? String(err);
+      this.logger.warn(
+        `[${workspaceId}] AI analysis failed: ${report.errors["ai_analysis"]}`,
+      );
     }
 
     // ── Step 3: Score + rank all actions ─────────────────────────────────────
@@ -155,54 +166,71 @@ export class AutoOptimizationService {
         allActions,
         report.ruleAnalysis ?? this.emptyRuleResult(),
       );
-      report.completedSteps.push('scoring');
+      report.completedSteps.push("scoring");
     } catch (err: any) {
-      report.errors['scoring'] = err?.message ?? String(err);
-      this.logger.warn(`[${workspaceId}] Action scoring failed: ${report.errors['scoring']}`);
+      report.errors["scoring"] = err?.message ?? String(err);
+      this.logger.warn(
+        `[${workspaceId}] Action scoring failed: ${report.errors["scoring"]}`,
+      );
     }
 
     // ── Step 4: Governance classification ───────────────────────────────────
     try {
-      const allActions = report.rankedActions.map(sa => sa.action);
-      const { governed, summary: govSummary } = governActions(allActions, policy, constraints);
-      report.governedActions   = governed;
+      const allActions = report.rankedActions.map((sa) => sa.action);
+      const { governed, summary: govSummary } = governActions(
+        allActions,
+        policy,
+        constraints,
+      );
+      report.governedActions = governed;
       report.governanceSummary = govSummary;
-      report.completedSteps.push('governance');
+      report.completedSteps.push("governance");
       this.logger.log(
         `[${workspaceId}] Governance: auto=${govSummary.autoApply}` +
-        ` approval=${govSummary.approvalRequired} blocked=${govSummary.blocked}`,
+          ` approval=${govSummary.approvalRequired} blocked=${govSummary.blocked}`,
       );
     } catch (err: any) {
-      report.errors['governance'] = err?.message ?? String(err);
-      this.logger.warn(`[${workspaceId}] Governance step failed: ${report.errors['governance']}`);
+      report.errors["governance"] = err?.message ?? String(err);
+      this.logger.warn(
+        `[${workspaceId}] Governance step failed: ${report.errors["governance"]}`,
+      );
     }
 
     // ── Step 5: Decision engine + safety gate ────────────────────────────────
     try {
-      report.autoAppliedActions = this.applyDecisionEngine(report.governedActions, mode);
-      report.completedSteps.push('decision_engine');
+      report.autoAppliedActions = this.applyDecisionEngine(
+        report.governedActions,
+        mode,
+      );
+      report.completedSteps.push("decision_engine");
     } catch (err: any) {
-      report.errors['decision_engine'] = err?.message ?? String(err);
+      report.errors["decision_engine"] = err?.message ?? String(err);
     }
 
     // ── Step 6: Creative refresh (only when creative problems exist) ──────────
-    const hasCreativeProblem = this.hasCreativeProblem(report.ruleAnalysis, report.aiSuggestion);
+    const hasCreativeProblem = this.hasCreativeProblem(
+      report.ruleAnalysis,
+      report.aiSuggestion,
+    );
     if (hasCreativeProblem) {
       try {
         const problemDescription = this.buildCreativeProblemDescription(
           report.ruleAnalysis,
           report.aiSuggestion,
         );
-        report.generatedCreatives = await this.optimizerAgent.generateCreativeRefresh(
-          campaign,
-          problemDescription,
-        );
+        report.generatedCreatives =
+          await this.optimizerAgent.generateCreativeRefresh(
+            campaign,
+            problemDescription,
+          );
         if (report.generatedCreatives) {
-          report.completedSteps.push('creative_refresh');
+          report.completedSteps.push("creative_refresh");
         }
       } catch (err: any) {
-        report.errors['creative_refresh'] = err?.message ?? String(err);
-        this.logger.warn(`[${workspaceId}] Creative refresh failed: ${report.errors['creative_refresh']}`);
+        report.errors["creative_refresh"] = err?.message ?? String(err);
+        this.logger.warn(
+          `[${workspaceId}] Creative refresh failed: ${report.errors["creative_refresh"]}`,
+        );
       }
     }
 
@@ -213,16 +241,18 @@ export class AutoOptimizationService {
     // ── Step 8: Persist ───────────────────────────────────────────────────────
     try {
       await this.persistRun(workspaceId, dto, report);
-      report.completedSteps.push('persisted');
+      report.completedSteps.push("persisted");
     } catch (err: any) {
-      report.errors['persistence'] = err?.message ?? String(err);
-      this.logger.warn(`[${workspaceId}] Failed to persist run: ${report.errors['persistence']}`);
+      report.errors["persistence"] = err?.message ?? String(err);
+      this.logger.warn(
+        `[${workspaceId}] Failed to persist run: ${report.errors["persistence"]}`,
+      );
     }
 
     this.logger.log(
-      `[${workspaceId}] Optimization run complete — steps=${report.completedSteps.join(',')}` +
-      ` actions=${report.rankedActions.length} autoApplied=${report.autoAppliedActions.length}` +
-      ` duration=${report.metadata.durationMs}ms`,
+      `[${workspaceId}] Optimization run complete — steps=${report.completedSteps.join(",")}` +
+        ` actions=${report.rankedActions.length} autoApplied=${report.autoAppliedActions.length}` +
+        ` duration=${report.metadata.durationMs}ms`,
     );
 
     return report;
@@ -231,12 +261,16 @@ export class AutoOptimizationService {
   // ─── History query ─────────────────────────────────────────────────────────
 
   /** Return the last N optimization runs for a workspace (for dashboard/audit) */
-  async getHistory(workspaceId: string, userId: string, limit = 10): Promise<OptimizationRun[]> {
+  async getHistory(
+    workspaceId: string,
+    userId: string,
+    limit = 10,
+  ): Promise<OptimizationRun[]> {
     await this.assertWorkspaceOwner(workspaceId, userId);
     return this.runRepo.find({
-      where:  { workspaceId },
-      order:  { createdAt: 'DESC' },
-      take:   limit,
+      where: { workspaceId },
+      order: { createdAt: "DESC" },
+      take: limit,
     });
   }
 
@@ -258,26 +292,29 @@ export class AutoOptimizationService {
     const loserIds = new Set(ruleAnalysis.losers);
     for (const loserId of loserIds) {
       const alreadyCovered = merged.some(
-        a => a.targetId === loserId && a.type === 'pause_creative',
+        (a) => a.targetId === loserId && a.type === "pause_creative",
       );
       if (!alreadyCovered) {
         merged.push({
-          type:            'pause_creative',
-          targetId:        loserId,
-          targetType:      'ad',
-          reason:          'Identified as lowest performer by rule engine',
-          expectedImpact:  'Reduce wasted spend, shift budget to higher performers',
-          priority:        'medium',
-          risk:            'medium',
-          autoApplicable:  false,
+          type: "pause_creative",
+          targetId: loserId,
+          targetType: "ad",
+          reason: "Identified as lowest performer by rule engine",
+          expectedImpact:
+            "Reduce wasted spend, shift budget to higher performers",
+          priority: "medium",
+          risk: "medium",
+          autoApplicable: false,
         });
       }
     }
 
     // Filter locked IDs (doNotPause constraint)
     const locked = new Set(doNotPause);
-    return merged.filter(a => {
-      const isLockedPause = locked.has(a.targetId) && ['pause_creative', 'pause_adset'].includes(a.type);
+    return merged.filter((a) => {
+      const isLockedPause =
+        locked.has(a.targetId) &&
+        ["pause_creative", "pause_adset"].includes(a.type);
       return !isLockedPause;
     });
   }
@@ -291,11 +328,11 @@ export class AutoOptimizationService {
     governedActions: GovernedAction[],
     mode: OptimizationMode,
   ): ActionType[] {
-    if (mode !== 'auto_apply') return [];
+    if (mode !== "auto_apply") return [];
 
     return governedActions
-      .filter(ga => ga.governance === 'AUTO_APPLY_ALLOWED')
-      .map(ga => ga.action.type);
+      .filter((ga) => ga.governance === "AUTO_APPLY_ALLOWED")
+      .map((ga) => ga.action.type);
   }
 
   /** Returns true if there are creative-related problems worth refreshing */
@@ -303,13 +340,28 @@ export class AutoOptimizationService {
     ruleAnalysis: RuleAnalysisResult | null,
     aiSuggestion: AiOptimizationSuggestion | null,
   ): boolean {
-    const creativeRuleProblems = ruleAnalysis?.problems.some(p =>
-      ['creative_fatigue', 'severe_creative_fatigue', 'weak_video_hook', 'low_video_hook', 'critically_low_ctr'].includes(p.type),
-    ) ?? false;
+    const creativeRuleProblems =
+      ruleAnalysis?.problems.some((p) =>
+        [
+          "creative_fatigue",
+          "severe_creative_fatigue",
+          "weak_video_hook",
+          "low_video_hook",
+          "critically_low_ctr",
+        ].includes(p.type),
+      ) ?? false;
 
-    const creativeAiActions = aiSuggestion?.actions.some(a =>
-      ['refresh_creative', 'rewrite_headline', 'rewrite_primary_text', 'generate_video_script', 'test_new_angle', 'flag_fatigue'].includes(a.type),
-    ) ?? false;
+    const creativeAiActions =
+      aiSuggestion?.actions.some((a) =>
+        [
+          "refresh_creative",
+          "rewrite_headline",
+          "rewrite_primary_text",
+          "generate_video_script",
+          "test_new_angle",
+          "flag_fatigue",
+        ].includes(a.type),
+      ) ?? false;
 
     return creativeRuleProblems || creativeAiActions;
   }
@@ -320,36 +372,42 @@ export class AutoOptimizationService {
   ): string {
     const parts: string[] = [];
 
-    const creativeProblems = ruleAnalysis?.problems.filter(p =>
-      p.type.includes('fatigue') || p.type.includes('hook') || p.type.includes('ctr'),
-    ) ?? [];
+    const creativeProblems =
+      ruleAnalysis?.problems.filter(
+        (p) =>
+          p.type.includes("fatigue") ||
+          p.type.includes("hook") ||
+          p.type.includes("ctr"),
+      ) ?? [];
 
     if (creativeProblems.length) {
-      parts.push(creativeProblems.map(p => p.message).join('. '));
+      parts.push(creativeProblems.map((p) => p.message).join(". "));
     }
 
     const aiCreativeNotes = aiSuggestion?.keyInsights.slice(0, 2) ?? [];
     if (aiCreativeNotes.length) {
-      parts.push(aiCreativeNotes.join('. '));
+      parts.push(aiCreativeNotes.join(". "));
     }
 
-    return parts.join(' ') || 'Creative performance is below benchmark.';
+    return parts.join(" ") || "Creative performance is below benchmark.";
   }
 
   private buildSummary(report: OptimizationReport): string {
     if (report.aiSuggestion?.summary) return report.aiSuggestion.summary;
 
     const problemCount = report.ruleAnalysis?.problems.length ?? 0;
-    const actionCount  = report.rankedActions.length;
-    const topAction    = report.rankedActions[0]?.action;
+    const actionCount = report.rankedActions.length;
+    const topAction = report.rankedActions[0]?.action;
 
     if (problemCount === 0 && actionCount === 0) {
-      return 'Campaign is performing within acceptable thresholds. No urgent actions required.';
+      return "Campaign is performing within acceptable thresholds. No urgent actions required.";
     }
 
     return (
       `Found ${problemCount} issue(s) and ${actionCount} recommended action(s). ` +
-      (topAction ? `Top priority: ${topAction.type.replace(/_/g, ' ')} on ${topAction.targetType} ${topAction.targetId}.` : '')
+      (topAction
+        ? `Top priority: ${topAction.type.replace(/_/g, " ")} on ${topAction.targetType} ${topAction.targetId}.`
+        : "")
     );
   }
 
@@ -363,41 +421,41 @@ export class AutoOptimizationService {
     await this.runRepo.save(
       this.runRepo.create({
         workspaceId,
-        campaignId:         c.campaignId,
-        platform:           c.platform,
-        mode:               dto.mode,
+        campaignId: c.campaignId,
+        platform: c.platform,
+        mode: dto.mode,
         inputSnapshot: {
           campaignName: c.campaignName,
-          spend:        c.spend,
-          roas:         c.roas,
-          ctr:          c.ctr,
-          conversions:  c.conversions,
-          adSetCount:   c.adSets.length,
-          adCount:      c.adSets.reduce((n, s) => n + s.ads.length, 0),
+          spend: c.spend,
+          roas: c.roas,
+          ctr: c.ctr,
+          conversions: c.conversions,
+          adSetCount: c.adSets.length,
+          adCount: c.adSets.reduce((n, s) => n + s.ads.length, 0),
         },
-        ruleAnalysis:       report.ruleAnalysis,
-        aiSuggestion:       report.aiSuggestion,
-        rankedActions:      report.rankedActions,
-        governedActions:    report.governedActions,
-        governanceSummary:  report.governanceSummary,
+        ruleAnalysis: report.ruleAnalysis,
+        aiSuggestion: report.aiSuggestion,
+        rankedActions: report.rankedActions,
+        governedActions: report.governedActions,
+        governanceSummary: report.governanceSummary,
         autoAppliedActions: report.autoAppliedActions,
-        summary:            report.summary,
-        model:              report.metadata.model,
-        tokensUsed:         report.metadata.tokensUsed,
-        durationMs:         report.metadata.durationMs,
-        healthScore:        report.aiSuggestion?.overallHealthScore ?? null,
+        summary: report.summary,
+        model: report.metadata.model,
+        tokensUsed: report.metadata.tokensUsed,
+        durationMs: report.metadata.durationMs,
+        healthScore: report.aiSuggestion?.overallHealthScore ?? null,
       }),
     );
   }
 
   private emptyRuleResult(): RuleAnalysisResult {
     return {
-      problems:     [],
+      problems: [],
       opportunities: [],
-      winners:      [],
-      losers:       [],
-      confidence:   0.5,
-      dataQuality:  'limited',
+      winners: [],
+      losers: [],
+      confidence: 0.5,
+      dataQuality: "limited",
     };
   }
 }

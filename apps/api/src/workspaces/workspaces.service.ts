@@ -44,7 +44,7 @@ export class WorkspacesService {
         const count = await this.workspaceRepo.count({ where: { userId } });
         if (count >= limits.maxWorkspaces) {
           throw new BadRequestException(
-            `Sizning ${user.plan} tarifingiz maksimal ${limits.maxWorkspaces} ta workspace yaratishga ruxsat beradi. Yangilash uchun subscription'ni upgrade qiling.`
+            `Sizning ${user.plan} tarifingiz maksimal ${limits.maxWorkspaces} ta workspace yaratishga ruxsat beradi. Yangilash uchun subscription'ni upgrade qiling.`,
           );
         }
       }
@@ -242,13 +242,13 @@ export class WorkspacesService {
       .getRawMany();
 
     // ── Merge: Meta data supplements internal data ────────────────────────────
-    const internalSpend   = parseFloat(internalResult.totalSpend) || 0;
+    const internalSpend = parseFloat(internalResult.totalSpend) || 0;
     const internalRevenue = parseFloat(internalResult.totalRevenue) || 0;
-    const metaSpend       = parseFloat(metaResult?.metaSpend ?? "0") || 0;
+    const metaSpend = parseFloat(metaResult?.metaSpend ?? "0") || 0;
 
-    const totalSpend      = Math.max(internalSpend, metaSpend);
-    const totalRevenue    = internalRevenue;
-    const totalClicks     = Math.max(
+    const totalSpend = Math.max(internalSpend, metaSpend);
+    const totalRevenue = internalRevenue;
+    const totalClicks = Math.max(
       parseInt(internalResult.totalClicks) || 0,
       parseInt(metaResult?.metaClicks ?? "0") || 0,
     );
@@ -286,14 +286,14 @@ export class WorkspacesService {
       metaSpend,
       // % change (current 7d vs previous 7d)
       changes: {
-        spend:       pctChange(currSpend, prevSpend),
-        clicks:      pctChange(currClicks, prevClicks),
+        spend: pctChange(currSpend, prevSpend),
+        clicks: pctChange(currClicks, prevClicks),
         impressions: pctChange(currImpr, prevImpr),
       },
       // Daily sparkline: array of spend values (last 14 days)
       sparkline: sparklineRows.map((r) => ({
-        day:    r.day,
-        spend:  parseFloat(r.spend) || 0,
+        day: r.day,
+        spend: parseFloat(r.spend) || 0,
         clicks: parseInt(r.clicks) || 0,
       })),
     };
@@ -309,17 +309,17 @@ export class WorkspacesService {
   async updatePolicy(
     id: string,
     userId: string,
-    patch: Partial<Workspace['optimizationPolicy']>,
+    patch: Partial<Workspace["optimizationPolicy"]>,
   ) {
     const workspace = await this.findOne(id, userId);
     workspace.optimizationPolicy = {
-      allowAutoBudgetChange:    false,
-      maxAutoBudgetChangePct:   0,
+      allowAutoBudgetChange: false,
+      maxAutoBudgetChangePct: 0,
       allowAutoCreativeRefresh: true,
-      allowAutoPauseCreative:   false,
-      allowAudienceChanges:     false,
-      protectedCampaignIds:     [],
-      protectedAdSetIds:        [],
+      allowAutoPauseCreative: false,
+      allowAudienceChanges: false,
+      protectedCampaignIds: [],
+      protectedAdSetIds: [],
       ...(workspace.optimizationPolicy ?? {}),
       ...patch,
     };

@@ -274,7 +274,9 @@ export class YandexPerformanceSyncService {
 
     // Validate config
     if (pullConfig.dayLookback < 1 || pullConfig.dayLookback > 730) {
-      throw new BadRequestException("dayLookback must be between 1 and 730 days");
+      throw new BadRequestException(
+        "dayLookback must be between 1 and 730 days",
+      );
     }
 
     try {
@@ -284,7 +286,9 @@ export class YandexPerformanceSyncService {
       });
 
       if (!specialist) {
-        throw new NotFoundException(`Agent profile ${agentProfileId} not found`);
+        throw new NotFoundException(
+          `Agent profile ${agentProfileId} not found`,
+        );
       }
 
       result.agentDisplayName = specialist.displayName;
@@ -335,7 +339,10 @@ export class YandexPerformanceSyncService {
       }
 
       // ──── Step 5: Convert currencies to target currency ──────────────────────
-      const convertedMetrics = this.convertCurrencies(accountsWithMetrics, pullConfig.targetCurrency);
+      const convertedMetrics = this.convertCurrencies(
+        accountsWithMetrics,
+        pullConfig.targetCurrency,
+      );
 
       // ──── Step 6: Validate metrics (fraud detection) ───────────────────────
       const validatedMetrics = await this.validateMetricsWithFraudDetection(
@@ -363,7 +370,8 @@ export class YandexPerformanceSyncService {
         result.metricsInserted = persistResult.inserted;
         result.metricsUpdated = persistResult.updated;
         result.campaignsSynced = convertedMetrics.reduce(
-          (sum, acc) => sum + new Set(acc.performanceRows.map((r) => r.campaignId)).size,
+          (sum, acc) =>
+            sum + new Set(acc.performanceRows.map((r) => r.campaignId)).size,
           0,
         );
       }
@@ -421,7 +429,10 @@ export class YandexPerformanceSyncService {
         // Rate limit: stagger requests
         await this.applyRateLimit(account.id);
 
-        const campaigns = await this.getYandexCampaigns(account.id, accessToken);
+        const campaigns = await this.getYandexCampaigns(
+          account.id,
+          accessToken,
+        );
 
         if (campaigns.length === 0) {
           this.logger.debug({
@@ -442,7 +453,10 @@ export class YandexPerformanceSyncService {
         );
 
         // Map reports to YandexPerformanceRow format
-        const performanceRows = this.mapReportsToMetrics(campaignReports, campaigns);
+        const performanceRows = this.mapReportsToMetrics(
+          campaignReports,
+          campaigns,
+        );
 
         results.push({
           accountId: account.id,
@@ -505,7 +519,10 @@ export class YandexPerformanceSyncService {
   /**
    * Fetches campaigns for a specific Yandex account.
    */
-  private async getYandexCampaigns(accountId: string, accessToken: string): Promise<any[]> {
+  private async getYandexCampaigns(
+    accountId: string,
+    accessToken: string,
+  ): Promise<any[]> {
     try {
       await this.applyRateLimit(accountId);
 
@@ -722,11 +739,24 @@ export class YandexPerformanceSyncService {
         return {
           ...row,
           spend: this.roundCurrency(row.spend * rubToTargetRate),
-          conversionValue: this.roundCurrency(row.conversionValue * rubToTargetRate),
+          conversionValue: this.roundCurrency(
+            row.conversionValue * rubToTargetRate,
+          ),
           currency: targetCurrency,
           // Recalculate derived metrics with converted values
-          cpa: row.conversions > 0 ? this.roundCurrency((row.spend * rubToTargetRate) / row.conversions) : null,
-          roas: row.spend > 0 ? this.roundCurrency((row.conversionValue * rubToTargetRate) / (row.spend * rubToTargetRate)) : null,
+          cpa:
+            row.conversions > 0
+              ? this.roundCurrency(
+                  (row.spend * rubToTargetRate) / row.conversions,
+                )
+              : null,
+          roas:
+            row.spend > 0
+              ? this.roundCurrency(
+                  (row.conversionValue * rubToTargetRate) /
+                    (row.spend * rubToTargetRate),
+                )
+              : null,
         };
       }),
     }));
@@ -794,29 +824,39 @@ export class YandexPerformanceSyncService {
       }
 
       if (row.conversions < 0) {
-        errors.push(`Campaign ${row.campaignId}: Negative conversions detected`);
+        errors.push(
+          `Campaign ${row.campaignId}: Negative conversions detected`,
+        );
         fraudRiskScore += 20;
       }
 
       if (row.impressions < 0) {
-        errors.push(`Campaign ${row.campaignId}: Negative impressions detected`);
+        errors.push(
+          `Campaign ${row.campaignId}: Negative impressions detected`,
+        );
         fraudRiskScore += 20;
       }
 
       if (row.clicks > row.impressions) {
-        errors.push(`Campaign ${row.campaignId}: Clicks > impressions (impossible)`);
+        errors.push(
+          `Campaign ${row.campaignId}: Clicks > impressions (impossible)`,
+        );
         fraudRiskScore += 25;
       }
 
       // Check for unrealistic ROAS (typically between 0.1 and 50 for most industries)
       if (row.roas !== null && (row.roas < 0 || row.roas > 100)) {
-        errors.push(`Campaign ${row.campaignId}: ROAS ${row.roas.toFixed(2)} is unrealistic`);
+        errors.push(
+          `Campaign ${row.campaignId}: ROAS ${row.roas.toFixed(2)} is unrealistic`,
+        );
         fraudRiskScore += 15;
       }
 
       // Check for unrealistic CPA (typically $0.01 to $10,000 depending on industry)
       if (row.cpa !== null && (row.cpa < 0.01 || row.cpa > 100000)) {
-        errors.push(`Campaign ${row.campaignId}: CPA $${row.cpa.toFixed(2)} is unrealistic`);
+        errors.push(
+          `Campaign ${row.campaignId}: CPA $${row.cpa.toFixed(2)} is unrealistic`,
+        );
         fraudRiskScore += 10;
       }
 
@@ -830,11 +870,14 @@ export class YandexPerformanceSyncService {
     // Additional: check if specialist's average ROAS would spike unrealistically
     if (specialist.cachedStats && allRows.length > 0) {
       const avgRoas =
-        allRows.filter((r) => r.roas !== null).reduce((sum, r) => sum + r.roas, 0) /
+        allRows
+          .filter((r) => r.roas !== null)
+          .reduce((sum, r) => sum + r.roas, 0) /
         Math.max(1, allRows.filter((r) => r.roas !== null).length);
 
       const historicalRoas = specialist.cachedStats.avgROAS ?? 1;
-      const roasChange = Math.abs(avgRoas - historicalRoas) / Math.max(0.1, historicalRoas);
+      const roasChange =
+        Math.abs(avgRoas - historicalRoas) / Math.max(0.1, historicalRoas);
 
       if (roasChange > 3 && avgRoas > 50) {
         errors.push(
@@ -873,7 +916,11 @@ export class YandexPerformanceSyncService {
     for (const row of rows) {
       // Create first-day-of-month date for aggregationPeriod
       const monthKey = `${row.date.getFullYear()}-${String(row.date.getMonth() + 1).padStart(2, "0")}`;
-      const _aggregationPeriod = new Date(row.date.getFullYear(), row.date.getMonth(), 1);
+      const _aggregationPeriod = new Date(
+        row.date.getFullYear(),
+        row.date.getMonth(),
+        1,
+      );
 
       if (!byMonth.has(monthKey)) {
         byMonth.set(monthKey, []);
@@ -886,14 +933,25 @@ export class YandexPerformanceSyncService {
 
     for (const [monthKey, monthRows] of byMonth.entries()) {
       const totalSpend = monthRows.reduce((sum, r) => sum + r.spend, 0);
-      const totalImpressions = monthRows.reduce((sum, r) => sum + r.impressions, 0);
+      const totalImpressions = monthRows.reduce(
+        (sum, r) => sum + r.impressions,
+        0,
+      );
       const totalClicks = monthRows.reduce((sum, r) => sum + r.clicks, 0);
-      const totalConversions = monthRows.reduce((sum, r) => sum + r.conversions, 0);
-      const totalRevenue = monthRows.reduce((sum, r) => sum + r.conversionValue, 0);
+      const totalConversions = monthRows.reduce(
+        (sum, r) => sum + r.conversions,
+        0,
+      );
+      const totalRevenue = monthRows.reduce(
+        (sum, r) => sum + r.conversionValue,
+        0,
+      );
 
       // Calculate aggregated metrics
-      const avgCtr = totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
-      const avgCpa = totalConversions > 0 ? totalSpend / totalConversions : null;
+      const avgCtr =
+        totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
+      const avgCpa =
+        totalConversions > 0 ? totalSpend / totalConversions : null;
       const avgRoas = totalSpend > 0 ? totalRevenue / totalSpend : null;
 
       const aggregationPeriod = new Date(
@@ -934,17 +992,16 @@ export class YandexPerformanceSyncService {
         }
 
         // Upsert
-        const upsertResult = await em.upsert(
-          AgentPlatformMetrics,
-          metric,
-          {
-            conflictPaths: ["agentProfileId", "platform", "aggregationPeriod"],
-            skipUpdateIfNoValuesChanged: true,
-          },
-        );
+        const upsertResult = await em.upsert(AgentPlatformMetrics, metric, {
+          conflictPaths: ["agentProfileId", "platform", "aggregationPeriod"],
+          skipUpdateIfNoValuesChanged: true,
+        });
 
         // TypeORM upsert returns affected rows count
-        if (upsertResult.raw?.affectedRows === 1 && upsertResult.identifiers.length > 0) {
+        if (
+          upsertResult.raw?.affectedRows === 1 &&
+          upsertResult.identifiers.length > 0
+        ) {
           const existing = await em.findOne(AgentPlatformMetrics, {
             where: {
               agentProfileId,
@@ -1143,7 +1200,10 @@ export class YandexPerformanceSyncService {
   private updateRateLimitState(accountId: string, headers: any): void {
     const state = this.rateLimitState.get(accountId);
     if (state && headers) {
-      const remaining = parseInt(headers["x-ratelimit-remaining"] ?? "1000", 10);
+      const remaining = parseInt(
+        headers["x-ratelimit-remaining"] ?? "1000",
+        10,
+      );
       const resetTime = parseInt(headers["x-ratelimit-reset"] ?? "0", 10);
 
       state.requestsRemaining = remaining;
@@ -1166,7 +1226,9 @@ export class YandexPerformanceSyncService {
    * Looks up ServiceEngagement and decrypts token if needed.
    * Attempts token refresh if token has expired.
    */
-  private async resolveAccessToken(workspaceId: string): Promise<string | null> {
+  private async resolveAccessToken(
+    workspaceId: string,
+  ): Promise<string | null> {
     const connectedAccount = await this.connectedAccountRepo.findOne({
       where: {
         workspaceId,
@@ -1197,10 +1259,15 @@ export class YandexPerformanceSyncService {
     }
 
     // Check if token is expired and attempt refresh
-    if (connectedAccount.tokenExpiresAt && connectedAccount.tokenExpiresAt < new Date()) {
+    if (
+      connectedAccount.tokenExpiresAt &&
+      connectedAccount.tokenExpiresAt < new Date()
+    ) {
       if (connectedAccount.refreshToken) {
         try {
-          const newToken = await this.refreshAccessToken(connectedAccount.refreshToken);
+          const newToken = await this.refreshAccessToken(
+            connectedAccount.refreshToken,
+          );
           token = newToken;
 
           // Update connected account with new token
@@ -1242,7 +1309,9 @@ export class YandexPerformanceSyncService {
     const clientId = this.config.get<string>("YANDEX_CLIENT_ID", "");
     const clientSecret = this.config.get<string>("YANDEX_CLIENT_SECRET", "");
 
-    const decryptedRefresh = this.encryptionKey ? decrypt(refreshToken, this.encryptionKey) : refreshToken;
+    const decryptedRefresh = this.encryptionKey
+      ? decrypt(refreshToken, this.encryptionKey)
+      : refreshToken;
 
     try {
       const response = await firstValueFrom(
@@ -1292,7 +1361,11 @@ export class YandexPerformanceSyncService {
 
     for (const specialist of specialists) {
       try {
-        const result = await this.syncSpecialistMetrics(specialist.id, workspaceId, config);
+        const result = await this.syncSpecialistMetrics(
+          specialist.id,
+          workspaceId,
+          config,
+        );
         results.push(result);
       } catch (err: any) {
         this.logger.error({

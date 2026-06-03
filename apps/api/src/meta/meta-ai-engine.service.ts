@@ -25,16 +25,16 @@ export type AnalysisResult = {
 
 const RULES = {
   /** Low CTR despite spend → stop wasting budget. */
-  LOW_CTR_SPEND_THRESHOLD: 20,   // spend > $20
-  LOW_CTR_THRESHOLD: 1,          // ctr < 1%
+  LOW_CTR_SPEND_THRESHOLD: 20, // spend > $20
+  LOW_CTR_THRESHOLD: 1, // ctr < 1%
 
   /** Strong CTR + cheap CPC → ready to scale. */
-  GOOD_CTR_THRESHOLD: 2.5,       // ctr > 2.5%
-  GOOD_CPC_THRESHOLD: 0.4,       // cpc < $0.40
+  GOOD_CTR_THRESHOLD: 2.5, // ctr > 2.5%
+  GOOD_CPC_THRESHOLD: 0.4, // cpc < $0.40
 
   /** High spend with near-zero engagement → kill immediately. */
   HIGH_SPEND_KILL_THRESHOLD: 100, // spend > $100
-  NO_ENGAGEMENT_CLICKS: 10,      // clicks < 10
+  NO_ENGAGEMENT_CLICKS: 10, // clicks < 10
 } as const;
 
 /**
@@ -56,7 +56,10 @@ export class MetaAiEngineService {
     const { campaignId, spend, clicks, ctr, cpc } = insights;
 
     // ── Rule 1: Low CTR with spend → stop ────────────────────────────────────
-    if (spend > RULES.LOW_CTR_SPEND_THRESHOLD && ctr < RULES.LOW_CTR_THRESHOLD) {
+    if (
+      spend > RULES.LOW_CTR_SPEND_THRESHOLD &&
+      ctr < RULES.LOW_CTR_THRESHOLD
+    ) {
       return {
         campaignId,
         health: "BAD",
@@ -76,7 +79,10 @@ export class MetaAiEngineService {
     }
 
     // ── Rule 3: High spend, no engagement → kill ──────────────────────────────
-    if (spend > RULES.HIGH_SPEND_KILL_THRESHOLD && clicks < RULES.NO_ENGAGEMENT_CLICKS) {
+    if (
+      spend > RULES.HIGH_SPEND_KILL_THRESHOLD &&
+      clicks < RULES.NO_ENGAGEMENT_CLICKS
+    ) {
       return {
         campaignId,
         health: "BAD",

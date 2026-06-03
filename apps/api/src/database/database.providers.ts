@@ -36,7 +36,10 @@ export default new DataSource({
         password: process.env.DATABASE_PASSWORD ?? "performa_secret",
         database: process.env.DATABASE_NAME ?? "performa_ai_db",
       }),
-  ssl: isProduction || Boolean(databaseUrl) ? { rejectUnauthorized: false } : false,
+  ssl:
+    isProduction || Boolean(databaseUrl)
+      ? { rejectUnauthorized: false }
+      : false,
   entities: [path.join(__dirname, "..", "**", "*.entity.js")],
   migrations: [
     CreateUsersTable1712000000001,

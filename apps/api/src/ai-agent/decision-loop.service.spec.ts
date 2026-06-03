@@ -9,7 +9,12 @@ import { ConnectedAccount } from "../platforms/entities/connected-account.entity
 import { MetaConnector } from "../platforms/connectors/meta.connector";
 import { GoogleConnector } from "../platforms/connectors/google.connector";
 import { TiktokConnector } from "../platforms/connectors/tiktok.connector";
-import { AutopilotMode, AiDecisionAction, Platform, CampaignStatus as _CampaignStatus } from "@adspectr/shared";
+import {
+  AutopilotMode,
+  AiDecisionAction,
+  Platform,
+  CampaignStatus as _CampaignStatus,
+} from "@adspectr/shared";
 
 const mockCompleteJson = jest.fn();
 
@@ -64,15 +69,24 @@ describe("DecisionLoopService", () => {
         { provide: getRepositoryToken(AiDecision), useValue: decisionRepo },
         { provide: getRepositoryToken(Campaign), useValue: campaignRepo },
         { provide: getRepositoryToken(Workspace), useValue: workspaceRepo },
-        { provide: getRepositoryToken(ConnectedAccount), useValue: accountRepo },
+        {
+          provide: getRepositoryToken(ConnectedAccount),
+          useValue: accountRepo,
+        },
         { provide: MetaConnector, useValue: metaConnector },
         {
           provide: GoogleConnector,
-          useValue: { updateCampaignStatus: jest.fn(), updateCampaignBudget: jest.fn() },
+          useValue: {
+            updateCampaignStatus: jest.fn(),
+            updateCampaignBudget: jest.fn(),
+          },
         },
         {
           provide: TiktokConnector,
-          useValue: { pauseCampaign: jest.fn(), updateCampaignBudget: jest.fn() },
+          useValue: {
+            pauseCampaign: jest.fn(),
+            updateCampaignBudget: jest.fn(),
+          },
         },
         {
           provide: ConfigService,
@@ -80,7 +94,8 @@ describe("DecisionLoopService", () => {
             get: jest.fn((key: string, def?: any) => {
               if (key === "OPENAI_API_KEY") return "sk-test-key";
               if (key === "OPENAI_BASE_URL") return "";
-              if (key === "ENCRYPTION_KEY") return "00000000000000000000000000000000";
+              if (key === "ENCRYPTION_KEY")
+                return "00000000000000000000000000000000";
               return def ?? "";
             }),
           },
@@ -104,7 +119,10 @@ describe("DecisionLoopService", () => {
     });
 
     it("should return empty array when no active campaigns", async () => {
-      workspaceRepo.findOne.mockResolvedValue({ id: "ws-1", autopilotMode: AutopilotMode.ASSISTED });
+      workspaceRepo.findOne.mockResolvedValue({
+        id: "ws-1",
+        autopilotMode: AutopilotMode.ASSISTED,
+      });
       campaignRepo.createQueryBuilder.mockReturnValue({
         leftJoinAndSelect: jest.fn().mockReturnThis(),
         where: jest.fn().mockReturnThis(),
@@ -141,7 +159,14 @@ describe("DecisionLoopService", () => {
 
       mockCompleteJson.mockResolvedValue({
         decisions: [
-          { action: "no_action", targetId: "camp-1", targetType: "campaign", reason: "All good", estimatedImpact: "None", urgency: "low" },
+          {
+            action: "no_action",
+            targetId: "camp-1",
+            targetType: "campaign",
+            reason: "All good",
+            estimatedImpact: "None",
+            urgency: "low",
+          },
         ],
         overallAssessment: "Healthy",
         nextReviewIn: "2h",

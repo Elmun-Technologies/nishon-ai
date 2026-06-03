@@ -30,7 +30,8 @@ export class RetargetOrchestrationService {
     private readonly metaPublisher: RetargetMetaPublisherService,
     private readonly telegramBot: RetargetTelegramBotService,
     private readonly config: ConfigService,
-    @InjectQueue(QUEUE_NAMES.RETARGET_POST_PURCHASE) private readonly postPurchaseQueue: Queue,
+    @InjectQueue(QUEUE_NAMES.RETARGET_POST_PURCHASE)
+    private readonly postPurchaseQueue: Queue,
   ) {}
 
   async handleCrmClick(dto: CrmClickDto): Promise<{ ok: true; phone: string }> {
@@ -52,7 +53,8 @@ export class RetargetOrchestrationService {
 
     const productId = dto.product_id ?? dto.productId ?? existing?.productId;
     const map = resolveRetargetCreativeMapping(productId);
-    const tgChat = (await this.redis.getTelegramChatId(phone)) ?? existing?.telegramChatId;
+    const tgChat =
+      (await this.redis.getTelegramChatId(phone)) ?? existing?.telegramChatId;
     const uHash = unifiedUserHash(phone);
 
     const payload: RetargetSignalPayload = {
@@ -61,14 +63,17 @@ export class RetargetOrchestrationService {
       lastPurchase: Date.now(),
       productId,
       status,
-      activatedAt: existing?.status === "active" ? undefined : existing?.activatedAt,
+      activatedAt:
+        existing?.status === "active" ? undefined : existing?.activatedAt,
       convertedAt,
       repeatPurchasesAfterRetarget: repeat,
       messageTemplate: map.primaryText,
       creativeMappingKey: map.key,
       unifiedHash: uHash,
       telegramChatId: tgChat,
-      telegramLinkedAt: tgChat ? (existing?.telegramLinkedAt ?? Date.now()) : existing?.telegramLinkedAt,
+      telegramLinkedAt: tgChat
+        ? (existing?.telegramLinkedAt ?? Date.now())
+        : existing?.telegramLinkedAt,
     };
 
     await this.redis.setSignal(phone, payload);
@@ -89,7 +94,10 @@ export class RetargetOrchestrationService {
       },
     );
 
-    this.logger.log({ message: "CRM click saqlandi, 7 kunlik retarget rejalashtirildi", phone });
+    this.logger.log({
+      message: "CRM click saqlandi, 7 kunlik retarget rejalashtirildi",
+      phone,
+    });
     return { ok: true, phone };
   }
 
@@ -132,7 +140,9 @@ export class RetargetOrchestrationService {
     const digits = normalizePhoneDigits(dto.phoneDigits);
     const signal = await this.redis.getSignal(digits);
     if (!signal) {
-      throw new BadRequestException("Redis da signal yo‘q — avval CRM click yuboring");
+      throw new BadRequestException(
+        "Redis da signal yo‘q — avval CRM click yuboring",
+      );
     }
     if (signal.metaAdSetId) {
       return {
@@ -141,11 +151,16 @@ export class RetargetOrchestrationService {
         metaAdSetId: signal.metaAdSetId,
         metaCampaignId: signal.metaCampaignId,
         metaAudienceId: signal.metaAudienceId,
-        telegramChannelReady: Boolean(signal.telegramSentAt && !signal.telegramLastError),
+        telegramChannelReady: Boolean(
+          signal.telegramSentAt && !signal.telegramLastError,
+        ),
       };
     }
 
-    const daysSince = Math.max(0, Math.floor((Date.now() - signal.lastPurchase) / 86_400_000));
+    const daysSince = Math.max(
+      0,
+      Math.floor((Date.now() - signal.lastPurchase) / 86_400_000),
+    );
     if (signal.status === "pending" && daysSince < 7) {
       throw new BadRequestException(
         `Retarget vaqti hali kelmadi — ${7 - daysSince} kun qoldi (7 kunlik kechikish).`,
@@ -177,11 +192,15 @@ export class RetargetOrchestrationService {
         unifiedHash: signal.unifiedHash ?? unifiedUserHash(digits),
       };
 
-      const chatId = next.telegramChatId ?? (await this.redis.getTelegramChatId(digits));
+      const chatId =
+        next.telegramChatId ?? (await this.redis.getTelegramChatId(digits));
       const sendTg = dto.sendTelegram !== false;
       const shopUrl =
         dto.shopButtonUrl?.trim() ||
-        this.config.get<string>("RETARGET_TELEGRAM_SHOP_URL", "https://shop.uz?utm_source=tg_retarget");
+        this.config.get<string>(
+          "RETARGET_TELEGRAM_SHOP_URL",
+          "https://shop.uz?utm_source=tg_retarget",
+        );
 
       if (sendTg && chatId) {
         try {
@@ -203,7 +222,10 @@ export class RetargetOrchestrationService {
           };
         } catch (te: unknown) {
           const tmsg = te instanceof Error ? te.message : String(te);
-          this.logger.warn({ message: "Telegram yuborish xatosi", error: tmsg });
+          this.logger.warn({
+            message: "Telegram yuborish xatosi",
+            error: tmsg,
+          });
           next = {
             ...next,
             telegramLastError: tmsg,
@@ -213,27 +235,41 @@ export class RetargetOrchestrationService {
       }
 
       await this.redis.setSignal(digits, next);
-      return { ok: true, ...result, telegramSent: Boolean(next.telegramSentAt) };
+      return {
+        ok: true,
+        ...result,
+        telegramSent: Boolean(next.telegramSentAt),
+      };
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
-      await this.redis.setSignal(digits, { ...signal, metaPublishError: msg, metaChannelReady: false });
+      await this.redis.setSignal(digits, {
+        ...signal,
+        metaPublishError: msg,
+        metaChannelReady: false,
+      });
       throw e;
     }
   }
 
-  async publishTelegramRetarget(dto: PublishTelegramDto): Promise<Record<string, unknown>> {
+  async publishTelegramRetarget(
+    dto: PublishTelegramDto,
+  ): Promise<Record<string, unknown>> {
     const digits = normalizePhoneDigits(dto.phoneDigits);
     const signal = await this.redis.getSignal(digits);
     if (!signal) {
       throw new BadRequestException("Redis da signal yo‘q");
     }
-    const daysSince = Math.max(0, Math.floor((Date.now() - signal.lastPurchase) / 86_400_000));
+    const daysSince = Math.max(
+      0,
+      Math.floor((Date.now() - signal.lastPurchase) / 86_400_000),
+    );
     if (signal.status === "pending" && daysSince < 7) {
       throw new BadRequestException(
         `Retarget vaqti hali kelmadi — ${7 - daysSince} kun qoldi (7 kunlik kechikish).`,
       );
     }
-    const chatId = signal.telegramChatId ?? (await this.redis.getTelegramChatId(digits));
+    const chatId =
+      signal.telegramChatId ?? (await this.redis.getTelegramChatId(digits));
     if (!chatId) {
       throw new BadRequestException(
         "Telegram ulanmagan — https://t.me/<bot>?start=phone=998901234567 orqali /start yuboring",
@@ -242,7 +278,10 @@ export class RetargetOrchestrationService {
     const rule = resolveRetargetCreativeMapping(signal.productId);
     const shopUrl =
       dto.shopButtonUrl?.trim() ||
-      this.config.get<string>("RETARGET_TELEGRAM_SHOP_URL", "https://shop.uz?utm_source=tg_retarget");
+      this.config.get<string>(
+        "RETARGET_TELEGRAM_SHOP_URL",
+        "https://shop.uz?utm_source=tg_retarget",
+      );
     const btn = dto.shopButtonText?.trim() || "Buyurtma berish";
     try {
       await this.telegramBot.sendRetargetOffer({
@@ -266,7 +305,11 @@ export class RetargetOrchestrationService {
       return { ok: true, telegramSent: true };
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
-      await this.redis.setSignal(digits, { ...signal, telegramLastError: msg, telegramChannelReady: false });
+      await this.redis.setSignal(digits, {
+        ...signal,
+        telegramLastError: msg,
+        telegramChannelReady: false,
+      });
       throw e;
     }
   }
@@ -283,7 +326,10 @@ export class RetargetOrchestrationService {
     let activatedEver = 0;
 
     const list = rows.map(({ phone, payload }) => {
-      const daysSincePurchase = Math.max(0, Math.floor((now - payload.lastPurchase) / MS_DAY));
+      const daysSincePurchase = Math.max(
+        0,
+        Math.floor((now - payload.lastPurchase) / MS_DAY),
+      );
       if (payload.status === "pending" && daysSincePurchase < 7) {
         waiting += 1;
       }
@@ -298,12 +344,16 @@ export class RetargetOrchestrationService {
           ? `${daysLeftUntilRetarget} kun kutilmoqda`
           : undefined;
       const canPublishAdSet =
-        !payload.metaAdSetId && (daysSincePurchase >= 7 || payload.status === "active");
+        !payload.metaAdSetId &&
+        (daysSincePurchase >= 7 || payload.status === "active");
       const chatId = payload.telegramChatId ?? telegramLinks.get(phone);
       const telegramLinked = Boolean(chatId);
       const metaChannelReady = Boolean(payload.metaAdSetId);
-      const telegramChannelReady = Boolean(payload.telegramSentAt && !payload.telegramLastError);
-      const unifiedBadge = telegramLinked && metaChannelReady && telegramChannelReady;
+      const telegramChannelReady = Boolean(
+        payload.telegramSentAt && !payload.telegramLastError,
+      );
+      const unifiedBadge =
+        telegramLinked && metaChannelReady && telegramChannelReady;
 
       return {
         phone: formatPhoneDisplay(phone),
@@ -328,7 +378,8 @@ export class RetargetOrchestrationService {
         telegramLastError: payload.telegramLastError,
         unifiedBadge,
         canPublishTelegram:
-          telegramLinked && Boolean(daysSincePurchase >= 7 || payload.status === "active"),
+          telegramLinked &&
+          Boolean(daysSincePurchase >= 7 || payload.status === "active"),
       };
     });
 

@@ -3,17 +3,17 @@ import {
   Logger,
   NotFoundException,
   BadRequestException,
-} from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { ConfigService } from '@nestjs/config';
-import { AgentProfile } from '../entities/agent-profile.entity';
-import { ServiceEngagement } from '../entities/service-engagement.entity';
+} from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { ConfigService } from "@nestjs/config";
+import { AgentProfile } from "../entities/agent-profile.entity";
+import { ServiceEngagement } from "../entities/service-engagement.entity";
 
 export interface ContactSpecialistDto {
   email: string;
   message: string;
-  preferredContactMethod?: 'email' | 'phone' | 'message';
+  preferredContactMethod?: "email" | "phone" | "message";
   phone?: string;
 }
 
@@ -65,20 +65,23 @@ export class MarketplaceContactService {
     });
 
     if (!profile) {
-      throw new NotFoundException(`Specialist '${slug}' not found or not available`);
+      throw new NotFoundException(
+        `Specialist '${slug}' not found or not available`,
+      );
     }
 
     // 2. Basic rate limiting — prevent spam from same email
     const recentContact = await this.engagementRepo.findOne({
       where: { agentProfileId: profile.id, notes: `contact:${dto.email}` },
-      order: { createdAt: 'DESC' },
+      order: { createdAt: "DESC" },
     });
 
     if (recentContact) {
-      const hoursSince = (Date.now() - recentContact.createdAt.getTime()) / 1000 / 3600;
+      const hoursSince =
+        (Date.now() - recentContact.createdAt.getTime()) / 1000 / 3600;
       if (hoursSince < 24) {
         throw new BadRequestException(
-          'You have already contacted this specialist recently. Please wait 24 hours before sending another message.',
+          "You have already contacted this specialist recently. Please wait 24 hours before sending another message.",
         );
       }
     }
@@ -86,9 +89,9 @@ export class MarketplaceContactService {
     // 3. Create engagement record (pending status = contact request)
     const engagement = this.engagementRepo.create({
       agentProfileId: profile.id,
-      workspaceId: null,               // client may not have a workspace yet
-      status: 'pending',
-      notes: `contact:${dto.email}`,   // used for rate limiting lookup
+      workspaceId: null, // client may not have a workspace yet
+      status: "pending",
+      notes: `contact:${dto.email}`, // used for rate limiting lookup
       agreedMonthlyRate: 0,
       agreedCommissionRate: 0,
       agreedPricingModel: profile.pricingModel,
@@ -106,7 +109,7 @@ export class MarketplaceContactService {
 
     return {
       success: true,
-      message: `Your message has been sent to ${profile.displayName}. They will contact you via ${dto.preferredContactMethod ?? 'email'}.`,
+      message: `Your message has been sent to ${profile.displayName}. They will contact you via ${dto.preferredContactMethod ?? "email"}.`,
       contactId: saved.id,
     };
   }
@@ -122,12 +125,12 @@ export class MarketplaceContactService {
     dto: ContactSpecialistDto,
     contactId: string,
   ): Promise<void> {
-    const botToken = this.config.get<string>('TELEGRAM_BOT_TOKEN');
-    const adminChatId = this.config.get<string>('TELEGRAM_ADMIN_CHAT_ID');
+    const botToken = this.config.get<string>("TELEGRAM_BOT_TOKEN");
+    const adminChatId = this.config.get<string>("TELEGRAM_ADMIN_CHAT_ID");
 
     if (!botToken || !adminChatId) return;
 
-    const method = dto.preferredContactMethod ?? 'email';
+    const method = dto.preferredContactMethod ?? "email";
     const text = [
       `📩 *Yangi kontakt so'rovi*`,
       ``,
@@ -139,20 +142,22 @@ export class MarketplaceContactService {
       dto.message.slice(0, 500),
       ``,
       `🆔 Contact ID: \`${contactId}\``,
-    ].join('\n');
+    ].join("\n");
 
     try {
       await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           chat_id: adminChatId,
           text,
-          parse_mode: 'Markdown',
+          parse_mode: "Markdown",
         }),
       });
     } catch (err: any) {
-      this.logger.warn(`Telegram notification failed for contact ${contactId}: ${err.message}`);
+      this.logger.warn(
+        `Telegram notification failed for contact ${contactId}: ${err.message}`,
+      );
     }
   }
 }

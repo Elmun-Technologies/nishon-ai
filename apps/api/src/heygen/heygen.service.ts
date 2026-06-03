@@ -86,7 +86,16 @@ export class HeygenService {
     return "half_body";
   }
 
-  mapHeygenStyle(visual?: string): "Realistic" | "Pixar" | "Cinematic" | "Vintage" | "Noir" | "Cyberpunk" | "Unspecified" {
+  mapHeygenStyle(
+    visual?: string,
+  ):
+    | "Realistic"
+    | "Pixar"
+    | "Cinematic"
+    | "Vintage"
+    | "Noir"
+    | "Cyberpunk"
+    | "Unspecified" {
     if (visual === "ugc") return "Realistic";
     if (visual === "professional") return "Cinematic";
     if (visual === "casual") return "Realistic";
@@ -105,12 +114,15 @@ export class HeygenService {
     ].filter(Boolean);
     let s = parts.join(". ").slice(0, 1000);
     if (!s.trim()) {
-      s = "Professional marketing presenter, neutral expression, soft studio lighting.";
+      s =
+        "Professional marketing presenter, neutral expression, soft studio lighting.";
     }
     return s;
   }
 
-  async generatePhotoAvatar(dto: GeneratePhotoAvatarDto): Promise<{ generationId: string }> {
+  async generatePhotoAvatar(
+    dto: GeneratePhotoAvatarDto,
+  ): Promise<{ generationId: string }> {
     const key = this.ensureConfigured();
     const body = {
       name: dto.name.trim(),
@@ -125,21 +137,23 @@ export class HeygenService {
 
     try {
       const res = await firstValueFrom(
-        this.http.post<{ error?: string | null; data?: { generation_id?: string } }>(
-          `${HEYGEN_BASE}/v2/photo_avatar/photo/generate`,
-          body,
-          {
-            headers: {
-              "x-api-key": key,
-              "Content-Type": "application/json",
-            },
-            timeout: 60_000,
+        this.http.post<{
+          error?: string | null;
+          data?: { generation_id?: string };
+        }>(`${HEYGEN_BASE}/v2/photo_avatar/photo/generate`, body, {
+          headers: {
+            "x-api-key": key,
+            "Content-Type": "application/json",
           },
-        ),
+          timeout: 60_000,
+        }),
       );
       const payload = res.data;
       if (payload?.error) {
-        this.logger.warn({ msg: "HeyGen generate error field", error: payload.error });
+        this.logger.warn({
+          msg: "HeyGen generate error field",
+          error: payload.error,
+        });
         throw new BadGatewayException(String(payload.error));
       }
       const generationId = payload?.data?.generation_id;
@@ -155,9 +169,19 @@ export class HeygenService {
         (typeof data === "object" && data && (data.message || data.error)) ||
         (typeof data === "string" ? data : null);
       const msg = raw || e?.message || "HeyGen request failed";
-      this.logger.error({ msg: "HeyGen generate failed", status, data: typeof data === "object" ? data : String(data) });
-      if (e instanceof BadGatewayException || e instanceof ServiceUnavailableException) throw e;
-      throw new BadGatewayException(typeof msg === "string" ? msg : "HeyGen request failed");
+      this.logger.error({
+        msg: "HeyGen generate failed",
+        status,
+        data: typeof data === "object" ? data : String(data),
+      });
+      if (
+        e instanceof BadGatewayException ||
+        e instanceof ServiceUnavailableException
+      )
+        throw e;
+      throw new BadGatewayException(
+        typeof msg === "string" ? msg : "HeyGen request failed",
+      );
     }
   }
 
@@ -178,10 +202,13 @@ export class HeygenService {
             msg?: string | null;
             image_url_list?: string[] | null;
           };
-        }>(`${HEYGEN_BASE}/v2/photo_avatar/generation/${encodeURIComponent(generationId)}`, {
-          headers: { "x-api-key": key },
-          timeout: 30_000,
-        }),
+        }>(
+          `${HEYGEN_BASE}/v2/photo_avatar/generation/${encodeURIComponent(generationId)}`,
+          {
+            headers: { "x-api-key": key },
+            timeout: 30_000,
+          },
+        ),
       );
       const payload = res.data;
       if (payload?.error) {
@@ -198,8 +225,13 @@ export class HeygenService {
         message: d.msg ?? null,
       };
     } catch (e: any) {
-      if (e instanceof BadGatewayException || e instanceof ServiceUnavailableException) throw e;
-      const msg = e?.response?.data?.message || e?.message || "HeyGen status failed";
+      if (
+        e instanceof BadGatewayException ||
+        e instanceof ServiceUnavailableException
+      )
+        throw e;
+      const msg =
+        e?.response?.data?.message || e?.message || "HeyGen status failed";
       throw new BadGatewayException(String(msg));
     }
   }

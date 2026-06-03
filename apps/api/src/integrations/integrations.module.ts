@@ -1,6 +1,6 @@
-import { Module } from '@nestjs/common'
-import { TypeOrmModule } from '@nestjs/typeorm'
-import { ConfigModule } from '@nestjs/config'
+import { Module } from "@nestjs/common";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { ConfigModule } from "@nestjs/config";
 import {
   IntegrationConnection,
   IntegrationConfigEntity,
@@ -15,7 +15,7 @@ import {
   CommissionRate,
   CommissionLog,
   SpecialistProfile,
-} from './entities'
+} from "./entities";
 import {
   EncryptionService,
   AmoCRMConnectorService,
@@ -28,8 +28,8 @@ import {
   CommissionCalculationService,
   CommissionRateService,
   CommissionReportingService,
-} from './services'
-import { IntegrationsController } from './integrations.controller'
+} from "./services";
+import { IntegrationsController } from "./integrations.controller";
 
 @Module({
   imports: [

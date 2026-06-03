@@ -12,7 +12,8 @@ export class CrmController {
   @Post("click")
   @UseGuards(CrmWebhookGuard)
   @ApiOperation({
-    summary: "Click / to‘lov webhook — Redis retarget signal + 7 kundan keyin retarget",
+    summary:
+      "Click / to‘lov webhook — Redis retarget signal + 7 kundan keyin retarget",
   })
   async click(@Body() body: CrmClickDto) {
     return this.orchestration.handleCrmClick(body);

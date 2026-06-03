@@ -1,19 +1,19 @@
-import { Injectable } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
-import * as crypto from 'crypto'
+import { Injectable } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import * as crypto from "crypto";
 
 @Injectable()
 export class EncryptionService {
-  private encryptionKey: Buffer
-  private algorithm = 'aes-256-gcm'
+  private encryptionKey: Buffer;
+  private algorithm = "aes-256-gcm";
 
   constructor(private configService: ConfigService) {
     const keyString = this.configService.get<string>(
-      'ENCRYPTION_KEY',
-      'default-encryption-key-please-set-env-var'
-    )
+      "ENCRYPTION_KEY",
+      "default-encryption-key-please-set-env-var",
+    );
     // Use SHA-256 hash of the key string to get exactly 32 bytes
-    this.encryptionKey = crypto.createHash('sha256').update(keyString).digest()
+    this.encryptionKey = crypto.createHash("sha256").update(keyString).digest();
   }
 
   /**
@@ -23,22 +23,26 @@ export class EncryptionService {
    */
   encrypt(plaintext: string): string {
     try {
-      const iv = crypto.randomBytes(16) // 128-bit IV for GCM
+      const iv = crypto.randomBytes(16); // 128-bit IV for GCM
       // @ts-expect-error - crypto algorithm/key/iv union typing differs across @types/node versions
-      const cipher = crypto.createCipheriv(this.algorithm, this.encryptionKey, iv)
+      const cipher = crypto.createCipheriv(
+        this.algorithm,
+        this.encryptionKey,
+        iv,
+      );
 
       const encrypted = Buffer.concat([
         // @ts-expect-error - Buffer/Uint8Array type drift between @types/node versions
-        cipher.update(plaintext, 'utf8'),
+        cipher.update(plaintext, "utf8"),
         // @ts-expect-error - Buffer/Uint8Array type drift between @types/node versions
         cipher.final(),
-      ])
-      const authTag = cipher.getAuthTag()
+      ]);
+      const authTag = cipher.getAuthTag();
 
       // Format: iv:authTag:encryptedData (all hex)
-      return `${iv.toString('hex')}:${authTag.toString('hex')}:${encrypted.toString('hex')}`
+      return `${iv.toString("hex")}:${authTag.toString("hex")}:${encrypted.toString("hex")}`;
     } catch (error) {
-      throw new Error(`Encryption failed: ${error.message}`)
+      throw new Error(`Encryption failed: ${error.message}`);
     }
   }
 
@@ -49,30 +53,34 @@ export class EncryptionService {
    */
   decrypt(encrypted: string): string {
     try {
-      const parts = encrypted.split(':')
+      const parts = encrypted.split(":");
       if (parts.length !== 3) {
-        throw new Error('Invalid encrypted format')
+        throw new Error("Invalid encrypted format");
       }
 
-      const iv = Buffer.from(parts[0], 'hex')
-      const authTag = Buffer.from(parts[1], 'hex')
-      const encryptedData = Buffer.from(parts[2], 'hex')
+      const iv = Buffer.from(parts[0], "hex");
+      const authTag = Buffer.from(parts[1], "hex");
+      const encryptedData = Buffer.from(parts[2], "hex");
 
       // @ts-expect-error - crypto algorithm/key/iv union typing differs across @types/node versions
-      const decipher = crypto.createDecipheriv(this.algorithm, this.encryptionKey, iv)
+      const decipher = crypto.createDecipheriv(
+        this.algorithm,
+        this.encryptionKey,
+        iv,
+      );
       // @ts-expect-error - Buffer/ArrayBufferView type drift between @types/node versions
-      decipher.setAuthTag(authTag)
+      decipher.setAuthTag(authTag);
 
       const decrypted = Buffer.concat([
         // @ts-expect-error - Buffer/Uint8Array type drift between @types/node versions
         decipher.update(encryptedData),
         // @ts-expect-error - Buffer/Uint8Array type drift between @types/node versions
         decipher.final(),
-      ])
+      ]);
 
-      return decrypted.toString('utf8')
+      return decrypted.toString("utf8");
     } catch (error) {
-      throw new Error(`Decryption failed: ${error.message}`)
+      throw new Error(`Decryption failed: ${error.message}`);
     }
   }
 
@@ -82,7 +90,7 @@ export class EncryptionService {
    * @returns Hash string
    */
   hash(data: string): string {
-    return crypto.createHash('sha256').update(data).digest('hex')
+    return crypto.createHash("sha256").update(data).digest("hex");
   }
 
   /**
@@ -95,18 +103,18 @@ export class EncryptionService {
   verifySignature(payload: string, signature: string, secret: string): boolean {
     try {
       const expectedSignature = crypto
-        .createHmac('sha256', secret)
+        .createHmac("sha256", secret)
         .update(payload)
-        .digest('hex')
+        .digest("hex");
 
       // Constant-time comparison to prevent timing attacks
       return crypto.timingSafeEqual(
         // @ts-expect-error - Buffer/ArrayBufferView type drift between @types/node versions
         Buffer.from(signature),
-        Buffer.from(expectedSignature)
-      )
+        Buffer.from(expectedSignature),
+      );
     } catch (error) {
-      return false
+      return false;
     }
   }
 
@@ -117,7 +125,7 @@ export class EncryptionService {
    * @returns Signature (hex)
    */
   generateSignature(payload: string, secret: string): string {
-    return crypto.createHmac('sha256', secret).update(payload).digest('hex')
+    return crypto.createHmac("sha256", secret).update(payload).digest("hex");
   }
 
   /**
@@ -126,7 +134,7 @@ export class EncryptionService {
    * @returns Random token (hex)
    */
   generateToken(length: number = 32): string {
-    return crypto.randomBytes(length).toString('hex')
+    return crypto.randomBytes(length).toString("hex");
   }
 
   /**
@@ -134,7 +142,7 @@ export class EncryptionService {
    * @returns State token
    */
   generateOAuthState(): string {
-    return crypto.randomBytes(32).toString('hex')
+    return crypto.randomBytes(32).toString("hex");
   }
 
   /**
@@ -143,6 +151,6 @@ export class EncryptionService {
    */
   validateOAuthState(state: string): boolean {
     // State should be 64 hex characters (32 bytes)
-    return /^[a-f0-9]{64}$/.test(state)
+    return /^[a-f0-9]{64}$/.test(state);
   }
 }

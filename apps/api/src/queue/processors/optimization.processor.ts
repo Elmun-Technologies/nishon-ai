@@ -53,11 +53,11 @@ export class OptimizationProcessor {
     );
 
     // Notify connected frontend clients in real-time
-    this.eventsGateway.emitToWorkspace(workspaceId, 'optimization_done', {
+    this.eventsGateway.emitToWorkspace(workspaceId, "optimization_done", {
       workspaceId,
       decisionsCreated: decisions.length,
       timestamp: new Date().toISOString(),
-    })
+    });
   }
 
   @OnQueueFailed()

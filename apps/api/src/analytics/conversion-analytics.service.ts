@@ -54,12 +54,18 @@ export class ConversionAnalyticsService {
     const raw = await this.insightRepo
       .createQueryBuilder("i")
       .select("COALESCE(SUM(i.conversions), 0)", "totalConversions")
-      .addSelect("COALESCE(SUM(CAST(i.conversionValue AS decimal)), 0)", "totalConversionValue")
+      .addSelect(
+        "COALESCE(SUM(CAST(i.conversionValue AS decimal)), 0)",
+        "totalConversionValue",
+      )
       .addSelect("COALESCE(SUM(CAST(i.spend AS decimal)), 0)", "totalSpend")
       .addSelect("COALESCE(SUM(i.clicks), 0)", "totalClicks")
       .where("i.workspaceId = :workspaceId", { workspaceId })
       .andWhere("i.campaignId = :campaignId", { campaignId })
-      .andWhere("i.date BETWEEN :startDate AND :endDate", { startDate, endDate })
+      .andWhere("i.date BETWEEN :startDate AND :endDate", {
+        startDate,
+        endDate,
+      })
       .getRawOne();
 
     const totalConversions = Number(raw.totalConversions);
@@ -70,9 +76,12 @@ export class ConversionAnalyticsService {
     return {
       totalConversions,
       totalConversionValue,
-      avgConversionValue: totalConversions > 0 ? totalConversionValue / totalConversions : 0,
-      costPerConversion: totalConversions > 0 ? totalSpend / totalConversions : 0,
-      conversionRateByClicks: totalClicks > 0 ? (totalConversions / totalClicks) * 100 : 0,
+      avgConversionValue:
+        totalConversions > 0 ? totalConversionValue / totalConversions : 0,
+      costPerConversion:
+        totalConversions > 0 ? totalSpend / totalConversions : 0,
+      conversionRateByClicks:
+        totalClicks > 0 ? (totalConversions / totalClicks) * 100 : 0,
       totalSpend,
       totalClicks,
     };
@@ -88,10 +97,16 @@ export class ConversionAnalyticsService {
       .createQueryBuilder("i")
       .select("i.campaignId", "campaignId")
       .addSelect("COALESCE(SUM(i.conversions), 0)", "conversionCount")
-      .addSelect("COALESCE(SUM(CAST(i.conversionValue AS decimal)), 0)", "conversionValue")
+      .addSelect(
+        "COALESCE(SUM(CAST(i.conversionValue AS decimal)), 0)",
+        "conversionValue",
+      )
       .addSelect("COALESCE(SUM(CAST(i.spend AS decimal)), 0)", "totalSpend")
       .where("i.workspaceId = :workspaceId", { workspaceId })
-      .andWhere("i.date BETWEEN :startDate AND :endDate", { startDate, endDate })
+      .andWhere("i.date BETWEEN :startDate AND :endDate", {
+        startDate,
+        endDate,
+      })
       .groupBy("i.campaignId")
       .orderBy("SUM(i.conversions)", "DESC")
       .limit(limit)
@@ -107,7 +122,8 @@ export class ConversionAnalyticsService {
         conversionCount,
         conversionValue,
         avgValue: conversionCount > 0 ? conversionValue / conversionCount : 0,
-        costPerConversion: conversionCount > 0 ? totalSpend / conversionCount : 0,
+        costPerConversion:
+          conversionCount > 0 ? totalSpend / conversionCount : 0,
         totalSpend,
       };
     });
@@ -135,7 +151,8 @@ export class ConversionAnalyticsService {
         conversionValue: Number(i.conversionValue),
         spend: Number(i.spend),
         clicks: i.clicks,
-        costPerConversion: i.conversions > 0 ? Number(i.spend) / i.conversions : 0,
+        costPerConversion:
+          i.conversions > 0 ? Number(i.spend) / i.conversions : 0,
       }));
   }
 
@@ -152,13 +169,25 @@ export class ConversionAnalyticsService {
     changes: { conversionsDelta: number; spendDelta: number; cpaDelta: number };
   }> {
     const [period1, period2] = await Promise.all([
-      this.getConversionSummary(workspaceId, campaignId, period1Start, period1End),
-      this.getConversionSummary(workspaceId, campaignId, period2Start, period2End),
+      this.getConversionSummary(
+        workspaceId,
+        campaignId,
+        period1Start,
+        period1End,
+      ),
+      this.getConversionSummary(
+        workspaceId,
+        campaignId,
+        period2Start,
+        period2End,
+      ),
     ]);
 
     const conversionsDelta =
       period1.totalConversions > 0
-        ? ((period2.totalConversions - period1.totalConversions) / period1.totalConversions) * 100
+        ? ((period2.totalConversions - period1.totalConversions) /
+            period1.totalConversions) *
+          100
         : 0;
 
     const spendDelta =
@@ -168,22 +197,30 @@ export class ConversionAnalyticsService {
 
     const cpaDelta =
       period1.costPerConversion > 0
-        ? ((period2.costPerConversion - period1.costPerConversion) / period1.costPerConversion) * 100
+        ? ((period2.costPerConversion - period1.costPerConversion) /
+            period1.costPerConversion) *
+          100
         : 0;
 
-    return { period1, period2, changes: { conversionsDelta, spendDelta, cpaDelta } };
+    return {
+      period1,
+      period2,
+      changes: { conversionsDelta, spendDelta, cpaDelta },
+    };
   }
 
   async getDecliningConversionCampaigns(
     workspaceId: string,
     startDate: Date,
     endDate: Date,
-  ): Promise<Array<{
-    campaignId: string;
-    currentConversionRate: number;
-    previousConversionRate: number;
-    decline: number;
-  }>> {
+  ): Promise<
+    Array<{
+      campaignId: string;
+      currentConversionRate: number;
+      previousConversionRate: number;
+      decline: number;
+    }>
+  > {
     const midpoint = new Date((startDate.getTime() + endDate.getTime()) / 2);
 
     // Fetch both periods in a single query using conditional aggregation
@@ -207,7 +244,10 @@ export class ConversionAnalyticsService {
         "previousClicks",
       )
       .where("i.workspaceId = :workspaceId", { workspaceId })
-      .andWhere("i.date BETWEEN :startDate AND :endDate", { startDate, endDate })
+      .andWhere("i.date BETWEEN :startDate AND :endDate", {
+        startDate,
+        endDate,
+      })
       .setParameter("midpoint", midpoint)
       .groupBy("i.campaignId")
       .getRawMany();
@@ -216,8 +256,14 @@ export class ConversionAnalyticsService {
       .map((row) => {
         const currClicks = Number(row.currentClicks);
         const prevClicks = Number(row.previousClicks);
-        const currRate = currClicks > 0 ? (Number(row.currentConversions) / currClicks) * 100 : 0;
-        const prevRate = prevClicks > 0 ? (Number(row.previousConversions) / prevClicks) * 100 : 0;
+        const currRate =
+          currClicks > 0
+            ? (Number(row.currentConversions) / currClicks) * 100
+            : 0;
+        const prevRate =
+          prevClicks > 0
+            ? (Number(row.previousConversions) / prevClicks) * 100
+            : 0;
         return {
           campaignId: row.campaignId,
           currentConversionRate: currRate,

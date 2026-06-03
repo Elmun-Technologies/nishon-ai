@@ -1,7 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { createAdSpectrAiClientFromEnv } from '@adspectr/ai-sdk';
-import type { AdSpectrAiClient } from '@adspectr/ai-sdk';
+import { Injectable, Logger } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { createAdSpectrAiClientFromEnv } from "@adspectr/ai-sdk";
+import type { AdSpectrAiClient } from "@adspectr/ai-sdk";
 import {
   CampaignPerformance,
   OptimizationGoal,
@@ -10,13 +10,13 @@ import {
   OptimizationAction,
   LOW_RISK_ACTIONS,
   ActionType,
-} from './types/optimization.types';
+} from "./types/optimization.types";
 import {
   OPTIMIZER_SYSTEM_PROMPT,
   buildOptimizerPrompt,
   CREATIVE_REFRESH_SYSTEM_PROMPT,
   buildCreativeRefreshPrompt,
-} from './prompts/optimization.prompt';
+} from "./prompts/optimization.prompt";
 
 /**
  * OptimizerAgentService — the AI reasoning layer of the optimization engine.
@@ -63,7 +63,7 @@ export class OptimizerAgentService {
       actions: Array<{
         type: string;
         targetId: string;
-        targetType: 'ad' | 'adset' | 'campaign';
+        targetType: "ad" | "adset" | "campaign";
         reason: string;
         expectedImpact: string;
         priority: string;
@@ -71,29 +71,29 @@ export class OptimizerAgentService {
         autoApplicable: boolean;
       }>;
     }>(prompt, OPTIMIZER_SYSTEM_PROMPT, {
-      taskType: 'optimization',
-      agentName: 'OptimizerAgent',
-      temperature: 0.25,  // low variance — optimization decisions need consistency
+      taskType: "optimization",
+      agentName: "OptimizerAgent",
+      temperature: 0.25, // low variance — optimization decisions need consistency
     });
 
     // Sanitise and enforce type safety on AI output
-    const actions: OptimizationAction[] = (raw.actions ?? []).map(a => ({
-      type:           this.sanitizeActionType(a.type),
-      targetId:       a.targetId ?? '',
-      targetType:     a.targetType ?? 'ad',
-      reason:         a.reason ?? '',
-      expectedImpact: a.expectedImpact ?? '',
-      priority:       this.sanitizePriority(a.priority),
-      risk:           this.sanitizeRisk(a.risk),
+    const actions: OptimizationAction[] = (raw.actions ?? []).map((a) => ({
+      type: this.sanitizeActionType(a.type),
+      targetId: a.targetId ?? "",
+      targetType: a.targetType ?? "ad",
+      reason: a.reason ?? "",
+      expectedImpact: a.expectedImpact ?? "",
+      priority: this.sanitizePriority(a.priority),
+      risk: this.sanitizeRisk(a.risk),
       autoApplicable: LOW_RISK_ACTIONS.includes(a.type as ActionType)
-        ? a.autoApplicable ?? false
-        : false,  // force false for high-risk action types regardless of AI claim
+        ? (a.autoApplicable ?? false)
+        : false, // force false for high-risk action types regardless of AI claim
     }));
 
     return {
-      summary:            raw.summary            ?? 'Analysis complete.',
+      summary: raw.summary ?? "Analysis complete.",
       overallHealthScore: raw.overallHealthScore ?? 50,
-      keyInsights:        raw.keyInsights        ?? [],
+      keyInsights: raw.keyInsights ?? [],
       actions,
     };
   }
@@ -110,11 +110,11 @@ export class OptimizerAgentService {
     problemDescription: string,
   ): Promise<any | null> {
     const fatiguedAds = campaign.adSets
-      .flatMap(s => s.ads)
-      .filter(a => a.creative)
+      .flatMap((s) => s.ads)
+      .filter((a) => a.creative)
       .slice(0, 5)
-      .map(a => ({
-        headline:    a.creative?.headline,
+      .map((a) => ({
+        headline: a.creative?.headline,
         primaryText: a.creative?.primaryText,
       }));
 
@@ -122,7 +122,9 @@ export class OptimizerAgentService {
       return null;
     }
 
-    this.logger.log(`Generating creative refresh concepts for "${campaign.campaignName}"`);
+    this.logger.log(
+      `Generating creative refresh concepts for "${campaign.campaignName}"`,
+    );
 
     try {
       return await this.aiClient.completeJson(
@@ -135,14 +137,14 @@ export class OptimizerAgentService {
         ),
         CREATIVE_REFRESH_SYSTEM_PROMPT,
         {
-          taskType:  'creative',
-          agentName: 'CreativeRefresh',
-          temperature: 0.75,  // more creative variance for copy generation
+          taskType: "creative",
+          agentName: "CreativeRefresh",
+          temperature: 0.75, // more creative variance for copy generation
         },
       );
     } catch (err: any) {
       this.logger.warn(`Creative refresh generation failed: ${err?.message}`);
-      return null;  // non-critical — return null and let orchestrator continue
+      return null; // non-critical — return null and let orchestrator continue
     }
   }
 
@@ -151,21 +153,36 @@ export class OptimizerAgentService {
 
   private sanitizeActionType(value: string): ActionType {
     const valid: ActionType[] = [
-      'pause_creative', 'pause_adset', 'increase_budget', 'decrease_budget',
-      'shift_budget', 'duplicate_winner', 'refresh_creative', 'test_new_angle',
-      'broaden_audience', 'narrow_audience', 'rewrite_headline',
-      'rewrite_primary_text', 'generate_video_script', 'rotate_creative', 'flag_fatigue',
+      "pause_creative",
+      "pause_adset",
+      "increase_budget",
+      "decrease_budget",
+      "shift_budget",
+      "duplicate_winner",
+      "refresh_creative",
+      "test_new_angle",
+      "broaden_audience",
+      "narrow_audience",
+      "rewrite_headline",
+      "rewrite_primary_text",
+      "generate_video_script",
+      "rotate_creative",
+      "flag_fatigue",
     ];
-    return valid.includes(value as ActionType) ? (value as ActionType) : 'flag_fatigue';
+    return valid.includes(value as ActionType)
+      ? (value as ActionType)
+      : "flag_fatigue";
   }
 
-  private sanitizePriority(value: string): 'critical' | 'high' | 'medium' | 'low' {
-    const valid = ['critical', 'high', 'medium', 'low'] as const;
-    return valid.includes(value as any) ? (value as any) : 'medium';
+  private sanitizePriority(
+    value: string,
+  ): "critical" | "high" | "medium" | "low" {
+    const valid = ["critical", "high", "medium", "low"] as const;
+    return valid.includes(value as any) ? (value as any) : "medium";
   }
 
-  private sanitizeRisk(value: string): 'low' | 'medium' | 'high' {
-    const valid = ['low', 'medium', 'high'] as const;
-    return valid.includes(value as any) ? (value as any) : 'medium';
+  private sanitizeRisk(value: string): "low" | "medium" | "high" {
+    const valid = ["low", "medium", "high"] as const;
+    return valid.includes(value as any) ? (value as any) : "medium";
   }
 }

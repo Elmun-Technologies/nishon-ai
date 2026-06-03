@@ -1,38 +1,47 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm'
-import { AgentCertification } from './agent-certification.entity'
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+} from "typeorm";
+import { AgentCertification } from "./agent-certification.entity";
 
-@Entity('marketplace_certifications')
+@Entity("marketplace_certifications")
 export class MarketplaceCertification {
-  @PrimaryGeneratedColumn('uuid')
-  id: string
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
   @Column({ unique: true })
-  name: string // "Google Partner", "Meta Blueprint Certified"
+  name: string; // "Google Partner", "Meta Blueprint Certified"
 
   @Column({ unique: true })
-  slug: string
+  slug: string;
 
-  @Column({ type: 'text', nullable: true })
-  description: string
+  @Column({ type: "text", nullable: true })
+  description: string;
 
   @Column()
-  issuer: string // "Google", "Meta", "Yandex"
+  issuer: string; // "Google", "Meta", "Yandex"
 
   @Column({ nullable: true })
-  iconUrl: string
+  iconUrl: string;
 
   @Column({ nullable: true })
-  badgeColor: string // CSS color/gradient
+  badgeColor: string; // CSS color/gradient
 
   @Column({ default: true })
-  isActive: boolean
+  isActive: boolean;
 
-  @OneToMany(() => AgentCertification, (cert) => cert.certification, { cascade: true })
-  agentCertifications: AgentCertification[]
+  @OneToMany(() => AgentCertification, (cert) => cert.certification, {
+    cascade: true,
+  })
+  agentCertifications: AgentCertification[];
 
   @CreateDateColumn()
-  createdAt: Date
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date
+  updatedAt: Date;
 }

@@ -17,8 +17,17 @@ class AudienceConfigDto {
   @IsString()
   name: string;
 
-  @IsIn(["acquisition_prospecting", "acquisition_reengagement", "retargeting", "retention"])
-  funnelStage: "acquisition_prospecting" | "acquisition_reengagement" | "retargeting" | "retention";
+  @IsIn([
+    "acquisition_prospecting",
+    "acquisition_reengagement",
+    "retargeting",
+    "retention",
+  ])
+  funnelStage:
+    | "acquisition_prospecting"
+    | "acquisition_reengagement"
+    | "retargeting"
+    | "retention";
 
   @IsOptional()
   @IsString()

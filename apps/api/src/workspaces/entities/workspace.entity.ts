@@ -69,7 +69,7 @@ export class Workspace {
    * Null = use SAFE_DEFAULTS (nothing auto-applied without approval).
    * See WorkspacePolicy type in action-policy.ts.
    */
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ type: "jsonb", nullable: true })
   optimizationPolicy: {
     allowAutoBudgetChange: boolean;
     maxAutoBudgetChangePct: number;
@@ -88,7 +88,7 @@ export class Workspace {
    * User gets this by messaging @AdSpectrBot and running /start.
    * If null, daily reports are skipped for this workspace.
    */
-  @Column({ type: 'varchar', length: 64, nullable: true })
+  @Column({ type: "varchar", length: 64, nullable: true })
   telegramChatId: string | null;
 
   /**
@@ -97,11 +97,16 @@ export class Workspace {
    *   'human_agent' — a real targetologist from marketplace manages it
    *   'ai_agent'    — an AI agent (AdSpectr or custom) manages it
    */
-  @Column({ type: 'varchar', length: 20, default: 'self', name: 'service_type' })
-  serviceType: 'self' | 'human_agent' | 'ai_agent';
+  @Column({
+    type: "varchar",
+    length: 20,
+    default: "self",
+    name: "service_type",
+  })
+  serviceType: "self" | "human_agent" | "ai_agent";
 
   /** ID of the assigned AgentProfile (null if self-service) */
-  @Column({ type: 'varchar', nullable: true, name: 'assigned_agent_id' })
+  @Column({ type: "varchar", nullable: true, name: "assigned_agent_id" })
   assignedAgentId: string | null;
 
   @CreateDateColumn()

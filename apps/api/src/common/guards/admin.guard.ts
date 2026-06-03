@@ -4,7 +4,7 @@ import {
   ExecutionContext,
   ForbiddenException,
   UnauthorizedException,
-} from '@nestjs/common';
+} from "@nestjs/common";
 
 /**
  * AdminGuard — allows only users with isAdmin = true.
@@ -25,11 +25,11 @@ export class AdminGuard implements CanActivate {
     const user = request.user;
 
     if (!user) {
-      throw new UnauthorizedException('Authentication required');
+      throw new UnauthorizedException("Authentication required");
     }
 
     if (!user.isAdmin) {
-      throw new ForbiddenException('Admin access required');
+      throw new ForbiddenException("Admin access required");
     }
 
     return true;

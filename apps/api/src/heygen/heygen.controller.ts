@@ -1,4 +1,12 @@
-import { Controller, Get, Param, Post, Body, UseGuards, Req } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  Body,
+  UseGuards,
+  Req,
+} from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { HeygenService } from "./heygen.service";
 import { GeneratePhotoAvatarDto } from "./dtos/generate-photo-avatar.dto";

@@ -34,17 +34,22 @@ export class TiktokConnector {
     const redirectUri = getOAuthCallbackUrl(this.config, "tiktok");
 
     if (!clientKey || !redirectUri) {
-      this.logger.warn("TikTok OAuth requested without TIKTOK_APP_ID/API_BASE_URL");
+      this.logger.warn(
+        "TikTok OAuth requested without TIKTOK_APP_ID/API_BASE_URL",
+      );
       return "";
     }
 
-    const state = Buffer.from(JSON.stringify({ workspaceId })).toString("base64");
+    const state = Buffer.from(JSON.stringify({ workspaceId })).toString(
+      "base64",
+    );
 
     const params = new URLSearchParams({
       client_key: clientKey,
       redirect_uri: redirectUri,
       response_type: "code",
-      scope: "ad.account.read,ad.report.read,ad.campaign.read,ad.campaign.write",
+      scope:
+        "ad.account.read,ad.report.read,ad.campaign.read,ad.campaign.write",
       state,
     });
 
@@ -103,7 +108,9 @@ export class TiktokConnector {
   /**
    * Get all advertiser accounts accessible with this token.
    */
-  async getAdvertiserAccounts(accessToken: string): Promise<
+  async getAdvertiserAccounts(
+    accessToken: string,
+  ): Promise<
     Array<{ id: string; name: string; currency: string; timezone: string }>
   > {
     try {
@@ -115,7 +122,9 @@ export class TiktokConnector {
 
       const { data, code } = response.data;
       if (code !== 0) {
-        throw new BadRequestException(`TikTok get advertisers failed: ${response.data.message}`);
+        throw new BadRequestException(
+          `TikTok get advertisers failed: ${response.data.message}`,
+        );
       }
 
       return (data.list ?? []).map((adv: any) => ({
@@ -146,7 +155,10 @@ export class TiktokConnector {
     params: {
       name: string;
       objectiveType: string;
-      budgetMode: "BUDGET_MODE_DAY" | "BUDGET_MODE_TOTAL" | "BUDGET_MODE_INFINITE";
+      budgetMode:
+        | "BUDGET_MODE_DAY"
+        | "BUDGET_MODE_TOTAL"
+        | "BUDGET_MODE_INFINITE";
       budget?: number;
     },
   ): Promise<{ id: string }> {
@@ -182,15 +194,11 @@ export class TiktokConnector {
     accessToken: string,
     campaignId: string,
   ): Promise<void> {
-    await this.apiPost(
-      `${this.apiBase}/campaign/status/update/`,
-      accessToken,
-      {
-        advertiser_id: advertiserId,
-        campaign_ids: [campaignId],
-        opt_status: "DISABLE",
-      },
-    );
+    await this.apiPost(`${this.apiBase}/campaign/status/update/`, accessToken, {
+      advertiser_id: advertiserId,
+      campaign_ids: [campaignId],
+      opt_status: "DISABLE",
+    });
     this.logger.log(`TikTok campaign paused: ${campaignId}`);
   }
 
@@ -202,15 +210,11 @@ export class TiktokConnector {
     accessToken: string,
     campaignId: string,
   ): Promise<void> {
-    await this.apiPost(
-      `${this.apiBase}/campaign/status/update/`,
-      accessToken,
-      {
-        advertiser_id: advertiserId,
-        campaign_ids: [campaignId],
-        opt_status: "ENABLE",
-      },
-    );
+    await this.apiPost(`${this.apiBase}/campaign/status/update/`, accessToken, {
+      advertiser_id: advertiserId,
+      campaign_ids: [campaignId],
+      opt_status: "ENABLE",
+    });
   }
 
   /**
@@ -222,17 +226,15 @@ export class TiktokConnector {
     campaignId: string,
     budget: number,
   ): Promise<void> {
-    await this.apiPost(
-      `${this.apiBase}/campaign/update/`,
-      accessToken,
-      {
-        advertiser_id: advertiserId,
-        campaign_id: campaignId,
-        budget,
-        budget_mode: "BUDGET_MODE_DAY",
-      },
+    await this.apiPost(`${this.apiBase}/campaign/update/`, accessToken, {
+      advertiser_id: advertiserId,
+      campaign_id: campaignId,
+      budget,
+      budget_mode: "BUDGET_MODE_DAY",
+    });
+    this.logger.log(
+      `TikTok campaign budget updated: ${campaignId} → ${budget}`,
     );
-    this.logger.log(`TikTok campaign budget updated: ${campaignId} → ${budget}`);
   }
 
   // ─── AD GROUPS ────────────────────────────────────────────────────────────
@@ -324,9 +326,9 @@ export class TiktokConnector {
       adGroupId: string;
       name: string;
       creativeType: "SINGLE_VIDEO" | "SINGLE_IMAGE" | "SPARK_ADS";
-      imageId?: string;  // from uploadImage()
-      videoId?: string;  // from uploadVideo()
-      text: string;      // ad caption
+      imageId?: string; // from uploadImage()
+      videoId?: string; // from uploadVideo()
+      text: string; // ad caption
       callToActionType?: string; // LEARN_MORE | SHOP_NOW | SIGN_UP | DOWNLOAD_NOW
       landingPageUrl: string;
     },
@@ -363,16 +365,15 @@ export class TiktokConnector {
     imageBase64: string,
     filename: string,
   ): Promise<{ imageId: string }> {
-    const response = await this.apiPost<{ image_id: string; image_url: string }>(
-      `${this.apiBase}/file/image/ad/upload/`,
-      accessToken,
-      {
-        advertiser_id: advertiserId,
-        upload_type: "UPLOAD_BY_FILE",
-        image_file: imageBase64,
-        file_name: filename,
-      },
-    );
+    const response = await this.apiPost<{
+      image_id: string;
+      image_url: string;
+    }>(`${this.apiBase}/file/image/ad/upload/`, accessToken, {
+      advertiser_id: advertiserId,
+      upload_type: "UPLOAD_BY_FILE",
+      image_file: imageBase64,
+      file_name: filename,
+    });
 
     return { imageId: response.image_id };
   }
@@ -392,16 +393,18 @@ export class TiktokConnector {
       campaignId?: string;
       level?: "CAMPAIGN" | "ADGROUP" | "AD";
     },
-  ): Promise<Array<{
-    campaignId: string;
-    date: string;
-    impressions: number;
-    clicks: number;
-    spend: number;
-    conversions: number;
-    reach: number;
-    videoPlayActions?: number;
-  }>> {
+  ): Promise<
+    Array<{
+      campaignId: string;
+      date: string;
+      impressions: number;
+      clicks: number;
+      spend: number;
+      conversions: number;
+      reach: number;
+      videoPlayActions?: number;
+    }>
+  > {
     const queryBody: Record<string, any> = {
       advertiser_id: advertiserId,
       report_type: "BASIC",
@@ -424,7 +427,11 @@ export class TiktokConnector {
 
     if (params.campaignId) {
       queryBody.filtering = [
-        { field_name: "campaign_id", filter_type: "IN", filter_value: `["${params.campaignId}"]` },
+        {
+          field_name: "campaign_id",
+          filter_type: "IN",
+          filter_value: `["${params.campaignId}"]`,
+        },
       ];
     }
 

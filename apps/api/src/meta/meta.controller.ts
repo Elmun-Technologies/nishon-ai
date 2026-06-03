@@ -30,7 +30,10 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { MetaAdsService } from "./meta-ads.service";
 import { MetaSyncService } from "./meta-sync.service";
-import { MetaAiEngineService, CampaignInsights } from "./meta-ai-engine.service";
+import {
+  MetaAiEngineService,
+  CampaignInsights,
+} from "./meta-ai-engine.service";
 import { MetaAdAccount } from "./entities/meta-ad-account.entity";
 import { MetaCampaignSync } from "./entities/meta-campaign-sync.entity";
 import { MetaInsight } from "./entities/meta-insight.entity";
@@ -45,7 +48,7 @@ import { MetaAuditService } from "./meta-audit.service";
 const RANGE_TO_DATE_PRESET: Record<string, string> = {
   "7d": "last_7d",
   "30d": "last_30d",
-  "today": "today",
+  today: "today",
 };
 
 /**
@@ -85,8 +88,13 @@ export class MetaController {
   // ─── Passthrough Graph API endpoints ────────────────────────────────────────
 
   @Get("ad-accounts")
-  @ApiOperation({ summary: "List all Meta ad accounts for the authenticated token" })
-  @ApiResponse({ status: 200, description: "Ad accounts returned successfully" })
+  @ApiOperation({
+    summary: "List all Meta ad accounts for the authenticated token",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Ad accounts returned successfully",
+  })
   async getAdAccounts(
     @Headers("authorization") authorization?: string,
     @Req() req?: Request,
@@ -104,9 +112,13 @@ export class MetaController {
     @Headers("authorization") authorization?: string,
     @Req() req?: Request,
   ) {
-    if (!accountId) throw new BadRequestException("accountId query parameter is required");
+    if (!accountId)
+      throw new BadRequestException("accountId query parameter is required");
     const accessToken = this.extractMetaToken(authorization, req);
-    const campaigns = await this.metaAdsService.getCampaigns(accountId, accessToken);
+    const campaigns = await this.metaAdsService.getCampaigns(
+      accountId,
+      accessToken,
+    );
     return { success: true, campaigns };
   }
 
@@ -122,7 +134,8 @@ export class MetaController {
   @ApiQuery({
     name: "datePreset",
     required: false,
-    description: "Raw Meta date_preset value. Overridden by range if both provided.",
+    description:
+      "Raw Meta date_preset value. Overridden by range if both provided.",
   })
   async getInsights(
     @Query("accountId") accountId: string | undefined,
@@ -131,10 +144,15 @@ export class MetaController {
     @Headers("authorization") authorization?: string,
     @Req() req?: Request,
   ) {
-    if (!accountId) throw new BadRequestException("accountId query parameter is required");
+    if (!accountId)
+      throw new BadRequestException("accountId query parameter is required");
     const accessToken = this.extractMetaToken(authorization, req);
     const resolvedPreset = this.resolveRange(range, datePreset);
-    const insights = await this.metaAdsService.getInsights(accountId, accessToken, resolvedPreset);
+    const insights = await this.metaAdsService.getInsights(
+      accountId,
+      accessToken,
+      resolvedPreset,
+    );
     return { success: true, insights };
   }
 
@@ -167,13 +185,21 @@ export class MetaController {
     @Req() req: Request,
   ) {
     if (!body.workspaceId) {
-      throw new BadRequestException("workspaceId is required in the request body");
+      throw new BadRequestException(
+        "workspaceId is required in the request body",
+      );
     }
 
     // Security: verify the authenticated user owns this workspace
-    await this.assertWorkspaceOwnership(body.workspaceId, this.getRequestUserId(req));
+    await this.assertWorkspaceOwnership(
+      body.workspaceId,
+      this.getRequestUserId(req),
+    );
 
-    this.logger.log({ message: "Sync triggered", workspaceId: body.workspaceId });
+    this.logger.log({
+      message: "Sync triggered",
+      workspaceId: body.workspaceId,
+    });
 
     const result = await this.metaSyncService.syncWorkspace(
       body.workspaceId,
@@ -211,8 +237,18 @@ export class MetaController {
                 id: "120214192783690",
                 name: "Black Friday – Retargeting",
                 status: "ACTIVE",
-                metrics: { spend: 87.5, clicks: 412, impressions: 12843, ctr: 3.21, cpc: 0.21 },
-                ai: { health: "GOOD", action: "SCALE", reason: "High CTR and low CPC" },
+                metrics: {
+                  spend: 87.5,
+                  clicks: 412,
+                  impressions: 12843,
+                  ctr: 3.21,
+                  cpc: 0.21,
+                },
+                ai: {
+                  health: "GOOD",
+                  action: "SCALE",
+                  reason: "High CTR and low CPC",
+                },
               },
             ],
           },
@@ -229,7 +265,10 @@ export class MetaController {
     }
 
     // Security: verify the authenticated user owns this workspace
-    await this.assertWorkspaceOwnership(workspaceId, this.getRequestUserId(req));
+    await this.assertWorkspaceOwnership(
+      workspaceId,
+      this.getRequestUserId(req),
+    );
 
     const accounts = await this.adAccountRepo.find({
       where: { workspaceId },
@@ -245,7 +284,10 @@ export class MetaController {
 
   // ─── Private: dashboard builders ────────────────────────────────────────────
 
-  private async buildAccountPayload(account: MetaAdAccount, workspaceId: string) {
+  private async buildAccountPayload(
+    account: MetaAdAccount,
+    workspaceId: string,
+  ) {
     // Filter campaigns by both adAccountId AND workspaceId for strict isolation
     const campaigns = await this.campaignRepo.find({
       where: { adAccountId: account.id, workspaceId },
@@ -265,7 +307,10 @@ export class MetaController {
     };
   }
 
-  private async buildCampaignPayload(campaign: MetaCampaignSync, workspaceId: string) {
+  private async buildCampaignPayload(
+    campaign: MetaCampaignSync,
+    workspaceId: string,
+  ) {
     const aggregated = await this.aggregateInsights(campaign.id, workspaceId);
     const aiResult = this.aiEngine.analyzeCampaign(aggregated);
 
@@ -298,10 +343,19 @@ export class MetaController {
     campaignId: string,
     workspaceId: string,
   ): Promise<CampaignInsights> {
-    const rows = await this.insightRepo.find({ where: { campaignId, workspaceId } });
+    const rows = await this.insightRepo.find({
+      where: { campaignId, workspaceId },
+    });
 
     if (rows.length === 0) {
-      return { campaignId, spend: 0, impressions: 0, clicks: 0, ctr: 0, cpc: 0 };
+      return {
+        campaignId,
+        spend: 0,
+        impressions: 0,
+        clicks: 0,
+        ctr: 0,
+        cpc: 0,
+      };
     }
 
     const spend = rows.reduce((s, r) => s + Number(r.spend), 0);
@@ -319,7 +373,8 @@ export class MetaController {
 
   @Get("top-ads")
   @ApiOperation({
-    summary: "Top performing campaigns by CTR with conversions, trend, and format detection",
+    summary:
+      "Top performing campaigns by CTR with conversions, trend, and format detection",
     description:
       "Returns the top N campaigns from cached insights, ranked by CTR " +
       "(default) or any metric the caller chooses. Each row includes a " +
@@ -327,12 +382,21 @@ export class MetaController {
       "label inferred from the campaign name.",
   })
   @ApiQuery({ name: "workspaceId" })
-  @ApiQuery({ name: "limit", required: false, description: "Number of results (default 10)" })
-  @ApiQuery({ name: "days", required: false, description: "Lookback window in days (default 30)" })
+  @ApiQuery({
+    name: "limit",
+    required: false,
+    description: "Number of results (default 10)",
+  })
+  @ApiQuery({
+    name: "days",
+    required: false,
+    description: "Lookback window in days (default 30)",
+  })
   @ApiQuery({
     name: "sort",
     required: false,
-    description: "ctr | spend | clicks | impressions | conversions | roas (default ctr)",
+    description:
+      "ctr | spend | clicks | impressions | conversions | roas (default ctr)",
   })
   @ApiQuery({
     name: "status",
@@ -348,7 +412,10 @@ export class MetaController {
     @Req() req: Request,
   ) {
     if (!workspaceId) throw new BadRequestException("workspaceId is required");
-    await this.assertWorkspaceOwnership(workspaceId, this.getRequestUserId(req));
+    await this.assertWorkspaceOwnership(
+      workspaceId,
+      this.getRequestUserId(req),
+    );
 
     const windowDays = Math.min(Math.max(parseInt(days, 10) || 30, 1), 180);
     const since = new Date();
@@ -389,7 +456,9 @@ export class MetaController {
 
     const campaignIds = rows.map((r) => r.campaignid ?? r.campaignId);
     const campaigns = campaignIds.length
-      ? await this.campaignRepo.find({ where: campaignIds.map((id) => ({ id })) })
+      ? await this.campaignRepo.find({
+          where: campaignIds.map((id) => ({ id })),
+        })
       : [];
     const campaignMap = Object.fromEntries(campaigns.map((c) => [c.id, c]));
 
@@ -462,16 +531,25 @@ export class MetaController {
   // ─── Reporting (hierarchical Account → Campaign) ─────────────────────────────
 
   @Get("reporting")
-  @ApiOperation({ summary: "Hierarchical report: Account → Campaign with aggregated metrics" })
+  @ApiOperation({
+    summary: "Hierarchical report: Account → Campaign with aggregated metrics",
+  })
   @ApiQuery({ name: "workspaceId" })
-  @ApiQuery({ name: "days", required: false, description: "Lookback window in days (default 30)" })
+  @ApiQuery({
+    name: "days",
+    required: false,
+    description: "Lookback window in days (default 30)",
+  })
   async reporting(
     @Query("workspaceId") workspaceId: string | undefined,
     @Query("days") days = "30",
     @Req() req: Request,
   ) {
     if (!workspaceId) throw new BadRequestException("workspaceId is required");
-    await this.assertWorkspaceOwnership(workspaceId, this.getRequestUserId(req));
+    await this.assertWorkspaceOwnership(
+      workspaceId,
+      this.getRequestUserId(req),
+    );
 
     const since = new Date();
     since.setDate(since.getDate() - (parseInt(days) || 30));
@@ -495,11 +573,11 @@ export class MetaController {
     const metricByCampaign: Record<string, any> = {};
     for (const r of insightRows) {
       metricByCampaign[r.campaignId] = {
-        spend:       parseFloat(r.spend) || 0,
-        clicks:      parseInt(r.clicks) || 0,
+        spend: parseFloat(r.spend) || 0,
+        clicks: parseInt(r.clicks) || 0,
         impressions: parseInt(r.impressions) || 0,
-        ctr:         parseFloat(r.ctr) || 0,
-        cpc:         parseFloat(r.cpc) || 0,
+        ctr: parseFloat(r.ctr) || 0,
+        cpc: parseFloat(r.cpc) || 0,
       };
     }
 
@@ -513,38 +591,49 @@ export class MetaController {
         });
 
         const enriched = campaigns.map((c) => ({
-          id:        c.id,
-          name:      c.name,
-          status:    c.status,
+          id: c.id,
+          name: c.name,
+          status: c.status,
           objective: c.objective,
-          tags:      c.tags ?? [],
-          metrics:   metricByCampaign[c.id] ?? { spend: 0, clicks: 0, impressions: 0, ctr: 0, cpc: 0 },
+          tags: c.tags ?? [],
+          metrics: metricByCampaign[c.id] ?? {
+            spend: 0,
+            clicks: 0,
+            impressions: 0,
+            ctr: 0,
+            cpc: 0,
+          },
         }));
 
         // Roll up account-level metrics
         const accountMetrics = enriched.reduce(
           (acc, c) => ({
-            spend:       acc.spend + c.metrics.spend,
-            clicks:      acc.clicks + c.metrics.clicks,
+            spend: acc.spend + c.metrics.spend,
+            clicks: acc.clicks + c.metrics.clicks,
             impressions: acc.impressions + c.metrics.impressions,
-            ctr:         0, // calculated below
-            cpc:         0,
+            ctr: 0, // calculated below
+            cpc: 0,
           }),
           { spend: 0, clicks: 0, impressions: 0, ctr: 0, cpc: 0 },
         );
-        accountMetrics.ctr = accountMetrics.impressions > 0
-          ? Math.round((accountMetrics.clicks / accountMetrics.impressions) * 10000) / 100
-          : 0;
-        accountMetrics.cpc = accountMetrics.clicks > 0
-          ? Math.round((accountMetrics.spend / accountMetrics.clicks) * 100) / 100
-          : 0;
+        accountMetrics.ctr =
+          accountMetrics.impressions > 0
+            ? Math.round(
+                (accountMetrics.clicks / accountMetrics.impressions) * 10000,
+              ) / 100
+            : 0;
+        accountMetrics.cpc =
+          accountMetrics.clicks > 0
+            ? Math.round((accountMetrics.spend / accountMetrics.clicks) * 100) /
+              100
+            : 0;
 
         return {
-          id:        account.id,
-          name:      account.name,
-          currency:  account.currency ?? "USD",
-          timezone:  account.timezone,
-          metrics:   accountMetrics,
+          id: account.id,
+          name: account.name,
+          currency: account.currency ?? "USD",
+          timezone: account.timezone,
+          metrics: accountMetrics,
           campaigns: enriched,
         };
       }),
@@ -569,40 +658,54 @@ export class MetaController {
 
     for (const account of data.accounts) {
       for (const campaign of account.campaigns) {
-        lines.push([
-          `"${account.name}"`,
-          account.id,
-          `"${campaign.name}"`,
-          campaign.id,
-          campaign.status,
-          campaign.objective ?? "",
-          campaign.metrics.spend.toFixed(2),
-          campaign.metrics.clicks,
-          campaign.metrics.impressions,
-          campaign.metrics.ctr.toFixed(4),
-          campaign.metrics.cpc.toFixed(4),
-        ].join(","));
+        lines.push(
+          [
+            `"${account.name}"`,
+            account.id,
+            `"${campaign.name}"`,
+            campaign.id,
+            campaign.status,
+            campaign.objective ?? "",
+            campaign.metrics.spend.toFixed(2),
+            campaign.metrics.clicks,
+            campaign.metrics.impressions,
+            campaign.metrics.ctr.toFixed(4),
+            campaign.metrics.cpc.toFixed(4),
+          ].join(","),
+        );
       }
     }
 
-    return { csv: lines.join("\n"), filename: `adspectr-report-${new Date().toISOString().slice(0, 10)}.csv` };
+    return {
+      csv: lines.join("\n"),
+      filename: `adspectr-report-${new Date().toISOString().slice(0, 10)}.csv`,
+    };
   }
 
   // ─── Spend forecast ────────────────────────────────────────────────────────
 
   @Get("spend-forecast")
-  @ApiOperation({ summary: "Monthly spend actuals + linear prediction for rest of month" })
+  @ApiOperation({
+    summary: "Monthly spend actuals + linear prediction for rest of month",
+  })
   @ApiQuery({ name: "workspaceId" })
   async spendForecast(
     @Query("workspaceId") workspaceId: string | undefined,
     @Req() req: Request,
   ) {
     if (!workspaceId) throw new BadRequestException("workspaceId is required");
-    await this.assertWorkspaceOwnership(workspaceId, this.getRequestUserId(req));
+    await this.assertWorkspaceOwnership(
+      workspaceId,
+      this.getRequestUserId(req),
+    );
 
     const now = new Date();
     const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    const daysInMonth = new Date(
+      now.getFullYear(),
+      now.getMonth() + 1,
+      0,
+    ).getDate();
     const daysElapsed = now.getDate(); // days elapsed including today
 
     // Daily spend for this month
@@ -621,7 +724,10 @@ export class MetaController {
     // Build a full daily array (fill missing days with 0)
     const spendByDay: Record<string, number> = {};
     for (const r of dailyRows) {
-      const key = typeof r.day === "string" ? r.day.slice(0, 10) : new Date(r.day).toISOString().slice(0, 10);
+      const key =
+        typeof r.day === "string"
+          ? r.day.slice(0, 10)
+          : new Date(r.day).toISOString().slice(0, 10);
       spendByDay[key] = parseFloat(r.spend) || 0;
     }
 
@@ -633,7 +739,9 @@ export class MetaController {
       daily.push({ date: key, spend: spendByDay[key] ?? 0, isPredicted });
     }
 
-    const spendToDate = daily.filter((d) => !d.isPredicted).reduce((s, d) => s + d.spend, 0);
+    const spendToDate = daily
+      .filter((d) => !d.isPredicted)
+      .reduce((s, d) => s + d.spend, 0);
     const avgDailySpend = daysElapsed > 0 ? spendToDate / daysElapsed : 0;
 
     // Fill predicted days with average daily spend
@@ -656,14 +764,19 @@ export class MetaController {
   // ─── Learning Monitor ─────────────────────────────────────────────────────────
 
   @Get("learning-monitor")
-  @ApiOperation({ summary: "Ad set delivery status breakdown for Learning Monitor widget" })
+  @ApiOperation({
+    summary: "Ad set delivery status breakdown for Learning Monitor widget",
+  })
   @ApiQuery({ name: "workspaceId" })
   async learningMonitor(
     @Query("workspaceId") workspaceId: string | undefined,
     @Req() req: Request,
   ) {
     if (!workspaceId) throw new BadRequestException("workspaceId is required");
-    await this.assertWorkspaceOwnership(workspaceId, this.getRequestUserId(req));
+    await this.assertWorkspaceOwnership(
+      workspaceId,
+      this.getRequestUserId(req),
+    );
 
     // Use MetaCampaignSync status as a proxy for ad set delivery.
     // Real ad set status would require syncing ad sets separately.
@@ -675,13 +788,16 @@ export class MetaController {
       .getRawMany();
 
     // Normalise to four buckets used in Smartly's Learning Monitor
-    let active = 0, learning = 0, paused = 0;
+    let active = 0,
+      learning = 0,
+      paused = 0;
     const limited = 0;
     for (const r of rows) {
       const s = (r.status as string).toUpperCase();
       const n = parseInt(r.cnt, 10) || 0;
       if (s === "ACTIVE") active += n;
-      else if (s === "PAUSED" || s === "ARCHIVED" || s === "DELETED") paused += n;
+      else if (s === "PAUSED" || s === "ARCHIVED" || s === "DELETED")
+        paused += n;
       else learning += n; // any other status counts as learning/in-progress
     }
 
@@ -732,7 +848,10 @@ export class MetaController {
     @Req() req: Request,
   ) {
     if (!workspaceId) throw new BadRequestException("workspaceId is required");
-    await this.assertWorkspaceOwnership(workspaceId, this.getRequestUserId(req));
+    await this.assertWorkspaceOwnership(
+      workspaceId,
+      this.getRequestUserId(req),
+    );
 
     const start = new Date(startDate + "T00:00:00Z");
     const end = new Date(endDate + "T23:59:59Z");
@@ -808,18 +927,23 @@ export class MetaController {
     @Req() req?: Request,
   ) {
     if (!workspaceId) throw new BadRequestException("workspaceId is required");
-    if (req) await this.assertWorkspaceOwnership(workspaceId, this.getRequestUserId(req));
+    if (req)
+      await this.assertWorkspaceOwnership(
+        workspaceId,
+        this.getRequestUserId(req),
+      );
 
     const start = new Date(startDate + "T00:00:00Z");
     const end = new Date(endDate + "T23:59:59Z");
     const limit = limitStr ? parseInt(limitStr) : 10;
 
-    const topCampaigns = await this.conversionAnalytics.getTopConvertingCampaigns(
-      workspaceId,
-      start,
-      end,
-      limit,
-    );
+    const topCampaigns =
+      await this.conversionAnalytics.getTopConvertingCampaigns(
+        workspaceId,
+        start,
+        end,
+        limit,
+      );
 
     return {
       success: true,
@@ -842,9 +966,14 @@ export class MetaController {
     @Req() req: Request,
   ) {
     if (!workspaceId) throw new BadRequestException("workspaceId is required");
-    await this.assertWorkspaceOwnership(workspaceId, this.getRequestUserId(req));
+    await this.assertWorkspaceOwnership(
+      workspaceId,
+      this.getRequestUserId(req),
+    );
 
-    const campaign = await this.campaignRepo.findOne({ where: { id: campaignId, workspaceId } });
+    const campaign = await this.campaignRepo.findOne({
+      where: { id: campaignId, workspaceId },
+    });
     if (!campaign) throw new BadRequestException("Campaign not found");
 
     await this.campaignRepo.update({ id: campaignId }, { tags: body.tags });
@@ -885,7 +1014,9 @@ export class MetaController {
   private getRequestUserId(req: Request): string {
     const user = (req as any).user as User | undefined;
     if (!user?.id) {
-      throw new UnauthorizedException("Authenticated user not found in request");
+      throw new UnauthorizedException(
+        "Authenticated user not found in request",
+      );
     }
     return user.id;
   }
@@ -923,8 +1054,16 @@ export class MetaController {
       "withAiSummary=true.",
   })
   @ApiQuery({ name: "workspaceId" })
-  @ApiQuery({ name: "days", required: false, description: "Lookback window (default 30)" })
-  @ApiQuery({ name: "ai", required: false, description: "Set to 1 to include AI executive summary" })
+  @ApiQuery({
+    name: "days",
+    required: false,
+    description: "Lookback window (default 30)",
+  })
+  @ApiQuery({
+    name: "ai",
+    required: false,
+    description: "Set to 1 to include AI executive summary",
+  })
   async runAudit(
     @Query("workspaceId") workspaceId: string | undefined,
     @Query("days") days: string | undefined,
@@ -934,7 +1073,10 @@ export class MetaController {
     if (!workspaceId) {
       throw new BadRequestException("workspaceId is required");
     }
-    await this.assertWorkspaceOwnership(workspaceId, this.getRequestUserId(req));
+    await this.assertWorkspaceOwnership(
+      workspaceId,
+      this.getRequestUserId(req),
+    );
 
     const window = days ? Math.max(1, Math.min(180, parseInt(days, 10))) : 30;
     const report = await this.metaAuditService.runAudit(workspaceId, window, {
@@ -944,7 +1086,9 @@ export class MetaController {
     // Surface whether Meta is connected at all so the frontend can swap
     // between the "Connect Meta" CTA and the real report without
     // pinging a second endpoint.
-    const adAccountCount = await this.adAccountRepo.count({ where: { workspaceId } });
+    const adAccountCount = await this.adAccountRepo.count({
+      where: { workspaceId },
+    });
     return { connected: adAccountCount > 0, report };
   }
 
@@ -964,19 +1108,26 @@ export class MetaController {
     if (!body.workspaceId) {
       throw new BadRequestException("workspaceId is required");
     }
-    await this.assertWorkspaceOwnership(body.workspaceId, this.getRequestUserId(req));
+    await this.assertWorkspaceOwnership(
+      body.workspaceId,
+      this.getRequestUserId(req),
+    );
 
-    const accessToken = await this.metaSyncService.resolveAccessToken(body.workspaceId);
+    const accessToken = await this.metaSyncService.resolveAccessToken(
+      body.workspaceId,
+    );
     if (!accessToken) {
-      throw new BadRequestException("Meta account is not connected for this workspace");
+      throw new BadRequestException(
+        "Meta account is not connected for this workspace",
+      );
     }
 
     const report = await this.metaAuditService.runAudit(
       body.workspaceId,
       body.days ?? 30,
     );
-    const targets = report.campaigns.filter((c) =>
-      c.flags.includes("LOSING_ROAS") && c.status === "ACTIVE",
+    const targets = report.campaigns.filter(
+      (c) => c.flags.includes("LOSING_ROAS") && c.status === "ACTIVE",
     );
 
     const paused: string[] = [];
@@ -1009,14 +1160,20 @@ export class MetaController {
     if (!workspaceId) {
       throw new BadRequestException("workspaceId query parameter is required");
     }
-    await this.assertWorkspaceOwnership(workspaceId, this.getRequestUserId(req));
+    await this.assertWorkspaceOwnership(
+      workspaceId,
+      this.getRequestUserId(req),
+    );
 
-    const accessToken = await this.metaSyncService.resolveAccessToken(workspaceId);
+    const accessToken =
+      await this.metaSyncService.resolveAccessToken(workspaceId);
     if (!accessToken) {
       return { success: true, connected: false, audiences: [] };
     }
 
-    const adAccounts = await this.adAccountRepo.find({ where: { workspaceId } });
+    const adAccounts = await this.adAccountRepo.find({
+      where: { workspaceId },
+    });
     if (adAccounts.length === 0) {
       return { success: true, connected: true, audiences: [] };
     }
@@ -1074,9 +1231,13 @@ export class MetaController {
       this.getRequestUserId(req),
     );
 
-    const accessToken = await this.metaSyncService.resolveAccessToken(body.workspaceId);
+    const accessToken = await this.metaSyncService.resolveAccessToken(
+      body.workspaceId,
+    );
     if (!accessToken) {
-      throw new BadRequestException("Meta account is not connected for this workspace");
+      throw new BadRequestException(
+        "Meta account is not connected for this workspace",
+      );
     }
 
     const created = await this.metaConnector.createLookalikeAudience(

@@ -41,7 +41,10 @@ describe("MetaAuditService", () => {
       providers: [
         MetaAuditService,
         { provide: getRepositoryToken(MetaInsight), useValue: insightRepo },
-        { provide: getRepositoryToken(MetaCampaignSync), useValue: campaignRepo },
+        {
+          provide: getRepositoryToken(MetaCampaignSync),
+          useValue: campaignRepo,
+        },
         { provide: getRepositoryToken(MetaAdAccount), useValue: {} },
         {
           provide: ConfigService,
@@ -71,21 +74,59 @@ describe("MetaAuditService", () => {
 
   it("flags ZERO_CLICKS on $50+ campaigns and surfaces it as critical", async () => {
     withFixture(
-      [{ id: "c1", name: "Cold Sales", status: "ACTIVE", objective: "OUTCOME_SALES", adAccountId: "act_1", workspaceId: "ws" } as any],
-      [{ campaignId: "c1", spend: 80, impressions: 5000, clicks: 0, conversions: 0, revenue: 0 }],
+      [
+        {
+          id: "c1",
+          name: "Cold Sales",
+          status: "ACTIVE",
+          objective: "OUTCOME_SALES",
+          adAccountId: "act_1",
+          workspaceId: "ws",
+        } as any,
+      ],
+      [
+        {
+          campaignId: "c1",
+          spend: 80,
+          impressions: 5000,
+          clicks: 0,
+          conversions: 0,
+          revenue: 0,
+        },
+      ],
     );
 
     const r = await service.runAudit("ws", 30);
     const camp = r.campaigns[0];
     expect(camp.flags).toContain("ZERO_CLICKS");
     expect(r.findings.find((f) => f.id === "zero_clicks")).toBeTruthy();
-    expect(r.findings.find((f) => f.id === "zero_clicks")?.severity).toBe("critical");
+    expect(r.findings.find((f) => f.id === "zero_clicks")?.severity).toBe(
+      "critical",
+    );
   });
 
   it("flags LOSING_ROAS when spend > 200 and roas < 1", async () => {
     withFixture(
-      [{ id: "c1", name: "Bad", status: "ACTIVE", objective: "OUTCOME_SALES", adAccountId: "act_1", workspaceId: "ws" } as any],
-      [{ campaignId: "c1", spend: 300, impressions: 10000, clicks: 100, conversions: 1, revenue: 50 }],
+      [
+        {
+          id: "c1",
+          name: "Bad",
+          status: "ACTIVE",
+          objective: "OUTCOME_SALES",
+          adAccountId: "act_1",
+          workspaceId: "ws",
+        } as any,
+      ],
+      [
+        {
+          campaignId: "c1",
+          spend: 300,
+          impressions: 10000,
+          clicks: 100,
+          conversions: 1,
+          revenue: 50,
+        },
+      ],
     );
     const r = await service.runAudit("ws", 30);
     expect(r.campaigns[0].flags).toContain("LOSING_ROAS");
@@ -94,8 +135,26 @@ describe("MetaAuditService", () => {
 
   it("flags HEALTHY_ROAS as a positive 'good' finding", async () => {
     withFixture(
-      [{ id: "c1", name: "Winner", status: "ACTIVE", objective: "OUTCOME_SALES", adAccountId: "act_1", workspaceId: "ws" } as any],
-      [{ campaignId: "c1", spend: 100, impressions: 5000, clicks: 200, conversions: 10, revenue: 400 }],
+      [
+        {
+          id: "c1",
+          name: "Winner",
+          status: "ACTIVE",
+          objective: "OUTCOME_SALES",
+          adAccountId: "act_1",
+          workspaceId: "ws",
+        } as any,
+      ],
+      [
+        {
+          campaignId: "c1",
+          spend: 100,
+          impressions: 5000,
+          clicks: 200,
+          conversions: 10,
+          revenue: 400,
+        },
+      ],
     );
     const r = await service.runAudit("ws", 30);
     expect(r.campaigns[0].flags).toContain("HEALTHY_ROAS");
@@ -106,13 +165,29 @@ describe("MetaAuditService", () => {
   it("flags ACTIVE campaigns that produced zero spend (delivery problem)", async () => {
     withFixture(
       [
-        { id: "c1", name: "Stalled 1", status: "ACTIVE", objective: "OUTCOME_LEADS", adAccountId: "a", workspaceId: "ws" } as any,
-        { id: "c2", name: "Stalled 2", status: "ACTIVE", objective: "OUTCOME_LEADS", adAccountId: "a", workspaceId: "ws" } as any,
+        {
+          id: "c1",
+          name: "Stalled 1",
+          status: "ACTIVE",
+          objective: "OUTCOME_LEADS",
+          adAccountId: "a",
+          workspaceId: "ws",
+        } as any,
+        {
+          id: "c2",
+          name: "Stalled 2",
+          status: "ACTIVE",
+          objective: "OUTCOME_LEADS",
+          adAccountId: "a",
+          workspaceId: "ws",
+        } as any,
       ],
       [], // no insights at all
     );
     const r = await service.runAudit("ws", 30);
-    expect(r.campaigns.every((c) => c.flags.includes("ACTIVE_NO_SPEND"))).toBe(true);
+    expect(r.campaigns.every((c) => c.flags.includes("ACTIVE_NO_SPEND"))).toBe(
+      true,
+    );
     const f = r.findings.find((x) => x.id === "active_no_spend");
     expect(f).toBeTruthy();
     expect(f?.detail).toMatch(/Stalled 1/);
@@ -121,12 +196,40 @@ describe("MetaAuditService", () => {
   it("detects spend concentration when one campaign is ≥ 60% of total", async () => {
     withFixture(
       [
-        { id: "a", name: "Whale", status: "ACTIVE", objective: "OUTCOME_SALES", adAccountId: "1", workspaceId: "ws" } as any,
-        { id: "b", name: "Minnow", status: "ACTIVE", objective: "OUTCOME_SALES", adAccountId: "1", workspaceId: "ws" } as any,
+        {
+          id: "a",
+          name: "Whale",
+          status: "ACTIVE",
+          objective: "OUTCOME_SALES",
+          adAccountId: "1",
+          workspaceId: "ws",
+        } as any,
+        {
+          id: "b",
+          name: "Minnow",
+          status: "ACTIVE",
+          objective: "OUTCOME_SALES",
+          adAccountId: "1",
+          workspaceId: "ws",
+        } as any,
       ],
       [
-        { campaignId: "a", spend: 800, impressions: 10000, clicks: 200, conversions: 5, revenue: 1000 },
-        { campaignId: "b", spend: 100, impressions: 2000, clicks: 30, conversions: 1, revenue: 80 },
+        {
+          campaignId: "a",
+          spend: 800,
+          impressions: 10000,
+          clicks: 200,
+          conversions: 5,
+          revenue: 1000,
+        },
+        {
+          campaignId: "b",
+          spend: 100,
+          impressions: 2000,
+          clicks: 30,
+          conversions: 1,
+          revenue: 80,
+        },
       ],
     );
     const r = await service.runAudit("ws", 30);
@@ -137,8 +240,26 @@ describe("MetaAuditService", () => {
 
   it("computes period-over-period deltas from prior-period insights", async () => {
     withFixture(
-      [{ id: "c1", name: "X", status: "ACTIVE", objective: "OUTCOME_SALES", adAccountId: "1", workspaceId: "ws" } as any],
-      [{ campaignId: "c1", spend: 200, impressions: 4000, clicks: 80, conversions: 10, revenue: 600 }],
+      [
+        {
+          id: "c1",
+          name: "X",
+          status: "ACTIVE",
+          objective: "OUTCOME_SALES",
+          adAccountId: "1",
+          workspaceId: "ws",
+        } as any,
+      ],
+      [
+        {
+          campaignId: "c1",
+          spend: 200,
+          impressions: 4000,
+          clicks: 80,
+          conversions: 10,
+          revenue: 600,
+        },
+      ],
     );
     // Mock prior-period totals
     const qb = insightRepo.createQueryBuilder();
@@ -159,8 +280,26 @@ describe("MetaAuditService", () => {
 
   it("returns priorTotals.spend = 0 and deltas.spendPct = null when no prior data exists", async () => {
     withFixture(
-      [{ id: "c1", name: "X", status: "ACTIVE", objective: "OUTCOME_SALES", adAccountId: "1", workspaceId: "ws" } as any],
-      [{ campaignId: "c1", spend: 50, impressions: 1000, clicks: 20, conversions: 0, revenue: 0 }],
+      [
+        {
+          id: "c1",
+          name: "X",
+          status: "ACTIVE",
+          objective: "OUTCOME_SALES",
+          adAccountId: "1",
+          workspaceId: "ws",
+        } as any,
+      ],
+      [
+        {
+          campaignId: "c1",
+          spend: 50,
+          impressions: 1000,
+          clicks: 20,
+          conversions: 0,
+          revenue: 0,
+        },
+      ],
     );
     const r = await service.runAudit("ws", 30);
     expect(r.priorTotals.spend).toBe(0);
@@ -170,9 +309,25 @@ describe("MetaAuditService", () => {
   it("yields a low score and 'poor' label when critical issues stack up", async () => {
     withFixture(
       [
-        { id: "a", name: "Disaster", status: "ACTIVE", objective: "OUTCOME_SALES", adAccountId: "1", workspaceId: "ws" } as any,
+        {
+          id: "a",
+          name: "Disaster",
+          status: "ACTIVE",
+          objective: "OUTCOME_SALES",
+          adAccountId: "1",
+          workspaceId: "ws",
+        } as any,
       ],
-      [{ campaignId: "a", spend: 500, impressions: 100000, clicks: 100, conversions: 0, revenue: 0 }],
+      [
+        {
+          campaignId: "a",
+          spend: 500,
+          impressions: 100000,
+          clicks: 100,
+          conversions: 0,
+          revenue: 0,
+        },
+      ],
     );
     const r = await service.runAudit("ws", 30);
     expect(r.score).toBeLessThan(50);

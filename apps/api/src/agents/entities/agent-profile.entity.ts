@@ -80,25 +80,52 @@ export class AgentProfile {
   avatar: string | null;
 
   /** Background gradient for avatar card */
-  @Column({ type: "varchar", length: 100, nullable: true, name: "avatar_color" })
+  @Column({
+    type: "varchar",
+    length: 100,
+    nullable: true,
+    name: "avatar_color",
+  })
   avatarColor: string | null;
 
   @Column({ type: "varchar", length: 100, nullable: true })
   location: string | null;
 
-  @Column({ type: "varchar", length: 50, nullable: true, name: "response_time" })
+  @Column({
+    type: "varchar",
+    length: 50,
+    nullable: true,
+    name: "response_time",
+  })
   responseTime: string | null;
 
   // ─── Pricing ──────────────────────────────────────────────────────────────
 
-  @Column({ type: "decimal", precision: 10, scale: 2, default: 0, name: "monthly_rate" })
+  @Column({
+    type: "decimal",
+    precision: 10,
+    scale: 2,
+    default: 0,
+    name: "monthly_rate",
+  })
   monthlyRate: number;
 
   /** % of managed ad spend (e.g. 8 = 8%) */
-  @Column({ type: "decimal", precision: 5, scale: 2, default: 0, name: "commission_rate" })
+  @Column({
+    type: "decimal",
+    precision: 5,
+    scale: 2,
+    default: 0,
+    name: "commission_rate",
+  })
   commissionRate: number;
 
-  @Column({ type: "varchar", length: 20, default: "fixed", name: "pricing_model" })
+  @Column({
+    type: "varchar",
+    length: 20,
+    default: "fixed",
+    name: "pricing_model",
+  })
   pricingModel: PricingModel;
 
   @Column({ type: "varchar", length: 10, default: "USD" })
@@ -108,7 +135,13 @@ export class AgentProfile {
    * AdSpectr platform commission (% of what client pays that goes to AdSpectr).
    * For human agents: default 15%. For owned AI agents: default 20%.
    */
-  @Column({ type: "decimal", precision: 5, scale: 2, default: 15, name: "platform_commission_pct" })
+  @Column({
+    type: "decimal",
+    precision: 5,
+    scale: 2,
+    default: 15,
+    name: "platform_commission_pct",
+  })
   platformCommissionPct: number;
 
   // ─── Status ───────────────────────────────────────────────────────────────
@@ -144,7 +177,13 @@ export class AgentProfile {
   @Column({ type: "jsonb", nullable: true, name: "cached_stats" })
   cachedStats: AgentStats | null;
 
-  @Column({ type: "decimal", precision: 3, scale: 2, default: 0, name: "cached_rating" })
+  @Column({
+    type: "decimal",
+    precision: 3,
+    scale: 2,
+    default: 0,
+    name: "cached_rating",
+  })
   cachedRating: number;
 
   @Column({ type: "int", default: 0, name: "cached_review_count" })
@@ -153,7 +192,12 @@ export class AgentProfile {
   // ─── Monthly Performance History ─────────────────────────────────────────
 
   @Column({ type: "jsonb", nullable: true, name: "monthly_performance" })
-  monthlyPerformance: Array<{ month: string; roas: number; spend: number; campaigns: number }> | null;
+  monthlyPerformance: Array<{
+    month: string;
+    roas: number;
+    spend: number;
+    campaigns: number;
+  }> | null;
 
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
@@ -163,7 +207,12 @@ export class AgentProfile {
 
   // ─── Marketplace Relations ──────────────────────────────────────────────────
 
-  @Column({ type: "varchar", length: 50, default: "unverified", name: "certification_level" })
+  @Column({
+    type: "varchar",
+    length: 50,
+    default: "unverified",
+    name: "certification_level",
+  })
   certificationLevel: "unverified" | "self_declared" | "verified" | "premium";
 
   @Column({ nullable: true, name: "verification_level_updated_at" })
@@ -172,10 +221,20 @@ export class AgentProfile {
   @Column({ nullable: true, name: "verified_by_admin" })
   verifiedByAdmin: string | null;
 
-  @Column({ type: "text", array: true, nullable: true, name: "primary_countries" })
+  @Column({
+    type: "text",
+    array: true,
+    nullable: true,
+    name: "primary_countries",
+  })
   primaryCountries: string[] | null;
 
-  @Column({ type: "text", array: true, nullable: true, name: "supported_languages" })
+  @Column({
+    type: "text",
+    array: true,
+    nullable: true,
+    name: "supported_languages",
+  })
   supportedLanguages: string[] | null;
 
   @Column({ nullable: true })
@@ -184,7 +243,12 @@ export class AgentProfile {
   @Column({ nullable: true, name: "last_performance_sync" })
   lastPerformanceSync: Date | null;
 
-  @Column({ type: "varchar", length: 20, default: "never_synced", name: "performance_sync_status" })
+  @Column({
+    type: "varchar",
+    length: 20,
+    default: "never_synced",
+    name: "performance_sync_status",
+  })
   performanceSyncStatus: "healthy" | "stale" | "failed" | "never_synced";
 
   @Column({ default: false, name: "is_performance_data_verified" })
@@ -202,13 +266,29 @@ export class AgentProfile {
   @Column({ type: "jsonb", nullable: true, name: "specializations" })
   specializations: { primary?: string[]; secondary?: string[] } | null;
 
-  @Column({ type: "text", array: true, nullable: true, name: "industries_served" })
+  @Column({
+    type: "text",
+    array: true,
+    nullable: true,
+    name: "industries_served",
+  })
   industriesServed: string[] | null;
 
-  @Column({ type: "decimal", precision: 5, scale: 1, nullable: true, name: "average_response_time_hours" })
+  @Column({
+    type: "decimal",
+    precision: 5,
+    scale: 1,
+    nullable: true,
+    name: "average_response_time_hours",
+  })
   averageResponseTimeHours: number | null;
 
-  @Column({ type: "text", array: true, nullable: true, name: "communication_channels" })
+  @Column({
+    type: "text",
+    array: true,
+    nullable: true,
+    name: "communication_channels",
+  })
   communicationChannels: string[] | null;
 
   @Column({ type: "time", nullable: true, name: "timezone_availability_start" })
@@ -220,10 +300,22 @@ export class AgentProfile {
   @Column({ nullable: true, name: "search_keywords" })
   searchKeywords: string | null;
 
-  @Column({ type: "decimal", precision: 8, scale: 2, default: 0, name: "popularity_score" })
+  @Column({
+    type: "decimal",
+    precision: 8,
+    scale: 2,
+    default: 0,
+    name: "popularity_score",
+  })
   popularityScore: number;
 
-  @Column({ type: "decimal", precision: 3, scale: 2, default: 0, name: "fraud_risk_score" })
+  @Column({
+    type: "decimal",
+    precision: 3,
+    scale: 2,
+    default: 0,
+    name: "fraud_risk_score",
+  })
   fraudRiskScore: number;
 
   // ─── Relations ───────────────────────────────────────────────────────────────

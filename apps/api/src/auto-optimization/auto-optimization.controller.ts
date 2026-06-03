@@ -9,8 +9,8 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
-} from '@nestjs/common';
-import type { Request } from 'express';
+} from "@nestjs/common";
+import type { Request } from "express";
 import {
   ApiTags,
   ApiBearerAuth,
@@ -18,14 +18,14 @@ import {
   ApiResponse,
   ApiParam,
   ApiQuery,
-} from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
-import { AutoOptimizationService } from './auto-optimization.service';
-import { RunOptimizationDto } from './dto/run-optimization.dto';
+} from "@nestjs/swagger";
+import { AuthGuard } from "@nestjs/passport";
+import { AutoOptimizationService } from "./auto-optimization.service";
+import { RunOptimizationDto } from "./dto/run-optimization.dto";
 
-@ApiTags('Auto-Optimization')
-@Controller('auto-optimization')
-@UseGuards(AuthGuard('jwt'))
+@ApiTags("Auto-Optimization")
+@Controller("auto-optimization")
+@UseGuards(AuthGuard("jwt"))
 @ApiBearerAuth()
 export class AutoOptimizationController {
   constructor(private readonly autoOpt: AutoOptimizationService) {}
@@ -40,19 +40,22 @@ export class AutoOptimizationController {
    * - Actions that were auto-applied (in auto_apply mode)
    * - Full optimization metadata
    */
-  @Post('workspaces/:workspaceId/run')
+  @Post("workspaces/:workspaceId/run")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: 'Run auto-optimization for a campaign',
+    summary: "Run auto-optimization for a campaign",
     description:
-      'Analyzes campaign performance using rules + AI, ranks recommended actions, ' +
-      'and optionally generates creative refresh concepts. ' +
-      'In auto_apply mode, low-risk content actions are executed automatically.',
+      "Analyzes campaign performance using rules + AI, ranks recommended actions, " +
+      "and optionally generates creative refresh concepts. " +
+      "In auto_apply mode, low-risk content actions are executed automatically.",
   })
-  @ApiParam({ name: 'workspaceId', description: 'Workspace UUID' })
-  @ApiResponse({ status: 200, description: 'Optimization report with ranked actions' })
+  @ApiParam({ name: "workspaceId", description: "Workspace UUID" })
+  @ApiResponse({
+    status: 200,
+    description: "Optimization report with ranked actions",
+  })
   async run(
-    @Param('workspaceId') workspaceId: string,
+    @Param("workspaceId") workspaceId: string,
     @Body() dto: RunOptimizationDto,
     @Req() req: Request,
   ) {
@@ -63,21 +66,28 @@ export class AutoOptimizationController {
    * Retrieve optimization history for a workspace.
    * Supports pagination via ?limit= query parameter.
    */
-  @Get('workspaces/:workspaceId/history')
+  @Get("workspaces/:workspaceId/history")
   @ApiOperation({
-    summary: 'Fetch optimization run history',
-    description: 'Returns the most recent optimization runs for a workspace, newest first.',
+    summary: "Fetch optimization run history",
+    description:
+      "Returns the most recent optimization runs for a workspace, newest first.",
   })
-  @ApiParam({ name: 'workspaceId', description: 'Workspace UUID' })
+  @ApiParam({ name: "workspaceId", description: "Workspace UUID" })
   @ApiQuery({
-    name: 'limit', required: false, type: Number,
-    description: 'Max number of runs to return (default: 10)',
+    name: "limit",
+    required: false,
+    type: Number,
+    description: "Max number of runs to return (default: 10)",
   })
   async history(
-    @Param('workspaceId') workspaceId: string,
+    @Param("workspaceId") workspaceId: string,
     @Req() req: Request,
-    @Query('limit') limit?: number,
+    @Query("limit") limit?: number,
   ) {
-    return this.autoOpt.getHistory(workspaceId, (req.user as any).id, limit ? Number(limit) : 10);
+    return this.autoOpt.getHistory(
+      workspaceId,
+      (req.user as any).id,
+      limit ? Number(limit) : 10,
+    );
   }
 }

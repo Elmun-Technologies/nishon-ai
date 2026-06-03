@@ -9,7 +9,10 @@ import {
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 
-import { MetaPerformanceSyncService, PerformanceSyncResult } from "../integrations/meta-sync.service";
+import {
+  MetaPerformanceSyncService,
+  PerformanceSyncResult,
+} from "../integrations/meta-sync.service";
 import { GooglePerformanceSyncService } from "../integrations/google-sync.service";
 import { YandexPerformanceSyncService } from "../integrations/yandex-sync.service";
 import { AgentProfile } from "../entities/agent-profile.entity";
@@ -93,7 +96,9 @@ export class MarketplaceAdminService {
         message: "Specialist not found for sync",
         agentProfileId,
       });
-      throw new NotFoundException(`Specialist profile ${agentProfileId} not found`);
+      throw new NotFoundException(
+        `Specialist profile ${agentProfileId} not found`,
+      );
     }
 
     // ──── Step 2: Validate platform ─────────────────────────────────────────
@@ -121,37 +126,54 @@ export class MarketplaceAdminService {
       // ──── Step 3: Route to platform service ─────────────────────────────────
       switch (normalizedPlatform) {
         case "meta":
-          syncResult = await this.metaSync.syncSpecialistMetrics(agentProfileId, workspaceId || "", {
-            dayLookback: 30,
-            forceRefresh,
-            dryRun: false,
-          });
+          syncResult = await this.metaSync.syncSpecialistMetrics(
+            agentProfileId,
+            workspaceId || "",
+            {
+              dayLookback: 30,
+              forceRefresh,
+              dryRun: false,
+            },
+          );
           break;
 
         case "google":
-          syncResult = await this.googleSync.syncSpecialistMetrics(agentProfileId, workspaceId || "", {
-            dayLookback: 30,
-            forceRefresh,
-            dryRun: false,
-          });
+          syncResult = await this.googleSync.syncSpecialistMetrics(
+            agentProfileId,
+            workspaceId || "",
+            {
+              dayLookback: 30,
+              forceRefresh,
+              dryRun: false,
+            },
+          );
           break;
 
         case "yandex":
-          syncResult = await this.yandexSync.syncSpecialistMetrics(agentProfileId, workspaceId || "", {
-            dayLookback: 30,
-            forceRefresh,
-            dryRun: false,
-          });
+          syncResult = await this.yandexSync.syncSpecialistMetrics(
+            agentProfileId,
+            workspaceId || "",
+            {
+              dayLookback: 30,
+              forceRefresh,
+              dryRun: false,
+            },
+          );
           break;
 
         default:
-          throw new InternalServerErrorException(`Unknown platform: ${normalizedPlatform}`);
+          throw new InternalServerErrorException(
+            `Unknown platform: ${normalizedPlatform}`,
+          );
       }
 
       // ──── Step 4: Verify sync result ────────────────────────────────────────
       const verificationResult = await this.verifySyncResult(syncResult);
 
-      if (!verificationResult.isValid && verificationResult.fraudRiskScore > 70) {
+      if (
+        !verificationResult.isValid &&
+        verificationResult.fraudRiskScore > 70
+      ) {
         this.logger.warn({
           message: "Sync verification flagged high fraud risk",
           agentProfileId,
@@ -164,10 +186,11 @@ export class MarketplaceAdminService {
       // ──── Step 5: Log the sync ──────────────────────────────────────────────
       const syncLog = this.syncLogRepo.create({
         agentProfileId,
-        syncType: normalizedPlatform as 'meta' | 'google' | 'yandex' | 'manual',
+        syncType: normalizedPlatform as "meta" | "google" | "yandex" | "manual",
         status: syncResult.success ? "completed" : "failed",
         recordsSynced: syncResult.metricsInserted + syncResult.metricsUpdated,
-        errorMessage: syncResult.errors.length > 0 ? syncResult.errors[0] : null,
+        errorMessage:
+          syncResult.errors.length > 0 ? syncResult.errors[0] : null,
         startedAt: new Date(),
         completedAt: new Date(),
       });
@@ -200,7 +223,7 @@ export class MarketplaceAdminService {
       // Log the sync failure
       const syncLog = this.syncLogRepo.create({
         agentProfileId,
-        syncType: normalizedPlatform as 'meta' | 'google' | 'yandex' | 'manual',
+        syncType: normalizedPlatform as "meta" | "google" | "yandex" | "manual",
         status: "failed",
         recordsSynced: 0,
         errorMessage,
@@ -219,7 +242,10 @@ export class MarketplaceAdminService {
       });
 
       // Re-throw with proper HTTP exception
-      if (err instanceof NotFoundException || err instanceof BadRequestException) {
+      if (
+        err instanceof NotFoundException ||
+        err instanceof BadRequestException
+      ) {
         throw err;
       }
 
@@ -326,7 +352,9 @@ export class MarketplaceAdminService {
       lastSyncAt: log.startedAt ?? log.createdAt,
       recordsCount: log.recordsSynced ?? 0,
       errorMessage: log.errorMessage ?? undefined,
-      nextScheduledSync: this.calculateNextSyncDate(log.startedAt ?? log.createdAt),
+      nextScheduledSync: this.calculateNextSyncDate(
+        log.startedAt ?? log.createdAt,
+      ),
     }));
 
     this.logger.log({
@@ -353,9 +381,9 @@ export class MarketplaceAdminService {
   }): Promise<MarketplaceCertification> {
     const slug = dto.name
       .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/[^a-z0-9\s-]/g, "")
       .trim()
-      .replace(/\s+/g, '-');
+      .replace(/\s+/g, "-");
 
     const existing = await this.certificationRepo.findOne({ where: { slug } });
     if (existing) {
@@ -368,7 +396,7 @@ export class MarketplaceAdminService {
       issuer: dto.issuer,
       description: dto.description ?? null,
       iconUrl: dto.iconUrl ?? null,
-      badgeColor: dto.badgeColor ?? '#6366f1',
+      badgeColor: dto.badgeColor ?? "#6366f1",
       isActive: true,
     });
 
@@ -386,7 +414,7 @@ export class MarketplaceAdminService {
     certificationId: string,
     dto: { verified: boolean; expiresAt?: string },
     adminId: string,
-  ): Promise<{ status: 'verified' | 'rejected'; expiresAt?: string }> {
+  ): Promise<{ status: "verified" | "rejected"; expiresAt?: string }> {
     const agentCert = await this.agentCertificationRepo.findOne({
       where: { agentProfileId, certificationId },
     });
@@ -397,7 +425,7 @@ export class MarketplaceAdminService {
       );
     }
 
-    agentCert.verificationStatus = dto.verified ? 'approved' : 'rejected';
+    agentCert.verificationStatus = dto.verified ? "approved" : "rejected";
     agentCert.verified = dto.verified;
     agentCert.verifiedAt = dto.verified ? new Date() : null;
     agentCert.verifiedBy = adminId;
@@ -410,7 +438,7 @@ export class MarketplaceAdminService {
     );
 
     return {
-      status: dto.verified ? 'verified' : 'rejected',
+      status: dto.verified ? "verified" : "rejected",
       expiresAt: agentCert.expiresAt?.toISOString(),
     };
   }

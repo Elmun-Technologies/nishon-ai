@@ -132,9 +132,13 @@ export class AuthService {
     if (!user) throw new UnauthorizedException("User not found");
 
     if (patch.email && patch.email !== user.email) {
-      const exists = await this.userRepo.findOne({ where: { email: patch.email } });
+      const exists = await this.userRepo.findOne({
+        where: { email: patch.email },
+      });
       if (exists && exists.id !== userId) {
-        throw new ConflictException("An account with this email already exists");
+        throw new ConflictException(
+          "An account with this email already exists",
+        );
       }
       user.email = patch.email;
     }
@@ -173,21 +177,25 @@ export class AuthService {
         // Link Google to existing account
         await this.userRepo.update(user.id, {
           googleId: profile.googleId,
-          picture:  profile.picture ?? user.picture,
+          picture: profile.picture ?? user.picture,
         });
-        const reloaded = await this.userRepo.findOne({ where: { id: user.id } });
+        const reloaded = await this.userRepo.findOne({
+          where: { id: user.id },
+        });
         if (!reloaded) {
-          throw new UnauthorizedException("User disappeared after Google link update");
+          throw new UnauthorizedException(
+            "User disappeared after Google link update",
+          );
         }
         user = reloaded;
       } else {
         // Create a brand-new user
         user = await this.userRepo.save(
           this.userRepo.create({
-            email:    profile.email,
-            name:     profile.name,
+            email: profile.email,
+            name: profile.name,
             googleId: profile.googleId,
-            picture:  profile.picture ?? null,
+            picture: profile.picture ?? null,
             password: null,
             trialEndsAt: trialEndsAtFromNow(),
           }),
@@ -205,28 +213,34 @@ export class AuthService {
     name: string;
     picture?: string;
   }): Promise<AuthResponseDto> {
-    let user = await this.userRepo.findOne({ where: { facebookId: profile.facebookId } });
+    let user = await this.userRepo.findOne({
+      where: { facebookId: profile.facebookId },
+    });
 
     if (!user) {
       user = await this.userRepo.findOne({ where: { email: profile.email } });
       if (user) {
         await this.userRepo.update(user.id, {
           facebookId: profile.facebookId,
-          picture:    profile.picture ?? user.picture,
+          picture: profile.picture ?? user.picture,
         });
-        const reloaded = await this.userRepo.findOne({ where: { id: user.id } });
+        const reloaded = await this.userRepo.findOne({
+          where: { id: user.id },
+        });
         if (!reloaded) {
-          throw new UnauthorizedException("User disappeared after Facebook link update");
+          throw new UnauthorizedException(
+            "User disappeared after Facebook link update",
+          );
         }
         user = reloaded;
       } else {
         user = await this.userRepo.save(
           this.userRepo.create({
-            email:      profile.email,
-            name:       profile.name,
+            email: profile.email,
+            name: profile.name,
             facebookId: profile.facebookId,
-            picture:    profile.picture ?? null,
-            password:   null,
+            picture: profile.picture ?? null,
+            password: null,
             trialEndsAt: trialEndsAtFromNow(),
           }),
         );

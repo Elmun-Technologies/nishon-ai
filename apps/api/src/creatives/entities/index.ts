@@ -1,2 +1,2 @@
-export { Creative } from './creative.entity'
-export { CreativePerformance } from './creative-performance.entity'
+export { Creative } from "./creative.entity";
+export { CreativePerformance } from "./creative-performance.entity";

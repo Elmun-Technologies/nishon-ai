@@ -105,7 +105,9 @@ describe("MarketplaceCronService", () => {
     workspaceRepo = module.get<Repository<Workspace>>(
       getRepositoryToken(Workspace),
     );
-    metaSync = module.get<MetaPerformanceSyncService>(MetaPerformanceSyncService);
+    metaSync = module.get<MetaPerformanceSyncService>(
+      MetaPerformanceSyncService,
+    );
     googleSync = module.get<GooglePerformanceSyncService>(
       GooglePerformanceSyncService,
     );
@@ -123,8 +125,16 @@ describe("MarketplaceCronService", () => {
     it("should sync all platforms for all workspaces", async () => {
       // Arrange
       const mockWorkspaces: Workspace[] = [
-        { id: "ws-1", name: "Workspace 1", isActive: true } as unknown as Workspace,
-        { id: "ws-2", name: "Workspace 2", isActive: true } as unknown as Workspace,
+        {
+          id: "ws-1",
+          name: "Workspace 1",
+          isActive: true,
+        } as unknown as Workspace,
+        {
+          id: "ws-2",
+          name: "Workspace 2",
+          isActive: true,
+        } as unknown as Workspace,
       ];
 
       jest.spyOn(workspaceRepo, "find").mockResolvedValue(mockWorkspaces);
@@ -170,7 +180,11 @@ describe("MarketplaceCronService", () => {
     it("should continue syncing other platforms if one fails", async () => {
       // Arrange
       const mockWorkspaces: Workspace[] = [
-        { id: "ws-1", name: "Workspace 1", isActive: true } as unknown as Workspace,
+        {
+          id: "ws-1",
+          name: "Workspace 1",
+          isActive: true,
+        } as unknown as Workspace,
       ];
 
       jest.spyOn(workspaceRepo, "find").mockResolvedValue(mockWorkspaces);
@@ -195,8 +209,16 @@ describe("MarketplaceCronService", () => {
     it("should continue with next workspace if one fails", async () => {
       // Arrange
       const mockWorkspaces: Workspace[] = [
-        { id: "ws-1", name: "Workspace 1", isActive: true } as unknown as Workspace,
-        { id: "ws-2", name: "Workspace 2", isActive: true } as unknown as Workspace,
+        {
+          id: "ws-1",
+          name: "Workspace 1",
+          isActive: true,
+        } as unknown as Workspace,
+        {
+          id: "ws-2",
+          name: "Workspace 2",
+          isActive: true,
+        } as unknown as Workspace,
       ];
 
       jest.spyOn(workspaceRepo, "find").mockResolvedValue(mockWorkspaces);
@@ -224,7 +246,11 @@ describe("MarketplaceCronService", () => {
     it("should collect metrics from all platforms", async () => {
       // Arrange
       const mockWorkspaces: Workspace[] = [
-        { id: "ws-1", name: "Workspace 1", isActive: true } as unknown as Workspace,
+        {
+          id: "ws-1",
+          name: "Workspace 1",
+          isActive: true,
+        } as unknown as Workspace,
       ];
 
       jest.spyOn(workspaceRepo, "find").mockResolvedValue(mockWorkspaces);
@@ -257,7 +283,11 @@ describe("MarketplaceCronService", () => {
     it("should perform deep validation with 90-day lookback", async () => {
       // Arrange
       const mockWorkspaces: Workspace[] = [
-        { id: "ws-1", name: "Workspace 1", isActive: true } as unknown as Workspace,
+        {
+          id: "ws-1",
+          name: "Workspace 1",
+          isActive: true,
+        } as unknown as Workspace,
       ];
 
       jest.spyOn(workspaceRepo, "find").mockResolvedValue(mockWorkspaces);
@@ -292,7 +322,11 @@ describe("MarketplaceCronService", () => {
     it("should use force refresh and 90-day lookback for deep validation", async () => {
       // Arrange
       const mockWorkspaces: Workspace[] = [
-        { id: "ws-1", name: "Workspace 1", isActive: true } as unknown as Workspace,
+        {
+          id: "ws-1",
+          name: "Workspace 1",
+          isActive: true,
+        } as unknown as Workspace,
       ];
 
       jest.spyOn(workspaceRepo, "find").mockResolvedValue(mockWorkspaces);
@@ -320,8 +354,16 @@ describe("MarketplaceCronService", () => {
     it("should process multiple workspaces independently", async () => {
       // Arrange
       const mockWorkspaces: Workspace[] = [
-        { id: "ws-1", name: "Workspace 1", isActive: true } as unknown as Workspace,
-        { id: "ws-2", name: "Workspace 2", isActive: true } as unknown as Workspace,
+        {
+          id: "ws-1",
+          name: "Workspace 1",
+          isActive: true,
+        } as unknown as Workspace,
+        {
+          id: "ws-2",
+          name: "Workspace 2",
+          isActive: true,
+        } as unknown as Workspace,
       ];
 
       jest.spyOn(workspaceRepo, "find").mockResolvedValue(mockWorkspaces);
@@ -339,16 +381,34 @@ describe("MarketplaceCronService", () => {
       await service.handleWeeklyDeepValidation();
 
       // Assert - Both workspaces should be processed
-      expect(metaSync.syncAllSpecialists).toHaveBeenCalledWith("ws-1", expect.any(Object));
-      expect(metaSync.syncAllSpecialists).toHaveBeenCalledWith("ws-2", expect.any(Object));
+      expect(metaSync.syncAllSpecialists).toHaveBeenCalledWith(
+        "ws-1",
+        expect.any(Object),
+      );
+      expect(metaSync.syncAllSpecialists).toHaveBeenCalledWith(
+        "ws-2",
+        expect.any(Object),
+      );
     });
 
     it("should process multiple workspaces with full refresh", async () => {
       // Arrange
       const mockWorkspaces: Workspace[] = [
-        { id: "ws-1", name: "Workspace 1", isActive: true } as unknown as Workspace,
-        { id: "ws-2", name: "Workspace 2", isActive: true } as unknown as Workspace,
-        { id: "ws-3", name: "Workspace 3", isActive: true } as unknown as Workspace,
+        {
+          id: "ws-1",
+          name: "Workspace 1",
+          isActive: true,
+        } as unknown as Workspace,
+        {
+          id: "ws-2",
+          name: "Workspace 2",
+          isActive: true,
+        } as unknown as Workspace,
+        {
+          id: "ws-3",
+          name: "Workspace 3",
+          isActive: true,
+        } as unknown as Workspace,
       ];
 
       jest.spyOn(workspaceRepo, "find").mockResolvedValue(mockWorkspaces);
@@ -380,15 +440,17 @@ describe("MarketplaceCronService", () => {
         .mockRejectedValue(new Error("Database error"));
 
       // Act & Assert - Should not throw
-      await expect(
-        service.handleDailyPerformanceSync(),
-      ).resolves.not.toThrow();
+      await expect(service.handleDailyPerformanceSync()).resolves.not.toThrow();
     });
 
     it("should handle all three platforms failing for a workspace", async () => {
       // Arrange
       const mockWorkspaces: Workspace[] = [
-        { id: "ws-1", name: "Workspace 1", isActive: true } as unknown as Workspace,
+        {
+          id: "ws-1",
+          name: "Workspace 1",
+          isActive: true,
+        } as unknown as Workspace,
       ];
 
       jest.spyOn(workspaceRepo, "find").mockResolvedValue(mockWorkspaces);
@@ -403,9 +465,7 @@ describe("MarketplaceCronService", () => {
         .mockRejectedValue(new Error("Yandex error"));
 
       // Act & Assert - Should not throw
-      await expect(
-        service.handleDailyPerformanceSync(),
-      ).resolves.not.toThrow();
+      await expect(service.handleDailyPerformanceSync()).resolves.not.toThrow();
     });
   });
 
@@ -427,23 +487,31 @@ describe("MarketplaceCronService", () => {
     it("should aggregate records synced across all results", async () => {
       // Arrange
       const mockWorkspaces: Workspace[] = [
-        { id: "ws-1", name: "Workspace 1", isActive: true } as unknown as Workspace,
+        {
+          id: "ws-1",
+          name: "Workspace 1",
+          isActive: true,
+        } as unknown as Workspace,
       ];
 
       jest.spyOn(workspaceRepo, "find").mockResolvedValue(mockWorkspaces);
 
-      const result1 = { ...mockSyncResult, metricsInserted: 10, metricsUpdated: 5 };
-      const result2 = { ...mockSyncResult, metricsInserted: 20, metricsUpdated: 10 };
+      const result1 = {
+        ...mockSyncResult,
+        metricsInserted: 10,
+        metricsUpdated: 5,
+      };
+      const result2 = {
+        ...mockSyncResult,
+        metricsInserted: 20,
+        metricsUpdated: 10,
+      };
 
       jest
         .spyOn(metaSync, "syncAllSpecialists")
         .mockResolvedValue([result1, result2]);
-      jest
-        .spyOn(googleSync, "syncAllSpecialists")
-        .mockResolvedValue([result1]);
-      jest
-        .spyOn(yandexSync, "syncAllSpecialists")
-        .mockResolvedValue([result2]);
+      jest.spyOn(googleSync, "syncAllSpecialists").mockResolvedValue([result1]);
+      jest.spyOn(yandexSync, "syncAllSpecialists").mockResolvedValue([result2]);
 
       // Act
       await service.handleDailyPerformanceSync();

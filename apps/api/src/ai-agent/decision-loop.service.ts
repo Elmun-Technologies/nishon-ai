@@ -75,7 +75,9 @@ export class DecisionLoopService {
         );
       }
     } else {
-      this.logger.warn("AI provider API key is not configured — AI decision loop will be unavailable");
+      this.logger.warn(
+        "AI provider API key is not configured — AI decision loop will be unavailable",
+      );
     }
   }
 
@@ -128,8 +130,8 @@ export class DecisionLoopService {
       `Analyze these campaign metrics and decide what actions to take:\n${JSON.stringify(performanceSummary, null, 2)}`,
       OPTIMIZATION_SYSTEM_PROMPT,
       {
-        taskType: 'optimization',
-        agentName: 'DecisionLoop',
+        taskType: "optimization",
+        agentName: "DecisionLoop",
         temperature: 0.2, // Very low temp — we want consistent, data-driven decisions
       },
     );
@@ -180,7 +182,9 @@ export class DecisionLoopService {
    *   4. Mark decision as executed
    */
   async executeDecision(decision: AiDecision): Promise<void> {
-    this.logger.log(`Executing decision: ${decision.actionType} (${decision.id})`);
+    this.logger.log(
+      `Executing decision: ${decision.actionType} (${decision.id})`,
+    );
 
     try {
       if (decision.campaignId) {
@@ -242,7 +246,9 @@ export class DecisionLoopService {
 
     const encryptionKey = this.config.get<string>("ENCRYPTION_KEY");
     if (!encryptionKey || encryptionKey.length !== 32) {
-      this.logger.error("ENCRYPTION_KEY is not set or is not 32 characters — cannot decrypt tokens");
+      this.logger.error(
+        "ENCRYPTION_KEY is not set or is not 32 characters — cannot decrypt tokens",
+      );
       return;
     }
     const accessToken = this.decryptToken(account.accessToken, encryptionKey);
@@ -253,23 +259,44 @@ export class DecisionLoopService {
     switch (decision.actionType) {
       case AiDecisionAction.PAUSE_AD:
       case AiDecisionAction.STOP_CAMPAIGN:
-        await this.pauseOnPlatform(platform, externalId, advertiserId, accessToken);
+        await this.pauseOnPlatform(
+          platform,
+          externalId,
+          advertiserId,
+          accessToken,
+        );
         break;
 
       case AiDecisionAction.SCALE_BUDGET:
-        await this.scaleBudgetOnPlatform(platform, externalId, advertiserId, accessToken, newBudget, account);
+        await this.scaleBudgetOnPlatform(
+          platform,
+          externalId,
+          advertiserId,
+          accessToken,
+          newBudget,
+          account,
+        );
         break;
 
       case AiDecisionAction.SHIFT_BUDGET:
         // Reduce budget by 20% — handled like a budget adjustment
         const reducedBudget = (campaign.dailyBudget ?? 0) * 0.8;
-        await this.scaleBudgetOnPlatform(platform, externalId, advertiserId, accessToken, reducedBudget, account);
+        await this.scaleBudgetOnPlatform(
+          platform,
+          externalId,
+          advertiserId,
+          accessToken,
+          reducedBudget,
+          account,
+        );
         break;
 
       default:
         // Actions like GENERATE_STRATEGY, ADJUST_TARGETING, ROTATE_CREATIVE
         // are informational — log them but don't call platform APIs
-        this.logger.log(`Decision type ${decision.actionType} noted (no direct API call)`);
+        this.logger.log(
+          `Decision type ${decision.actionType} noted (no direct API call)`,
+        );
         break;
     }
   }
@@ -283,10 +310,21 @@ export class DecisionLoopService {
     if (platform === Platform.META) {
       await this.metaConnector.pauseCampaign(externalId, accessToken);
     } else if (platform === Platform.GOOGLE) {
-      const [customerId, campaignId] = externalId.includes(":") ? externalId.split(":") : [advertiserId, externalId];
-      await this.googleConnector.updateCampaignStatus(customerId, accessToken, campaignId, "PAUSED");
+      const [customerId, campaignId] = externalId.includes(":")
+        ? externalId.split(":")
+        : [advertiserId, externalId];
+      await this.googleConnector.updateCampaignStatus(
+        customerId,
+        accessToken,
+        campaignId,
+        "PAUSED",
+      );
     } else if (platform === Platform.TIKTOK) {
-      await this.tiktokConnector.pauseCampaign(advertiserId, accessToken, externalId);
+      await this.tiktokConnector.pauseCampaign(
+        advertiserId,
+        accessToken,
+        externalId,
+      );
     }
     this.logger.log(`Paused campaign ${externalId} on ${platform}`);
   }
@@ -300,14 +338,32 @@ export class DecisionLoopService {
     _account: ConnectedAccount,
   ): Promise<void> {
     if (platform === Platform.META) {
-      await this.metaConnector.updateCampaignBudget(externalId, accessToken, newBudgetUsd);
+      await this.metaConnector.updateCampaignBudget(
+        externalId,
+        accessToken,
+        newBudgetUsd,
+      );
     } else if (platform === Platform.GOOGLE) {
-      const [customerId, budgetId] = externalId.includes(":") ? externalId.split(":") : [advertiserId, externalId];
-      await this.googleConnector.updateCampaignBudget(customerId, accessToken, budgetId, newBudgetUsd);
+      const [customerId, budgetId] = externalId.includes(":")
+        ? externalId.split(":")
+        : [advertiserId, externalId];
+      await this.googleConnector.updateCampaignBudget(
+        customerId,
+        accessToken,
+        budgetId,
+        newBudgetUsd,
+      );
     } else if (platform === Platform.TIKTOK) {
-      await this.tiktokConnector.updateCampaignBudget(advertiserId, accessToken, externalId, newBudgetUsd);
+      await this.tiktokConnector.updateCampaignBudget(
+        advertiserId,
+        accessToken,
+        externalId,
+        newBudgetUsd,
+      );
     }
-    this.logger.log(`Updated budget for campaign ${externalId} on ${platform} → $${newBudgetUsd}`);
+    this.logger.log(
+      `Updated budget for campaign ${externalId} on ${platform} → $${newBudgetUsd}`,
+    );
   }
 
   private decryptToken(encryptedText: string, encryptionKey: string): string {

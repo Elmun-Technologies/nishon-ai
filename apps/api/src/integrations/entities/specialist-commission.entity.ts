@@ -5,176 +5,176 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Index,
-} from 'typeorm'
+} from "typeorm";
 
 /**
  * Records commission earned by a specialist from closed deals
  * Tied to AmoCRM specialist assignment and configurable commission rates
  */
-@Entity('specialist_commissions')
-@Index(['workspaceId', 'amoCrmSpecialistId'])
-@Index(['workspaceId', 'dealClosedAt'])
-@Index(['status'])
-@Index(['periodStartDate', 'periodEndDate'])
+@Entity("specialist_commissions")
+@Index(["workspaceId", "amoCrmSpecialistId"])
+@Index(["workspaceId", "dealClosedAt"])
+@Index(["status"])
+@Index(["periodStartDate", "periodEndDate"])
 export class SpecialistCommission {
-  @PrimaryGeneratedColumn('uuid')
-  id: string
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
   /**
    * Workspace ID for multi-tenancy
    */
   @Column()
   @Index()
-  workspaceId: string
+  workspaceId: string;
 
   /**
    * Reference to IntegrationConnection
    */
   @Column()
-  connectionId: string
+  connectionId: string;
 
   /**
    * Reference to LinkedDeal (nullable - for historical records)
    */
   @Column({ nullable: true })
-  dealId: string
+  dealId: string;
 
   /**
    * AmoCRM specialist user ID
    */
   @Column()
   @Index()
-  amoCrmSpecialistId: number
+  amoCrmSpecialistId: number;
 
   /**
    * Specialist name (cached for display)
    */
   @Column()
-  specialistName: string
+  specialistName: string;
 
   /**
    * Deal value (in original currency)
    */
-  @Column('decimal', { precision: 12, scale: 2 })
-  dealValue: number
+  @Column("decimal", { precision: 12, scale: 2 })
+  dealValue: number;
 
   /**
    * Deal currency (USD, UZS, RUB, etc)
    */
-  @Column({ default: 'USD' })
-  dealCurrency: string
+  @Column({ default: "USD" })
+  dealCurrency: string;
 
   /**
    * Commission amount earned
    */
-  @Column('decimal', { precision: 12, scale: 2 })
-  commissionAmount: number
+  @Column("decimal", { precision: 12, scale: 2 })
+  commissionAmount: number;
 
   /**
    * Commission currency (usually same as deal)
    */
-  @Column({ default: 'USD' })
-  commissionCurrency: string
+  @Column({ default: "USD" })
+  commissionCurrency: string;
 
   /**
    * Commission rate applied (8.5 = 8.5%)
    */
-  @Column('decimal', { precision: 5, scale: 2 })
-  commissionRate: number
+  @Column("decimal", { precision: 5, scale: 2 })
+  commissionRate: number;
 
   /**
    * Specialist tier (affects base rate)
    */
   @Column({
-    type: 'enum',
-    enum: ['junior', 'senior', 'manager'],
-    default: 'senior',
+    type: "enum",
+    enum: ["junior", "senior", "manager"],
+    default: "senior",
   })
-  specialistTier: 'junior' | 'senior' | 'manager'
+  specialistTier: "junior" | "senior" | "manager";
 
   /**
    * Deal name from AmoCRM
    */
   @Column()
-  dealName: string
+  dealName: string;
 
   /**
    * When deal was closed/won
    */
   @Column()
-  dealClosedAt: Date
+  dealClosedAt: Date;
 
   /**
    * Commission period start date
    */
   @Column()
-  periodStartDate: Date
+  periodStartDate: Date;
 
   /**
    * Commission period end date
    */
   @Column()
-  periodEndDate: Date
+  periodEndDate: Date;
 
   /**
    * Commission status in approval workflow
    */
   @Column({
-    type: 'enum',
-    enum: ['pending', 'calculated', 'approved', 'paid', 'disputed'],
-    default: 'calculated',
+    type: "enum",
+    enum: ["pending", "calculated", "approved", "paid", "disputed"],
+    default: "calculated",
   })
-  status: 'pending' | 'calculated' | 'approved' | 'paid' | 'disputed'
+  status: "pending" | "calculated" | "approved" | "paid" | "disputed";
 
   /**
    * Admin user who approved the commission
    */
   @Column({ nullable: true })
-  approvedBy: string
+  approvedBy: string;
 
   /**
    * When commission was approved
    */
   @Column({ nullable: true })
-  approvedAt: Date
+  approvedAt: Date;
 
   /**
    * When commission was paid
    */
   @Column({ nullable: true })
-  paidAt: Date
+  paidAt: Date;
 
   /**
    * Payment method used
    */
   @Column({ nullable: true })
-  paymentMethod: string
+  paymentMethod: string;
 
   /**
    * Notes about commission (disputes, adjustments, etc)
    */
   @Column({ nullable: true })
-  notes: string
+  notes: string;
 
   /**
    * Additional metadata
    */
-  @Column('jsonb', { nullable: true, default: () => "'{}'" })
+  @Column("jsonb", { nullable: true, default: () => "'{}'" })
   metadata: {
-    source_campaign?: string
-    conversion_attribution?: string
-    performance_bonus_applied?: boolean
-    bonus_rate?: number
-    bonus_amount?: number
-    [key: string]: any
-  }
+    source_campaign?: string;
+    conversion_attribution?: string;
+    performance_bonus_applied?: boolean;
+    bonus_rate?: number;
+    bonus_amount?: number;
+    [key: string]: any;
+  };
 
   /**
    * Audit fields
    */
   @CreateDateColumn()
-  createdAt: Date
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date
+  updatedAt: Date;
 }

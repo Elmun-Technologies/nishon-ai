@@ -71,10 +71,20 @@ export class LandingPage {
   @Column({ type: "jsonb", nullable: true })
   settings: LandingPageSettings | null;
 
-  @Column({ type: "varchar", length: 64, nullable: true, name: "meta_pixel_id" })
+  @Column({
+    type: "varchar",
+    length: 64,
+    nullable: true,
+    name: "meta_pixel_id",
+  })
   metaPixelId: string | null;
 
-  @Column({ type: "varchar", length: 64, nullable: true, name: "google_analytics_id" })
+  @Column({
+    type: "varchar",
+    length: 64,
+    nullable: true,
+    name: "google_analytics_id",
+  })
   googleAnalyticsId: string | null;
 
   @Column({ default: false, name: "is_published" })

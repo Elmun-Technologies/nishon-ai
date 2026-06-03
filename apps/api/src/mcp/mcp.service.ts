@@ -79,7 +79,11 @@ export class McpService {
     };
   }
 
-  async revokeCredential(configId: string, workspaceId: string, userId: string) {
+  async revokeCredential(
+    configId: string,
+    workspaceId: string,
+    userId: string,
+  ) {
     await this.assertWriteAccess(workspaceId, userId);
 
     const config = await this.configRepo.findOne({
@@ -165,20 +169,29 @@ export class McpService {
   }
 
   private async assertReadAccess(workspaceId: string, userId: string) {
-    const workspace = await this.workspaceRepo.findOne({ where: { id: workspaceId } });
+    const workspace = await this.workspaceRepo.findOne({
+      where: { id: workspaceId },
+    });
     if (!workspace) throw new NotFoundException("Workspace not found");
     if (workspace.userId === userId) return;
 
-    const member = await this.memberRepo.findOne({ where: { workspaceId, userId } });
-    if (!member) throw new ForbiddenException("You do not have access to this workspace");
+    const member = await this.memberRepo.findOne({
+      where: { workspaceId, userId },
+    });
+    if (!member)
+      throw new ForbiddenException("You do not have access to this workspace");
   }
 
   private async assertWriteAccess(workspaceId: string, userId: string) {
-    const workspace = await this.workspaceRepo.findOne({ where: { id: workspaceId } });
+    const workspace = await this.workspaceRepo.findOne({
+      where: { id: workspaceId },
+    });
     if (!workspace) throw new NotFoundException("Workspace not found");
     if (workspace.userId === userId) return;
 
-    const member = await this.memberRepo.findOne({ where: { workspaceId, userId } });
+    const member = await this.memberRepo.findOne({
+      where: { workspaceId, userId },
+    });
     if (!member || (member.role !== "owner" && member.role !== "admin")) {
       throw new ForbiddenException("Owner or admin access is required");
     }

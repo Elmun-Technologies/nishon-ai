@@ -6,11 +6,11 @@ import {
   SubscribeMessage,
   MessageBody,
   ConnectedSocket,
-} from '@nestjs/websockets'
-import { Server, Socket } from 'socket.io'
-import { Logger } from '@nestjs/common'
-import { JwtService } from '@nestjs/jwt'
-import { ConfigService } from '@nestjs/config'
+} from "@nestjs/websockets";
+import { Server, Socket } from "socket.io";
+import { Logger } from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
+import { ConfigService } from "@nestjs/config";
 
 /**
  * EventsGateway — real-time WebSocket server.
@@ -29,28 +29,31 @@ import { ConfigService } from '@nestjs/config'
  */
 @WebSocketGateway({
   cors: {
-    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    origin: (
+      origin: string | undefined,
+      callback: (err: Error | null, allow?: boolean) => void,
+    ) => {
       // Allow requests with no origin (same-origin / server-side)
-      if (!origin) return callback(null, true)
-      const frontendUrl = process.env.FRONTEND_URL || ''
+      if (!origin) return callback(null, true);
+      const frontendUrl = process.env.FRONTEND_URL || "";
       const allowed = frontendUrl
-        .split(',')
+        .split(",")
         .map((u) => u.trim())
-        .filter(Boolean)
+        .filter(Boolean);
       if (allowed.length === 0 || allowed.includes(origin)) {
-        return callback(null, true)
+        return callback(null, true);
       }
-      callback(new Error(`Origin ${origin} not allowed`))
+      callback(new Error(`Origin ${origin} not allowed`));
     },
     credentials: true,
   },
-  transports: ['websocket', 'polling'],
+  transports: ["websocket", "polling"],
 })
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
-  server: Server
+  server: Server;
 
-  private readonly logger = new Logger(EventsGateway.name)
+  private readonly logger = new Logger(EventsGateway.name);
 
   constructor(
     private readonly jwtService: JwtService,
@@ -59,81 +62,89 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleConnection(client: Socket) {
     if (!this.authenticateSocket(client)) {
-      this.logger.warn(`Unauthorized WebSocket connection attempt: ${client.id}`)
-      client.emit('error', { message: 'Unauthorized' })
-      client.disconnect(true)
-      return
+      this.logger.warn(
+        `Unauthorized WebSocket connection attempt: ${client.id}`,
+      );
+      client.emit("error", { message: "Unauthorized" });
+      client.disconnect(true);
+      return;
     }
-    this.logger.log(`Client connected: ${client.id}`)
+    this.logger.log(`Client connected: ${client.id}`);
   }
 
   handleDisconnect(client: Socket) {
-    this.logger.log(`Client disconnected: ${client.id}`)
+    this.logger.log(`Client disconnected: ${client.id}`);
   }
 
   /** Client joins a workspace-specific room to receive workspace events */
-  @SubscribeMessage('join')
+  @SubscribeMessage("join")
   handleJoin(
     @MessageBody() data: { workspaceId: string },
     @ConnectedSocket() client: Socket,
   ) {
-    const userId = this.getUserIdFromSocket(client)
+    const userId = this.getUserIdFromSocket(client);
     if (!userId) {
-      client.emit('error', { message: 'Unauthorized' })
-      return
+      client.emit("error", { message: "Unauthorized" });
+      return;
     }
 
-    const room = `workspace:${data.workspaceId}`
-    client.join(room)
-    this.logger.log(`Client ${client.id} (user ${userId}) joined room ${room}`)
-    client.emit('joined', { room })
+    const room = `workspace:${data.workspaceId}`;
+    client.join(room);
+    this.logger.log(`Client ${client.id} (user ${userId}) joined room ${room}`);
+    client.emit("joined", { room });
   }
 
   /** Emit an event to all clients in a workspace room */
   emitToWorkspace(workspaceId: string, event: string, payload: any) {
-    this.server.to(`workspace:${workspaceId}`).emit(event, payload)
+    this.server.to(`workspace:${workspaceId}`).emit(event, payload);
   }
 
   /** Broadcast to ALL connected clients */
   broadcast(event: string, payload: any) {
-    this.server.emit(event, payload)
+    this.server.emit(event, payload);
   }
 
   private authenticateSocket(client: Socket): boolean {
     try {
-      const token = this.extractTokenFromSocket(client)
-      if (!token) return false
-      const secret = this.configService.get<string>('JWT_SECRET', '')
-      this.jwtService.verify(token, { secret })
-      return true
+      const token = this.extractTokenFromSocket(client);
+      if (!token) return false;
+      const secret = this.configService.get<string>("JWT_SECRET", "");
+      this.jwtService.verify(token, { secret });
+      return true;
     } catch {
-      return false
+      return false;
     }
   }
 
   private getUserIdFromSocket(client: Socket): string | null {
     try {
-      const token = this.extractTokenFromSocket(client)
-      if (!token) return null
-      const secret = this.configService.get<string>('JWT_SECRET', '')
-      const payload = this.jwtService.verify<{ sub: string }>(token, { secret })
-      return payload.sub
+      const token = this.extractTokenFromSocket(client);
+      if (!token) return null;
+      const secret = this.configService.get<string>("JWT_SECRET", "");
+      const payload = this.jwtService.verify<{ sub: string }>(token, {
+        secret,
+      });
+      return payload.sub;
     } catch {
-      return null
+      return null;
     }
   }
 
   private extractTokenFromSocket(client: Socket): string | null {
     // Try handshake auth.token first (preferred)
-    const authToken = (client.handshake as any)?.auth?.token as string | undefined
+    const authToken = (client.handshake as any)?.auth?.token as
+      | string
+      | undefined;
     if (authToken) {
-      return authToken.replace(/^Bearer\s+/i, '')
+      return authToken.replace(/^Bearer\s+/i, "");
     }
     // Fallback: Authorization header
-    const authHeader = client.handshake?.headers?.authorization as string | undefined
+    const authHeader = client.handshake?.headers?.authorization as
+      | string
+      | undefined;
     if (authHeader) {
-      return authHeader.replace(/^Bearer\s+/i, '')
+      return authHeader.replace(/^Bearer\s+/i, "");
     }
-    return null
+    return null;
   }
 }

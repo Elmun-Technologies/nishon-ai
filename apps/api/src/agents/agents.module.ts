@@ -57,7 +57,11 @@ import { MetaModule } from "../meta/meta.module";
       ConnectedAccount,
     ]),
   ],
-  controllers: [AgentsController, CertificationController, MarketplaceController],
+  controllers: [
+    AgentsController,
+    CertificationController,
+    MarketplaceController,
+  ],
   providers: [
     AgentsService,
     PerformanceSyncService,

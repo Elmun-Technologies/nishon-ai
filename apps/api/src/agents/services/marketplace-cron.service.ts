@@ -206,7 +206,9 @@ export class MarketplaceCronService {
       });
 
       if (workspaces.length === 0) {
-        this.logger.warn("No active workspaces found for weekly deep validation");
+        this.logger.warn(
+          "No active workspaces found for weekly deep validation",
+        );
         return;
       }
 
@@ -332,7 +334,10 @@ export class MarketplaceCronService {
         platform,
       });
 
-      const syncResults = await syncService.syncAllSpecialists(workspaceId, config);
+      const syncResults = await syncService.syncAllSpecialists(
+        workspaceId,
+        config,
+      );
 
       // Count total records synced across all specialists
       const totalRecords = syncResults.reduce(
@@ -344,7 +349,9 @@ export class MarketplaceCronService {
       result.recordsSynced = totalRecords;
 
       // Count specialists synced
-      const successfulSpecialists = syncResults.filter((r: any) => r.success).length;
+      const successfulSpecialists = syncResults.filter(
+        (r: any) => r.success,
+      ).length;
 
       this.logger.log({
         message: "Platform sync completed",
@@ -381,7 +388,10 @@ export class MarketplaceCronService {
    *
    * Example with 4 workspaces: [0 min, 15 min, 30 min, 45 min]
    */
-  private calculateStaggerOffset(workspaceId: string, totalWorkspaces: number): number {
+  private calculateStaggerOffset(
+    workspaceId: string,
+    totalWorkspaces: number,
+  ): number {
     // Simple hash to consistent number (0-totalWorkspaces-1)
     let hash = 0;
     for (let i = 0; i < workspaceId.length; i++) {

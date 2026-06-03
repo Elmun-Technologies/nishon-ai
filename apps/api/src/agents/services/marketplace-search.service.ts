@@ -251,10 +251,13 @@ export class MarketplaceSearchService {
 
       // Apply price range filter
       if (filters.priceRange) {
-        query = query.andWhere("ap.monthly_rate BETWEEN :minPrice AND :maxPrice", {
-          minPrice: filters.priceRange.min,
-          maxPrice: filters.priceRange.max,
-        });
+        query = query.andWhere(
+          "ap.monthly_rate BETWEEN :minPrice AND :maxPrice",
+          {
+            minPrice: filters.priceRange.min,
+            maxPrice: filters.priceRange.max,
+          },
+        );
       }
 
       // Apply verification filter
@@ -339,9 +342,7 @@ export class MarketplaceSearchService {
       const specialists = await query.getMany();
 
       // Get available filters for this result set
-      const availableFilters = await this.getAvailableFiltersInternal(
-        filters,
-      );
+      const availableFilters = await this.getAvailableFiltersInternal(filters);
 
       return {
         specialists,
@@ -475,23 +476,22 @@ export class MarketplaceSearchService {
       );
 
       // Get certifications with counts
-      const certificationsResult =
-        await this.marketplaceCertificationRepository
-          .createQueryBuilder("mc")
-          .select("mc.id, mc.name, mc.issuer")
-          .innerJoinAndSelect(
-            "mc.agentCertifications",
-            "ac",
-            "ac.verification_status = :status",
-            { status: "approved" },
-          )
-          .innerJoinAndSelect(
-            "ac.agentProfile",
-            "ap",
-            "ap.is_published = :isPublished AND ap.is_indexable = :isIndexable",
-            { isPublished: true, isIndexable: true },
-          )
-          .getRawMany();
+      const certificationsResult = await this.marketplaceCertificationRepository
+        .createQueryBuilder("mc")
+        .select("mc.id, mc.name, mc.issuer")
+        .innerJoinAndSelect(
+          "mc.agentCertifications",
+          "ac",
+          "ac.verification_status = :status",
+          { status: "approved" },
+        )
+        .innerJoinAndSelect(
+          "ac.agentProfile",
+          "ap",
+          "ap.is_published = :isPublished AND ap.is_indexable = :isIndexable",
+          { isPublished: true, isIndexable: true },
+        )
+        .getRawMany();
 
       const certificationCounts = await Promise.all(
         certificationsResult
@@ -532,8 +532,7 @@ export class MarketplaceSearchService {
       ];
 
       for (const range of priceRanges) {
-        const maxPrice =
-          range.max === Infinity ? 999999 : range.max;
+        const maxPrice = range.max === Infinity ? 999999 : range.max;
         range.count = await baseQuery
           .clone()
           .andWhere("ap.monthly_rate BETWEEN :min AND :max", {
@@ -684,9 +683,7 @@ export class MarketplaceSearchService {
       .getOne();
 
     if (!specialist) {
-      throw new NotFoundException(
-        `Specialist with slug '${slug}' not found`,
-      );
+      throw new NotFoundException(`Specialist with slug '${slug}' not found`);
     }
 
     return specialist;
@@ -704,9 +701,7 @@ export class MarketplaceSearchService {
     });
 
     if (!specialist) {
-      throw new NotFoundException(
-        `Specialist with slug '${slug}' not found`,
-      );
+      throw new NotFoundException(`Specialist with slug '${slug}' not found`);
     }
 
     // Get monthly performance data
@@ -720,9 +715,8 @@ export class MarketplaceSearchService {
       .limit(12)
       .getMany();
 
-    const aggregatedPlatformMetrics = this.aggregatePlatformMetrics(
-      platformMetrics,
-    );
+    const aggregatedPlatformMetrics =
+      this.aggregatePlatformMetrics(platformMetrics);
 
     return {
       slug,
@@ -756,8 +750,7 @@ export class MarketplaceSearchService {
       const keywords: string[] = [];
 
       // Add basic profile info
-      if (specialist.displayName)
-        keywords.push(specialist.displayName);
+      if (specialist.displayName) keywords.push(specialist.displayName);
       if (specialist.title) keywords.push(specialist.title);
       if (specialist.bio) keywords.push(specialist.bio);
 
@@ -772,10 +765,7 @@ export class MarketplaceSearchService {
       }
 
       // Add certifications
-      if (
-        specialist.certifications &&
-        specialist.certifications.length > 0
-      ) {
+      if (specialist.certifications && specialist.certifications.length > 0) {
         for (const cert of specialist.certifications) {
           if (cert.certification) {
             keywords.push(cert.certification.name);
@@ -812,9 +802,7 @@ export class MarketplaceSearchService {
       }
 
       // Create full-text search string
-      const searchKeywords = keywords
-        .filter((k) => k && k.trim())
-        .join(" ");
+      const searchKeywords = keywords.filter((k) => k && k.trim()).join(" ");
 
       // Update the search keywords field
       await this.agentProfileRepository.update(
@@ -824,9 +812,7 @@ export class MarketplaceSearchService {
         },
       );
 
-      this.logger.log(
-        `Updated search keywords for agent ${agentId}`,
-      );
+      this.logger.log(`Updated search keywords for agent ${agentId}`);
     } catch (error) {
       this.logger.error(
         `Failed to update search keywords for agent ${agentId}: ${error.message}`,
@@ -842,9 +828,7 @@ export class MarketplaceSearchService {
   @Cron(CronExpression.EVERY_DAY_AT_2AM)
   async updateAllSearchKeywords(): Promise<void> {
     try {
-      this.logger.log(
-        "Starting batch update of search keywords...",
-      );
+      this.logger.log("Starting batch update of search keywords...");
 
       const agents = await this.agentProfileRepository
         .createQueryBuilder("ap")
@@ -885,20 +869,22 @@ export class MarketplaceSearchService {
    */
   private applySorting(
     query: SelectQueryBuilder<AgentProfile>,
-    sortBy?: "rating" | "roas" | "price" | "experience" | "popularity" | "newest",
+    sortBy?:
+      | "rating"
+      | "roas"
+      | "price"
+      | "experience"
+      | "popularity"
+      | "newest",
   ): void {
     switch (sortBy) {
       case "rating":
-        query.orderBy("ap.cached_rating", "DESC").addOrderBy(
-          "ap.cached_review_count",
-          "DESC",
-        );
+        query
+          .orderBy("ap.cached_rating", "DESC")
+          .addOrderBy("ap.cached_review_count", "DESC");
         break;
       case "roas":
-        query.orderBy(
-          "(ap.cached_stats->>'avgROAS')::decimal",
-          "DESC",
-        );
+        query.orderBy("(ap.cached_stats->>'avgROAS')::decimal", "DESC");
         break;
       case "price":
         query.orderBy("ap.monthly_rate", "ASC");
@@ -907,10 +893,9 @@ export class MarketplaceSearchService {
         query.orderBy("ap.created_at", "ASC");
         break;
       case "popularity":
-        query.orderBy("ap.popularity_score", "DESC").addOrderBy(
-          "ap.cached_review_count",
-          "DESC",
-        );
+        query
+          .orderBy("ap.popularity_score", "DESC")
+          .addOrderBy("ap.cached_review_count", "DESC");
         break;
       case "newest":
         query.orderBy("ap.created_at", "DESC");
@@ -995,17 +980,13 @@ export class MarketplaceSearchService {
 
       aggregated[metric.platform].avgRoas += metric.avgRoas || 0;
       aggregated[metric.platform].avgCpa += metric.avgCpa || 0;
-      aggregated[metric.platform].totalSpend += Number(
-        metric.totalSpend,
-      ) || 0;
-      aggregated[metric.platform].campaignsCount +=
-        metric.campaignsCount || 0;
+      aggregated[metric.platform].totalSpend += Number(metric.totalSpend) || 0;
+      aggregated[metric.platform].campaignsCount += metric.campaignsCount || 0;
     }
 
     // Calculate averages
     return Object.values(aggregated).map((agg: any) => {
-      const count = metrics.filter((m) => m.platform === agg.platform)
-        .length;
+      const count = metrics.filter((m) => m.platform === agg.platform).length;
       return {
         platform: agg.platform,
         avgRoas: count > 0 ? agg.avgRoas / count : 0,

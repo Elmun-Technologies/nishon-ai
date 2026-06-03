@@ -164,7 +164,9 @@ export class TeamInvitesService {
     await this.assertInviteWriteAccess(dto.workspaceId, actorUserId);
 
     if (dto.memberUserId === actorUserId) {
-      throw new BadRequestException("You cannot remove yourself from the workspace");
+      throw new BadRequestException(
+        "You cannot remove yourself from the workspace",
+      );
     }
 
     const workspace = await this.workspaceRepo.findOne({

@@ -1,11 +1,11 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
-import { AutoOptimizationController } from './auto-optimization.controller';
-import { AutoOptimizationService } from './auto-optimization.service';
-import { OptimizerAgentService } from './optimizer-agent.service';
-import { OptimizationRun } from './entities/optimization-run.entity';
-import { Workspace } from '../workspaces/entities/workspace.entity';
+import { Module } from "@nestjs/common";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { ConfigModule } from "@nestjs/config";
+import { AutoOptimizationController } from "./auto-optimization.controller";
+import { AutoOptimizationService } from "./auto-optimization.service";
+import { OptimizerAgentService } from "./optimizer-agent.service";
+import { OptimizationRun } from "./entities/optimization-run.entity";
+import { Workspace } from "../workspaces/entities/workspace.entity";
 
 /**
  * AutoOptimizationModule
@@ -24,13 +24,7 @@ import { Workspace } from '../workspaces/entities/workspace.entity';
     TypeOrmModule.forFeature([OptimizationRun, Workspace]),
   ],
   controllers: [AutoOptimizationController],
-  providers: [
-    AutoOptimizationService,
-    OptimizerAgentService,
-  ],
-  exports: [
-    AutoOptimizationService,
-    OptimizerAgentService,
-  ],
+  providers: [AutoOptimizationService, OptimizerAgentService],
+  exports: [AutoOptimizationService, OptimizerAgentService],
 })
 export class AutoOptimizationModule {}

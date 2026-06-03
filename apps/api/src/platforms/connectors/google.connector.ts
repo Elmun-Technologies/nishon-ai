@@ -35,7 +35,9 @@ export class GoogleConnector {
     const redirectUri = getOAuthCallbackUrl(this.config, "google");
 
     if (!clientId || !redirectUri) {
-      this.logger.warn("Google OAuth requested without GOOGLE_CLIENT_ID/API_BASE_URL");
+      this.logger.warn(
+        "Google OAuth requested without GOOGLE_CLIENT_ID/API_BASE_URL",
+      );
       return "";
     }
 
@@ -92,7 +94,9 @@ export class GoogleConnector {
     } catch (error: any) {
       const detail = error.response?.data?.error_description || error.message;
       this.logger.error(`Google token exchange failed: ${detail}`);
-      throw new BadRequestException(`Google OAuth token exchange failed: ${detail}`);
+      throw new BadRequestException(
+        `Google OAuth token exchange failed: ${detail}`,
+      );
     }
   }
 
@@ -134,15 +138,16 @@ export class GoogleConnector {
    * List all accessible Google Ads customer accounts.
    * Returns the manager account's child accounts (or the direct account).
    */
-  async getAccessibleCustomers(accessToken: string): Promise<
+  async getAccessibleCustomers(
+    accessToken: string,
+  ): Promise<
     Array<{ id: string; descriptiveName: string; currencyCode: string }>
   > {
     try {
       const response = await firstValueFrom(
-        this.http.get(
-          `${this.apiBase}/customers:listAccessibleCustomers`,
-          { headers: this.buildHeaders(accessToken) },
-        ),
+        this.http.get(`${this.apiBase}/customers:listAccessibleCustomers`, {
+          headers: this.buildHeaders(accessToken),
+        }),
       );
 
       const resourceNames: string[] = response.data.resourceNames ?? [];
@@ -164,7 +169,11 @@ export class GoogleConnector {
               currencyCode: row?.customer?.currency_code ?? "USD",
             };
           } catch {
-            return { id: customerId, descriptiveName: customerId, currencyCode: "USD" };
+            return {
+              id: customerId,
+              descriptiveName: customerId,
+              currencyCode: "USD",
+            };
           }
         }),
       );
@@ -197,23 +206,30 @@ export class GoogleConnector {
     this.logger.log(`Creating Google Ads campaign: ${params.name}`);
 
     const devToken = this.config.get<string>("GOOGLE_DEVELOPER_TOKEN", "");
-    const headers = { ...this.buildHeaders(accessToken), "developer-token": devToken };
+    const headers = {
+      ...this.buildHeaders(accessToken),
+      "developer-token": devToken,
+    };
 
     // Step 1: Create campaign budget
     const budgetResponse = await firstValueFrom(
-      this.http.post(
-        `${this.apiBase}/customers/${customerId}/campaignBudgets:mutate`,
-        {
-          operations: [{
-            create: {
-              name: `Budget for ${params.name}`,
-              amountMicros: Math.round(params.dailyBudgetUsd * 1_000_000),
-              deliveryMethod: "STANDARD",
-            },
-          }],
-        },
-        { headers },
-      ).pipe(),
+      this.http
+        .post(
+          `${this.apiBase}/customers/${customerId}/campaignBudgets:mutate`,
+          {
+            operations: [
+              {
+                create: {
+                  name: `Budget for ${params.name}`,
+                  amountMicros: Math.round(params.dailyBudgetUsd * 1_000_000),
+                  deliveryMethod: "STANDARD",
+                },
+              },
+            ],
+          },
+          { headers },
+        )
+        .pipe(),
     ).catch((err) => {
       throw new BadRequestException(
         `Google Ads budget creation failed: ${err.response?.data?.error?.message || err.message}`,
@@ -229,20 +245,23 @@ export class GoogleConnector {
       this.http.post(
         `${this.apiBase}/customers/${customerId}/campaigns:mutate`,
         {
-          operations: [{
-            create: {
-              name: params.name,
-              advertisingChannelType: params.advertisingChannelType || "SEARCH",
-              status: params.status || "PAUSED",
-              campaignBudget: budgetResourceName,
-              manualCpc: {},  // Default bidding strategy
-              networkSettings: {
-                targetGoogleSearch: true,
-                targetSearchNetwork: true,
-                targetContentNetwork: false,
+          operations: [
+            {
+              create: {
+                name: params.name,
+                advertisingChannelType:
+                  params.advertisingChannelType || "SEARCH",
+                status: params.status || "PAUSED",
+                campaignBudget: budgetResourceName,
+                manualCpc: {}, // Default bidding strategy
+                networkSettings: {
+                  targetGoogleSearch: true,
+                  targetSearchNetwork: true,
+                  targetContentNetwork: false,
+                },
               },
             },
-          }],
+          ],
         },
         { headers },
       ),
@@ -256,7 +275,9 @@ export class GoogleConnector {
       campaignResponse.data.results?.[0]?.resourceName ?? "";
     const campaignId = campaignResourceName.split("/").pop() ?? "";
 
-    this.logger.log(`Google Ads campaign created: ${campaignId} (budget: ${budgetId})`);
+    this.logger.log(
+      `Google Ads campaign created: ${campaignId} (budget: ${budgetId})`,
+    );
     return { id: campaignId, budgetId };
   }
 
@@ -273,20 +294,25 @@ export class GoogleConnector {
     },
   ): Promise<{ id: string }> {
     const devToken = this.config.get<string>("GOOGLE_DEVELOPER_TOKEN", "");
-    const headers = { ...this.buildHeaders(accessToken), "developer-token": devToken };
+    const headers = {
+      ...this.buildHeaders(accessToken),
+      "developer-token": devToken,
+    };
 
     const response = await firstValueFrom(
       this.http.post(
         `${this.apiBase}/customers/${customerId}/adGroups:mutate`,
         {
-          operations: [{
-            create: {
-              name: params.name,
-              campaign: `customers/${customerId}/campaigns/${params.campaignId}`,
-              status: "PAUSED",
-              cpcBidMicros: params.cpcBidMicros ?? 1_000_000, // $1 default
+          operations: [
+            {
+              create: {
+                name: params.name,
+                campaign: `customers/${customerId}/campaigns/${params.campaignId}`,
+                status: "PAUSED",
+                cpcBidMicros: params.cpcBidMicros ?? 1_000_000, // $1 default
+              },
             },
-          }],
+          ],
         },
         { headers },
       ),
@@ -315,25 +341,34 @@ export class GoogleConnector {
     },
   ): Promise<{ id: string }> {
     const devToken = this.config.get<string>("GOOGLE_DEVELOPER_TOKEN", "");
-    const headers = { ...this.buildHeaders(accessToken), "developer-token": devToken };
+    const headers = {
+      ...this.buildHeaders(accessToken),
+      "developer-token": devToken,
+    };
 
     const response = await firstValueFrom(
       this.http.post(
         `${this.apiBase}/customers/${customerId}/adGroupAds:mutate`,
         {
-          operations: [{
-            create: {
-              adGroup: `customers/${customerId}/adGroups/${params.adGroupId}`,
-              status: "PAUSED",
-              ad: {
-                responsiveSearchAd: {
-                  headlines: params.headlines.slice(0, 15).map((text) => ({ text })),
-                  descriptions: params.descriptions.slice(0, 4).map((text) => ({ text })),
+          operations: [
+            {
+              create: {
+                adGroup: `customers/${customerId}/adGroups/${params.adGroupId}`,
+                status: "PAUSED",
+                ad: {
+                  responsiveSearchAd: {
+                    headlines: params.headlines
+                      .slice(0, 15)
+                      .map((text) => ({ text })),
+                    descriptions: params.descriptions
+                      .slice(0, 4)
+                      .map((text) => ({ text })),
+                  },
+                  finalUrls: params.finalUrls,
                 },
-                finalUrls: params.finalUrls,
               },
             },
-          }],
+          ],
         },
         { headers },
       ),
@@ -358,19 +393,24 @@ export class GoogleConnector {
     status: "ENABLED" | "PAUSED" | "REMOVED",
   ): Promise<void> {
     const devToken = this.config.get<string>("GOOGLE_DEVELOPER_TOKEN", "");
-    const headers = { ...this.buildHeaders(accessToken), "developer-token": devToken };
+    const headers = {
+      ...this.buildHeaders(accessToken),
+      "developer-token": devToken,
+    };
 
     await firstValueFrom(
       this.http.post(
         `${this.apiBase}/customers/${customerId}/campaigns:mutate`,
         {
-          operations: [{
-            update: {
-              resourceName: `customers/${customerId}/campaigns/${campaignId}`,
-              status,
+          operations: [
+            {
+              update: {
+                resourceName: `customers/${customerId}/campaigns/${campaignId}`,
+                status,
+              },
+              updateMask: "status",
             },
-            updateMask: "status",
-          }],
+          ],
         },
         { headers },
       ),
@@ -393,19 +433,24 @@ export class GoogleConnector {
     dailyBudgetUsd: number,
   ): Promise<void> {
     const devToken = this.config.get<string>("GOOGLE_DEVELOPER_TOKEN", "");
-    const headers = { ...this.buildHeaders(accessToken), "developer-token": devToken };
+    const headers = {
+      ...this.buildHeaders(accessToken),
+      "developer-token": devToken,
+    };
 
     await firstValueFrom(
       this.http.post(
         `${this.apiBase}/customers/${customerId}/campaignBudgets:mutate`,
         {
-          operations: [{
-            update: {
-              resourceName: `customers/${customerId}/campaignBudgets/${budgetId}`,
-              amountMicros: Math.round(dailyBudgetUsd * 1_000_000),
+          operations: [
+            {
+              update: {
+                resourceName: `customers/${customerId}/campaignBudgets/${budgetId}`,
+                amountMicros: Math.round(dailyBudgetUsd * 1_000_000),
+              },
+              updateMask: "amount_micros",
             },
-            updateMask: "amount_micros",
-          }],
+          ],
         },
         { headers },
       ),
@@ -432,16 +477,18 @@ export class GoogleConnector {
       until: string; // YYYY-MM-DD
       campaignId?: string;
     },
-  ): Promise<Array<{
-    campaignId: string;
-    campaignName: string;
-    date: string;
-    impressions: number;
-    clicks: number;
-    costMicros: number;
-    conversions: number;
-  conversionValue: number;
-  }>> {
+  ): Promise<
+    Array<{
+      campaignId: string;
+      campaignName: string;
+      date: string;
+      impressions: number;
+      clicks: number;
+      costMicros: number;
+      conversions: number;
+      conversionValue: number;
+    }>
+  > {
     const campaignFilter = params.campaignId
       ? ` AND campaign.id = ${params.campaignId}`
       : "";
@@ -489,7 +536,10 @@ export class GoogleConnector {
     query: string,
   ): Promise<any[]> {
     const devToken = this.config.get<string>("GOOGLE_DEVELOPER_TOKEN", "");
-    const headers = { ...this.buildHeaders(accessToken), "developer-token": devToken };
+    const headers = {
+      ...this.buildHeaders(accessToken),
+      "developer-token": devToken,
+    };
 
     try {
       const response = await firstValueFrom(

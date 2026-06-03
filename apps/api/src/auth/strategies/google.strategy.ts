@@ -1,11 +1,11 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { PassportStrategy } from '@nestjs/passport';
-import { Strategy, VerifyCallback } from 'passport-google-oauth20';
-import { ConfigService } from '@nestjs/config';
-import { AuthService } from '../auth.service';
+import { Injectable, Logger } from "@nestjs/common";
+import { PassportStrategy } from "@nestjs/passport";
+import { Strategy, VerifyCallback } from "passport-google-oauth20";
+import { ConfigService } from "@nestjs/config";
+import { AuthService } from "../auth.service";
 
 @Injectable()
-export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
+export class GoogleStrategy extends PassportStrategy(Strategy, "google") {
   private readonly logger = new Logger(GoogleStrategy.name);
 
   constructor(
@@ -13,11 +13,12 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     private readonly authService: AuthService,
   ) {
     super({
-      clientID:     config.getOrThrow<string>('GOOGLE_CLIENT_ID'),
-      clientSecret: config.getOrThrow<string>('GOOGLE_CLIENT_SECRET'),
-      callbackURL: config.get<string>('GOOGLE_CALLBACK_URL') ||
-        `${config.get<string>('API_BASE_URL', 'http://localhost:3001')}/auth/google/callback`,
-      scope: ['email', 'profile'],
+      clientID: config.getOrThrow<string>("GOOGLE_CLIENT_ID"),
+      clientSecret: config.getOrThrow<string>("GOOGLE_CLIENT_SECRET"),
+      callbackURL:
+        config.get<string>("GOOGLE_CALLBACK_URL") ||
+        `${config.get<string>("API_BASE_URL", "http://localhost:3001")}/auth/google/callback`,
+      scope: ["email", "profile"],
     });
   }
 
@@ -27,12 +28,12 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     profile: any,
     done: VerifyCallback,
   ): Promise<void> {
-    const email  = profile.emails?.[0]?.value;
-    const name   = profile.displayName ?? profile.name?.givenName ?? 'User';
+    const email = profile.emails?.[0]?.value;
+    const name = profile.displayName ?? profile.name?.givenName ?? "User";
     const picture = profile.photos?.[0]?.value ?? undefined;
 
     if (!email) {
-      return done(new Error('Google profile has no email'), undefined);
+      return done(new Error("Google profile has no email"), undefined);
     }
 
     try {
@@ -44,9 +45,11 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       });
       done(null, authResponse);
     } catch (err) {
-      const e = err as Error & { driverError?: { message?: string; code?: string } };
+      const e = err as Error & {
+        driverError?: { message?: string; code?: string };
+      };
       this.logger.error({
-        message: 'Google OAuth validate failed',
+        message: "Google OAuth validate failed",
         email,
         error: e?.message,
         pgCode: e?.driverError?.code,
@@ -54,7 +57,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       });
       // Pass error as a marker object so the callback controller can redirect
       // to the frontend with a human-readable error instead of returning 500.
-      done(null, { _oauthError: e?.message ?? 'Google authentication failed' });
+      done(null, { _oauthError: e?.message ?? "Google authentication failed" });
     }
   }
 }

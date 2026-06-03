@@ -50,7 +50,8 @@ export const MCP_TOOLS: McpToolDefinition[] = [
   },
   {
     name: "approve_decision",
-    description: "Kutilayotgan AI qarorini tasdiqlaydi va platforma API orqali bajaradi.",
+    description:
+      "Kutilayotgan AI qarorini tasdiqlaydi va platforma API orqali bajaradi.",
     inputSchema: {
       type: "object",
       properties: {
@@ -125,7 +126,8 @@ export const MCP_TOOLS: McpToolDefinition[] = [
         },
         objective: {
           type: "string",
-          description: "Kampaniya maqsadi (masalan: savdo oshirish, brend taniqlilik)",
+          description:
+            "Kampaniya maqsadi (masalan: savdo oshirish, brend taniqlilik)",
         },
         product_description: {
           type: "string",
@@ -179,9 +181,16 @@ export class McpToolsService {
     }
   }
 
-  private async getWorkspaceInfo(ctx: McpCredentialContext): Promise<McpToolResult> {
-    const ws = await this.workspacesService.findOne(ctx.workspaceId, ctx.userId);
-    const platforms = (ws.connectedAccounts ?? []).map((a: any) => a.platform).join(", ");
+  private async getWorkspaceInfo(
+    ctx: McpCredentialContext,
+  ): Promise<McpToolResult> {
+    const ws = await this.workspacesService.findOne(
+      ctx.workspaceId,
+      ctx.userId,
+    );
+    const platforms = (ws.connectedAccounts ?? [])
+      .map((a: any) => a.platform)
+      .join(", ");
     const campaignCount = (ws.campaigns ?? []).length;
     const text = [
       `Workspace: ${ws.name}`,
@@ -193,16 +202,21 @@ export class McpToolsService {
     return { content: [{ type: "text", text }] };
   }
 
-  private async listCampaigns(ctx: McpCredentialContext): Promise<McpToolResult> {
+  private async listCampaigns(
+    ctx: McpCredentialContext,
+  ): Promise<McpToolResult> {
     const campaigns = await this.campaignsService.findAllByWorkspace(
       ctx.workspaceId,
       ctx.userId,
     );
     if (!campaigns.length) {
-      return { content: [{ type: "text", text: "Hech qanday kampaniya topilmadi." }] };
+      return {
+        content: [{ type: "text", text: "Hech qanday kampaniya topilmadi." }],
+      };
     }
-    const lines = campaigns.map((c) =>
-      `• ${c.name} | Platforma: ${c.platform ?? "—"} | Holat: ${c.status} | Byudjet: ${c.dailyBudget ?? c.budget ?? "—"} ${c.currency ?? ""} | ID: ${c.id}`,
+    const lines = campaigns.map(
+      (c) =>
+        `• ${c.name} | Platforma: ${c.platform ?? "—"} | Holat: ${c.status} | Byudjet: ${c.dailyBudget ?? c.budget ?? "—"} ${c.currency ?? ""} | ID: ${c.id}`,
     );
     return { content: [{ type: "text", text: lines.join("\n") }] };
   }
@@ -223,36 +237,66 @@ export class McpToolsService {
       return true;
     });
     if (!filtered.length) {
-      return { content: [{ type: "text", text: `Qarorlar topilmadi (filtr: ${status}).` }] };
+      return {
+        content: [
+          { type: "text", text: `Qarorlar topilmadi (filtr: ${status}).` },
+        ],
+      };
     }
     const lines = filtered.map((d) => {
       const statusLabel =
-        d.isApproved === null ? "⏳ Kutilmoqda" : d.isApproved ? "✅ Tasdiqlangan" : "❌ Rad etilgan";
+        d.isApproved === null
+          ? "⏳ Kutilmoqda"
+          : d.isApproved
+            ? "✅ Tasdiqlangan"
+            : "❌ Rad etilgan";
       return `• [${statusLabel}] ${d.reason?.slice(0, 120) ?? "—"} | ID: ${d.id}`;
     });
     return { content: [{ type: "text", text: lines.join("\n") }] };
   }
 
-  private async approveDecision(args: Record<string, any>): Promise<McpToolResult> {
+  private async approveDecision(
+    args: Record<string, any>,
+  ): Promise<McpToolResult> {
     if (!args.decision_id) return this.error("decision_id talab qilinadi");
     await this.aiAgentService.approveDecision(args.decision_id);
-    return { content: [{ type: "text", text: `AI qaror tasdiqlandi va bajarildi: ${args.decision_id}` }] };
+    return {
+      content: [
+        {
+          type: "text",
+          text: `AI qaror tasdiqlandi va bajarildi: ${args.decision_id}`,
+        },
+      ],
+    };
   }
 
-  private async rejectDecision(args: Record<string, any>): Promise<McpToolResult> {
+  private async rejectDecision(
+    args: Record<string, any>,
+  ): Promise<McpToolResult> {
     if (!args.decision_id) return this.error("decision_id talab qilinadi");
     await this.aiAgentService.rejectDecision(args.decision_id);
-    return { content: [{ type: "text", text: `AI qaror rad etildi: ${args.decision_id}` }] };
+    return {
+      content: [
+        { type: "text", text: `AI qaror rad etildi: ${args.decision_id}` },
+      ],
+    };
   }
 
-  private async generateStrategy(ctx: McpCredentialContext): Promise<McpToolResult> {
+  private async generateStrategy(
+    ctx: McpCredentialContext,
+  ): Promise<McpToolResult> {
     const result = await this.aiAgentService.generateStrategy(ctx.workspaceId);
-    const text = typeof result === "string" ? result : JSON.stringify(result, null, 2);
+    const text =
+      typeof result === "string" ? result : JSON.stringify(result, null, 2);
     return { content: [{ type: "text", text }] };
   }
 
-  private async runOptimization(ctx: McpCredentialContext): Promise<McpToolResult> {
-    const decisions = await this.aiAgentService.runOptimizationLoop(ctx.workspaceId);
+  private async runOptimization(
+    ctx: McpCredentialContext,
+  ): Promise<McpToolResult> {
+    const decisions = await this.aiAgentService.runOptimizationLoop(
+      ctx.workspaceId,
+    );
     const count = decisions?.length ?? 0;
     return {
       content: [
@@ -270,8 +314,12 @@ export class McpToolsService {
     args: Record<string, any>,
     ctx: McpCredentialContext,
   ): Promise<McpToolResult> {
-    if (!args.competitor_name) return this.error("competitor_name talab qilinadi");
-    const ws = await this.workspacesService.findOne(ctx.workspaceId, ctx.userId);
+    if (!args.competitor_name)
+      return this.error("competitor_name talab qilinadi");
+    const ws = await this.workspacesService.findOne(
+      ctx.workspaceId,
+      ctx.userId,
+    );
     const result = await this.aiAgentService.analyzeCompetitor({
       workspaceId: ctx.workspaceId,
       competitor: {
@@ -285,7 +333,8 @@ export class McpToolsService {
         productDescription: (ws as any).productDescription ?? "",
       },
     });
-    const text = typeof result === "string" ? result : JSON.stringify(result, null, 2);
+    const text =
+      typeof result === "string" ? result : JSON.stringify(result, null, 2);
     return { content: [{ type: "text", text }] };
   }
 
@@ -294,16 +343,23 @@ export class McpToolsService {
     ctx: McpCredentialContext,
   ): Promise<McpToolResult> {
     if (!args.platform) return this.error("platform talab qilinadi");
-    const result = await this.aiAgentService.generateAdScripts(ctx.workspaceId, {
-      platform: args.platform,
-      objective: args.objective ?? "brand_awareness",
-      productDescription: args.product_description ?? "",
-    });
-    const text = typeof result === "string" ? result : JSON.stringify(result, null, 2);
+    const result = await this.aiAgentService.generateAdScripts(
+      ctx.workspaceId,
+      {
+        platform: args.platform,
+        objective: args.objective ?? "brand_awareness",
+        productDescription: args.product_description ?? "",
+      },
+    );
+    const text =
+      typeof result === "string" ? result : JSON.stringify(result, null, 2);
     return { content: [{ type: "text", text }] };
   }
 
   private error(message: string): McpToolResult {
-    return { content: [{ type: "text", text: `Xato: ${message}` }], isError: true };
+    return {
+      content: [{ type: "text", text: `Xato: ${message}` }],
+      isError: true,
+    };
   }
 }

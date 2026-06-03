@@ -93,7 +93,9 @@ export class MetaConnector {
    */
   getOAuthUrl(workspaceId: string): string {
     if (!this.callbackUrl) {
-      throw new BadRequestException("API_BASE_URL is not configured for Meta OAuth callback");
+      throw new BadRequestException(
+        "API_BASE_URL is not configured for Meta OAuth callback",
+      );
     }
 
     const scopes = [
@@ -127,7 +129,9 @@ export class MetaConnector {
     expiresAt: Date | null;
   }> {
     if (!this.callbackUrl) {
-      throw new BadRequestException("API_BASE_URL is not configured for Meta OAuth callback");
+      throw new BadRequestException(
+        "API_BASE_URL is not configured for Meta OAuth callback",
+      );
     }
 
     const url = `${META_BASE_URL}/oauth/access_token`;
@@ -379,7 +383,14 @@ export class MetaConnector {
   async getCampaignAds(
     campaignId: string,
     accessToken: string,
-  ): Promise<Array<{ id: string; name: string; creativeId: string | null; status: string }>> {
+  ): Promise<
+    Array<{
+      id: string;
+      name: string;
+      creativeId: string | null;
+      status: string;
+    }>
+  > {
     const data = await this.apiGet<{ data: any[] }>(
       `${META_BASE_URL}/${campaignId}/ads`,
       {
@@ -407,16 +418,13 @@ export class MetaConnector {
     accessToken: string,
     params: { adSetId: string; name: string; existingCreativeId: string },
   ): Promise<{ id: string }> {
-    return this.apiPost<{ id: string }>(
-      `${META_BASE_URL}/${adAccountId}/ads`,
-      {
-        access_token: accessToken,
-        name: params.name,
-        adset_id: params.adSetId,
-        creative: JSON.stringify({ creative_id: params.existingCreativeId }),
-        status: "PAUSED",
-      },
-    );
+    return this.apiPost<{ id: string }>(`${META_BASE_URL}/${adAccountId}/ads`, {
+      access_token: accessToken,
+      name: params.name,
+      adset_id: params.adSetId,
+      creative: JSON.stringify({ creative_id: params.existingCreativeId }),
+      status: "PAUSED",
+    });
   }
 
   /**
@@ -515,8 +523,10 @@ export class MetaConnector {
       ad_id?: string;
     }>
   > {
-    const defaultFields = "impressions,clicks,spend,actions,action_values,ctr,cpm,cpp,reach";
-    const fields = params.fields.length > 0 ? params.fields.join(",") : defaultFields;
+    const defaultFields =
+      "impressions,clicks,spend,actions,action_values,ctr,cpm,cpp,reach";
+    const fields =
+      params.fields.length > 0 ? params.fields.join(",") : defaultFields;
 
     const data = await this.apiGet<{ data: any[] }>(
       `${META_BASE_URL}/${objectId}/insights`,
@@ -538,7 +548,8 @@ export class MetaConnector {
       actions: row.actions || [],
       action_values: row.action_values || [],
       date_start: row.date_start,
-      ad_id: row.ad_id != null && row.ad_id !== "" ? String(row.ad_id) : undefined,
+      ad_id:
+        row.ad_id != null && row.ad_id !== "" ? String(row.ad_id) : undefined,
     }));
   }
 
@@ -548,7 +559,9 @@ export class MetaConnector {
    */
   async getAppAccessToken(): Promise<string | null> {
     if (!this.appId || !this.appSecret) {
-      this.logger.warn("META_APP_ID / META_APP_SECRET missing — cannot obtain app access token");
+      this.logger.warn(
+        "META_APP_ID / META_APP_SECRET missing — cannot obtain app access token",
+      );
       return null;
     }
     try {
@@ -560,7 +573,10 @@ export class MetaConnector {
       });
       return data.access_token ?? null;
     } catch (error: any) {
-      const msg = error?.response?.data?.error?.message || error?.message || String(error);
+      const msg =
+        error?.response?.data?.error?.message ||
+        error?.message ||
+        String(error);
       this.logger.warn(`Meta app access token failed: ${msg}`);
       return null;
     }

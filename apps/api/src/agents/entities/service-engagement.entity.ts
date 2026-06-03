@@ -58,17 +58,40 @@ export class ServiceEngagement {
   endDate: Date | null;
 
   /** Rate locked at time of hire */
-  @Column({ type: "decimal", precision: 10, scale: 2, default: 0, name: "agreed_monthly_rate" })
+  @Column({
+    type: "decimal",
+    precision: 10,
+    scale: 2,
+    default: 0,
+    name: "agreed_monthly_rate",
+  })
   agreedMonthlyRate: number;
 
-  @Column({ type: "decimal", precision: 5, scale: 2, default: 0, name: "agreed_commission_rate" })
+  @Column({
+    type: "decimal",
+    precision: 5,
+    scale: 2,
+    default: 0,
+    name: "agreed_commission_rate",
+  })
   agreedCommissionRate: number;
 
-  @Column({ type: "varchar", length: 20, default: "fixed", name: "agreed_pricing_model" })
+  @Column({
+    type: "varchar",
+    length: 20,
+    default: "fixed",
+    name: "agreed_pricing_model",
+  })
   agreedPricingModel: string;
 
   /** AdSpectr's commission rate locked at hire time */
-  @Column({ type: "decimal", precision: 5, scale: 2, default: 15, name: "platform_commission_pct" })
+  @Column({
+    type: "decimal",
+    precision: 5,
+    scale: 2,
+    default: 15,
+    name: "platform_commission_pct",
+  })
   platformCommissionPct: number;
 
   /** Optional note from client when hiring */

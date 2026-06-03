@@ -10,9 +10,14 @@ export function createRateLimitMiddleware(
   configService: ConfigService,
   logger: JsonLoggerService,
 ) {
-  const isEnabled = configService.get<string>("RATE_LIMIT_ENABLED", "true") !== "false";
-  const windowMs = Number(configService.get<string>("RATE_LIMIT_WINDOW_MS", "60000"));
-  const maxRequests = Number(configService.get<string>("RATE_LIMIT_MAX_REQUESTS", "120"));
+  const isEnabled =
+    configService.get<string>("RATE_LIMIT_ENABLED", "true") !== "false";
+  const windowMs = Number(
+    configService.get<string>("RATE_LIMIT_WINDOW_MS", "60000"),
+  );
+  const maxRequests = Number(
+    configService.get<string>("RATE_LIMIT_MAX_REQUESTS", "120"),
+  );
   const buckets = new Map<string, RateLimitBucket>();
 
   setInterval(() => {
@@ -66,7 +71,10 @@ export function createRateLimitMiddleware(
       return;
     }
 
-    const retryAfterSeconds = Math.max(Math.ceil((existing.resetAt - now) / 1000), 1);
+    const retryAfterSeconds = Math.max(
+      Math.ceil((existing.resetAt - now) / 1000),
+      1,
+    );
     res.setHeader("Retry-After", retryAfterSeconds);
 
     logger.warn({

@@ -1,9 +1,17 @@
-import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { BillingInvoice } from "./entities/billing-invoice.entity";
 import { PaymentMethod } from "./entities/payment-method.entity";
-import { CreateInvoiceDto, CreatePaymentMethodDto, UpdateBillingContactDto } from "./dto/billing.dto";
+import {
+  CreateInvoiceDto,
+  CreatePaymentMethodDto,
+  UpdateBillingContactDto,
+} from "./dto/billing.dto";
 import { Workspace } from "../workspaces/entities/workspace.entity";
 import { WorkspaceMember } from "../workspace-members/entities/workspace-member.entity";
 import { IntegrationConfigEntity } from "../integrations/entities/integration-config.entity";
@@ -38,7 +46,10 @@ export class BillingService {
 
   async listInvoices(workspaceId: string, userId: string) {
     await this.assertReadAccess(workspaceId, userId);
-    return this.invoiceRepo.find({ where: { workspaceId }, order: { createdAt: "DESC" } });
+    return this.invoiceRepo.find({
+      where: { workspaceId },
+      order: { createdAt: "DESC" },
+    });
   }
 
   async createInvoice(dto: CreateInvoiceDto, userId: string) {
@@ -55,13 +66,19 @@ export class BillingService {
 
   async listPaymentMethods(workspaceId: string, userId: string) {
     await this.assertReadAccess(workspaceId, userId);
-    return this.paymentMethodRepo.find({ where: { workspaceId }, order: { createdAt: "DESC" } });
+    return this.paymentMethodRepo.find({
+      where: { workspaceId },
+      order: { createdAt: "DESC" },
+    });
   }
 
   async addPaymentMethod(dto: CreatePaymentMethodDto, userId: string) {
     await this.assertWriteAccess(dto.workspaceId, userId);
     if (dto.isDefault) {
-      await this.paymentMethodRepo.update({ workspaceId: dto.workspaceId, isDefault: true }, { isDefault: false });
+      await this.paymentMethodRepo.update(
+        { workspaceId: dto.workspaceId, isDefault: true },
+        { isDefault: false },
+      );
     }
 
     const entity = this.paymentMethodRepo.create({
@@ -75,12 +92,21 @@ export class BillingService {
     return this.paymentMethodRepo.save(entity);
   }
 
-  async setDefaultPaymentMethod(workspaceId: string, methodId: string, userId: string) {
+  async setDefaultPaymentMethod(
+    workspaceId: string,
+    methodId: string,
+    userId: string,
+  ) {
     await this.assertWriteAccess(workspaceId, userId);
-    const method = await this.paymentMethodRepo.findOne({ where: { id: methodId, workspaceId } });
+    const method = await this.paymentMethodRepo.findOne({
+      where: { id: methodId, workspaceId },
+    });
     if (!method) throw new NotFoundException("Payment method not found");
 
-    await this.paymentMethodRepo.update({ workspaceId, isDefault: true }, { isDefault: false });
+    await this.paymentMethodRepo.update(
+      { workspaceId, isDefault: true },
+      { isDefault: false },
+    );
     method.isDefault = true;
     return this.paymentMethodRepo.save(method);
   }
@@ -91,7 +117,11 @@ export class BillingService {
     return (config.customFields?.contact ?? {}) as BillingContact;
   }
 
-  async updateBillingContact(workspaceId: string, userId: string, dto: UpdateBillingContactDto) {
+  async updateBillingContact(
+    workspaceId: string,
+    userId: string,
+    dto: UpdateBillingContactDto,
+  ) {
     await this.assertWriteAccess(workspaceId, userId);
     const config = await this.getOrCreateBillingConfig(workspaceId);
     config.customFields = {
@@ -132,18 +162,26 @@ export class BillingService {
   }
 
   private async assertReadAccess(workspaceId: string, userId: string) {
-    const workspace = await this.workspaceRepo.findOne({ where: { id: workspaceId } });
+    const workspace = await this.workspaceRepo.findOne({
+      where: { id: workspaceId },
+    });
     if (!workspace) throw new NotFoundException("Workspace not found");
     if (workspace.userId === userId) return;
-    const member = await this.memberRepo.findOne({ where: { workspaceId, userId } });
+    const member = await this.memberRepo.findOne({
+      where: { workspaceId, userId },
+    });
     if (!member) throw new ForbiddenException("No access to workspace billing");
   }
 
   private async assertWriteAccess(workspaceId: string, userId: string) {
-    const workspace = await this.workspaceRepo.findOne({ where: { id: workspaceId } });
+    const workspace = await this.workspaceRepo.findOne({
+      where: { id: workspaceId },
+    });
     if (!workspace) throw new NotFoundException("Workspace not found");
     if (workspace.userId === userId) return;
-    const member = await this.memberRepo.findOne({ where: { workspaceId, userId } });
+    const member = await this.memberRepo.findOne({
+      where: { workspaceId, userId },
+    });
     if (!member || (member.role !== "owner" && member.role !== "admin")) {
       throw new ForbiddenException("Owner or admin access is required");
     }

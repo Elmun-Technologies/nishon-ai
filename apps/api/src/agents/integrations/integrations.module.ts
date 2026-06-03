@@ -22,7 +22,12 @@ import { MetaModule } from "../../meta/meta.module";
   imports: [
     HttpModule,
     MetaModule,
-    TypeOrmModule.forFeature([AgentProfile, AgentPlatformMetrics, ConnectedAccount, Workspace]),
+    TypeOrmModule.forFeature([
+      AgentProfile,
+      AgentPlatformMetrics,
+      ConnectedAccount,
+      Workspace,
+    ]),
   ],
   providers: [MetaPerformanceSyncService],
   exports: [MetaPerformanceSyncService],

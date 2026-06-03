@@ -1,16 +1,21 @@
-import { Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between } from 'typeorm';
-import { AgentProfile } from '../entities/agent-profile.entity';
-import { FraudDetectionAudit } from '../entities/fraud-detection-audit.entity';
-import { AgentPlatformMetrics } from '../entities/agent-platform-metrics.entity';
-import { FraudDetectionService } from './fraud-detection.service';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  BadRequestException,
+} from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository, Between } from "typeorm";
+import { AgentProfile } from "../entities/agent-profile.entity";
+import { FraudDetectionAudit } from "../entities/fraud-detection-audit.entity";
+import { AgentPlatformMetrics } from "../entities/agent-platform-metrics.entity";
+import { FraudDetectionService } from "./fraud-detection.service";
 
 /**
  * Admin action request for fraud audit
  */
 export interface AdminFraudAction {
-  action: 'approve' | 'reject' | 'mark_false_positive';
+  action: "approve" | "reject" | "mark_false_positive";
   comment?: string;
   rule?: string; // For mark_false_positive
 }
@@ -23,7 +28,7 @@ export interface FraudRiskAnalysis {
   displayName: string;
   currentRiskScore: number;
   trends: {
-    riskTrend: 'improving' | 'stable' | 'declining';
+    riskTrend: "improving" | "stable" | "declining";
     recentIssueCount: number;
     criticalCount: number;
   };
@@ -84,7 +89,7 @@ export class FraudDetectionAdminService {
   ): Promise<FraudDetectionAudit> {
     const audit = await this.auditRepo.findOne({
       where: { id: auditId },
-      relations: ['agentProfile'],
+      relations: ["agentProfile"],
     });
 
     if (!audit) {
@@ -105,7 +110,7 @@ export class FraudDetectionAdminService {
     });
 
     // If marking as false positive, adjust detection rules
-    if (action.action === 'mark_false_positive' && action.rule) {
+    if (action.action === "mark_false_positive" && action.rule) {
       await this.handleFalsePositive(audit, action.rule, adminId);
     }
 
@@ -120,7 +125,11 @@ export class FraudDetectionAdminService {
    * @param adminId - UUID of admin user
    * @param comment - Optional approval comment
    */
-  async approveMetrics(metricId: string, adminId: string, comment?: string): Promise<void> {
+  async approveMetrics(
+    metricId: string,
+    adminId: string,
+    comment?: string,
+  ): Promise<void> {
     const metric = await this.metricsRepo.findOne({
       where: { id: metricId },
     });
@@ -135,7 +144,7 @@ export class FraudDetectionAdminService {
     // Log audit trail
     await this.auditRepo.save({
       agentProfileId: metric.agentProfileId,
-      action: 'admin_approved',
+      action: "admin_approved",
       platform: metric.platform,
       riskScore: 0,
       passed: true,
@@ -144,7 +153,9 @@ export class FraudDetectionAdminService {
       sourceType: metric.sourceType,
     } as any);
 
-    this.logger.log(`Admin ${adminId} approved metrics ${metricId} for agent ${metric.agentProfileId}`);
+    this.logger.log(
+      `Admin ${adminId} approved metrics ${metricId} for agent ${metric.agentProfileId}`,
+    );
   }
 
   /**
@@ -154,7 +165,11 @@ export class FraudDetectionAdminService {
    * @param adminId - UUID of admin user
    * @param reason - Reason for rejection
    */
-  async rejectMetrics(metricId: string, adminId: string, reason: string): Promise<void> {
+  async rejectMetrics(
+    metricId: string,
+    adminId: string,
+    reason: string,
+  ): Promise<void> {
     const metric = await this.metricsRepo.findOne({
       where: { id: metricId },
     });
@@ -169,7 +184,7 @@ export class FraudDetectionAdminService {
     // Log audit trail
     await this.auditRepo.save({
       agentProfileId: metric.agentProfileId,
-      action: 'admin_rejected',
+      action: "admin_rejected",
       platform: metric.platform,
       riskScore: 1,
       passed: false,
@@ -192,7 +207,7 @@ export class FraudDetectionAdminService {
   async analyzeFraudRisk(agentId: string): Promise<FraudRiskAnalysis> {
     const agent = await this.agentProfileRepo.findOne({
       where: { id: agentId },
-      select: ['id', 'displayName', 'fraudRiskScore'],
+      select: ["id", "displayName", "fraudRiskScore"],
     });
 
     if (!agent) {
@@ -208,14 +223,14 @@ export class FraudDetectionAdminService {
         agentProfileId: agentId,
         createdAt: Between(thirtyDaysAgo, new Date()),
       },
-      order: { createdAt: 'DESC' },
+      order: { createdAt: "DESC" },
       take: 10,
     });
 
     // Calculate trend
     const riskTrend = this.calculateRiskTrend(recentAudits);
-    const criticalCount = recentAudits.filter(
-      (a) => a.failedChecks?.some((c) => c.severity === 'critical'),
+    const criticalCount = recentAudits.filter((a) =>
+      a.failedChecks?.some((c) => c.severity === "critical"),
     ).length;
 
     // Analyze failed rules
@@ -261,13 +276,17 @@ export class FraudDetectionAdminService {
       this.validateThresholds(thresholds);
 
       // Update service thresholds
-      const platformThresholds = this.fraudDetectionService.getPlatformThresholds(platform);
+      const platformThresholds =
+        this.fraudDetectionService.getPlatformThresholds(platform);
       const updated = { ...platformThresholds };
 
       if (thresholds.maxRoas) updated.maxRoas = thresholds.maxRoas;
-      if (thresholds.maxConversionRate) updated.maxConversionRate = thresholds.maxConversionRate;
-      if (thresholds.maxSpendSpikeMoM) updated.maxSpendSpikeMoM = thresholds.maxSpendSpikeMoM;
-      if (thresholds.maxCpcVariance) updated.maxCpcVariance = thresholds.maxCpcVariance;
+      if (thresholds.maxConversionRate)
+        updated.maxConversionRate = thresholds.maxConversionRate;
+      if (thresholds.maxSpendSpikeMoM)
+        updated.maxSpendSpikeMoM = thresholds.maxSpendSpikeMoM;
+      if (thresholds.maxCpcVariance)
+        updated.maxCpcVariance = thresholds.maxCpcVariance;
       if (thresholds.maxDataAge) updated.maxDataAge = thresholds.maxDataAge;
 
       this.fraudDetectionService.setPlatformThresholds(platform, updated);
@@ -279,7 +298,9 @@ export class FraudDetectionAdminService {
       // TODO: Send notification to monitoring/alerting system
     } catch (error) {
       this.logger.error(`Failed to adjust thresholds: ${error.message}`);
-      throw new BadRequestException(`Invalid threshold values: ${error.message}`);
+      throw new BadRequestException(
+        `Invalid threshold values: ${error.message}`,
+      );
     }
   }
 
@@ -304,7 +325,7 @@ export class FraudDetectionAdminService {
         agentProfileId: agentId,
         createdAt: Between(startDate, new Date()),
       },
-      order: { createdAt: 'DESC' },
+      order: { createdAt: "DESC" },
       take: limit,
     });
   }
@@ -317,11 +338,14 @@ export class FraudDetectionAdminService {
    * @param limit - Max agents to return
    * @returns List of agents with high risk scores
    */
-  async getHighRiskAgents(riskThreshold: number = 0.5, limit: number = 20): Promise<AgentProfile[]> {
+  async getHighRiskAgents(
+    riskThreshold: number = 0.5,
+    limit: number = 20,
+  ): Promise<AgentProfile[]> {
     return this.agentProfileRepo
-      .createQueryBuilder('agent')
-      .where('agent.fraudRiskScore >= :threshold', { threshold: riskThreshold })
-      .orderBy('agent.fraudRiskScore', 'DESC')
+      .createQueryBuilder("agent")
+      .where("agent.fraudRiskScore >= :threshold", { threshold: riskThreshold })
+      .orderBy("agent.fraudRiskScore", "DESC")
       .take(limit)
       .getMany();
   }
@@ -348,20 +372,20 @@ export class FraudDetectionAdminService {
 
     // Get average risk score
     const agentQuery = await this.agentProfileRepo
-      .createQueryBuilder('agent')
-      .select('AVG(agent.fraudRiskScore)', 'avgRisk')
+      .createQueryBuilder("agent")
+      .select("AVG(agent.fraudRiskScore)", "avgRisk")
       .getRawOne();
-    const averageRiskScore = parseFloat(agentQuery?.avgRisk || '0');
+    const averageRiskScore = parseFloat(agentQuery?.avgRisk || "0");
 
     // Get recent critical issues (last 7 days)
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
     const recentCriticalIssues = await this.auditRepo
-      .createQueryBuilder('audit')
-      .where('audit.createdAt >= :date', { date: sevenDaysAgo })
+      .createQueryBuilder("audit")
+      .where("audit.createdAt >= :date", { date: sevenDaysAgo })
       .andWhere("audit.failedChecks @> :critical", {
-        critical: JSON.stringify([{ severity: 'critical' }]),
+        critical: JSON.stringify([{ severity: "critical" }]),
       })
       .getCount();
 
@@ -386,7 +410,9 @@ export class FraudDetectionAdminService {
     rule: string,
     adminId: string,
   ): Promise<void> {
-    this.logger.log(`Processing false positive for rule "${rule}" marked by admin ${adminId}`);
+    this.logger.log(
+      `Processing false positive for rule "${rule}" marked by admin ${adminId}`,
+    );
 
     // TODO: Implement ML-based threshold adjustment
     // This could:
@@ -404,16 +430,16 @@ export class FraudDetectionAdminService {
    */
   private mapActionToAuditAction(
     action: string,
-  ): 'admin_approved' | 'admin_rejected' | 'marked_false_positive' {
+  ): "admin_approved" | "admin_rejected" | "marked_false_positive" {
     switch (action) {
-      case 'approve':
-        return 'admin_approved';
-      case 'reject':
-        return 'admin_rejected';
-      case 'mark_false_positive':
-        return 'marked_false_positive';
+      case "approve":
+        return "admin_approved";
+      case "reject":
+        return "admin_rejected";
+      case "mark_false_positive":
+        return "marked_false_positive";
       default:
-        return 'admin_approved';
+        return "admin_approved";
     }
   }
 
@@ -422,34 +448,37 @@ export class FraudDetectionAdminService {
    */
   private calculateRiskTrend(
     audits: FraudDetectionAudit[],
-  ): 'improving' | 'stable' | 'declining' {
-    if (audits.length < 3) return 'stable';
+  ): "improving" | "stable" | "declining" {
+    if (audits.length < 3) return "stable";
 
     const recent = audits.slice(0, Math.ceil(audits.length / 2));
     const older = audits.slice(Math.ceil(audits.length / 2));
 
-    const recentAvg = recent.reduce((sum, a) => sum + a.riskScore, 0) / recent.length;
-    const olderAvg = older.reduce((sum, a) => sum + a.riskScore, 0) / older.length;
+    const recentAvg =
+      recent.reduce((sum, a) => sum + a.riskScore, 0) / recent.length;
+    const olderAvg =
+      older.reduce((sum, a) => sum + a.riskScore, 0) / older.length;
 
     const change = recentAvg - olderAvg;
 
-    if (change < -0.1) return 'improving';
-    if (change > 0.1) return 'declining';
-    return 'stable';
+    if (change < -0.1) return "improving";
+    if (change > 0.1) return "declining";
+    return "stable";
   }
 
   /**
    * Internal: Analyze most common failed rules
    */
-  private analyzeFailedRules(
-    audits: FraudDetectionAudit[],
-  ): Array<{
+  private analyzeFailedRules(audits: FraudDetectionAudit[]): Array<{
     rule: string;
     count: number;
     lastOccurred: Date;
     severity: string;
   }> {
-    const ruleStats: Map<string, { count: number; lastOccurred: Date; severity: string }> = new Map();
+    const ruleStats: Map<
+      string,
+      { count: number; lastOccurred: Date; severity: string }
+    > = new Map();
 
     audits.forEach((audit) => {
       if (audit.failedChecks) {
@@ -489,13 +518,19 @@ export class FraudDetectionAdminService {
     const recommendations: string[] = [];
 
     if (riskScore >= 0.8) {
-      recommendations.push('HIGH PRIORITY: Agent has critical fraud risk. Consider suspending data publication.');
+      recommendations.push(
+        "HIGH PRIORITY: Agent has critical fraud risk. Consider suspending data publication.",
+      );
     } else if (riskScore >= 0.5) {
-      recommendations.push('MEDIUM PRIORITY: Agent shows elevated fraud risk. Schedule for detailed review.');
+      recommendations.push(
+        "MEDIUM PRIORITY: Agent shows elevated fraud risk. Schedule for detailed review.",
+      );
     }
 
-    if (trend === 'declining') {
-      recommendations.push('Risk score is increasing. Monitor closely and check for patterns.');
+    if (trend === "declining") {
+      recommendations.push(
+        "Risk score is increasing. Monitor closely and check for patterns.",
+      );
     }
 
     if (failedRules.length > 0) {
@@ -506,7 +541,9 @@ export class FraudDetectionAdminService {
     }
 
     if (recommendations.length === 0) {
-      recommendations.push('Agent appears legitimate. Continue standard monitoring.');
+      recommendations.push(
+        "Agent appears legitimate. Continue standard monitoring.",
+      );
     }
 
     return recommendations;
@@ -517,11 +554,11 @@ export class FraudDetectionAdminService {
    */
   private validateThresholds(thresholds: Record<string, number>): void {
     const validKeys = [
-      'maxRoas',
-      'maxConversionRate',
-      'maxSpendSpikeMoM',
-      'maxCpcVariance',
-      'maxDataAge',
+      "maxRoas",
+      "maxConversionRate",
+      "maxSpendSpikeMoM",
+      "maxCpcVariance",
+      "maxDataAge",
     ];
 
     for (const [key, value] of Object.entries(thresholds)) {
@@ -529,16 +566,18 @@ export class FraudDetectionAdminService {
         throw new BadRequestException(`Invalid threshold key: ${key}`);
       }
 
-      if (typeof value !== 'number' || value <= 0) {
-        throw new BadRequestException(`Invalid threshold value for ${key}: must be a positive number`);
+      if (typeof value !== "number" || value <= 0) {
+        throw new BadRequestException(
+          `Invalid threshold value for ${key}: must be a positive number`,
+        );
       }
 
       // Sanity checks
-      if (key === 'maxRoas' && value < 2) {
-        throw new BadRequestException('maxRoas must be at least 2');
+      if (key === "maxRoas" && value < 2) {
+        throw new BadRequestException("maxRoas must be at least 2");
       }
-      if (key === 'maxConversionRate' && value < 1) {
-        throw new BadRequestException('maxConversionRate must be at least 1%');
+      if (key === "maxConversionRate" && value < 1) {
+        throw new BadRequestException("maxConversionRate must be at least 1%");
       }
     }
   }

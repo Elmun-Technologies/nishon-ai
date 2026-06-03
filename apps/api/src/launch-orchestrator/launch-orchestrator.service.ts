@@ -127,7 +127,8 @@ export class LaunchOrchestratorService {
     );
     const accessToken = decrypt(account.accessToken, encryptionKey);
     const objective = payload.objective || "OUTCOME_SALES";
-    const dailyBudget = Number(payload.dailyBudget) > 0 ? Number(payload.dailyBudget) : 20;
+    const dailyBudget =
+      Number(payload.dailyBudget) > 0 ? Number(payload.dailyBudget) : 20;
     const name = `Launch ${job.id.slice(0, 8)} - ${objective}`;
     const targeting = payload.targeting ?? {
       countries: ["UZ"],
@@ -138,7 +139,8 @@ export class LaunchOrchestratorService {
     const sourceCampaignIds = Array.isArray(payload.sourceCampaignIds)
       ? payload.sourceCampaignIds
       : [];
-    const copyCreatives = payload.copyCreatives !== false && sourceCampaignIds.length > 0;
+    const copyCreatives =
+      payload.copyCreatives !== false && sourceCampaignIds.length > 0;
 
     if (normalizedPlatform === Platform.META) {
       const created = await this.metaConnector.createCampaign(
@@ -156,7 +158,9 @@ export class LaunchOrchestratorService {
       // For ABO (Ad-Set Budget Optimization) split the daily budget across
       // ad sets — one per audience. For CBO the campaign owns the budget
       // and ad sets share it, so a small floor per ad set is fine.
-      const audiences = Array.isArray(payload.audiences) ? payload.audiences : [];
+      const audiences = Array.isArray(payload.audiences)
+        ? payload.audiences
+        : [];
       const perAdSetBudget =
         payload.budgetType === "ABO" && audiences.length > 0
           ? Math.max(1, Math.round(dailyBudget / audiences.length))
@@ -170,7 +174,10 @@ export class LaunchOrchestratorService {
       if (copyCreatives) {
         for (const sourceId of sourceCampaignIds) {
           try {
-            const ads = await this.metaConnector.getCampaignAds(sourceId, accessToken);
+            const ads = await this.metaConnector.getCampaignAds(
+              sourceId,
+              accessToken,
+            );
             for (const ad of ads) {
               if (ad.creativeId) sourceCreativeIds.push(ad.creativeId);
             }
@@ -178,7 +185,11 @@ export class LaunchOrchestratorService {
             // Non-fatal: continue with whatever creatives we already gathered.
           }
         }
-      } else if (payload.creative && payload.creative.pageId && payload.creative.linkUrl) {
+      } else if (
+        payload.creative &&
+        payload.creative.pageId &&
+        payload.creative.linkUrl
+      ) {
         try {
           const created = await this.metaConnector.createAdCreative(
             account.externalAccountId,
@@ -204,7 +215,11 @@ export class LaunchOrchestratorService {
       const adSetIds: string[] = [];
       const adIds: string[] = [];
       const adSetErrors: Array<{ audience: string; error: string }> = [];
-      const adErrors: Array<{ adSetId: string; creativeId: string; error: string }> = [];
+      const adErrors: Array<{
+        adSetId: string;
+        creativeId: string;
+        error: string;
+      }> = [];
 
       for (const audience of audiences) {
         let adSetId: string;
@@ -225,7 +240,9 @@ export class LaunchOrchestratorService {
               targeting: {
                 ageMin: targeting.ageMin,
                 ageMax: targeting.ageMax,
-                genders: targeting.genders?.length ? targeting.genders : undefined,
+                genders: targeting.genders?.length
+                  ? targeting.genders
+                  : undefined,
                 geoLocations: { countries: targeting.countries },
               },
             },

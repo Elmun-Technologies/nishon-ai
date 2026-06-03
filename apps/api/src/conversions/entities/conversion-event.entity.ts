@@ -36,7 +36,10 @@ export enum ConversionSource {
  */
 @Entity("conversion_events")
 @Index("IDX_conversion_events_workspace", ["workspaceId"])
-@Index("IDX_conversion_events_campaign_workspace", ["campaignId", "workspaceId"])
+@Index("IDX_conversion_events_campaign_workspace", [
+  "campaignId",
+  "workspaceId",
+])
 @Index("IDX_conversion_events_type_date", ["eventType", "timestamp"])
 export class ConversionEvent {
   @PrimaryGeneratedColumn("uuid")
