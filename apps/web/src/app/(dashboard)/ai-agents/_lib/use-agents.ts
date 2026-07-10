@@ -61,10 +61,12 @@ export function useAgents(): UseAgentsResult {
         setIsDemo(false)
       }
     } catch (e: unknown) {
+      // Do NOT fall back to demo dollar figures on a real fetch failure — that
+      // would show fabricated profit during an API outage (Ishonch). Surface
+      // the error with no agents; demo data is only for the no-workspace case.
       setError(e instanceof Error ? e.message : 'Xato')
-      // Fall back to demo so UI doesn't break.
-      setAgents(DEMO_MY_AGENTS)
-      setIsDemo(true)
+      setAgents([])
+      setIsDemo(false)
     } finally {
       setLoading(false)
     }

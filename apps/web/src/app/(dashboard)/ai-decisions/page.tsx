@@ -27,35 +27,6 @@ interface AiDecision {
   campaignId: string | null
 }
 
-const DEMO_DECISIONS: AiDecision[] = [
-  {
-    id: 'demo-pause-1',
-    actionType: 'pause_ad',
-    reason:
-      'CTR dropped 42% over 7 days while frequency climbed. Pausing protects spend until creative refresh.',
-    estimatedImpact: 'Save ~$120/week; re-test after new hook.',
-    beforeState: { status: 'active', spend: 340, ctr: '0.9%' },
-    afterState: { status: 'paused', spend: 340, ctr: '0.9%' },
-    isApproved: null,
-    isExecuted: false,
-    createdAt: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
-    campaignId: 'demo-camp-1',
-  },
-  {
-    id: 'demo-scale-1',
-    actionType: 'scale_budget',
-    reason:
-      'Stable CPA under target for 5 days with headroom on frequency. Scaling captures demand safely.',
-    estimatedImpact: '+18% conversions at same CPA band.',
-    beforeState: { dailyBudget: 80, roas: 2.4 },
-    afterState: { dailyBudget: 100, roas: 2.4 },
-    isApproved: true,
-    isExecuted: true,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 6).toISOString(),
-    campaignId: 'demo-camp-2',
-  },
-]
-
 const ACTION_ICONS: Record<string, string> = {
   pause_ad: '⏸',
   scale_budget: '📈',
@@ -125,13 +96,16 @@ export default function AiDecisionsPage() {
       setDecisions((res.data as any) ?? [])
       setDemoMode(false)
     } catch {
-      setDecisions(DEMO_DECISIONS)
-      setDemoMode(true)
-      setFetchError('')
+      // Show a real error instead of masking an API outage with demo decisions.
+      setDecisions([])
+      setDemoMode(false)
+      setFetchError(
+        t('aiDecisions.loadError', "Qarorlarni yuklab bo'lmadi. Keyinroq urinib ko'ring."),
+      )
     } finally {
       setLoading(false)
     }
-  }, [currentWorkspace?.id])
+  }, [currentWorkspace?.id, t])
 
   useEffect(() => {
     fetchDecisions()
