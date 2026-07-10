@@ -50,7 +50,7 @@ function formatPaidAt(iso: string) {
 
 export default function BillingPage() {
   const { t } = useI18n()
-  const { currentWorkspace } = useWorkspaceStore()
+  const { currentWorkspace, user } = useWorkspaceStore()
   const [sub, setSub] = useState<LocalSubscriptionState>(() => loadLocalSubscription())
   const [promoInput, setPromoInput] = useState('')
   const [promoMsg, setPromoMsg] = useState('')
@@ -83,9 +83,12 @@ export default function BillingPage() {
     }
   }, [])
 
-  const currentPlan = getPlan(sub.planId)
-  const capC = campaignCap(sub.planId)
-  const capCl = clientCap(sub.planId)
+  const backendPlan =
+    user?.plan && getPlan(user.plan) ? (user.plan as SubscriptionPlanId) : null
+  const effectivePlanId: SubscriptionPlanId = backendPlan ?? sub.planId
+  const currentPlan = getPlan(effectivePlanId)
+  const capC = campaignCap(effectivePlanId)
+  const capCl = clientCap(effectivePlanId)
 
   const discountPct = sub.promoCodeApplied ? KNOWN_PROMOS[sub.promoCodeApplied.toUpperCase()] ?? 0 : 0
 
@@ -292,9 +295,9 @@ export default function BillingPage() {
             <p className="text-xs uppercase tracking-wide text-text-tertiary font-medium">
               {t('billing.currentPlan', 'Hozirgi plan')}
             </p>
-            <p className="text-2xl font-bold text-text-primary mt-1">{currentPlan?.name ?? sub.planId}</p>
+            <p className="text-2xl font-bold text-text-primary mt-1">{currentPlan?.name ?? effectivePlanId}</p>
             <p className="text-sm text-text-secondary mt-1">
-              {sub.planId === 'free'
+              {effectivePlanId === 'free'
                 ? t('billing.freeHint', 'Cheksiz sinov — 1 kampaniya, 7 kun data.')
                 : t('billing.nextCharge', 'Keyingi to‘lov (oyning 1-kuni): {date}')
                     .replace('{date}', formatNextPayment(sub.currentPeriodEnd))}
@@ -348,7 +351,7 @@ export default function BillingPage() {
               className={cn(
                 'p-4 flex flex-col border-border/80 h-full',
                 p.popular && 'ring-2 ring-violet-500/40 shadow-md',
-                sub.planId === p.id && 'bg-violet-500/5',
+                effectivePlanId === p.id && 'bg-violet-500/5',
               )}
             >
               {p.popular ? (
@@ -381,7 +384,7 @@ export default function BillingPage() {
                   <Button
                     variant="secondary"
                     className="w-full rounded-xl"
-                    disabled={sub.planId === 'free'}
+                    disabled={effectivePlanId === 'free'}
                     onClick={() => {
                       setSub((prev) => {
                         const n = { ...prev, planId: 'free' as const, currentPeriodEnd: null }
@@ -390,16 +393,16 @@ export default function BillingPage() {
                       })
                     }}
                   >
-                    {sub.planId === 'free' ? t('billing.current', 'Joriy') : t('billing.downgrade', 'Free ga')}
+                    {effectivePlanId === 'free' ? t('billing.current', 'Joriy') : t('billing.downgrade', 'Free ga')}
                   </Button>
                 ) : (
                   <Button
                     className="w-full rounded-xl"
-                    variant={sub.planId === p.id ? 'secondary' : 'primary'}
+                    variant={effectivePlanId === p.id ? 'secondary' : 'primary'}
                     onClick={() => openCheckout(p.id)}
-                    disabled={sub.planId === p.id}
+                    disabled={effectivePlanId === p.id}
                   >
-                    {sub.planId === p.id ? t('billing.current', 'Joriy') : t('billing.select', 'Tanlash')}
+                    {effectivePlanId === p.id ? t('billing.current', 'Joriy') : t('billing.select', 'Tanlash')}
                   </Button>
                 )}
               </div>
