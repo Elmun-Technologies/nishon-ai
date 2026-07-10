@@ -57,6 +57,13 @@ lint/i18n/tsc/build/e2e 39/39), lekin ikki mustaqil audit real MVP blockerlarini
   endi login kabi workspace'ni hydrate qiladi.
 - ✅ **Render health check `/health` → `/ready`** (DB/Redis o'lganda 503 qaytaradi).
 - ✅ Graph API versiya birlashtirildi (v19→v20), OAuth `pages_*` scope qo'shildi.
+- ✅ **Mock sahifalar halol qilindi** (MVP faqat Meta):
+  - Launch Hub: Google/Yandex endi "Coming soon" (Telegram kabi) — ilgari soxta
+    "launched" ko'rsatardi (faqat ichki `/campaigns` yozuvi, real platform launch yo'q).
+  - `/settings/integrations` mock sahifasiga "Preview" banner + real `/settings/meta`
+    havolasi; ai-decisions'dagi "Meta ulash" CTA endi real sahifaga qaratildi.
+- **Yakuniy holat:** API 295/295, web unit 112/112, build/e2e 39/39, migration zanjiri
+  toza PG'da exit 0. PR #149.
 
 ### Oldingi faol branch: `claude/hopeful-rubin-vTmX2` — 10/10 sprint (PR #131)
 
