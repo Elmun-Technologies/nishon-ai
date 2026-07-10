@@ -143,6 +143,11 @@ describe("LaunchOrchestratorService", () => {
       expect(campaignParams.dailyBudget).toBe(75);
       expect(campaignParams.status).toBe("PAUSED");
       expect(result.status).toBe("launched");
+
+      // CBO: the campaign owns the budget, so ad sets must NOT carry one —
+      // Meta rejects a launch with a budget at both levels.
+      const [, , cboAdSet] = metaConnector.createAdSet.mock.calls[0];
+      expect(cboAdSet.dailyBudget).toBeUndefined();
     });
 
     it("falls back to safe defaults when payload.dailyBudget is missing", async () => {
@@ -194,6 +199,10 @@ describe("LaunchOrchestratorService", () => {
 
       // ABO splits the budget across ad sets
       expect(firstAdSet.dailyBudget).toBe(30);
+
+      // ABO: budget lives on the ad sets, so the campaign must NOT carry one.
+      const [, , campaignParams] = metaConnector.createCampaign.mock.calls[0];
+      expect(campaignParams.dailyBudget).toBeUndefined();
 
       // Targeting from the payload is honored on every ad set
       expect(firstAdSet.targeting.geoLocations.countries).toEqual(["UZ", "KZ"]);

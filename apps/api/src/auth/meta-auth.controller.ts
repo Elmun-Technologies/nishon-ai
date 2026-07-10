@@ -12,6 +12,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Response } from "express";
 import { MetaOAuthService } from "./meta-oauth.service";
+import { MetaConnector } from "../platforms/connectors/meta.connector";
 import { ConnectedAccount } from "../platforms/entities/connected-account.entity";
 import { Workspace } from "../workspaces/entities/workspace.entity";
 import { Platform } from "@adspectr/shared";
@@ -41,6 +42,7 @@ export class MetaAuthController {
     private readonly connectedAccountRepo: Repository<ConnectedAccount>,
     @InjectRepository(Workspace)
     private readonly workspaceRepo: Repository<Workspace>,
+    private readonly metaConnector: MetaConnector,
   ) {
     const key = this.config.get<string>("ENCRYPTION_KEY", "");
     if (key.length === 32) {
@@ -235,6 +237,13 @@ export class MetaAuthController {
       ? encrypt(accessToken, this.encryptionKey)
       : accessToken;
 
+    // Resolve the real Meta ad-account id (act_<id>) now. The Ad Launcher
+    // passes externalAccountId straight into Graph API calls, so a placeholder
+    // like "meta_oauth" would make every launch hit POST /meta_oauth/campaigns
+    // and fail. Falls back to the placeholder only if resolution fails, so the
+    // connect step itself never breaks.
+    const adAccount = await this.resolveAdAccount(accessToken);
+
     const existing = await this.connectedAccountRepo.findOne({
       where: { workspaceId, platform: Platform.META },
     });
@@ -243,6 +252,12 @@ export class MetaAuthController {
       existing.accessToken = storedToken;
       existing.isActive = true;
       existing.tokenExpiresAt = tokenExpiresAt;
+      // Backfill a real ad-account id if we have one (repairs older records
+      // that were saved with the "meta_oauth" placeholder).
+      if (adAccount) {
+        existing.externalAccountId = adAccount.id;
+        existing.externalAccountName = adAccount.name;
+      }
       await this.connectedAccountRepo.save(existing);
     } else {
       const record = this.connectedAccountRepo.create({
@@ -250,12 +265,34 @@ export class MetaAuthController {
         platform: Platform.META,
         accessToken: storedToken,
         refreshToken: null,
-        externalAccountId: "meta_oauth", // updated to real ID on first sync
-        externalAccountName: "Meta Account", // updated to real name on first sync
+        externalAccountId: adAccount?.id ?? "meta_oauth",
+        externalAccountName: adAccount?.name ?? "Meta Account",
         isActive: true,
         tokenExpiresAt,
       });
       await this.connectedAccountRepo.save(record);
+    }
+  }
+
+  /**
+   * Fetches the workspace's Meta ad accounts and picks one to launch under.
+   * Prefers an ACTIVE account (account_status === 1) and falls back to the
+   * first returned. Returns null (non-fatal) if the token has no ad accounts
+   * or the Graph call fails.
+   */
+  private async resolveAdAccount(
+    accessToken: string,
+  ): Promise<{ id: string; name: string } | null> {
+    try {
+      const accounts = await this.metaConnector.getAdAccounts(accessToken);
+      if (!accounts.length) return null;
+      const chosen = accounts.find((a) => a.status === 1) ?? accounts[0];
+      return { id: chosen.id, name: chosen.name };
+    } catch (err: any) {
+      this.logger.warn(
+        `Could not resolve Meta ad account (leaving placeholder): ${err?.message}`,
+      );
+      return null;
     }
   }
 

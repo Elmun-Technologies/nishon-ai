@@ -143,6 +143,11 @@ export class LaunchOrchestratorService {
       payload.copyCreatives !== false && sourceCampaignIds.length > 0;
 
     if (normalizedPlatform === Platform.META) {
+      // Meta forbids a budget at BOTH the campaign and ad-set level.
+      //   CBO (default): campaign owns the budget, ad sets carry none.
+      //   ABO: each ad set owns its budget, campaign carries none.
+      const isABO = payload.budgetType === "ABO";
+
       const created = await this.metaConnector.createCampaign(
         account.externalAccountId,
         accessToken,
@@ -150,21 +155,19 @@ export class LaunchOrchestratorService {
           name,
           objective,
           status: "PAUSED",
-          dailyBudget,
+          dailyBudget: isABO ? undefined : dailyBudget,
           specialAdCategories: [],
         },
       );
 
-      // For ABO (Ad-Set Budget Optimization) split the daily budget across
-      // ad sets — one per audience. For CBO the campaign owns the budget
-      // and ad sets share it, so a small floor per ad set is fine.
+      // For ABO split the daily budget across ad sets — one per audience.
+      // For CBO the ad sets must NOT carry a budget (undefined).
       const audiences = Array.isArray(payload.audiences)
         ? payload.audiences
         : [];
-      const perAdSetBudget =
-        payload.budgetType === "ABO" && audiences.length > 0
-          ? Math.max(1, Math.round(dailyBudget / audiences.length))
-          : Math.max(1, dailyBudget);
+      const perAdSetBudget = isABO
+        ? Math.max(1, Math.round(dailyBudget / Math.max(1, audiences.length)))
+        : undefined;
 
       // Resolve the creative ids each ad set will receive. Two paths:
       // 1. `copyCreatives` mode — pull creatives from source campaign(s)

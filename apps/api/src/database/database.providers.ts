@@ -17,6 +17,9 @@ import { AddUserTrialEndsAt1745070000000 } from "./migrations/1745070000000-AddU
 import { EnsureUsersTrialEndsAtColumn1750000000000 } from "./migrations/1750000000000-EnsureUsersTrialEndsAtColumn";
 import { IdempotentUsersSchemaRepairSql1750000000002 } from "./migrations/1750000000002-IdempotentUsersSchemaRepairSql";
 import { CreateLaunchJobsTable1763000000000 } from "./migrations/1763000000000-CreateLaunchJobsTable";
+import { CreateWorkspacesTable1763100000000 } from "./migrations/1763100000000-CreateWorkspacesTable";
+import { CreateWorkspaceMembersTable1763200000000 } from "./migrations/1763200000000-CreateWorkspaceMembersTable";
+import { CreateConnectedAccountsTable1763300000000 } from "./migrations/1763300000000-CreateConnectedAccountsTable";
 
 const databaseUrl = process.env.DATABASE_URL;
 const isProduction = process.env.NODE_ENV === "production";
@@ -58,6 +61,9 @@ export default new DataSource({
     EnsureUsersTrialEndsAtColumn1750000000000,
     IdempotentUsersSchemaRepairSql1750000000002,
     CreateLaunchJobsTable1763000000000,
+    CreateWorkspacesTable1763100000000,
+    CreateWorkspaceMembersTable1763200000000,
+    CreateConnectedAccountsTable1763300000000,
   ],
   synchronize: false,
   logging: process.env.TYPEORM_LOGGING === "true" || !isProduction,

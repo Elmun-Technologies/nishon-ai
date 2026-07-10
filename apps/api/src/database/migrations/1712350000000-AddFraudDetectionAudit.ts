@@ -30,8 +30,10 @@ export class AddFraudDetectionAudit1712350000000 implements MigrationInterface {
             default: "uuid_generate_v4()",
           },
           {
+            // Must be uuid to match agent_profiles.id (the FK target);
+            // a varchar column makes the foreign key impossible to create.
             name: "agent_profile_id",
-            type: "varchar",
+            type: "uuid",
             isNullable: false,
           },
           {

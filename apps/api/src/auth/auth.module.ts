@@ -13,6 +13,7 @@ import { FacebookStrategy } from "./strategies/facebook.strategy";
 import { User } from "../users/entities/user.entity";
 import { MetaAuthController } from "./meta-auth.controller";
 import { MetaOAuthService } from "./meta-oauth.service";
+import { MetaConnector } from "../platforms/connectors/meta.connector";
 import { ConnectedAccount } from "../platforms/entities/connected-account.entity";
 import { Workspace } from "../workspaces/entities/workspace.entity";
 
@@ -40,6 +41,7 @@ import { Workspace } from "../workspaces/entities/workspace.entity";
     GoogleStrategy,
     FacebookStrategy,
     MetaOAuthService,
+    MetaConnector,
   ],
   exports: [AuthService, JwtModule],
 })

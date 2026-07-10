@@ -143,9 +143,21 @@ export class AddMarketplaceColumnsToExisting1712281201000 implements MigrationIn
       }),
     ];
 
-    for (const column of agentProfileColumns) {
-      await queryRunner.addColumn("agent_profiles", column);
-    }
+    // Defensive: only touch a table if it exists and only add a column that is
+    // still missing. Some marketplace tables (service_engagements, agent_reviews)
+    // are created by synchronize rather than a migration, so on a clean
+    // migration-only deploy they may be absent — skip them instead of aborting
+    // the whole chain (which would block the MVP-critical tables that follow).
+    const addColumns = async (table: string, columns: TableColumn[]) => {
+      if (!(await queryRunner.hasTable(table))) return;
+      for (const column of columns) {
+        if (!(await queryRunner.hasColumn(table, column.name))) {
+          await queryRunner.addColumn(table, column);
+        }
+      }
+    };
+
+    await addColumns("agent_profiles", agentProfileColumns);
 
     // Add columns to service_engagements
     const engagementColumns = [
@@ -181,9 +193,7 @@ export class AddMarketplaceColumnsToExisting1712281201000 implements MigrationIn
       }),
     ];
 
-    for (const column of engagementColumns) {
-      await queryRunner.addColumn("service_engagements", column);
-    }
+    await addColumns("service_engagements", engagementColumns);
 
     // Add columns to agent_reviews
     const reviewColumns = [
@@ -219,39 +229,46 @@ export class AddMarketplaceColumnsToExisting1712281201000 implements MigrationIn
       }),
     ];
 
-    for (const column of reviewColumns) {
-      await queryRunner.addColumn("agent_reviews", column);
-    }
+    await addColumns("agent_reviews", reviewColumns);
 
-    // Create indexes for full-text search on agent_profiles
+    // Full-text + performance indexes on agent_profiles. Guarded so a re-run
+    // (or a synchronize-created DB) doesn't fail on an already-present index.
     await queryRunner.query(`
-      CREATE INDEX idx_agent_profiles_search_keywords
+      CREATE INDEX IF NOT EXISTS idx_agent_profiles_search_keywords
       ON agent_profiles USING gin(search_keywords)
     `);
 
-    // Create indexes for performance queries
     await queryRunner.query(`
-      CREATE INDEX idx_agent_profiles_performance_sync_status
+      CREATE INDEX IF NOT EXISTS idx_agent_profiles_performance_sync_status
       ON agent_profiles(performance_sync_status)
     `);
 
     await queryRunner.query(`
-      CREATE INDEX idx_agent_profiles_certification_level
+      CREATE INDEX IF NOT EXISTS idx_agent_profiles_certification_level
       ON agent_profiles(certification_level)
     `);
 
     await queryRunner.query(`
-      CREATE INDEX idx_agent_profiles_is_indexable
+      CREATE INDEX IF NOT EXISTS idx_agent_profiles_is_indexable
       ON agent_profiles(is_indexable) WHERE is_indexable = true
     `);
 
     await queryRunner.query(`
-      CREATE INDEX idx_agent_profiles_primary_countries
+      CREATE INDEX IF NOT EXISTS idx_agent_profiles_primary_countries
       ON agent_profiles USING gin(primary_countries)
     `);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
+    const dropColumns = async (table: string, columns: string[]) => {
+      if (!(await queryRunner.hasTable(table))) return;
+      for (const col of columns) {
+        if (await queryRunner.hasColumn(table, col)) {
+          await queryRunner.dropColumn(table, col);
+        }
+      }
+    };
+
     // Drop indexes
     await queryRunner.query(
       "DROP INDEX IF EXISTS idx_agent_profiles_search_keywords",
@@ -277,9 +294,7 @@ export class AddMarketplaceColumnsToExisting1712281201000 implements MigrationIn
       "is_featured",
       "country_engaged",
     ];
-    for (const col of reviewColumns) {
-      await queryRunner.dropColumn("agent_reviews", col);
-    }
+    await dropColumns("agent_reviews", reviewColumns);
 
     // Drop columns from service_engagements
     const engagementColumns = [
@@ -289,9 +304,7 @@ export class AddMarketplaceColumnsToExisting1712281201000 implements MigrationIn
       "kpi_targets",
       "performance_achieved",
     ];
-    for (const col of engagementColumns) {
-      await queryRunner.dropColumn("service_engagements", col);
-    }
+    await dropColumns("service_engagements", engagementColumns);
 
     // Drop columns from agent_profiles
     const agentProfileColumns = [
@@ -319,8 +332,6 @@ export class AddMarketplaceColumnsToExisting1712281201000 implements MigrationIn
       "cached_stats",
       "monthly_performance",
     ];
-    for (const col of agentProfileColumns) {
-      await queryRunner.dropColumn("agent_profiles", col);
-    }
+    await dropColumns("agent_profiles", agentProfileColumns);
   }
 }

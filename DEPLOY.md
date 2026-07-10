@@ -26,7 +26,7 @@ Arxitektura:
 2. **App ID** va **App Secret** ni nusxalang
 3. Mahsulot qo'shing: **Facebook Login** va **Marketing API**
 4. **Facebook Login → Settings → Valid OAuth Redirect URIs**'ga qo'shing:
-   - `https://<sizning-api-render-domain>/platforms/meta/callback`
+   - `https://<sizning-api-render-domain>/meta/callback`
 5. **App Review → Permissions and Features** — quyidagilarni so'rang:
    - `ads_management`
    - `ads_read`
@@ -69,7 +69,7 @@ JWT_REFRESH_SECRET=<openssl rand -hex 32>
 ENCRYPTION_KEY=<openssl rand -hex 16>   # 32 char hex
 META_APP_ID=<2-bosqichdan>
 META_APP_SECRET=<2-bosqichdan>
-META_CALLBACK_URL=https://<api-domain>/platforms/meta/callback
+META_CALLBACK_URL=https://<api-domain>/meta/callback
 OPENAI_API_KEY=<optional, AI insights uchun>
 ```
 
