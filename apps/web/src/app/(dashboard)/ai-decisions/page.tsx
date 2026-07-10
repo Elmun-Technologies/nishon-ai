@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/Button'
 import { PageSpinner } from '@/components/ui/Spinner'
 import { Alert } from '@/components/ui/Alert'
 import { PageHeader } from '@/components/ui'
-import { aiDecisions as aiDecisionsApi } from '@/lib/api-client'
+import { aiDecisions as aiDecisionsApi, aiAgent } from '@/lib/api-client'
 import { timeAgo } from '@/lib/utils'
 
 interface AiDecision {
@@ -163,7 +163,9 @@ export default function AiDecisionsPage() {
       return
     }
     try {
-      await aiDecisionsApi.approve(id)
+      // Use the executing, owner-checked agent path (not the flag-only route)
+      // so approving here actually applies the action on the ad platform.
+      await aiAgent.approveDecision(id)
       setDecisions((prev) =>
         prev.map((d) => (d.id === id ? { ...d, isApproved: true, isExecuted: true } : d)),
       )
@@ -183,7 +185,7 @@ export default function AiDecisionsPage() {
       return
     }
     try {
-      await aiDecisionsApi.reject(id)
+      await aiAgent.rejectDecision(id)
       setDecisions((prev) => prev.map((d) => (d.id === id ? { ...d, isApproved: false } : d)))
     } catch (err: any) {
       setActionError(err?.message ?? t('aiDecisions.rejectFailed', 'Failed to reject decision'))

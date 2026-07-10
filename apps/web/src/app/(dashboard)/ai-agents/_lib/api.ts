@@ -28,6 +28,10 @@ export interface ApiAiDecision {
   createdAt: string
   workspaceId: string | null
   campaignId: string | null
+  // Real values persisted by the agent decision loop (may be absent on older
+  // rows; TypeORM serialises decimals as strings over the wire).
+  confidence: number | string | null
+  impactUsd: number | string | null
 }
 
 /** Map backend actionType enum to frontend AgentAction. */
@@ -113,20 +117,20 @@ function decisionTitle(d: ApiAiDecision): string {
   }
 }
 
-/** Estimate impact in USD from the estimatedImpact text or beforeState. */
+/** Real projected $ impact from the agent; falls back to parsing the text. */
 function decisionImpactUsd(d: ApiAiDecision): number {
-  const txt = d.estimatedImpact ?? ''
-  const match = txt.match(/\$?\s*(\d+(?:\.\d+)?)/)
-  if (match) return Math.round(Number(match[1]))
-  return 0
+  const real = d.impactUsd != null ? Number(d.impactUsd) : NaN
+  if (Number.isFinite(real) && real > 0) return Math.round(real)
+  const match = (d.estimatedImpact ?? '').match(/\$?\s*(\d+(?:\.\d+)?)/)
+  return match ? Math.round(Number(match[1])) : 0
 }
 
-/** Stub confidence — backend doesn't yet expose this. */
+/** Real model/rules confidence (0-1) from the agent; falls back to a heuristic. */
 function decisionConfidence(d: ApiAiDecision): number {
-  if (d.isApproved === true && d.isExecuted) return 0.95
-  if (d.actionType === 'pause_ad' || d.actionType === 'stop_campaign') return 0.85
-  if (d.actionType === 'scale_budget') return 0.9
-  return 0.8
+  const real = d.confidence != null ? Number(d.confidence) : NaN
+  if (Number.isFinite(real)) return Math.min(1, Math.max(0, real))
+  if (d.isApproved === true && d.isExecuted) return 0.9
+  return 0.7
 }
 
 function approvalStatus(d: ApiAiDecision): ApprovalStatus {
