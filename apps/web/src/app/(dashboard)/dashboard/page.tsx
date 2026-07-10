@@ -365,16 +365,16 @@ export default function DashboardPage() {
       list.push({
         id: 'creative',
         icon: '🎨',
-        title: t('dashboard.dashboardHome.alertCreative', 'Kreativ charchashi'),
-        body: t('dashboard.dashboardHome.alertCreativeBody', 'Yangi variant yuklash vaqti'),
+        title: t('dashboard.dashboardHome.alertCreative', 'Kreativni yangilab turing'),
+        body: t('dashboard.dashboardHome.alertCreativeBody', 'Har 2-3 haftada yangi variant sinang'),
         href: '/creative-hub/image-ads',
         color: 'border-primary/25 bg-primary/5',
       })
       list.push({
         id: 'competitor',
         icon: '🕵️',
-        title: t('dashboard.dashboardHome.alertCompetitor', 'Raqib aktivligi'),
-        body: t('dashboard.dashboardHome.alertCompetitorBody', 'Ad Library da yangi reklamalar'),
+        title: t('dashboard.dashboardHome.alertCompetitor', 'Raqiblarni kuzatib boring'),
+        body: t('dashboard.dashboardHome.alertCompetitorBody', "Ad Library'da yangi reklamalarni ko'ring"),
         href: '/ad-library',
         color: 'border-brand-mid/25 bg-brand-mid/5',
       })
@@ -632,7 +632,7 @@ export default function DashboardPage() {
           <div className="rounded-2xl border border-border bg-surface p-5">
             <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-text-primary">
               <Sparkles className="h-4 w-4 text-primary" />
-              {t('dashboard.dashboardHome.signalsTitle', 'AI Signallar')}
+              {t('dashboard.dashboardHome.signalsTitle', 'Signallar va maslahatlar')}
             </h2>
             <ul className="space-y-2">
               {aiAlerts.map((a) => (

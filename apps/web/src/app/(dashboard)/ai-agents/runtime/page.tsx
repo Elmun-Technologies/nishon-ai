@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import Link from 'next/link'
 import {
   Activity,
@@ -17,6 +17,7 @@ import {
 import { Alert } from '@/components/ui/Alert'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { useWorkspaceStore } from '@/stores/workspace.store'
+import { workspaces as workspacesApi } from '@/lib/api-client'
 import { cn } from '@/lib/utils'
 import { AgentAvatar } from '../_components/AgentAvatar'
 import { DemoBanner } from '../_components/DemoBanner'
@@ -30,7 +31,8 @@ import {
 import { useAgents } from '../_lib/use-agents'
 
 export default function AgentRuntimePage() {
-  const { currentWorkspace } = useWorkspaceStore()
+  const { currentWorkspace, setCurrentWorkspace } = useWorkspaceStore()
+  const [autopilotSaving, setAutopilotSaving] = useState(false)
   const {
     agents,
     loading,
@@ -53,6 +55,28 @@ export default function AgentRuntimePage() {
     if (!selected) return []
     return selected.recent.filter((r) => r.approvalStatus === 'pending')
   }, [selected])
+
+  // The platform agents are all governed by ONE workspace autopilot mode, so
+  // "pause/enable" here changes that real mode (MANUAL = propose only,
+  // ASSISTED = act on low-risk with approval) rather than faking per-agent state.
+  const autopilotMode = String(currentWorkspace?.autopilotMode ?? 'ASSISTED').toUpperCase()
+  const agentPaused = autopilotMode === 'MANUAL'
+
+  const setAutopilot = useCallback(
+    async (mode: 'MANUAL' | 'ASSISTED') => {
+      if (!currentWorkspace?.id || autopilotSaving) return
+      setAutopilotSaving(true)
+      try {
+        await workspacesApi.setAutopilot(currentWorkspace.id, mode)
+        setCurrentWorkspace({ ...currentWorkspace, autopilotMode: mode })
+      } catch {
+        /* keep prior mode on failure */
+      } finally {
+        setAutopilotSaving(false)
+      }
+    },
+    [currentWorkspace, autopilotSaving, setCurrentWorkspace],
+  )
 
   const otherRecsForSelected = useMemo(() => {
     if (!selected) return []
@@ -233,30 +257,36 @@ export default function AgentRuntimePage() {
                       </div>
                     </div>
                     <div className="flex shrink-0 gap-2">
-                      {selected.status === 'active' ? (
-                        <button
-                          type="button"
-                          className="inline-flex items-center gap-1 rounded-xl border border-border bg-surface px-3 py-2 text-xs font-medium text-text-secondary hover:bg-surface-2"
-                        >
-                          <Pause className="h-3 w-3" aria-hidden />
-                          Pauza
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          className="inline-flex items-center gap-1 rounded-xl border border-border bg-surface px-3 py-2 text-xs font-medium text-text-secondary hover:bg-surface-2"
-                        >
-                          <Play className="h-3 w-3" aria-hidden />
-                          Yoqish
-                        </button>
-                      )}
-                      <button
-                        type="button"
+                      {!isDemo && currentWorkspace?.id ? (
+                        agentPaused ? (
+                          <button
+                            type="button"
+                            disabled={autopilotSaving}
+                            onClick={() => void setAutopilot('ASSISTED')}
+                            className="inline-flex items-center gap-1 rounded-xl border border-border bg-surface px-3 py-2 text-xs font-medium text-text-secondary hover:bg-surface-2 disabled:opacity-60"
+                          >
+                            <Play className="h-3 w-3" aria-hidden />
+                            Yoqish
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            disabled={autopilotSaving}
+                            onClick={() => void setAutopilot('MANUAL')}
+                            className="inline-flex items-center gap-1 rounded-xl border border-border bg-surface px-3 py-2 text-xs font-medium text-text-secondary hover:bg-surface-2 disabled:opacity-60"
+                          >
+                            <Pause className="h-3 w-3" aria-hidden />
+                            Pauza
+                          </button>
+                        )
+                      ) : null}
+                      <Link
+                        href="/ai-agents"
                         className="inline-flex items-center gap-1 rounded-xl border border-border bg-surface px-3 py-2 text-xs font-medium text-text-secondary hover:bg-surface-2"
                       >
                         <Settings2 className="h-3 w-3" aria-hidden />
                         Sozlamalar
-                      </button>
+                      </Link>
                     </div>
                   </div>
 
