@@ -1,8 +1,8 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { useI18n } from '@/i18n/use-i18n'
-import { autoOptimization } from '@/lib/api-client'
+import { autoOptimization, meta as metaApi } from '@/lib/api-client'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
@@ -255,6 +255,56 @@ const DEMO_PAYLOAD = {
   goal: { type: 'conversions', targetCpa: 20, targetRoas: 3.0 },
 }
 
+/** A real campaign row as returned by the Meta audit endpoint. */
+interface RealCampaign {
+  id: string
+  name: string
+  status?: string
+  objective?: string | null
+  spend: number
+  impressions: number
+  clicks: number
+  conversions: number
+  revenue: number
+  ctr: number
+  cpc: number
+  roas: number
+}
+
+/**
+ * Build the optimizer payload from a REAL campaign. We only have campaign-level
+ * synced metrics (no ad-set/ad breakdown), so adSets is empty — the rules that
+ * operate on campaign totals (spend/ROAS/CPA/budget) still apply.
+ */
+function buildRealPayload(
+  c: RealCampaign,
+  mode: 'recommend' | 'auto_apply',
+) {
+  const cpa = c.conversions > 0 ? c.spend / c.conversions : null
+  return {
+    platform: 'meta' as const,
+    campaignId: c.id,
+    performance: {
+      campaignId: c.id,
+      campaignName: c.name,
+      platform: 'meta',
+      objective: c.objective || 'conversions',
+      impressions: c.impressions,
+      clicks: c.clicks,
+      ctr: c.ctr,
+      cpc: c.cpc,
+      spend: c.spend,
+      conversions: c.conversions,
+      cpa,
+      roas: c.roas,
+      dailyBudget: 0,
+      adSets: [],
+    },
+    mode,
+    goal: { type: 'conversions' as const, targetCpa: 20, targetRoas: 3.0 },
+  }
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 type Tab = 'run' | 'history'
@@ -278,7 +328,49 @@ export default function AutoOptimizationPage() {
   const [optimizerTickLoading, setOptimizerTickLoading] = useState(false)
   const [optimizerApiError, setOptimizerApiError] = useState<string | null>(null)
 
+  // Real synced Meta campaigns for this workspace (from the audit endpoint).
+  const [realCampaigns, setRealCampaigns] = useState<RealCampaign[]>([])
+  const [selectedCampaignId, setSelectedCampaignId] = useState<string>('')
+  const [campaignsLoading, setCampaignsLoading] = useState(false)
+
   const workspaceId = currentWorkspace?.id ?? 'demo'
+
+  // Pull the workspace's real campaigns so the optimizer analyzes THEM, not a
+  // hardcoded demo campaign. Falls back to demo only when nothing is connected.
+  useEffect(() => {
+    if (!currentWorkspace?.id) {
+      setRealCampaigns([])
+      setSelectedCampaignId('')
+      return
+    }
+    let cancelled = false
+    setCampaignsLoading(true)
+    metaApi
+      .audit(currentWorkspace.id, 30)
+      .then((res) => {
+        if (cancelled) return
+        const camps = ((res.data as any)?.report?.campaigns ?? []) as RealCampaign[]
+        const withSpend = camps
+          .filter((c) => Number(c.spend) > 0)
+          .sort((a, b) => Number(b.spend) - Number(a.spend))
+        setRealCampaigns(withSpend)
+        setSelectedCampaignId(withSpend[0]?.id ?? '')
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setRealCampaigns([])
+          setSelectedCampaignId('')
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setCampaignsLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [currentWorkspace?.id])
+
+  const selectedCampaign = realCampaigns.find((c) => c.id === selectedCampaignId) ?? null
 
   async function handleOptimizerClientTick() {
     setOptimizerTickLoading(true)
@@ -323,7 +415,12 @@ export default function AutoOptimizationPage() {
     setError(null)
     setReport(null)
     try {
-      const res = await autoOptimization.run(workspaceId, { ...DEMO_PAYLOAD, mode })
+      // Analyze the user's REAL selected campaign when available; only fall back
+      // to the labeled demo payload when no Meta campaign is connected.
+      const payload = selectedCampaign
+        ? buildRealPayload(selectedCampaign, mode)
+        : { ...DEMO_PAYLOAD, mode }
+      const res = await autoOptimization.run(workspaceId, payload)
       setReport((res as any).data)
     } catch (err: any) {
       setError(err?.message ?? t('autoOptimization.runFailed', 'Optimization failed'))
@@ -376,41 +473,45 @@ export default function AutoOptimizationPage() {
             <li>Vaqt — kechasi ROAS tushishi, ertaga ko‘rish kech</li>
           </ul>
         </details>
-        <div className="flex flex-wrap gap-2">
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            disabled={optimizerTickLoading}
-            onClick={() => void handleOptimizerClientTick()}
-          >
-            {optimizerTickLoading ? '…' : 'Tick (brauzer)'}
-          </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            disabled={optimizerTickLoading}
-            onClick={() => void handleOptimizerApiTick()}
-          >
-            Tick (API / cron namuna)
-          </Button>
-          <Button type="button" variant="ghost" size="sm" onClick={handleBumpOptimizerFailures}>
-            +1 muvaffaqiyatsiz (escalate demo)
-          </Button>
-        </div>
-        {optimizerApiError && (
-          <p className="text-xs text-red-400">{optimizerApiError}</p>
+        {/* Developer-only tick harness (synthetic signal + localStorage
+            learning). Hidden in production so users don't see debug controls. */}
+        {process.env.NODE_ENV !== 'production' && (
+          <>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                disabled={optimizerTickLoading}
+                onClick={() => void handleOptimizerClientTick()}
+              >
+                {optimizerTickLoading ? '…' : 'Tick (brauzer)'}
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                disabled={optimizerTickLoading}
+                onClick={() => void handleOptimizerApiTick()}
+              >
+                Tick (API / cron namuna)
+              </Button>
+              <Button type="button" variant="ghost" size="sm" onClick={handleBumpOptimizerFailures}>
+                +1 muvaffaqiyatsiz (escalate demo)
+              </Button>
+            </div>
+            {optimizerApiError && <p className="text-xs text-red-400">{optimizerApiError}</p>}
+            {optimizerTick && (
+              <pre className="text-[11px] leading-relaxed bg-surface-2 border border-border rounded-lg p-3 overflow-x-auto text-text-secondary">
+                {JSON.stringify(optimizerTick, null, 2)}
+              </pre>
+            )}
+            <p className="text-[10px] text-text-tertiary">
+              Demo: signal <code className="text-text-tertiary">getSignal</code> hash; o‘rganish{' '}
+              <code className="text-text-tertiary">localStorage</code> — kampaniya: {DEMO_OPT_CAMPAIGN}
+            </p>
+          </>
         )}
-        {optimizerTick && (
-          <pre className="text-[11px] leading-relaxed bg-surface-2 border border-border rounded-lg p-3 overflow-x-auto text-text-secondary">
-            {JSON.stringify(optimizerTick, null, 2)}
-          </pre>
-        )}
-        <p className="text-[10px] text-text-tertiary">
-          Demo: signal <code className="text-text-tertiary">getSignal</code> hash; o‘rganish{' '}
-          <code className="text-text-tertiary">localStorage</code> — kampaniya: {DEMO_OPT_CAMPAIGN}
-        </p>
       </Card>
 
       {/* ── Approach selector ── */}
@@ -595,16 +696,42 @@ export default function AutoOptimizationPage() {
               </div>
             </div>
 
-            {/* Demo notice */}
-            <div className="flex items-start gap-2 bg-surface-2 border border-border rounded-lg p-3 mb-5">
-              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#A78BFA" strokeWidth={1.8} className="shrink-0 mt-0.5">
-                <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <p className="text-text-tertiary text-xs leading-relaxed">
-                Demo ma'lumotlar ishlatilmoqda: Summer Sale 2024 kampaniyasi (Meta), $502 sarflov,
-                ROAS 2.1x, 18 konversiya. Real platformaga ulanish sozlamalardan amalga oshiriladi.
-              </p>
-            </div>
+            {/* Campaign selector — analyze a REAL campaign when connected */}
+            {realCampaigns.length > 0 ? (
+              <div className="mb-5">
+                <p className="text-text-tertiary text-xs mb-2 uppercase tracking-wide font-medium">
+                  Kampaniya
+                </p>
+                <select
+                  value={selectedCampaignId}
+                  onChange={(e) => setSelectedCampaignId(e.target.value)}
+                  className="w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-sm text-text-primary focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/15"
+                >
+                  {realCampaigns.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name} — ${Math.round(c.spend)} sarf · ROAS {c.roas.toFixed(1)}x
+                    </option>
+                  ))}
+                </select>
+                {selectedCampaign && (
+                  <p className="mt-2 text-xs text-emerald-600 dark:text-emerald-400">
+                    Real ma'lumot: {selectedCampaign.conversions} konversiya ·{' '}
+                    {selectedCampaign.clicks} klik · CTR {selectedCampaign.ctr.toFixed(2)}%
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-start gap-2 bg-surface-2 border border-border rounded-lg p-3 mb-5">
+                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#A78BFA" strokeWidth={1.8} className="shrink-0 mt-0.5">
+                  <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p className="text-text-tertiary text-xs leading-relaxed">
+                  {campaignsLoading
+                    ? 'Kampaniyalar yuklanmoqda…'
+                    : "Meta ulanmagan — quyidagi tahlil namuna ma'lumotlarda (Summer Sale 2024, $502, ROAS 2.1x) ishlaydi. Real kampaniyalaringizni tahlil qilish uchun Sozlamalardan Meta'ni ulang."}
+                </p>
+              </div>
+            )}
 
             <Button
               onClick={handleRun}
