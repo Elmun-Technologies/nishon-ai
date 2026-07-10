@@ -466,7 +466,13 @@
       "actionLaunch": "🚀 New campaign",
       "actionReport": "📊 Build report",
       "actionIdea": "💡 Get ideas",
-      "actionAudience": "👥 Audience"
+      "actionAudience": "👥 Audience",
+      "alertRoasBody": "Auto budget-reduction recommended",
+      "alertCreativeBody": "Time to upload a fresh creative variant",
+      "alertCompetitorBody": "New ads in the Ad Library",
+      "actionTrigger": "⚡ Triggers",
+      "actionAi": "🤖 AI decisions",
+      "signalsTitle": "AI signals"
     },
     "metaRealtimePrefix": "Metrics are streamed in real-time from",
     "settingsLink": "settings",
@@ -511,7 +517,18 @@
     "chartHint": "Actual spend and estimated revenue (Spend × ROAS)",
     "viewAll": "View all →",
     "topAdsTitle": "Top Ads",
-    "refresh": "Refresh"
+    "refresh": "Refresh",
+    "firstCampaignBanner": "Create your first campaign — get started in one step.",
+    "crm": {
+      "title": "CRM — real revenue",
+      "subtitle": "Payme / Click / Telegram payments",
+      "realRevenue": "Real revenue",
+      "metaRevenue": "Meta estimate",
+      "events": "events",
+      "realRoas": "Real ROAS",
+      "diff": "Difference"
+    },
+    "metaLive": "Meta Live"
   },
   "metaAudit": {
     "title": "360° Meta Audit",

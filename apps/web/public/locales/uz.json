@@ -466,7 +466,13 @@
       "actionLaunch": "🚀 Yangi kampaniya",
       "actionReport": "📊 Hisobot yaratish",
       "actionIdea": "💡 Idea olish",
-      "actionAudience": "👥 Auditoriya"
+      "actionAudience": "👥 Auditoriya",
+      "alertRoasBody": "Byudjet avtomatik qisqartirish tavsiyasi",
+      "alertCreativeBody": "Yangi variant yuklash vaqti",
+      "alertCompetitorBody": "Ad Library da yangi reklamalar",
+      "actionTrigger": "⚡ Triggerlar",
+      "actionAi": "🤖 AI qarorlar",
+      "signalsTitle": "AI Signallar"
     },
     "metaRealtimePrefix": "Ko'rsatkichlar real vaqtda olinmoqda:",
     "settingsLink": "sozlamalar",
@@ -511,7 +517,18 @@
     "chartHint": "Haqiqiy xarajat va taxminiy daromad (Spend × ROAS)",
     "viewAll": "Barchasini ko‘rish →",
     "topAdsTitle": "Top reklamalar",
-    "refresh": "Yangilash"
+    "refresh": "Yangilash",
+    "firstCampaignBanner": "Birinchi kampaniyangizni yarating — bir qadamda boshlang.",
+    "crm": {
+      "title": "CRM — real daromad",
+      "subtitle": "Payme / Click / Telegram to'lovlar",
+      "realRevenue": "Real daromad",
+      "metaRevenue": "Meta taxmin",
+      "events": "hodisa",
+      "realRoas": "Real ROAS",
+      "diff": "Farq"
+    },
+    "metaLive": "Meta Live"
   },
   "metaAudit": {
     "title": "360° Meta Audit",

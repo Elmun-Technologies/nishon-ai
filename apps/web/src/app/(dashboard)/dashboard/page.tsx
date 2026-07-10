@@ -472,7 +472,7 @@ export default function DashboardPage() {
           {performance?.metaConnected && (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
-              Meta Live
+              {t('dashboard.metaLive', 'Meta Live')}
             </span>
           )}
           <Button
@@ -843,19 +843,19 @@ export default function DashboardPage() {
             <div className="rounded-xl border border-border/50 bg-surface-2/50 px-4 py-3">
               <p className="text-[10px] uppercase tracking-wide text-text-tertiary">{t('dashboard.crm.realRevenue', 'Real daromad')}</p>
               <p className="mt-1 text-xl font-bold tabular-nums text-emerald-400">{formatUzs(crmSummary.realRevenueUzs ?? 0)}</p>
-              <p className="text-[10px] text-text-tertiary">{crmSummary.eventCount ?? 0} hodisa</p>
+              <p className="text-[10px] text-text-tertiary">{crmSummary.eventCount ?? 0} {t('dashboard.crm.events', 'hodisa')}</p>
             </div>
             <div className="rounded-xl border border-border/50 bg-surface-2/50 px-4 py-3">
               <p className="text-[10px] uppercase tracking-wide text-text-tertiary">{t('dashboard.crm.metaRevenue', 'Meta taxmin')}</p>
               <p className="mt-1 text-xl font-bold tabular-nums text-text-primary">{formatUzs(crmSummary.metaRevenueEstimateUzs ?? 0)}</p>
               {crmSummary.diffPctVsMeta != null && (
-                <p className="text-[10px] text-text-tertiary">Farq: {crmSummary.diffPctVsMeta}%</p>
+                <p className="text-[10px] text-text-tertiary">{t('dashboard.crm.diff', 'Farq')}: {crmSummary.diffPctVsMeta}%</p>
               )}
             </div>
           </div>
           {crmSummary.realRoas != null && (
             <p className="mt-3 text-xs text-text-secondary">
-              Real ROAS: <span className="font-semibold text-text-primary">{crmSummary.realRoas}x</span>
+              {t('dashboard.crm.realRoas', 'Real ROAS')}: <span className="font-semibold text-text-primary">{crmSummary.realRoas}x</span>
             </p>
           )}
         </div>

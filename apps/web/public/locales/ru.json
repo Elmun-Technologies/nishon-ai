@@ -466,7 +466,13 @@
       "actionLaunch": "🚀 Новая кампания",
       "actionReport": "📊 Создать отчёт",
       "actionIdea": "💡 Идеи",
-      "actionAudience": "👥 Аудитория"
+      "actionAudience": "👥 Аудитория",
+      "alertRoasBody": "Рекомендуем автоматически снизить бюджет",
+      "alertCreativeBody": "Пора загрузить новый вариант креатива",
+      "alertCompetitorBody": "Новые объявления в Ad Library",
+      "actionTrigger": "⚡ Триггеры",
+      "actionAi": "🤖 AI-решения",
+      "signalsTitle": "AI-сигналы"
     },
     "metaRealtimePrefix": "Метрики в реальном времени поступают из",
     "settingsLink": "настройки",
@@ -511,7 +517,18 @@
     "chartHint": "Расход (факт) и расчётная выручка (Spend × ROAS)",
     "viewAll": "Посмотреть всё →",
     "topAdsTitle": "Топ объявлений",
-    "refresh": "Обновить"
+    "refresh": "Обновить",
+    "firstCampaignBanner": "Создайте первую кампанию — начните за один шаг.",
+    "crm": {
+      "title": "CRM — реальная выручка",
+      "subtitle": "Платежи Payme / Click / Telegram",
+      "realRevenue": "Реальная выручка",
+      "metaRevenue": "Оценка Meta",
+      "events": "событий",
+      "realRoas": "Реальный ROAS",
+      "diff": "Разница"
+    },
+    "metaLive": "Meta Live"
   },
   "metaAudit": {
     "title": "360° Meta Audit",
