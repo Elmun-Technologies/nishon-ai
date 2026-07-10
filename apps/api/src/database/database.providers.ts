@@ -20,6 +20,14 @@ import { CreateLaunchJobsTable1763000000000 } from "./migrations/1763000000000-C
 import { CreateWorkspacesTable1763100000000 } from "./migrations/1763100000000-CreateWorkspacesTable";
 import { CreateWorkspaceMembersTable1763200000000 } from "./migrations/1763200000000-CreateWorkspaceMembersTable";
 import { CreateConnectedAccountsTable1763300000000 } from "./migrations/1763300000000-CreateConnectedAccountsTable";
+import { CreateMetaAdAccountsTable1763310000000 } from "./migrations/1763310000000-CreateMetaAdAccountsTable";
+import { CreateCampaignsTable1763320000000 } from "./migrations/1763320000000-CreateCampaignsTable";
+import { CreateAdSetsTable1763330000000 } from "./migrations/1763330000000-CreateAdSetsTable";
+import { CreateAdsTable1763340000000 } from "./migrations/1763340000000-CreateAdsTable";
+import { CreateBudgetsTable1763350000000 } from "./migrations/1763350000000-CreateBudgetsTable";
+import { CreateAiDecisionsTable1763360000000 } from "./migrations/1763360000000-CreateAiDecisionsTable";
+import { CreateMetaCampaignSyncsTable1763370000000 } from "./migrations/1763370000000-CreateMetaCampaignSyncsTable";
+import { CreateMetaInsightsTable1763380000000 } from "./migrations/1763380000000-CreateMetaInsightsTable";
 import { AddPerformanceIndexes1763400000000 } from "./migrations/1763400000000-AddPerformanceIndexes";
 
 const databaseUrl = process.env.DATABASE_URL;
@@ -65,6 +73,14 @@ export default new DataSource({
     CreateWorkspacesTable1763100000000,
     CreateWorkspaceMembersTable1763200000000,
     CreateConnectedAccountsTable1763300000000,
+    CreateMetaAdAccountsTable1763310000000,
+    CreateCampaignsTable1763320000000,
+    CreateAdSetsTable1763330000000,
+    CreateAdsTable1763340000000,
+    CreateBudgetsTable1763350000000,
+    CreateAiDecisionsTable1763360000000,
+    CreateMetaCampaignSyncsTable1763370000000,
+    CreateMetaInsightsTable1763380000000,
     AddPerformanceIndexes1763400000000,
   ],
   synchronize: false,
