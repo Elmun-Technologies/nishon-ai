@@ -19,26 +19,7 @@ import type {
   YandexStep,
 } from './types'
 import { parsePositiveNumber } from './utils'
-
-const INITIAL_META_DATA: MetaData = {
-  name: '',
-  objective: '',
-  minAge: 18,
-  maxAge: 65,
-  location: 'UZ',
-  dailyBudget: '',
-  campaignDuration: 7,
-  creativeName: '',
-  creativeUrl: '',
-  creativeText: '',
-  ctaButton: 'learn_more',
-  pageId: '',
-  abTestEnabled: false,
-  abTestType: 'creative',
-  abTestDuration: 7,
-  abTestMetric: 'cost_per_result',
-  specialAdCategories: [],
-}
+import { INITIAL_META_DATA, metaDefaultsFromStrategy } from './prefill'
 
 const INITIAL_GOOGLE_DATA: GoogleData = {
   name: '',
@@ -77,8 +58,17 @@ export function useLaunchWizard() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
+  // Seed the Meta wizard from the workspace's onboarding strategy so it opens
+  // pre-answered. Computed once from the workspace present at mount.
+  const initialMetaDefaults = useMemo(
+    () => metaDefaultsFromStrategy(currentWorkspace?.aiStrategy),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  )
+
   const [metaStep, setMetaStep] = useState<MetaStep>(1)
-  const [metaData, setMetaData] = useState<MetaData>(INITIAL_META_DATA)
+  const [metaData, setMetaData] = useState<MetaData>(initialMetaDefaults.data)
+  const [metaPrefilled, setMetaPrefilled] = useState(initialMetaDefaults.prefilled)
 
   const [googleStep, setGoogleStep] = useState<GoogleStep>(1)
   const [googleData, setGoogleData] = useState<GoogleData>(INITIAL_GOOGLE_DATA)
@@ -86,18 +76,24 @@ export function useLaunchWizard() {
   const [yandexStep, setYandexStep] = useState<YandexStep>(1)
   const [yandexData, setYandexData] = useState<YandexData>(INITIAL_YANDEX_DATA)
 
-  const handlePlatformPick = useCallback((next: Platform) => {
-    setPlatform(next)
-    setLaunchModeConfirmed(false)
-    setLaunchMode('self')
-    setError('')
-    setMetaStep(1)
-    setGoogleStep(1)
-    setYandexStep(1)
-    setMetaData(INITIAL_META_DATA)
-    setGoogleData(INITIAL_GOOGLE_DATA)
-    setYandexData(INITIAL_YANDEX_DATA)
-  }, [])
+  const handlePlatformPick = useCallback(
+    (next: Platform) => {
+      setPlatform(next)
+      setLaunchModeConfirmed(false)
+      setLaunchMode('self')
+      setError('')
+      setMetaStep(1)
+      setGoogleStep(1)
+      setYandexStep(1)
+      // Re-seed Meta from the workspace strategy on (re)entry; Google/Yandex reset.
+      const seeded = metaDefaultsFromStrategy(currentWorkspace?.aiStrategy)
+      setMetaData(seeded.data)
+      setMetaPrefilled(seeded.prefilled)
+      setGoogleData(INITIAL_GOOGLE_DATA)
+      setYandexData(INITIAL_YANDEX_DATA)
+    },
+    [currentWorkspace],
+  )
 
   const exitToHub = useCallback(() => {
     setPlatform(null)
@@ -330,6 +326,7 @@ export function useLaunchWizard() {
     metaData,
     setMetaData,
     metaStepValid,
+    metaPrefilled,
     launchMeta,
     // google
     googleStep,

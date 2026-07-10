@@ -145,6 +145,13 @@ export default function OnboardingPage() {
             pixelMode: 'skipped',
             dailyBudget: Math.round(ready.monthlyBudgetUzs / 30),
             telegram: ready.telegram,
+            // Rich strategy so the Ad Launcher can prefill AI-suggested defaults.
+            cjm: ready.cjm || undefined,
+            vertical: ready.vertical || undefined,
+            geos: ready.geos,
+            ageRanges: ready.ageRanges,
+            monthlyBudgetUzs: ready.monthlyBudgetUzs,
+            allocation: ready.allocation,
           }),
         })
         if (res.ok) {

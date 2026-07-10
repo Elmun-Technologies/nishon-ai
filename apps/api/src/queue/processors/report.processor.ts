@@ -6,7 +6,8 @@ import { Repository, MoreThanOrEqual } from "typeorm";
 import { ConfigService } from "@nestjs/config";
 import { Workspace } from "../../workspaces/entities/workspace.entity";
 import { AiDecision } from "../../ai-decisions/entities/ai-decision.entity";
-import { PerformanceMetric } from "../../analytics/entities/performance-metric.entity";
+import { MetaCampaignSync } from "../../meta/entities/meta-campaign-sync.entity";
+import { MetaInsight } from "../../meta/entities/meta-insight.entity";
 import { QUEUE_NAMES } from "../queue.constants";
 
 interface ReportJobData {
@@ -23,6 +24,11 @@ interface ReportData {
   activeCampaigns: number;
   aiDecisionsToday: number;
   topAdName: string | null;
+  // What the agent actually did overnight + what needs the owner's approval.
+  agentExecuted: number;
+  agentPending: number;
+  pendingHighlights: string[];
+  projectedImpactUsd: number;
 }
 
 /**
@@ -49,8 +55,10 @@ export class ReportProcessor {
     private readonly workspaceRepo: Repository<Workspace>,
     @InjectRepository(AiDecision)
     private readonly decisionRepo: Repository<AiDecision>,
-    @InjectRepository(PerformanceMetric)
-    private readonly metricRepo: Repository<PerformanceMetric>,
+    @InjectRepository(MetaCampaignSync)
+    private readonly metaCampaignRepo: Repository<MetaCampaignSync>,
+    @InjectRepository(MetaInsight)
+    private readonly metaInsightRepo: Repository<MetaInsight>,
     private readonly config: ConfigService,
   ) {}
 
@@ -60,7 +68,6 @@ export class ReportProcessor {
 
     const workspace = await this.workspaceRepo.findOne({
       where: { id: workspaceId },
-      relations: ["campaigns"],
     });
 
     if (!workspace) return;
@@ -80,56 +87,77 @@ export class ReportProcessor {
   }
 
   private async buildReportData(workspace: Workspace): Promise<ReportData> {
-    // Yesterday's date range
+    // Yesterday's date, as a YYYY-MM-DD string — meta_insights.date is a DATE
+    // column keyed on the ad account's day, so we match on the date, not a
+    // JS timestamp range (which drifts with server timezone).
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    yesterday.setHours(0, 0, 0, 0);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const yDate = yesterday.toISOString().slice(0, 10);
+    const dayStart = new Date();
+    dayStart.setDate(dayStart.getDate() - 1);
+    dayStart.setHours(0, 0, 0, 0);
 
-    // Aggregate yesterday's metrics across all ads in this workspace
-    const metricsRaw = await this.metricRepo
-      .createQueryBuilder("m")
-      .innerJoin("m.ad", "ad")
-      .innerJoin("ad.adSet", "adSet")
-      .innerJoin("adSet.campaign", "campaign")
-      .where("campaign.workspaceId = :wid", { wid: workspace.id })
-      .andWhere("m.recordedAt >= :yesterday", { yesterday })
-      .andWhere("m.recordedAt < :today", { today })
+    // Aggregate yesterday's Meta insights (the real synced data). This replaces
+    // the old read of the seed-only performance_metrics chain, which is empty
+    // for real accounts.
+    const metricsRaw = await this.metaInsightRepo
+      .createQueryBuilder("insight")
+      .where("insight.workspaceId = :wid", { wid: workspace.id })
+      .andWhere("insight.date = :d", { d: yDate })
       .select([
-        "COALESCE(SUM(m.spend), 0) AS spend",
-        "COALESCE(SUM(m.conversions), 0) AS conversions",
-        "COALESCE(SUM(m.revenue), 0) AS revenue",
+        'COALESCE(SUM(insight.spend), 0) AS "spend"',
+        'COALESCE(SUM(insight.conversions), 0) AS "conversions"',
+        'COALESCE(SUM(insight.conversionValue), 0) AS "revenue"',
       ])
-      .getRawOne();
+      .getRawOne<{ spend: string; conversions: string; revenue: string }>();
 
     const totalSpend = parseFloat(metricsRaw?.spend ?? "0") || 0;
     const totalRevenue = parseFloat(metricsRaw?.revenue ?? "0") || 0;
-    const totalConversions = parseInt(metricsRaw?.conversions ?? "0") || 0;
+    const totalConversions = parseInt(metricsRaw?.conversions ?? "0", 10) || 0;
     const roas = totalSpend > 0 ? totalRevenue / totalSpend : 0;
 
-    // Count AI decisions made since midnight today
-    const aiDecisionsToday = await this.decisionRepo.count({
-      where: {
-        workspaceId: workspace.id,
-        createdAt: MoreThanOrEqual(today),
-      },
+    // Active campaigns from the Meta sync table.
+    const activeCampaigns = await this.metaCampaignRepo.count({
+      where: { workspaceId: workspace.id, status: "ACTIVE" },
     });
 
-    // Find best performing ad by ROAS yesterday
-    const topAdRaw = await this.metricRepo
-      .createQueryBuilder("m")
-      .innerJoin("m.ad", "ad")
-      .innerJoin("ad.adSet", "adSet")
-      .innerJoin("adSet.campaign", "campaign")
-      .where("campaign.workspaceId = :wid", { wid: workspace.id })
-      .andWhere("m.recordedAt >= :yesterday", { yesterday })
-      .andWhere("m.recordedAt < :today", { today })
-      .andWhere("m.spend > 0")
-      .select(["ad.name AS adName", "m.roas AS roas"])
-      .orderBy("m.roas", "DESC")
+    // Top campaign yesterday by spend, with its human name.
+    const topRaw = await this.metaInsightRepo
+      .createQueryBuilder("insight")
+      .leftJoin(
+        MetaCampaignSync,
+        "campaign",
+        "campaign.id = insight.campaignId",
+      )
+      .where("insight.workspaceId = :wid", { wid: workspace.id })
+      .andWhere("insight.date = :d", { d: yDate })
+      .andWhere("insight.spend > 0")
+      .select(['campaign.name AS "name"', "insight.spend AS spend"])
+      .orderBy("insight.spend", "DESC")
       .limit(1)
-      .getRawOne();
+      .getRawOne<{ name: string | null; spend: string }>();
+
+    // The agent's overnight work: decisions from the last 24h, split into what
+    // was auto-applied vs what is waiting for the owner to approve.
+    const recentDecisions = await this.decisionRepo.find({
+      where: {
+        workspaceId: workspace.id,
+        createdAt: MoreThanOrEqual(dayStart),
+      },
+      order: { createdAt: "DESC" },
+    });
+
+    const agentExecuted = recentDecisions.filter((d) => d.isExecuted).length;
+    const pending = recentDecisions.filter(
+      (d) => d.isApproved === null && !d.isExecuted,
+    );
+    const pendingHighlights = pending
+      .slice(0, 2)
+      .map((d) => this.shortReason(d.reason));
+    const projectedImpactUsd = recentDecisions.reduce(
+      (sum, d) => sum + (Number(d.impactUsd) || 0),
+      0,
+    );
 
     return {
       workspaceName: workspace.name,
@@ -138,11 +166,21 @@ export class ReportProcessor {
       totalRevenue,
       totalConversions,
       roas,
-      activeCampaigns:
-        workspace.campaigns?.filter((c) => c.status === "active").length || 0,
-      aiDecisionsToday,
-      topAdName: topAdRaw?.adName ?? null,
+      activeCampaigns,
+      aiDecisionsToday: recentDecisions.length,
+      topAdName: topRaw?.name ?? null,
+      agentExecuted,
+      agentPending: pending.length,
+      pendingHighlights,
+      projectedImpactUsd,
     };
+  }
+
+  /** Trim a decision's reason to one scannable line for the Telegram digest. */
+  private shortReason(reason: string): string {
+    const firstLine = (reason || "").split(/[.\n]/)[0].trim();
+    if (!firstLine) return "AI tavsiya";
+    return firstLine.length > 90 ? `${firstLine.slice(0, 87)}…` : firstLine;
   }
 
   /**
@@ -190,6 +228,36 @@ export class ReportProcessor {
     const spendFormatted = `$${data.totalSpend.toFixed(2)}`;
     const revenueFormatted = `$${data.totalRevenue.toFixed(2)}`;
 
+    // Narrative of what the agent did overnight — the Trust surface. Only shown
+    // when the agent actually did or proposed something.
+    const agentLines: string[] = [];
+    if (data.agentExecuted > 0) {
+      agentLines.push(
+        `✅ <b>${data.agentExecuted} ta</b> amalni avtomatik bajardi`,
+      );
+    }
+    if (data.agentPending > 0) {
+      agentLines.push(
+        `⏳ <b>${data.agentPending} ta</b> tavsiya tasdiqingizni kutmoqda:`,
+      );
+      for (const h of data.pendingHighlights) {
+        agentLines.push(`   • ${h}`);
+      }
+    }
+    if (data.agentExecuted === 0 && data.agentPending === 0) {
+      agentLines.push("😴 Bugun aralashuv shart bo'lmadi — hammasi joyida");
+    }
+    if (data.projectedImpactUsd > 0) {
+      agentLines.push(
+        `💡 <b>Taxminiy samara:</b> ~$${Math.round(data.projectedImpactUsd)}`,
+      );
+    }
+
+    const ctaLine =
+      data.agentPending > 0
+        ? "<i>👉 Tasdiqlash: adspectr.com/ai-decisions</i>"
+        : "<i>Batafsil: adspectr.com/dashboard</i>";
+
     return `
 <b>📊 AdSpectr — Kunlik Hisobot</b>
 <b>${data.workspaceName}</b> | ${data.date}
@@ -197,13 +265,14 @@ export class ReportProcessor {
 💰 <b>Sarflandi:</b> ${spendFormatted}
 💵 <b>Daromad:</b> ${revenueFormatted}
 ${roasEmoji} <b>ROAS:</b> ${data.roas.toFixed(2)}x
-🎯 <b>Leadlar:</b> ${data.totalConversions} ta
+🎯 <b>Konversiyalar:</b> ${data.totalConversions} ta
 📢 <b>Aktiv kampaniyalar:</b> ${data.activeCampaigns} ta
+${data.topAdName ? `🔥 <b>Eng yaxshi kampaniya:</b> "${data.topAdName}"` : ""}
 
-🤖 <b>AI bugun:</b> ${data.aiDecisionsToday} ta qaror qabul qildi
-${data.topAdName ? `🔥 <b>Eng yaxshi reklama:</b> "${data.topAdName}"` : ""}
+🤖 <b>Agent kecha:</b>
+${agentLines.join("\n")}
 
-<i>Batafsil: adspectr.com/dashboard</i>
+${ctaLine}
     `.trim();
   }
 

@@ -162,9 +162,9 @@ export class McpToolsService {
         case "list_ai_decisions":
           return this.listAiDecisions(args, ctx);
         case "approve_decision":
-          return this.approveDecision(args);
+          return this.approveDecision(args, ctx);
         case "reject_decision":
-          return this.rejectDecision(args);
+          return this.rejectDecision(args, ctx);
         case "generate_strategy":
           return this.generateStrategy(ctx);
         case "run_optimization":
@@ -257,9 +257,10 @@ export class McpToolsService {
 
   private async approveDecision(
     args: Record<string, any>,
+    ctx: McpCredentialContext,
   ): Promise<McpToolResult> {
     if (!args.decision_id) return this.error("decision_id talab qilinadi");
-    await this.aiAgentService.approveDecision(args.decision_id);
+    await this.aiAgentService.approveDecision(args.decision_id, ctx.userId);
     return {
       content: [
         {
@@ -272,9 +273,10 @@ export class McpToolsService {
 
   private async rejectDecision(
     args: Record<string, any>,
+    ctx: McpCredentialContext,
   ): Promise<McpToolResult> {
     if (!args.decision_id) return this.error("decision_id talab qilinadi");
-    await this.aiAgentService.rejectDecision(args.decision_id);
+    await this.aiAgentService.rejectDecision(args.decision_id, ctx.userId);
     return {
       content: [
         { type: "text", text: `AI qaror rad etildi: ${args.decision_id}` },

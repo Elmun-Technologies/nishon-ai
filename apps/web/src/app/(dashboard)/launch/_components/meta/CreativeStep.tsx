@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { AlertCircle, ExternalLink, Facebook } from 'lucide-react'
+import { AlertCircle, ExternalLink, Facebook, Sparkles } from 'lucide-react'
 import { Input, Textarea } from '@/components/ui'
 import { WizardStepCard } from '@/components/launch/wizard-shell'
 import { useI18n } from '@/i18n/use-i18n'
-import { platforms } from '@/lib/api-client'
+import { aiAgent, platforms } from '@/lib/api-client'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { cn } from '@/lib/utils'
 import type { LaunchWizardCtl } from '../../_lib/use-launch-wizard'
@@ -19,6 +19,62 @@ export function CreativeStep({ ctl }: { ctl: LaunchWizardCtl }) {
   const [pages, setPages] = useState<Array<{ id: string; name: string }>>([])
   const [pagesLoading, setPagesLoading] = useState(false)
   const [pagesError, setPagesError] = useState('')
+  const [copyLoading, setCopyLoading] = useState(false)
+  const [copyError, setCopyError] = useState('')
+
+  /**
+   * Let the agent write the ad copy — one click instead of a blank textarea.
+   * Uses the workspace + chosen objective as context, then fills the message,
+   * campaign name and CTA. Everything stays editable (Vaqt, not lock-in).
+   */
+  const handleWriteCopy = async () => {
+    setCopyLoading(true)
+    setCopyError('')
+    try {
+      const productName =
+        currentWorkspace?.name?.trim() || ctl.metaData.name.trim() || 'Mahsulot'
+      const audience =
+        currentWorkspace?.targetAudience?.trim() || 'Keng omma va potentsial mijozlar'
+      const benefits = [currentWorkspace?.industry?.trim()].filter(
+        (b): b is string => !!b,
+      )
+      const res = await aiAgent.wizardAdCopy({
+        productName,
+        benefits: benefits.length ? benefits : ['sifat', 'ishonch', 'tezkor xizmat'],
+        objective: ctl.metaData.objective || 'leads',
+        audience,
+        platform: 'meta',
+      })
+      const copy = (res.data ?? {}) as {
+        headlines?: string[]
+        descriptions?: string[]
+        cta?: string
+        primaryText?: string
+      }
+      const body =
+        copy.primaryText?.trim() ||
+        copy.descriptions?.[0]?.trim() ||
+        copy.headlines?.[0]?.trim() ||
+        ''
+      if (!body) {
+        setCopyError('AI matn qaytarmadi — qayta urinib ko\'ring.')
+        return
+      }
+      ctl.setMetaData((d) => ({
+        ...d,
+        creativeText: body,
+        creativeName: d.creativeName || copy.headlines?.[0]?.trim() || d.creativeName,
+      }))
+    } catch (err: any) {
+      setCopyError(
+        err?.response?.data?.message ||
+          err?.message ||
+          'Matn yaratishda xato. Keyinroq urinib ko\'ring.',
+      )
+    } finally {
+      setCopyLoading(false)
+    }
+  }
 
   useEffect(() => {
     if (!currentWorkspace?.id) return
@@ -151,18 +207,37 @@ export function CreativeStep({ ctl }: { ctl: LaunchWizardCtl }) {
         />
 
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-text-secondary">
-            {lt('meta.creativeText', 'Reklama matni')}
-          </label>
+          <div className="flex items-center justify-between gap-2">
+            <label className="block text-sm font-medium text-text-secondary">
+              {lt('meta.creativeText', 'Reklama matni')}
+            </label>
+            <button
+              type="button"
+              onClick={handleWriteCopy}
+              disabled={copyLoading}
+              className={cn(
+                'inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition-colors',
+                'border-brand-mid/30 bg-brand-mid/[0.06] text-brand-mid hover:bg-brand-mid/12',
+                'disabled:cursor-not-allowed disabled:opacity-60',
+                'dark:border-brand-lime/30 dark:bg-brand-lime/[0.06] dark:text-brand-lime',
+              )}
+            >
+              <Sparkles className={cn('h-3.5 w-3.5', copyLoading && 'animate-pulse')} aria-hidden />
+              {copyLoading ? 'AI yozmoqda…' : 'AI matn yozib bersin'}
+            </button>
+          </div>
           <Textarea
             value={ctl.metaData.creativeText}
             onChange={(e) => ctl.setMetaData((d) => ({ ...d, creativeText: e.target.value }))}
             placeholder="…"
             rows={4}
           />
-          <p className="text-[11px] text-text-tertiary">
-            {ctl.metaData.creativeText.length} ta belgi
-          </p>
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-[11px] text-text-tertiary">
+              {ctl.metaData.creativeText.length} ta belgi
+            </p>
+            {copyError && <p className="text-[11px] text-rose-600">{copyError}</p>}
+          </div>
         </div>
 
         <div>

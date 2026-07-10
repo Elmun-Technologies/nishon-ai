@@ -14,6 +14,8 @@ import { Campaign } from "../campaigns/entities/campaign.entity";
 import { AiDecision } from "../ai-decisions/entities/ai-decision.entity";
 import { PerformanceMetric } from "../analytics/entities/performance-metric.entity";
 import { ConnectedAccount } from "../platforms/entities/connected-account.entity";
+import { MetaCampaignSync } from "../meta/entities/meta-campaign-sync.entity";
+import { MetaInsight } from "../meta/entities/meta-insight.entity";
 import { AiAgentModule } from "../ai-agent/ai-agent.module";
 import { TriggersetModule } from "../triggersets/triggersets.module";
 import { PlatformsModule } from "../platforms/platforms.module";
@@ -28,6 +30,8 @@ import { QUEUE_NAMES } from "./queue.constants";
       AiDecision,
       PerformanceMetric,
       ConnectedAccount,
+      MetaCampaignSync,
+      MetaInsight,
     ]),
     HttpModule,
     // Register Bull queues — each connects to Redis automatically

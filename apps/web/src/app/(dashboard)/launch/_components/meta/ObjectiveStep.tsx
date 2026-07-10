@@ -41,6 +41,17 @@ export function ObjectiveStep({ ctl }: { ctl: LaunchWizardCtl }) {
             Erishmoqchi bo&apos;lgan biznes natijani belgilang.
           </p>
 
+          {ctl.metaPrefilled && (
+            <div className="mb-4 flex items-start gap-2 rounded-lg border border-[#0866FF]/25 bg-[#0866FF]/[0.05] p-3">
+              <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#0866FF]" aria-hidden />
+              <p className="text-xs leading-relaxed text-text-secondary">
+                <span className="font-semibold text-text-primary">AI tayyorladi.</span>{' '}
+                Onboarding javoblaringizga qarab maqsad, hudud, yosh va byudjet oldindan
+                to&apos;ldirildi — istalgan qiymatni o&apos;zgartirishingiz mumkin.
+              </p>
+            </div>
+          )}
+
           <div className="space-y-1">
             {META_OBJECTIVES.map((o) => {
               const Icon = o.icon
