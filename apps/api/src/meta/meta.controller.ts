@@ -275,8 +275,15 @@ export class MetaController {
       order: { name: "ASC" },
     });
 
+    // One grouped aggregation for ALL of the workspace's campaigns, instead of
+    // a per-campaign query (the old N+1). Behaviour-preserving: still all-time
+    // totals, just resolved from a single scan + in-memory map lookups.
+    const insightsByCampaign = await this.aggregateInsightsMap(workspaceId);
+
     const enrichedAccounts = await Promise.all(
-      accounts.map((account) => this.buildAccountPayload(account, workspaceId)),
+      accounts.map((account) =>
+        this.buildAccountPayload(account, workspaceId, insightsByCampaign),
+      ),
     );
 
     return { workspaceId, accounts: enrichedAccounts };
@@ -287,6 +294,7 @@ export class MetaController {
   private async buildAccountPayload(
     account: MetaAdAccount,
     workspaceId: string,
+    insightsByCampaign: Map<string, CampaignInsights>,
   ) {
     // Filter campaigns by both adAccountId AND workspaceId for strict isolation
     const campaigns = await this.campaignRepo.find({
@@ -294,8 +302,8 @@ export class MetaController {
       order: { name: "ASC" },
     });
 
-    const enrichedCampaigns = await Promise.all(
-      campaigns.map((c) => this.buildCampaignPayload(c, workspaceId)),
+    const enrichedCampaigns = campaigns.map((c) =>
+      this.buildCampaignPayload(c, insightsByCampaign),
     );
 
     return {
@@ -307,11 +315,20 @@ export class MetaController {
     };
   }
 
-  private async buildCampaignPayload(
+  private buildCampaignPayload(
     campaign: MetaCampaignSync,
-    workspaceId: string,
+    insightsByCampaign: Map<string, CampaignInsights>,
   ) {
-    const aggregated = await this.aggregateInsights(campaign.id, workspaceId);
+    const aggregated =
+      insightsByCampaign.get(campaign.id) ??
+      ({
+        campaignId: campaign.id,
+        spend: 0,
+        impressions: 0,
+        clicks: 0,
+        ctr: 0,
+        cpc: 0,
+      } as CampaignInsights);
     const aiResult = this.aiEngine.analyzeCampaign(aggregated);
 
     return {
@@ -334,39 +351,46 @@ export class MetaController {
   }
 
   /**
-   * Aggregates all MetaInsight rows for a campaign into a single totals snapshot.
-   * ALWAYS filters by workspaceId to enforce tenant isolation — even though the
-   * campaign PK is already unique, an explicit workspaceId filter prevents any
-   * edge-case data leaks during upsert race conditions.
+   * Aggregates MetaInsight rows for EVERY campaign in a workspace in a single
+   * grouped query, keyed by campaignId. Replaces the old per-campaign scan
+   * (N+1). ALWAYS filters by workspaceId to enforce tenant isolation. Totals
+   * are recomputed from summed spend/clicks/impressions to avoid averaging bias.
    */
-  private async aggregateInsights(
-    campaignId: string,
+  private async aggregateInsightsMap(
     workspaceId: string,
-  ): Promise<CampaignInsights> {
-    const rows = await this.insightRepo.find({
-      where: { campaignId, workspaceId },
-    });
+  ): Promise<Map<string, CampaignInsights>> {
+    const rows = await this.insightRepo
+      .createQueryBuilder("insight")
+      .where("insight.workspaceId = :wid", { wid: workspaceId })
+      .select([
+        "insight.campaignId AS campaignId",
+        'COALESCE(SUM(insight.spend), 0) AS "spend"',
+        'COALESCE(SUM(insight.clicks), 0) AS "clicks"',
+        'COALESCE(SUM(insight.impressions), 0) AS "impressions"',
+      ])
+      .groupBy("insight.campaignId")
+      .getRawMany<{
+        campaignId: string;
+        spend: string;
+        clicks: string;
+        impressions: string;
+      }>();
 
-    if (rows.length === 0) {
-      return {
-        campaignId,
-        spend: 0,
-        impressions: 0,
-        clicks: 0,
-        ctr: 0,
-        cpc: 0,
-      };
+    const map = new Map<string, CampaignInsights>();
+    for (const r of rows) {
+      const spend = parseFloat(r.spend) || 0;
+      const clicks = parseInt(r.clicks, 10) || 0;
+      const impressions = parseInt(r.impressions, 10) || 0;
+      map.set(r.campaignId, {
+        campaignId: r.campaignId,
+        spend,
+        clicks,
+        impressions,
+        ctr: impressions > 0 ? (clicks / impressions) * 100 : 0,
+        cpc: clicks > 0 ? spend / clicks : 0,
+      });
     }
-
-    const spend = rows.reduce((s, r) => s + Number(r.spend), 0);
-    const impressions = rows.reduce((s, r) => s + Number(r.impressions), 0);
-    const clicks = rows.reduce((s, r) => s + Number(r.clicks), 0);
-
-    // Recalculate from totals to avoid averaging-bias; guard against division by zero
-    const ctr = impressions > 0 ? (clicks / impressions) * 100 : 0;
-    const cpc = clicks > 0 ? spend / clicks : 0;
-
-    return { campaignId, spend, impressions, clicks, ctr, cpc };
+    return map;
   }
 
   // ─── Top performing campaigns ────────────────────────────────────────────────

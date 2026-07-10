@@ -166,10 +166,10 @@ function KpiCard({
     <div
       className={cn(
         'relative overflow-hidden rounded-2xl border bg-surface p-5 transition-shadow hover:shadow-lg',
-        accent ? 'border-violet-500/30' : 'border-white/[0.07]',
+        accent ? 'border-primary/30' : 'border-white/[0.07]',
       )}
     >
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-violet-500/60 via-blue-500/40 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-primary/60 via-brand-mid/40 to-transparent" />
       <div className="flex items-start justify-between gap-2">
         <p className="text-[11px] font-semibold uppercase tracking-widest text-text-tertiary">{label}</p>
         <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white/[0.05]">
@@ -512,7 +512,7 @@ export default function DashboardPage() {
             className={cn(
               'rounded-lg px-3 py-1 text-xs font-medium transition-all',
               datePreset === p.id
-                ? 'bg-violet-600 text-white shadow-sm shadow-violet-500/20'
+                ? 'bg-primary text-brand-ink shadow-sm shadow-primary/20'
                 : 'text-text-secondary hover:bg-white/[0.06] hover:text-text-primary',
             )}
           >
@@ -667,9 +667,9 @@ export default function DashboardPage() {
                 <Link
                   key={x.href}
                   href={x.href}
-                  className="flex items-center gap-2 rounded-xl border border-white/[0.06] bg-surface-2/60 px-3 py-2.5 text-xs font-medium text-text-secondary transition hover:border-violet-500/30 hover:bg-violet-500/8 hover:text-text-primary"
+                  className="flex items-center gap-2 rounded-xl border border-white/[0.06] bg-surface-2/60 px-3 py-2.5 text-xs font-medium text-text-secondary transition hover:border-primary/30 hover:bg-primary/8 hover:text-text-primary"
                 >
-                  <x.icon className="h-3.5 w-3.5 shrink-0 text-violet-400" />
+                  <x.icon className="h-3.5 w-3.5 shrink-0 text-primary" />
                   <span className="truncate">{x.label}</span>
                 </Link>
               ))}
@@ -682,7 +682,7 @@ export default function DashboardPage() {
       <div className="rounded-2xl border border-white/[0.07] bg-surface overflow-hidden">
         <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
           <h2 className="flex items-center gap-2 text-sm font-semibold text-text-primary">
-            <Users className="h-4 w-4 text-violet-400" />
+            <Users className="h-4 w-4 text-primary" />
             {t('dashboard.dashboardHome.activeCampaigns', 'Faol kampaniyalar')}
             {reportCampaigns.length > 0 && (
               <span className="rounded-full bg-white/[0.08] px-2 py-0.5 text-[11px] font-medium text-text-secondary">
@@ -692,7 +692,7 @@ export default function DashboardPage() {
           </h2>
           <Link
             href="/campaigns"
-            className="text-xs font-medium text-violet-400 hover:text-violet-300 hover:underline"
+            className="text-xs font-medium text-primary hover:text-primary/80 hover:underline"
           >
             {t('dashboard.viewAll', 'Barchasini ko\'rish →')}
           </Link>
@@ -794,10 +794,10 @@ export default function DashboardPage() {
         <div className="rounded-2xl border border-white/[0.07] bg-surface p-5">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="flex items-center gap-2 text-sm font-semibold text-text-primary">
-              <Sparkles className="h-4 w-4 text-violet-400" />
+              <Sparkles className="h-4 w-4 text-primary" />
               {t('dashboard.topAdsTitle', 'Top reklamalar')}
             </h2>
-            <Link href="/top-ads" className="text-xs font-medium text-violet-400 hover:underline">
+            <Link href="/top-ads" className="text-xs font-medium text-primary hover:underline">
               {t('dashboard.viewAll', 'Barchasini ko\'rish →')}
             </Link>
           </div>
@@ -808,7 +808,7 @@ export default function DashboardPage() {
                 className={cn(
                   'rounded-xl border p-3 transition',
                   i === 0
-                    ? 'border-violet-500/30 bg-violet-500/5'
+                    ? 'border-primary/30 bg-primary/5'
                     : 'border-white/[0.06] bg-surface-2/50',
                 )}
               >
