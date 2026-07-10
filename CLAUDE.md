@@ -28,7 +28,49 @@ pnpm --filter api dev   # Faqat backend
 ## Joriy holat (so'nggi yangilash: 2026-07-10)
 
 **Asosiy branch:** `main`
-**Faol branch:** `claude/loyihani-mvp-readiness-xv4anj` — MVP-tayyorlik: real deploy blockerlari tuzatildi
+**Faol branch:** `claude/loyihani-mvp-readiness-xv4anj` — Agentic platforma (Vaqt · Pul · Ishonch)
+
+### 2026-07-10 sessiyasi (2) — Agentic: real, boshqariladigan agent (PR #149)
+Startap va'dasi **Vaqt · Pul · Ishonch** — AI agent biznes reklamasini o'zi
+boshqaradi. Ikki mustaqil audit + to'g'ridan-to'g'ri tracing tasdiqladi:
+katta agentic *skelet* bor edi (2-soatlik optimizatsiya cron, decision loop,
+governance, autopilot rejimlar), lekin **real akkauntlarda amalda no-op** edi.
+Ikki parallel yo'nalishda tuzatildi:
+
+**Track A — Foundation (Ishonch + Pul): real, governed, ASSISTED agent**
+- ✅ **A1: Real Meta datani ko'radi** — `DecisionLoopService` endi seed-only
+  `campaigns` jadvali o'rniga `meta_campaign_syncs` + `meta_insights` (7 kunlik)
+  dan o'qiydi (real userlarda bo'sh emas).
+- ✅ **A2: Execution targeting** — LLM `targetId` endi tashlab yuborilmaydi;
+  `ai_decisions`ga `target_external_id`/`target_platform` ustunlari (guarded
+  migration 1763500), token `connected_accounts`dan decrypt qilinib
+  `meta.connector.pauseCampaign`/`updateCampaignBudget` chaqiriladi.
+- ✅ **A3: Governance + rejim gating** — MANUAL=faqat taklif; **ASSISTED=faqat
+  low-risk auto, high-risk (pause/budget) tasdiqqa**; FULL_AUTO=hammasi. Cron
+  faqat onboarded + active account + rejim≠MANUAL workspacelarga. Workspace
+  default MANUAL→**ASSISTED**.
+- ✅ **A4: Approval unify + IDOR fix** — bitta executing, owner-checked
+  `/ai-agent/decisions/:id/approve` yo'li; `ai-decisions` sahifasi va MCP
+  ham shu yo'lga o'tdi (userId owner check).
+- ✅ **A5: Real confidence + impact** — har `AiDecision`ga haqiqiy confidence
+  (0-1) va $ impact yoziladi; frontend soxta 0.8-0.95 stublar o'chirildi.
+
+**Track B — Time (Vaqt): proaktiv + auto-config**
+- ✅ **B6: Ad Launcher auto-to'ldirish** — onboarding javoblari (goal/CJM, geo,
+  yosh, byudjet split) `workspace.aiStrategy`ga saqlanadi; Meta wizard
+  objective/geo/yosh/byudjetni oldindan to'ldiradi ("AI tayyorladi" badge,
+  hammasi tahrirlanadi). `prefill.ts` + 6 unit test.
+- ✅ **B7: Bir-klik AI matn** — CreativeStep'da "AI matn yozib bersin" tugmasi
+  ilgari ulanmagan `aiAgent.wizardAdCopy` endpoint'iga ulandi.
+- ✅ **B8: Real kunlik Telegram digest** — 9:00 cron endi seed-only metrics
+  o'rniga real `meta_insights` (kechagi spend/ROAS/konversiya) + agent kecha
+  nima qildi/nima tasdiq kutmoqda narrativi + approve CTA. 4 processor test.
+
+**Yakuniy holat:** API **305/305**, API lint toza, web build OK, web unit
+**118/118**, i18n 2533×3, e2e **39/39**. Yangi migration Track B'da yo'q.
+
+**Keyingi (Phase 2, kechiktirilgan):** adset-level pause/budget connector
+metodlari, proaktiv anomaliya alertlari, cross-campaign byudjet reallokatsiya.
 
 ### 2026-07-10 sessiyasi — MVP-tayyorlik: real deploy blockerlari
 Holat aniqlash: barcha CI darvozalari yashil edi (API 295/295, web unit 112/112,
