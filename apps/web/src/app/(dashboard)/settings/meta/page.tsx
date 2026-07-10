@@ -587,7 +587,7 @@ export default function MetaSettingsPage() {
             type="button"
             onClick={() => void handleSync()}
             disabled={syncing}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-surface hover:bg-surface text-white text-sm font-medium disabled:opacity-50 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary hover:bg-primary/90 text-brand-ink text-sm font-medium disabled:opacity-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
           >
             <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} className={syncing ? 'animate-spin' : ''}>
               <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
