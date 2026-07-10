@@ -316,6 +316,33 @@ describe("LaunchOrchestratorService", () => {
       expect(metaConnector.createAdFromExistingCreative).not.toHaveBeenCalled();
     });
 
+    it("marks the job failed when the campaign is created but every ad set is rejected", async () => {
+      launchRepo.findOne.mockResolvedValue(
+        jobWith({
+          workspaceId,
+          platform: "meta",
+          objective: "OUTCOME_SALES",
+          budgetType: "CBO",
+          dailyBudget: 40,
+          audiences: [
+            { name: "Retarget", funnelStage: "retargeting" },
+            { name: "Retention", funnelStage: "retention" },
+          ],
+        }),
+      );
+      // Every ad set creation fails (e.g. Meta rejects OFFSITE_CONVERSIONS with
+      // no promoted_object) — the campaign shell exists but nothing is deliverable.
+      metaConnector.createAdSet.mockRejectedValue(new Error("adset rejected"));
+
+      const result = await service.launch("job-1", userId);
+
+      expect(metaConnector.createCampaign).toHaveBeenCalledTimes(1);
+      expect(result.status).toBe("failed");
+      expect(result.error).toMatch(/adset rejected|No ad sets/i);
+      // The result is still persisted so the UI can show what went wrong.
+      expect((result.payload as any).launchResult.adSetIds).toEqual([]);
+    });
+
     it("marks the job failed when no audiences are provided in validate()", async () => {
       launchRepo.findOne.mockResolvedValue(
         jobWith({

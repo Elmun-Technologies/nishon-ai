@@ -76,13 +76,35 @@ export class LaunchOrchestratorService {
 
     try {
       const result = await this.launchOnConnectedPlatform(job);
-      job.status = "launched";
-      job.launchedAt = new Date();
-      job.error = null;
+
+      // Don't report "launched" when the campaign shell was created but no ad
+      // sets survived (e.g. every audience's ad set was rejected by Meta). That
+      // produces a paused campaign with nothing deliverable, so it's a failure,
+      // not a success. Meta results carry adSetIds/adSetErrors; other platforms
+      // don't, so this only downgrades the Meta path.
+      const adSetIds = Array.isArray((result as any).adSetIds)
+        ? (result as any).adSetIds
+        : null;
+      const adSetErrors = Array.isArray((result as any).adSetErrors)
+        ? (result as any).adSetErrors
+        : [];
+      const noAdSetsCreated = adSetIds !== null && adSetIds.length === 0;
+
       job.payload = {
         ...job.payload,
         launchResult: result,
       };
+
+      if (noAdSetsCreated) {
+        job.status = "failed";
+        job.error =
+          adSetErrors[0]?.error ||
+          "No ad sets could be created for this launch";
+      } else {
+        job.status = "launched";
+        job.launchedAt = new Date();
+        job.error = null;
+      }
     } catch (error: any) {
       job.status = "failed";
       job.error = error?.message || "Launch failed";
