@@ -25,124 +25,167 @@ import type { AudiencePresetId, LaunchObjective } from '../_lib/types'
 const OBJECTIVES: {
   id: LaunchObjective
   icon: React.ComponentType<{ className?: string }>
-  label: string
-  description: string
+  labelKey: string
+  labelFallback: string
+  descKey: string
+  descFallback: string
 }[] = [
   {
     id: 'OUTCOME_SALES',
     icon: ShoppingCart,
-    label: 'Sotuvlar',
-    description: 'Xarid qilishi mumkin bo\'lgan odamlarga ko\'rsatish',
+    labelKey: 'adLauncher.objSales',
+    labelFallback: 'Sotuvlar',
+    descKey: 'adLauncher.objSalesDesc',
+    descFallback: 'Xarid qilishi mumkin bo\'lgan odamlarga ko\'rsatish',
   },
   {
     id: 'OUTCOME_LEADS',
     icon: Users,
-    label: 'Lidlar',
-    description: 'Telefon/email to\'plash, forma to\'ldirtirish',
+    labelKey: 'adLauncher.objLeads',
+    labelFallback: 'Lidlar',
+    descKey: 'adLauncher.objLeadsDesc',
+    descFallback: 'Telefon/email to\'plash, forma to\'ldirtirish',
   },
   {
     id: 'OUTCOME_TRAFFIC',
     icon: TrendingUp,
-    label: 'Trafik',
-    description: 'Saytingizga tashrif buyurtuvchilar',
+    labelKey: 'adLauncher.objTraffic',
+    labelFallback: 'Trafik',
+    descKey: 'adLauncher.objTrafficDesc',
+    descFallback: 'Saytingizga tashrif buyurtuvchilar',
   },
   {
     id: 'OUTCOME_ENGAGEMENT',
     icon: Target,
-    label: 'Engagement',
-    description: 'Like, izoh, ulashish — brendga e\'tibor',
+    labelKey: 'adLauncher.objEngagement',
+    labelFallback: 'Engagement',
+    descKey: 'adLauncher.objEngagementDesc',
+    descFallback: 'Like, izoh, ulashish — brendga e\'tibor',
   },
   {
     id: 'OUTCOME_AWARENESS',
     icon: Megaphone,
-    label: 'Bilimdorlik',
-    description: 'Brendingizni ko\'proq odamga tanittirish',
+    labelKey: 'adLauncher.objAwareness',
+    labelFallback: 'Bilimdorlik',
+    descKey: 'adLauncher.objAwarenessDesc',
+    descFallback: 'Brendingizni ko\'proq odamga tanittirish',
   },
 ]
 
 const BUDGET_PRESETS = [10, 25, 50, 100, 200]
 
-const COUNTRY_OPTIONS: { code: string; label: string }[] = [
-  { code: 'UZ', label: 'O\'zbekiston' },
-  { code: 'KZ', label: 'Qozog\'iston' },
-  { code: 'RU', label: 'Rossiya' },
-  { code: 'KG', label: 'Qirg\'iziston' },
-  { code: 'TJ', label: 'Tojikiston' },
-  { code: 'TM', label: 'Turkmaniston' },
-  { code: 'TR', label: 'Turkiya' },
-  { code: 'US', label: 'AQSh' },
+const COUNTRY_OPTIONS: { code: string; labelKey: string; labelFallback: string }[] = [
+  { code: 'UZ', labelKey: 'adLauncher.countryUZ', labelFallback: 'O\'zbekiston' },
+  { code: 'KZ', labelKey: 'adLauncher.countryKZ', labelFallback: 'Qozog\'iston' },
+  { code: 'RU', labelKey: 'adLauncher.countryRU', labelFallback: 'Rossiya' },
+  { code: 'KG', labelKey: 'adLauncher.countryKG', labelFallback: 'Qirg\'iziston' },
+  { code: 'TJ', labelKey: 'adLauncher.countryTJ', labelFallback: 'Tojikiston' },
+  { code: 'TM', labelKey: 'adLauncher.countryTM', labelFallback: 'Turkmaniston' },
+  { code: 'TR', labelKey: 'adLauncher.countryTR', labelFallback: 'Turkiya' },
+  { code: 'US', labelKey: 'adLauncher.countryUS', labelFallback: 'AQSh' },
 ]
 
-const GENDER_OPTIONS: { id: number | 'all'; label: string }[] = [
-  { id: 'all', label: 'Hammasi' },
-  { id: 1, label: 'Erkak' },
-  { id: 2, label: 'Ayol' },
+const GENDER_OPTIONS: { id: number | 'all'; labelKey: string; labelFallback: string }[] = [
+  { id: 'all', labelKey: 'adLauncher.genderAll', labelFallback: 'Hammasi' },
+  { id: 1, labelKey: 'adLauncher.genderMale', labelFallback: 'Erkak' },
+  { id: 2, labelKey: 'adLauncher.genderFemale', labelFallback: 'Ayol' },
 ]
 
 const AUDIENCE_PRESETS: {
   id: AudiencePresetId
   emoji: string
-  label: string
-  who: string
+  labelKey: string
+  labelFallback: string
+  whoKey: string
+  whoFallback: string
 }[] = [
   {
     id: 'prospecting',
     emoji: '🆕',
-    label: 'Yangi odamlar',
-    who: 'Siz bilan hali tanish bo\'lmagan potentsial mijozlar',
+    labelKey: 'adLauncher.audNewLabel',
+    labelFallback: 'Yangi odamlar',
+    whoKey: 'adLauncher.audNewWho',
+    whoFallback: 'Siz bilan hali tanish bo\'lmagan potentsial mijozlar',
   },
   {
     id: 'reengagement',
     emoji: '🔄',
-    label: 'Qaytish uchun',
-    who: 'Saytga kirgan, lekin hali xarid qilmagan',
+    labelKey: 'adLauncher.audReturnLabel',
+    labelFallback: 'Qaytish uchun',
+    whoKey: 'adLauncher.audReturnWho',
+    whoFallback: 'Saytga kirgan, lekin hali xarid qilmagan',
   },
   {
     id: 'retargeting',
     emoji: '🎯',
-    label: 'Retargeting',
-    who: 'So\'nggi 30 kundagi faol foydalanuvchilar',
+    labelKey: 'adLauncher.audRetargeting',
+    labelFallback: 'Retargeting',
+    whoKey: 'adLauncher.audRetargetWho',
+    whoFallback: 'So\'nggi 30 kundagi faol foydalanuvchilar',
   },
   {
     id: 'retention',
     emoji: '💎',
-    label: 'Mavjud mijozlar',
-    who: 'Avval xarid qilganlarni yana jalb qilish',
+    labelKey: 'adLauncher.audExistingLabel',
+    labelFallback: 'Mavjud mijozlar',
+    whoKey: 'adLauncher.audExistingWho',
+    whoFallback: 'Avval xarid qilganlarni yana jalb qilish',
   },
 ]
 
-const LAUNCH_STEPS: { key: string; label: string; sub: string }[] = [
+const LAUNCH_STEPS: {
+  key: string
+  labelKey: string
+  labelFallback: string
+  subKey: string
+  subFallback: string
+}[] = [
   {
     key: 'creating_draft',
-    label: 'Launch job yaratilmoqda',
-    sub: "Bizning serverda kampaniya konfiguratsiyasi saqlanmoqda",
+    labelKey: 'adLauncher.launchStepDraftLabel',
+    labelFallback: 'Launch job yaratilmoqda',
+    subKey: 'adLauncher.launchStepDraftSub',
+    subFallback: 'Bizning serverda kampaniya konfiguratsiyasi saqlanmoqda',
   },
   {
     key: 'validating',
-    label: 'Validatsiyadan o\'tmoqda',
-    sub: "Auditoriya, byudjet va targeting tekshirilmoqda",
+    labelKey: 'adLauncher.launchStepValidateLabel',
+    labelFallback: 'Validatsiyadan o\'tmoqda',
+    subKey: 'adLauncher.launchStepValidateSub',
+    subFallback: 'Auditoriya, byudjet va targeting tekshirilmoqda',
   },
   {
     key: 'launching',
-    label: 'Meta API\'ga yuborilmoqda',
-    sub: "Campaign + AdSets + Ads yaratilmoqda",
+    labelKey: 'adLauncher.launchStepPushLabel',
+    labelFallback: 'Meta API\'ga yuborilmoqda',
+    subKey: 'adLauncher.launchStepPushSub',
+    subFallback: 'Campaign + AdSets + Ads yaratilmoqda',
   },
 ]
 
-function launchErrorMessage(code: string): string {
+function launchErrorMessage(
+  code: string,
+  t: (key: string, fallback?: string) => string,
+): string {
   switch (code) {
     case 'NO_WORKSPACE':
-      return 'Workspace topilmadi. Qaytadan login qiling.'
+      return t('adLauncher.errNoWorkspace', 'Workspace topilmadi. Qaytadan login qiling.')
     case 'NO_AUDIENCE':
-      return 'Kamida bitta auditoriya tanlang.'
+      return t('adLauncher.errNoAudience', 'Kamida bitta auditoriya tanlang.')
     case 'VALIDATION_FAILED':
-      return 'Konfiguratsiya validatsiyadan o\'tmadi. Sozlamalarni tekshiring.'
+      return t(
+        'adLauncher.launchErrValidation',
+        'Konfiguratsiya validatsiyadan o\'tmadi. Sozlamalarni tekshiring.',
+      )
     case 'LAUNCH_FAILED':
-      return 'Meta\'ga yuborishda xato yuz berdi. Qayta urinib ko\'ring.'
+      return t(
+        'adLauncher.launchErrLaunch',
+        'Meta\'ga yuborishda xato yuz berdi. Qayta urinib ko\'ring.',
+      )
     case 'DEMO_LAUNCH_BLOCKED':
-      return 'Demo rejimda haqiqiy launch yoqilmagan.'
+      return t('adLauncher.launchErrDemo', 'Demo rejimda haqiqiy launch yoqilmagan.')
     default:
-      return code || 'Kutilmagan xato yuz berdi.'
+      return code || t('adLauncher.errGeneric', 'Kutilmagan xato yuz berdi.')
   }
 }
 
@@ -173,6 +216,7 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
   const cfg = ctl.launchConfig
   const phase = ctl.launchPhase
   const currency = ctl.selectedAccount?.currency ?? 'USD'
+  const dayUnit = t('adLauncher.confirmBudgetDay', 'kun')
 
   const isBusy =
     phase.state === 'creating_draft' ||
@@ -208,9 +252,14 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-1 space-y-4 duration-300">
       <header>
-        <h2 className="text-lg font-semibold text-text-primary">3. Kampaniyani sozlang</h2>
+        <h2 className="text-lg font-semibold text-text-primary">
+          {t('adLauncher.setupTitle', '3. Kampaniyani sozlang')}
+        </h2>
         <p className="mt-0.5 text-sm text-text-tertiary">
-          Quyidagi 3 ta savolga javob bering — kampaniya avtomatik yaratiladi.
+          {t(
+            'adLauncher.setupSubtitle',
+            'Quyidagi 3 ta savolga javob bering — kampaniya avtomatik yaratiladi.',
+          )}
         </p>
       </header>
 
@@ -219,48 +268,58 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
         <div className="rounded-xl border border-primary/25 bg-gradient-to-br from-primary/8 to-primary/3 px-4 py-3">
           <div className="flex items-center justify-between gap-3">
             <p className="text-xs font-semibold uppercase tracking-wide text-primary">
-              Meta'da nima yaratiladi
+              {t('adLauncher.previewHeading', 'Meta\'da nima yaratiladi')}
             </p>
             {audienceCount === 0 && (
               <span className="text-[11px] text-amber-700 dark:text-amber-400">
-                ⓘ Avval auditoriya tanlang
+                ⓘ {t('adLauncher.previewPickAudienceFirst', 'Avval auditoriya tanlang')}
               </span>
             )}
           </div>
           <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
             <div>
-              <p className="text-[10px] uppercase tracking-wide text-text-tertiary">Campaign</p>
+              <p className="text-[10px] uppercase tracking-wide text-text-tertiary">
+                {t('adLauncher.previewCampaign', 'Campaign')}
+              </p>
               <p className="text-base font-bold text-text-primary tabular-nums">1</p>
               <p className="text-[10px] text-text-tertiary truncate">
                 {cfg.objective.replace('OUTCOME_', '').toLowerCase()}
               </p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wide text-text-tertiary">Ad Set</p>
+              <p className="text-[10px] uppercase tracking-wide text-text-tertiary">
+                {t('adLauncher.previewAdSet', 'Ad Set')}
+              </p>
               <p className="text-base font-bold text-text-primary tabular-nums">
                 {audienceCount || '—'}
               </p>
               <p className="text-[10px] text-text-tertiary">
                 {cfg.budgetType === 'ABO'
-                  ? `${perAdSetBudget} ${currency}/kun har biri`
-                  : `${cfg.dailyBudget} ${currency}/kun (CBO)`}
+                  ? `${perAdSetBudget} ${currency}/${dayUnit} ${t('adLauncher.each', 'har biri')}`
+                  : `${cfg.dailyBudget} ${currency}/${dayUnit} (CBO)`}
               </p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wide text-text-tertiary">Reklama</p>
+              <p className="text-[10px] uppercase tracking-wide text-text-tertiary">
+                {t('adLauncher.previewAd', 'Reklama')}
+              </p>
               <p className="text-base font-bold text-text-primary tabular-nums">
                 {willCreateAds || '—'}
               </p>
               <p className="text-[10px] text-text-tertiary">
                 {cfg.copyCreatives
-                  ? `${sourceAdCount} kreativ × ${audienceCount || 0} adset`
-                  : "Bo'sh adset (keyin qo'shasiz)"}
+                  ? `${sourceAdCount} ${t('adLauncher.creativeUnit', 'kreativ')} × ${audienceCount || 0} ${t('adLauncher.adsetUnit', 'adset')}`
+                  : t('adLauncher.emptyAdsetNote', 'Bo\'sh adset (keyin qo\'shasiz)')}
               </p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wide text-text-tertiary">Holat</p>
+              <p className="text-[10px] uppercase tracking-wide text-text-tertiary">
+                {t('adLauncher.status', 'Holat')}
+              </p>
               <p className="text-base font-bold text-text-primary">PAUSED</p>
-              <p className="text-[10px] text-text-tertiary">Meta'da qo'lda yoqasiz</p>
+              <p className="text-[10px] text-text-tertiary">
+                {t('adLauncher.pausedManualNote', 'Meta\'da qo\'lda yoqasiz')}
+              </p>
             </div>
           </div>
         </div>
@@ -271,7 +330,8 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
         <div className="flex items-center gap-2">
           <CheckCircle2 className="h-4 w-4 text-emerald-500" />
           <span className="text-sm font-medium text-text-primary">
-            {ctl.selectedCampaigns.length} ta reklama tanlangan
+            {ctl.selectedCampaigns.length}{' '}
+            {t('adLauncher.adsSelectedSuffix', 'ta reklama tanlangan')}
           </span>
         </div>
         <button
@@ -279,7 +339,7 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
           onClick={() => ctl.goToStep('pick')}
           className="text-xs text-primary hover:underline"
         >
-          O'zgartirish
+          {t('adLauncher.change', 'O\'zgartirish')}
         </button>
       </div>
 
@@ -288,8 +348,11 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
         <section className="p-5">
           <SectionHeader
             num={1}
-            title="Kampaniyadan nima kutyapsiz?"
-            subtitle="Meta shu maqsadga qarab reklama ko'rsatadi"
+            title={t('adLauncher.objectiveQuestion', 'Kampaniyadan nima kutyapsiz?')}
+            subtitle={t(
+              'adLauncher.objectiveQuestionHint',
+              'Meta shu maqsadga qarab reklama ko\'rsatadi',
+            )}
           />
           <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {OBJECTIVES.map((o) => {
@@ -318,9 +381,11 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
                     <Icon className="h-4 w-4" />
                   </span>
                   <span>
-                    <span className="block text-sm font-semibold text-text-primary">{o.label}</span>
+                    <span className="block text-sm font-semibold text-text-primary">
+                      {t(o.labelKey, o.labelFallback)}
+                    </span>
                     <span className="mt-0.5 block text-xs leading-relaxed text-text-tertiary">
-                      {o.description}
+                      {t(o.descKey, o.descFallback)}
                     </span>
                   </span>
                   {active && (
@@ -336,8 +401,11 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
         <section className="p-5">
           <SectionHeader
             num={2}
-            title="Kunlik byudjet qancha?"
-            subtitle="Bu boshlang'ich qiymat — keyin Meta'da o'zgartirishingiz mumkin"
+            title={t('adLauncher.budgetQuestion', 'Kunlik byudjet qancha?')}
+            subtitle={t(
+              'adLauncher.budgetQuestionHint',
+              'Bu boshlang\'ich qiymat — keyin Meta\'da o\'zgartirishingiz mumkin',
+            )}
           />
           <div className="mt-4 space-y-3">
             {/* Quick presets */}
@@ -358,7 +426,9 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
                   {preset} {currency}
                 </button>
               ))}
-              <span className="flex items-center text-xs text-text-tertiary">yoki</span>
+              <span className="flex items-center text-xs text-text-tertiary">
+                {t('adLauncher.orWord', 'yoki')}
+              </span>
             </div>
 
             {/* Custom amount */}
@@ -377,26 +447,35 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
                     })
                   }
                   className="w-24 bg-transparent text-sm tabular-nums outline-none"
-                  placeholder="Miqdor"
+                  placeholder={t('adLauncher.amountPlaceholder', 'Miqdor')}
                 />
               </div>
-              <span className="text-xs text-text-tertiary">o'z miqdoringizni kiriting</span>
+              <span className="text-xs text-text-tertiary">
+                {t('adLauncher.enterCustomAmount', 'o\'z miqdoringizni kiriting')}
+              </span>
             </div>
 
             {/* Budget type */}
             <div className="rounded-xl border border-border bg-surface-2 p-3 dark:bg-surface">
-              <p className="mb-2 text-xs font-semibold text-text-tertiary">Byudjet taqsimlanishi</p>
+              <p className="mb-2 text-xs font-semibold text-text-tertiary">
+                {t('adLauncher.budgetDistribution', 'Byudjet taqsimlanishi')}
+              </p>
               <div className="flex gap-2">
                 {([
                   {
                     id: 'CBO' as const,
-                    label: 'Avtomatik (CBO)',
-                    desc: 'Meta o\'zi eng yaxshi guruhga taqsimlaydi — tavsiya etiladi',
+                    labelKey: 'adLauncher.budgetAutoLabel',
+                    labelFallback: 'Avtomatik (CBO)',
+                    descKey: 'adLauncher.budgetAutoDesc',
+                    descFallback:
+                      'Meta o\'zi eng yaxshi guruhga taqsimlaydi — tavsiya etiladi',
                   },
                   {
                     id: 'ABO' as const,
-                    label: 'Qo\'lda (ABO)',
-                    desc: 'Har bir auditoriya uchun alohida byudjet belgilaysiz',
+                    labelKey: 'adLauncher.budgetManualLabel',
+                    labelFallback: 'Qo\'lda (ABO)',
+                    descKey: 'adLauncher.budgetManualDesc',
+                    descFallback: 'Har bir auditoriya uchun alohida byudjet belgilaysiz',
                   },
                 ] as const).map((bt) => (
                   <button
@@ -412,8 +491,12 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
                         : 'border-border bg-surface hover:border-primary/30',
                     )}
                   >
-                    <p className="text-xs font-semibold text-text-primary">{bt.label}</p>
-                    <p className="mt-0.5 text-[11px] leading-relaxed text-text-tertiary">{bt.desc}</p>
+                    <p className="text-xs font-semibold text-text-primary">
+                      {t(bt.labelKey, bt.labelFallback)}
+                    </p>
+                    <p className="mt-0.5 text-[11px] leading-relaxed text-text-tertiary">
+                      {t(bt.descKey, bt.descFallback)}
+                    </p>
                   </button>
                 ))}
               </div>
@@ -425,8 +508,14 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
         <section className="p-5">
           <SectionHeader
             num={3}
-            title="Kim ko'rsin? (bir yoki bir nechtasini tanlang)"
-            subtitle="Tanlagan har bir guruh uchun alohida adset yaratiladi"
+            title={t(
+              'adLauncher.audienceQuestion',
+              'Kim ko\'rsin? (bir yoki bir nechtasini tanlang)',
+            )}
+            subtitle={t(
+              'adLauncher.audienceQuestionHint',
+              'Tanlagan har bir guruh uchun alohida adset yaratiladi',
+            )}
           />
           <div className="mt-4 grid gap-2 sm:grid-cols-2">
             {AUDIENCE_PRESETS.map((a) => {
@@ -447,9 +536,11 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
                 >
                   <span className="text-xl leading-none">{a.emoji}</span>
                   <span className="min-w-0 flex-1">
-                    <span className="block text-sm font-semibold text-text-primary">{a.label}</span>
+                    <span className="block text-sm font-semibold text-text-primary">
+                      {t(a.labelKey, a.labelFallback)}
+                    </span>
                     <span className="mt-0.5 block text-xs leading-relaxed text-text-tertiary">
-                      {a.who}
+                      {t(a.whoKey, a.whoFallback)}
                     </span>
                   </span>
                   <span
@@ -474,7 +565,9 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
                 onChange={(e) => ctl.updateLaunchConfig({ splitByFunnelStage: e.target.checked })}
                 className="rounded border-border text-primary"
               />
-              Har bir guruh uchun <strong>alohida adset</strong> yaratish (tavsiya etiladi)
+              {t('adLauncher.splitPre', 'Har bir guruh uchun')}{' '}
+              <strong>{t('adLauncher.splitStrong', 'alohida adset')}</strong>{' '}
+              {t('adLauncher.splitPost', 'yaratish (tavsiya etiladi)')}
             </label>
           )}
         </section>
@@ -483,13 +576,18 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
         <section className="p-5">
           <SectionHeader
             num={4}
-            title="Targeting — kimga ko'rsatish"
-            subtitle="Davlat, yosh va jins. Meta shu chegaralarda reklama tarqatadi."
+            title={t('adLauncher.targetingTitle', 'Targeting — kimga ko\'rsatish')}
+            subtitle={t(
+              'adLauncher.targetingSubtitle',
+              'Davlat, yosh va jins. Meta shu chegaralarda reklama tarqatadi.',
+            )}
           />
           <div className="mt-4 space-y-4">
             {/* Countries */}
             <div>
-              <p className="mb-2 text-xs font-semibold text-text-tertiary">Davlatlar</p>
+              <p className="mb-2 text-xs font-semibold text-text-tertiary">
+                {t('adLauncher.countriesLabel', 'Davlatlar')}
+              </p>
               <div className="flex flex-wrap gap-2">
                 {COUNTRY_OPTIONS.map((c) => {
                   const on = cfg.targeting.countries.includes(c.code)
@@ -514,7 +612,7 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
                           : 'border-border bg-surface-2 text-text-secondary hover:border-primary/40',
                       )}
                     >
-                      {c.label}
+                      {t(c.labelKey, c.labelFallback)}
                     </button>
                   )
                 })}
@@ -523,10 +621,14 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
 
             {/* Age range */}
             <div>
-              <p className="mb-2 text-xs font-semibold text-text-tertiary">Yosh oralig'i</p>
+              <p className="mb-2 text-xs font-semibold text-text-tertiary">
+                {t('adLauncher.ageRangeLabel', 'Yosh oralig\'i')}
+              </p>
               <div className="flex items-center gap-3">
                 <div className="flex h-9 items-center gap-2 rounded-lg border border-border bg-surface-2 px-3 dark:bg-surface">
-                  <span className="text-xs text-text-tertiary">dan</span>
+                  <span className="text-xs text-text-tertiary">
+                    {t('adLauncher.ageFrom', 'dan')}
+                  </span>
                   <input
                     type="number"
                     min={13}
@@ -547,7 +649,9 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
                   />
                 </div>
                 <div className="flex h-9 items-center gap-2 rounded-lg border border-border bg-surface-2 px-3 dark:bg-surface">
-                  <span className="text-xs text-text-tertiary">gacha</span>
+                  <span className="text-xs text-text-tertiary">
+                    {t('adLauncher.ageTo', 'gacha')}
+                  </span>
                   <input
                     type="number"
                     min={13}
@@ -566,13 +670,17 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
                     className="w-14 bg-transparent text-sm tabular-nums outline-none"
                   />
                 </div>
-                <span className="text-xs text-text-tertiary">yosh</span>
+                <span className="text-xs text-text-tertiary">
+                  {t('adLauncher.ageYears', 'yosh')}
+                </span>
               </div>
             </div>
 
             {/* Genders */}
             <div>
-              <p className="mb-2 text-xs font-semibold text-text-tertiary">Jins</p>
+              <p className="mb-2 text-xs font-semibold text-text-tertiary">
+                {t('adLauncher.genderLabel', 'Jins')}
+              </p>
               <div className="flex gap-2">
                 {GENDER_OPTIONS.map((g) => {
                   const isAll = g.id === 'all'
@@ -607,7 +715,7 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
                           : 'border-border bg-surface-2 text-text-secondary hover:border-primary/40',
                       )}
                     >
-                      {g.label}
+                      {t(g.labelKey, g.labelFallback)}
                     </button>
                   )
                 })}
@@ -620,8 +728,11 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
         <section className="p-5">
           <SectionHeader
             num={5}
-            title="Reklama kreativlari"
-            subtitle="Tanlangan manba kampaniyalardan kreativlarni yangi adset'larga ko'chirish"
+            title={t('adLauncher.creativeSectionTitle', 'Reklama kreativlari')}
+            subtitle={t(
+              'adLauncher.creativeSectionSubtitle',
+              'Tanlangan manba kampaniyalardan kreativlarni yangi adset\'larga ko\'chirish',
+            )}
           />
           <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-xl border border-border bg-surface-2 p-3">
             <input
@@ -633,12 +744,15 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
             />
             <span className="min-w-0 flex-1">
               <span className="block text-sm font-semibold text-text-primary">
-                Manba kampaniyadagi reklamalarni nusxalash
+                {t('adLauncher.copyCreativesLabel', 'Manba kampaniyadagi reklamalarni nusxalash')}
               </span>
               <span className="mt-0.5 block text-xs leading-relaxed text-text-tertiary">
-                Belgilangach, tanlangan {ctl.selectedCampaigns.length} kampaniya ichidagi har bir
-                kreativ yangi adset'larda paydo bo'ladi. Aks holda adset bo'sh — keyinroq Meta'da
-                qo'lda kreativ qo'shasiz.
+                {t('adLauncher.copyCreativesBodyPre', 'Belgilangach, tanlangan')}{' '}
+                {ctl.selectedCampaigns.length}{' '}
+                {t(
+                  'adLauncher.copyCreativesBodyPost',
+                  'kampaniya ichidagi har bir kreativ yangi adset\'larda paydo bo\'ladi. Aks holda adset bo\'sh — keyinroq Meta\'da qo\'lda kreativ qo\'shasiz.',
+                )}
               </span>
             </span>
           </label>
@@ -673,10 +787,12 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
                         !done && !active && 'text-text-tertiary',
                       )}
                     >
-                      {s.label}
+                      {t(s.labelKey, s.labelFallback)}
                     </p>
                     {active && (
-                      <p className="mt-0.5 text-[11px] text-text-tertiary">{s.sub}</p>
+                      <p className="mt-0.5 text-[11px] text-text-tertiary">
+                        {t(s.subKey, s.subFallback)}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -696,21 +812,24 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
               </span>
               <div className="flex-1">
                 <h3 className="text-base font-semibold text-amber-900 dark:text-amber-200">
-                  Demo rejimda haqiqiy launch o'chirilgan
+                  {t('adLauncher.demoBlockedTitle', 'Demo rejimda haqiqiy launch o\'chirilgan')}
                 </h3>
                 <p className="mt-0.5 text-sm text-amber-800/85 dark:text-amber-200/80">
-                  Bepul ro'yxatdan o'ting va Meta hisobingizni ulang — keyin xuddi shu sozlamalar bilan haqiqiy kampaniya yaratiladi.
+                  {t(
+                    'adLauncher.demoBlockedBody',
+                    'Bepul ro\'yxatdan o\'ting va Meta hisobingizni ulang — keyin xuddi shu sozlamalar bilan haqiqiy kampaniya yaratiladi.',
+                  )}
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   <Link href="/register">
                     <Button size="sm">
                       <Sparkles className="h-4 w-4" />
-                      Bepul boshlash
+                      {t('adLauncher.demoBlockedCta', 'Bepul boshlash')}
                     </Button>
                   </Link>
                   <Link href="/login">
                     <Button size="sm" variant="secondary">
-                      Akkauntim bor
+                      {t('adLauncher.demoBlockedLogin', 'Akkauntim bor')}
                     </Button>
                   </Link>
                 </div>
@@ -721,7 +840,7 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
           <Alert variant="error">
             <div className="flex items-start gap-2">
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-              <span className="flex-1">{launchErrorMessage(phase.message)}</span>
+              <span className="flex-1">{launchErrorMessage(phase.message, t)}</span>
             </div>
           </Alert>
         ))}
@@ -736,10 +855,15 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
             <div className="flex-1 space-y-3">
               <div>
                 <h3 className="text-base font-semibold text-emerald-900 dark:text-emerald-200">
-                  Kampaniya yaratildi!
+                  {t('adLauncher.launchSuccess', 'Kampaniya yaratildi!')}
                 </h3>
                 <p className="mt-0.5 text-sm text-emerald-800/85 dark:text-emerald-200/80">
-                  Meta'da <strong>PAUSED</strong> holatda turibdi — siz u yerda ko'rib, faollashtirish tugmasini bosasiz.
+                  {t('adLauncher.successBodyPre', 'Meta\'da')}{' '}
+                  <strong>PAUSED</strong>{' '}
+                  {t(
+                    'adLauncher.successBodyPost',
+                    'holatda turibdi — siz u yerda ko\'rib, faollashtirish tugmasini bosasiz.',
+                  )}
                 </p>
               </div>
 
@@ -747,17 +871,23 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
               {phase.result && (
                 <div className="grid grid-cols-3 gap-2 rounded-lg border border-emerald-300/30 bg-white/60 p-3 text-xs dark:border-emerald-500/20 dark:bg-emerald-500/5">
                   <div>
-                    <p className="text-[10px] uppercase tracking-wide text-emerald-800/60 dark:text-emerald-300/60">Campaign</p>
+                    <p className="text-[10px] uppercase tracking-wide text-emerald-800/60 dark:text-emerald-300/60">
+                      {t('adLauncher.previewCampaign', 'Campaign')}
+                    </p>
                     <p className="font-bold text-emerald-900 dark:text-emerald-100">1</p>
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase tracking-wide text-emerald-800/60 dark:text-emerald-300/60">Ad Set</p>
+                    <p className="text-[10px] uppercase tracking-wide text-emerald-800/60 dark:text-emerald-300/60">
+                      {t('adLauncher.previewAdSet', 'Ad Set')}
+                    </p>
                     <p className="font-bold text-emerald-900 dark:text-emerald-100">
                       {phase.result.adSetIds?.length ?? 0}
                     </p>
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase tracking-wide text-emerald-800/60 dark:text-emerald-300/60">Reklama</p>
+                    <p className="text-[10px] uppercase tracking-wide text-emerald-800/60 dark:text-emerald-300/60">
+                      {t('adLauncher.previewAd', 'Reklama')}
+                    </p>
                     <p className="font-bold text-emerald-900 dark:text-emerald-100">
                       {phase.result.adIds?.length ?? 0}
                     </p>
@@ -768,7 +898,8 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
               {phase.metaCampaignId && (
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/15 px-2 py-1 text-xs text-emerald-900 dark:text-emerald-200">
-                    Meta ID: <code className="font-mono">{phase.metaCampaignId}</code>
+                    {t('adLauncher.metaIdLabel', 'Meta ID')}:{' '}
+                    <code className="font-mono">{phase.metaCampaignId}</code>
                   </span>
                   <a
                     href={`https://business.facebook.com/adsmanager/manage/campaigns?selected_campaign_ids=${encodeURIComponent(phase.metaCampaignId)}`}
@@ -776,7 +907,7 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 text-xs font-medium text-emerald-800 hover:underline dark:text-emerald-300"
                   >
-                    Meta Ads Manager'da ochish
+                    {t('adLauncher.openInMetaAdsManager', 'Meta Ads Manager\'da ochish')}
                     <ExternalLink className="h-3 w-3" />
                   </a>
                 </div>
@@ -785,7 +916,10 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
               {/* Partial failure warnings (some ad sets / ads couldn't be created) */}
               {phase.result?.adSetErrors && phase.result.adSetErrors.length > 0 && (
                 <div className="rounded-md border border-amber-300/40 bg-amber-50/50 px-3 py-2 text-xs text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
-                  <p className="font-semibold">{phase.result.adSetErrors.length} ta adset yaratilmadi:</p>
+                  <p className="font-semibold">
+                    {phase.result.adSetErrors.length}{' '}
+                    {t('adLauncher.adSetsFailedSuffix', 'ta adset yaratilmadi:')}
+                  </p>
                   <ul className="mt-1 list-disc pl-4">
                     {phase.result.adSetErrors.slice(0, 3).map((e, i) => (
                       <li key={i}>
@@ -797,19 +931,23 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
               )}
               {phase.result?.adErrors && phase.result.adErrors.length > 0 && (
                 <p className="text-xs text-amber-700 dark:text-amber-300">
-                  ⚠ {phase.result.adErrors.length} ta reklama nusxalanmadi. Meta Ads Manager'da qo'lda qo'shishingiz mumkin.
+                  ⚠ {phase.result.adErrors.length}{' '}
+                  {t(
+                    'adLauncher.adsNotCopiedSuffix',
+                    'ta reklama nusxalanmadi. Meta Ads Manager\'da qo\'lda qo\'shishingiz mumkin.',
+                  )}
                 </p>
               )}
 
               <div className="flex flex-wrap gap-2 pt-1">
                 <Link href="/campaigns">
                   <Button size="sm">
-                    Kampaniyalarni ko'rish
+                    {t('adLauncher.seeCampaigns', 'Kampaniyalarni ko\'rish')}
                     <ExternalLink className="h-4 w-4" />
                   </Button>
                 </Link>
                 <Button size="sm" variant="secondary" onClick={ctl.resetLaunch}>
-                  Yangi launch
+                  {t('adLauncher.startNew', 'Yangi launch')}
                 </Button>
               </div>
             </div>
@@ -828,19 +966,19 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
             onClick={() => ctl.goToStep('pick')}
           >
             <ArrowLeft className="h-4 w-4" />
-            Tanlovga qaytish
+            {t('adLauncher.backToPick', 'Tanlovga qaytish')}
           </Button>
 
           <div className="flex items-center gap-3">
             {/* Inline validation hints */}
             {cfg.audiences.length === 0 && !isBusy && (
               <span className="text-xs text-amber-600 dark:text-amber-400">
-                ↑ Kamida 1 auditoriya tanlang
+                ↑ {t('adLauncher.pickMinAudience', 'Kamida 1 auditoriya tanlang')}
               </span>
             )}
             {phase.state === 'error' && phase.message !== 'DEMO_LAUNCH_BLOCKED' ? (
               <Button type="button" size="sm" onClick={ctl.requestLaunch}>
-                Qayta urinish
+                {t('common.retry', 'Qayta urinish')}
               </Button>
             ) : (
               <Button
@@ -854,7 +992,7 @@ export function LaunchStep({ ctl }: { ctl: AdLauncherController }) {
                 ) : (
                   <Rocket className="h-4 w-4" />
                 )}
-                Kampaniyani yaratish
+                {t('adLauncher.createCampaignBtn', 'Kampaniyani yaratish')}
               </Button>
             )}
           </div>
