@@ -30,6 +30,10 @@ export function LaunchHub({ onPick }: { onPick: (p: Platform) => void }) {
     [t],
   )
 
+  // MVP launches on Meta only. Google Ads and Yandex Direct wizards exist in
+  // the codebase but do NOT perform a real platform launch yet, so they are
+  // presented as "coming soon" (alongside Telegram) rather than offered as
+  // working launches — showing a fake success would mislead the user.
   const platforms = useMemo(
     () =>
       [
@@ -39,29 +43,30 @@ export function LaunchHub({ onPick }: { onPick: (p: Platform) => void }) {
           title: lt('platforms.metaName', 'Meta'),
           desc: lt('platforms.metaDesc', ''),
         },
-        {
-          id: 'google' as const,
-          variant: 'google' as const,
-          title: lt('platforms.googleName', 'Google Ads'),
-          desc: lt('platforms.googleDesc', ''),
-        },
-        {
-          id: 'yandex' as const,
-          variant: 'yandex' as const,
-          title: lt('platforms.yandexName', 'Yandex Direct'),
-          desc: lt('platforms.yandexDesc', ''),
-        },
       ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [t],
   )
 
-  const telegramCard = useMemo(
-    () => ({
-      title: lt('platforms.telegramName', 'Telegram Ads'),
-      desc: lt('platforms.telegramDesc', ''),
-      badge: lt('platforms.comingSoon', 'Coming soon'),
-    }),
+  const comingSoonCards = useMemo(
+    () =>
+      [
+        {
+          variant: 'google' as const,
+          title: lt('platforms.googleName', 'Google Ads'),
+          desc: lt('platforms.googleDesc', ''),
+        },
+        {
+          variant: 'yandex' as const,
+          title: lt('platforms.yandexName', 'Yandex Direct'),
+          desc: lt('platforms.yandexDesc', ''),
+        },
+        {
+          variant: 'telegram' as const,
+          title: lt('platforms.telegramName', 'Telegram Ads'),
+          desc: lt('platforms.telegramDesc', ''),
+        },
+      ].map((c) => ({ ...c, badge: lt('platforms.comingSoon', 'Coming soon') })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [t],
   )
@@ -146,22 +151,25 @@ export function LaunchHub({ onPick }: { onPick: (p: Platform) => void }) {
               </span>
             </button>
           ))}
-          <div
-            role="note"
-            aria-label={`${telegramCard.title} — ${telegramCard.badge}`}
-            className="flex flex-col rounded-2xl border border-dashed border-border/90 bg-surface-2/50 p-6 text-left shadow-inner dark:bg-surface-elevated/40"
-          >
-            <div className="mb-4 flex items-start justify-between gap-2">
-              <div className={platformIconShell('telegram')}>
-                <PlatformGlyph variant="telegram" />
+          {comingSoonCards.map((card) => (
+            <div
+              key={card.variant}
+              role="note"
+              aria-label={`${card.title} — ${card.badge}`}
+              className="flex flex-col rounded-2xl border border-dashed border-border/90 bg-surface-2/50 p-6 text-left shadow-inner dark:bg-surface-elevated/40"
+            >
+              <div className="mb-4 flex items-start justify-between gap-2">
+                <div className={platformIconShell(card.variant)}>
+                  <PlatformGlyph variant={card.variant} />
+                </div>
+                <span className="shrink-0 rounded-full border border-border bg-surface px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-text-secondary">
+                  {card.badge}
+                </span>
               </div>
-              <span className="shrink-0 rounded-full border border-border bg-surface px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-text-secondary">
-                {telegramCard.badge}
-              </span>
+              <h3 className="text-base font-semibold text-text-primary">{card.title}</h3>
+              <p className="mt-2 text-sm text-text-secondary">{card.desc}</p>
             </div>
-            <h3 className="text-base font-semibold text-text-primary">{telegramCard.title}</h3>
-            <p className="mt-2 text-sm text-text-secondary">{telegramCard.desc}</p>
-          </div>
+          ))}
         </div>
       </div>
 
@@ -173,9 +181,6 @@ export function LaunchHub({ onPick }: { onPick: (p: Platform) => void }) {
         <div className="flex flex-wrap items-center justify-center gap-2">
           <Button type="button" onClick={() => onPick('meta')}>
             {lt('hub.newCampaign', '+ New campaign')}
-          </Button>
-          <Button type="button" variant="secondary" onClick={() => onPick('google')}>
-            {lt('hub.ctaGoogleAlt', 'Google Ads')}
           </Button>
         </div>
       </div>

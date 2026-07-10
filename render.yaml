@@ -11,7 +11,10 @@ services:
       NODE_OPTIONS='--max-old-space-size=400' pnpm --filter api build
     # Run pending DB migrations on every deploy, then start the API.
     startCommand: pnpm --filter api run start:prod:with-migrations
-    healthCheckPath: /health
+    # /ready returns 503 when Postgres or Redis is unreachable, so Render
+    # stops routing to (and redeploys) a broken instance. /health always
+    # returns 200 and would mask a DB-down box as healthy.
+    healthCheckPath: /ready
     envVars:
       - key: NODE_ENV
         value: production
@@ -67,8 +70,11 @@ services:
         sync: false
       - key: META_APP_SECRET
         sync: false
+      # Must resolve to MetaAuthController's handler — the flow the frontend
+      # /meta/connect drives (sets the httpOnly cookie and redirects back with
+      # ?connected=1). Register this exact URL in the Meta App Dashboard.
       - key: META_CALLBACK_URL
-        value: https://api.adspectr.com/platforms/meta/callback
+        value: https://api.adspectr.com/meta/callback
 
       # ── TikTok ─────────────────────────────────────────────────────────────
       - key: TIKTOK_APP_ID

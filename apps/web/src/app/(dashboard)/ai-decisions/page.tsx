@@ -316,7 +316,7 @@ export default function AiDecisionsPage() {
               </p>
             </div>
             <Link
-              href="/settings/integrations"
+              href="/settings/meta"
               className="shrink-0 inline-flex items-center gap-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs font-medium px-3 py-2 transition-colors"
             >
               {t('aiDecisions.demoBannerCta', 'Подключить Meta для реальных данных')} →
@@ -550,7 +550,7 @@ export default function AiDecisionsPage() {
             {demoMode && decisions.length === 0 && (
               <div className="pt-1">
                 <Link
-                  href="/settings/integrations"
+                  href="/settings/meta"
                   className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 text-xs font-medium hover:underline"
                 >
                   {t('aiDecisions.demoBannerCta', 'Подключить Meta для реальных данных')} →

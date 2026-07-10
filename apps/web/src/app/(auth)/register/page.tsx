@@ -7,7 +7,7 @@ import { Eye, EyeOff } from 'lucide-react'
 import { ContentMediaSlot } from '@/components/media/ContentMediaSlot'
 import { Alert, Button, Input } from '@/components/ui'
 import { PageSpinner } from '@/components/ui/Spinner'
-import { auth } from '@/lib/api-client'
+import { auth, workspaces as workspacesApi } from '@/lib/api-client'
 import { getApiErrorMessage } from '@/lib/api-error'
 import { setRefreshToken } from '@/lib/auth-storage'
 import { useI18n } from '@/i18n/use-i18n'
@@ -51,7 +51,7 @@ async function tryCreateWorkspace(accessToken: string, draft: PreAuthOnboardingD
 export default function RegisterPage() {
   const { t } = useI18n()
   const router = useRouter()
-  const { setUser, setAccessToken } = useWorkspaceStore()
+  const { setUser, setAccessToken, setCurrentWorkspace } = useWorkspaceStore()
   const [gateChecked, setGateChecked] = useState(false)
   const [form, setForm] = useState({ name: '', email: '', password: '' })
   const [showPassword, setShowPassword] = useState(false)
@@ -83,6 +83,18 @@ export default function RegisterPage() {
       const onboardingDraft = loadPreAuthOnboardingDraft()
       clearPreAuthOnboarding()
       await tryCreateWorkspace(accessToken, onboardingDraft)
+
+      // Hydrate the workspace store so the dashboard, Meta connect and Ad
+      // Launcher have a currentWorkspace. Without this a freshly-registered
+      // user lands on the dashboard with currentWorkspace === null and the
+      // whole workspace-scoped MVP dead-ends until they log out and back in.
+      try {
+        const wsRes = await workspacesApi.list()
+        const ws = wsRes.data?.[0] ?? null
+        if (ws) setCurrentWorkspace(ws)
+      } catch {
+        // Non-blocking — dashboard/login can still hydrate later.
+      }
 
       router.push('/dashboard')
     } catch (err: unknown) {

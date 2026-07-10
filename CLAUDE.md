@@ -25,10 +25,47 @@ pnpm --filter api dev   # Faqat backend
 
 ---
 
-## Joriy holat (so'nggi yangilash: 2026-06-03)
+## Joriy holat (so'nggi yangilash: 2026-07-10)
 
 **Asosiy branch:** `main`
-**Faol branch:** `claude/hopeful-rubin-vTmX2` — 10/10 sprint davom etmoqda (PR #131)
+**Faol branch:** `claude/loyihani-mvp-readiness-xv4anj` — MVP-tayyorlik: real deploy blockerlari tuzatildi
+
+### 2026-07-10 sessiyasi — MVP-tayyorlik: real deploy blockerlari
+Holat aniqlash: barcha CI darvozalari yashil edi (API 295/295, web unit 112/112,
+lint/i18n/tsc/build/e2e 39/39), lekin ikki mustaqil audit real MVP blockerlarini topdi:
+
+- ✅ **Migration zanjiri toza DB'da ishlamas edi** — `synchronize:false` prod'da
+  `migration:run` deploy'ning yagona sxema manbai, ammo zanjir buzuq edi:
+  - MVP-kritik jadvallar (`workspaces`, `workspace_members`, `connected_accounts`)
+    umuman migration'siz edi → 3 ta yangi migration yozildi (`1763100/200/300`).
+  - `AddMarketplaceSchema` — enum default'lar tirnoqsiz (`DEFAULT pending_review`
+    → "column reference" xatosi). 5 ta tuzatildi.
+  - `AddMarketplaceColumnsToExisting` — mavjud bo'lmagan `service_engagements`/
+    `agent_reviews` jadvallariga ustun qo'shardi → `hasTable`/`hasColumn` guard,
+    indekslar `IF NOT EXISTS`.
+  - `AddFraudDetectionAudit` — `agent_profile_id varchar` → `uuid`ga FK mumkin emas edi.
+  - **Natija:** toza Postgres'da butun zanjir exit 0, idempotent (real PG'da tekshirildi).
+- ✅ **Meta CBO/ABO budget konflikti** — kampaniya ham, har AdSet ham `daily_budget`
+  olardi → Meta har launchni rad etardi. Endi CBO=faqat kampaniya, ABO=faqat AdSet.
+- ✅ **Meta placeholder `meta_oauth` account id** hech qachon real `act_<id>`'ga
+  aylanmasdi → callback endi `getAdAccounts` bilan real ad-account'ni hal qiladi
+  (eski placeholder record'larni ham tuzatadi).
+- ✅ **`META_CALLBACK_URL` noto'g'ri handler'ga** ishora qilardi
+  (`/platforms/meta/callback` ≠ frontend ishlatadigan `/meta/callback`) → render.yaml + DEPLOY.md tuzatildi.
+- ✅ **Register → workspace hydration** — yangi foydalanuvchi `currentWorkspace=null`
+  bilan dashboard'ga tushib, Ad Launcher/Meta connect dead-end bo'lardi → register
+  endi login kabi workspace'ni hydrate qiladi.
+- ✅ **Render health check `/health` → `/ready`** (DB/Redis o'lganda 503 qaytaradi).
+- ✅ Graph API versiya birlashtirildi (v19→v20), OAuth `pages_*` scope qo'shildi.
+- ✅ **Mock sahifalar halol qilindi** (MVP faqat Meta):
+  - Launch Hub: Google/Yandex endi "Coming soon" (Telegram kabi) — ilgari soxta
+    "launched" ko'rsatardi (faqat ichki `/campaigns` yozuvi, real platform launch yo'q).
+  - `/settings/integrations` mock sahifasiga "Preview" banner + real `/settings/meta`
+    havolasi; ai-decisions'dagi "Meta ulash" CTA endi real sahifaga qaratildi.
+- **Yakuniy holat:** API 295/295, web unit 112/112, build/e2e 39/39, migration zanjiri
+  toza PG'da exit 0. PR #149.
+
+### Oldingi faol branch: `claude/hopeful-rubin-vTmX2` — 10/10 sprint (PR #131)
 
 ### 2026-06-03 sessiyasi — 10/10 sprint (faol PR #131)
 - ✅ **Qadam 2: cheap strict TS flags** — `noFallthroughCasesInSwitch`,

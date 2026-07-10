@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useI18n } from '@/i18n/use-i18n'
 import {
   Plus,
@@ -114,6 +115,26 @@ export default function IntegrationsPage() {
         <p className="text-text-secondary mt-2">
           {t('pages.integrations.subtitle')}
         </p>
+      </section>
+
+      {/* Honesty banner: this page is a non-functional preview. The real,
+          working platform connection (Meta OAuth) lives on /settings/meta. */}
+      <section className="flex flex-col gap-2 rounded-2xl border border-amber-400/40 bg-amber-400/10 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-start gap-2">
+          <AlertCircle className="mt-0.5 shrink-0 text-amber-500" size={18} />
+          <p className="text-sm text-text-secondary">
+            {t(
+              'pages.integrations.previewNotice',
+              'This is a preview — the integrations shown here are not connected yet. To connect a real ad account, use Meta integration.',
+            )}
+          </p>
+        </div>
+        <Link
+          href="/settings/meta"
+          className="shrink-0 inline-flex items-center gap-1.5 rounded-xl border border-amber-500/40 bg-amber-500/15 px-3 py-2 text-xs font-medium text-amber-700 transition-colors hover:bg-amber-500/25 dark:text-amber-300"
+        >
+          {t('pages.integrations.previewCta', 'Connect Meta')} →
+        </Link>
       </section>
 
       {/* Status Summary */}

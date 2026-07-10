@@ -5,21 +5,28 @@ import { firstValueFrom } from "rxjs";
 import { getOAuthCallbackUrl } from "./oauth-callback.util";
 
 // Meta Graph API version — update when Meta releases new versions
-const META_API_VERSION = "v19.0";
+// Keep in sync with GRAPH_VERSION in meta-oauth.service.ts — token exchange
+// and campaign creation must run on the same Graph API version.
+const META_API_VERSION = "v20.0";
 const META_BASE_URL = `https://graph.facebook.com/${META_API_VERSION}`;
 
 export interface MetaCampaignCreateParams {
   name: string;
   objective: string; // e.g. 'OUTCOME_LEADS', 'OUTCOME_SALES', 'OUTCOME_TRAFFIC'
   status: string; // 'ACTIVE' | 'PAUSED'
-  dailyBudget: number; // In cents! Meta uses cents — $10 = 1000
+  // Campaign-level daily budget in dollars — set for CBO (campaign budget
+  // optimization). Omit for ABO, where each ad set owns its budget; Meta
+  // rejects a launch that carries a budget at BOTH levels.
+  dailyBudget?: number;
   specialAdCategories: string[]; // Required by Meta — [] for most campaigns
 }
 
 export interface MetaAdSetCreateParams {
   campaignId: string;
   name: string;
-  dailyBudget: number;
+  // Ad-set daily budget in dollars — set for ABO. Omit for CBO, where the
+  // campaign owns the budget and ad sets must NOT carry one.
+  dailyBudget?: number;
   billingEvent: string; // 'IMPRESSIONS' | 'LINK_CLICKS'
   optimizationGoal: string; // 'LEAD_GENERATION' | 'CONVERSIONS' | 'LINK_CLICKS'
   targeting: {
@@ -214,8 +221,11 @@ export class MetaConnector {
         name: params.name,
         objective: params.objective,
         status: params.status,
-        // Meta requires budget in cents — multiply dollars by 100
-        daily_budget: Math.round(params.dailyBudget * 100),
+        // Only send a campaign budget for CBO. Sending it alongside ad-set
+        // budgets (ABO) makes Meta reject the whole launch.
+        ...(params.dailyBudget != null
+          ? { daily_budget: Math.round(params.dailyBudget * 100) }
+          : {}),
         special_ad_categories: params.specialAdCategories || [],
       },
     );
@@ -282,7 +292,11 @@ export class MetaConnector {
         access_token: accessToken,
         campaign_id: params.campaignId,
         name: params.name,
-        daily_budget: Math.round(params.dailyBudget * 100),
+        // Only send an ad-set budget for ABO. Under CBO the campaign owns the
+        // budget and an ad-set budget here would be rejected by Meta.
+        ...(params.dailyBudget != null
+          ? { daily_budget: Math.round(params.dailyBudget * 100) }
+          : {}),
         billing_event: params.billingEvent,
         optimization_goal: params.optimizationGoal,
         targeting: JSON.stringify(targeting),

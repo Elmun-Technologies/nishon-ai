@@ -47,7 +47,10 @@ export class MetaOAuthService {
     const params = new URLSearchParams({
       client_id: clientId,
       redirect_uri: redirectUri,
-      scope: "ads_management,ads_read,business_management",
+      // pages_* scopes are needed for getMetaPages and inline-creative launches
+      // (object_story_spec requires a Page). Harmless for copy-creative launches.
+      scope:
+        "ads_management,ads_read,business_management,pages_show_list,pages_read_engagement",
       response_type: "code",
       state,
     });
