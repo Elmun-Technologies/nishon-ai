@@ -10,6 +10,8 @@ import { Workspace } from "../workspaces/entities/workspace.entity";
 import { AiDecision } from "../ai-decisions/entities/ai-decision.entity";
 import { Campaign } from "../campaigns/entities/campaign.entity";
 import { ConnectedAccount } from "../platforms/entities/connected-account.entity";
+import { MetaCampaignSync } from "../meta/entities/meta-campaign-sync.entity";
+import { MetaInsight } from "../meta/entities/meta-insight.entity";
 import { WorkspacesModule } from "../workspaces/workspaces.module";
 import { PlatformsModule } from "../platforms/platforms.module";
 
@@ -21,6 +23,8 @@ import { PlatformsModule } from "../platforms/platforms.module";
       AiDecision,
       Campaign,
       ConnectedAccount,
+      MetaCampaignSync,
+      MetaInsight,
     ]),
     // AiDecision is needed by AiAgentService (approveDecision/rejectDecision)
     WorkspacesModule,

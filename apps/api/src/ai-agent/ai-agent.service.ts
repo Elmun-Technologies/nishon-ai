@@ -4,6 +4,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
   BadRequestException,
+  ForbiddenException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -13,6 +14,7 @@ import {
 } from "./strategy-engine.service";
 import { DecisionLoopService } from "./decision-loop.service";
 import { AiDecision } from "../ai-decisions/entities/ai-decision.entity";
+import { Workspace } from "../workspaces/entities/workspace.entity";
 import { ConfigService } from "@nestjs/config";
 import { createAdSpectrAiClientFromEnv } from "@adspectr/ai-sdk";
 import type { AdSpectrAiClient } from "@adspectr/ai-sdk";
@@ -40,10 +42,38 @@ export class AiAgentService {
     private readonly metaConnector: MetaConnector,
     @InjectRepository(AiDecision)
     private readonly decisionRepo: Repository<AiDecision>,
+    @InjectRepository(Workspace)
+    private readonly workspaceRepo: Repository<Workspace>,
   ) {
     this.aiClient = createAdSpectrAiClientFromEnv((k) =>
       this.config.get<string>(k),
     );
+  }
+
+  /**
+   * Loads a pending decision and verifies the caller owns its workspace.
+   * Prevents one user from approving/rejecting another workspace's decisions.
+   */
+  private async loadOwnedPendingDecision(
+    decisionId: string,
+    userId: string,
+  ): Promise<AiDecision> {
+    const decision = await this.decisionRepo.findOne({
+      where: { id: decisionId },
+    });
+    if (!decision) {
+      throw new NotFoundException(`AI decision ${decisionId} not found`);
+    }
+    const workspace = decision.workspaceId
+      ? await this.workspaceRepo.findOne({ where: { id: decision.workspaceId } })
+      : null;
+    if (!workspace || workspace.userId !== userId) {
+      throw new ForbiddenException("You do not have access to this decision");
+    }
+    if (decision.isExecuted) {
+      throw new BadRequestException("This decision has already been executed");
+    }
+    return decision;
   }
 
   /**
@@ -118,16 +148,8 @@ export class AiAgentService {
    * Approve a pending AI decision and execute it on the platform.
    * Only decisions with isApproved=null (pending) can be approved.
    */
-  async approveDecision(decisionId: string): Promise<void> {
-    const decision = await this.decisionRepo.findOne({
-      where: { id: decisionId },
-    });
-    if (!decision) {
-      throw new NotFoundException(`AI decision ${decisionId} not found`);
-    }
-    if (decision.isExecuted) {
-      throw new BadRequestException("This decision has already been executed");
-    }
+  async approveDecision(decisionId: string, userId: string): Promise<void> {
+    const decision = await this.loadOwnedPendingDecision(decisionId, userId);
 
     // Mark as approved first so it passes the guard in executeDecision
     await this.decisionRepo.update(decisionId, { isApproved: true });
@@ -140,18 +162,8 @@ export class AiAgentService {
   /**
    * Reject a pending AI decision — marks it as rejected without execution.
    */
-  async rejectDecision(decisionId: string): Promise<void> {
-    const decision = await this.decisionRepo.findOne({
-      where: { id: decisionId },
-    });
-    if (!decision) {
-      throw new NotFoundException(`AI decision ${decisionId} not found`);
-    }
-    if (decision.isExecuted) {
-      throw new BadRequestException(
-        "Cannot reject an already-executed decision",
-      );
-    }
+  async rejectDecision(decisionId: string, userId: string): Promise<void> {
+    await this.loadOwnedPendingDecision(decisionId, userId);
 
     await this.decisionRepo.update(decisionId, {
       isApproved: false,

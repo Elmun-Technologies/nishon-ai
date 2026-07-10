@@ -242,6 +242,33 @@ export class MetaConnector {
     this.logger.log(`Meta campaign paused: ${campaignId}`);
   }
 
+  /**
+   * Read a campaign's current name/status/daily budget. Used by the autonomous
+   * optimizer to compute a relative budget change (e.g. +30%) from the real
+   * current value. `dailyBudget` is returned in dollars (Meta stores cents).
+   */
+  async getCampaign(
+    campaignId: string,
+    accessToken: string,
+  ): Promise<{ id: string; name: string; status: string; dailyBudget: number | null }> {
+    const data = await this.apiGet<{
+      id: string;
+      name?: string;
+      status?: string;
+      daily_budget?: string;
+    }>(`${META_BASE_URL}/${campaignId}`, {
+      access_token: accessToken,
+      fields: "id,name,status,daily_budget",
+    });
+    const cents = data.daily_budget != null ? parseInt(data.daily_budget, 10) : NaN;
+    return {
+      id: data.id,
+      name: data.name ?? "",
+      status: data.status ?? "",
+      dailyBudget: Number.isFinite(cents) ? cents / 100 : null,
+    };
+  }
+
   async resumeCampaign(campaignId: string, accessToken: string): Promise<void> {
     await this.apiPost(`${META_BASE_URL}/${campaignId}`, {
       access_token: accessToken,

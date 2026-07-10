@@ -43,6 +43,36 @@ export class AiDecision {
   // e.g. "Expected to reduce CPA by ~25% based on similar campaigns"
   estimatedImpact: string | null;
 
+  // The platform entity this decision acts on (e.g. the Meta campaign id
+  // "120214192783690"). Distinct from campaignId (a local uuid FK) — real
+  // Meta campaigns live in meta_campaign_syncs, keyed by the Meta id, so
+  // execution routes off these two fields, not the local campaigns table.
+  @Column({ name: "target_external_id", type: "varchar", nullable: true })
+  targetExternalId: string | null;
+
+  @Column({ name: "target_platform", type: "varchar", length: 20, nullable: true })
+  targetPlatform: string | null;
+
+  // Real model/rules confidence (0-1) and projected $ impact — persisted so the
+  // UI shows true numbers and the ASSISTED auto-apply threshold is trustworthy.
+  @Column({
+    name: "confidence",
+    type: "decimal",
+    precision: 4,
+    scale: 3,
+    nullable: true,
+  })
+  confidence: number | null;
+
+  @Column({
+    name: "impact_usd",
+    type: "decimal",
+    precision: 12,
+    scale: 2,
+    nullable: true,
+  })
+  impactUsd: number | null;
+
   @Column({ type: "boolean", nullable: true, default: null })
   // null = pending (ASSISTED mode), true = approved, false = rejected
   isApproved: boolean | null;

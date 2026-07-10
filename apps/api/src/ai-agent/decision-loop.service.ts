@@ -2,49 +2,65 @@ import { Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { ConfigService } from "@nestjs/config";
-import * as crypto from "crypto";
 import { AiDecision } from "../ai-decisions/entities/ai-decision.entity";
-import { Campaign } from "../campaigns/entities/campaign.entity";
 import { Workspace } from "../workspaces/entities/workspace.entity";
 import { ConnectedAccount } from "../platforms/entities/connected-account.entity";
+import { MetaCampaignSync } from "../meta/entities/meta-campaign-sync.entity";
+import { MetaInsight } from "../meta/entities/meta-insight.entity";
 import { MetaConnector } from "../platforms/connectors/meta.connector";
-import { GoogleConnector } from "../platforms/connectors/google.connector";
-import { TiktokConnector } from "../platforms/connectors/tiktok.connector";
+import { decrypt, resolveEncryptionKey } from "../common/crypto.util";
 import {
   createAdSpectrAiClientFromEnv,
   isAiClientConfigured,
   OPTIMIZATION_SYSTEM_PROMPT,
 } from "@adspectr/ai-sdk";
 import type { AdSpectrAiClient } from "@adspectr/ai-sdk";
-import {
-  AiDecisionAction,
-  AutopilotMode,
-  CampaignStatus,
-  Platform,
-} from "@adspectr/shared";
+import { AiDecisionAction, AutopilotMode, Platform } from "@adspectr/shared";
 
 interface OptimizationDecision {
   action: string;
-  targetId: string;
+  targetId: string; // the Meta campaign id the action applies to
   targetType: string;
   reason: string;
   estimatedImpact: string;
   urgency: string;
+  confidence?: number; // 0-1, if the model provides it
 }
+
+type Risk = "low" | "medium" | "high";
+
+/**
+ * Risk of each action, mirroring auto-optimization/policy/action-policy.ts
+ * (ACTION_RISK). Any platform mutation is high/medium; content-only actions
+ * are low. Used to gate auto-execution by autopilot mode.
+ */
+const ACTION_RISK: Record<string, Risk> = {
+  [AiDecisionAction.PAUSE_AD]: "high",
+  [AiDecisionAction.STOP_CAMPAIGN]: "high",
+  [AiDecisionAction.SCALE_BUDGET]: "high",
+  [AiDecisionAction.SHIFT_BUDGET]: "medium",
+  [AiDecisionAction.CREATE_AD]: "medium",
+  [AiDecisionAction.ADJUST_TARGETING]: "medium",
+  [AiDecisionAction.GENERATE_STRATEGY]: "low",
+  [AiDecisionAction.ROTATE_CREATIVE]: "low",
+};
 
 /**
  * DecisionLoopService is the autonomous optimization engine.
  *
- * It runs on a schedule (every 2 hours by default) and:
- * 1. Fetches all active campaigns with their latest metrics
- * 2. Sends performance data to GPT-4o for analysis
- * 3. Receives a list of recommended actions (pause, scale, stop, shift)
- * 4. In FULL_AUTO mode: executes actions immediately
- * 5. In ASSISTED mode: saves decisions as pending for user approval
- * 6. In MANUAL mode: saves decisions as suggestions only
+ * Every 2 hours (via the optimization cron/queue) it, per workspace:
+ * 1. Reads the REAL synced Meta data (meta_campaign_syncs + meta_insights) —
+ *    the local campaigns table is seed-only and empty for real users.
+ * 2. Sends a per-campaign performance summary to the LLM.
+ * 3. Turns each recommendation into an AiDecision carrying the target Meta
+ *    campaign id + a real confidence / $ impact.
+ * 4. Gates execution by autopilot mode × action risk:
+ *      MANUAL     → propose everything (nothing auto-runs)
+ *      ASSISTED   → auto-apply only LOW-risk; queue medium/high for approval
+ *      FULL_AUTO  → auto-apply everything
+ * 5. Executes approved/auto actions on the real Meta account.
  *
- * Every decision is logged to the ai_decisions table so users always
- * know what the AI did and why — full transparency.
+ * Every decision is logged to ai_decisions for full transparency.
  */
 @Injectable()
 export class DecisionLoopService {
@@ -55,15 +71,15 @@ export class DecisionLoopService {
     private readonly config: ConfigService,
     @InjectRepository(AiDecision)
     private readonly decisionRepo: Repository<AiDecision>,
-    @InjectRepository(Campaign)
-    private readonly campaignRepo: Repository<Campaign>,
     @InjectRepository(Workspace)
     private readonly workspaceRepo: Repository<Workspace>,
     @InjectRepository(ConnectedAccount)
     private readonly accountRepo: Repository<ConnectedAccount>,
+    @InjectRepository(MetaCampaignSync)
+    private readonly metaCampaignRepo: Repository<MetaCampaignSync>,
+    @InjectRepository(MetaInsight)
+    private readonly metaInsightRepo: Repository<MetaInsight>,
     private readonly metaConnector: MetaConnector,
-    private readonly googleConnector: GoogleConnector,
-    private readonly tiktokConnector: TiktokConnector,
   ) {
     const get = (k: string) => this.config.get<string>(k);
     if (isAiClientConfigured(get)) {
@@ -83,11 +99,7 @@ export class DecisionLoopService {
 
   /**
    * Run the optimization loop for a single workspace.
-   * This is the main entry point — called by the queue processor every 2 hours.
-   *
-   * The logic is like a human media buyer sitting down to review campaigns:
-   * "What's performing well? What's wasting money? What should I change?"
-   * Except it does this automatically, at scale, every 2 hours.
+   * Called by the queue processor every 2 hours.
    */
   async runForWorkspace(workspaceId: string): Promise<AiDecision[]> {
     this.logger.log(`Running decision loop for workspace: ${workspaceId}`);
@@ -95,91 +107,132 @@ export class DecisionLoopService {
     const workspace = await this.workspaceRepo.findOne({
       where: { id: workspaceId },
     });
-
     if (!workspace) return [];
 
-    // Fetch active campaigns with their recent performance metrics
-    const campaigns = await this.campaignRepo
-      .createQueryBuilder("campaign")
-      .leftJoinAndSelect("campaign.adSets", "adSet")
-      .leftJoinAndSelect("adSet.ads", "ad")
-      .leftJoinAndSelect("ad.metrics", "metric")
-      .where("campaign.workspaceId = :workspaceId", { workspaceId })
-      .andWhere("campaign.status = :status", { status: CampaignStatus.ACTIVE })
-      .orderBy("metric.recordedAt", "DESC")
-      .getMany();
+    // MANUAL/off workspaces still get suggestions logged; the cron already
+    // filters to connected + non-manual, but keep this defensive.
+    const mode = workspace.autopilotMode ?? AutopilotMode.MANUAL;
 
-    if (campaigns.length === 0) {
-      this.logger.log(`No active campaigns for workspace: ${workspaceId}`);
+    // Build the performance summary from the REAL synced Meta data.
+    const performanceSummary = await this.buildMetaPerformanceSummary(
+      workspaceId,
+    );
+    if (performanceSummary.length === 0) {
+      this.logger.log(
+        `No active synced Meta campaigns for workspace: ${workspaceId}`,
+      );
       return [];
     }
 
-    // Build performance summary for the AI to analyze
-    const performanceSummary = this.buildPerformanceSummary(campaigns);
-
-    // Ask GPT-4o what actions to take
     if (!this.aiClient) {
       this.logger.warn("AI client not configured, skipping decision loop");
       return [];
     }
+
     const aiResponse = await this.aiClient.completeJson<{
       decisions: OptimizationDecision[];
       overallAssessment: string;
       nextReviewIn: string;
     }>(
-      `Analyze these campaign metrics and decide what actions to take:\n${JSON.stringify(performanceSummary, null, 2)}`,
+      `Analyze these campaign metrics and decide what actions to take. Each decision's targetId MUST be one of the campaignId values below.\n${JSON.stringify(performanceSummary, null, 2)}`,
       OPTIMIZATION_SYSTEM_PROMPT,
-      {
-        taskType: "optimization",
-        agentName: "DecisionLoop",
-        temperature: 0.2, // Very low temp — we want consistent, data-driven decisions
-      },
+      { taskType: "optimization", agentName: "DecisionLoop", temperature: 0.2 },
     );
 
-    // Convert AI decisions to database records
+    const byCampaign = new Map(
+      performanceSummary.map((c) => [String(c.campaignId), c]),
+    );
+
     const savedDecisions: AiDecision[] = [];
 
-    for (const decision of aiResponse.decisions) {
-      if (decision.action === "no_action") continue;
+    for (const decision of aiResponse.decisions ?? []) {
+      if (!decision.action || decision.action === "no_action") continue;
+
+      const target = byCampaign.get(String(decision.targetId));
+      const risk = ACTION_RISK[decision.action] ?? "high";
+      const autoApply = this.shouldAutoApply(mode, risk);
 
       const aiDecision = this.decisionRepo.create({
         workspaceId,
         actionType: decision.action as AiDecisionAction,
         reason: decision.reason,
         estimatedImpact: decision.estimatedImpact,
-        beforeState: performanceSummary,
-        afterState: null, // Will be filled after execution
-        // In FULL_AUTO: auto-approve. In ASSISTED/MANUAL: wait for human.
-        isApproved:
-          workspace.autopilotMode === AutopilotMode.FULL_AUTO ? true : null,
+        beforeState: target ?? { note: "target not in summary" },
+        afterState: null,
+        targetExternalId: decision.targetId ?? null,
+        targetPlatform: Platform.META,
+        confidence: this.deriveConfidence(decision),
+        impactUsd: this.deriveImpactUsd(decision, target),
+        // Auto-applied actions are pre-approved; everything else waits.
+        isApproved: autoApply ? true : null,
         isExecuted: false,
       });
 
       const saved = await this.decisionRepo.save(aiDecision);
       savedDecisions.push(saved);
 
-      // In FULL_AUTO mode, execute the decision immediately
-      if (workspace.autopilotMode === AutopilotMode.FULL_AUTO) {
-        await this.executeDecision(saved);
+      if (autoApply) {
+        // Non-fatal: one failed execution shouldn't abort the whole loop.
+        await this.executeDecision(saved).catch((e) =>
+          this.logger.error(`Auto-execute failed [${saved.id}]: ${e?.message}`),
+        );
       }
     }
 
     this.logger.log(
-      `Decision loop complete for ${workspaceId}: ${savedDecisions.length} decisions created`,
+      `Decision loop complete for ${workspaceId}: ${savedDecisions.length} decisions (mode=${mode})`,
     );
-
     return savedDecisions;
   }
 
+  /** MANUAL → never; ASSISTED → low-risk only; FULL_AUTO → any. */
+  private shouldAutoApply(mode: AutopilotMode, risk: Risk): boolean {
+    if (mode === AutopilotMode.FULL_AUTO) return true;
+    if (mode === AutopilotMode.ASSISTED) return risk === "low";
+    return false; // MANUAL
+  }
+
+  private deriveConfidence(d: OptimizationDecision): number {
+    if (typeof d.confidence === "number") {
+      return Math.min(1, Math.max(0, d.confidence));
+    }
+    // Fall back to the model's own urgency signal, not a per-action constant.
+    switch ((d.urgency ?? "").toLowerCase()) {
+      case "high":
+        return 0.9;
+      case "medium":
+        return 0.75;
+      case "low":
+        return 0.6;
+      default:
+        return 0.7;
+    }
+  }
+
   /**
-   * Execute a previously saved decision by routing to the correct platform connector.
-   * Called immediately in FULL_AUTO mode or after user approval in ASSISTED mode.
-   *
-   * Routing logic:
-   *   1. Load the campaign associated with this decision
-   *   2. Look up the workspace's connected account for that platform
-   *   3. Decrypt the token and call the platform API
-   *   4. Mark decision as executed
+   * Projected $ impact. For a pause/stop, the real impact is the wasted daily
+   * spend saved (derived from the campaign's own last-7d data). Otherwise, pull
+   * the first dollar figure the model quoted in estimatedImpact.
+   */
+  private deriveImpactUsd(
+    d: OptimizationDecision,
+    target: CampaignSummary | undefined,
+  ): number | null {
+    if (
+      target &&
+      (d.action === AiDecisionAction.PAUSE_AD ||
+        d.action === AiDecisionAction.STOP_CAMPAIGN)
+    ) {
+      const perDay = target.metrics.spend / 7;
+      return Math.round(perDay * 100) / 100;
+    }
+    const m = (d.estimatedImpact ?? "").replace(/,/g, "").match(/\$?\s*(\d+(?:\.\d+)?)/);
+    return m ? parseFloat(m[1]) : null;
+  }
+
+  /**
+   * Execute a decision on the real ad platform. Called immediately for
+   * auto-applied actions, or from the approve endpoint after human approval.
    */
   async executeDecision(decision: AiDecision): Promise<void> {
     this.logger.log(
@@ -187,14 +240,11 @@ export class DecisionLoopService {
     );
 
     try {
-      if (decision.campaignId) {
-        const campaign = await this.campaignRepo.findOne({
-          where: { id: decision.campaignId },
-        });
+      const targetId = decision.targetExternalId;
+      const platform = (decision.targetPlatform as Platform) ?? Platform.META;
 
-        if (campaign?.platform && campaign.externalId && campaign.workspaceId) {
-          await this.dispatchToConnector(decision, campaign);
-        }
+      if (targetId && decision.workspaceId && platform === Platform.META) {
+        await this.dispatchMeta(decision, decision.workspaceId, targetId);
       }
 
       await this.decisionRepo.update(decision.id, {
@@ -221,79 +271,61 @@ export class DecisionLoopService {
     }
   }
 
-  /**
-   * Route a decision to the appropriate platform connector.
-   * Maps AiDecisionAction enum values to specific API calls.
-   */
-  private async dispatchToConnector(
+  /** Route a Meta decision to the real Graph API using the workspace token. */
+  private async dispatchMeta(
     decision: AiDecision,
-    campaign: Campaign,
+    workspaceId: string,
+    metaCampaignId: string,
   ): Promise<void> {
-    const platform = campaign.platform!;
-    const externalId = campaign.externalId!;
-    const workspaceId = campaign.workspaceId!;
-
     const account = await this.accountRepo.findOne({
-      where: { workspaceId, platform, isActive: true },
+      where: { workspaceId, platform: Platform.META, isActive: true },
     });
-
     if (!account) {
       this.logger.warn(
-        `No active ${platform} account for workspace ${workspaceId} — skipping execution`,
+        `No active Meta account for workspace ${workspaceId} — skipping execution`,
       );
       return;
     }
 
-    const encryptionKey = this.config.get<string>("ENCRYPTION_KEY");
-    if (!encryptionKey || encryptionKey.length !== 32) {
-      this.logger.error(
-        "ENCRYPTION_KEY is not set or is not 32 characters — cannot decrypt tokens",
-      );
-      return;
-    }
-    const accessToken = this.decryptToken(account.accessToken, encryptionKey);
-    const advertiserId = account.externalAccountId;
-
-    const newBudget = (campaign.dailyBudget ?? 0) * 1.3; // 30% scale-up
+    const key = resolveEncryptionKey(this.config.get<string>("ENCRYPTION_KEY"));
+    const accessToken = decrypt(account.accessToken, key);
 
     switch (decision.actionType) {
       case AiDecisionAction.PAUSE_AD:
       case AiDecisionAction.STOP_CAMPAIGN:
-        await this.pauseOnPlatform(
-          platform,
-          externalId,
-          advertiserId,
-          accessToken,
-        );
+        await this.metaConnector.pauseCampaign(metaCampaignId, accessToken);
+        this.logger.log(`Paused Meta campaign ${metaCampaignId}`);
         break;
 
       case AiDecisionAction.SCALE_BUDGET:
-        await this.scaleBudgetOnPlatform(
-          platform,
-          externalId,
-          advertiserId,
+      case AiDecisionAction.SHIFT_BUDGET: {
+        const current = await this.metaConnector.getCampaign(
+          metaCampaignId,
           accessToken,
-          newBudget,
-          account,
+        );
+        if (current.dailyBudget == null || current.dailyBudget <= 0) {
+          this.logger.warn(
+            `Campaign ${metaCampaignId} has no campaign-level daily budget (CBO/ABO) — skipping budget change`,
+          );
+          return;
+        }
+        const factor =
+          decision.actionType === AiDecisionAction.SCALE_BUDGET ? 1.3 : 0.8;
+        const next = Math.max(1, current.dailyBudget * factor);
+        await this.metaConnector.updateCampaignBudget(
+          metaCampaignId,
+          accessToken,
+          next,
+        );
+        this.logger.log(
+          `Meta campaign ${metaCampaignId} budget ${current.dailyBudget} → ${next.toFixed(2)}`,
         );
         break;
-
-      case AiDecisionAction.SHIFT_BUDGET:
-        // Reduce budget by 20% — handled like a budget adjustment
-        const reducedBudget = (campaign.dailyBudget ?? 0) * 0.8;
-        await this.scaleBudgetOnPlatform(
-          platform,
-          externalId,
-          advertiserId,
-          accessToken,
-          reducedBudget,
-          account,
-        );
-        break;
+      }
 
       default:
-        // Actions like GENERATE_STRATEGY, ADJUST_TARGETING, ROTATE_CREATIVE
-        // are informational — log them but don't call platform APIs
+        // GENERATE_STRATEGY / ADJUST_TARGETING / ROTATE_CREATIVE / CREATE_AD are
+        // content/suggestion-only for now — logged, no platform mutation.
         this.logger.log(
           `Decision type ${decision.actionType} noted (no direct API call)`,
         );
@@ -301,131 +333,99 @@ export class DecisionLoopService {
     }
   }
 
-  private async pauseOnPlatform(
-    platform: Platform,
-    externalId: string,
-    advertiserId: string,
-    accessToken: string,
-  ): Promise<void> {
-    if (platform === Platform.META) {
-      await this.metaConnector.pauseCampaign(externalId, accessToken);
-    } else if (platform === Platform.GOOGLE) {
-      const [customerId, campaignId] = externalId.includes(":")
-        ? externalId.split(":")
-        : [advertiserId, externalId];
-      await this.googleConnector.updateCampaignStatus(
-        customerId,
-        accessToken,
-        campaignId,
-        "PAUSED",
-      );
-    } else if (platform === Platform.TIKTOK) {
-      await this.tiktokConnector.pauseCampaign(
-        advertiserId,
-        accessToken,
-        externalId,
-      );
-    }
-    this.logger.log(`Paused campaign ${externalId} on ${platform}`);
-  }
-
-  private async scaleBudgetOnPlatform(
-    platform: Platform,
-    externalId: string,
-    advertiserId: string,
-    accessToken: string,
-    newBudgetUsd: number,
-    _account: ConnectedAccount,
-  ): Promise<void> {
-    if (platform === Platform.META) {
-      await this.metaConnector.updateCampaignBudget(
-        externalId,
-        accessToken,
-        newBudgetUsd,
-      );
-    } else if (platform === Platform.GOOGLE) {
-      const [customerId, budgetId] = externalId.includes(":")
-        ? externalId.split(":")
-        : [advertiserId, externalId];
-      await this.googleConnector.updateCampaignBudget(
-        customerId,
-        accessToken,
-        budgetId,
-        newBudgetUsd,
-      );
-    } else if (platform === Platform.TIKTOK) {
-      await this.tiktokConnector.updateCampaignBudget(
-        advertiserId,
-        accessToken,
-        externalId,
-        newBudgetUsd,
-      );
-    }
-    this.logger.log(
-      `Updated budget for campaign ${externalId} on ${platform} → $${newBudgetUsd}`,
-    );
-  }
-
-  private decryptToken(encryptedText: string, encryptionKey: string): string {
-    const [ivHex, encrypted] = encryptedText.split(":");
-    if (!ivHex || !encrypted) throw new Error("Invalid encrypted token format");
-    const iv = new Uint8Array(Buffer.from(ivHex, "hex"));
-    const decipher = crypto.createDecipheriv("aes-256-cbc", encryptionKey, iv);
-    let decrypted = decipher.update(encrypted, "hex", "utf8");
-    decrypted += decipher.final("utf8");
-    return decrypted;
-  }
-
   /**
-   * Build a clean performance summary from raw campaign data.
-   * We extract only the relevant metrics so the AI prompt stays focused
-   * and doesn't waste tokens on irrelevant data.
+   * Build a per-campaign performance summary from the REAL synced Meta data:
+   * active meta_campaign_syncs joined with a 7-day grouped aggregation of
+   * meta_insights. This replaces the old read of the seed-only local
+   * `campaigns` table (which is empty for real users).
    */
-  private buildPerformanceSummary(campaigns: Campaign[]) {
-    return campaigns.map((campaign) => ({
-      campaignId: campaign.id,
-      campaignName: campaign.name,
-      platform: campaign.platform,
-      dailyBudget: campaign.dailyBudget,
-      adSets: campaign.adSets?.map((adSet) => ({
-        adSetId: adSet.id,
-        name: adSet.name,
-        ads: adSet.ads?.map((ad) => {
-          // Get the most recent 7 days of metrics
-          const recentMetrics = ad.metrics?.slice(0, 7) || [];
-          const totals = recentMetrics.reduce(
-            (acc, m) => ({
-              spend: acc.spend + Number(m.spend),
-              clicks: acc.clicks + m.clicks,
-              impressions: acc.impressions + Number(m.impressions),
-              conversions: acc.conversions + m.conversions,
-              revenue: acc.revenue + Number(m.revenue),
-            }),
-            { spend: 0, clicks: 0, impressions: 0, conversions: 0, revenue: 0 },
-          );
+  private async buildMetaPerformanceSummary(
+    workspaceId: string,
+  ): Promise<CampaignSummary[]> {
+    const active = await this.metaCampaignRepo.find({
+      where: { workspaceId, status: "ACTIVE" },
+    });
+    if (active.length === 0) return [];
 
-          return {
-            adId: ad.id,
-            name: ad.name,
-            aiScore: ad.aiScore,
-            last7Days: {
-              ...totals,
-              ctr:
-                totals.impressions > 0
-                  ? ((totals.clicks / totals.impressions) * 100).toFixed(3)
-                  : "0",
-              cpa:
-                totals.conversions > 0
-                  ? (totals.spend / totals.conversions).toFixed(2)
-                  : null,
-              roas:
-                totals.spend > 0
-                  ? (totals.revenue / totals.spend).toFixed(2)
-                  : "0",
-            },
-          };
-        }),
-      })),
-    }));
+    const since = new Date();
+    since.setDate(since.getDate() - 7);
+
+    const rows = await this.metaInsightRepo
+      .createQueryBuilder("insight")
+      .where("insight.workspaceId = :wid", { wid: workspaceId })
+      .andWhere("insight.date >= :since", { since })
+      .select([
+        "insight.campaignId AS campaignId",
+        'COALESCE(SUM(insight.spend), 0) AS "spend"',
+        'COALESCE(SUM(insight.clicks), 0) AS "clicks"',
+        'COALESCE(SUM(insight.impressions), 0) AS "impressions"',
+        'COALESCE(SUM(insight.conversions), 0) AS "conversions"',
+        'COALESCE(SUM(insight.conversionValue), 0) AS "revenue"',
+      ])
+      .groupBy("insight.campaignId")
+      .getRawMany<{
+        campaignid: string;
+        spend: string;
+        clicks: string;
+        impressions: string;
+        conversions: string;
+        revenue: string;
+      }>();
+
+    const metricsById = new Map(
+      rows.map((r) => [
+        String(r.campaignid),
+        {
+          spend: parseFloat(r.spend) || 0,
+          clicks: parseInt(r.clicks, 10) || 0,
+          impressions: parseInt(r.impressions, 10) || 0,
+          conversions: parseInt(r.conversions, 10) || 0,
+          revenue: parseFloat(r.revenue) || 0,
+        },
+      ]),
+    );
+
+    return active
+      .map((c) => {
+        const m = metricsById.get(String(c.id)) ?? {
+          spend: 0,
+          clicks: 0,
+          impressions: 0,
+          conversions: 0,
+          revenue: 0,
+        };
+        return {
+          campaignId: c.id,
+          campaignName: c.name,
+          platform: "meta" as const,
+          metrics: {
+            ...m,
+            ctr:
+              m.impressions > 0
+                ? Number(((m.clicks / m.impressions) * 100).toFixed(3))
+                : 0,
+            cpa: m.conversions > 0 ? Number((m.spend / m.conversions).toFixed(2)) : null,
+            roas: m.spend > 0 ? Number((m.revenue / m.spend).toFixed(2)) : 0,
+          },
+        };
+      })
+      // Only surface campaigns that actually have spend to reason about.
+      .filter((c) => c.metrics.spend > 0);
   }
+}
+
+interface CampaignSummary {
+  campaignId: string;
+  campaignName: string;
+  platform: "meta";
+  metrics: {
+    spend: number;
+    clicks: number;
+    impressions: number;
+    conversions: number;
+    revenue: number;
+    ctr: number;
+    cpa: number | null;
+    roas: number;
+  };
 }

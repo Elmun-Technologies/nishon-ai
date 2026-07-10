@@ -29,6 +29,7 @@ import { CreateAiDecisionsTable1763360000000 } from "./migrations/1763360000000-
 import { CreateMetaCampaignSyncsTable1763370000000 } from "./migrations/1763370000000-CreateMetaCampaignSyncsTable";
 import { CreateMetaInsightsTable1763380000000 } from "./migrations/1763380000000-CreateMetaInsightsTable";
 import { AddPerformanceIndexes1763400000000 } from "./migrations/1763400000000-AddPerformanceIndexes";
+import { AddAiDecisionTargetColumns1763500000000 } from "./migrations/1763500000000-AddAiDecisionTargetColumns";
 
 const databaseUrl = process.env.DATABASE_URL;
 const isProduction = process.env.NODE_ENV === "production";
@@ -82,6 +83,7 @@ export default new DataSource({
     CreateMetaCampaignSyncsTable1763370000000,
     CreateMetaInsightsTable1763380000000,
     AddPerformanceIndexes1763400000000,
+    AddAiDecisionTargetColumns1763500000000,
   ],
   synchronize: false,
   logging: process.env.TYPEORM_LOGGING === "true" || !isProduction,

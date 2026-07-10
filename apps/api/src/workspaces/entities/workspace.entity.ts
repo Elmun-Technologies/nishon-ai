@@ -53,7 +53,10 @@ export class Workspace {
   @Column({
     type: "enum",
     enum: AutopilotMode,
-    default: AutopilotMode.MANUAL,
+    // Default to ASSISTED: the agent proactively proposes optimizations and the
+    // user approves each (only low-risk actions auto-apply). This is the Trust
+    // default — a proposing agent out of the box, never silent auto-spend.
+    default: AutopilotMode.ASSISTED,
   })
   autopilotMode: AutopilotMode;
 

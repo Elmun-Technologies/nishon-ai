@@ -4,12 +4,13 @@ import {
   Patch,
   Param,
   Body,
+  Req,
   UseGuards,
   HttpCode,
   HttpStatus,
   Res,
 } from "@nestjs/common";
-import type { Response } from "express";
+import type { Request, Response } from "express";
 import {
   ApiTags,
   ApiBearerAuth,
@@ -101,15 +102,27 @@ export class AiAgentController {
   @Patch("decisions/:decisionId/approve")
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: "Approve a pending AI decision (ASSISTED mode)" })
-  async approveDecision(@Param("decisionId") decisionId: string) {
-    return this.aiAgentService.approveDecision(decisionId);
+  async approveDecision(
+    @Param("decisionId") decisionId: string,
+    @Req() req: Request,
+  ) {
+    return this.aiAgentService.approveDecision(
+      decisionId,
+      (req.user as { id: string }).id,
+    );
   }
 
   @Patch("decisions/:decisionId/reject")
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: "Reject a pending AI decision (ASSISTED mode)" })
-  async rejectDecision(@Param("decisionId") decisionId: string) {
-    return this.aiAgentService.rejectDecision(decisionId);
+  async rejectDecision(
+    @Param("decisionId") decisionId: string,
+    @Req() req: Request,
+  ) {
+    return this.aiAgentService.rejectDecision(
+      decisionId,
+      (req.user as { id: string }).id,
+    );
   }
 
   @Post("score-creative")

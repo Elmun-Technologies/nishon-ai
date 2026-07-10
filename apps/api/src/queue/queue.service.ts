@@ -2,8 +2,10 @@ import { Injectable, Logger } from "@nestjs/common";
 import { InjectQueue } from "@nestjs/bull";
 import { Queue } from "bull";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { Workspace } from "../workspaces/entities/workspace.entity";
+import { ConnectedAccount } from "../platforms/entities/connected-account.entity";
+import { AutopilotMode } from "@adspectr/shared";
 import { QUEUE_NAMES } from "./queue.constants";
 
 /**
@@ -26,6 +28,8 @@ export class QueueService {
     @InjectQueue(QUEUE_NAMES.CAMPAIGN_SYNC) private syncQueue: Queue,
     @InjectQueue(QUEUE_NAMES.REPORTS) private reportsQueue: Queue,
     @InjectRepository(Workspace) private workspaceRepo: Repository<Workspace>,
+    @InjectRepository(ConnectedAccount)
+    private accountRepo: Repository<ConnectedAccount>,
   ) {}
 
   /**
@@ -35,12 +39,31 @@ export class QueueService {
    * and one slow workspace doesn't block others.
    */
   async scheduleOptimizationForAllWorkspaces(): Promise<void> {
-    const workspaces = await this.workspaceRepo.find({
-      where: { isOnboardingComplete: true },
+    // Only run the (paid) AI loop where it can actually help: onboarded
+    // workspaces that opted into automation (autopilot ≠ MANUAL) AND have an
+    // active connected account for the agent to read/act on.
+    const candidates = await this.workspaceRepo.find({
+      where: {
+        isOnboardingComplete: true,
+        autopilotMode: In([AutopilotMode.ASSISTED, AutopilotMode.FULL_AUTO]),
+      },
     });
 
+    let workspaces = candidates;
+    if (candidates.length > 0) {
+      const active = await this.accountRepo.find({
+        where: {
+          workspaceId: In(candidates.map((w) => w.id)),
+          isActive: true,
+        },
+        select: ["workspaceId"],
+      });
+      const connected = new Set(active.map((a) => a.workspaceId));
+      workspaces = candidates.filter((w) => connected.has(w.id));
+    }
+
     this.logger.log(
-      `Scheduling optimization for ${workspaces.length} workspaces`,
+      `Scheduling optimization for ${workspaces.length} workspaces (connected + auto)`,
     );
 
     for (let i = 0; i < workspaces.length; i++) {
