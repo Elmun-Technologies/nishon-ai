@@ -567,7 +567,7 @@ export default function WorkspaceAdAccountsPage() {
                 <div>
                   <h4 className="text-heading-lg text-text-primary">What&apos;s your optimization goal?</h4>
                   <p className="mt-1 text-body text-text-tertiary">
-                    Set your primary KPI and review a quick baseline before activating automation.
+                    Set your primary KPI and review an estimated baseline before activating automation.
                   </p>
                 </div>
                 <div className="max-w-md">
@@ -604,6 +604,10 @@ export default function WorkspaceAdAccountsPage() {
                     </tbody>
                   </table>
                 </div>
+                <p className="text-body-sm text-text-tertiary">
+                  * Taxminiy — kiritilgan 30 kunlik xarajatdan proporsional hisoblangan.
+                  Real kunlik ko&apos;rsatkichlar Meta ulangach ko&apos;rinadi.
+                </p>
               </div>
             )}
 
