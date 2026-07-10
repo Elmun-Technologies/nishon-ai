@@ -126,66 +126,118 @@ const REPORT_TEMPLATES: Array<{
   },
 ]
 
+// Only metrics we can actually source from the real Meta audit payload are
+// pickable — no fabricated ROAS/leads/frequency. Reach/frequency are omitted
+// because the reporting endpoint doesn't return unique-reach.
 const AVAILABLE_METRICS = [
-  { id: 'roas',      label: 'ROAS',            icon: 'R', value: '2.4x',   trend: '+0.3x',  positive: true  },
-  { id: 'cpa',       label: 'CPA',             icon: 'C', value: '$18.50', trend: '-$2.1',  positive: true  },
-  { id: 'ctr',       label: 'CTR',             icon: 'T', value: '2.14%',  trend: '+0.4%',  positive: true  },
-  { id: 'frequency', label: 'Frequency',       icon: 'F', value: '3.2x',   trend: '+0.8x',  positive: false },
-  { id: 'cpm',       label: 'CPM',             icon: 'M', value: '$8.40',  trend: '-$1.2',  positive: true  },
-  { id: 'reach',     label: 'Reach',           icon: 'A', value: '12,400', trend: '+2,100', positive: true  },
-  { id: 'leads',     label: 'Leads',           icon: 'L', value: '84',     trend: '+12',    positive: true  },
-  { id: 'conv_rate', label: 'Conversion Rate', icon: 'V', value: '4.8%',   trend: '+0.6%',  positive: true  },
+  { id: 'roas', label: 'ROAS', icon: 'R' },
+  { id: 'revenue', label: 'Revenue', icon: '$' },
+  { id: 'spend', label: 'Spend', icon: 'S' },
+  { id: 'cpa', label: 'CPA', icon: 'C' },
+  { id: 'ctr', label: 'CTR', icon: 'T' },
+  { id: 'cpm', label: 'CPM', icon: 'M' },
+  { id: 'leads', label: 'Leads', icon: 'L' },
+  { id: 'conv_rate', label: 'Conversion Rate', icon: 'V' },
+  { id: 'impressions', label: 'Impressions', icon: 'I' },
+  { id: 'clicks', label: 'Clicks', icon: 'K' },
 ]
 
 const METRIC_ORDER_STORAGE = (workspaceId: string) => `adspectr:reporting:metric-order:${workspaceId}`
 
-function metricDisplayForId(
-  id: string,
-  totals: { spend: number; clicks: number; impressions: number } | undefined,
-): { value: string; trend: string; positive: boolean; label: string; icon: string } {
-  const def = AVAILABLE_METRICS.find((m) => m.id === id)
-  if (!def) return { value: '—', trend: '', positive: true, label: id, icon: '?' }
-  if (!totals || (totals.impressions === 0 && totals.clicks === 0)) {
-    return { value: def.value, trend: def.trend, positive: def.positive, label: def.label, icon: def.icon }
+/** Real audit snapshot (period totals + real prior-period deltas). */
+interface AuditSnapshot {
+  spend: number
+  impressions: number
+  clicks: number
+  conversions: number
+  revenue: number
+  avgCtr: number
+  avgRoas: number
+  deltas: {
+    spendPct: number | null
+    revenuePct: number | null
+    ctrPct: number | null
+    roasPct: number | null
+    conversionsPct: number | null
   }
-  const ctrPct = totals.impressions > 0 ? (totals.clicks / totals.impressions) * 100 : 0
-  const cpm = totals.impressions > 0 ? totals.spend / (totals.impressions / 1000) : 0
-  const cpa = totals.clicks > 0 ? totals.spend / totals.clicks : 0
+}
+
+interface MetricDisplay {
+  value: string
+  trend: string
+  positive: boolean
+  hasTrend: boolean
+  label: string
+  icon: string
+}
+
+/** Format a real prior-period percent delta (null → no trend shown). */
+function trendFromPct(pct: number | null | undefined): {
+  trend: string
+  positive: boolean
+  hasTrend: boolean
+} {
+  if (pct == null || !Number.isFinite(pct)) return { trend: '', positive: true, hasTrend: false }
+  const sign = pct >= 0 ? '+' : ''
+  return { trend: `${sign}${pct.toFixed(1)}%`, positive: pct >= 0, hasTrend: true }
+}
+
+/**
+ * Real metric display. Values are computed from the actual audit totals; trends
+ * are the real prior-period deltas (only shown when the backend provides them).
+ * Anything we can't source shows "—" — never a fabricated number.
+ */
+function metricDisplayForId(id: string, audit: AuditSnapshot | null): MetricDisplay {
+  const def = AVAILABLE_METRICS.find((m) => m.id === id)
+  const base = { label: def?.label ?? id, icon: def?.icon ?? '?' }
+  const none: MetricDisplay = { ...base, value: '—', trend: '', positive: true, hasTrend: false }
+  if (!audit) return none
+
   switch (id) {
+    case 'roas':
+      return { ...base, value: `${audit.avgRoas.toFixed(1)}x`, ...trendFromPct(audit.deltas.roasPct) }
+    case 'revenue':
+      return { ...base, value: formatCurrency(audit.revenue), ...trendFromPct(audit.deltas.revenuePct) }
+    case 'spend':
+      return { ...base, value: formatCurrency(audit.spend), ...trendFromPct(audit.deltas.spendPct) }
     case 'ctr':
+      return { ...base, value: `${audit.avgCtr.toFixed(2)}%`, ...trendFromPct(audit.deltas.ctrPct) }
+    case 'leads':
       return {
-        value: `${ctrPct.toFixed(2)}%`,
-        trend: def.trend,
-        positive: def.positive,
-        label: def.label,
-        icon: def.icon,
-      }
-    case 'cpm':
-      return {
-        value: formatCurrency(cpm),
-        trend: def.trend,
-        positive: def.positive,
-        label: def.label,
-        icon: def.icon,
-      }
-    case 'reach':
-      return {
-        value: formatNumber(totals.impressions),
-        trend: def.trend,
-        positive: def.positive,
-        label: def.label,
-        icon: def.icon,
+        ...base,
+        value: formatNumber(audit.conversions),
+        ...trendFromPct(audit.deltas.conversionsPct),
       }
     case 'cpa':
       return {
-        value: cpa > 0 ? formatCurrency(cpa) : def.value,
-        trend: def.trend,
-        positive: def.positive,
-        label: def.label,
-        icon: def.icon,
+        ...base,
+        value: audit.conversions > 0 ? formatCurrency(audit.spend / audit.conversions) : '—',
+        trend: '',
+        positive: true,
+        hasTrend: false,
       }
+    case 'cpm':
+      return {
+        ...base,
+        value: audit.impressions > 0 ? formatCurrency(audit.spend / (audit.impressions / 1000)) : '—',
+        trend: '',
+        positive: true,
+        hasTrend: false,
+      }
+    case 'conv_rate':
+      return {
+        ...base,
+        value: audit.clicks > 0 ? `${((audit.conversions / audit.clicks) * 100).toFixed(1)}%` : '—',
+        trend: '',
+        positive: true,
+        hasTrend: false,
+      }
+    case 'impressions':
+      return { ...base, value: formatNumber(audit.impressions), trend: '', positive: true, hasTrend: false }
+    case 'clicks':
+      return { ...base, value: formatNumber(audit.clicks), trend: '', positive: true, hasTrend: false }
     default:
-      return { value: def.value, trend: def.trend, positive: def.positive, label: def.label, icon: def.icon }
+      return none
   }
 }
 
@@ -205,6 +257,7 @@ export default function ReportingPage() {
   const { t } = useI18n()
   const { currentWorkspace } = useWorkspaceStore()
   const [data, setData] = useState<ReportData | null>(null)
+  const [audit, setAudit] = useState<AuditSnapshot | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [days, setDays] = useState(30)
@@ -220,7 +273,7 @@ export default function ReportingPage() {
   const [editingTagId, setEditingTagId] = useState<string | null>(null)
   const [tagInput, setTagInput] = useState('')
   /** Ordered list of visible KPI card metric ids (drag to reorder; persisted per workspace). */
-  const [orderedActiveMetrics, setOrderedActiveMetrics] = useState<string[]>(['roas', 'cpa', 'ctr', 'frequency'])
+  const [orderedActiveMetrics, setOrderedActiveMetrics] = useState<string[]>(['roas', 'revenue', 'ctr', 'leads'])
   const [showSimulation, setShowSimulation] = useState(false)
   const [simBudget, setSimBudget] = useState(1500)
   const [templatesOpen, setTemplatesOpen] = useState(false)
@@ -229,9 +282,43 @@ export default function ReportingPage() {
 
   const load = useCallback(() => {
     if (!currentWorkspace?.id) return
+    const wsId = currentWorkspace.id
     setLoading(true)
     setError('')
-    metaApi.reporting(currentWorkspace.id, days)
+    // Real KPI cards + trends come from the audit endpoint (it returns
+    // conversions/revenue/ROAS and real prior-period deltas); the table comes
+    // from the reporting endpoint. Fetch both; the audit is best-effort.
+    metaApi
+      .audit(wsId, days)
+      .then((res) => {
+        const rep = (res.data as { report?: { totals?: any; deltas?: any } } | undefined)?.report
+        if (rep?.totals) {
+          const tot = rep.totals
+          const del = rep.deltas ?? {}
+          setAudit({
+            spend: Number(tot.spend) || 0,
+            impressions: Number(tot.impressions) || 0,
+            clicks: Number(tot.clicks) || 0,
+            conversions: Number(tot.conversions) || 0,
+            revenue: Number(tot.revenue) || 0,
+            avgCtr: Number(tot.avgCtr) || 0,
+            avgRoas: Number(tot.avgRoas) || 0,
+            deltas: {
+              spendPct: del.spendPct ?? null,
+              revenuePct: del.revenuePct ?? null,
+              ctrPct: del.ctrPct ?? null,
+              roasPct: del.roasPct ?? null,
+              conversionsPct: del.conversionsPct ?? null,
+            },
+          })
+        } else {
+          setAudit(null)
+        }
+      })
+      .catch(() => setAudit(null))
+
+    metaApi
+      .reporting(wsId, days)
       .then((res) => {
         const d = res.data as ReportData
         setData(d)
@@ -760,7 +847,7 @@ export default function ReportingPage() {
         {orderedActiveMetrics.length > 0 ? (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
             {orderedActiveMetrics.map((id) => {
-              const disp = metricDisplayForId(id, totals)
+              const disp = metricDisplayForId(id, audit)
               return (
                 <div
                   key={id}
@@ -800,9 +887,13 @@ export default function ReportingPage() {
                     {disp.icon} {disp.label}
                   </p>
                   <p className="text-xl font-bold text-text-primary">{disp.value}</p>
-                  <p className={`mt-0.5 text-xs ${disp.positive ? 'text-emerald-500' : 'text-red-400'}`}>
-                    {disp.trend} vs oldingi davr
-                  </p>
+                  {disp.hasTrend ? (
+                    <p className={`mt-0.5 text-xs ${disp.positive ? 'text-emerald-500' : 'text-red-400'}`}>
+                      {disp.trend} {t('reporting.vsPrevPeriod', 'vs oldingi davr')}
+                    </p>
+                  ) : (
+                    <p className="mt-0.5 text-xs text-transparent select-none">·</p>
+                  )}
                 </div>
               )
             })}
@@ -848,21 +939,41 @@ export default function ReportingPage() {
                   <span>$500</span><span>$10,000</span>
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-3">
-                {[
-                  { label: 'Pessimistik', mult: 0.65, color: 'text-red-500', bg: 'bg-red-500/10 border-red-100' },
-                  { label: 'Realistik',   mult: 1.0,  color: 'text-text-secondary', bg: 'bg-surface-2 border-border' },
-                  { label: 'Optimistik',  mult: 1.35, color: 'text-emerald-500', bg: 'bg-emerald-500/10 border-emerald-100' },
-                ].map((s) => (
-                  <div key={s.label} className={`border rounded-xl p-3 ${s.bg}`}>
-                    <p className="text-text-tertiary text-xs mb-2">{s.label}</p>
-                    <p className={`text-lg font-bold ${s.color}`}>{Math.round(simBudget / 18.5 * s.mult)} lid</p>
-                    <p className="text-text-tertiary text-xs">ROAS: {(2.4 * s.mult).toFixed(1)}x</p>
-                    <p className="text-text-tertiary text-xs">CPA: ${(18.5 / s.mult).toFixed(0)}</p>
-                  </div>
-                ))}
-              </div>
-              <p className="text-text-tertiary text-xs">* Hisoblash joriy kampaniyalar ko'rsatkichlariga asoslangan</p>
+              {(() => {
+                // Anchor the simulation on the workspace's REAL CPA/ROAS when we
+                // have them; otherwise fall back to a generic benchmark and say so.
+                const realCpa =
+                  audit && audit.conversions > 0 ? audit.spend / audit.conversions : null
+                const realRoas = audit && audit.avgRoas > 0 ? audit.avgRoas : null
+                const baseCpa = realCpa ?? 18.5
+                const baseRoas = realRoas ?? 2.4
+                const isReal = realCpa != null && realRoas != null
+                return (
+                  <>
+                    <div className="grid grid-cols-3 gap-3">
+                      {[
+                        { label: 'Pessimistik', mult: 0.65, color: 'text-red-500', bg: 'bg-red-500/10 border-red-100' },
+                        { label: 'Realistik', mult: 1.0, color: 'text-text-secondary', bg: 'bg-surface-2 border-border' },
+                        { label: 'Optimistik', mult: 1.35, color: 'text-emerald-500', bg: 'bg-emerald-500/10 border-emerald-100' },
+                      ].map((s) => (
+                        <div key={s.label} className={`border rounded-xl p-3 ${s.bg}`}>
+                          <p className="text-text-tertiary text-xs mb-2">{s.label}</p>
+                          <p className={`text-lg font-bold ${s.color}`}>
+                            {Math.round((simBudget / baseCpa) * s.mult)} lid
+                          </p>
+                          <p className="text-text-tertiary text-xs">ROAS: {(baseRoas * s.mult).toFixed(1)}x</p>
+                          <p className="text-text-tertiary text-xs">CPA: ${(baseCpa / s.mult).toFixed(0)}</p>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-text-tertiary text-xs">
+                      {isReal
+                        ? "* Hisoblash joriy kampaniyalaringiz CPA/ROAS ko'rsatkichlariga asoslangan"
+                        : '* Meta ulanmagan — hisoblash umumiy benchmark (namuna) qiymatlariga asoslangan'}
+                    </p>
+                  </>
+                )
+              })()}
             </div>
           </div>
         )}

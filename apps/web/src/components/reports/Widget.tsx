@@ -80,6 +80,19 @@ function ResizeHandle() {
   )
 }
 
+/**
+ * Every widget in this builder renders sample values (the report builder is a
+ * design surface, not yet wired to a live data source). This badge labels each
+ * tile so no individual card reads as the user's real performance.
+ */
+function SampleBadge() {
+  return (
+    <span className="pointer-events-none absolute bottom-1.5 left-2 select-none rounded-full bg-amber-100 px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wide text-amber-700">
+      namuna
+    </span>
+  )
+}
+
 function DeltaPill({ delta, up }: { delta: string; up: boolean }) {
   return (
     <span
@@ -196,6 +209,7 @@ export function ReportWidget({ metricId, filters: _filters, onRemove }: ReportWi
               {m && <DeltaPill delta={m.delta} up={m.up} />}
             </div>
           </div>
+          <SampleBadge />
           <ResizeHandle />
         </div>
       )
@@ -243,6 +257,7 @@ export function ReportWidget({ metricId, filters: _filters, onRemove }: ReportWi
             </LineChart>
           </ResponsiveContainer>
         </div>
+        <SampleBadge />
         <ResizeHandle />
       </div>
     )
@@ -281,6 +296,7 @@ export function ReportWidget({ metricId, filters: _filters, onRemove }: ReportWi
             </LineChart>
           </ResponsiveContainer>
         </div>
+        <SampleBadge />
         <ResizeHandle />
       </div>
     )
@@ -319,6 +335,7 @@ export function ReportWidget({ metricId, filters: _filters, onRemove }: ReportWi
             </BarChart>
           </ResponsiveContainer>
         </div>
+        <SampleBadge />
         <ResizeHandle />
       </div>
     )
@@ -362,6 +379,7 @@ export function ReportWidget({ metricId, filters: _filters, onRemove }: ReportWi
             </tbody>
           </table>
         </div>
+        <SampleBadge />
         <ResizeHandle />
       </div>
     )
@@ -389,6 +407,7 @@ export function ReportWidget({ metricId, filters: _filters, onRemove }: ReportWi
       <p className="text-xs text-text-secondary leading-relaxed px-3 pb-3 flex-1">
         {INSIGHT_BODY[metricId] ?? "AI tahlil bu yerda ko'rinadi."}
       </p>
+      <SampleBadge />
       <ResizeHandle />
     </div>
   )
