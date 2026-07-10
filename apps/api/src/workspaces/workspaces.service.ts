@@ -198,6 +198,8 @@ export class WorkspacesService {
         'COALESCE(SUM(insight.spend), 0) AS "metaSpend"',
         'COALESCE(SUM(insight.clicks), 0) AS "metaClicks"',
         'COALESCE(SUM(insight.impressions), 0) AS "metaImpressions"',
+        'COALESCE(SUM(insight.conversions), 0) AS "metaConversions"',
+        'COALESCE(SUM(insight.conversionValue), 0) AS "metaRevenue"',
         'COUNT(DISTINCT insight.campaignId) AS "metaCampaignCount"',
       ])
       .getRawOne();
@@ -245,9 +247,14 @@ export class WorkspacesService {
     const internalSpend = parseFloat(internalResult.totalSpend) || 0;
     const internalRevenue = parseFloat(internalResult.totalRevenue) || 0;
     const metaSpend = parseFloat(metaResult?.metaSpend ?? "0") || 0;
+    const metaRevenue = parseFloat(metaResult?.metaRevenue ?? "0") || 0;
+    const metaConversions = parseInt(metaResult?.metaConversions ?? "0") || 0;
 
     const totalSpend = Math.max(internalSpend, metaSpend);
-    const totalRevenue = internalRevenue;
+    // Use Meta's own conversion revenue when the internal CRM has none — a
+    // Meta-only user had internalRevenue = 0, which made ROAS always "—" on the
+    // flagship dashboard even with real purchase data synced from Meta.
+    const totalRevenue = Math.max(internalRevenue, metaRevenue);
     const totalClicks = Math.max(
       parseInt(internalResult.totalClicks) || 0,
       parseInt(metaResult?.metaClicks ?? "0") || 0,
@@ -277,7 +284,10 @@ export class WorkspacesService {
     return {
       totalSpend,
       totalRevenue,
-      totalConversions: parseInt(internalResult.totalConversions) || 0,
+      totalConversions: Math.max(
+        parseInt(internalResult.totalConversions) || 0,
+        metaConversions,
+      ),
       totalClicks,
       totalImpressions,
       campaignCount,
