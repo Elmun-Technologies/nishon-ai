@@ -400,129 +400,85 @@ export class MarketplaceSearchService {
         });
       }
 
-      // Get all distinct platforms with counts
-      const platformsResult = await baseQuery
+      // Get all distinct platforms with counts.
+      // Single grouped query over the `platforms` array column (unnest + GROUP BY)
+      // instead of one .getCount() per distinct platform value.
+      const platformRows = await baseQuery
         .clone()
-        .select("DISTINCT unnest(ap.platforms) as platform")
-        .getRawMany();
+        .select("unnest(ap.platforms)", "platform")
+        .addSelect("COUNT(DISTINCT ap.id)", "count")
+        .groupBy("platform")
+        .getRawMany<{ platform: string; count: string }>();
 
-      const platformCounts = await Promise.all(
-        platformsResult.map(async (row) => {
-          const count = await baseQuery
-            .clone()
-            .andWhere("ap.platforms && :platforms", {
-              platforms: [row.platform],
-            })
-            .getCount();
-          return {
-            id: row.platform,
-            name: this.getPlatformName(row.platform),
-            count,
-            icon: this.getPlatformIcon(row.platform),
-          };
-        }),
-      );
+      const platformCounts = platformRows.map((row) => ({
+        id: row.platform,
+        name: this.getPlatformName(row.platform),
+        count: parseInt(row.count, 10) || 0,
+        icon: this.getPlatformIcon(row.platform),
+      }));
 
-      // Get all distinct niches with counts
-      const nichesResult = await baseQuery
+      // Get all distinct niches with counts (single grouped query over the array column).
+      const nicheRows = await baseQuery
         .clone()
-        .select("DISTINCT unnest(ap.niches) as niche")
-        .getRawMany();
+        .select("unnest(ap.niches)", "niche")
+        .addSelect("COUNT(DISTINCT ap.id)", "count")
+        .groupBy("niche")
+        .getRawMany<{ niche: string; count: string }>();
 
-      const nicheCounts = await Promise.all(
-        nichesResult.map(async (row) => {
-          const count = await baseQuery
-            .clone()
-            .andWhere("ap.niches && :niches", { niches: [row.niche] })
-            .getCount();
-          return {
-            id: row.niche,
-            name: row.niche,
-            count,
-          };
-        }),
-      );
+      const nicheCounts = nicheRows.map((row) => ({
+        id: row.niche,
+        name: row.niche,
+        count: parseInt(row.count, 10) || 0,
+      }));
 
-      // Get all countries with counts
-      const countriesResult = await this.agentGeographicCoverageRepository
+      // Get all countries with counts (single grouped query over the geo join).
+      // Base filters here mirror the original: is_published + is_indexable only.
+      const countryRows = await this.agentGeographicCoverageRepository
         .createQueryBuilder("geo")
-        .select("DISTINCT geo.country_code")
-        .innerJoinAndSelect(
-          "geo.agentProfile",
-          "ap",
-          "ap.is_published = :isPublished AND ap.is_indexable = :isIndexable",
-          { isPublished: true, isIndexable: true },
-        )
-        .getRawMany();
+        .innerJoin("geo.agentProfile", "ap")
+        .where("ap.is_published = :isPublished", { isPublished: true })
+        .andWhere("ap.is_indexable = :isIndexable", { isIndexable: true })
+        .select("geo.country_code", "country_code")
+        .addSelect("COUNT(geo.id)", "count")
+        .groupBy("geo.country_code")
+        .getRawMany<{ country_code: string; count: string }>();
 
-      const countryCounts = await Promise.all(
-        countriesResult.map(async (row) => {
-          const count = await this.agentGeographicCoverageRepository
-            .createQueryBuilder("geo")
-            .innerJoinAndSelect(
-              "geo.agentProfile",
-              "ap",
-              "ap.is_published = :isPublished AND ap.is_indexable = :isIndexable",
-              { isPublished: true, isIndexable: true },
-            )
-            .where("geo.country_code = :code", { code: row.country_code })
-            .getCount();
-          return {
-            id: row.country_code,
-            name: this.getCountryName(row.country_code),
-            count,
-          };
-        }),
-      );
+      const countryCounts = countryRows.map((row) => ({
+        id: row.country_code,
+        name: this.getCountryName(row.country_code),
+        count: parseInt(row.count, 10) || 0,
+      }));
 
-      // Get certifications with counts
-      const certificationsResult = await this.marketplaceCertificationRepository
-        .createQueryBuilder("mc")
-        .select("mc.id, mc.name, mc.issuer")
-        .innerJoinAndSelect(
-          "mc.agentCertifications",
-          "ac",
-          "ac.verification_status = :status",
-          { status: "approved" },
-        )
-        .innerJoinAndSelect(
-          "ac.agentProfile",
-          "ap",
-          "ap.is_published = :isPublished AND ap.is_indexable = :isIndexable",
-          { isPublished: true, isIndexable: true },
-        )
-        .getRawMany();
+      // Get certifications with counts (single grouped query over the certification join).
+      const certificationRows = await this.agentCertificationRepository
+        .createQueryBuilder("ac")
+        .innerJoin("ac.agentProfile", "ap")
+        .innerJoin("ac.certification", "mc")
+        .where("ap.is_published = :isPublished", { isPublished: true })
+        .andWhere("ap.is_indexable = :isIndexable", { isIndexable: true })
+        .andWhere("ac.verification_status = :status", { status: "approved" })
+        .select("mc.id", "id")
+        .addSelect("mc.name", "name")
+        .addSelect("mc.issuer", "issuer")
+        .addSelect("COUNT(ac.id)", "count")
+        .groupBy("mc.id")
+        .addGroupBy("mc.name")
+        .addGroupBy("mc.issuer")
+        .getRawMany<{
+          id: string;
+          name: string;
+          issuer: string;
+          count: string;
+        }>();
 
-      const certificationCounts = await Promise.all(
-        certificationsResult
-          .filter((v, i, a) => a.findIndex((t) => t.id === v.id) === i)
-          .map(async (row) => {
-            const count = await this.agentCertificationRepository
-              .createQueryBuilder("ac")
-              .innerJoinAndSelect(
-                "ac.agentProfile",
-                "ap",
-                "ap.is_published = :isPublished AND ap.is_indexable = :isIndexable",
-                { isPublished: true, isIndexable: true },
-              )
-              .where(
-                "ac.certification_id = :certId AND ac.verification_status = :status",
-                {
-                  certId: row.id,
-                  status: "approved",
-                },
-              )
-              .getCount();
-            return {
-              id: row.id,
-              name: row.name,
-              count,
-              issuer: row.issuer,
-            };
-          }),
-      );
+      const certificationCounts = certificationRows.map((row) => ({
+        id: row.id,
+        name: row.name,
+        count: parseInt(row.count, 10) || 0,
+        issuer: row.issuer,
+      }));
 
-      // Get price ranges with counts
+      // Get price ranges with counts (single query, conditional aggregates).
       const priceRanges: PriceRangeFilter[] = [
         { min: 0, max: 50, label: "Under $50", count: 0 },
         { min: 50, max: 150, label: "$50 - $150", count: 0 },
@@ -531,18 +487,23 @@ export class MarketplaceSearchService {
         { min: 1000, max: Infinity, label: "$1000+", count: 0 },
       ];
 
-      for (const range of priceRanges) {
+      let priceQuery = baseQuery.clone();
+      priceRanges.forEach((range, index) => {
         const maxPrice = range.max === Infinity ? 999999 : range.max;
-        range.count = await baseQuery
-          .clone()
-          .andWhere("ap.monthly_rate BETWEEN :min AND :max", {
-            min: range.min,
-            max: maxPrice,
-          })
-          .getCount();
-      }
+        // range.min / maxPrice are numeric constants from the list above (safe to inline).
+        const expr = `COUNT(*) FILTER (WHERE ap.monthly_rate BETWEEN ${range.min} AND ${maxPrice})`;
+        priceQuery =
+          index === 0
+            ? priceQuery.select(expr, `p${index}`)
+            : priceQuery.addSelect(expr, `p${index}`);
+      });
+      const priceRow =
+        (await priceQuery.getRawOne<Record<string, string>>()) || {};
+      priceRanges.forEach((range, index) => {
+        range.count = parseInt(priceRow[`p${index}`] ?? "0", 10) || 0;
+      });
 
-      // Get experience levels (inferred from created date and campaign count)
+      // Get experience levels (inferred from created date), computed in one query.
       const experienceLevels: ExperienceLevelFilter[] = [
         {
           level: "beginner",
@@ -573,65 +534,73 @@ export class MarketplaceSearchService {
       const fiveYearsAgo = new Date();
       fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
 
-      experienceLevels[0].count = await baseQuery
-        .clone()
-        .andWhere("ap.created_at >= :date", { date: oneYearAgo })
-        .getCount();
+      const experienceRow =
+        (await baseQuery
+          .clone()
+          .select(
+            "COUNT(*) FILTER (WHERE ap.created_at >= :oneYearAgo)",
+            "beginner",
+          )
+          .addSelect(
+            "COUNT(*) FILTER (WHERE ap.created_at >= :threeYearsAgo AND ap.created_at < :oneYearAgo)",
+            "intermediate",
+          )
+          .addSelect(
+            "COUNT(*) FILTER (WHERE ap.created_at >= :fiveYearsAgo AND ap.created_at < :threeYearsAgo)",
+            "experienced",
+          )
+          .addSelect(
+            "COUNT(*) FILTER (WHERE ap.created_at < :fiveYearsAgo)",
+            "expert",
+          )
+          .setParameters({ oneYearAgo, threeYearsAgo, fiveYearsAgo })
+          .getRawOne<Record<string, string>>()) || {};
 
-      experienceLevels[1].count = await baseQuery
-        .clone()
-        .andWhere("ap.created_at >= :date1 AND ap.created_at < :date2", {
-          date1: threeYearsAgo,
-          date2: oneYearAgo,
-        })
-        .getCount();
+      experienceLevels[0].count =
+        parseInt(experienceRow.beginner ?? "0", 10) || 0;
+      experienceLevels[1].count =
+        parseInt(experienceRow.intermediate ?? "0", 10) || 0;
+      experienceLevels[2].count =
+        parseInt(experienceRow.experienced ?? "0", 10) || 0;
+      experienceLevels[3].count =
+        parseInt(experienceRow.expert ?? "0", 10) || 0;
 
-      experienceLevels[2].count = await baseQuery
-        .clone()
-        .andWhere("ap.created_at >= :date1 AND ap.created_at < :date2", {
-          date1: fiveYearsAgo,
-          date2: threeYearsAgo,
-        })
-        .getCount();
+      // Get rating ranges (all buckets in one query, conditional aggregates).
+      const ratingRow =
+        (await baseQuery
+          .clone()
+          .select("COUNT(*) FILTER (WHERE ap.cached_rating >= 4.5)", "r45")
+          .addSelect(
+            "COUNT(*) FILTER (WHERE ap.cached_rating >= 4 AND ap.cached_rating < 4.5)",
+            "r40",
+          )
+          .addSelect(
+            "COUNT(*) FILTER (WHERE ap.cached_rating >= 3 AND ap.cached_rating < 4)",
+            "r30",
+          )
+          .addSelect("COUNT(*) FILTER (WHERE ap.cached_rating < 3)", "r00")
+          .getRawOne<Record<string, string>>()) || {};
 
-      experienceLevels[3].count = await baseQuery
-        .clone()
-        .andWhere("ap.created_at < :date", { date: fiveYearsAgo })
-        .getCount();
-
-      // Get rating ranges
       const ratingRanges: FilterOption[] = [
         {
           id: "4.5_5",
           name: "4.5 ★ and above",
-          count: await baseQuery
-            .clone()
-            .andWhere("ap.cached_rating >= 4.5")
-            .getCount(),
+          count: parseInt(ratingRow.r45 ?? "0", 10) || 0,
         },
         {
           id: "4_4.5",
           name: "4 ★ - 4.5 ★",
-          count: await baseQuery
-            .clone()
-            .andWhere("ap.cached_rating >= 4 AND ap.cached_rating < 4.5")
-            .getCount(),
+          count: parseInt(ratingRow.r40 ?? "0", 10) || 0,
         },
         {
           id: "3_4",
           name: "3 ★ - 4 ★",
-          count: await baseQuery
-            .clone()
-            .andWhere("ap.cached_rating >= 3 AND ap.cached_rating < 4")
-            .getCount(),
+          count: parseInt(ratingRow.r30 ?? "0", 10) || 0,
         },
         {
           id: "under_3",
           name: "Under 3 ★",
-          count: await baseQuery
-            .clone()
-            .andWhere("ap.cached_rating < 3")
-            .getCount(),
+          count: parseInt(ratingRow.r00 ?? "0", 10) || 0,
         },
       ];
 
