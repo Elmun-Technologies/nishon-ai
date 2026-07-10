@@ -65,7 +65,9 @@ export class AiAgentService {
       throw new NotFoundException(`AI decision ${decisionId} not found`);
     }
     const workspace = decision.workspaceId
-      ? await this.workspaceRepo.findOne({ where: { id: decision.workspaceId } })
+      ? await this.workspaceRepo.findOne({
+          where: { id: decision.workspaceId },
+        })
       : null;
     if (!workspace || workspace.userId !== userId) {
       throw new ForbiddenException("You do not have access to this decision");

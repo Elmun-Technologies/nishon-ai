@@ -66,19 +66,26 @@ describe("DecisionLoopService", () => {
     accountRepo = mockRepo();
     metaCampaignRepo = mockRepo();
     metaInsightRepo = mockRepo();
-    metaInsightRepo.createQueryBuilder = jest.fn(() => insightQb([INSIGHT_ROW]));
+    metaInsightRepo.createQueryBuilder = jest.fn(() =>
+      insightQb([INSIGHT_ROW]),
+    );
 
     metaConnector = {
       pauseCampaign: jest.fn().mockResolvedValue(undefined),
       updateCampaignBudget: jest.fn().mockResolvedValue(undefined),
-      getCampaign: jest
-        .fn()
-        .mockResolvedValue({ id: "meta-camp-1", name: "Summer", status: "ACTIVE", dailyBudget: 20 }),
+      getCampaign: jest.fn().mockResolvedValue({
+        id: "meta-camp-1",
+        name: "Summer",
+        status: "ACTIVE",
+        dailyBudget: 20,
+      }),
     };
 
     // The connected account token is decrypted before use — stub it.
     jest.spyOn(cryptoUtil, "decrypt").mockReturnValue("plain-token");
-    jest.spyOn(cryptoUtil, "resolveEncryptionKey").mockReturnValue("0".repeat(32));
+    jest
+      .spyOn(cryptoUtil, "resolveEncryptionKey")
+      .mockReturnValue("0".repeat(32));
     accountRepo.findOne.mockResolvedValue({
       accessToken: "enc",
       externalAccountId: "act_1",
@@ -90,8 +97,14 @@ describe("DecisionLoopService", () => {
         DecisionLoopService,
         { provide: getRepositoryToken(AiDecision), useValue: decisionRepo },
         { provide: getRepositoryToken(Workspace), useValue: workspaceRepo },
-        { provide: getRepositoryToken(ConnectedAccount), useValue: accountRepo },
-        { provide: getRepositoryToken(MetaCampaignSync), useValue: metaCampaignRepo },
+        {
+          provide: getRepositoryToken(ConnectedAccount),
+          useValue: accountRepo,
+        },
+        {
+          provide: getRepositoryToken(MetaCampaignSync),
+          useValue: metaCampaignRepo,
+        },
         { provide: getRepositoryToken(MetaInsight), useValue: metaInsightRepo },
         { provide: MetaConnector, useValue: metaConnector },
         {

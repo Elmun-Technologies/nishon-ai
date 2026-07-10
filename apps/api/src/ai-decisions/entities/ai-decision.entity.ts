@@ -50,7 +50,12 @@ export class AiDecision {
   @Column({ name: "target_external_id", type: "varchar", nullable: true })
   targetExternalId: string | null;
 
-  @Column({ name: "target_platform", type: "varchar", length: 20, nullable: true })
+  @Column({
+    name: "target_platform",
+    type: "varchar",
+    length: 20,
+    nullable: true,
+  })
   targetPlatform: string | null;
 
   // Real model/rules confidence (0-1) and projected $ impact — persisted so the

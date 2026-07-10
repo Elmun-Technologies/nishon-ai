@@ -250,7 +250,12 @@ export class MetaConnector {
   async getCampaign(
     campaignId: string,
     accessToken: string,
-  ): Promise<{ id: string; name: string; status: string; dailyBudget: number | null }> {
+  ): Promise<{
+    id: string;
+    name: string;
+    status: string;
+    dailyBudget: number | null;
+  }> {
     const data = await this.apiGet<{
       id: string;
       name?: string;
@@ -260,7 +265,8 @@ export class MetaConnector {
       access_token: accessToken,
       fields: "id,name,status,daily_budget",
     });
-    const cents = data.daily_budget != null ? parseInt(data.daily_budget, 10) : NaN;
+    const cents =
+      data.daily_budget != null ? parseInt(data.daily_budget, 10) : NaN;
     return {
       id: data.id,
       name: data.name ?? "",

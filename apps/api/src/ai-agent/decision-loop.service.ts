@@ -114,9 +114,8 @@ export class DecisionLoopService {
     const mode = workspace.autopilotMode ?? AutopilotMode.MANUAL;
 
     // Build the performance summary from the REAL synced Meta data.
-    const performanceSummary = await this.buildMetaPerformanceSummary(
-      workspaceId,
-    );
+    const performanceSummary =
+      await this.buildMetaPerformanceSummary(workspaceId);
     if (performanceSummary.length === 0) {
       this.logger.log(
         `No active synced Meta campaigns for workspace: ${workspaceId}`,
@@ -226,7 +225,9 @@ export class DecisionLoopService {
       const perDay = target.metrics.spend / 7;
       return Math.round(perDay * 100) / 100;
     }
-    const m = (d.estimatedImpact ?? "").replace(/,/g, "").match(/\$?\s*(\d+(?:\.\d+)?)/);
+    const m = (d.estimatedImpact ?? "")
+      .replace(/,/g, "")
+      .match(/\$?\s*(\d+(?:\.\d+)?)/);
     return m ? parseFloat(m[1]) : null;
   }
 
@@ -385,32 +386,37 @@ export class DecisionLoopService {
       ]),
     );
 
-    return active
-      .map((c) => {
-        const m = metricsById.get(String(c.id)) ?? {
-          spend: 0,
-          clicks: 0,
-          impressions: 0,
-          conversions: 0,
-          revenue: 0,
-        };
-        return {
-          campaignId: c.id,
-          campaignName: c.name,
-          platform: "meta" as const,
-          metrics: {
-            ...m,
-            ctr:
-              m.impressions > 0
-                ? Number(((m.clicks / m.impressions) * 100).toFixed(3))
-                : 0,
-            cpa: m.conversions > 0 ? Number((m.spend / m.conversions).toFixed(2)) : null,
-            roas: m.spend > 0 ? Number((m.revenue / m.spend).toFixed(2)) : 0,
-          },
-        };
-      })
-      // Only surface campaigns that actually have spend to reason about.
-      .filter((c) => c.metrics.spend > 0);
+    return (
+      active
+        .map((c) => {
+          const m = metricsById.get(String(c.id)) ?? {
+            spend: 0,
+            clicks: 0,
+            impressions: 0,
+            conversions: 0,
+            revenue: 0,
+          };
+          return {
+            campaignId: c.id,
+            campaignName: c.name,
+            platform: "meta" as const,
+            metrics: {
+              ...m,
+              ctr:
+                m.impressions > 0
+                  ? Number(((m.clicks / m.impressions) * 100).toFixed(3))
+                  : 0,
+              cpa:
+                m.conversions > 0
+                  ? Number((m.spend / m.conversions).toFixed(2))
+                  : null,
+              roas: m.spend > 0 ? Number((m.revenue / m.spend).toFixed(2)) : 0,
+            },
+          };
+        })
+        // Only surface campaigns that actually have spend to reason about.
+        .filter((c) => c.metrics.spend > 0)
+    );
   }
 }
 
