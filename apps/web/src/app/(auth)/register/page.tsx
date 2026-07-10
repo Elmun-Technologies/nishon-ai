@@ -85,18 +85,23 @@ export default function RegisterPage() {
       await tryCreateWorkspace(accessToken, onboardingDraft)
 
       // Hydrate the workspace store so the dashboard, Meta connect and Ad
-      // Launcher have a currentWorkspace. Without this a freshly-registered
-      // user lands on the dashboard with currentWorkspace === null and the
-      // whole workspace-scoped MVP dead-ends until they log out and back in.
+      // Launcher have a currentWorkspace. If workspace creation/hydration
+      // didn't yield one (API hiccup, DTO rejection), route to /onboarding —
+      // mirroring login — instead of dropping the user on a dashboard with
+      // currentWorkspace === null, which dead-ends the workspace-scoped MVP.
+      let hydratedWorkspace = false
       try {
         const wsRes = await workspacesApi.list()
         const ws = wsRes.data?.[0] ?? null
-        if (ws) setCurrentWorkspace(ws)
+        if (ws) {
+          setCurrentWorkspace(ws)
+          hydratedWorkspace = true
+        }
       } catch {
-        // Non-blocking — dashboard/login can still hydrate later.
+        // Non-blocking — fall through to the onboarding fallback below.
       }
 
-      router.push('/dashboard')
+      router.push(hydratedWorkspace ? '/dashboard' : '/onboarding')
     } catch (err: unknown) {
       const fallback = t('auth.registerPage.genericError', 'Registration failed. Please try again.')
       let msg = getApiErrorMessage(err, fallback)

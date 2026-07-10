@@ -110,6 +110,54 @@ export class MetaOAuthService {
       tokenPreview: this.maskToken(token),
     });
 
+    // The code exchange returns a SHORT-lived user token (~1-2h). Upgrade it to
+    // a long-lived (~60 day) token so the connection — dashboard auto-sync and
+    // Ad Launcher launches — doesn't silently die ~90 minutes after connecting.
+    // Fall back to the short-lived token if the upgrade fails so connect never
+    // breaks outright.
+    const longLived = await this.exchangeForLongLivedToken(token).catch(
+      (err: any) => {
+        this.logger.warn(
+          `Meta long-lived token exchange failed, using short-lived token: ${err?.message}`,
+        );
+        return null;
+      },
+    );
+
+    return longLived?.access_token ? longLived : response.data;
+  }
+
+  /**
+   * Exchanges a short-lived Meta user token for a long-lived (~60 day) one via
+   * grant_type=fb_exchange_token. Returns the long-lived token response
+   * (its expires_in is what upsertConnectedAccount stores as tokenExpiresAt).
+   */
+  private async exchangeForLongLivedToken(
+    shortToken: string,
+  ): Promise<MetaTokenResponse> {
+    const clientId = this.config.get<string>("META_APP_ID", "");
+    const clientSecret = this.config.get<string>("META_APP_SECRET", "");
+
+    const response = await firstValueFrom(
+      this.http.get<MetaTokenResponse>(
+        `https://graph.facebook.com/${GRAPH_VERSION}/oauth/access_token`,
+        {
+          params: {
+            grant_type: "fb_exchange_token",
+            client_id: clientId,
+            client_secret: clientSecret,
+            fb_exchange_token: shortToken,
+          },
+        },
+      ),
+    );
+
+    this.logger.log({
+      message: "Meta long-lived token obtained",
+      expiresIn: response.data.expires_in ?? null,
+      tokenPreview: this.maskToken(response.data.access_token),
+    });
+
     return response.data;
   }
 
