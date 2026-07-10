@@ -30,6 +30,41 @@ pnpm --filter api dev   # Faqat backend
 **Asosiy branch:** `main`
 **Faol branch:** `claude/loyihani-mvp-readiness-xv4anj` — Agentic platforma (Vaqt · Pul · Ishonch)
 
+### 2026-07-10 sessiyasi (3) — Avtonom sifat/halollik sweep (Ishonch)
+To'rt parallel audit (core loop, agentic, Meta-connect, money) real yadroni
+tasdiqladi, lekin ko'p yuzada **soxta ma'lumot real deb ko'rsatilardi**. 11 ta
+tekshirilgan batch (har biri build+unit+e2e+i18n yashil, alohida commit+push):
+
+1. **Reporting KPI** — ROAS/leads/conv qattiq-kodlangan + soxta trend deltalar
+   real jadval ustida. Endi `/meta/audit` real totals + real prior-period
+   deltalar; manba yo'q qiymat → "—". Reports builder widgetlariga "namuna" badge.
+2. **Telegram** — alert toggle'lar localStorage-only edi, cron e'tibormas; "21:00"
+   noto'g'ri (cron 09:00). Digest=always-on(09:00), boshqalari "tez orada".
+3. **Integrations** — soxta ACTIVE AmoCRM/Slack + "2 connected/99.8%" o'z preview
+   banneri ostida. Endi "Namuna" badge, soxta raqamlar "—".
+4. **Demo-on-error** — ai-agents va ai-decisions API xatosida soxta $2,840 foyda /
+   demo qarorlar ko'rsatardi. Endi real error state, demo faqat no-workspace.
+5. **Auto-optimization** — har userga DEMO_PAYLOAD ("Summer Sale 2024") yuborardi.
+   Endi real synced kampaniya picker; demo faqat Meta ulanmaganda. Debug tick
+   panel dev-only.
+6. **Agent Store/Studio** — soxta marketplace + rent/train stub. "Preview/Beta"
+   banner, rent stub o'rniga halol "tez orada".
+7. **Automation** — "create rule" o'lik mock wizardga yo'naltirardi. Endi real
+   `/triggersets` CRUD; wizard route redirect.
+8. **Launch preview→execute fasad** — qattiq-kodlangan strategiya, soxta agent
+   log, 5 soxta mutaxassis. "Namuna oqim (demo)" banner; execute real Launch/AI
+   Agents CTA; specialist real Marketplace CTA.
+9. **Dashboard "AI Signallar"** — soxta detection matnlari → halol maslahatlar
+   (3 til). Runtime o'lik Pause/Enable/Settings → real workspace autopilot.
+10. **Ad-accounts baseline** — soxta kunlik raqamlar "taxminiy" deb belgilandi.
+11. **Billing** — joriy plan localStorage'dan edi (real Payme upgrade ko'rinmasdi).
+    Endi backend `user.plan` (/auth/me) manba; demo-pay soxta upgrade neytrallandi.
+
+**Holat:** web build OK, web unit 118/118, e2e 39/39, i18n 2533×3. API o'zgармади.
+Backlog (kechiktirilgan): budget slider persist (backend endpoint kerak),
+reporting templates modal, campaigns kartalarida real metrikalar, F1 telegram
+link store DB'ga, F9 dead platforms Meta OAuth.
+
 ### 2026-07-10 sessiyasi (2) — Agentic: real, boshqariladigan agent (PR #149)
 Startap va'dasi **Vaqt · Pul · Ishonch** — AI agent biznes reklamasini o'zi
 boshqaradi. Ikki mustaqil audit + to'g'ridan-to'g'ri tracing tasdiqladi:
