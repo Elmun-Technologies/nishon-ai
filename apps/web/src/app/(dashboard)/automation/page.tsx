@@ -365,7 +365,7 @@ export default function AutomationPage() {
   const onboardingSteps = [
     { done: false, label: 'Подключите Meta Ads', action: () => router.push('/settings/meta'), cta: 'Подключить' },
     { done: false, label: 'Откройте автооптимизацию', action: () => router.push('/auto-optimization'), cta: 'Открыть' },
-    { done: true,  label: 'Создайте первое правило', action: () => router.push('/automation/wizard'), cta: 'Готово' },
+    { done: true,  label: 'Создайте первое правило', action: () => router.push('/triggersets'), cta: 'Готово' },
   ]
 
   return (
@@ -400,7 +400,7 @@ export default function AutomationPage() {
               type="button"
               size="md"
               className="gap-1.5 shadow-sm"
-              onClick={() => router.push('/automation/wizard')}
+              onClick={() => router.push('/triggersets')}
             >
               <Plus className="h-4 w-4" />
               Новое правило
@@ -539,7 +539,7 @@ export default function AutomationPage() {
                 : 'Filterlarni o\'zgartirib qayta urinib ko\'ring'}
             </p>
             {tactics.length === 0 && (
-              <Button type="button" onClick={() => router.push('/automation/wizard')}>
+              <Button type="button" onClick={() => router.push('/triggersets')}>
                 <Plus className="h-4 w-4" />
                 Создать правило
               </Button>
@@ -563,7 +563,7 @@ export default function AutomationPage() {
                   <tr
                     key={row.id}
                     className="group border-b border-border/80 last:border-0 hover:bg-surface-2/40 cursor-pointer transition-colors"
-                    onClick={() => router.push('/automation/wizard')}
+                    onClick={() => router.push('/triggersets')}
                   >
                     <td className="px-4 py-3">
                       <span className="font-medium text-text-primary group-hover:text-primary transition-colors">
@@ -589,8 +589,8 @@ export default function AutomationPage() {
                           id={`tactic-toggle-${row.id}`}
                         />
                         <RowMenu
-                          onEdit={() => router.push('/automation/wizard')}
-                          onDuplicate={() => {}}
+                          onEdit={() => router.push('/triggersets')}
+                          onDuplicate={() => router.push('/triggersets')}
                           onDelete={() => void deleteTactic(row.id)}
                         />
                       </div>
@@ -638,7 +638,7 @@ export default function AutomationPage() {
           ))}
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button type="button" className="gap-1.5" onClick={() => router.push('/automation/wizard')}>
+          <Button type="button" className="gap-1.5" onClick={() => router.push('/triggersets')}>
             <Plus className="h-4 w-4" />
             Мастер правил
           </Button>
