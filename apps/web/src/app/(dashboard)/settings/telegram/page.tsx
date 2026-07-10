@@ -11,41 +11,9 @@ import { useI18n } from '@/i18n/use-i18n'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { workspaces as workspacesApi } from '@/lib/api-client'
 
-const TG_PREFS_KEY = 'adspectr-telegram-alert-prefs'
-
-type Prefs = {
-  roasDrop: boolean
-  budget80: boolean
-  competitor: boolean
-  daily2100: boolean
-}
-
-const defaultPrefs: Prefs = {
-  roasDrop: true,
-  budget80: true,
-  competitor: true,
-  daily2100: false,
-}
-
-function loadPrefs(): Prefs {
-  if (typeof window === 'undefined') return defaultPrefs
-  try {
-    const r = JSON.parse(localStorage.getItem(TG_PREFS_KEY) ?? '{}') as Partial<Prefs>
-    return { ...defaultPrefs, ...r }
-  } catch {
-    return defaultPrefs
-  }
-}
-
-function savePrefs(p: Prefs) {
-  if (typeof window === 'undefined') return
-  localStorage.setItem(TG_PREFS_KEY, JSON.stringify(p))
-}
-
 export default function TelegramSettingsPage() {
   const { t } = useI18n()
   const { currentWorkspace, setCurrentWorkspace } = useWorkspaceStore()
-  const [prefs, setPrefs] = useState<Prefs>(defaultPrefs)
   const [hydrated, setHydrated] = useState(false)
   const [linkToken, setLinkToken] = useState<string | null>(null)
   const [deepLink, setDeepLink] = useState<string | null>(null)
@@ -57,7 +25,6 @@ export default function TelegramSettingsPage() {
   const linkDoneRef = useRef(false)
 
   useEffect(() => {
-    setPrefs(loadPrefs())
     setHydrated(true)
   }, [])
 
@@ -138,14 +105,6 @@ export default function TelegramSettingsPage() {
       if (linkTimeoutRef.current) clearTimeout(linkTimeoutRef.current)
     }
   }, [stopPoll])
-
-  const togglePref = (key: keyof Prefs) => {
-    setPrefs((p) => {
-      const n = { ...p, [key]: !p[key] }
-      savePrefs(n)
-      return n
-    })
-  }
 
   const disconnect = async () => {
     if (!currentWorkspace?.id) return
@@ -238,25 +197,35 @@ export default function TelegramSettingsPage() {
             </div>
 
             <div className="space-y-3 border-t border-border pt-4">
+              {/* The daily digest is the one notification that is actually
+                  wired (report.processor 09:00 cron, sent whenever a chat is
+                  linked). It's shown as always-on. The event alerts below are
+                  not built yet, so they're marked "tez orada" and disabled —
+                  we don't show a toggle that controls nothing. */}
+              <label className="flex items-center justify-between gap-3 text-sm">
+                <span className="text-text-primary">
+                  {t('settingsTelegram.prefDaily', 'Kunlik hisobot (09:00)')}
+                </span>
+                <span className="rounded-full bg-emerald-500/15 px-2.5 py-1 text-xs font-semibold text-emerald-600">
+                  {t('settingsTelegram.alwaysOn', 'Yoqiq')}
+                </span>
+              </label>
               {(
                 [
                   ['roasDrop', t('settingsTelegram.prefRoas', 'ROAS tushsa')] as const,
                   ['budget80', t('settingsTelegram.prefBudget', 'Budget ~80%')] as const,
                   ['competitor', t('settingsTelegram.prefCompetitor', 'Raqib yangi ad')] as const,
-                  ['daily2100', t('settingsTelegram.prefDaily', 'Kunlik hisobot 21:00')] as const,
                 ] as const
               ).map(([key, label]) => (
-                <label key={key} className="flex items-center justify-between gap-3 text-sm">
+                <div
+                  key={key}
+                  className="flex items-center justify-between gap-3 text-sm opacity-70"
+                >
                   <span className="text-text-primary">{label}</span>
-                  <button
-                    type="button"
-                    onClick={() => togglePref(key)}
-                    className={cnToggle(prefs[key])}
-                    aria-pressed={prefs[key]}
-                  >
-                    <span className={cnKnob(prefs[key])} />
-                  </button>
-                </label>
+                  <span className="rounded-full bg-surface-2 px-2.5 py-1 text-xs font-medium text-text-tertiary">
+                    {t('common.comingSoon', 'tez orada')}
+                  </span>
+                </div>
               ))}
             </div>
           </div>
@@ -277,12 +246,4 @@ export default function TelegramSettingsPage() {
       </Card>
     </div>
   )
-}
-
-function cnToggle(on: boolean) {
-  return `relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors ${on ? 'bg-emerald-500/80' : 'bg-surface-2'}`
-}
-
-function cnKnob(on: boolean) {
-  return `inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${on ? 'translate-x-6' : 'translate-x-1'}`
 }

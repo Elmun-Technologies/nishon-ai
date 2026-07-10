@@ -143,7 +143,7 @@ export default function IntegrationsPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-text-tertiary">{t('pages.integrations.connected')}</p>
-              <p className="text-3xl font-bold text-emerald-400">2</p>
+              <p className="text-3xl font-bold text-emerald-400">—</p>
             </div>
             <Check className="text-emerald-400" size={32} />
           </div>
@@ -173,7 +173,7 @@ export default function IntegrationsPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-text-tertiary">{t('pages.integrations.syncHealth')}</p>
-              <p className="text-3xl font-bold text-purple-400">99.8%</p>
+              <p className="text-3xl font-bold text-purple-400">—</p>
             </div>
             <TrendingUp className="text-purple-400" size={32} />
           </div>
@@ -270,8 +270,8 @@ function IntegrationCard({ integration, onConfigure, onTest }: IntegrationCardPr
           <div>
             <div className="flex items-center gap-2">
               <h3 className="text-xl font-semibold text-text-primary">{integration.name}</h3>
-              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-medium">
-                <Check size={14} /> ACTIVE
+              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-300 text-xs font-medium uppercase tracking-wide">
+                Namuna
               </span>
             </div>
             <p className="text-sm text-text-tertiary">{integration.account}</p>
