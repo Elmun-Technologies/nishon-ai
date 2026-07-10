@@ -417,19 +417,18 @@ export default function BudgetPage() {
           <div className="flex items-center gap-2 mb-3">
             <span className="text-lg">📊</span>
             <p className="text-text-tertiary text-xs font-medium uppercase tracking-wide">
-              Aktiv kampaniyalar
+              Kampaniyalar
             </p>
           </div>
           <p className="text-xl font-bold text-text-primary">
-            {performance?.activeCampaigns != null
-              ? `${performance.activeCampaigns} ta`
+            {performance?.campaignCount != null
+              ? `${performance.campaignCount} ta`
               : '—'}
           </p>
           <p className="text-text-tertiary text-xs mt-1">
-            Jami —{' '}
-            {performance?.totalCampaigns != null
-              ? `${performance.totalCampaigns} ta`
-              : '—'}
+            {performance?.totalSpend != null
+              ? `${formatCurrency(performance.totalSpend)} sarflandi`
+              : 'Meta hisobini ulang'}
           </p>
         </Card>
       </div>
@@ -576,8 +575,8 @@ export default function BudgetPage() {
                   <div className="text-base">📊</div>
                   <p className="text-text-tertiary text-xs leading-snug">O&apos;rtacha ROAS</p>
                   <p className="text-text-primary font-bold text-lg tabular-nums">
-                    {performance?.averageRoas != null
-                      ? `${Number(performance.averageRoas).toFixed(2)}x`
+                    {performance?.overallRoas != null
+                      ? `${Number(performance.overallRoas).toFixed(2)}x`
                       : '—'}
                   </p>
                   {performance?.totalRevenue != null && (

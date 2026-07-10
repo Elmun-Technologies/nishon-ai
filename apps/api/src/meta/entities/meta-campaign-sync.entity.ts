@@ -26,6 +26,8 @@ import { Workspace } from "../../workspaces/entities/workspace.entity";
  */
 @Entity("meta_campaign_syncs")
 @Index("IDX_meta_campaign_syncs_workspace", ["workspaceId"])
+// Dashboard/reporting filter by (workspaceId, adAccountId) together.
+@Index("IDX_meta_campaign_syncs_ws_account", ["workspaceId", "adAccountId"])
 export class MetaCampaignSync {
   /** Meta's numeric campaign ID stored as string. */
   @PrimaryColumn({ length: 50 })

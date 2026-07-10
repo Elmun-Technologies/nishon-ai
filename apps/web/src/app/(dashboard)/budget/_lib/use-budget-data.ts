@@ -19,13 +19,14 @@ export type BudgetData = {
   /** Filled when the spend-forecast request actually fails (auth, network). */
   error: string | null
   forecast: BudgetForecast | null
-  /** Aggregate workspace performance (active / total campaign counts, etc). */
+  /** Aggregate workspace performance. Field names mirror the API response
+      from `GET /workspaces/:id/performance` (workspaces.service.ts). */
   performance: {
-    totalCampaigns?: number
-    activeCampaigns?: number
+    campaignCount?: number
     totalSpend?: number
     totalRevenue?: number
-    averageRoas?: number
+    overallRoas?: number
+    metaConnected?: boolean
   } | null
   refetch: () => void
 }
@@ -85,7 +86,9 @@ export function useBudgetData(workspaceId: string | undefined): BudgetData {
       // workspace has insights synced but no Meta account is producing
       // data. Treat that as needs-connect too so the UI shows a CTA.
       if (f && f.spendToDate === 0 && f.daysElapsed > 0) {
-        setNeedsMetaConnect((prev) => prev || (p?.activeCampaigns ?? 0) === 0)
+        setNeedsMetaConnect(
+          (prev) => prev || p?.metaConnected === false || (p?.campaignCount ?? 0) === 0,
+        )
       }
     } catch (e: any) {
       setError(e?.message ?? 'budget_load_failed')

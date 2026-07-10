@@ -89,6 +89,10 @@ export default function AudiencesPage() {
       setConnected(data.connected)
       setAudiences(data.audiences)
     } catch (e: any) {
+      // A load failure most likely means the Meta connection is missing or
+      // broken — route to the connect/error path instead of rendering the
+      // "no audiences yet" empty state as if everything were fine.
+      setConnected(false)
       setError(e?.message ?? 'Auditoriya ro\'yxatini yuklab bo\'lmadi.')
     } finally {
       setLoading(false)

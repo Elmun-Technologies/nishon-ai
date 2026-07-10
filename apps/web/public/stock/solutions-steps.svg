@@ -1,0 +1,53 @@
+<svg width="1280" height="720" viewBox="0 0 1280 720" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Three step launch flow: source, select, launch">
+  <defs>
+    <linearGradient id="ss-bg" x1="0" y1="0" x2="1280" y2="720" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F7FCF2"/>
+      <stop offset="1" stop-color="#E8F5DB"/>
+    </linearGradient>
+    <linearGradient id="ss-badge" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#B0ED6F"/>
+      <stop offset="1" stop-color="#93C75B"/>
+    </linearGradient>
+    <radialGradient id="ss-glow" cx="0.5" cy="0.5" r="0.5">
+      <stop stop-color="#B0ED6F" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#B0ED6F" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="ss-shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#3D5626" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+
+  <rect width="1280" height="720" rx="32" fill="url(#ss-bg)"/>
+  <circle cx="640" cy="360" r="360" fill="url(#ss-glow)"/>
+
+  <!-- dashed connecting path, ascending -->
+  <path d="M250 470 C 430 470, 470 400, 640 400 C 810 400, 850 330, 1030 330" stroke="#9BD061" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="2 22"/>
+
+  <!-- card 1: source -->
+  <g filter="url(#ss-shadow)">
+    <rect x="150" y="380" width="230" height="230" rx="28" fill="#FFFFFF" stroke="#DCEFC6"/>
+    <path d="M205 452 h34 l12 16 h54 a10 10 0 0 1 10 10 v58 a10 10 0 0 1 -10 10 h-100 a10 10 0 0 1 -10 -10 v-74 a10 10 0 0 1 10 -10 z" fill="#EAF7DC" stroke="#93C75B" stroke-width="5"/>
+    <rect x="188" y="556" width="120" height="14" rx="7" fill="#EDF7E1"/>
+  </g>
+  <g filter="url(#ss-shadow)"><circle cx="180" cy="410" r="26" fill="url(#ss-badge)"/><circle cx="180" cy="410" r="7" fill="#FFFFFF"/></g>
+
+  <!-- card 2: select -->
+  <g filter="url(#ss-shadow)">
+    <rect x="525" y="310" width="230" height="230" rx="28" fill="#FFFFFF" stroke="#DCEFC6"/>
+    <rect x="565" y="360" width="150" height="26" rx="8" fill="#EDF7E1"/>
+    <rect x="565" y="400" width="150" height="26" rx="8" fill="#EAF7DC"/>
+    <rect x="565" y="440" width="150" height="26" rx="8" fill="#EDF7E1"/>
+    <circle cx="700" cy="413" r="17" fill="#93C75B"/>
+    <path d="M692 413 l6 7 l12 -15" stroke="#FFFFFF" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g filter="url(#ss-shadow)"><circle cx="555" cy="340" r="26" fill="url(#ss-badge)"/><rect x="549" y="334" width="12" height="12" rx="3" fill="#FFFFFF"/></g>
+
+  <!-- card 3: launch -->
+  <g filter="url(#ss-shadow)">
+    <rect x="900" y="240" width="230" height="230" rx="28" fill="#FFFFFF" stroke="#DCEFC6"/>
+    <path d="M1015 288 c 28 14, 32 52, 8 82 l-8 10 l-8 -10 c -24 -30, -20 -68, 8 -82 z" fill="#EAF7DC" stroke="#93C75B" stroke-width="5"/>
+    <circle cx="1015" cy="326" r="10" fill="#93C75B"/>
+    <path d="M995 384 l20 -12 l20 12 l-20 30 z" fill="#B0ED6F"/>
+  </g>
+  <g filter="url(#ss-shadow)"><circle cx="930" cy="270" r="26" fill="url(#ss-badge)"/><path d="M922 270 l6 7 l14 -12" stroke="#FFFFFF" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+</svg>

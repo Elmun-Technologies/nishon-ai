@@ -64,8 +64,7 @@ export default function SolutionsPage() {
             <ContentMediaSlot
               slotId="public-solutions-hero-media"
               ratio="21:9"
-              imageSrc="/stock/solutions-demo.svg"
-              caption={t('preAuthOnboarding.mediaSlotCaption', 'Illustration / motion')}
+              imageSrc="/stock/solutions-hero.svg"
             />
           </div>
         </PublicContainer>
@@ -109,8 +108,7 @@ export default function SolutionsPage() {
           <ContentMediaSlot
             slotId="public-solutions-steps-media"
             ratio="16:9"
-            imageSrc="/stock/solutions-demo.svg"
-            caption={t('preAuthOnboarding.mediaSlotCaption', 'Illustration / motion')}
+            imageSrc="/stock/solutions-steps.svg"
             className="mb-6"
           />
           <div className="grid gap-4 md:grid-cols-3">

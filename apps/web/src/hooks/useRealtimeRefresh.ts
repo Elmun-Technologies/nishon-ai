@@ -1,5 +1,5 @@
 'use client'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { getSocket, joinWorkspace } from '@/lib/socket'
 
 /**
@@ -8,12 +8,21 @@ import { getSocket, joinWorkspace } from '@/lib/socket'
  *
  * Usage:
  *   useRealtimeRefresh(workspaceId, ['meta_synced', 'optimization_done'], fetchData)
+ *
+ * `onRefresh` is read through a ref so callers can pass a fresh closure each
+ * render (e.g. a useCallback that depends on locale/state) without the socket
+ * handler binding a stale version. Subscriptions are rebuilt only when the
+ * workspace or the event list actually changes (by value, not identity).
  */
 export function useRealtimeRefresh(
   workspaceId: string | undefined,
   events: string[],
   onRefresh: () => void,
 ) {
+  const onRefreshRef = useRef(onRefresh)
+  onRefreshRef.current = onRefresh
+  const eventsKey = events.join(',')
+
   useEffect(() => {
     if (!workspaceId) return
 
@@ -22,10 +31,11 @@ export function useRealtimeRefresh(
 
     joinWorkspace(workspaceId)
 
-    const handlers: Array<() => void> = events.map((event) => {
+    const eventList = eventsKey ? eventsKey.split(',') : []
+    const handlers: Array<() => void> = eventList.map((event) => {
       const handler = (data: any) => {
         if (!data?.workspaceId || data.workspaceId === workspaceId) {
-          onRefresh()
+          onRefreshRef.current()
         }
       }
       socket.on(event, handler)
@@ -35,6 +45,5 @@ export function useRealtimeRefresh(
     return () => {
       handlers.forEach((cleanup) => cleanup())
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [workspaceId])
+  }, [workspaceId, eventsKey])
 }

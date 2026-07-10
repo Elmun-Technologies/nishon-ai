@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { CreditCard, Sparkles } from 'lucide-react'
 import { useI18n } from '@/i18n/use-i18n'
 import { Button } from '@/components/ui/Button'
@@ -13,7 +13,6 @@ import {
   SUBSCRIPTION_PLANS,
   formatUzs,
   getPlan,
-  uzsToPaymeTiyin,
   type SubscriptionPlanId,
 } from '@/lib/subscription-plans'
 import {
@@ -264,12 +263,6 @@ export default function BillingPage() {
 
   const checkoutPlanDef = checkoutPlan ? getPlan(checkoutPlan) : null
 
-  const paymeDeepLink = useMemo(() => {
-    if (!orderId || !checkoutPlanDef || checkoutPlanDef.priceUzs <= 0) return null
-    const tiyin = amountTiyin ?? uzsToPaymeTiyin(checkoutPlanDef.priceUzs)
-    return `payme://checkout?order_id=${encodeURIComponent(orderId)}&amount=${tiyin}`
-  }, [orderId, checkoutPlanDef, amountTiyin])
-
   if (!currentWorkspace) {
     return (
       <div className="max-w-xl mx-auto py-16 px-4 text-center text-text-secondary text-sm">
@@ -461,11 +454,6 @@ export default function BillingPage() {
             <p className="text-sm text-text-secondary mt-2">
               {checkoutPlanDef.name} — {formatUzs(checkoutPlanDef.priceUzs)}
             </p>
-            {orderId ? (
-              <p className="text-xs font-mono text-text-tertiary mt-1 break-all">
-                order: {orderId} · Payme tiyin: {amountTiyin ?? uzsToPaymeTiyin(checkoutPlanDef.priceUzs)}
-              </p>
-            ) : null}
             <div className="mt-5 space-y-3">
               <Button
                 className="w-full rounded-xl py-5 justify-between"
@@ -475,9 +463,6 @@ export default function BillingPage() {
                 <span className="font-semibold">Payme</span>
                 <span className="text-xs opacity-80">Click, Uzcard, Humo</span>
               </Button>
-              {paymeDeepLink && orderId ? (
-                <p className="text-center text-[10px] font-mono text-text-tertiary break-all">{paymeDeepLink}</p>
-              ) : null}
               <Button
                 variant="secondary"
                 className="w-full rounded-xl py-5 justify-between"

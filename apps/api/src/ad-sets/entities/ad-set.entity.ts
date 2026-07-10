@@ -7,6 +7,7 @@ import {
   ManyToOne,
   OneToMany,
   JoinColumn,
+  Index,
 } from "typeorm";
 import { Campaign } from "../../campaigns/entities/campaign.entity";
 import { Ad } from "../../ads/entities/ad.entity";
@@ -19,6 +20,7 @@ import { CampaignStatus } from "@adspectr/shared";
  * This is where A/B testing of audiences happens.
  */
 @Entity("ad_sets")
+@Index("IDX_ad_sets_campaign_id", ["campaignId"])
 export class AdSet {
   @PrimaryGeneratedColumn("uuid")
   id: string;

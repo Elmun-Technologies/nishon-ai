@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronDown, Link2 } from "lucide-react";
 import { useWorkspaceStore } from "@/stores/workspace.store";
@@ -18,7 +18,6 @@ import { formatCurrency, timeAgo } from "@/lib/utils";
 import { CreateCampaignForm } from "@/components/campaigns/CreateCampaignForm";
 import { CampaignCollaborationPanel } from "@/components/campaigns/CampaignCollaborationPanel";
 import { AdsManagerPanel } from "@/components/campaigns/AdsManagerPanel";
-import { DateRangeFilter } from "@/components/filters/DateRangeFilter";
 
 interface Campaign {
   id: string;
@@ -56,22 +55,6 @@ export default function CampaignsPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [actionError, setActionError] = useState("");
   const [showCreatePanel, setShowCreatePanel] = useState(false);
-  const [filterPreset, setFilterPreset] = useState("default");
-  const [dateRange, setDateRange] = useState("last7");
-  const [fromDate, setFromDate] = useState("");
-  const [toDate, setToDate] = useState("");
-
-  const campaignLoadRangePresets = useMemo(
-    () => [
-      { id: "today", label: "Today" },
-      { id: "yesterday", label: "Yesterday" },
-      { id: "last3", label: "Last 3 days" },
-      { id: "last7", label: "Last 7 days" },
-      { id: "last14", label: "Last 14 days" },
-      { id: "last30", label: "Last 30 days" },
-    ],
-    [],
-  );
 
   const fetchCampaigns = useCallback(async () => {
     if (!currentWorkspace?.id) return;
@@ -180,38 +163,6 @@ export default function CampaignsPage() {
 
       <div className="rounded-2xl border border-border/70 bg-white/85 p-4 shadow-sm backdrop-blur-sm dark:bg-slate-900/70">
         <AdsManagerPanel workspaceId={currentWorkspace?.id} />
-      </div>
-
-      <div className="rounded-2xl border border-border/70 bg-white/85 p-4 shadow-sm backdrop-blur-sm dark:bg-slate-900/70">
-        <div className="flex flex-wrap items-center gap-2">
-          <label className="text-xs text-text-tertiary">Load filter preset</label>
-          <select
-            value={filterPreset}
-            onChange={(e) => setFilterPreset(e.target.value)}
-            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary"
-          >
-            <option value="default">Default preset</option>
-            <option value="high-roas">High ROAS</option>
-            <option value="creative-testing">Creative testing</option>
-            <option value="retargeting">Retargeting</option>
-          </select>
-          <label className="ml-2 text-xs text-text-tertiary">Range</label>
-          <DateRangeFilter
-            variant="select"
-            value={dateRange}
-            onValueChange={setDateRange}
-            presets={campaignLoadRangePresets}
-            fromDate={fromDate}
-            toDate={toDate}
-            onFromDateChange={setFromDate}
-            onToDateChange={setToDate}
-            selectClassName="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary"
-            dateInputClassName="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary"
-          />
-          <Button size="sm" className="ml-auto">
-            Update
-          </Button>
-        </div>
       </div>
 
       {/* ── Filter tabs ── */}

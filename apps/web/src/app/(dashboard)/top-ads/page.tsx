@@ -148,9 +148,9 @@ export default function TopAdsPage() {
         status: statusFilter,
       })
       setAds(data)
-      // Empty result with no error almost always means the workspace
-      // has no Meta connection yet (sync hasn't populated insights).
-      if (data.length === 0) setNeedsMetaConnect(true)
+      // An empty 200 response means "connected, but no ads match the current
+      // window/filter" — render the empty state, not the connect CTA. Real
+      // disconnection surfaces as a META_NOT_CONNECTED error (handled below).
     } catch (e: any) {
       const code = e?.code ?? e?.response?.data?.code
       const msg = e?.response?.data?.message ?? e?.message ?? ''

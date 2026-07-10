@@ -1,0 +1,73 @@
+<svg width="1600" height="686" viewBox="0 0 1600 686" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Analytics dashboard with rising performance charts">
+  <defs>
+    <linearGradient id="fh-bg" x1="0" y1="0" x2="1600" y2="686" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F7FCF2"/>
+      <stop offset="1" stop-color="#EAF6DE"/>
+    </linearGradient>
+    <linearGradient id="fh-line" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#93C75B"/>
+      <stop offset="1" stop-color="#B0ED6F"/>
+    </linearGradient>
+    <linearGradient id="fh-area" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#B0ED6F" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#B0ED6F" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="fh-bar" x1="0" y1="1" x2="0" y2="0">
+      <stop stop-color="#93C75B"/>
+      <stop offset="1" stop-color="#B0ED6F"/>
+    </linearGradient>
+    <radialGradient id="fh-glow" cx="0.5" cy="0.5" r="0.5">
+      <stop stop-color="#B0ED6F" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#B0ED6F" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="fh-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="26" flood-color="#3D5626" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="686" rx="36" fill="url(#fh-bg)"/>
+  <circle cx="1300" cy="150" r="340" fill="url(#fh-glow)"/>
+  <circle cx="470" cy="560" r="260" fill="url(#fh-glow)" opacity="0.5"/>
+
+  <!-- primary chart card -->
+  <g filter="url(#fh-shadow)">
+    <rect x="700" y="118" width="720" height="360" rx="26" fill="#FFFFFF"/>
+    <rect x="700" y="118" width="720" height="360" rx="26" fill="none" stroke="#DCEFC6"/>
+    <rect x="740" y="160" width="150" height="20" rx="10" fill="#E3F2D2"/>
+    <rect x="740" y="196" width="90" height="14" rx="7" fill="#EDF7E1"/>
+    <path d="M740 430 L820 392 L900 404 L980 336 L1060 348 L1140 276 L1230 236 L1380 190 L1380 448 L740 448 Z" fill="url(#fh-area)"/>
+    <path d="M740 430 L820 392 L900 404 L980 336 L1060 348 L1140 276 L1230 236 L1380 190" stroke="url(#fh-line)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="1380" cy="190" r="12" fill="#FFFFFF" stroke="#93C75B" stroke-width="6"/>
+    <circle cx="1140" cy="276" r="8" fill="#B0ED6F"/>
+  </g>
+
+  <!-- gauge card -->
+  <g filter="url(#fh-shadow)">
+    <rect x="700" y="502" width="345" height="150" rx="24" fill="#FFFFFF"/>
+    <rect x="700" y="502" width="345" height="150" rx="24" fill="none" stroke="#DCEFC6"/>
+    <path d="M760 610 A60 60 0 0 1 880 610" stroke="#EDF7E1" stroke-width="14" stroke-linecap="round" fill="none"/>
+    <path d="M760 610 A60 60 0 0 1 862 568" stroke="url(#fh-line)" stroke-width="14" stroke-linecap="round" fill="none"/>
+    <rect x="905" y="548" width="110" height="18" rx="9" fill="#E3F2D2"/>
+    <rect x="905" y="580" width="80" height="14" rx="7" fill="#EDF7E1"/>
+    <rect x="905" y="608" width="95" height="14" rx="7" fill="#EDF7E1"/>
+  </g>
+
+  <!-- bar chart card -->
+  <g filter="url(#fh-shadow)">
+    <rect x="1075" y="502" width="345" height="150" rx="24" fill="#FFFFFF"/>
+    <rect x="1075" y="502" width="345" height="150" rx="24" fill="none" stroke="#DCEFC6"/>
+    <rect x="1110" y="592" width="34" height="40" rx="8" fill="url(#fh-bar)" opacity="0.55"/>
+    <rect x="1162" y="572" width="34" height="60" rx="8" fill="url(#fh-bar)" opacity="0.7"/>
+    <rect x="1214" y="552" width="34" height="80" rx="8" fill="url(#fh-bar)" opacity="0.82"/>
+    <rect x="1266" y="536" width="34" height="96" rx="8" fill="url(#fh-bar)"/>
+    <rect x="1318" y="560" width="34" height="72" rx="8" fill="url(#fh-bar)" opacity="0.75"/>
+    <rect x="1370" y="524" width="34" height="108" rx="8" fill="url(#fh-bar)"/>
+  </g>
+
+  <!-- floating chips -->
+  <g filter="url(#fh-shadow)">
+    <rect x="560" y="250" width="132" height="132" rx="24" fill="#152508"/>
+    <path d="M626 292 l16 16 l-16 40 l-16 -40 z" fill="#B0ED6F"/>
+    <circle cx="626" cy="292" r="10" fill="#B0ED6F"/>
+  </g>
+</svg>

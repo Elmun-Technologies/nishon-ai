@@ -83,8 +83,7 @@ export default function MarketplacePage() {
             <ContentMediaSlot
               slotId="public-marketplace-hero-media"
               ratio="21:9"
-              imageSrc="/stock/marketplace-demo.svg"
-              caption={t('preAuthOnboarding.mediaSlotCaption', 'Illustration / motion')}
+              imageSrc="/stock/marketplace-hero.svg"
             />
           </div>
         </PublicContainer>
@@ -122,8 +121,7 @@ export default function MarketplacePage() {
           <ContentMediaSlot
             slotId="public-marketplace-catalog-media"
             ratio="16:9"
-            imageSrc="/stock/marketplace-demo.svg"
-            caption={t('preAuthOnboarding.mediaSlotCaption', 'Illustration / motion')}
+            imageSrc="/stock/marketplace-catalog.svg"
             className="mb-6"
           />
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

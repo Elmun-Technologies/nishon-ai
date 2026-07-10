@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   ManyToOne,
   JoinColumn,
+  Index,
 } from "typeorm";
 import { Workspace } from "../../workspaces/entities/workspace.entity";
 import { Campaign } from "../../campaigns/entities/campaign.entity";
@@ -18,6 +19,7 @@ import { AiDecisionAction } from "@adspectr/shared";
  * beforeState and afterState store snapshots so users can see exactly what changed.
  */
 @Entity("ai_decisions")
+@Index("IDX_ai_decisions_workspace_id", ["workspaceId"])
 export class AiDecision {
   @PrimaryGeneratedColumn("uuid")
   id: string;

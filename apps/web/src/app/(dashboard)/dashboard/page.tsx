@@ -23,16 +23,7 @@ import {
   Wallet,
   Zap,
 } from 'lucide-react'
-import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  Legend,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts'
+import nextDynamic from 'next/dynamic'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { useI18n } from '@/i18n/use-i18n'
 import { useRealtimeRefresh } from '@/hooks/useRealtimeRefresh'
@@ -175,10 +166,10 @@ function KpiCard({
     <div
       className={cn(
         'relative overflow-hidden rounded-2xl border bg-surface p-5 transition-shadow hover:shadow-lg',
-        accent ? 'border-violet-500/30' : 'border-white/[0.07]',
+        accent ? 'border-primary/30' : 'border-white/[0.07]',
       )}
     >
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-violet-500/60 via-blue-500/40 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-primary/60 via-brand-mid/40 to-transparent" />
       <div className="flex items-start justify-between gap-2">
         <p className="text-[11px] font-semibold uppercase tracking-widest text-text-tertiary">{label}</p>
         <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white/[0.05]">
@@ -232,10 +223,17 @@ function RoasBar({ value }: { value: number | null }) {
 const TOOLTIP_STYLE = {
   fontSize: 12,
   borderRadius: 10,
-  background: '#18181b',
-  border: '1px solid rgba(255,255,255,0.08)',
-  color: '#e4e4e7',
+  background: '#1b2e06',
+  border: '1px solid rgba(176,237,111,0.18)',
+  color: '#f7fcf2',
 }
+
+// recharts is heavy (~90 kB gzip). Load the chart lazily so it code-splits
+// out of the main dashboard bundle and only downloads when it renders.
+const RevenueAreaChart = nextDynamic(() => import('./_components/RevenueAreaChart'), {
+  ssr: false,
+  loading: () => <Skeleton className="h-[260px] w-full" />,
+})
 
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
@@ -347,32 +345,42 @@ export default function DashboardPage() {
     }))
   }, [spark, roas, days])
 
-  const aiAlerts = useMemo(() => [
-    {
-      id: '1',
-      icon: '📉',
-      title: t('dashboard.dashboardHome.alertRoas', 'ROAS 1.7x ga yaqin'),
-      body:  t('dashboard.dashboardHome.alertRoasBody', 'Byudjet avtomatik qisqartirish tavsiyasi'),
-      href:  '/auto-optimization',
-      color: 'border-amber-500/20 bg-amber-500/5',
-    },
-    {
-      id: '2',
-      icon: '🎨',
-      title: t('dashboard.dashboardHome.alertCreative', 'Kreativ charchashi'),
-      body:  t('dashboard.dashboardHome.alertCreativeBody', 'Yangi variant yuklash vaqti'),
-      href:  '/creative-hub/image-ads',
-      color: 'border-violet-500/20 bg-violet-500/5',
-    },
-    {
-      id: '3',
-      icon: '🕵️',
-      title: t('dashboard.dashboardHome.alertCompetitor', 'Raqib aktivligi'),
-      body:  t('dashboard.dashboardHome.alertCompetitorBody', 'Ad Library da yangi reklamalar'),
-      href:  '/ad-library',
-      color: 'border-blue-500/20 bg-blue-500/5',
-    },
-  ], [t])
+  // Data-aware signals — only surface what the real numbers justify, so a
+  // fresh/empty account never sees fabricated "live" alerts. The ROAS warning
+  // is derived from the actual account ROAS; the generic tips appear only once
+  // there is real campaign activity to act on.
+  const aiAlerts = useMemo(() => {
+    const list: Array<{ id: string; icon: string; title: string; body: string; href: string; color: string }> = []
+    if (roas > 0 && roas < 2) {
+      list.push({
+        id: 'roas',
+        icon: '📉',
+        title: t('dashboard.dashboardHome.alertRoas', 'ROAS past: ') + `${roas.toFixed(1)}x`,
+        body: t('dashboard.dashboardHome.alertRoasBody', 'Byudjet avtomatik qisqartirish tavsiyasi'),
+        href: '/auto-optimization',
+        color: 'border-amber-500/25 bg-amber-500/5',
+      })
+    }
+    if (reportCampaigns.length > 0) {
+      list.push({
+        id: 'creative',
+        icon: '🎨',
+        title: t('dashboard.dashboardHome.alertCreative', 'Kreativ charchashi'),
+        body: t('dashboard.dashboardHome.alertCreativeBody', 'Yangi variant yuklash vaqti'),
+        href: '/creative-hub/image-ads',
+        color: 'border-primary/25 bg-primary/5',
+      })
+      list.push({
+        id: 'competitor',
+        icon: '🕵️',
+        title: t('dashboard.dashboardHome.alertCompetitor', 'Raqib aktivligi'),
+        body: t('dashboard.dashboardHome.alertCompetitorBody', 'Ad Library da yangi reklamalar'),
+        href: '/ad-library',
+        color: 'border-brand-mid/25 bg-brand-mid/5',
+      })
+    }
+    return list
+  }, [t, roas, reportCampaigns.length])
 
   const quickActions = [
     { href: '/launch',          icon: Rocket,          label: t('dashboard.dashboardHome.actionLaunch',   '🚀 Yangi kampaniya') },
@@ -504,7 +512,7 @@ export default function DashboardPage() {
             className={cn(
               'rounded-lg px-3 py-1 text-xs font-medium transition-all',
               datePreset === p.id
-                ? 'bg-violet-600 text-white shadow-sm shadow-violet-500/20'
+                ? 'bg-primary text-brand-ink shadow-sm shadow-primary/20'
                 : 'text-text-secondary hover:bg-white/[0.06] hover:text-text-primary',
             )}
           >
@@ -589,11 +597,11 @@ export default function DashboardPage() {
               </div>
               <span className="flex items-center gap-3 text-[11px] text-text-tertiary">
                 <span className="flex items-center gap-1">
-                  <span className="inline-block h-2 w-6 rounded-full bg-violet-500/70" />
+                  <span className="inline-block h-2 w-6 rounded-full bg-[#5c8239]/80" />
                   Spend
                 </span>
                 <span className="flex items-center gap-1">
-                  <span className="inline-block h-2 w-6 rounded-full bg-emerald-500/70" />
+                  <span className="inline-block h-2 w-6 rounded-full bg-[#93c75b]/80" />
                   {t('dashboard.dashboardHome.legendRevenue', 'Daromad')}
                 </span>
               </span>
@@ -602,60 +610,13 @@ export default function DashboardPage() {
             {loadingPerf ? (
               <Skeleton className="h-[260px] w-full" />
             ) : chartData.length >= 2 ? (
-              <div className="h-[260px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={chartData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="gradSpend" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%"  stopColor="#7c3aed" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#7c3aed" stopOpacity={0.02} />
-                      </linearGradient>
-                      <linearGradient id="gradRevenue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%"  stopColor="#10b981" stopOpacity={0.25} />
-                        <stop offset="95%" stopColor="#10b981" stopOpacity={0.02} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                    <XAxis
-                      dataKey="label"
-                      tick={{ fontSize: 10, fill: '#71717a' }}
-                      axisLine={false}
-                      tickLine={false}
-                    />
-                    <YAxis
-                      tick={{ fontSize: 10, fill: '#71717a' }}
-                      axisLine={false}
-                      tickLine={false}
-                      width={48}
-                      tickFormatter={(v) => `$${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`}
-                    />
-                    <Tooltip
-                      contentStyle={TOOLTIP_STYLE}
-                      formatter={(v: number, name: string) => [formatCurrency(v), name]}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="spend"
-                      name="Spend"
-                      stroke="#7c3aed"
-                      strokeWidth={2}
-                      fill="url(#gradSpend)"
-                      dot={false}
-                      activeDot={{ r: 4, strokeWidth: 0 }}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="revenue"
-                      name={t('dashboard.dashboardHome.legendRevenue', 'Daromad')}
-                      stroke="#10b981"
-                      strokeWidth={2}
-                      fill="url(#gradRevenue)"
-                      dot={false}
-                      activeDot={{ r: 4, strokeWidth: 0 }}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
+              <RevenueAreaChart
+                data={chartData}
+                spendLabel="Spend"
+                revenueLabel={t('dashboard.dashboardHome.legendRevenue', 'Daromad')}
+                tooltipStyle={TOOLTIP_STYLE}
+                formatValue={formatCurrency}
+              />
             ) : (
               <div className="flex h-[260px] items-center justify-center text-sm text-text-tertiary">
                 {t('dashboard.dashboardHome.chartEmpty', 'Hali yetarli ma\'lumot yo\'q.')}
@@ -666,11 +627,12 @@ export default function DashboardPage() {
 
         {/* Right sidebar: AI alerts + quick actions */}
         <div className="lg:col-span-4 space-y-4">
-          {/* AI Alerts */}
-          <div className="rounded-2xl border border-white/[0.07] bg-surface p-5">
+          {/* AI Alerts — only when the data justifies a signal */}
+          {aiAlerts.length > 0 && (
+          <div className="rounded-2xl border border-border bg-surface p-5">
             <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-text-primary">
-              <Sparkles className="h-4 w-4 text-amber-400" />
-              AI Signals
+              <Sparkles className="h-4 w-4 text-primary" />
+              {t('dashboard.dashboardHome.signalsTitle', 'AI Signallar')}
             </h2>
             <ul className="space-y-2">
               {aiAlerts.map((a) => (
@@ -693,6 +655,7 @@ export default function DashboardPage() {
               ))}
             </ul>
           </div>
+          )}
 
           {/* Quick Actions */}
           <div className="rounded-2xl border border-white/[0.07] bg-surface p-5">
@@ -704,9 +667,9 @@ export default function DashboardPage() {
                 <Link
                   key={x.href}
                   href={x.href}
-                  className="flex items-center gap-2 rounded-xl border border-white/[0.06] bg-surface-2/60 px-3 py-2.5 text-xs font-medium text-text-secondary transition hover:border-violet-500/30 hover:bg-violet-500/8 hover:text-text-primary"
+                  className="flex items-center gap-2 rounded-xl border border-white/[0.06] bg-surface-2/60 px-3 py-2.5 text-xs font-medium text-text-secondary transition hover:border-primary/30 hover:bg-primary/8 hover:text-text-primary"
                 >
-                  <x.icon className="h-3.5 w-3.5 shrink-0 text-violet-400" />
+                  <x.icon className="h-3.5 w-3.5 shrink-0 text-primary" />
                   <span className="truncate">{x.label}</span>
                 </Link>
               ))}
@@ -719,7 +682,7 @@ export default function DashboardPage() {
       <div className="rounded-2xl border border-white/[0.07] bg-surface overflow-hidden">
         <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
           <h2 className="flex items-center gap-2 text-sm font-semibold text-text-primary">
-            <Users className="h-4 w-4 text-violet-400" />
+            <Users className="h-4 w-4 text-primary" />
             {t('dashboard.dashboardHome.activeCampaigns', 'Faol kampaniyalar')}
             {reportCampaigns.length > 0 && (
               <span className="rounded-full bg-white/[0.08] px-2 py-0.5 text-[11px] font-medium text-text-secondary">
@@ -729,7 +692,7 @@ export default function DashboardPage() {
           </h2>
           <Link
             href="/campaigns"
-            className="text-xs font-medium text-violet-400 hover:text-violet-300 hover:underline"
+            className="text-xs font-medium text-primary hover:text-primary/80 hover:underline"
           >
             {t('dashboard.viewAll', 'Barchasini ko\'rish →')}
           </Link>
@@ -762,10 +725,10 @@ export default function DashboardPage() {
             <tbody>
               {reportCampaigns.length > 0 ? (
                 reportCampaigns.slice(0, 12).map((row) => {
-                  const proxyRoas =
-                    row.metrics.spend > 0 && roas > 0
-                      ? parseFloat(Math.min(5, Math.max(0.5, roas * (0.88 + (row.name.length % 9) * 0.018))).toFixed(1))
-                      : null
+                  // Per-campaign ROAS isn't available from the reporting API
+                  // (metrics carry spend/clicks/impressions only, no revenue).
+                  // Show "—" rather than fabricating a value from the name.
+                  const proxyRoas: number | null = null
                   return (
                     <tr
                       key={row.id}
@@ -831,10 +794,10 @@ export default function DashboardPage() {
         <div className="rounded-2xl border border-white/[0.07] bg-surface p-5">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="flex items-center gap-2 text-sm font-semibold text-text-primary">
-              <Sparkles className="h-4 w-4 text-violet-400" />
+              <Sparkles className="h-4 w-4 text-primary" />
               {t('dashboard.topAdsTitle', 'Top reklamalar')}
             </h2>
-            <Link href="/top-ads" className="text-xs font-medium text-violet-400 hover:underline">
+            <Link href="/top-ads" className="text-xs font-medium text-primary hover:underline">
               {t('dashboard.viewAll', 'Barchasini ko\'rish →')}
             </Link>
           </div>
@@ -845,7 +808,7 @@ export default function DashboardPage() {
                 className={cn(
                   'rounded-xl border p-3 transition',
                   i === 0
-                    ? 'border-violet-500/30 bg-violet-500/5'
+                    ? 'border-primary/30 bg-primary/5'
                     : 'border-white/[0.06] bg-surface-2/50',
                 )}
               >

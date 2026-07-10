@@ -1,0 +1,80 @@
+<svg width="1600" height="686" viewBox="0 0 1600 686" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Marketplace of marketing specialists connected to a business">
+  <defs>
+    <linearGradient id="mh-bg" x1="0" y1="0" x2="1600" y2="686" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F7FCF2"/>
+      <stop offset="1" stop-color="#E7F4D9"/>
+    </linearGradient>
+    <linearGradient id="mh-av" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#B0ED6F"/>
+      <stop offset="1" stop-color="#93C75B"/>
+    </linearGradient>
+    <radialGradient id="mh-glow" cx="0.5" cy="0.5" r="0.5">
+      <stop stop-color="#B0ED6F" stop-opacity="0.6"/>
+      <stop offset="1" stop-color="#B0ED6F" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="mh-shadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="14" stdDeviation="22" flood-color="#3D5626" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="686" rx="36" fill="url(#mh-bg)"/>
+  <circle cx="1120" cy="343" r="330" fill="url(#mh-glow)"/>
+
+  <!-- connections to central business -->
+  <g stroke="#9BD061" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.75" stroke-dasharray="2 20">
+    <path d="M1120 343 C 980 260, 900 210, 780 190"/>
+    <path d="M1120 343 C 980 430, 900 480, 800 520"/>
+    <path d="M1120 343 C 1260 250, 1330 220, 1420 205"/>
+    <path d="M1120 343 C 1260 440, 1330 480, 1430 520"/>
+    <path d="M1120 343 C 1040 300, 980 130, 1080 110"/>
+  </g>
+
+  <!-- central business hub -->
+  <g filter="url(#mh-shadow)">
+    <circle cx="1120" cy="343" r="86" fill="#152508"/>
+    <path d="M1082 366 v-34 l38 -26 l38 26 v34 a6 6 0 0 1 -6 6 h-64 a6 6 0 0 1 -6 -6 z" fill="#B0ED6F"/>
+    <rect x="1104" y="346" width="14" height="26" rx="3" fill="#152508"/>
+    <rect x="1124" y="346" width="14" height="14" rx="3" fill="#152508"/>
+  </g>
+
+  <!-- specialist profile cards -->
+  <g filter="url(#mh-shadow)">
+    <rect x="660" y="128" width="150" height="128" rx="24" fill="#FFFFFF" stroke="#DCEFC6"/>
+    <circle cx="700" cy="172" r="22" fill="url(#mh-av)"/>
+    <path d="M700 168 a10 10 0 1 0 0.1 0 z M684 196 a16 16 0 0 1 32 0 z" fill="#FFFFFF"/>
+    <rect x="734" y="158" width="58" height="12" rx="6" fill="#E3F2D2"/>
+    <rect x="734" y="180" width="42" height="10" rx="5" fill="#EDF7E1"/>
+    <path d="M690 224 l5 10 l11 1 l-8 8 l2 11 l-10 -6 l-10 6 l2 -11 l-8 -8 l11 -1 z" fill="#B0ED6F"/>
+  </g>
+  <g filter="url(#mh-shadow)">
+    <rect x="680" y="470" width="150" height="128" rx="24" fill="#FFFFFF" stroke="#DCEFC6"/>
+    <circle cx="720" cy="514" r="22" fill="url(#mh-av)"/>
+    <path d="M720 510 a10 10 0 1 0 0.1 0 z M704 538 a16 16 0 0 1 32 0 z" fill="#FFFFFF"/>
+    <rect x="754" y="500" width="58" height="12" rx="6" fill="#E3F2D2"/>
+    <rect x="754" y="522" width="42" height="10" rx="5" fill="#EDF7E1"/>
+    <path d="M710 566 l5 10 l11 1 l-8 8 l2 11 l-10 -6 l-10 6 l2 -11 l-8 -8 l11 -1 z" fill="#B0ED6F"/>
+  </g>
+  <g filter="url(#mh-shadow)">
+    <rect x="1360" y="130" width="150" height="128" rx="24" fill="#FFFFFF" stroke="#DCEFC6"/>
+    <circle cx="1400" cy="174" r="22" fill="url(#mh-av)"/>
+    <path d="M1400 170 a10 10 0 1 0 0.1 0 z M1384 198 a16 16 0 0 1 32 0 z" fill="#FFFFFF"/>
+    <rect x="1434" y="160" width="54" height="12" rx="6" fill="#E3F2D2"/>
+    <rect x="1434" y="182" width="40" height="10" rx="5" fill="#EDF7E1"/>
+    <path d="M1390 226 l5 10 l11 1 l-8 8 l2 11 l-10 -6 l-10 6 l2 -11 l-8 -8 l11 -1 z" fill="#B0ED6F"/>
+  </g>
+  <g filter="url(#mh-shadow)">
+    <rect x="1372" y="470" width="150" height="128" rx="24" fill="#FFFFFF" stroke="#DCEFC6"/>
+    <circle cx="1412" cy="514" r="22" fill="url(#mh-av)"/>
+    <path d="M1412 510 a10 10 0 1 0 0.1 0 z M1396 538 a16 16 0 0 1 32 0 z" fill="#FFFFFF"/>
+    <rect x="1446" y="500" width="54" height="12" rx="6" fill="#E3F2D2"/>
+    <rect x="1446" y="522" width="40" height="10" rx="5" fill="#EDF7E1"/>
+    <path d="M1402 566 l5 10 l11 1 l-8 8 l2 11 l-10 -6 l-10 6 l2 -11 l-8 -8 l11 -1 z" fill="#B0ED6F"/>
+  </g>
+  <g filter="url(#mh-shadow)">
+    <rect x="1010" y="60" width="150" height="122" rx="24" fill="#FFFFFF" stroke="#DCEFC6"/>
+    <circle cx="1050" cy="102" r="20" fill="url(#mh-av)"/>
+    <path d="M1050 99 a9 9 0 1 0 0.1 0 z M1036 124 a14 14 0 0 1 28 0 z" fill="#FFFFFF"/>
+    <rect x="1082" y="90" width="54" height="12" rx="6" fill="#E3F2D2"/>
+    <rect x="1082" y="112" width="40" height="10" rx="5" fill="#EDF7E1"/>
+  </g>
+</svg>
