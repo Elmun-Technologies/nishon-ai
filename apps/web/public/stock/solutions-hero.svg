@@ -1,0 +1,59 @@
+<svg width="1600" height="686" viewBox="0 0 1600 686" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Growth funnel converting leads into sales">
+  <defs>
+    <linearGradient id="sh-bg" x1="0" y1="0" x2="1600" y2="686" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F7FCF2"/>
+      <stop offset="1" stop-color="#E8F5DB"/>
+    </linearGradient>
+    <linearGradient id="sh-funnel" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#93C75B" stop-opacity="0.25"/>
+      <stop offset="1" stop-color="#B0ED6F" stop-opacity="0.8"/>
+    </linearGradient>
+    <linearGradient id="sh-arrow" x1="0" y1="1" x2="1" y2="0">
+      <stop stop-color="#93C75B"/>
+      <stop offset="1" stop-color="#B0ED6F"/>
+    </linearGradient>
+    <radialGradient id="sh-glow" cx="0.5" cy="0.5" r="0.5">
+      <stop stop-color="#B0ED6F" stop-opacity="0.6"/>
+      <stop offset="1" stop-color="#B0ED6F" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="sh-shadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#3D5626" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="686" rx="36" fill="url(#sh-bg)"/>
+  <circle cx="1240" cy="230" r="360" fill="url(#sh-glow)"/>
+
+  <!-- scattered particles (many leads) -->
+  <g fill="#93C75B">
+    <circle cx="640" cy="150" r="10" opacity="0.5"/><circle cx="700" cy="230" r="8" opacity="0.4"/>
+    <circle cx="660" cy="330" r="12" opacity="0.6"/><circle cx="720" cy="410" r="7" opacity="0.35"/>
+    <circle cx="650" cy="500" r="9" opacity="0.5"/><circle cx="705" cy="560" r="11" opacity="0.45"/>
+    <circle cx="600" cy="240" r="7" opacity="0.35"/><circle cx="610" cy="430" r="8" opacity="0.4"/>
+    <circle cx="690" cy="120" r="6" opacity="0.3"/><circle cx="695" cy="640" r="7" opacity="0.3"/>
+  </g>
+
+  <!-- funnel -->
+  <g filter="url(#sh-shadow)">
+    <path d="M740 150 L1120 300 L1120 386 L740 536 C 700 520, 700 166, 740 150 Z" fill="url(#sh-funnel)"/>
+    <path d="M760 210 L1090 320 M760 300 L1090 343 M760 390 L1090 366 M760 476 L1090 386" stroke="#FFFFFF" stroke-opacity="0.55" stroke-width="6" stroke-linecap="round"/>
+  </g>
+
+  <!-- converged trail + rocket -->
+  <path d="M1120 343 C 1230 343, 1290 320, 1360 250" stroke="url(#sh-arrow)" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="2 26"/>
+  <g filter="url(#sh-shadow)">
+    <circle cx="1400" cy="210" r="70" fill="#152508"/>
+    <path d="M1400 172 c 26 12, 30 46, 8 74 l-8 10 l-8 -10 c -22 -28, -18 -62, 8 -74 z" fill="#B0ED6F"/>
+    <circle cx="1400" cy="206" r="10" fill="#152508"/>
+    <path d="M1382 250 l18 -12 l18 12 l-18 30 z" fill="#93C75B"/>
+  </g>
+
+  <!-- small result badges -->
+  <g filter="url(#sh-shadow)">
+    <rect x="1250" y="430" width="230" height="96" rx="22" fill="#FFFFFF" stroke="#DCEFC6"/>
+    <circle cx="1300" cy="478" r="24" fill="#EAF7DC"/>
+    <path d="M1289 478 l8 9 l16 -19" stroke="#93C75B" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="1340" y="462" width="110" height="16" rx="8" fill="#E3F2D2"/>
+    <rect x="1340" y="490" width="80" height="14" rx="7" fill="#EDF7E1"/>
+  </g>
+</svg>

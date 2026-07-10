@@ -1,0 +1,59 @@
+<svg width="1280" height="720" viewBox="0 0 1280 720" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AI automation connecting ad platforms">
+  <defs>
+    <linearGradient id="fp-bg" x1="0" y1="0" x2="1280" y2="720" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F7FCF2"/>
+      <stop offset="1" stop-color="#E6F4D8"/>
+    </linearGradient>
+    <radialGradient id="fp-core" cx="0.5" cy="0.5" r="0.5">
+      <stop stop-color="#C7F58C"/>
+      <stop offset="1" stop-color="#93C75B"/>
+    </radialGradient>
+    <radialGradient id="fp-glow" cx="0.5" cy="0.5" r="0.5">
+      <stop stop-color="#B0ED6F" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#B0ED6F" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="fp-shadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="14" stdDeviation="22" flood-color="#3D5626" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <rect width="1280" height="720" rx="32" fill="url(#fp-bg)"/>
+  <circle cx="640" cy="360" r="330" fill="url(#fp-glow)"/>
+
+  <!-- connection lines -->
+  <g stroke="#9BD061" stroke-width="4" fill="none" opacity="0.8" stroke-linecap="round">
+    <path d="M640 360 C 470 300, 420 220, 300 200"/>
+    <path d="M640 360 C 470 420, 420 520, 300 540"/>
+    <path d="M640 360 C 810 300, 860 210, 980 195"/>
+    <path d="M640 360 C 810 420, 860 520, 980 545"/>
+    <path d="M640 360 C 640 260, 640 210, 640 150"/>
+  </g>
+  <g fill="#B0ED6F">
+    <circle cx="452" cy="322" r="7"/><circle cx="452" cy="398" r="7"/>
+    <circle cx="828" cy="322" r="7"/><circle cx="828" cy="398" r="7"/>
+    <circle cx="640" cy="250" r="7"/>
+  </g>
+
+  <!-- outer platform nodes -->
+  <g filter="url(#fp-shadow)">
+    <rect x="196" y="150" width="118" height="118" rx="26" fill="#FFFFFF" stroke="#DCEFC6"/>
+    <rect x="235" y="189" width="40" height="40" rx="12" fill="#93C75B"/>
+    <rect x="196" y="480" width="118" height="118" rx="26" fill="#FFFFFF" stroke="#DCEFC6"/>
+    <path d="M255 512 l26 26 l-26 34 l-26 -34 z" fill="#93C75B"/>
+    <rect x="922" y="146" width="118" height="118" rx="26" fill="#FFFFFF" stroke="#DCEFC6"/>
+    <circle cx="981" cy="205" r="24" fill="none" stroke="#93C75B" stroke-width="9"/>
+    <rect x="922" y="486" width="118" height="118" rx="26" fill="#FFFFFF" stroke="#DCEFC6"/>
+    <path d="M945 560 l24 -20 l22 24 l24 -34" stroke="#93C75B" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="581" y="86" width="118" height="118" rx="26" fill="#FFFFFF" stroke="#DCEFC6"/>
+    <circle cx="640" cy="145" r="26" fill="none" stroke="#93C75B" stroke-width="9"/>
+    <circle cx="640" cy="145" r="7" fill="#93C75B"/>
+  </g>
+
+  <!-- AI core -->
+  <g filter="url(#fp-shadow)">
+    <circle cx="640" cy="360" r="92" fill="#152508"/>
+    <circle cx="640" cy="360" r="60" fill="url(#fp-core)"/>
+    <circle cx="640" cy="360" r="60" fill="none" stroke="#EAFBD6" stroke-width="3" opacity="0.5"/>
+    <path d="M640 322 l14 34 l34 4 l-26 24 l8 34 l-30 -20 l-30 20 l8 -34 l-26 -24 l34 -4 z" fill="#152508"/>
+  </g>
+</svg>

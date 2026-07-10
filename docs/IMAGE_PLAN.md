@@ -21,9 +21,12 @@ Har bir promptni ishlatganda oxiriga qo'shing: `Aspect ratio <X:Y>.`
 
 ---
 
-## Faza 1 — Public marketing sahifalari (eng yuqori ROI, allaqachon ulangan)
+## Faza 1 — Public marketing sahifalari ✅ BAJARILDI
 
-Bu 6 slot hozir bitta takroriy demo SVG'ni ko'rsatadi. Har biriga alohida real rasm.
+6 slot ilgari bitta takroriy demo SVG'ni ko'rsatardi. Endi har biriga alohida,
+brand'ga mos SVG illyustratsiya yaratildi va `imageSrc` ulandi (build + e2e ✅).
+Placeholder "Illustration / motion" caption'lar ham olib tashlandi.
+Keyinroq xohlansa bu vektor illyustratsiyalarni raster/AI rasmlarga almashtirish mumkin.
 
 | # | Slot / Fayl | Sahifa | Nisbat / Piksel |
 |---|-------------|--------|-----------------|

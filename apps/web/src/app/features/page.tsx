@@ -109,8 +109,7 @@ export default function FeaturesPage() {
             <ContentMediaSlot
               slotId="public-features-hero-media"
               ratio="21:9"
-              imageSrc="/stock/features-demo.svg"
-              caption={t('preAuthOnboarding.mediaSlotCaption', 'Illustration / motion')}
+              imageSrc="/stock/features-hero.svg"
             />
           </div>
         </PublicContainer>
@@ -167,8 +166,7 @@ export default function FeaturesPage() {
           <ContentMediaSlot
             slotId="public-features-pillar-media"
             ratio="16:9"
-            imageSrc="/stock/features-demo.svg"
-            caption={t('preAuthOnboarding.mediaSlotCaption', 'Illustration / motion')}
+            imageSrc="/stock/features-pillar.svg"
             className="mb-6"
           />
           <div className="grid gap-4 md:grid-cols-3">
