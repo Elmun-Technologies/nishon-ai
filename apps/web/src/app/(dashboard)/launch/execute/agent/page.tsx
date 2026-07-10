@@ -46,6 +46,12 @@ export default function LaunchExecuteAgentPage() {
 
       <LaunchFlowProgress step={2} />
 
+      <div className="rounded-2xl border border-amber-400/40 bg-amber-400/10 p-4 text-sm text-text-secondary">
+        Namuna — bu oqim agent bosqichlarini ko&apos;rsatadi (demo). Reklamani haqiqatan
+        ishga tushirish va agentga topshirish uchun quyidagi haqiqiy sahifalardan
+        foydalaning.
+      </div>
+
       <div className="space-y-4">
         {STEPS.map((s, i) => (
           <div key={s.id} className="rounded-2xl border border-border bg-surface-1 p-4">
@@ -60,10 +66,19 @@ export default function LaunchExecuteAgentPage() {
         ))}
       </div>
 
-      <div className="rounded-2xl border border-dashed border-border bg-surface-2/50 p-4 font-mono text-xs text-text-secondary">
-        [log] Agent: strategiya yuklandi…
-        <br />
-        [log] Telegram: «ROAS {state.mindmap.children?.find((c) => c.id === 'budget')?.label ?? '—'} — tasdiq?»
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <Link
+          href="/launch"
+          className="flex-1 rounded-2xl bg-gradient-to-r from-brand-mid to-brand-lime py-3 text-center text-sm font-bold text-brand-ink"
+        >
+          Reklamani ishga tushirish (Launch)
+        </Link>
+        <Link
+          href="/ai-agents"
+          className="flex-1 rounded-2xl border border-border bg-surface-1 py-3 text-center text-sm font-semibold text-text-primary"
+        >
+          AI Agentga topshirish
+        </Link>
       </div>
     </div>
   )

@@ -77,6 +77,23 @@ export default function LaunchPreviewPage() {
         }
       />
 
+      <div className="flex flex-col gap-2 rounded-2xl border border-amber-400/40 bg-amber-400/10 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-start gap-2">
+          <AlertTriangle className="mt-0.5 shrink-0 text-amber-500" size={18} aria-hidden />
+          <p className="text-sm text-text-secondary">
+            Namuna oqim (demo) — bu yangi tajriba oqimi. Quyidagi strategiya va bosqichlar
+            namuna sifatida ko&apos;rsatilgan. Real reklama chiqarish uchun Klassik Launch&apos;dan
+            foydalaning.
+          </p>
+        </div>
+        <Link
+          href="/launch"
+          className="shrink-0 inline-flex items-center gap-1.5 rounded-xl border border-amber-500/40 bg-amber-500/15 px-3 py-2 text-xs font-medium text-amber-700 transition-colors hover:bg-amber-500/25 dark:text-amber-300"
+        >
+          Klassik Launch →
+        </Link>
+      </div>
+
       <LaunchFlowProgress step={0} />
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
