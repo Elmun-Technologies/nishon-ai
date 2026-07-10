@@ -130,6 +130,11 @@ export default function AgentStudioPage() {
         }
       />
 
+      <Alert variant="warning">
+        Beta — Agent Studio namuna kampaniyalar bilan ishlaydi va trening simulyatsiya
+        rejimida. Real trening quvuri tez orada ulanadi.
+      </Alert>
+
       {!currentWorkspace?.id && (
         <Alert variant="info">
           Workspace tanlang — kampaniya datalari shu yerga ulanadi (keyingi bosqich).

@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { ArrowLeft, Search, Store } from 'lucide-react'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Alert } from '@/components/ui/Alert'
-import { useWorkspaceStore } from '@/stores/workspace.store'
 import type { VerticalId } from '@/lib/ai-agents/types'
 import { cn } from '@/lib/utils'
 import { StoreAgentCard } from '../_components/AgentCard'
@@ -18,11 +17,9 @@ type VerticalFilter = 'all' | VerticalId
 type SortKey = 'top' | 'cheapest' | 'newest' | 'most_rented'
 
 export default function AgentStorePage() {
-  const { currentWorkspace } = useWorkspaceStore()
   const [search, setSearch] = useState('')
   const [vertical, setVertical] = useState<VerticalFilter>('all')
   const [sort, setSort] = useState<SortKey>('top')
-  const [loadingId, setLoadingId] = useState<string | null>(null)
   const [msg, setMsg] = useState<string | null>(null)
   const [err, setErr] = useState<string | null>(null)
 
@@ -58,33 +55,14 @@ export default function AgentStorePage() {
     return list
   }, [search, vertical, sort])
 
-  const rent = async (listingId: string) => {
-    const wid = currentWorkspace?.id ?? 'demo_ws'
-    setLoadingId(listingId)
+  // The agent marketplace (listings + rental billing) isn't built yet — the
+  // catalog below is a preview of sample agents. Don't pretend to rent one via
+  // the stub endpoint; tell the user it's coming.
+  const rent = (_listingId: string) => {
     setErr(null)
-    setMsg(null)
-    try {
-      const res = await fetch('/api/ai-agents/rent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ listingId, businessWorkspaceId: wid }),
-      })
-      const j = (await res.json()) as {
-        ok?: boolean
-        message?: string
-        revenueSplitMonthlyUsd?: { toTargetologist: number; toPlatform: number }
-        listing?: { priceMonthlyUsd: number }
-      }
-      if (!res.ok || !j.ok) throw new Error(j.message || 'Xato')
-      const rev = j.revenueSplitMonthlyUsd
-      setMsg(
-        `Ijara ulandi! Oyiga ~$${j.listing?.priceMonthlyUsd}: targetolog $${rev?.toTargetologist}, platforma $${rev?.toPlatform} (70/30).`,
-      )
-    } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Xato')
-    } finally {
-      setLoadingId(null)
-    }
+    setMsg(
+      "Agent Store tez orada ishga tushadi — targetologlar o'z agentlarini shu yerda ijaraga qo'yadi (70/30). Hozircha bu namuna katalog.",
+    )
   }
 
   const verticalChips: { id: VerticalFilter; label: string }[] = [
@@ -121,6 +99,11 @@ export default function AgentStorePage() {
           </Link>
         }
       />
+
+      <Alert variant="warning">
+        Preview — bu katalogdagi agentlar namuna. Agent marketplace (ijara va
+        to&apos;lov) tez orada ishga tushadi.
+      </Alert>
 
       {err ? <Alert variant="error">{err}</Alert> : null}
       {msg ? <Alert variant="info">{msg}</Alert> : null}
@@ -213,8 +196,8 @@ export default function AgentStorePage() {
               <StoreAgentCard
                 key={a.id}
                 agent={a}
-                onRent={() => void rent(a.id)}
-                loading={loadingId === a.id}
+                onRent={() => rent(a.id)}
+                loading={false}
               />
             ))}
           </div>
