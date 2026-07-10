@@ -166,13 +166,13 @@ function KpiCard({
     <div
       className={cn(
         'relative overflow-hidden rounded-2xl border bg-surface p-5 transition-shadow hover:shadow-lg',
-        accent ? 'border-primary/30' : 'border-white/[0.07]',
+        accent ? 'border-primary/30' : 'border-border',
       )}
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-primary/60 via-brand-mid/40 to-transparent" />
       <div className="flex items-start justify-between gap-2">
         <p className="text-[11px] font-semibold uppercase tracking-widest text-text-tertiary">{label}</p>
-        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white/[0.05]">
+        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-surface-2">
           <Icon className="h-3.5 w-3.5 text-text-tertiary" />
         </span>
       </div>
@@ -210,7 +210,7 @@ function RoasBar({ value }: { value: number | null }) {
   return (
     <div className="flex items-center gap-2">
       <span className={cn('text-sm font-semibold tabular-nums', roasColor(value))}>{value.toFixed(1)}x</span>
-      <div className="h-1.5 w-14 overflow-hidden rounded-full bg-white/[0.08]">
+      <div className="h-1.5 w-14 overflow-hidden rounded-full bg-surface-2">
         <div
           className={cn('h-full rounded-full', value >= 2 ? 'bg-emerald-500' : value >= 1 ? 'bg-amber-500' : 'bg-red-500')}
           style={{ width: `${pct}%` }}
@@ -500,7 +500,7 @@ export default function DashboardPage() {
       </div>
 
       {/* ── Filter bar ─────────────────────────────────────────────────────── */}
-      <div className="flex flex-wrap items-center gap-2 rounded-xl border border-white/[0.06] bg-surface px-4 py-2.5">
+      <div className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5">
         <Activity size={14} className="text-text-tertiary shrink-0" />
         <span className="text-xs font-medium text-text-tertiary mr-1">
           {t('dashboard.period', 'Davr:')}
@@ -513,7 +513,7 @@ export default function DashboardPage() {
               'rounded-lg px-3 py-1 text-xs font-medium transition-all',
               datePreset === p.id
                 ? 'bg-primary text-brand-ink shadow-sm shadow-primary/20'
-                : 'text-text-secondary hover:bg-white/[0.06] hover:text-text-primary',
+                : 'text-text-secondary hover:bg-surface-2 hover:text-text-primary',
             )}
           >
             {p.label}
@@ -585,7 +585,7 @@ export default function DashboardPage() {
 
         {/* Area chart */}
         <div className="lg:col-span-8">
-          <div className="rounded-2xl border border-white/[0.07] bg-surface p-5">
+          <div className="rounded-2xl border border-border bg-surface p-5">
             <div className="mb-4 flex items-center justify-between">
               <div>
                 <h2 className="text-sm font-semibold text-text-primary">
@@ -640,7 +640,7 @@ export default function DashboardPage() {
                   <Link
                     href={a.href}
                     className={cn(
-                      'flex items-start gap-3 rounded-xl border p-3 transition-all hover:ring-1 hover:ring-white/10',
+                      'flex items-start gap-3 rounded-xl border p-3 transition-all hover:ring-1 hover:ring-border',
                       a.color,
                     )}
                   >
@@ -658,7 +658,7 @@ export default function DashboardPage() {
           )}
 
           {/* Quick Actions */}
-          <div className="rounded-2xl border border-white/[0.07] bg-surface p-5">
+          <div className="rounded-2xl border border-border bg-surface p-5">
             <h2 className="mb-3 text-sm font-semibold text-text-primary">
               {t('dashboard.quickActions', 'Tezkor harakatlar')}
             </h2>
@@ -667,7 +667,7 @@ export default function DashboardPage() {
                 <Link
                   key={x.href}
                   href={x.href}
-                  className="flex items-center gap-2 rounded-xl border border-white/[0.06] bg-surface-2/60 px-3 py-2.5 text-xs font-medium text-text-secondary transition hover:border-primary/30 hover:bg-primary/8 hover:text-text-primary"
+                  className="flex items-center gap-2 rounded-xl border border-border bg-surface-2/60 px-3 py-2.5 text-xs font-medium text-text-secondary transition hover:border-primary/30 hover:bg-primary/8 hover:text-text-primary"
                 >
                   <x.icon className="h-3.5 w-3.5 shrink-0 text-primary" />
                   <span className="truncate">{x.label}</span>
@@ -679,13 +679,13 @@ export default function DashboardPage() {
       </div>
 
       {/* ── Campaigns table ─────────────────────────────────────────────────── */}
-      <div className="rounded-2xl border border-white/[0.07] bg-surface overflow-hidden">
-        <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
+      <div className="rounded-2xl border border-border bg-surface overflow-hidden">
+        <div className="flex items-center justify-between border-b border-border px-5 py-4">
           <h2 className="flex items-center gap-2 text-sm font-semibold text-text-primary">
             <Users className="h-4 w-4 text-primary" />
             {t('dashboard.dashboardHome.activeCampaigns', 'Faol kampaniyalar')}
             {reportCampaigns.length > 0 && (
-              <span className="rounded-full bg-white/[0.08] px-2 py-0.5 text-[11px] font-medium text-text-secondary">
+              <span className="rounded-full bg-surface-2 px-2 py-0.5 text-[11px] font-medium text-text-secondary">
                 {reportCampaigns.length}
               </span>
             )}
@@ -701,7 +701,7 @@ export default function DashboardPage() {
         <div className="overflow-x-auto">
           <table className="w-full min-w-[700px] text-sm">
             <thead>
-              <tr className="border-b border-white/[0.05] bg-white/[0.02]">
+              <tr className="border-b border-border/70 bg-surface-2/50">
                 <th className="px-5 py-3 text-left text-[10px] font-semibold uppercase tracking-widest text-text-tertiary">
                   {t('dashboard.campaign', 'Kampaniya')}
                 </th>
@@ -732,7 +732,7 @@ export default function DashboardPage() {
                   return (
                     <tr
                       key={row.id}
-                      className="group border-b border-white/[0.04] transition hover:bg-white/[0.025]"
+                      className="group border-b border-border/60 transition hover:bg-surface-2/50"
                     >
                       <td className="max-w-[220px] px-5 py-3">
                         <p className="truncate font-medium text-text-primary">{row.name}</p>
@@ -791,7 +791,7 @@ export default function DashboardPage() {
 
       {/* ── Top Ads strip ───────────────────────────────────────────────────── */}
       {topAds.length > 0 && (
-        <div className="rounded-2xl border border-white/[0.07] bg-surface p-5">
+        <div className="rounded-2xl border border-border bg-surface p-5">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="flex items-center gap-2 text-sm font-semibold text-text-primary">
               <Sparkles className="h-4 w-4 text-primary" />
@@ -809,7 +809,7 @@ export default function DashboardPage() {
                   'rounded-xl border p-3 transition',
                   i === 0
                     ? 'border-primary/30 bg-primary/5'
-                    : 'border-white/[0.06] bg-surface-2/50',
+                    : 'border-border bg-surface-2/50',
                 )}
               >
                 {i === 0 && (
