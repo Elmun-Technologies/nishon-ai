@@ -94,12 +94,20 @@ tekshirilgan batch (har biri build+unit+e2e+i18n yashil, alohida commit+push):
 22. **Settings notifications** — email/weekly/AI toggle'lar saqlanmasdi → "tez
     orada" izoh. **platform-architecture** ichki blueprint → `/docs` redirect.
 
-**Holat:** web build OK, web unit 118/118, e2e 39/39, i18n 2533×3, API **311/311**.
-Backlog (kechiktirilgan — past qiymat yoki verify qilib bo'lmaydi):
-budget slider persist (runtime consumer yo'q → past qiymat), F9 dead platforms
-Meta OAuth (past qiymat/test xavfi), image-ads real generatsiya (Fal.ai kalit
-kerak), marketplace real-wiring + my-portfolio visibleMetrics (katta feature'lar),
-docs unshipped-feature trim + real support kanali.
+**Image-ads real generatsiya (Reve / fal.ai) — yangi feature:**
+23. **Creative Hub → Image ads «Product page»** endi real Reve generatsiya
+    (fal.ai `fal-ai/reve/text-to-image`, $0.04/rasm). Yangi `reve` backend moduli
+    (heygen patterni): `ReveService` server-side `FAL_KEY` bilan proxy, aspect
+    mapping, `GET /reve/status` + `POST /reve/image-ads/generate` (JWT). Kalit
+    yo'q → 503 "not configured" (soxta rasm yo'q). 5 spec. Frontend: Generate
+    tugmasi real chaqiradi, loading skeleton, natijalar galereyasi + download.
+    **Faollashtirish:** serverda `FAL_KEY` (Reve accessли fal.ai kaliti) kerak.
+
+**Holat:** web build OK, web unit 118/118, e2e 39/39, i18n 2533×3, API **316/316**.
+Backlog (kechiktirilgan — past qiymat yoki katta feature/credential):
+budget slider persist (runtime consumer yo'q), F9 dead platforms Meta OAuth,
+image-ads qolgan 3 metod (upload/competitor/actor clone — Reve edit/remix),
+marketplace real-wiring + my-portfolio visibleMetrics, docs trim + support kanali.
 
 ### 2026-07-10 sessiyasi (2) — Agentic: real, boshqariladigan agent (PR #149)
 Startap va'dasi **Vaqt · Pul · Ishonch** — AI agent biznes reklamasini o'zi
