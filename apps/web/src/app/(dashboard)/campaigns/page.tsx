@@ -70,6 +70,9 @@ export default function CampaignsPage() {
     setLoading(true);
     setError("");
     const wsId = currentWorkspace.id;
+    // Reset so a workspace switch never shows the prior workspace's metrics
+    // while the new audit is in flight.
+    setMetrics({});
     // Best-effort: pull real 30-day Meta performance so synced campaigns show
     // actual spend/ROAS/CTR, keyed by their Meta campaign id (externalId).
     metaApi

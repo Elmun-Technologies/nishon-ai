@@ -285,6 +285,9 @@ export default function ReportingPage() {
     const wsId = currentWorkspace.id
     setLoading(true)
     setError('')
+    // Clear the previous workspace/period's KPIs while the new audit is in
+    // flight — never show one account's financials under another (Ishonch).
+    setAudit(null)
     // Real KPI cards + trends come from the audit endpoint (it returns
     // conversions/revenue/ROAS and real prior-period deltas); the table comes
     // from the reporting endpoint. Fetch both; the audit is best-effort.

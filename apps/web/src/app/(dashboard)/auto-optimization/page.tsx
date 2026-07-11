@@ -345,6 +345,10 @@ export default function AutoOptimizationPage() {
     }
     let cancelled = false
     setCampaignsLoading(true)
+    // Drop the prior workspace's campaigns while the new audit loads so the
+    // picker/run never targets another workspace's campaign.
+    setRealCampaigns([])
+    setSelectedCampaignId('')
     metaApi
       .audit(currentWorkspace.id, 30)
       .then((res) => {

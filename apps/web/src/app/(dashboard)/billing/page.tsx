@@ -384,7 +384,9 @@ export default function BillingPage() {
                   <Button
                     variant="secondary"
                     className="w-full rounded-xl"
-                    disabled={effectivePlanId === 'free'}
+                    // When the backend knows the plan, a local flag can't honor a
+                    // downgrade — disable rather than present an inert control.
+                    disabled={effectivePlanId === 'free' || backendPlan != null}
                     onClick={() => {
                       setSub((prev) => {
                         const n = { ...prev, planId: 'free' as const, currentPeriodEnd: null }
