@@ -6,6 +6,7 @@ import {
   telegramAppOrigin,
 } from '@/lib/telegram-bot'
 import { completeTelegramLink } from '@/lib/telegram-link-store'
+import { backendCompleteLink } from '@/lib/telegram-link-backend'
 import { appendCrmRevenue } from '@/lib/crm-revenue-store'
 
 export const runtime = 'nodejs'
@@ -55,7 +56,9 @@ export async function POST(req: Request) {
 
       if (cmd === '/start') {
         if (arg.startsWith('lnk_')) {
+          // In-memory (same-instance fast path) + backend (cross-instance).
           completeTelegramLink(arg, chatId)
+          await backendCompleteLink(arg, chatId)
         }
         await sendTelegramMessage(
           chatId,

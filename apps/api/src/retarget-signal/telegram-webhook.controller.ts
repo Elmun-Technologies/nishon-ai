@@ -1,6 +1,8 @@
 import {
+  BadRequestException,
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Logger,
@@ -81,6 +83,56 @@ export class TelegramWebhookController {
     }
 
     return { ok: true };
+  }
+
+  /**
+   * Cross-instance bridge for the digest linking flow. The Next.js web app's
+   * /start webhook records token→chat_id here (Redis), and its status poll
+   * reads it back — because those two requests may land on different serverless
+   * instances, an in-process map on the web side silently loses the link.
+   */
+  @Post("link/complete")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: "Store a deep-link token → chat_id (digest linking)",
+  })
+  async linkComplete(
+    @Query("secret") secret: string | undefined,
+    @Body() body: { token?: string; chatId?: string },
+  ): Promise<{ ok: true }> {
+    this.assertSecret(secret);
+    const token = (body?.token ?? "").trim();
+    const chatId = (body?.chatId ?? "").trim();
+    if (!token || !chatId) {
+      throw new BadRequestException("token va chatId kerak");
+    }
+    await this.redis.setLinkTokenChatId(token, chatId);
+    return { ok: true };
+  }
+
+  @Get("link/status")
+  @ApiOperation({ summary: "Read the chat_id linked to a deep-link token" })
+  async linkStatus(
+    @Query("secret") secret: string | undefined,
+    @Query("token") token: string | undefined,
+  ): Promise<{ ok: true; status: "linked" | "missing"; chatId?: string }> {
+    this.assertSecret(secret);
+    const t = (token ?? "").trim();
+    if (!t) throw new BadRequestException("token kerak");
+    const chatId = await this.redis.getLinkTokenChatId(t);
+    return chatId
+      ? { ok: true, status: "linked", chatId }
+      : { ok: true, status: "missing" };
+  }
+
+  /** Enforce the shared webhook secret only when one is configured. */
+  private assertSecret(secret: string | undefined): void {
+    const expected = this.config
+      .get<string>("TELEGRAM_WEBHOOK_SECRET", "")
+      .trim();
+    if (expected && (secret ?? "").trim() !== expected) {
+      throw new UnauthorizedException("Noto‘g‘ri webhook secret");
+    }
   }
 
   private parsePhoneFromStart(text: string): string | null {

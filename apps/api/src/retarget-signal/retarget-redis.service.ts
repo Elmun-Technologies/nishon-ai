@@ -6,6 +6,8 @@ import {
   RETARGET_KEY_PREFIX,
   TELEGRAM_LINK_PREFIX,
   TELEGRAM_LINK_TTL_SEC,
+  TELEGRAM_LINKTOKEN_PREFIX,
+  TELEGRAM_LINKTOKEN_TTL_SEC,
   THIRTY_DAYS_SEC,
 } from "./retarget-signal.types";
 
@@ -46,6 +48,20 @@ export class RetargetRedisService implements OnApplicationShutdown {
   async getTelegramChatId(phoneDigits: string): Promise<string | null> {
     const client = await this.getClient();
     const v = await client.get(this.telegramKey(phoneDigits));
+    return v ?? null;
+  }
+
+  /** Deep-link token → chat_id (short-lived handshake, shared across instances). */
+  async setLinkTokenChatId(token: string, chatId: string): Promise<void> {
+    const client = await this.getClient();
+    await client.set(`${TELEGRAM_LINKTOKEN_PREFIX}${token}`, chatId, {
+      EX: TELEGRAM_LINKTOKEN_TTL_SEC,
+    });
+  }
+
+  async getLinkTokenChatId(token: string): Promise<string | null> {
+    const client = await this.getClient();
+    const v = await client.get(`${TELEGRAM_LINKTOKEN_PREFIX}${token}`);
     return v ?? null;
   }
 

@@ -41,6 +41,15 @@ export const TELEGRAM_LINK_PREFIX = "telegram:";
 /** Bot /start orqali telefon ↔ chat_id (90 kun). */
 export const TELEGRAM_LINK_TTL_SEC = 90 * 24 * 60 * 60;
 
+/**
+ * Deep-link token ↔ chat_id bridge for the digest linking flow. Shared across
+ * web instances (the /start webhook and the status poll may hit different
+ * serverless instances), so it lives in Redis, not in-process memory. Short
+ * TTL — the link is a one-time handshake.
+ */
+export const TELEGRAM_LINKTOKEN_PREFIX = "tglink:";
+export const TELEGRAM_LINKTOKEN_TTL_SEC = 30 * 60;
+
 export const RETARGET_KEY_PREFIX = "retarget:";
 export const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 export const THIRTY_DAYS_SEC = 30 * 24 * 60 * 60;
