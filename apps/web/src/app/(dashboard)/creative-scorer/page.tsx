@@ -26,6 +26,7 @@ import { Badge } from '@/components/ui/Badge'
 import { Spinner } from '@/components/ui/Spinner'
 import apiClient from '@/lib/api-client'
 import { cn } from '@/lib/utils'
+import { FocusGroupTester } from '@/components/creative/FocusGroupTester'
 
 // ─── TYPES ───────────────────────────────────────────────────────────────────
 
@@ -769,6 +770,8 @@ export default function CreativeScorerPage() {
           )}
         </div>
       </div>
+
+      <FocusGroupTester />
     </div>
   )
 }

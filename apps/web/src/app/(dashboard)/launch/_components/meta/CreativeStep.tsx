@@ -11,6 +11,7 @@ import { useWorkspaceStore } from '@/stores/workspace.store'
 import { cn } from '@/lib/utils'
 import type { LaunchWizardCtl } from '../../_lib/use-launch-wizard'
 import { StepFooter } from '../StepFooter'
+import { FocusGroupTester } from '@/components/creative/FocusGroupTester'
 
 export function CreativeStep({ ctl }: { ctl: LaunchWizardCtl }) {
   const { t } = useI18n()
@@ -282,6 +283,10 @@ export function CreativeStep({ ctl }: { ctl: LaunchWizardCtl }) {
               </button>
             </div>
           </div>
+        )}
+
+        {ctl.metaData.creativeText.trim().length > 0 && (
+          <FocusGroupTester defaultBody={ctl.metaData.creativeText} />
         )}
       </div>
 

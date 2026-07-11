@@ -5,6 +5,7 @@ import {
   NotFoundException,
   BadRequestException,
   ForbiddenException,
+  ServiceUnavailableException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -16,8 +17,12 @@ import { DecisionLoopService } from "./decision-loop.service";
 import { AiDecision } from "../ai-decisions/entities/ai-decision.entity";
 import { Workspace } from "../workspaces/entities/workspace.entity";
 import { ConfigService } from "@nestjs/config";
-import { createAdSpectrAiClientFromEnv } from "@adspectr/ai-sdk";
+import {
+  createAdSpectrAiClientFromEnv,
+  isAiClientConfigured,
+} from "@adspectr/ai-sdk";
 import type { AdSpectrAiClient } from "@adspectr/ai-sdk";
+import { FocusGroupDto } from "./dtos/focus-group.dto";
 import { MetaConnector } from "../platforms/connectors/meta.connector";
 
 /**
@@ -844,6 +849,203 @@ Write all feedback in Uzbek language.
       systemPrompt,
       { taskType: "vision", agentName: "CreativeScorer" },
     );
+  }
+
+  /**
+   * Synthetic focus group — pre-flight test a creative against a panel of AI
+   * personas built from the workspace's real target audience, BEFORE any ad
+   * spend. Serves Money (cut cold-start test budget) and Trust (know before you
+   * spend). One LLM call role-plays the whole panel (token-efficient); the CTR
+   * band + verdict are computed in code from the personas' click intent so the
+   * output is deterministic and honest (labelled an estimate).
+   */
+  async runFocusGroup(dto: FocusGroupDto): Promise<{
+    personas: Array<{
+      label: string;
+      clickProbability: number;
+      emotion: string;
+      objection: string;
+      whatWouldMakeMeClick: string;
+    }>;
+    avgClickProbability: number;
+    predictedCtrRange: string;
+    verdict: "ready" | "needs_work" | "not_ready";
+    topObjections: string[];
+    topImprovements: string[];
+    winningPersona: string | null;
+  }> {
+    if (!isAiClientConfigured((k) => this.config.get<string>(k))) {
+      throw new ServiceUnavailableException(
+        "AI is not configured. Set the AI provider key on the API server.",
+      );
+    }
+    if (!dto.adCopy && !dto.headline && !dto.imageBase64) {
+      throw new BadRequestException(
+        "Provide ad copy, a headline, or an image to test.",
+      );
+    }
+
+    const ws = dto.workspaceId
+      ? await this.workspaceRepo.findOne({ where: { id: dto.workspaceId } })
+      : null;
+    const seeds = this.buildPersonaSeeds(ws);
+
+    const creative = [
+      dto.headline ? `Headline: ${dto.headline}` : "",
+      dto.adCopy ? `Body: ${dto.adCopy}` : "",
+      dto.cta ? `CTA: ${dto.cta}` : "",
+      dto.imageBase64 ? "(A visual creative image is attached.)" : "",
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    const systemPrompt = `You run a synthetic focus group for advertising creatives in CIS markets (Uzbekistan, Kazakhstan, Russia).
+You are given a list of audience personas and one ad creative. Role-play EACH persona honestly — some will not be interested. Do NOT be optimistic; reflect real scepticism and ad-blindness.
+Respond with VALID JSON ONLY:
+{
+  "personas": [
+    { "label": "<persona label>", "clickProbability": 0.0, "emotion": "<short reaction>", "objection": "<their main hesitation>", "whatWouldMakeMeClick": "<one concrete change>" }
+  ],
+  "topObjections": ["<most common objection>", "..."],
+  "topImprovements": ["<highest-impact fix>", "..."]
+}
+Rules:
+- One persona object per given persona, in the same order.
+- clickProbability is this persona's honest likelihood of clicking (0.0-1.0). Most everyday ads land 0.1-0.4; only a strong, relevant creative earns 0.5+.
+- Write emotion/objection/whatWouldMakeMeClick and the top lists in Uzbek.`;
+
+    const userMessage = `Business: ${ws?.name ?? "Unknown"} — ${ws?.industry ?? "general"}
+Goal: ${dto.goal ?? "conversions"} · Platform: ${dto.platform ?? "meta"}
+Target audience: ${ws?.targetAudience ?? "General consumers"}
+
+Personas (role-play each):
+${seeds.map((s, i) => `${i + 1}. ${s}`).join("\n")}
+
+Ad creative to test:
+${creative}`;
+
+    const raw = dto.imageBase64
+      ? await this.aiClient.completeVision<{
+          personas?: any[];
+          topObjections?: string[];
+          topImprovements?: string[];
+        }>(
+          dto.imageBase64,
+          dto.mimeType ?? "image/jpeg",
+          userMessage,
+          systemPrompt,
+          { taskType: "vision", agentName: "FocusGroup" },
+        )
+      : await this.aiClient.completeJson<{
+          personas?: any[];
+          topObjections?: string[];
+          topImprovements?: string[];
+        }>(userMessage, systemPrompt, {
+          taskType: "strategy",
+          agentName: "FocusGroup",
+        });
+
+    // ── Deterministic, code-side aggregation (not left to the model) ──────────
+    const personas = (Array.isArray(raw?.personas) ? raw.personas : []).map(
+      (p: any, i: number) => {
+        const cp = Number(p?.clickProbability);
+        return {
+          label: String(p?.label ?? seeds[i] ?? `Persona ${i + 1}`),
+          clickProbability: Number.isFinite(cp)
+            ? Math.min(1, Math.max(0, cp))
+            : 0,
+          emotion: String(p?.emotion ?? ""),
+          objection: String(p?.objection ?? ""),
+          whatWouldMakeMeClick: String(p?.whatWouldMakeMeClick ?? ""),
+        };
+      },
+    );
+
+    const avg =
+      personas.length > 0
+        ? personas.reduce((s, p) => s + p.clickProbability, 0) / personas.length
+        : 0;
+    const avgClickProbability = Number(avg.toFixed(3));
+
+    // Survey click-intent hugely overstates real CTR — map it down to a
+    // plausible ad CTR band (heuristic, honestly labelled as an estimate).
+    const ctrMid = Math.max(0.1, Number((avg * 3).toFixed(2)));
+    const lo = Math.max(0.1, Number((ctrMid - 0.4).toFixed(1)));
+    const hi = Number((ctrMid + 0.4).toFixed(1));
+    const predictedCtrRange = `${lo.toFixed(1)}–${hi.toFixed(1)}%`;
+
+    const verdict: "ready" | "needs_work" | "not_ready" =
+      avg >= 0.45 ? "ready" : avg >= 0.28 ? "needs_work" : "not_ready";
+
+    const winning = personas.length
+      ? personas.reduce((a, b) =>
+          b.clickProbability > a.clickProbability ? b : a,
+        )
+      : null;
+
+    return {
+      personas,
+      avgClickProbability,
+      predictedCtrRange,
+      verdict,
+      topObjections: (Array.isArray(raw?.topObjections)
+        ? raw.topObjections
+        : []
+      )
+        .slice(0, 4)
+        .map(String),
+      topImprovements: (Array.isArray(raw?.topImprovements)
+        ? raw.topImprovements
+        : []
+      )
+        .slice(0, 4)
+        .map(String),
+      winningPersona: winning ? winning.label : null,
+    };
+  }
+
+  /**
+   * Build 4-6 audience persona seeds from the workspace's real onboarding
+   * strategy (geo × age combos + a value-shopper archetype). Falls back to
+   * generic CIS personas when the workspace has no captured audience.
+   */
+  private buildPersonaSeeds(ws: Workspace | null): string[] {
+    const strat = (ws?.aiStrategy ?? {}) as {
+      geos?: string[];
+      ageRanges?: string[];
+      cjm?: string | null;
+      vertical?: string | null;
+    };
+    const geoNames: Record<string, string> = {
+      UZ: "Toshkent",
+      KZ: "Olmaota",
+      RU: "Moskva",
+      KG: "Bishkek",
+      TJ: "Dushanbe",
+    };
+    const geos =
+      Array.isArray(strat.geos) && strat.geos.length ? strat.geos : ["UZ"];
+    const ages =
+      Array.isArray(strat.ageRanges) && strat.ageRanges.length
+        ? strat.ageRanges
+        : ["25-34", "35-44"];
+    const industry = ws?.industry ?? "umumiy";
+
+    const seeds: string[] = [];
+    for (const geo of geos.slice(0, 2)) {
+      const city = geoNames[geo] ?? geo;
+      for (const age of ages.slice(0, 2)) {
+        const gender = seeds.length % 2 === 0 ? "ayol" : "erkak";
+        seeds.push(
+          `${age} yoshli ${city}lik ${gender}, ${industry} sohasiga qiziqadi`,
+        );
+        if (seeds.length >= 5) break;
+      }
+      if (seeds.length >= 5) break;
+    }
+    // Always include a price-sensitive sceptic — the toughest audience.
+    seeds.push("Narxga sezgir, reklamaga ishonchsiz tejamkor xaridor");
+    return seeds.slice(0, 6);
   }
 
   /**

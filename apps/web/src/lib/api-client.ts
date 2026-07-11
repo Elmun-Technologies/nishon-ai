@@ -288,6 +288,32 @@ export const aiAgent = {
     goal: string
     workspaceContext: any
   }) => apiClient.post('/ai-agent/score-creative', data),
+  /** Synthetic focus-group pre-test of a creative before spending. */
+  focusGroup: (data: {
+    workspaceId: string
+    adCopy?: string
+    headline?: string
+    cta?: string
+    imageBase64?: string
+    mimeType?: string
+    platform?: string
+    goal?: string
+  }) =>
+    apiClient.post<{
+      personas: Array<{
+        label: string
+        clickProbability: number
+        emotion: string
+        objection: string
+        whatWouldMakeMeClick: string
+      }>
+      avgClickProbability: number
+      predictedCtrRange: string
+      verdict: 'ready' | 'needs_work' | 'not_ready'
+      topObjections: string[]
+      topImprovements: string[]
+      winningPersona: string | null
+    }>('/ai-agent/focus-group', data),
   chat: (body: {
     workspaceId: string
     message: string

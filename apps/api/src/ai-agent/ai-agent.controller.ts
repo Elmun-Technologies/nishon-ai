@@ -24,6 +24,7 @@ import {
   CampaignOrchestratorService,
   CampaignPipelineInput,
 } from "./campaign-orchestrator.service";
+import { FocusGroupDto } from "./dtos/focus-group.dto";
 
 @ApiTags("AI Agent")
 @Controller("ai-agent")
@@ -130,6 +131,15 @@ export class AiAgentController {
   @ApiOperation({ summary: "Score a creative using GPT-4o Vision" })
   async scoreCreative(@Body() dto: any) {
     return this.aiAgentService.scoreCreative(dto);
+  }
+
+  @Post("focus-group")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: "Synthetic focus-group pre-test of a creative before spend",
+  })
+  async focusGroup(@Body() dto: FocusGroupDto) {
+    return this.aiAgentService.runFocusGroup(dto);
   }
 
   @Post("workspaces/:workspaceId/pipeline")
