@@ -10,7 +10,6 @@ import { PageHeader } from '@/components/ui'
 
 export default function AudienceStudioPage() {
   const { t } = useI18n()
-  const [tab, setTab] = useState<'performance' | 'discover'>('performance')
   const [range, setRange] = useState('last7')
   const [customFromDate, setCustomFromDate] = useState('')
   const [customToDate, setCustomToDate] = useState('')
@@ -41,34 +40,8 @@ export default function AudienceStudioPage() {
         }
       />
 
-      <div className="border-b border-border flex gap-1">
-        <button
-          type="button"
-          onClick={() => setTab('performance')}
-          className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
-            tab === 'performance' ? 'border-violet-500 text-violet-600 dark:text-violet-300' : 'border-transparent text-text-tertiary'
-          }`}
-        >
-          {t('audiences.studioTabPerformance', 'Explore audiences by performance')}
-        </button>
-        <button
-          type="button"
-          onClick={() => setTab('discover')}
-          className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
-            tab === 'discover' ? 'border-violet-500 text-violet-600 dark:text-violet-300' : 'border-transparent text-text-tertiary'
-          }`}
-        >
-          {t('audiences.studioTabDiscover', 'Discover new interests')}
-        </button>
-      </div>
-
       <section className="rounded-2xl border border-border/70 bg-white/95 p-4 shadow-sm dark:bg-slate-900/75">
         <div className="flex flex-wrap items-center gap-2 mb-4">
-          <input
-            type="search"
-            placeholder={t('audiences.studioSearchPlaceholder', 'Search audiences…')}
-            className="flex-1 min-w-[200px] rounded-xl border border-border bg-surface px-4 py-2.5 text-sm outline-none focus:border-violet-500/50"
-          />
           <DateRangeFilter
             variant="select"
             value={range}
