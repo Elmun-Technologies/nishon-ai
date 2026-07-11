@@ -139,8 +139,11 @@ export class AiAgentController {
   @ApiOperation({
     summary: "Synthetic focus-group pre-test of a creative before spend",
   })
-  async focusGroup(@Body() dto: FocusGroupDto) {
-    return this.aiAgentService.runFocusGroup(dto);
+  async focusGroup(@Body() dto: FocusGroupDto, @Req() req: Request) {
+    return this.aiAgentService.runFocusGroup(
+      dto,
+      (req.user as { id: string }).id,
+    );
   }
 
   @Post("plan-campaign")
@@ -149,8 +152,11 @@ export class AiAgentController {
     summary:
       "Chat-first launch — turn a free-text brief (+ optional image) into an editable Meta campaign proposal (does NOT launch)",
   })
-  async planCampaign(@Body() dto: PlanCampaignDto) {
-    return this.aiAgentService.planCampaignFromBrief(dto);
+  async planCampaign(@Body() dto: PlanCampaignDto, @Req() req: Request) {
+    return this.aiAgentService.planCampaignFromBrief(
+      dto,
+      (req.user as { id: string }).id,
+    );
   }
 
   @Post("workspaces/:workspaceId/pipeline")

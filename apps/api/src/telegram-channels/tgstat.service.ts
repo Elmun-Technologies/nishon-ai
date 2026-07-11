@@ -189,7 +189,10 @@ export class TgStatService {
     const subscribers = Number(c.participants_count) || 0;
     const avgPostReach =
       c.avg_post_reach != null ? Number(c.avg_post_reach) || 0 : null;
-    const err = c.err_percent != null ? Number(c.err_percent) : null;
+    const errRaw = c.err_percent != null ? Number(c.err_percent) : null;
+    // Guard against a present-but-non-numeric err_percent — NaN would poison
+    // the fitScore. Treat it as "unknown" (null) instead.
+    const err = errRaw != null && Number.isFinite(errRaw) ? errRaw : null;
     const reachForPrice = avgPostReach ?? Math.round(subscribers * 0.25);
     const estPricePerPostUsd =
       reachForPrice > 0

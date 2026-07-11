@@ -85,6 +85,26 @@ export class AiAgentService {
   }
 
   /**
+   * Loads a workspace and verifies the caller owns it. Prevents one user from
+   * reading another workspace's onboarding strategy (IDOR) via a guessed id.
+   * Returns null when no workspaceId is supplied (callers fall back to defaults).
+   */
+  private async loadOwnedWorkspace(
+    workspaceId: string | undefined,
+    userId: string | undefined,
+  ): Promise<Workspace | null> {
+    if (!workspaceId) return null;
+    const workspace = await this.workspaceRepo.findOne({
+      where: { id: workspaceId },
+    });
+    if (!workspace) return null;
+    if (userId && workspace.userId !== userId) {
+      throw new ForbiddenException("You do not have access to this workspace");
+    }
+    return workspace;
+  }
+
+  /**
    * Fetches recent public ads from Meta Ad Library (Marketing API / ads_archive)
    * for each competitor name and formats a prompt appendix. Best-effort: returns
    * empty string if the app token is missing or Meta returns nothing useful.
@@ -860,7 +880,10 @@ Write all feedback in Uzbek language.
    * band + verdict are computed in code from the personas' click intent so the
    * output is deterministic and honest (labelled an estimate).
    */
-  async runFocusGroup(dto: FocusGroupDto): Promise<{
+  async runFocusGroup(
+    dto: FocusGroupDto,
+    userId?: string,
+  ): Promise<{
     personas: Array<{
       label: string;
       clickProbability: number;
@@ -886,9 +909,7 @@ Write all feedback in Uzbek language.
       );
     }
 
-    const ws = dto.workspaceId
-      ? await this.workspaceRepo.findOne({ where: { id: dto.workspaceId } })
-      : null;
+    const ws = await this.loadOwnedWorkspace(dto.workspaceId, userId);
     const seeds = this.buildPersonaSeeds(ws);
 
     const creative = [
@@ -1056,7 +1077,10 @@ ${creative}`;
    * reviews/edits it and confirms through the real launch-orchestrator, which
    * keeps this 100% Green Zone (official API, nothing auto-launched here).
    */
-  async planCampaignFromBrief(dto: PlanCampaignDto): Promise<{
+  async planCampaignFromBrief(
+    dto: PlanCampaignDto,
+    userId?: string,
+  ): Promise<{
     name: string;
     objective: string;
     countries: string[];
@@ -1074,9 +1098,7 @@ ${creative}`;
       );
     }
 
-    const ws = dto.workspaceId
-      ? await this.workspaceRepo.findOne({ where: { id: dto.workspaceId } })
-      : null;
+    const ws = await this.loadOwnedWorkspace(dto.workspaceId, userId);
     const ld = ((ws?.aiStrategy as any)?.launchDefaults ?? {}) as {
       objective?: string;
       geos?: string[];
@@ -1134,10 +1156,17 @@ ${dto.brief}`;
     const objective = OBJECTIVES.includes(String(raw?.objective))
       ? String(raw.objective)
       : (ld.objective ?? "leads");
-    const countries =
-      Array.isArray(raw?.countries) && raw.countries.length
-        ? raw.countries.map((c: any) => String(c).toUpperCase().slice(0, 2))
-        : (ld.geos ?? ["UZ"]);
+    // Keep only well-formed ISO-2 codes — a full name like "Kazakhstan" sliced
+    // to "KA" is invalid and Meta would reject it, so drop non-2-letter tokens
+    // and fall back to the onboarding geos when nothing valid remains.
+    const validCountries: string[] = (
+      Array.isArray(raw?.countries) ? raw.countries : []
+    )
+      .map((c: any) => String(c).trim().toUpperCase())
+      .filter((c: string) => /^[A-Z]{2}$/.test(c));
+    const countries: string[] = validCountries.length
+      ? Array.from(new Set(validCountries))
+      : (ld.geos ?? ["UZ"]);
     const clampAge = (n: any, def: number) => {
       const v = Math.round(Number(n));
       return Number.isFinite(v) ? Math.min(65, Math.max(13, v)) : def;

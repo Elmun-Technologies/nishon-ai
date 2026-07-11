@@ -1,4 +1,7 @@
-import { ServiceUnavailableException } from "@nestjs/common";
+import {
+  ForbiddenException,
+  ServiceUnavailableException,
+} from "@nestjs/common";
 
 const mockAiClient = {
   completeJson: jest.fn(),
@@ -38,6 +41,16 @@ describe("AiAgentService.planCampaignFromBrief", () => {
     await expect(
       service.planCampaignFromBrief({ workspaceId: "w1", brief: "hi" } as any),
     ).rejects.toBeInstanceOf(ServiceUnavailableException);
+  });
+
+  it("rejects when the caller does not own the workspace (IDOR)", async () => {
+    workspaceRepo.findOne.mockResolvedValue({ id: "w1", userId: "owner" });
+    await expect(
+      service.planCampaignFromBrief(
+        { workspaceId: "w1", brief: "reklama qil" } as any,
+        "attacker",
+      ),
+    ).rejects.toBeInstanceOf(ForbiddenException);
   });
 
   it("returns a normalised proposal and seeds from launchDefaults", async () => {

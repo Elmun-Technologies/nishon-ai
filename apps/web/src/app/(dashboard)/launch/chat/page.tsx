@@ -141,6 +141,16 @@ export default function ChatLaunchPage() {
 
   const confirmLaunch = async () => {
     if (!proposal || !currentWorkspace?.id) return
+    // Pre-submit guards — mirror the backend normaliser so the user gets an
+    // immediate, clear message instead of a late, opaque Meta rejection.
+    if (proposal.countries.length === 0) {
+      setLaunchError('Kamida bitta davlat tanlang.')
+      return
+    }
+    if (proposal.ageMin >= proposal.ageMax) {
+      setLaunchError('Yosh (min) yosh (max) dan kichik bo\'lishi kerak.')
+      return
+    }
     setLaunching(true)
     setLaunchError('')
     setLaunchedId(null)
@@ -176,7 +186,11 @@ export default function ChatLaunchPage() {
         creative,
       })
       const jobId = draft.data.id
-      await launchOrchestrator.validate(jobId)
+      const validated = await launchOrchestrator.validate(jobId)
+      if (validated.data.status === 'failed') {
+        setLaunchError(validated.data.error || 'Reja tekshiruvdan o\'tmadi.')
+        return
+      }
       const launched = await launchOrchestrator.launch(jobId)
       if (launched.data.status === 'failed') {
         setLaunchError(launched.data.error || 'Ishga tushirishda xato.')

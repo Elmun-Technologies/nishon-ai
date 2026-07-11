@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   ServiceUnavailableException,
 } from "@nestjs/common";
 
@@ -42,6 +43,16 @@ describe("AiAgentService.runFocusGroup", () => {
     await expect(
       service.runFocusGroup({ workspaceId: "w1", adCopy: "hi" } as any),
     ).rejects.toBeInstanceOf(ServiceUnavailableException);
+  });
+
+  it("rejects when the caller does not own the workspace (IDOR)", async () => {
+    workspaceRepo.findOne.mockResolvedValue({ id: "w1", userId: "owner" });
+    await expect(
+      service.runFocusGroup(
+        { workspaceId: "w1", headline: "hi" } as any,
+        "attacker",
+      ),
+    ).rejects.toBeInstanceOf(ForbiddenException);
   });
 
   it("rejects when no creative is provided", async () => {
