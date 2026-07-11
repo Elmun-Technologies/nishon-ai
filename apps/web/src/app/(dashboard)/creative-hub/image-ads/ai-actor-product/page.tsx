@@ -72,7 +72,7 @@ export default function AiActorProductImageAdsPage() {
             >
               <Users className="h-8 w-8 text-text-tertiary" aria-hidden />
               <span className="font-semibold text-text-primary">{t('imageAdsPage.browseAvatarGallery', 'Browse avatar gallery')}</span>
-              <span className="text-caption text-text-tertiary">{t('imageAdsPage.avatarCount', 'Choose from 300+ AI actors.')}</span>
+              <span className="text-caption text-text-tertiary">{t('imageAdsPage.avatarCount', 'Sample AI actors.')}</span>
             </Link>
             <label className="mt-4 flex cursor-pointer items-center gap-2 text-sm text-text-secondary">
               <input

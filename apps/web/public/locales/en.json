@@ -2797,7 +2797,7 @@
     "aiActors": "AI actors",
     "aiActorsHint": "Select one or more AI actors. Each actor will get their own set of variations.",
     "browseAvatarGallery": "Browse avatar gallery",
-    "avatarCount": "Choose from 300+ AI actors.",
+    "avatarCount": "Sample AI actors.",
     "actorsReady": "I selected one or more actors in the gallery",
     "configureActorHint": "Pose, wardrobe, and shot list will be configured here."
   },

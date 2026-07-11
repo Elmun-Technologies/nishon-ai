@@ -25,6 +25,7 @@ export default function ProductPageImageAdsPage() {
   const [instructions, setInstructions] = useState('')
   const [aspect, setAspect] = useState<'1:1' | '4:5' | '9:16'>('1:1')
   const [variations, setVariations] = useState(3)
+  const [comingSoon, setComingSoon] = useState(false)
 
   const runAnalyze = () => {
     const host = tryHost(productUrl)
@@ -173,14 +174,18 @@ export default function ProductPageImageAdsPage() {
             >
               {t('imageAdsPage.backToInput', 'Back to input')}
             </button>
-            <ImageAdsBusyButton
-              onClick={() => {
-                /* Generation API can be wired here */
-              }}
-            >
+            <ImageAdsBusyButton onClick={() => setComingSoon(true)}>
               {t('imageAdsPage.generate', 'Generate')}
             </ImageAdsBusyButton>
           </div>
+          {comingSoon && (
+            <p className="mt-3 rounded-xl border border-amber-400/40 bg-amber-400/10 p-3 text-sm text-amber-700 dark:text-amber-300">
+              {t(
+                'imageAdsPage.generateComingSoon',
+                "AI rasm generatsiyasi tez orada ulanadi. Hozircha Creative Hub shablonlaridan tayyor kreativ tanlashingiz mumkin.",
+              )}
+            </p>
+          )}
         </div>
       )}
     </ImageAdsShell>
