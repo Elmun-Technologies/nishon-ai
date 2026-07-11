@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation'
 import { ArrowLeft, Star } from 'lucide-react'
 import { MOCK_TARGETOLOGISTS, formatSpend } from '@/lib/portfolio-data'
 import { PublicContainer, PublicFooter } from '@/components/public/PublicLayout'
+import { MarketplacePreviewBanner } from '@/components/marketplace/MarketplacePreviewBanner'
 import { useI18n } from '@/i18n/use-i18n'
 
 export default function MarketplacePortfolioDetailPage({ params }: { params: { slug: string } }) {
@@ -25,6 +26,8 @@ export default function MarketplacePortfolioDetailPage({ params }: { params: { s
             <ArrowLeft className="h-4 w-4" />
             {t('publicSite.marketing.common.backToPortfolio', '')}
           </Link>
+
+          <MarketplacePreviewBanner />
 
           <div className="grid gap-6 md:grid-cols-[1.5fr_1fr]">
             <div>

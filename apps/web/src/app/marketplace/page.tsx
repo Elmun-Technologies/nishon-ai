@@ -5,6 +5,7 @@ import { ArrowRight, CheckCircle2, Search, SlidersHorizontal, Star, TrendingUp, 
 import { PublicContainer, PublicFooter } from '@/components/public/PublicLayout'
 import { ContentMediaSlot } from '@/components/media/ContentMediaSlot'
 import { MarketplaceLiveDiscovery } from '@/components/marketplace/MarketplaceLiveDiscovery'
+import { MarketplacePreviewBanner } from '@/components/marketplace/MarketplacePreviewBanner'
 import { useI18n } from '@/i18n/use-i18n'
 
 const specialists = [
@@ -86,6 +87,12 @@ export default function MarketplacePage() {
               imageSrc="/stock/marketplace-hero.svg"
             />
           </div>
+        </PublicContainer>
+      </section>
+
+      <section className="bg-surface pt-8">
+        <PublicContainer>
+          <MarketplacePreviewBanner />
         </PublicContainer>
       </section>
 

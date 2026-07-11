@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Search, Star } from 'lucide-react'
 import { MOCK_TARGETOLOGISTS, formatSpend } from '@/lib/portfolio-data'
 import { PublicContainer, PublicFooter, PublicSectionHeader } from '@/components/public/PublicLayout'
+import { MarketplacePreviewBanner } from '@/components/marketplace/MarketplacePreviewBanner'
 import { useI18n } from '@/i18n/use-i18n'
 
 export default function MarketplacePortfolioPage() {
@@ -38,6 +39,8 @@ export default function MarketplacePortfolioPage() {
       <section className="border-b border-border bg-surface py-10">
         <PublicContainer>
           <PublicSectionHeader eyebrow={pp('eyebrow')} title={pp('title')} description={pp('description')} />
+
+          <MarketplacePreviewBanner />
 
           <div className="grid gap-3 sm:grid-cols-4">
             <div className="rounded-xl border border-border bg-surface-2 p-4">

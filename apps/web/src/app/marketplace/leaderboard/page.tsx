@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Award, Star } from 'lucide-react'
 import { PublicContainer, PublicFooter, PublicSectionHeader } from '@/components/public/PublicLayout'
+import { MarketplacePreviewBanner } from '@/components/marketplace/MarketplacePreviewBanner'
 import { useI18n } from '@/i18n/use-i18n'
 
 const LEADERBOARD_DATA = [
@@ -149,6 +150,8 @@ export default function MarketplaceLeaderboardPage() {
       <section className="border-b border-border bg-surface py-10">
         <PublicContainer>
           <PublicSectionHeader eyebrow={lp('eyebrow')} title={lp('title')} description={lp('description')} />
+
+          <MarketplacePreviewBanner />
 
           <div className="flex flex-wrap gap-2">
             {TABS.map((tab) => (
