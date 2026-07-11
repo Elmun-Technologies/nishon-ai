@@ -258,7 +258,7 @@ export default function CampaignsPage() {
           />
           {filter === "all" && (
             <div className="flex justify-center pb-6">
-              <Button variant="primary" onClick={() => router.push("/wizard")}>
+              <Button variant="primary" onClick={() => router.push("/launch")}>
                 + {t("campaigns.create", "Create Campaign")}
               </Button>
             </div>
