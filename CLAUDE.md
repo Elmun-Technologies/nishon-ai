@@ -73,10 +73,19 @@ tekshirilgan batch (har biri build+unit+e2e+i18n yashil, alohida commit+push):
     "shipped" derdi → Preview banner, Generate "tez orada", "300+ aktyor"→"namuna".
 17. **Audiences studio** — o'lik tab bar + dekorativ search olib tashlandi.
 
-**Holat:** web build OK, web unit 118/118, e2e 39/39, i18n 2533×3. API o'zgармади.
-Backlog (kechiktirilgan): budget slider persist (backend endpoint kerak),
-F1 telegram link store DB'ga (multi-instance), F9 dead platforms Meta OAuth,
-image-ads real generatsiya, my-portfolio visibleMetrics backend.
+18. **Telegram link store (production bug)** — in-memory Map serverless'da
+    (Vercel) digest onboarding'ni buzardi (webhook va poll turli instance'ga
+    tushadi). Backend Redis bridge qo'shildi (`/api/telegram/link/complete|status`,
+    RetargetRedisService `tglink:` kalitlar, webhook secret gated). Web additive:
+    webhook backend'ga ham yozadi, link-status backend'ga fallback qiladi;
+    in-memory single-instance uchun tegilmaydi (regressiya yo'q). 6 controller
+    spec. Migration yo'q (Redis).
+
+**Holat:** web build OK, web unit 118/118, e2e 39/39, i18n 2533×3, API **311/311**.
+Backlog (kechiktirilgan — past qiymat yoki verify qilib bo'lmaydi):
+budget slider persist (runtime consumer yo'q → past qiymat), F9 dead platforms
+Meta OAuth (past qiymat/test xavfi), image-ads real generatsiya (Fal.ai kalit
+kerak), my-portfolio visibleMetrics backend (public-profil enforcement feature).
 
 ### 2026-07-10 sessiyasi (2) — Agentic: real, boshqariladigan agent (PR #149)
 Startap va'dasi **Vaqt · Pul · Ishonch** — AI agent biznes reklamasini o'zi
