@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Alert, Button, Input } from '@/components/ui'
@@ -57,6 +57,28 @@ export function LoginClient() {
   const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  // Only offer social login for providers the server actually has configured —
+  // clicking an unconfigured provider would dead-end. Start hidden; reveal on
+  // confirmation. On a transient fetch error, fail open to the prior behavior.
+  const [providers, setProviders] = useState<{ google: boolean; facebook: boolean }>({
+    google: false,
+    facebook: false,
+  })
+
+  useEffect(() => {
+    let cancelled = false
+    auth
+      .providers()
+      .then((res) => {
+        if (!cancelled) setProviders(res.data)
+      })
+      .catch(() => {
+        if (!cancelled) setProviders({ google: true, facebook: true })
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   function safeNext(): string | null {
     const n = searchParams.get('next')
@@ -142,30 +164,38 @@ export function LoginClient() {
           <h2 className="text-xl font-semibold">{t('auth.loginPage.panelTitle', 'Sign in')}</h2>
           <p className="mt-1 text-sm text-text-secondary">{t('auth.loginPage.panelSubtitle', 'Use your account credentials or social auth.')}</p>
 
-          <div className="mt-4 flex flex-col gap-2">
-            <button
-              type="button"
-              onClick={handleGoogleLogin}
-              className="flex w-full items-center justify-center gap-3 rounded-lg border border-border bg-surface-2 px-4 py-2.5 text-sm text-text-secondary hover:bg-surface"
-            >
-              <GoogleIcon />
-              {t('auth.loginPage.continueGoogle', 'Continue with Google')}
-            </button>
-            <button
-              type="button"
-              onClick={handleFacebookLogin}
-              className="flex w-full items-center justify-center gap-3 rounded-lg bg-[#1877F2] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#166FE5]"
-            >
-              <FacebookIcon />
-              {t('auth.loginPage.continueFacebook', 'Continue with Facebook')}
-            </button>
-          </div>
+          {(providers.google || providers.facebook) && (
+            <>
+              <div className="mt-4 flex flex-col gap-2">
+                {providers.google && (
+                  <button
+                    type="button"
+                    onClick={handleGoogleLogin}
+                    className="flex w-full items-center justify-center gap-3 rounded-lg border border-border bg-surface-2 px-4 py-2.5 text-sm text-text-secondary hover:bg-surface"
+                  >
+                    <GoogleIcon />
+                    {t('auth.loginPage.continueGoogle', 'Continue with Google')}
+                  </button>
+                )}
+                {providers.facebook && (
+                  <button
+                    type="button"
+                    onClick={handleFacebookLogin}
+                    className="flex w-full items-center justify-center gap-3 rounded-lg bg-[#1877F2] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#166FE5]"
+                  >
+                    <FacebookIcon />
+                    {t('auth.loginPage.continueFacebook', 'Continue with Facebook')}
+                  </button>
+                )}
+              </div>
 
-          <div className="my-4 flex items-center gap-3">
-            <div className="h-px flex-1 bg-border" />
-            <span className="text-xs text-text-tertiary">{t('auth.loginPage.orEmail', 'or email')}</span>
-            <div className="h-px flex-1 bg-border" />
-          </div>
+              <div className="my-4 flex items-center gap-3">
+                <div className="h-px flex-1 bg-border" />
+                <span className="text-xs text-text-tertiary">{t('auth.loginPage.orEmail', 'or email')}</span>
+                <div className="h-px flex-1 bg-border" />
+              </div>
+            </>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input

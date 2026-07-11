@@ -10,6 +10,8 @@ import { JwtStrategy } from "./strategies/jwt.strategy";
 import { LocalStrategy } from "./strategies/local.strategy";
 import { GoogleStrategy } from "./strategies/google.strategy";
 import { FacebookStrategy } from "./strategies/facebook.strategy";
+import { AuthService as AuthServiceType } from "./auth.service";
+import { isFacebookConfigured, isGoogleConfigured } from "./oauth.util";
 import { User } from "../users/entities/user.entity";
 import { MetaAuthController } from "./meta-auth.controller";
 import { MetaOAuthService } from "./meta-oauth.service";
@@ -38,8 +40,25 @@ import { Workspace } from "../workspaces/entities/workspace.entity";
     AuthService,
     JwtStrategy,
     LocalStrategy,
-    GoogleStrategy,
-    FacebookStrategy,
+    // OAuth login strategies register with passport in their constructor. We
+    // instantiate them ONLY when their credentials are present — an unconfigured
+    // provider must not throw at construction and crash the whole API on boot.
+    {
+      provide: GoogleStrategy,
+      useFactory: (config: ConfigService, authService: AuthServiceType) =>
+        isGoogleConfigured(config)
+          ? new GoogleStrategy(config, authService)
+          : null,
+      inject: [ConfigService, AuthService],
+    },
+    {
+      provide: FacebookStrategy,
+      useFactory: (config: ConfigService, authService: AuthServiceType) =>
+        isFacebookConfigured(config)
+          ? new FacebookStrategy(config, authService)
+          : null,
+      inject: [ConfigService, AuthService],
+    },
     MetaOAuthService,
     MetaConnector,
   ],

@@ -153,6 +153,9 @@ export const auth = {
     apiClient.patch('/auth/me', body),
   googleUrl: () => `${API_BASE_URL}/auth/google`,
   facebookUrl: () => `${API_BASE_URL}/auth/facebook`,
+  /** Which social login providers are configured on the server (booleans only). */
+  providers: () =>
+    apiClient.get<{ google: boolean; facebook: boolean }>('/auth/providers'),
 }
 
 /** Workspace team: invites, members, roles (Nest `TeamInvitesController` @ `/team`) */

@@ -57,7 +57,14 @@ services:
         sync: false
 
       # ── Google OAuth (Sign-In) ─────────────────────────────────────────────
-      # callbackURL is auto-built from API_BASE_URL; no need to set separately
+      # The callback is auto-built as `${API_BASE_URL}/auth/google/callback`.
+      # In Google Cloud Console → APIs & Services → Credentials → your OAuth
+      # client → "Authorized redirect URIs", add EXACTLY that URL, e.g.
+      #   https://api.adspectr.com/auth/google/callback
+      # It must match API_BASE_URL above (or your real *.onrender.com domain).
+      # If it doesn't match, Google returns redirect_uri_mismatch and sign-in
+      # fails. Leave GOOGLE_CLIENT_ID/SECRET unset to hide the Google button
+      # entirely (the API stays up; the login page just omits it).
       - key: GOOGLE_CLIENT_ID
         sync: false
       - key: GOOGLE_CLIENT_SECRET

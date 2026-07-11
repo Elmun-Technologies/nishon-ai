@@ -83,6 +83,18 @@ PAYME_TEST_MODE=true   # sandbox uchun; prod'da false yoki olib tashlang
 > Payme merchant kabinetida webhook (endpoint) URL: `https://<api-domain>/billing/payme`.
 > Kalitlar qo'shilgach `/billing` sahifasidagi Payme tugmasi avtomatik real checkout'ga ulanadi — kod o'zgartirish shart emas.
 
+**Google orqali kirish (ixtiyoriy):**
+```
+GOOGLE_CLIENT_ID=<Google Cloud OAuth client ID>
+GOOGLE_CLIENT_SECRET=<Google Cloud OAuth client secret>
+```
+> Google Cloud Console → APIs & Services → Credentials → OAuth client →
+> **Authorized redirect URIs**'ga AYNAN quyidagini qo'shing:
+> `https://<api-domain>/auth/google/callback` (bu `API_BASE_URL` bilan mos bo'lishi shart).
+> Agar mos kelmasa, Google `redirect_uri_mismatch` beradi va kirish ishlamaydi.
+> Kalitlar berilmasa — API baribir ishlaydi, login sahifasida Google tugmasi
+> ko'rinmaydi (soxta tugma yo'q). Frontend `GET /auth/providers` orqali tekshiradi.
+
 **Render avtomatik (render.yaml'dan):**
 ```
 NODE_ENV=production
