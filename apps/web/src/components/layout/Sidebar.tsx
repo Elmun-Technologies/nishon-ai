@@ -164,6 +164,7 @@ const BOTTOM_NAV = [
   { href: '/settings/workspace', labelKey: 'navigation.workspace', fallback: 'Workspace', icon: Users },
   { href: '/team', labelKey: 'navigation.team', fallback: 'Team', icon: UserPlus },
   { href: '/billing', labelKey: 'navigation.billing', fallback: 'Billing', icon: CreditCard },
+  { href: '/settings/activation', labelKey: 'navigation.activation', fallback: 'Activation', icon: Zap },
   { href: '/settings', labelKey: 'navigation.settings', fallback: 'Settings', icon: Settings2 },
 ]
 

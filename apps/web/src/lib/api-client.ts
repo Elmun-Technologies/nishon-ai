@@ -825,6 +825,25 @@ export type TelegramChannel = {
   why: string
 }
 
+export type PlatformCapability = {
+  key: string
+  label: string
+  live: boolean
+  scope: 'server' | 'workspace'
+  hint: string
+  href?: string
+}
+
+/** Activation Center — which capabilities are live (booleans only, no keys). */
+export const platformStatus = {
+  capabilities: (workspaceId?: string) =>
+    apiClient.get<{ capabilities: PlatformCapability[] }>(
+      workspaceId
+        ? `/platform/capabilities?workspaceId=${encodeURIComponent(workspaceId)}`
+        : '/platform/capabilities',
+    ),
+}
+
 /** Telegram channel discovery (TGStat) — hyper-local placement candidates. */
 export const telegramChannels = {
   status: () =>
