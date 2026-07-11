@@ -368,6 +368,16 @@ export const heygen = {
     }>(`/heygen/photo-avatar/generation/${encodeURIComponent(generationId)}`),
 }
 
+/** Reve image generation (static image ads), proxied server-side via fal.ai. */
+export const reve = {
+  status: () => apiClient.get<{ configured: boolean }>('/reve/status'),
+  generateImageAd: (body: {
+    prompt: string
+    aspectRatio?: '1:1' | '4:5' | '9:16' | '16:9'
+    numImages?: number
+  }) => apiClient.post<{ images: string[]; seed: number | null }>('/reve/image-ads/generate', body),
+}
+
 export const campaigns = {
   list: (workspaceId: string) =>
     apiClient.get(`/campaigns/workspace/${workspaceId}`),

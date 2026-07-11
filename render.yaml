@@ -91,3 +91,10 @@ services:
       # ── Telegram (optional) ────────────────────────────────────────────────
       - key: TELEGRAM_BOT_TOKEN
         sync: false
+
+      # ── Image generation — Reve via fal.ai (optional) ──────────────────────
+      # fal.ai key with Reve access. Enables real static image-ad generation
+      # in Creative Hub → Image ads. Without it the feature reports
+      # "not configured" instead of generating.
+      - key: FAL_KEY
+        sync: false

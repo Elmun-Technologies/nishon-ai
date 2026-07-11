@@ -2,9 +2,10 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import { CheckCircle2, Link2, Sparkles } from 'lucide-react'
+import { CheckCircle2, Download, Link2, Sparkles } from 'lucide-react'
 import { ImageAdsBusyButton, ImageAdsShell } from '../_components/ImageAdsShell'
 import { useI18n } from '@/i18n/use-i18n'
+import { reve } from '@/lib/api-client'
 import { cn } from '@/lib/utils'
 
 function tryHost(url: string): string | null {
@@ -25,7 +26,52 @@ export default function ProductPageImageAdsPage() {
   const [instructions, setInstructions] = useState('')
   const [aspect, setAspect] = useState<'1:1' | '4:5' | '9:16'>('1:1')
   const [variations, setVariations] = useState(3)
-  const [comingSoon, setComingSoon] = useState(false)
+  const [generating, setGenerating] = useState(false)
+  const [results, setResults] = useState<string[]>([])
+  const [genError, setGenError] = useState('')
+
+  const handleGenerate = async () => {
+    const brief = instructions.trim()
+    if (!brief) {
+      setGenError(t('imageAdsPage.needBrief', 'Add a short brief before generating.'))
+      return
+    }
+    setGenerating(true)
+    setGenError('')
+    setResults([])
+    try {
+      const prompt = `${brief}\n\nProfessional, high-converting static advertisement image. Clean composition, the product as the clear focal point, strong lighting, ad-ready, no watermark.`
+      const res = await reve.generateImageAd({
+        prompt,
+        aspectRatio: aspect,
+        numImages: Math.min(4, Math.max(1, variations)),
+      })
+      const imgs = res.data?.images ?? []
+      if (imgs.length === 0) {
+        setGenError(t('imageAdsPage.genEmpty', 'No image was returned. Try again.'))
+      } else {
+        setResults(imgs)
+      }
+    } catch (err: any) {
+      const status = err?.response?.status
+      if (status === 503) {
+        setGenError(
+          t(
+            'imageAdsPage.genNotConfigured',
+            'Rasm generatsiyasi hali sozlanmagan (FAL_KEY). Administrator serverda kalitni qo\'shsin.',
+          ),
+        )
+      } else {
+        setGenError(
+          err?.response?.data?.message ||
+            err?.message ||
+            t('imageAdsPage.genFailed', 'Generation failed. Please try again.'),
+        )
+      }
+    } finally {
+      setGenerating(false)
+    }
+  }
 
   const runAnalyze = () => {
     const host = tryHost(productUrl)
@@ -152,7 +198,7 @@ export default function ProductPageImageAdsPage() {
             <input
               type="range"
               min={1}
-              max={8}
+              max={4}
               value={variations}
               onChange={(e) => setVariations(Number(e.target.value))}
               className="mt-2 w-full accent-brand-mid dark:accent-brand-lime"
@@ -174,17 +220,62 @@ export default function ProductPageImageAdsPage() {
             >
               {t('imageAdsPage.backToInput', 'Back to input')}
             </button>
-            <ImageAdsBusyButton onClick={() => setComingSoon(true)}>
-              {t('imageAdsPage.generate', 'Generate')}
+            <ImageAdsBusyButton busy={generating} onClick={handleGenerate}>
+              <Sparkles className="h-4 w-4" aria-hidden />
+              {generating
+                ? t('imageAdsPage.generating', 'Generating…')
+                : t('imageAdsPage.generate', 'Generate')}
             </ImageAdsBusyButton>
           </div>
-          {comingSoon && (
+
+          {genError && (
             <p className="mt-3 rounded-xl border border-amber-400/40 bg-amber-400/10 p-3 text-sm text-amber-700 dark:text-amber-300">
-              {t(
-                'imageAdsPage.generateComingSoon',
-                "AI rasm generatsiyasi tez orada ulanadi. Hozircha Creative Hub shablonlaridan tayyor kreativ tanlashingiz mumkin.",
-              )}
+              {genError}
             </p>
+          )}
+
+          {generating && (
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              {Array.from({ length: Math.min(4, Math.max(1, variations)) }).map((_, i) => (
+                <div
+                  key={i}
+                  className="aspect-square animate-pulse rounded-2xl border border-border/60 bg-surface-2/60"
+                />
+              ))}
+            </div>
+          )}
+
+          {results.length > 0 && (
+            <div className="mt-5">
+              <p className="mb-3 text-sm font-semibold text-text-primary">
+                {t('imageAdsPage.resultsTitle', 'Generated ads')}
+              </p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {results.map((url, i) => (
+                  <div
+                    key={url}
+                    className="group relative overflow-hidden rounded-2xl border border-border/70 bg-surface-2/40"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={url}
+                      alt={`${t('imageAdsPage.generate', 'Generate')} ${i + 1}`}
+                      className="h-full w-full object-cover"
+                    />
+                    <a
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      download
+                      className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-lg bg-black/60 px-2 py-1 text-xs font-medium text-white opacity-0 transition-opacity group-hover:opacity-100"
+                    >
+                      <Download className="h-3.5 w-3.5" aria-hidden />
+                      {t('imageAdsPage.download', 'Download')}
+                    </a>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
         </div>
       )}

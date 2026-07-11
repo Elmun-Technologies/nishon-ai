@@ -86,8 +86,8 @@ export default function ImageAdsHubPage() {
         <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" aria-hidden />
         <p className="text-sm text-text-secondary">
           {t(
-            'imageAdsPage.previewNotice',
-            "Preview — AI rasm generatsiyasi tayyorlanmoqda. Hozircha oqimlarni ko'rib chiqishingiz mumkin; tayyor kreativlar uchun Creative Hub shablonlaridan foydalaning.",
+            'imageAdsPage.previewNotice2',
+            "AI rasm generatsiyasi «Product page» metodida mavjud (Reve). Qolgan metodlar tez orada — hozircha ularni ko'rib chiqishingiz mumkin.",
           )}
         </p>
       </div>
