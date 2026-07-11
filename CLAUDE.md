@@ -60,10 +60,23 @@ tekshirilgan batch (har biri build+unit+e2e+i18n yashil, alohida commit+push):
 11. **Billing** — joriy plan localStorage'dan edi (real Payme upgrade ko'rinmasdi).
     Endi backend `user.plan` (/auth/me) manba; demo-pay soxta upgrade neytrallandi.
 
+**Kengaytirilgan sweep (ikkilamchi sahifalar, +7 batch):**
+12. **Reporting templates modal** — dead-end galereya → "namuna" belgisi.
+13. **Campaigns kartalari** — real Meta metrikalar (`externalId` bo'yicha
+    `/meta/audit` join): ROAS badge, spend, kengaytirilgan Spend/ROAS/CTR/Conv.
+14. **Dead stub route'lar** — `/retargeting/wizard`, `/retargeting/funnel`,
+    `/audiences/create` bo'sh `<h1>Page</h1>` edi (jonli CTA'lar shularга
+    ketardi) → real sahifalarga redirect. Reports soxta kampaniya filtri olindi.
+15. **My-portfolio visibility** — public profil privacy toggle'lari jim
+    tashlanardi (backend yo'q) → "hali faol emas" ogohlantirish.
+16. **Creative-hub image-ads** — 4 wizard no-op/placeholder'da tugardi, landing
+    "shipped" derdi → Preview banner, Generate "tez orada", "300+ aktyor"→"namuna".
+17. **Audiences studio** — o'lik tab bar + dekorativ search olib tashlandi.
+
 **Holat:** web build OK, web unit 118/118, e2e 39/39, i18n 2533×3. API o'zgармади.
 Backlog (kechiktirilgan): budget slider persist (backend endpoint kerak),
-reporting templates modal, campaigns kartalarida real metrikalar, F1 telegram
-link store DB'ga, F9 dead platforms Meta OAuth.
+F1 telegram link store DB'ga (multi-instance), F9 dead platforms Meta OAuth,
+image-ads real generatsiya, my-portfolio visibleMetrics backend.
 
 ### 2026-07-10 sessiyasi (2) — Agentic: real, boshqariladigan agent (PR #149)
 Startap va'dasi **Vaqt · Pul · Ishonch** — AI agent biznes reklamasini o'zi
