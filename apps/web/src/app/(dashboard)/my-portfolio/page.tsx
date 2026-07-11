@@ -580,9 +580,21 @@ export default function PortfolioDashboardPage() {
                   {t('portfolioSetup.visibilityTitle', 'Public visibility')}
                 </h2>
               </div>
-              <p className="mb-6 text-sm text-text-secondary">
+              <p className="mb-3 text-sm text-text-secondary">
                 {t('portfolioSetup.visibilitySubtitle', 'Choose which metrics appear on your public profile.')}
               </p>
+
+              <div className="mb-6 flex items-start gap-2 rounded-xl border border-amber-500/30 bg-amber-500/5 p-3">
+                <span className="text-base" aria-hidden>
+                  ⏳
+                </span>
+                <p className="text-xs text-amber-700 dark:text-amber-300">
+                  {t(
+                    'portfolioSetup.visibilityNotEnforced',
+                    "Tez orada — bu sozlama hozircha saqlanmaydi, barcha ko'rsatkichlar profilingizda ko'rinadi.",
+                  )}
+                </p>
+              </div>
 
               <div className="space-y-3">
                 {VISIBILITY_IDS.map((id) => (
