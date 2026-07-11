@@ -23,6 +23,7 @@ import {
 } from "@adspectr/ai-sdk";
 import type { AdSpectrAiClient } from "@adspectr/ai-sdk";
 import { FocusGroupDto } from "./dtos/focus-group.dto";
+import { CompareFocusGroupDto } from "./dtos/compare-focus-group.dto";
 import { PlanCampaignDto } from "./dtos/plan-campaign.dto";
 import { MetaConnector } from "../platforms/connectors/meta.connector";
 
@@ -1024,6 +1025,49 @@ ${creative}`;
         .map(String),
       winningPersona: winning ? winning.label : null,
     };
+  }
+
+  /**
+   * A/B pre-test — run two creatives through the same synthetic panel and pick a
+   * winner. Reuses runFocusGroup per variant (ownership + AI-config checks run
+   * there); the winner and lift are computed in code so they are verifiable.
+   */
+  async compareFocusGroup(
+    dto: CompareFocusGroupDto,
+    userId?: string,
+  ): Promise<{
+    a: Awaited<ReturnType<AiAgentService["runFocusGroup"]>>;
+    b: Awaited<ReturnType<AiAgentService["runFocusGroup"]>>;
+    winner: "A" | "B" | "tie";
+    liftPct: number;
+    recommendation: string;
+  }> {
+    const base = {
+      workspaceId: dto.workspaceId,
+      platform: dto.platform,
+      goal: dto.goal,
+    };
+    const [a, b] = await Promise.all([
+      this.runFocusGroup({ ...base, ...dto.variantA } as FocusGroupDto, userId),
+      this.runFocusGroup({ ...base, ...dto.variantB } as FocusGroupDto, userId),
+    ]);
+
+    const av = a.avgClickProbability;
+    const bv = b.avgClickProbability;
+    const winner: "A" | "B" | "tie" =
+      Math.abs(av - bv) < 0.02 ? "tie" : av > bv ? "A" : "B";
+    // Relative lift of the winner over the loser (guard divide-by-zero).
+    const hiV = Math.max(av, bv);
+    const loV = Math.min(av, bv);
+    const liftPct =
+      winner === "tie" || loV <= 0 ? 0 : Math.round(((hiV - loV) / loV) * 100);
+
+    const recommendation =
+      winner === "tie"
+        ? "Ikkala variant deyarli teng — kreativni yanada farqlantiring yoki uchinchi variantni sinang."
+        : `Variant ${winner} g'olib — o'rtacha qiziqish ${liftPct}% yuqori. Shu variantdan boshlang.`;
+
+    return { a, b, winner, liftPct, recommendation };
   }
 
   /**

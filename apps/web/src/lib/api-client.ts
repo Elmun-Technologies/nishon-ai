@@ -259,6 +259,22 @@ export const mcpCredentials = {
   health: () => apiClient.get<{ status: string; tools: number }>('/mcp/health'),
 }
 
+export type FocusGroupResult = {
+  personas: Array<{
+    label: string
+    clickProbability: number
+    emotion: string
+    objection: string
+    whatWouldMakeMeClick: string
+  }>
+  avgClickProbability: number
+  predictedCtrRange: string
+  verdict: 'ready' | 'needs_work' | 'not_ready'
+  topObjections: string[]
+  topImprovements: string[]
+  winningPersona: string | null
+}
+
 export const aiAgent = {
   generateStrategy: (workspaceId: string) =>
     apiClient.post(`/ai-agent/workspaces/${workspaceId}/strategy`),
@@ -317,6 +333,21 @@ export const aiAgent = {
       topImprovements: string[]
       winningPersona: string | null
     }>('/ai-agent/focus-group', data),
+  /** A/B pre-test two creatives; returns per-variant panels + winner + lift. */
+  focusGroupCompare: (data: {
+    workspaceId: string
+    variantA: { adCopy?: string; headline?: string; cta?: string }
+    variantB: { adCopy?: string; headline?: string; cta?: string }
+    platform?: string
+    goal?: string
+  }) =>
+    apiClient.post<{
+      a: FocusGroupResult
+      b: FocusGroupResult
+      winner: 'A' | 'B' | 'tie'
+      liftPct: number
+      recommendation: string
+    }>('/ai-agent/focus-group/compare', data),
   /** Chat-first launch: brief (+ optional image) → editable Meta proposal. */
   planCampaign: (data: {
     workspaceId: string

@@ -27,6 +27,7 @@ import { Spinner } from '@/components/ui/Spinner'
 import apiClient from '@/lib/api-client'
 import { cn } from '@/lib/utils'
 import { FocusGroupTester } from '@/components/creative/FocusGroupTester'
+import { FocusGroupCompare } from '@/components/creative/FocusGroupCompare'
 
 // ─── TYPES ───────────────────────────────────────────────────────────────────
 
@@ -772,6 +773,7 @@ export default function CreativeScorerPage() {
       </div>
 
       <FocusGroupTester />
+      <FocusGroupCompare />
     </div>
   )
 }

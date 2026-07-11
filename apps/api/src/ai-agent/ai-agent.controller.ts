@@ -25,6 +25,7 @@ import {
   CampaignPipelineInput,
 } from "./campaign-orchestrator.service";
 import { FocusGroupDto } from "./dtos/focus-group.dto";
+import { CompareFocusGroupDto } from "./dtos/compare-focus-group.dto";
 import { PlanCampaignDto } from "./dtos/plan-campaign.dto";
 
 @ApiTags("AI Agent")
@@ -141,6 +142,22 @@ export class AiAgentController {
   })
   async focusGroup(@Body() dto: FocusGroupDto, @Req() req: Request) {
     return this.aiAgentService.runFocusGroup(
+      dto,
+      (req.user as { id: string }).id,
+    );
+  }
+
+  @Post("focus-group/compare")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary:
+      "A/B pre-test two creatives with the synthetic panel; pick a winner",
+  })
+  async compareFocusGroup(
+    @Body() dto: CompareFocusGroupDto,
+    @Req() req: Request,
+  ) {
+    return this.aiAgentService.compareFocusGroup(
       dto,
       (req.user as { id: string }).id,
     );
