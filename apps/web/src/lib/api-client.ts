@@ -810,6 +810,38 @@ export const launchOrchestrator = {
     apiClient.get<LaunchJob[]>(`/launch-orchestrator/workspaces/${workspaceId}`),
 }
 
+export type TelegramChannel = {
+  id: string
+  username: string | null
+  title: string
+  link: string | null
+  category: string | null
+  country: string | null
+  subscribers: number
+  avgPostReach: number | null
+  err: number | null
+  estPricePerPostUsd: number | null
+  fitScore: number
+  why: string
+}
+
+/** Telegram channel discovery (TGStat) — hyper-local placement candidates. */
+export const telegramChannels = {
+  status: () =>
+    apiClient.get<{ configured: boolean }>('/telegram-channels/status'),
+  recommend: (data: {
+    workspaceId?: string
+    niche: string
+    country?: string
+    category?: string
+    monthlyBudgetUsd?: number
+  }) =>
+    apiClient.post<{ channels: TelegramChannel[]; aiAnnotated: boolean }>(
+      '/telegram-channels/recommend',
+      data,
+    ),
+}
+
 /** CRM click → Redis `retarget:{phone}` + 7 kunlik Bull job (post-purchase) */
 export const retargetBridge = {
   signals: () => apiClient.get<RetargetSignalsResponse>('/api/retarget/signals'),

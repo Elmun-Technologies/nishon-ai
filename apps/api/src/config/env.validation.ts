@@ -14,6 +14,7 @@ const WARN_ENV_VARS = [
   "META_CALLBACK_URL",
   "HEYGEN_API_KEY",
   "FAL_KEY",
+  "TGSTAT_API_KEY",
 ] as const;
 
 export function validateEnv(config: EnvRecord): EnvRecord {

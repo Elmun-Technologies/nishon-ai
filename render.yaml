@@ -98,3 +98,10 @@ services:
       # "not configured" instead of generating.
       - key: FAL_KEY
         sync: false
+
+      # ── Telegram channel discovery — TGStat (optional) ─────────────────────
+      # TGStat API key. Enables the Telegram channel ad agent (discover + rank
+      # channels for hyper-local placement). Without it the feature reports
+      # "not configured" instead of returning channels.
+      - key: TGSTAT_API_KEY
+        sync: false

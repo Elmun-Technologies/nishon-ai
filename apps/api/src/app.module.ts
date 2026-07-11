@@ -27,6 +27,7 @@ import { IntegrationsModule } from "./integrations/integrations.module";
 import { McpModule } from "./mcp/mcp.module";
 import { HeygenModule } from "./heygen/heygen.module";
 import { ReveModule } from "./reve/reve.module";
+import { TelegramChannelsModule } from "./telegram-channels/telegram-channels.module";
 import { RetargetSignalModule } from "./retarget-signal/retarget-signal.module";
 import { validateEnv } from "./config/env.validation";
 import { HealthController } from "./health/health.controller";
@@ -101,6 +102,7 @@ import { RequestLoggingInterceptor } from "./common/interceptors/request-logging
     McpModule,
     HeygenModule,
     ReveModule,
+    TelegramChannelsModule,
   ],
   controllers: [HealthController],
   providers: [

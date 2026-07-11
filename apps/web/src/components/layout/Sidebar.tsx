@@ -45,6 +45,7 @@ import {
   CreditCard,
   UserPlus,
   Star,
+  Send,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -81,6 +82,7 @@ const CATEGORIES: Array<{
       { href: '/campaigns', labelKey: 'navigation.campaigns', fallback: 'Campaigns', icon: Zap },
       { href: '/audiences', labelKey: 'navigation.audiences', fallback: 'Audiences', icon: Users },
       { href: '/ad-launcher', labelKey: 'navigation.adLauncher', fallback: 'Ad Launcher', icon: Clapperboard },
+      { href: '/telegram-channels', labelKey: 'navigation.telegramChannels', fallback: 'Telegram Channels', icon: Send },
     ],
   },
   {
