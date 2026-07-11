@@ -4,6 +4,10 @@ const path = require('path')
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  // Self-host (Docker/Contabo): emit a standalone server bundle
+  // (.next/standalone/apps/web/server.js). Harmless on Vercel, which uses its
+  // own output. Pairs with outputFileTracingRoot so workspace packages resolve.
+  output: 'standalone',
   experimental: {
     externalDir: true,
     /** Monorepo: trace server bundles from repo root so workspace packages resolve on Vercel. */

@@ -1,0 +1,32 @@
+# ── Nishon AI — API image (self-host / Contabo) ──────────────────────────────
+# Monorepo-aware: builds from the REPO ROOT context so the pnpm workspace
+# packages (@adspectr/shared, @adspectr/ai-sdk) the API imports are available.
+# Build:  docker build -f Dockerfile.api -t nishon-api .
+FROM node:20-alpine AS base
+WORKDIR /app
+RUN apk add --no-cache libc6-compat && corepack enable && corepack prepare pnpm@8.15.5 --activate
+
+# ── build: install the whole workspace (frozen) and compile shared → api ─────
+FROM base AS build
+# Full repo (see .dockerignore — node_modules/.next/dist are excluded). Copying
+# everything avoids frozen-lockfile workspace-member mismatches.
+COPY . .
+RUN pnpm install --frozen-lockfile
+# The api build script chains the shared + ai-sdk package builds first.
+RUN pnpm --filter api build
+
+# ── runtime: prod deps + compiled dist, run migrations then boot ─────────────
+FROM base AS production
+ENV NODE_ENV=production
+ENV PORT=3001
+COPY . .
+RUN pnpm install --frozen-lockfile --prod
+# Compiled JS for the workspace packages + the API (built in the previous stage).
+COPY --from=build /app/packages/shared/dist ./packages/shared/dist
+COPY --from=build /app/packages/ai-sdk/dist ./packages/ai-sdk/dist
+COPY --from=build /app/apps/api/dist ./apps/api/dist
+
+WORKDIR /app/apps/api
+EXPOSE 3001
+# Runs `typeorm migration:run` against the prod DB, then starts Nest.
+CMD ["pnpm", "run", "start:prod:with-migrations"]

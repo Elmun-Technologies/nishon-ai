@@ -1,0 +1,17 @@
+# Nishon AI — reverse proxy with automatic HTTPS (Let's Encrypt).
+# {$DOMAIN} and {$ACME_EMAIL} come from the compose environment.
+{
+	email {$ACME_EMAIL}
+}
+
+# Frontend (Next.js)
+{$DOMAIN} {
+	encode zstd gzip
+	reverse_proxy web:3000
+}
+
+# API (NestJS) on the api.<domain> subdomain
+api.{$DOMAIN} {
+	encode zstd gzip
+	reverse_proxy api:3001
+}

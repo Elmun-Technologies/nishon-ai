@@ -1,0 +1,117 @@
+# ── Nishon AI — self-host stack (Contabo / any VPS) ──────────────────────────
+# One command:  docker compose -f docker-compose.contabo.yml up -d --build
+# Reads secrets from a sibling .env (see .env.contabo.example). Caddy terminates
+# TLS with automatic Let's Encrypt certificates.
+services:
+  postgres:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-nishon}
+      POSTGRES_USER: ${POSTGRES_USER:-nishon}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-nishon} -d ${POSTGRES_DB:-nishon}"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks: [nishon]
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    networks: [nishon]
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    restart: always
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      # ── URLs ──────────────────────────────────────────────────────────────
+      API_BASE_URL: https://api.${DOMAIN}
+      FRONTEND_URL: https://${DOMAIN}
+      # ── Datastores (in-cluster) ───────────────────────────────────────────
+      DATABASE_URL: postgresql://${POSTGRES_USER:-nishon}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-nishon}
+      REDIS_URL: redis://redis:6379
+      # ── Auth ──────────────────────────────────────────────────────────────
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?set JWT_REFRESH_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-15m}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-7d}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:?set ENCRYPTION_KEY (32 chars)}
+      # ── AI provider ───────────────────────────────────────────────────────
+      AI_PROVIDER: ${AI_PROVIDER:-openai}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      # ── Meta (core MVP) ───────────────────────────────────────────────────
+      META_APP_ID: ${META_APP_ID:-}
+      META_APP_SECRET: ${META_APP_SECRET:-}
+      META_CALLBACK_URL: https://api.${DOMAIN}/meta/callback
+      # ── Optional activations (blank = "not configured", honest 503) ───────
+      FAL_KEY: ${FAL_KEY:-}
+      TGSTAT_API_KEY: ${TGSTAT_API_KEY:-}
+      HEYGEN_API_KEY: ${HEYGEN_API_KEY:-}
+      HIGGSFIELD_API_KEY: ${HIGGSFIELD_API_KEY:-}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_ADMIN_CHAT_ID: ${TELEGRAM_ADMIN_CHAT_ID:-}
+      PAYME_MERCHANT_ID: ${PAYME_MERCHANT_ID:-}
+      PAYME_MERCHANT_KEY: ${PAYME_MERCHANT_KEY:-}
+      PAYME_TEST_MODE: ${PAYME_TEST_MODE:-}
+      # ── Social login (optional; blank hides the buttons) ──────────────────
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      GOOGLE_CALLBACK_URL: https://api.${DOMAIN}/auth/google/callback
+    networks: [nishon]
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+      args:
+        # Baked in at build time — rebuild web if the API domain changes.
+        NEXT_PUBLIC_API_BASE_URL: https://api.${DOMAIN}
+    restart: always
+    depends_on: [api]
+    networks: [nishon]
+
+  caddy:
+    image: caddy:2-alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on: [api, web]
+    networks: [nishon]
+
+volumes:
+  postgres_data:
+  redis_data:
+  caddy_data:
+  caddy_config:
+
+networks:
+  nishon:
+    driver: bridge

@@ -1,0 +1,33 @@
+# ── Nishon AI — Web image (self-host / Contabo) ──────────────────────────────
+# Monorepo-aware Next.js standalone build. NEXT_PUBLIC_* are inlined at BUILD
+# time, so the API base URL is a build ARG (not just a runtime env).
+# Build:  docker build -f Dockerfile.web --build-arg NEXT_PUBLIC_API_BASE_URL=https://api.example.com -t nishon-web .
+FROM node:20-alpine AS base
+WORKDIR /app
+RUN apk add --no-cache libc6-compat && corepack enable && corepack prepare pnpm@8.15.5 --activate
+
+# ── build: full workspace install, then build web (standalone output) ────────
+FROM base AS build
+ARG NEXT_PUBLIC_API_BASE_URL
+ENV NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
+ENV NEXT_TELEMETRY_DISABLED=1
+# Full repo (see .dockerignore). Copying everything avoids frozen-lockfile
+# workspace-member mismatches; Next transpiles the workspace packages it uses.
+COPY . .
+RUN pnpm install --frozen-lockfile
+RUN pnpm --filter web build
+
+# ── runtime: Next standalone server (minimal, self-contained) ────────────────
+FROM base AS production
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nextjs
+# outputFileTracingRoot=repo root → standalone at apps/web/.next/standalone with
+# a traced node_modules + workspace packages already inside.
+COPY --from=build --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
+COPY --from=build --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=build --chown=nextjs:nodejs /app/apps/web/public ./apps/web/public
+USER nextjs
+EXPOSE 3000
+CMD ["node", "apps/web/server.js"]

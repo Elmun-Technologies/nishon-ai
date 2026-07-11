@@ -1,0 +1,15 @@
+# Keep build context small + reproducible for the Contabo/self-host images.
+**/node_modules
+**/.next
+**/dist
+**/.turbo
+**/coverage
+**/.git
+**/.env
+**/.env.*
+!**/.env.example
+**/*.log
+**/.DS_Store
+**/playwright-report
+**/test-results
+ssl
