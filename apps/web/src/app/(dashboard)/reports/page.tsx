@@ -131,10 +131,10 @@ export default function ReportsBuilderPage() {
     loadTemplate(cfg.template)
   }
 
+  // The report builder is a preview surface (widgets show sample data), so the
+  // campaign filter lists only "all" rather than fabricated campaign names.
   const campaignOptions = useMemo(() => [
     { id: 'all' as const, label: '📊 Barcha kampaniyalar' },
-    { id: 'c1', label: 'Summer / Meta' },
-    { id: 'c2', label: 'Retargeting 30d' },
   ], [])
 
   async function handleShareLink() {
