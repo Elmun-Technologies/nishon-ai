@@ -30,6 +30,27 @@ pnpm --filter api dev   # Faqat backend
 **Asosiy branch:** `main`
 **Faol branch:** `claude/loyihani-mvp-readiness-xv4anj` — Agentic platforma (Vaqt · Pul · Ishonch)
 
+### 2026-07-11 sessiyasi (2) — Activation Center + credential checklist (Ishonch)
+Ta'sischi: "davom et; men tarafdan kerak narsalarni yig, oxirida aytasan, man
+ulab beraman". Ikki natija:
+- **Faollashtirish markazi** (`/settings/activation`) — bitta joydan qaysi
+  imkoniyat yoqilgan (Live) yoki kalit kutayotganini ko'rsatadi. Yangi
+  `platform-status/` modul: `GET /platform/capabilities` (JWT) — har feature'ning
+  **o'z** signalidan foydalanadi (`isAiClientConfigured`, Reve/TgStat
+  `isConfigured()`, Payme/Telegram-bot/HeyGen/Higgsfield env; Meta = server app
+  creds + egalik-tekshirilgan active connected account). Faqat **boolean**, kalit
+  qiymati hech qachon ochilmaydi; soxta "connected" yo'q. 6 spec. Sidebar
+  bottom-nav "Faollashtirish" + i18n (uz/ru/en). Karta yoqilgach avtomatik "Live".
+- **Kerakli kalitlar ro'yxati** — DEPLOY.md + render.yaml asosida to'liq inventar
+  ta'sischiga taqdim etildi (majburiy: DB/Redis/JWT×2/ENCRYPTION_KEY/AI kaliti;
+  MVP yadrosi: META_APP_ID/SECRET/CALLBACK; ixtiyoriy faollashtirishlar:
+  TGSTAT_API_KEY, FAL_KEY, PAYME_*, TELEGRAM_BOT_TOKEN, HEYGEN/HIGGSFIELD,
+  Google/TikTok/Yandex; front: NEXT_PUBLIC_API_BASE_URL). Uch yangi feature uchun
+  yagona yangi kalit = **TGSTAT_API_KEY**.
+
+**Holat:** API **337/337** + lint + build, web build + unit **118/118** + e2e
+**39/39** + tsc + i18n **2535×3**. Yangi migration yo'q.
+
 ### 2026-07-11 sessiyasi — "White-Space" dasturi (Green Zone)
 Ta'sischi bozor tahlili "oq nuqtalar"ni aniqladi: global (Madgicx, Revealbot) va
 mahalliy o'yinchilar qoldirgan bo'shliqlar. **Green Zone** (100% qonuniy,
