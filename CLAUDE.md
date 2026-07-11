@@ -81,11 +81,25 @@ tekshirilgan batch (har biri build+unit+e2e+i18n yashil, alohida commit+push):
     in-memory single-instance uchun tegilmaydi (regressiya yo'q). 6 controller
     spec. Migration yo'q (Redis).
 
+**Yakuniy honesty batch (audit 5 — wizard/settings/marketplace, +4 batch):**
+19. **Marketplace public** — main/portfolio/[slug]/leaderboard hammasi mock
+    mutaxassislar (soxta reyting/ROAS/reviews) belgisiz edi → shared
+    `MarketplacePreviewBanner` ("namuna"). Backend real /agents bor lekin web
+    TargetologistProfile boy mock-shakl → to'liq wiring katta feature.
+20. **Wizard connection status (P0)** — PLATFORMS google+meta `connected:true`
+    har userga → yangi user "Ready to use" ko'rardi. Endi `false` (flag kosmetik,
+    selection bloklamaydi). Campaigns bo'sh-holat "Create Campaign" → real `/launch`.
+21. **Products sahifasi** — soxta $2500 spend limit, "Trial" badge, bugungi sana
+    billing period → real spend (cap'siz), badge olib tashlandi, sana "—".
+22. **Settings notifications** — email/weekly/AI toggle'lar saqlanmasdi → "tez
+    orada" izoh. **platform-architecture** ichki blueprint → `/docs` redirect.
+
 **Holat:** web build OK, web unit 118/118, e2e 39/39, i18n 2533×3, API **311/311**.
 Backlog (kechiktirilgan — past qiymat yoki verify qilib bo'lmaydi):
 budget slider persist (runtime consumer yo'q → past qiymat), F9 dead platforms
 Meta OAuth (past qiymat/test xavfi), image-ads real generatsiya (Fal.ai kalit
-kerak), my-portfolio visibleMetrics backend (public-profil enforcement feature).
+kerak), marketplace real-wiring + my-portfolio visibleMetrics (katta feature'lar),
+docs unshipped-feature trim + real support kanali.
 
 ### 2026-07-10 sessiyasi (2) — Agentic: real, boshqariladigan agent (PR #149)
 Startap va'dasi **Vaqt · Pul · Ishonch** — AI agent biznes reklamasini o'zi
