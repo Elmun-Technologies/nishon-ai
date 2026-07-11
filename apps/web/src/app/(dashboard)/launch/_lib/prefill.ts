@@ -12,6 +12,7 @@ export const INITIAL_META_DATA: MetaData = {
   creativeName: '',
   creativeUrl: '',
   creativeText: '',
+  imageUrl: '',
   ctaButton: 'learn_more',
   pageId: '',
   abTestEnabled: false,

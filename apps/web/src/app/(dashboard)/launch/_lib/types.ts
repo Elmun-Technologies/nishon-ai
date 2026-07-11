@@ -36,6 +36,8 @@ export interface MetaData {
   creativeName: string
   creativeUrl: string
   creativeText: string
+  /** Public image URL (Reve-generated) → Meta creative picture. Empty = text-only. */
+  imageUrl: string
   ctaButton: MetaCtaButton | string
   /** Selected Facebook Page id — required for new ad creative. */
   pageId: string

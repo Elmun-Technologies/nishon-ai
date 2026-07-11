@@ -6,7 +6,7 @@ import { AlertCircle, ExternalLink, Facebook, Sparkles } from 'lucide-react'
 import { Input, Textarea } from '@/components/ui'
 import { WizardStepCard } from '@/components/launch/wizard-shell'
 import { useI18n } from '@/i18n/use-i18n'
-import { aiAgent, platforms } from '@/lib/api-client'
+import { aiAgent, platforms, reve } from '@/lib/api-client'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { cn } from '@/lib/utils'
 import type { LaunchWizardCtl } from '../../_lib/use-launch-wizard'
@@ -22,6 +22,44 @@ export function CreativeStep({ ctl }: { ctl: LaunchWizardCtl }) {
   const [pagesError, setPagesError] = useState('')
   const [copyLoading, setCopyLoading] = useState(false)
   const [copyError, setCopyError] = useState('')
+  const [imgLoading, setImgLoading] = useState(false)
+  const [imgError, setImgError] = useState('')
+
+  /**
+   * Generate an ad image with Reve → attach it to the Meta creative as
+   * link_data.picture. The fal.ai URL is public, so it flows straight into the
+   * launch. Honest 503 when FAL_KEY is unset (launch still works, imageless).
+   */
+  const handleGenerateImage = async () => {
+    setImgLoading(true)
+    setImgError('')
+    try {
+      const prompt = [ctl.metaData.creativeText, ctl.metaData.name]
+        .map((s) => s?.trim())
+        .filter(Boolean)
+        .join('. ')
+        .slice(0, 500)
+      const res = await reve.generateImageAd({
+        prompt: prompt || 'Product advertisement, clean studio background',
+        aspectRatio: '1:1',
+        numImages: 1,
+      })
+      const url = res.data.images?.[0]
+      if (!url) {
+        setImgError('Rasm qaytmadi — qayta urinib ko\'ring.')
+        return
+      }
+      ctl.setMetaData((d) => ({ ...d, imageUrl: url }))
+    } catch (err: any) {
+      setImgError(
+        err?.response?.status === 503
+          ? 'Rasm generatsiyasi sozlanmagan (FAL_KEY yo\'q) — matnli reklama bilan davom etishingiz mumkin.'
+          : err?.response?.data?.message || err?.message || 'Rasm yaratilmadi.',
+      )
+    } finally {
+      setImgLoading(false)
+    }
+  }
 
   /**
    * Let the agent write the ad copy — one click instead of a blank textarea.
@@ -261,12 +299,65 @@ export function CreativeStep({ ctl }: { ctl: LaunchWizardCtl }) {
           </select>
         </div>
 
+        {/* AI ad image (Reve) → Meta creative picture */}
+        <div className="space-y-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <label className="block text-sm font-medium text-text-secondary">
+              {lt('meta.creativeImage', 'Reklama rasmi')}
+            </label>
+            <button
+              type="button"
+              onClick={handleGenerateImage}
+              disabled={imgLoading}
+              className={cn(
+                'inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition-colors',
+                'border-brand-mid/30 bg-brand-mid/[0.06] text-brand-mid hover:bg-brand-mid/12',
+                'disabled:cursor-not-allowed disabled:opacity-60',
+                'dark:border-brand-lime/30 dark:bg-brand-lime/[0.06] dark:text-brand-lime',
+              )}
+            >
+              <Sparkles className={cn('h-3.5 w-3.5', imgLoading && 'animate-pulse')} aria-hidden />
+              {imgLoading
+                ? 'Chizilmoqda…'
+                : ctl.metaData.imageUrl
+                  ? 'Boshqa rasm'
+                  : 'AI rasm yaratib bersin'}
+            </button>
+          </div>
+          {ctl.metaData.imageUrl && (
+            <div className="flex items-start gap-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={ctl.metaData.imageUrl}
+                alt="Reklama rasmi"
+                className="h-20 w-20 rounded-lg border border-border object-cover"
+              />
+              <button
+                type="button"
+                onClick={() => ctl.setMetaData((d) => ({ ...d, imageUrl: '' }))}
+                className="text-xs text-text-tertiary hover:text-rose-500"
+              >
+                Olib tashlash
+              </button>
+            </div>
+          )}
+          {imgError && <p className="text-xs text-amber-600 dark:text-amber-400">{imgError}</p>}
+        </div>
+
         {ctl.metaData.creativeText && (
           <div className="rounded-xl border border-border bg-surface-2/40 p-4 dark:bg-surface-elevated/30">
             <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-tertiary">
               Ko&apos;rinish (taxminiy)
             </p>
             <div className="rounded-lg border border-border bg-surface p-3 shadow-sm">
+              {ctl.metaData.imageUrl && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={ctl.metaData.imageUrl}
+                  alt=""
+                  className="mb-2 aspect-square w-full max-w-[220px] rounded-md border border-border object-cover"
+                />
+              )}
               <p className="line-clamp-3 text-sm text-text-primary">{ctl.metaData.creativeText}</p>
               <button
                 type="button"

@@ -216,6 +216,7 @@ export function useLaunchWizard() {
         message: metaData.creativeText || nameTrim,
         linkUrl: metaData.creativeUrl.trim(),
         callToActionType: ctaMap[metaData.ctaButton] ?? 'LEARN_MORE',
+        imageUrl: metaData.imageUrl.trim() || undefined,
       }
     }
 

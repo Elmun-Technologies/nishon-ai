@@ -1118,6 +1118,7 @@
       "creativeSubtitle": "Primary asset and copy for this campaign.",
       "creativeUrl": "Image or video URL",
       "creativeText": "Primary text",
+      "creativeImage": "Ad image",
       "ctaLabel": "Call to action",
       "cta_learn_more": "Learn more",
       "cta_contact": "Contact us",
