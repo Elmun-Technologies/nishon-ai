@@ -23,6 +23,7 @@ import {
 } from "@adspectr/ai-sdk";
 import type { AdSpectrAiClient } from "@adspectr/ai-sdk";
 import { FocusGroupDto } from "./dtos/focus-group.dto";
+import { PlanCampaignDto } from "./dtos/plan-campaign.dto";
 import { MetaConnector } from "../platforms/connectors/meta.connector";
 
 /**
@@ -1046,6 +1047,135 @@ ${creative}`;
     // Always include a price-sensitive sceptic — the toughest audience.
     seeds.push("Narxga sezgir, reklamaga ishonchsiz tejamkor xaridor");
     return seeds.slice(0, 6);
+  }
+
+  /**
+   * Chat-first "no-dashboard" launch: turn a free-text brief into a structured
+   * Meta campaign proposal (objective / geo / age / budget / ad copy), seeded by
+   * the workspace's onboarding defaults. Returns a PROPOSAL only — the user
+   * reviews/edits it and confirms through the real launch-orchestrator, which
+   * keeps this 100% Green Zone (official API, nothing auto-launched here).
+   */
+  async planCampaignFromBrief(dto: PlanCampaignDto): Promise<{
+    name: string;
+    objective: string;
+    countries: string[];
+    ageMin: number;
+    ageMax: number;
+    dailyBudgetUsd: number;
+    headline: string;
+    primaryText: string;
+    cta: string;
+    rationale: string;
+  }> {
+    if (!isAiClientConfigured((k) => this.config.get<string>(k))) {
+      throw new ServiceUnavailableException(
+        "AI is not configured. Set the AI provider key on the API server.",
+      );
+    }
+
+    const ws = dto.workspaceId
+      ? await this.workspaceRepo.findOne({ where: { id: dto.workspaceId } })
+      : null;
+    const ld = ((ws?.aiStrategy as any)?.launchDefaults ?? {}) as {
+      objective?: string;
+      geos?: string[];
+      ageMin?: number;
+      ageMax?: number;
+      dailyBudgetUsd?: number;
+    };
+    const OBJECTIVES = [
+      "awareness",
+      "traffic",
+      "engagement",
+      "leads",
+      "app_promotion",
+      "sales",
+    ];
+
+    const systemPrompt = `You are a media buyer. Turn a business owner's free-text brief into a Meta (Facebook/Instagram) ad campaign plan.
+Respond with VALID JSON ONLY:
+{
+  "name": "<short campaign name>",
+  "objective": "one of: awareness | traffic | engagement | leads | app_promotion | sales",
+  "countries": ["UZ"],
+  "ageMin": 18,
+  "ageMax": 45,
+  "dailyBudgetUsd": 10,
+  "headline": "<ad headline>",
+  "primaryText": "<primary ad text>",
+  "cta": "one of: LEARN_MORE | SHOP_NOW | SIGN_UP | CONTACT_US | GET_OFFER",
+  "rationale": "<one short sentence explaining the plan>"
+}
+Rules:
+- Use the provided DEFAULTS when the brief does not specify geo / age / budget.
+- countries are ISO-2 codes (UZ, KZ, RU, ...).
+- Write name / headline / primaryText / rationale in the SAME language as the brief (Uzbek or Russian).`;
+
+    const userMessage = `Business: ${ws?.name ?? "Unknown"} — ${ws?.industry ?? "general"}
+DEFAULTS (from onboarding): objective=${ld.objective ?? "leads"}, geos=${(ld.geos ?? ["UZ"]).join(",")}, age=${ld.ageMin ?? 18}-${ld.ageMax ?? 45}, dailyBudgetUsd=${ld.dailyBudgetUsd ?? 10}
+${dto.imageBase64 ? "(A product image is attached.)\n" : ""}Owner's brief:
+${dto.brief}`;
+
+    const raw = dto.imageBase64
+      ? await this.aiClient.completeVision<any>(
+          dto.imageBase64,
+          dto.mimeType ?? "image/jpeg",
+          userMessage,
+          systemPrompt,
+          { taskType: "vision", agentName: "ChatLaunch" },
+        )
+      : await this.aiClient.completeJson<any>(userMessage, systemPrompt, {
+          taskType: "strategy",
+          agentName: "ChatLaunch",
+        });
+
+    // ── Code-side normalisation (never trust the model blindly) ───────────────
+    const objective = OBJECTIVES.includes(String(raw?.objective))
+      ? String(raw.objective)
+      : (ld.objective ?? "leads");
+    const countries =
+      Array.isArray(raw?.countries) && raw.countries.length
+        ? raw.countries.map((c: any) => String(c).toUpperCase().slice(0, 2))
+        : (ld.geos ?? ["UZ"]);
+    const clampAge = (n: any, def: number) => {
+      const v = Math.round(Number(n));
+      return Number.isFinite(v) ? Math.min(65, Math.max(13, v)) : def;
+    };
+    let ageMin = clampAge(raw?.ageMin, ld.ageMin ?? 18);
+    let ageMax = clampAge(raw?.ageMax, ld.ageMax ?? 45);
+    if (ageMin >= ageMax) {
+      ageMin = ld.ageMin ?? 18;
+      ageMax = ld.ageMax ?? 45;
+    }
+    const budget = Number(raw?.dailyBudgetUsd);
+    const dailyBudgetUsd =
+      Number.isFinite(budget) && budget >= 1
+        ? Math.round(budget)
+        : (ld.dailyBudgetUsd ?? 10);
+    const CTAS = [
+      "LEARN_MORE",
+      "SHOP_NOW",
+      "SIGN_UP",
+      "CONTACT_US",
+      "GET_OFFER",
+    ];
+    const cta = CTAS.includes(String(raw?.cta))
+      ? String(raw.cta)
+      : "LEARN_MORE";
+
+    return {
+      name: String(raw?.name ?? "Yangi kampaniya").slice(0, 120),
+      objective,
+      countries,
+      ageMin,
+      ageMax,
+      dailyBudgetUsd,
+      headline: String(raw?.headline ?? "").slice(0, 300),
+      primaryText: String(raw?.primaryText ?? "").slice(0, 2000),
+      cta,
+      rationale: String(raw?.rationale ?? "").slice(0, 300),
+    };
   }
 
   /**

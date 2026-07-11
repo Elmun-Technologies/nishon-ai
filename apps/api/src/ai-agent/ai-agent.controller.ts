@@ -25,6 +25,7 @@ import {
   CampaignPipelineInput,
 } from "./campaign-orchestrator.service";
 import { FocusGroupDto } from "./dtos/focus-group.dto";
+import { PlanCampaignDto } from "./dtos/plan-campaign.dto";
 
 @ApiTags("AI Agent")
 @Controller("ai-agent")
@@ -140,6 +141,16 @@ export class AiAgentController {
   })
   async focusGroup(@Body() dto: FocusGroupDto) {
     return this.aiAgentService.runFocusGroup(dto);
+  }
+
+  @Post("plan-campaign")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary:
+      "Chat-first launch — turn a free-text brief (+ optional image) into an editable Meta campaign proposal (does NOT launch)",
+  })
+  async planCampaign(@Body() dto: PlanCampaignDto) {
+    return this.aiAgentService.planCampaignFromBrief(dto);
   }
 
   @Post("workspaces/:workspaceId/pipeline")

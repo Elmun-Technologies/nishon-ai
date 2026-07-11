@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui'
 import { useI18n } from '@/i18n/use-i18n'
 import { cn } from '@/lib/utils'
@@ -98,6 +98,25 @@ export function LaunchHub({ onPick }: { onPick: (p: Platform) => void }) {
           </p>
           <p className="mt-0.5 text-xs text-text-secondary">
             Preview, 2 yo‘l, Meta ketma-ketligi bilan chalkashmaslik
+          </p>
+        </div>
+        <span className="text-sm font-semibold text-primary underline">Ochish</span>
+      </Link>
+
+      <Link
+        href="/launch/chat"
+        className="flex flex-col gap-1 rounded-2xl border border-brand-ink/20 bg-brand-ink/[0.03] p-4 transition-colors hover:bg-brand-ink/[0.06] dark:border-brand-lime/25 dark:bg-brand-lime/5 dark:hover:bg-brand-lime/10 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div>
+          <p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-brand-ink dark:text-brand-lime">
+            <Sparkles className="h-3.5 w-3.5" aria-hidden />
+            Suhbat orqali
+          </p>
+          <p className="mt-1 text-sm font-semibold text-text-primary">
+            Bir jumlada tasvirlab bering — AI to‘liq rejani tayyorlaydi
+          </p>
+          <p className="mt-0.5 text-xs text-text-secondary">
+            Rasm + byudjet → tahrirlanadigan reja → bir tugmada haqiqiy launch
           </p>
         </div>
         <span className="text-sm font-semibold text-primary underline">Ochish</span>

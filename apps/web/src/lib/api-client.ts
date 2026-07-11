@@ -314,6 +314,25 @@ export const aiAgent = {
       topImprovements: string[]
       winningPersona: string | null
     }>('/ai-agent/focus-group', data),
+  /** Chat-first launch: brief (+ optional image) → editable Meta proposal. */
+  planCampaign: (data: {
+    workspaceId: string
+    brief: string
+    imageBase64?: string
+    mimeType?: string
+  }) =>
+    apiClient.post<{
+      name: string
+      objective: string
+      countries: string[]
+      ageMin: number
+      ageMax: number
+      dailyBudgetUsd: number
+      headline: string
+      primaryText: string
+      cta: string
+      rationale: string
+    }>('/ai-agent/plan-campaign', data),
   chat: (body: {
     workspaceId: string
     message: string
