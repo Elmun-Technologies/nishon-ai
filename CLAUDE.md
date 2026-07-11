@@ -30,6 +30,19 @@ pnpm --filter api dev   # Faqat backend
 **Asosiy branch:** `main`
 **Faol branch:** `claude/loyihani-mvp-readiness-xv4anj` — Agentic platforma (Vaqt · Pul · Ishonch)
 
+### 2026-07-11 sessiyasi (3) — "Ishni boshlash" faollashtirish ro'yxati (Vaqt)
+Ta'sischi "davom ettir". Dashboard'ga **Get Started checklist** qo'shildi —
+yangi foydalanuvchini nol'dan → birinchi haqiqiy Meta launch'gacha yo'naltiradi.
+4 qadam **real signal** bilan (soxta emas): workspace (store), AI sozlangan +
+Meta ulangan (`platformStatus.capabilities`), birinchi launch
+(`launchOrchestrator.list` → `status==='launched'`). Har qadamda hint + aniq CTA;
+progress bar; signal yuklanmaguncha ko'rsatilmaydi (soxta "todo" chaqnashi yo'q).
+Hammasi bajarilib dismiss qilingach localStorage flag bilan yashirinadi
+(`onboarding-v2.ts` first-campaign-banner patterni). **Faqat frontend** — backend/
+migration/kalit yo'q. Web tsc+lint+build+unit 118+e2e 39+i18n 2535×3 yashil.
+Marketplace real-wiring (to'liq mock + backend shakl farqi) va Reve edit/remix
+ataylab kechiktirildi.
+
 ### 2026-07-11 sessiyasi (2) — Activation Center + credential checklist (Ishonch)
 Ta'sischi: "davom et; men tarafdan kerak narsalarni yig, oxirida aytasan, man
 ulab beraman". Ikki natija:
