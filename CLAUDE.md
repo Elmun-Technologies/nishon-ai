@@ -25,10 +25,39 @@ pnpm --filter api dev   # Faqat backend
 
 ---
 
-## Joriy holat (so'nggi yangilash: 2026-07-10)
+## Joriy holat (so'nggi yangilash: 2026-07-11)
 
 **Asosiy branch:** `main`
 **Faol branch:** `claude/loyihani-mvp-readiness-xv4anj` — Agentic platforma (Vaqt · Pul · Ishonch)
+
+### 2026-07-11 sessiyasi — "White-Space" dasturi (Green Zone)
+Ta'sischi bozor tahlili "oq nuqtalar"ni aniqladi: global (Madgicx, Revealbot) va
+mahalliy o'yinchilar qoldirgan bo'shliqlar. **Green Zone** (100% qonuniy,
+platforma-xavfsiz, off-platform) tanlandi; **Red Zone** (ban-himoya, cross-platform
+arbitraj, anti-fraud — Meta/Google ToS buzadi) ataylab chetlab o'tildi. Uch feature
+qurildi (har biri alohida commit+push, hamma darvoza yashil):
+
+1. **Sintetik fokus-guruh** (Pul + Ishonch) — reklamani efirga chiqarmasdan,
+   workspace auditoriyasidan qurilgan AI personalar test qiladi. Bitta LLM chaqiruv
+   (matn yoki rasm → completeVision) butun panelni rolь o'ynaydi; agregatsiya
+   (o'rtacha qiziqish → CTR band, verdict) **kodda** hisoblanadi (tekshiriladigan).
+   `POST /ai-agent/focus-group`, `FocusGroupTester` komponenti (Creative Scorer +
+   Launch CreativeStep + Chat-launchга o'rnatilgan). 4 spec.
+2. **Suhbat orqali ishga tushirish** (Vaqt) — "No-Dashboard": bir jumla (+ ixtiyoriy
+   rasm) → AI to'liq tahrirlanadigan Meta rejasini taklif qiladi → tasdiq **haqiqiy**
+   `launch-orchestrator` (draft→validate→launch) orqali ketadi (soxta launch yo'q).
+   `POST /ai-agent/plan-campaign` (kod-tomon normalizatsiya: objective/cta oq ro'yxat,
+   ISO-2, yosh clamp, byudjet floor). `/launch/chat` sahifa + LaunchHub kartasi. 4 spec.
+3. **Telegram kanal agenti** (hyper-local kashfiyot) — TGStat API orqali nishaga mos
+   kanallarni topadi + saralaydi (obunachi log-shkala + faollik, kodda). AI "nega"
+   izohi best-effort (kalit yo'q → tashlab ketiladi, soxta emas). Narx = belgilangan
+   CIS-CPM evristika ("taxminiy", real kotirovka emas). Yangi `telegram-channels/`
+   modul (reve patterni), `GET /status` + `POST /recommend`, `/telegram-channels`
+   sahifa + sidebar nav. 5 spec. **Faollashtirish:** `TGSTAT_API_KEY` (env warn-list
+   + render.yaml qo'shildi).
+
+**Holat:** API **329/329** + lint toza + build OK, web build OK, unit **118/118**,
+e2e **39/39**, i18n **2534×3**. Yangi migration yo'q (uchalasi stateless AI/HTTP proksi).
 
 ### 2026-07-10 sessiyasi (3) — Avtonom sifat/halollik sweep (Ishonch)
 To'rt parallel audit (core loop, agentic, Meta-connect, money) real yadroni
