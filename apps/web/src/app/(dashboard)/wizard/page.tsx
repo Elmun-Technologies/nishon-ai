@@ -215,7 +215,9 @@ const PLATFORMS: Platform[] = [
     name: 'google',
     displayName: 'Google Ads',
     logo: '🔍',
-    connected: true,
+    // Connection status is not assumed — a real account link is verified on the
+    // dedicated connect flow. Never tell a user an account is "ready" by default.
+    connected: false,
     color: '#4285F4'
   },
   {
@@ -223,7 +225,7 @@ const PLATFORMS: Platform[] = [
     name: 'meta',
     displayName: 'Meta Ads',
     logo: '📘',
-    connected: true,
+    connected: false,
     color: '#1877F2'
   },
   {

@@ -863,6 +863,15 @@ export default function SettingsPage() {
                   Qanday xabarlar olishni tanlang
                 </p>
               </div>
+              <div className="mb-4 flex items-start gap-2 rounded-xl border border-amber-500/30 bg-amber-500/5 p-3">
+                <span className="text-base" aria-hidden>
+                  ⏳
+                </span>
+                <p className="text-xs text-amber-700 dark:text-amber-300">
+                  Tez orada — bu almashtirgichlar hozircha saqlanmaydi. Kunlik Telegram
+                  hisoboti Telegram ulanganda avtomatik yoqiladi (09:00).
+                </p>
+              </div>
               <div className="space-y-0 divide-y divide-[#2A2A3A]">
                 {[
                   {

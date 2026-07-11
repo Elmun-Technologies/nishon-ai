@@ -90,8 +90,6 @@ export default function WorkspaceProductsPage() {
 
   const connectedAccounts = plan != null ? Number((plan as any)?.usage?.connectedAccounts ?? 0) : 0
   const accountLimit = plan != null ? (plan as any)?.limits?.accounts : null
-  const spendCap = 2500
-  const spendBarPct = Math.min(100, spendMonth > 0 ? (spendMonth / spendCap) * 100 : 0)
 
   async function checkOrderStatus() {
     if (!orderId) return
@@ -136,9 +134,6 @@ export default function WorkspaceProductsPage() {
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <h3 className="text-xl font-bold text-text-primary">{planName}</h3>
-                  <span className="rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-400">
-                    {t('workspaceSettings.products.trialBadge', 'Trial')}
-                  </span>
                 </div>
                 <p className="mt-2 max-w-xl text-sm leading-relaxed text-text-tertiary">
                   AdSpectr plans bundle reporting, automation, and workspace seats. Connect billing when you are ready to scale.
@@ -149,26 +144,12 @@ export default function WorkspaceProductsPage() {
                 <div className="mt-6 space-y-4">
                   <div>
                     <div className="mb-1 flex justify-between text-xs text-text-tertiary">
-                      <span>{t('workspaceSettings.products.spendPlanLimit', 'Current ad spend plan limit')}</span>
-                      <span className="tabular-nums">Up to ${spendCap.toLocaleString()}</span>
-                    </div>
-                    <div className="h-2 overflow-hidden rounded-full bg-surface-2">
-                      <div className="h-full w-full rounded-full bg-slate-300/50 dark:bg-slate-600/50" />
-                    </div>
-                  </div>
-                  <div>
-                    <div className="mb-1 flex justify-between text-xs text-text-tertiary">
                       <span>{t('workspaceSettings.products.spendThisMonth', 'Ad spend this month')}</span>
                       <span className="tabular-nums font-semibold text-violet-600 dark:text-violet-400">
-                        {spendMonth >= 1000 ? `${(spendMonth / 1000).toFixed(2)}K` : `$${spendMonth.toFixed(0)}`} /{' '}
-                        {(spendCap / 1000).toFixed(1)}K
+                        {spendMonth >= 1000
+                          ? `$${(spendMonth / 1000).toFixed(2)}K`
+                          : `$${spendMonth.toFixed(0)}`}
                       </span>
-                    </div>
-                    <div className="h-2 overflow-hidden rounded-full bg-surface-2">
-                      <div
-                        className="h-full rounded-full bg-gradient-to-r from-violet-500 to-indigo-500 transition-all"
-                        style={{ width: `${spendBarPct}%` }}
-                      />
                     </div>
                   </div>
                 </div>
@@ -193,7 +174,7 @@ export default function WorkspaceProductsPage() {
               <p className="mt-4 text-xs font-medium uppercase tracking-wide text-text-tertiary">
                 {t('workspaceSettings.products.billingPeriodStarts', 'Billing period starts')}
               </p>
-              <p className="mt-1 font-medium text-text-secondary">{new Date().toLocaleDateString()}</p>
+              <p className="mt-1 font-medium text-text-secondary">—</p>
             </div>
           </div>
         )}
