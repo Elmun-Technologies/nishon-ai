@@ -30,6 +30,24 @@ pnpm --filter api dev   # Faqat backend
 **Asosiy branch:** `main`
 **Faol branch:** `claude/loyihani-mvp-readiness-xv4anj` — Agentic platforma (Vaqt · Pul · Ishonch)
 
+### 2026-07-11 sessiyasi (4) — Real rasmli reklama (Reve → Meta creative)
+Ta'sischi "davom etamiz". Tuzatilgan yadro-kamchilik: launch-orchestrator inline
+kreativ yaratardi, lekin **rasm biriktirmasdi** — har yangi kreativ launch rasmsiz
+Meta link-reklama chiqarardi (yomon natija, ko'pincha rad). Bu "photo + budget"
+suhbat-launch'ni ham to'ldiradi: AI endi rasmni yaratib, real reklamaga biriktiradi.
+Kalit topilma: `apiPost` faqat query-param yuboradi (base64 sig'maydi), lekin Meta
+`link_data.picture` URL qabul qiladi — Reve/fal.ai rasmlari public URL. Shuning
+uchun `/adimages` upload yo'q, URL to'g'ridan-to'g'ri o'tadi.
+- Backend: `MetaConnector.createAdCreative` → `imageUrl` bo'lsa `link_data.picture`
+  (hash ustuvor); `CreativePayloadDto.imageUrl`; orchestrator uzatadi (non-fatal).
+  Testlar: connector picture-vs-hash (2), orchestrator forward (1). API **340/340**.
+- Frontend: `/launch/chat`'da "AI rasm yaratib bersin (Reve)" — `reve.generateImageAd`
+  chaqiradi, ko'rsatadi, launch'da `creative.imageUrl` qiladi. FAL_KEY yo'q → halol
+  503, rasmsiz davom etadi (soxta rasm yo'q). Kechiktirildi: user-upload base64
+  rasm (hosting/multipart kerak), wizard CreativeStep rasm biriktirish.
+- Gates yashil: API 340 + lint + build, web tsc + lint + build + unit 118 + e2e 39
+  + i18n 2535×3.
+
 ### 2026-07-11 sessiyasi (3) — "Ishni boshlash" faollashtirish ro'yxati (Vaqt)
 Ta'sischi "davom ettir". Dashboard'ga **Get Started checklist** qo'shildi —
 yangi foydalanuvchini nol'dan → birinchi haqiqiy Meta launch'gacha yo'naltiradi.
