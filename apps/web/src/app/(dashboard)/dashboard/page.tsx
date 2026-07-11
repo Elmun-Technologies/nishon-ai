@@ -36,6 +36,7 @@ import { formatCurrency, formatNumber, cn } from '@/lib/utils'
 import { formatUzs } from '@/lib/subscription-plans'
 import { FIRST_CAMPAIGN_BANNER_KEY } from '@/lib/onboarding-v2'
 import { ChatWidget } from '@/components/ui/ChatWidget'
+import { GetStartedChecklist } from './_components/GetStartedChecklist'
 
 export const dynamic = 'force-dynamic'
 
@@ -498,6 +499,9 @@ export default function DashboardPage() {
           </Button>
         </div>
       </div>
+
+      {/* ── Get Started checklist (self-hides once set up) ─────────────────── */}
+      <GetStartedChecklist />
 
       {/* ── Filter bar ─────────────────────────────────────────────────────── */}
       <div className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5">

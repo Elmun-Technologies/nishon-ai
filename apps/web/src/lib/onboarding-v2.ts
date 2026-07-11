@@ -118,3 +118,27 @@ export function setFirstCampaignBanner() {
     /* ignore */
   }
 }
+
+/**
+ * "Get Started" checklist dismissal — persisted so a set-up account never sees
+ * the activation card again once they dismiss it (or finish all steps).
+ */
+export const GET_STARTED_DISMISSED_KEY = 'adspectr-get-started-dismissed'
+
+export function isGetStartedDismissed(): boolean {
+  if (typeof window === 'undefined') return false
+  try {
+    return localStorage.getItem(GET_STARTED_DISMISSED_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+export function dismissGetStarted() {
+  if (typeof window === 'undefined') return
+  try {
+    localStorage.setItem(GET_STARTED_DISMISSED_KEY, '1')
+  } catch {
+    /* ignore */
+  }
+}
