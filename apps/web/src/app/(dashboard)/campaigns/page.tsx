@@ -13,7 +13,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { Alert } from "@/components/ui/Alert";
 import { Dialog, PageHeader } from "@/components/ui";
 import { PlatformIcon } from "@/components/ui/PlatformIcon";
-import { campaigns as campaignsApi } from "@/lib/api-client";
+import { campaigns as campaignsApi, meta as metaApi } from "@/lib/api-client";
 import { formatCurrency, timeAgo } from "@/lib/utils";
 import { CreateCampaignForm } from "@/components/campaigns/CreateCampaignForm";
 import { CampaignCollaborationPanel } from "@/components/campaigns/CampaignCollaborationPanel";
@@ -32,6 +32,14 @@ interface Campaign {
   adSets?: any[];
 }
 
+/** Real 30-day performance for a synced Meta campaign, keyed by its Meta id. */
+interface CampaignMetric {
+  spend: number;
+  roas: number;
+  ctr: number;
+  conversions: number;
+}
+
 const OBJECTIVE_LABELS: Record<string, string> = {
   leads: "Lead Generation",
   sales: "Sales & Conversions",
@@ -46,6 +54,7 @@ export default function CampaignsPage() {
   const router = useRouter();
   const { currentWorkspace, user } = useWorkspaceStore();
   const [items, setItems] = useState<Campaign[]>([]);
+  const [metrics, setMetrics] = useState<Record<string, CampaignMetric>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -60,8 +69,34 @@ export default function CampaignsPage() {
     if (!currentWorkspace?.id) return;
     setLoading(true);
     setError("");
+    const wsId = currentWorkspace.id;
+    // Best-effort: pull real 30-day Meta performance so synced campaigns show
+    // actual spend/ROAS/CTR, keyed by their Meta campaign id (externalId).
+    metaApi
+      .audit(wsId, 30)
+      .then((res) => {
+        const camps = ((res.data as any)?.report?.campaigns ?? []) as Array<{
+          id: string;
+          spend: number;
+          roas: number;
+          ctr: number;
+          conversions: number;
+        }>;
+        const map: Record<string, CampaignMetric> = {};
+        for (const c of camps) {
+          map[String(c.id)] = {
+            spend: Number(c.spend) || 0,
+            roas: Number(c.roas) || 0,
+            ctr: Number(c.ctr) || 0,
+            conversions: Number(c.conversions) || 0,
+          };
+        }
+        setMetrics(map);
+      })
+      .catch(() => setMetrics({}));
+
     try {
-      const res = await campaignsApi.list(currentWorkspace.id);
+      const res = await campaignsApi.list(wsId);
       setItems((res.data as any) ?? []);
     } catch (err: any) {
       setError(err?.message ?? t("campaigns.loadFailed", "Failed to load campaigns"));
@@ -255,6 +290,20 @@ export default function CampaignsPage() {
                             Synced
                           </Badge>
                         )}
+                        {campaign.externalId && metrics[campaign.externalId] && (
+                          <Badge
+                            variant={
+                              metrics[campaign.externalId].roas >= 2
+                                ? "success"
+                                : metrics[campaign.externalId].roas >= 1
+                                  ? "warning"
+                                  : "danger"
+                            }
+                            size="sm"
+                          >
+                            ROAS {metrics[campaign.externalId].roas.toFixed(1)}x
+                          </Badge>
+                        )}
                       </div>
                       <p className="text-text-tertiary text-xs">
                         {OBJECTIVE_LABELS[campaign.objective] ??
@@ -268,13 +317,27 @@ export default function CampaignsPage() {
                     </div>
 
                     <div className="text-right shrink-0">
-                      <p className="text-text-primary text-sm font-semibold">
-                        {formatCurrency(campaign.dailyBudget)}
-                        <span className="text-text-tertiary font-normal">/day</span>
-                      </p>
-                      <p className="text-text-tertiary text-xs mt-0.5">
-                        {formatCurrency(campaign.totalBudget)} total
-                      </p>
+                      {campaign.externalId && metrics[campaign.externalId] ? (
+                        <>
+                          <p className="text-text-primary text-sm font-semibold">
+                            {formatCurrency(metrics[campaign.externalId].spend)}
+                            <span className="text-text-tertiary font-normal"> spent</span>
+                          </p>
+                          <p className="text-text-tertiary text-xs mt-0.5">
+                            {formatCurrency(campaign.dailyBudget)}/day
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <p className="text-text-primary text-sm font-semibold">
+                            {formatCurrency(campaign.dailyBudget)}
+                            <span className="text-text-tertiary font-normal">/day</span>
+                          </p>
+                          <p className="text-text-tertiary text-xs mt-0.5">
+                            {formatCurrency(campaign.totalBudget)} total
+                          </p>
+                        </>
+                      )}
                     </div>
 
                     <div className="shrink-0">
@@ -292,6 +355,28 @@ export default function CampaignsPage() {
                     <div className="lg:col-span-2 rounded-2xl border border-border/70 bg-white/85 px-5 py-4 shadow-sm backdrop-blur-sm dark:bg-slate-900/70">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                       {[
+                        // Real 30-day performance first, when this campaign is
+                        // synced and has Meta insights.
+                        ...(campaign.externalId && metrics[campaign.externalId]
+                          ? [
+                              {
+                                label: "Spend (30d)",
+                                value: formatCurrency(metrics[campaign.externalId].spend),
+                              },
+                              {
+                                label: "ROAS (30d)",
+                                value: `${metrics[campaign.externalId].roas.toFixed(1)}x`,
+                              },
+                              {
+                                label: "CTR (30d)",
+                                value: `${metrics[campaign.externalId].ctr.toFixed(2)}%`,
+                              },
+                              {
+                                label: "Conversions (30d)",
+                                value: String(metrics[campaign.externalId].conversions),
+                              },
+                            ]
+                          : []),
                         {
                           label: "Platform",
                           value: campaign.platform.toUpperCase(),
