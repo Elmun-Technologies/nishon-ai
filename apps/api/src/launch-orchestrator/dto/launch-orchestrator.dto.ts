@@ -81,6 +81,14 @@ class CreativePayloadDto {
   @IsOptional()
   @IsIn(["LEARN_MORE", "SHOP_NOW", "SIGN_UP", "CONTACT_US", "GET_OFFER"])
   callToActionType?: string;
+
+  /**
+   * Publicly-accessible image URL (e.g. a Reve/fal.ai generated image) to use as
+   * the ad picture. Attached via Meta link_data.picture — no upload step.
+   */
+  @IsOptional()
+  @IsString()
+  imageUrl?: string;
 }
 
 export class CreateLaunchJobDto {

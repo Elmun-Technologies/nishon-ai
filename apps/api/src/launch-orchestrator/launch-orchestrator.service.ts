@@ -227,6 +227,7 @@ export class LaunchOrchestratorService {
               headline: payload.creative.headline,
               description: payload.creative.description,
               callToActionType: payload.creative.callToActionType,
+              imageUrl: payload.creative.imageUrl,
             },
           );
           if (created.id) sourceCreativeIds.push(created.id);

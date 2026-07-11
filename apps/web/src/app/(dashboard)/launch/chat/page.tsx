@@ -11,7 +11,7 @@ import {
   Sparkles,
   X,
 } from 'lucide-react'
-import { aiAgent, launchOrchestrator, platforms } from '@/lib/api-client'
+import { aiAgent, launchOrchestrator, platforms, reve } from '@/lib/api-client'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { FocusGroupTester } from '@/components/creative/FocusGroupTester'
 import { cn } from '@/lib/utils'
@@ -79,6 +79,11 @@ export default function ChatLaunchPage() {
   const [pageId, setPageId] = useState('')
   const [linkUrl, setLinkUrl] = useState('')
 
+  // Reve-generated ad image → becomes the Meta creative picture (link_data.picture).
+  const [adImageUrl, setAdImageUrl] = useState('')
+  const [genLoading, setGenLoading] = useState(false)
+  const [genError, setGenError] = useState('')
+
   const [launching, setLaunching] = useState(false)
   const [launchError, setLaunchError] = useState('')
   const [launchedId, setLaunchedId] = useState<string | null>(null)
@@ -139,6 +144,46 @@ export default function ChatLaunchPage() {
   const setField = <K extends keyof Proposal>(key: K, value: Proposal[K]) =>
     setProposal((p) => (p ? { ...p, [key]: value } : p))
 
+  /**
+   * Generate an ad image with Reve and use it as the Meta creative picture.
+   * The returned fal.ai URL is public, so it flows straight into the launch as
+   * `creative.imageUrl` (no upload). Honest 503 when FAL_KEY is unset.
+   */
+  const generateAdImage = async () => {
+    if (!proposal) return
+    setGenLoading(true)
+    setGenError('')
+    try {
+      const prompt = [proposal.headline, proposal.primaryText, brief]
+        .map((s) => s?.trim())
+        .filter(Boolean)
+        .join('. ')
+        .slice(0, 500)
+      const res = await reve.generateImageAd({
+        prompt: prompt || 'Product advertisement, clean studio background',
+        aspectRatio: '1:1',
+        numImages: 1,
+      })
+      const url = res.data.images?.[0]
+      if (!url) {
+        setGenError('Rasm qaytmadi — qayta urinib ko\'ring.')
+        return
+      }
+      setAdImageUrl(url)
+    } catch (err: any) {
+      const status = err?.response?.status
+      setGenError(
+        status === 503
+          ? 'Rasm generatsiyasi sozlanmagan (FAL_KEY yo\'q) — matnli reklama bilan davom etishingiz mumkin.'
+          : err?.response?.data?.message ||
+              err?.message ||
+              'Rasm yaratilmadi. Qayta urinib ko\'ring.',
+      )
+    } finally {
+      setGenLoading(false)
+    }
+  }
+
   const confirmLaunch = async () => {
     if (!proposal || !currentWorkspace?.id) return
     // Pre-submit guards — mirror the backend normaliser so the user gets an
@@ -163,6 +208,7 @@ export default function ChatLaunchPage() {
               linkUrl: linkUrl.trim(),
               headline: proposal.headline || undefined,
               callToActionType: proposal.cta as any,
+              imageUrl: adImageUrl || undefined,
             }
           : undefined
 
@@ -451,6 +497,50 @@ export default function ChatLaunchPage() {
                 </label>
               </div>
             )}
+
+            {/* AI ad image (Reve) → becomes the Meta creative picture */}
+            <div className="mt-3 border-t border-border/60 pt-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-xs font-medium text-text-secondary">Reklama rasmi</p>
+                <button
+                  type="button"
+                  onClick={generateAdImage}
+                  disabled={genLoading}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-brand-mid/30 bg-brand-mid/[0.06] px-2.5 py-1.5 text-xs font-semibold text-brand-mid transition-colors hover:bg-brand-mid/12 disabled:cursor-not-allowed disabled:opacity-60 dark:border-brand-lime/30 dark:bg-brand-lime/[0.06] dark:text-brand-lime"
+                >
+                  <Sparkles className={cn('h-3.5 w-3.5', genLoading && 'animate-pulse')} aria-hidden />
+                  {genLoading
+                    ? 'Chizilmoqda…'
+                    : adImageUrl
+                      ? 'Boshqa rasm'
+                      : 'AI rasm yaratib bersin'}
+                </button>
+              </div>
+              {adImageUrl && (
+                <div className="mt-2 flex items-start gap-3">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={adImageUrl}
+                    alt="Reklama rasmi"
+                    className="h-20 w-20 rounded-lg border border-border object-cover"
+                  />
+                  <div className="min-w-0 flex-1 text-xs text-text-secondary">
+                    <p className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                      <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
+                      Rasm reklamaga biriktiriladi
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setAdImageUrl('')}
+                      className="mt-1 text-text-tertiary hover:text-rose-500"
+                    >
+                      Olib tashlash
+                    </button>
+                  </div>
+                </div>
+              )}
+              {genError && <p className="mt-2 text-xs text-amber-600 dark:text-amber-400">{genError}</p>}
+            </div>
           </div>
 
           {/* Pre-test the proposed copy before spending (Phase 1 tie-in) */}

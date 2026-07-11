@@ -765,6 +765,8 @@ export type LaunchCreativePayload = {
   headline?: string
   description?: string
   callToActionType?: 'LEARN_MORE' | 'SHOP_NOW' | 'SIGN_UP' | 'CONTACT_US' | 'GET_OFFER'
+  /** Public image URL (e.g. a Reve/fal.ai generated image) → Meta link_data.picture. */
+  imageUrl?: string
 }
 
 export type CreateLaunchJobInput = {

@@ -515,6 +515,12 @@ export class MetaConnector {
       description?: string;
       callToActionType?: string; // 'LEARN_MORE' | 'SHOP_NOW' | 'SIGN_UP' | 'CONTACT_US'
       imageHash?: string;
+      /**
+       * Publicly-accessible image URL (e.g. a Reve/fal.ai generated image). Meta
+       * fetches it directly via link_data.picture — no /adimages upload needed.
+       * Ignored when imageHash is supplied (a hash is the stronger reference).
+       */
+      imageUrl?: string;
     },
   ): Promise<{ id: string }> {
     const linkData: Record<string, any> = {
@@ -524,6 +530,7 @@ export class MetaConnector {
     if (params.headline) linkData.name = params.headline;
     if (params.description) linkData.description = params.description;
     if (params.imageHash) linkData.image_hash = params.imageHash;
+    else if (params.imageUrl) linkData.picture = params.imageUrl;
     if (params.callToActionType) {
       linkData.call_to_action = {
         type: params.callToActionType,

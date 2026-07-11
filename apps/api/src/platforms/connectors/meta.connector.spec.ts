@@ -178,6 +178,45 @@ describe("MetaConnector", () => {
     });
   });
 
+  describe("createAdCreative", () => {
+    it("attaches a picture URL to link_data when imageUrl is set (no hash)", async () => {
+      httpService.post.mockReturnValue(of({ data: { id: "cr-1" } } as any));
+
+      await connector.createAdCreative("act_123", "token", {
+        name: "c",
+        pageId: "page_1",
+        message: "hi",
+        linkUrl: "https://shop.uz",
+        imageUrl: "https://fal.media/x.png",
+      });
+
+      const spec = JSON.parse(
+        httpService.post.mock.calls[0][2].params.object_story_spec,
+      );
+      expect(spec.link_data.picture).toBe("https://fal.media/x.png");
+      expect(spec.link_data.image_hash).toBeUndefined();
+    });
+
+    it("prefers image_hash over picture when both are provided", async () => {
+      httpService.post.mockReturnValue(of({ data: { id: "cr-2" } } as any));
+
+      await connector.createAdCreative("act_123", "token", {
+        name: "c",
+        pageId: "page_1",
+        message: "hi",
+        linkUrl: "https://shop.uz",
+        imageHash: "HASH123",
+        imageUrl: "https://fal.media/x.png",
+      });
+
+      const spec = JSON.parse(
+        httpService.post.mock.calls[0][2].params.object_story_spec,
+      );
+      expect(spec.link_data.image_hash).toBe("HASH123");
+      expect(spec.link_data.picture).toBeUndefined();
+    });
+  });
+
   describe("pauseCampaign / resumeCampaign", () => {
     beforeEach(() => {
       httpService.post.mockReturnValue(of({ data: {} } as any));

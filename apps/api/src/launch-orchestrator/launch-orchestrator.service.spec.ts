@@ -296,6 +296,34 @@ describe("LaunchOrchestratorService", () => {
       expect(savedResult.adIds).toEqual(["ad_new", "ad_new"]);
     });
 
+    it("forwards the inline creative image URL to createAdCreative", async () => {
+      launchRepo.findOne.mockResolvedValue(
+        jobWith({
+          workspaceId,
+          platform: "meta",
+          objective: "OUTCOME_LEADS",
+          budgetType: "CBO",
+          dailyBudget: 30,
+          audiences: [{ name: "A", funnelStage: "acquisition_prospecting" }],
+          copyCreatives: false,
+          creative: {
+            pageId: "page_123",
+            message: "Bahor aksiyasi",
+            linkUrl: "https://shop.uz/spring",
+            callToActionType: "SHOP_NOW",
+            imageUrl: "https://fal.media/generated/abc.png",
+          },
+        }),
+      );
+
+      await service.launch("job-1", userId);
+
+      const [, , creativeParams] = metaConnector.createAdCreative.mock.calls[0];
+      expect(creativeParams.imageUrl).toBe(
+        "https://fal.media/generated/abc.png",
+      );
+    });
+
     it("skips creative copy when copyCreatives is explicitly false", async () => {
       launchRepo.findOne.mockResolvedValue(
         jobWith({
