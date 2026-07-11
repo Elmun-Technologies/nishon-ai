@@ -30,6 +30,32 @@ pnpm --filter api dev   # Faqat backend
 **Asosiy branch:** `main`
 **Faol branch:** `claude/loyihani-mvp-readiness-xv4anj` — Agentic platforma (Vaqt · Pul · Ishonch)
 
+### 2026-07-11 sessiyasi (7) — A/B fokus-guruh (Pul)
+Fokus-guruhga **A/B taqqoslash** qo'shildi: ikki kreativni bir xil AI panelida
+sinab, g'olibni tanlaydi. `compareFocusGroup` har variant uchun `runFocusGroup`ni
+qayta ishlatadi (egalik + AI-config tekshiruvi, agregatsiya birga), g'olib + lift
+**kodda** (2pp ichida durang, nolga bo'lish himoyasi) + uzbekcha tavsiya.
+`POST /ai-agent/focus-group/compare` + `CompareFocusGroupDto` (3 spec). Frontend:
+`FocusGroupCompare` (o'z A/B kiritishlari, g'olib ajratilgan natija kartalari)
+Creative Scorer'da. API **354/354** + gates yashil.
+
+### 2026-07-11 sessiyasi (6) — OAuth mustahkamligi + Google auth tuzatish (Ishonch)
+Ta'sischi "Google auth ishlamayapti". Ikki nuqson: (1) Google/Facebook strategiyasi
+`getOrThrow` bilan shartsiz ro'yxatdan o'tardi — kalit yo'q bo'lsa **butun API
+ko'tarilmasdi**; (2) login sahifasi kalitsiz ham Google/Facebook tugmasini
+ko'rsatib dead-end berardi. Tuzatildi: strategiyalar **shartli** (useFactory →
+null), `ConfiguredOAuthGuard` (kalitsiz — 500 emas, `error=not_configured`
+redirect), public `GET /auth/providers`, login tugmalari faqat sozlangan
+providerlar uchun. Eng ehtimoliy jonli sabab — redirect-URI mos emasligi
+(config): DEPLOY.md + render.yaml'ga aniq `${API_BASE_URL}/auth/google/callback`
+ko'rsatmasi. `oauth.util` + guard spec (11 test). API **351/351**.
+
+### 2026-07-11 sessiyasi (5) — Wizard rasm biriktirish
+To'liq Meta sehrgar CreativeStep'ga ham "AI rasm yaratib bersin (Reve)" qo'shildi
+(oldingi increment faqat chat-launch'ga qo'shgandi). `MetaData.imageUrl`,
+`use-launch-wizard` uni `creative.imageUrl`ga uzatadi (backend → `link_data.picture`).
+Faqat frontend, i18n 2536×3.
+
 ### 2026-07-11 sessiyasi (4) — Real rasmli reklama (Reve → Meta creative)
 Ta'sischi "davom etamiz". Tuzatilgan yadro-kamchilik: launch-orchestrator inline
 kreativ yaratardi, lekin **rasm biriktirmasdi** — har yangi kreativ launch rasmsiz
