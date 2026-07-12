@@ -8,31 +8,104 @@ Bu fayl har safar loyihaga kirganda yo'nalish beradi. Har yangi ish tugagach, "J
 
 ## Loyiha haqida qisqacha
 
-**Nishon AI** — performance marketing platformasi. Reklama yaratish, kampaniya boshqarish, ROAS hisoblash, va mutaxassislar bozori.
+**Nishon AI** — performance marketing platformasi. Reklama yaratish, kampaniya boshqarish, ROAS/ROI hisoblash, AI agent'lar va mutaxassislar bozori.
+
+> **Eslatma:** Mahsulot brendi — **Nishon AI**, lekin repo/paket ichki nomi hali ham
+> `adspectr` (`@adspectr/shared`, `@adspectr/ai-sdk`, `@adspectr/creative-hub-core`).
+> Kod ichida `adspectr` uchrasa — bu shu loyiha.
 
 **Tech stack:**
-- Frontend: Next.js (apps/web)
-- Backend: NestJS (apps/api)
-- Monorepo: pnpm + Turborepo
-- DB: PostgreSQL (TypeORM)
+- **Monorepo:** pnpm workspaces + Turborepo (`pnpm@8.15.5`, Node **22** — `.nvmrc`)
+- **Frontend:** Next.js 14 App Router (`apps/web`) — React 18, Tailwind + Radix UI,
+  TanStack Query, Zustand, Zod, next-themes, recharts, Socket.IO client
+- **Backend:** NestJS 10 (`apps/api`) — TypeORM + PostgreSQL, Redis + Bull (queue),
+  Passport (JWT/local/facebook/google), WebSockets (Socket.IO), Swagger
+- **Worker:** `apps/retargeting-worker` — mustaqil retargeting signal ishlovchisi (tsx/tsc)
+- **Umumiy paketlar:** `packages/shared`, `packages/ai-sdk`, `packages/creative-hub-core`
+- **AI:** `AI_PROVIDER` orqali OpenAI yoki Anthropic (`ai-sdk` paketi)
+- **Deploy:** API + worker → Render (`render.yaml`), web → Vercel (`vercel.json`).
+  Batafsil: `DEPLOY.md`.
 
 **Ishga tushirish:**
 ```bash
-pnpm dev          # Hamma applarni ishga tushirish
-pnpm --filter web dev   # Faqat frontend
-pnpm --filter api dev   # Faqat backend
+pnpm install            # Bog'liqliklarni o'rnatish (frozen-lockfile CI'da)
+pnpm dev                # Hamma applar (turbo)
+pnpm --filter web dev   # Faqat frontend (localhost:3000)
+pnpm --filter api dev   # Faqat backend (nest --watch)
 ```
+Lokal DB/Redis uchun: `docker-compose.yml`. Env shabloni: `.env.example`.
 
 ---
 
-## Joriy holat (so'nggi yangilash: 2026-07-10)
+## Muhim buyruqlar (commands)
+
+Ishni tugatishdan oldin **doim** CI darvozalarini lokal qaytar — CI aynan shularni tekshiradi:
+
+```bash
+# API (apps/api)
+pnpm --filter api test           # Jest unit testlar (*.spec.ts)
+pnpm --filter api build          # Nest build (avval shared + ai-sdk build bo'ladi)
+pnpm --filter api lint:check     # ESLint (--fix'siz, CI shu variantni ishlatadi)
+pnpm --filter api lint           # ESLint --fix (lokal tuzatish uchun)
+
+# Web (apps/web)
+pnpm --filter web test:unit      # Vitest unit testlar (*.test.ts / *.test.tsx)
+pnpm --filter web test:e2e       # Playwright smoke (request API, brauzersiz)
+pnpm --filter web i18n:check     # uz/ru/en kalit pariteti (scripts/check-i18n-keys.mjs)
+pnpm --filter web exec tsc --noEmit   # Typecheck
+pnpm --filter web build          # next build
+pnpm --filter web lint           # next lint
+
+# Migration (apps/api — prod'da synchronize:false, sxema faqat shu yerdan)
+pnpm --filter api build                  # avval build (migration dist'dan ishlaydi)
+cd apps/api && npm run migration:run     # migration'larni qo'llash
+npm run migration:revert                 # oxirgisini qaytarish
+npm run migration:generate               # entity'lardan yangi migration
+npm run seed                             # seed data
+```
+
+**Bitta testni ishga tushirish:** `pnpm --filter api test -- campaigns.service` /
+`pnpm --filter web test:unit -- validation`.
+
+---
+
+## CI/CD
+
+`.github/workflows/ci.yml` — har PR va `main` push'da (Node 22, pnpm 8.15.5):
+- **api job:** `test` → `build` → `lint:check`
+- **web job:** `lint` → `i18n:check` → `tsc --noEmit` → `test:unit` (vitest) → `build` → `test:e2e`
+- Top-level `permissions: contents: read` (default-deny GITHUB_TOKEN, hardening)
+- `concurrency` bilan eski run'lar bekor qilinadi
+- Dependabot: `.github/dependabot.yml` — weekly grouped bump'lar
+- `prettier/prettier` = warning (bloklamaydi, style debt)
+
+**Qoida:** CI hech qachon prettier whitespace'ni jimgina qayta yozmasin —
+shuning uchun `lint:check` (`--fix`'siz) ishlatiladi.
+
+---
+
+## Joriy holat (so'nggi yangilash: 2026-07-12)
 
 **Asosiy branch:** `main`
-**Faol branch:** `claude/loyihani-mvp-readiness-xv4anj` — MVP-tayyorlik: real deploy blockerlari tuzatildi
+**Faol branch:** `claude/claude-md-docs-uiyjze` — hujjat yangilash (CLAUDE.md)
 
-### 2026-07-10 sessiyasi — MVP-tayyorlik: real deploy blockerlari
-Holat aniqlash: barcha CI darvozalari yashil edi (API 295/295, web unit 112/112,
-lint/i18n/tsc/build/e2e 39/39), lekin ikki mustaqil audit real MVP blockerlarini topdi:
+### 2026-07-12 sessiyasi — CLAUDE.md ni real holatga keltirish
+- ✅ CLAUDE.md yangilandi: to'liq command reference, CI tafsiloti, to'g'ri paket/modul
+  strukturasi (`packages/` = shared/ai-sdk/creative-hub-core; `apps/` = web/api/retargeting-worker),
+  Node 22 + pnpm 8.15.5, ichki `adspectr` nomi haqida eslatma.
+
+### 2026-07-11 sessiyasi — Internal MVP pass (PR #150 merged)
+Dashboard bug'lari, halollik (honesty) tuzatishlari, brend va performans:
+- ✅ **Brand illustration'lar** — public marketing image slot'lariga real brend
+  rasmlar (Phase 1); `docs/` ichida project-wide image plan + generatsiya prompt'lari.
+- ✅ **Dashboard bug'lari** — N+1 so'rov tuzatildi, o'lik campaign toolbar,
+  "empty vs disconnected" holatlar farqlandi, brend nomlanishi.
+- ✅ **`useRealtimeRefresh`** endi stale `onRefresh`/events'ga bog'lanmaydi
+  (realtime socket refresh to'g'ri ishlaydi).
+- ✅ Honesty: Meta-only MVP uchun soxta "launched"/"connected" holatlar tozalandi.
+
+### 2026-07-10 sessiyasi — MVP-tayyorlik: real deploy blockerlari (PR #149)
+Barcha CI darvozalari yashil edi, lekin ikki mustaqil audit real MVP blockerlarini topdi:
 
 - ✅ **Migration zanjiri toza DB'da ishlamas edi** — `synchronize:false` prod'da
   `migration:run` deploy'ning yagona sxema manbai, ammo zanjir buzuq edi:
@@ -48,159 +121,110 @@ lint/i18n/tsc/build/e2e 39/39), lekin ikki mustaqil audit real MVP blockerlarini
 - ✅ **Meta CBO/ABO budget konflikti** — kampaniya ham, har AdSet ham `daily_budget`
   olardi → Meta har launchni rad etardi. Endi CBO=faqat kampaniya, ABO=faqat AdSet.
 - ✅ **Meta placeholder `meta_oauth` account id** hech qachon real `act_<id>`'ga
-  aylanmasdi → callback endi `getAdAccounts` bilan real ad-account'ni hal qiladi
-  (eski placeholder record'larni ham tuzatadi).
-- ✅ **`META_CALLBACK_URL` noto'g'ri handler'ga** ishora qilardi
-  (`/platforms/meta/callback` ≠ frontend ishlatadigan `/meta/callback`) → render.yaml + DEPLOY.md tuzatildi.
-- ✅ **Register → workspace hydration** — yangi foydalanuvchi `currentWorkspace=null`
-  bilan dashboard'ga tushib, Ad Launcher/Meta connect dead-end bo'lardi → register
-  endi login kabi workspace'ni hydrate qiladi.
+  aylanmasdi → callback endi `getAdAccounts` bilan real ad-account'ni hal qiladi.
+- ✅ **`META_CALLBACK_URL` noto'g'ri handler'ga** ishora qilardi → render.yaml + DEPLOY.md tuzatildi.
+- ✅ **Register → workspace hydration** — register endi login kabi workspace'ni hydrate qiladi.
 - ✅ **Render health check `/health` → `/ready`** (DB/Redis o'lganda 503 qaytaradi).
 - ✅ Graph API versiya birlashtirildi (v19→v20), OAuth `pages_*` scope qo'shildi.
-- ✅ **Mock sahifalar halol qilindi** (MVP faqat Meta):
-  - Launch Hub: Google/Yandex endi "Coming soon" (Telegram kabi) — ilgari soxta
-    "launched" ko'rsatardi (faqat ichki `/campaigns` yozuvi, real platform launch yo'q).
-  - `/settings/integrations` mock sahifasiga "Preview" banner + real `/settings/meta`
-    havolasi; ai-decisions'dagi "Meta ulash" CTA endi real sahifaga qaratildi.
-- **Yakuniy holat:** API 295/295, web unit 112/112, build/e2e 39/39, migration zanjiri
-  toza PG'da exit 0. PR #149.
+- ✅ **Mock sahifalar halol qilindi** (MVP faqat Meta): Launch Hub Google/Yandex
+  "Coming soon"; `/settings/integrations` mock'iga "Preview" banner + real `/settings/meta` havolasi.
 
-### Oldingi faol branch: `claude/hopeful-rubin-vTmX2` — 10/10 sprint (PR #131)
-
-### 2026-06-03 sessiyasi — 10/10 sprint (faol PR #131)
-- ✅ **Qadam 2: cheap strict TS flags** — `noFallthroughCasesInSwitch`,
-  `noImplicitOverride`, `forceConsistentCasingInFileNames` API+web ikkalasiga,
-  web qo'shimcha `allowUnreachableCode: false`. 0 ta xato.
-- ✅ **Qadam 3: web unit testlar 12 → 97** (+85) — `lib/utils` (13),
-  `reporting-export` (6), `local-subscription` (5), `validation` (35),
-  `api-error` (9), `date-range` (7), `subscription-plans` (8).
-- ✅ **Qadam 4: backend service specs 152 → 262** (+110, 6 ta service) —
-  `AiDecisionsService` (11), `CampaignsService` (17), `TeamInvitesService` (25),
-  `WorkspacesService` (19), `AuthService` (23 — auth-core: bcrypt 12 rounds,
-  email-enumeration safety, refresh-token bcrypt-hashed, JWT secret fail-closed),
-  `BillingService` (15 — read/write gate + "exactly one default card" invariant).
-- ✅ **Qadam 5: CI hardening** — `.github/workflows/ci.yml`'da top-level
-  `permissions: contents: read` (default-deny GITHUB_TOKEN); `.github/dependabot.yml`
-  weekly grouped bumps (dev+prod, monthly actions). Dependency-review action
-  o'chirildi (Dependency graph feature flip kerak edi).
+### Oldingi sessiyalar (qisqacha)
+- **2026-06-03 — 10/10 sprint (PR #131):** cheap strict TS flag'lar; web unit 12→97;
+  backend service spec 152→262 (6 service); CI hardening (default-deny GITHUB_TOKEN, dependabot).
+- **2026-06-02 — sifat sprinti (10 PR):** Launch refactor 1610→34 qator orchestrator (#113);
+  dashboard freeze fix (#114); SEO + animatsiya (#115); conversational onboarding (#116);
+  AI Agents redizayn + real backend ulanish (#117/#118/#121); `/launch` → real orchestrator (#119);
+  sifat sprinti — testlar 120/120, GitHub Actions CI, `ignoreBuildErrors` o'chirildi, Payme
+  checkout real backend (#120); Reports CSV eksport (#122). **Loyiha bahosi 7.2 → ~8.6/10.**
 
 ### MVP fokus
-**Ad Launcher (3-bosqichli flow) production deploy.**
-Qolgan modullar (Marketplace, Portfolio, AmoCRM, Fraud, AI Agents va h.k.) kodda turaveradi, lekin MVP launch va sinov diqqati Ad Launcher'ga qaratiladi.
-
-Batafsil deploy qadamlari: `DEPLOY.md`.
-
-### 2026-06-02 sessiyasi — sifat sprinti + feature ulanishlar (10 PR merged)
-- **#113** Launch refactor: 1610 → 34 qator orchestrator + `_components/`
-- **#114** Dashboard freeze fix (effect cleanup, startTransition)
-- **#115** 21 ta unique feature animatsiya + SEO sahifalar
-- **#116** Conversational onboarding (CJM + AI byudjet taqsimlash)
-- **#117** AI Agents redizayn (My Agents, runtime dashboard)
-- **#118** AI Agents frontend → real `AiDecisions` backend
-- **#119** `/launch` → real `launch-orchestrator` + inline Meta creative
-- **#120** Sifat sprinti: testlar 84/87→**120/120**, GitHub Actions CI (yo'q edi),
-  yashirin TS xatolar 27→**0** (`ignoreBuildErrors` o'chirildi), 4 real prod bug,
-  4 mock sahifaga halol "Preview" badge, 14 Playwright smoke test, Payme checkout
-  real backend'ga ulandi, API lint 135→**0**
-- **#121** AI Agents approve → real platform bajarish (loop yopildi)
-- **#122** Reports — real client-side CSV eksport
-
-**Loyiha bahosi: 7.2 → ~8.6 / 10.**
-
-### CI/CD (yangi — #120)
-`.github/workflows/ci.yml` — har PR'da:
-- api: `test` (120/120) + `build` + `lint:check` (0 error)
-- web: `lint` + `i18n:check` + `tsc` + `build` + `test:e2e` (14 smoke)
-- `prettier/prettier` = warning (style debt, bloklamaydi)
+**Ad Launcher (Meta, 3-bosqichli flow) production deploy.**
+Qolgan modullar (Marketplace, Portfolio, AmoCRM, AI Agents, Fraud audit va h.k.) kodda
+turaveradi, lekin MVP launch va sinov diqqati Ad Launcher'ga qaratiladi. Deploy: `DEPLOY.md`.
 
 ### 10/10 ga qolgan ish (credential yoki katta feature kerak)
-- [ ] **To'lov live** — Render env: `PAYME_MERCHANT_ID` + `PAYME_MERCHANT_KEY`
-  (webhook: `/billing/payme`). Kod tayyor (#120), faqat kalit kutadi.
+- [ ] **To'lov live** — Render env: `PAYME_MERCHANT_ID` + `PAYME_MERCHANT_KEY` (webhook `/billing/payme`)
 - [ ] **Ad Library** — Meta `ads_archive` API (META_APP_ID/SECRET kerak)
 - [ ] **Simulation** — real Meta tarixiy data (connected account kerak)
-- [ ] **Reports PDF** — client-side PDF generatsiya (CSV tayyor)
-- [ ] **prettier churn** — `pnpm --filter api lint` (--fix) bir martalik formatlash
-
-### Bajarilgan va production-ga merged bo'lgan ishlar:
-- Landing page qayta dizayni
-- Ad Launcher 3-bosqichli flow (frontend)
-- Marketplace, Portfolio Gamification, AmoCRM, Fraud detection
-- i18n (Uzbek/Russian/English)
-- Retargeting worker, Creative Hub, Meta Audit, Reporting, Budget pages
-
-### Bu sessiyada qilingan ishlar (claude/hopeful-rubin-vTmX2 — Launch refactor Phase 1):
-- ✅ `/launch/page.tsx` 1610 → 34 qator — boshqaruvchi orchestrator
-- ✅ `_lib/` — `types.ts`, `meta-objectives.ts`, `utils.ts` (parsePositiveNumber, formatMoneyUsd, estimateAudienceReach), `use-launch-wizard.ts` (yagona state hook)
-- ✅ `_components/` — `LaunchHub`, `ModePicker`, `PlatformGlyph`, `ProgressRibbon` (clickable, step nomlari bilan), `SummaryPanel` (jonli sticky panel), `WizardHeader`, `StepFooter`
-- ✅ `_components/meta/` — ObjectiveStep, SettingsStep, AudienceStep, BudgetStep, CreativeStep, ReviewStep, MetaSummary, MetaWizard
-- ✅ `_components/google/GoogleWizard.tsx` va `_components/yandex/YandexWizard.tsx` — eski mantiq saqlangan
-- ✅ **Yangi UX qo'shimchalari:**
-  - SummaryPanel — har wizard stepda jonli xulasa (Meta uchun)
-  - ProgressRibbon — bosib steplar orasida sakrash (reachable steplar uchun)
-  - AudienceStep'da davlat chiplari + reach estimate (heuristic, taxminiy)
-  - BudgetStep'da Tezkor presetlar (Test/Standard/Masshtab) + duration chips
-  - CreativeStep'da live preview + Creative Hub link
-  - ObjectiveStep'da AI tavsiya hinti (Leads)
-- ✅ `pnpm --filter web build` — muvaffaqiyatli, `/launch` 19 kB
-- ✅ ESLint toza, `pnpm i18n:check` 2356 leaf key (3 tilda) saqlangan
-
-### Oldingi sessiyada (claude/setup-mvp-ads-Rivx6):
-- ✅ `pnpm install` — barcha bog'liqliklar o'rnatildi
-- ✅ Lokal `.env` shabloni (random JWT/ENCRYPTION secret'lar bilan)
-- ✅ `pnpm --filter api build` va `pnpm --filter web build` — har ikkalasi muvaffaqiyatli
-- ✅ **Bug tuzatildi:** `launch-orchestrator.service.ts` endi `payload.objective`, `payload.dailyBudget`, `payload.audiences` qiymatlarini Meta'ga to'g'ri uzatadi
-- ✅ Har audience uchun alohida Meta AdSet yaratiladi (ABO uchun budget bo'linadi)
-- ✅ **Source kampaniyadan kreativ nusxalash** — `MetaConnector.getCampaignAds()` + `createAdFromExistingCreative()`, yangi AdSet'larga manba reklamadagi har kreativ qo'shiladi
-- ✅ **Targeting frontend'ga ko'chirildi** — davlat (UZ/KZ/RU/...), yosh oralig'i, jins LaunchStep'da tanlanadi
-- ✅ **`launch_jobs` migration yozildi** — production'da `synchronize: false` bo'lganligi sababli avval jadval umuman yaratilmas edi
-- ✅ **Unit testlar** — `launch-orchestrator.service.spec.ts` (6 ta test, hammasi pass)
-- ✅ DTO'da `dailyBudget` ixtiyoriy (backward compat, default $20)
-- ✅ `render.yaml`'ga `AI_PROVIDER` va `ANTHROPIC_API_KEY` qo'shildi
-- ✅ `DEPLOY.md` — Render + Vercel + Meta App qadam-baqadam yo'riqnomasi
-
-### Keyingi qadamlar (faqat foydalanuvchi credentials kerak):
-- [ ] Render.com'da Postgres + Redis + API web service yaratish
-- [ ] Vercel'da web frontend deploy
-- [ ] Meta for Developers'da App yaratish va credentials Render'ga qo'shish
-- [ ] OAuth callback URL'ni Meta App'ga ro'yxatdan o'tkazish
+- [ ] **Reports PDF** — client-side PDF (CSV tayyor)
+- [ ] Render'da Postgres+Redis+API, Vercel'da web, Meta App credentials va OAuth callback ro'yxati
 - [ ] Birinchi sinov: register → workspace → Meta connect → Ad Launcher → real launch
+
+---
+
+## Repo strukturasi
+
+```
+apps/
+  web/                 — Next.js 14 App Router frontend
+    src/
+      app/
+        (auth)/        — login / register
+        (dashboard)/   — barcha dashboard sahifalari (quyidagi jadval)
+        marketplace/   — mutaxassislar bozori (public)
+        lp/            — landing page
+        solutions/, features/, onboarding/, privacy/, terms/, ...
+      components/      — umumiy React komponentlar
+      hooks/           — React hook'lar (masalan useRealtimeRefresh)
+      lib/, utils/     — helper'lar (test qamrovi shu yerda)
+      stores/          — Zustand store'lar
+      i18n/            — uz/ru/en tarjimalar (i18n:check paritet tekshiradi)
+      types/, content/, middleware.ts
+  api/                 — NestJS 10 backend
+    src/
+      auth/            — JWT/local/OAuth, refresh token, workspace guard
+      campaigns/, ads/, ad-sets/, creatives/  — reklama domeni
+      launch-orchestrator/  — Ad Launcher backend (Meta launch flow)
+      meta/            — Meta Graph API: ads, audit, sync, cron, AI engine
+      platforms/       — platform OAuth callback'lar (meta/google/yandex)
+      integrations/    — tashqi integratsiyalar (AmoCRM connector shu yerda)
+      ai-agent/, ai-decisions/, agents/  — AI agent runtime va qarorlar
+      auto-optimization/, budget/, analytics/, conversions/  — optimallashtirish
+      workspaces/, workspace-members/, workspace-service/, team-invites/  — multi-tenant
+      billing/         — obuna + Payme
+      marketplace bilan bog'liq: agents/, landing-pages/, heygen/
+      retarget-signal/, triggersets/, events/, queue/  — realtime + Bull queue
+      health/          — /ready, /health probe'lar
+      database/        — TypeORM datasource + migrations/ + seed
+      common/, config/, dto/, mcp/
+  retargeting-worker/  — mustaqil worker (Bull consumer, SQL sql/ ichida)
+packages/
+  shared/              — @adspectr/shared (umumiy tiplar/util)
+  ai-sdk/              — @adspectr/ai-sdk (OpenAI/Anthropic abstraksiya)
+  creative-hub-core/   — @adspectr/creative-hub-core (kreativ generatsiya yadrosi)
+```
+
+> Turbo bog'liqlik tartibi: `api` build'i avval `@adspectr/shared` va `@adspectr/ai-sdk`
+> ni build qiladi; `web` `@adspectr/creative-hub-core`'ga bog'liq. Jest/Vitest bu paketlarga
+> `moduleNameMapper` orqali to'g'ridan-to'g'ri `src`'ni map qiladi.
 
 ---
 
 ## Dashboard sahifalari (apps/web/src/app/(dashboard)/)
 
-| Sahifa | Yo'l | Holat |
-|--------|------|-------|
-| Campaigns | /campaigns | ✅ |
-| Ad Launcher | /ad-launcher | ✅ |
-| Creative Hub | /creative-hub | ✅ |
-| Marketplace | /marketplace | ✅ |
-| Meta Audit | /meta-audit | ✅ |
-| Reports | /reports | ✅ |
-| Budget | /budget | ✅ |
-| Top Ads | /top-ads | ✅ |
-| Automation | /automation | ✅ |
-| My Portfolio | /my-portfolio | ✅ |
-| AI Agents | /ai-agents | ✅ |
-| Wizard | /wizard | ✅ |
+| Sahifa | Yo'l | | Sahifa | Yo'l |
+|--------|------|-|--------|------|
+| Dashboard | /dashboard | | Reports / Reporting | /reports, /reporting |
+| Campaigns | /campaigns | | Budget | /budget |
+| Ad Launcher | /ad-launcher | | Billing | /billing |
+| Launch (wizard) | /launch | | Automation | /automation |
+| Creative Hub | /creative-hub | | Auto-optimization | /auto-optimization |
+| Creative Scorer | /creative-scorer | | Top Ads | /top-ads |
+| Creative Audit | /creative-audit | | Competitors | /competitors |
+| Meta Audit | /meta-audit | | Simulation | /simulation |
+| Ad Library | /ad-library | | ROI Calculator | /roi-calculator |
+| AI Agents | /ai-agents | | Retargeting | /retarget, /retargeting |
+| Create Agent | /create-agent | | Triggersets | /triggersets |
+| AI Decisions | /ai-decisions | | Audiences | /audiences |
+| Marketplace | /marketplace | | Performance | /performance |
+| My Portfolio | /my-portfolio | | Team | /team |
+| Landing Page | /landing-page | | Settings | /settings |
+| Site Generator | /site-generator | | Platforms | /platforms |
+| Wizard | /wizard | | Service | /service |
 
----
-
-## Asosiy fayllar
-
-```
-apps/
-  web/src/app/
-    (dashboard)/     — barcha dashboard sahifalari
-    marketplace/     — mutaxassislar bozori
-    lp/              — landing page
-  api/src/
-    amocrm/          — AmoCRM integration
-    campaigns/       — kampaniya API
-    fraud/           — fraud detection
-packages/
-  ui/                — umumiy UI komponentlar
-```
+> MVP diqqati: **Ad Launcher / Launch**. Ba'zi sahifalar "Preview"/"Coming soon"
+> badge bilan halol belgilangan (real integratsiya hali yo'q).
 
 ---
 
@@ -213,12 +237,30 @@ git checkout -b feature/...    # Yangi feature branch
 git push -u origin <branch>    # Pushdan keyin PR oching
 ```
 
-**Qoida:** Har yangi feature uchun yangi branch → PR → main-ga merge.
+**Qoida:** Har yangi feature uchun yangi branch → PR → `main`ga merge. Har PR CI'dan o'tishi shart.
+
+---
+
+## Konvensiyalar
+
+- **Kod uslubi:** mavjud fayllarga moslash. API'da NestJS module/service/controller
+  namunasi; web'da App Router server/client component ajratmasi.
+- **Testlar:** API — `*.spec.ts` (Jest, service yonida); web — `*.test.ts(x)` (Vitest,
+  asosan `lib`/`utils`); e2e — Playwright smoke (`test:e2e`, brauzersiz request API).
+- **i18n:** har yangi UI matn uz/ru/en uchtasida bo'lishi kerak — aks holda `i18n:check` yiqiladi.
+- **DB o'zgarishi:** prod'da `synchronize:false`. Sxema o'zgarsa **migration yoz**
+  (idempotent: `IF NOT EXISTS`, `hasTable`/`hasColumn` guard) va toza PG'da sinab ko'r.
+- **Halollik (honesty):** real integratsiyasiz feature'ni "launched/connected" deb
+  ko'rsatma — "Preview"/"Coming soon" badge qo'y.
+- **Xavfsizlik:** bcrypt 12 round, refresh token hash'langan, JWT secret fail-closed,
+  email-enumeration'dan himoya. Bularni buzma.
 
 ---
 
 ## Sessiya oxirida qilish kerak
 
-1. `git status` — o'zgarishlar bor-yo'qligini tekshir
-2. Commit va push qil
-3. Bu fayldagi "Joriy holat" bo'limini yangilash (nima qilindi, nima qoldi)
+1. `git status` — o'zgarishlarni tekshir
+2. Tegishli CI darvozalarini lokal qaytar (test / lint:check / tsc / i18n:check / build)
+3. Commit va push (`git push -u origin <branch>`)
+4. Bu fayldagi "Joriy holat" bo'limini yangilash (nima qilindi, nima qoldi)
+```
