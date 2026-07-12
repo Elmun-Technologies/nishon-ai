@@ -27,7 +27,7 @@ import {
 } from "@nestjs/swagger";
 import { Request } from "express";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { MetaAdsService } from "./meta-ads.service";
 import { MetaSyncService } from "./meta-sync.service";
 import {
@@ -280,9 +280,18 @@ export class MetaController {
     // totals, just resolved from a single scan + in-memory map lookups.
     const insightsByCampaign = await this.aggregateInsightsMap(workspaceId);
 
-    const enrichedAccounts = await Promise.all(
-      accounts.map((account) =>
-        this.buildAccountPayload(account, workspaceId, insightsByCampaign),
+    // Single query for all accounts' campaigns instead of one find() per
+    // account (the old N+1), grouped in memory by adAccountId.
+    const campaignsByAccount = await this.groupCampaignsByAccount(
+      accounts.map((a) => a.id),
+      workspaceId,
+    );
+
+    const enrichedAccounts = accounts.map((account) =>
+      this.buildAccountPayload(
+        account,
+        campaignsByAccount.get(account.id) ?? [],
+        insightsByCampaign,
       ),
     );
 
@@ -291,17 +300,31 @@ export class MetaController {
 
   // ─── Private: dashboard builders ────────────────────────────────────────────
 
-  private async buildAccountPayload(
-    account: MetaAdAccount,
+  /** Fetches every campaign for the given accounts in a single query, grouped by adAccountId. */
+  private async groupCampaignsByAccount(
+    accountIds: string[],
     workspaceId: string,
-    insightsByCampaign: Map<string, CampaignInsights>,
-  ) {
-    // Filter campaigns by both adAccountId AND workspaceId for strict isolation
+  ): Promise<Map<string, MetaCampaignSync[]>> {
+    const map = new Map<string, MetaCampaignSync[]>();
+    if (accountIds.length === 0) return map;
+
     const campaigns = await this.campaignRepo.find({
-      where: { adAccountId: account.id, workspaceId },
+      where: { adAccountId: In(accountIds), workspaceId },
       order: { name: "ASC" },
     });
+    for (const c of campaigns) {
+      const list = map.get(c.adAccountId);
+      if (list) list.push(c);
+      else map.set(c.adAccountId, [c]);
+    }
+    return map;
+  }
 
+  private buildAccountPayload(
+    account: MetaAdAccount,
+    campaigns: MetaCampaignSync[],
+    insightsByCampaign: Map<string, CampaignInsights>,
+  ) {
     const enrichedCampaigns = campaigns.map((c) =>
       this.buildCampaignPayload(c, insightsByCampaign),
     );
@@ -607,61 +630,63 @@ export class MetaController {
 
     const accounts = await this.adAccountRepo.find({ where: { workspaceId } });
 
-    const result = await Promise.all(
-      accounts.map(async (account) => {
-        const campaigns = await this.campaignRepo.find({
-          where: { adAccountId: account.id, workspaceId },
-          order: { name: "ASC" },
-        });
-
-        const enriched = campaigns.map((c) => ({
-          id: c.id,
-          name: c.name,
-          status: c.status,
-          objective: c.objective,
-          tags: c.tags ?? [],
-          metrics: metricByCampaign[c.id] ?? {
-            spend: 0,
-            clicks: 0,
-            impressions: 0,
-            ctr: 0,
-            cpc: 0,
-          },
-        }));
-
-        // Roll up account-level metrics
-        const accountMetrics = enriched.reduce(
-          (acc, c) => ({
-            spend: acc.spend + c.metrics.spend,
-            clicks: acc.clicks + c.metrics.clicks,
-            impressions: acc.impressions + c.metrics.impressions,
-            ctr: 0, // calculated below
-            cpc: 0,
-          }),
-          { spend: 0, clicks: 0, impressions: 0, ctr: 0, cpc: 0 },
-        );
-        accountMetrics.ctr =
-          accountMetrics.impressions > 0
-            ? Math.round(
-                (accountMetrics.clicks / accountMetrics.impressions) * 10000,
-              ) / 100
-            : 0;
-        accountMetrics.cpc =
-          accountMetrics.clicks > 0
-            ? Math.round((accountMetrics.spend / accountMetrics.clicks) * 100) /
-              100
-            : 0;
-
-        return {
-          id: account.id,
-          name: account.name,
-          currency: account.currency ?? "USD",
-          timezone: account.timezone,
-          metrics: accountMetrics,
-          campaigns: enriched,
-        };
-      }),
+    // Single query for all accounts' campaigns instead of one find() per
+    // account (the old N+1), grouped in memory by adAccountId.
+    const campaignsByAccount = await this.groupCampaignsByAccount(
+      accounts.map((a) => a.id),
+      workspaceId,
     );
+
+    const result = accounts.map((account) => {
+      const campaigns = campaignsByAccount.get(account.id) ?? [];
+
+      const enriched = campaigns.map((c) => ({
+        id: c.id,
+        name: c.name,
+        status: c.status,
+        objective: c.objective,
+        tags: c.tags ?? [],
+        metrics: metricByCampaign[c.id] ?? {
+          spend: 0,
+          clicks: 0,
+          impressions: 0,
+          ctr: 0,
+          cpc: 0,
+        },
+      }));
+
+      // Roll up account-level metrics
+      const accountMetrics = enriched.reduce(
+        (acc, c) => ({
+          spend: acc.spend + c.metrics.spend,
+          clicks: acc.clicks + c.metrics.clicks,
+          impressions: acc.impressions + c.metrics.impressions,
+          ctr: 0, // calculated below
+          cpc: 0,
+        }),
+        { spend: 0, clicks: 0, impressions: 0, ctr: 0, cpc: 0 },
+      );
+      accountMetrics.ctr =
+        accountMetrics.impressions > 0
+          ? Math.round(
+              (accountMetrics.clicks / accountMetrics.impressions) * 10000,
+            ) / 100
+          : 0;
+      accountMetrics.cpc =
+        accountMetrics.clicks > 0
+          ? Math.round((accountMetrics.spend / accountMetrics.clicks) * 100) /
+            100
+          : 0;
+
+      return {
+        id: account.id,
+        name: account.name,
+        currency: account.currency ?? "USD",
+        timezone: account.timezone,
+        metrics: accountMetrics,
+        campaigns: enriched,
+      };
+    });
 
     return { workspaceId, days: parseInt(days) || 30, accounts: result };
   }
