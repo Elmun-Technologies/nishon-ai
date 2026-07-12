@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import {
   AudienceSegment,
   SegmentMember,
@@ -158,39 +158,49 @@ export class ContactSyncService {
       let membersAdded = 0;
       let membersFailed = 0;
 
-      // Upsert segment members
-      for (const identifier of contactIdentifiers) {
-        try {
-          const existing = await this.segmentMemberRepository.findOne({
+      // Batch-load existing members for all contacts in one query instead of
+      // one findOne() per contact (was N+1), then split into re-add/insert
+      // sets and persist each set with a single save() call.
+      const existingMembers = contactIdentifiers.length
+        ? await this.segmentMemberRepository.find({
             where: {
               segmentId,
-              amoCrmContactId: identifier.amoCrmContactId,
+              amoCrmContactId: In(
+                contactIdentifiers.map((c) => c.amoCrmContactId),
+              ),
             },
-          });
+          })
+        : [];
+      const existingByContactId = new Map(
+        existingMembers.map((m) => [m.amoCrmContactId, m]),
+      );
 
-          if (existing && existing.removedAt) {
-            // Re-add member
-            existing.removedAt = null;
-            existing.syncStatus = "pending";
-            await this.segmentMemberRepository.save(existing);
-            membersAdded++;
-          } else if (!existing) {
-            // Add new member
-            await this.segmentMemberRepository.save(
-              this.segmentMemberRepository.create({
-                segmentId,
-                ...identifier,
-                syncStatus: "pending",
-              }),
-            );
-            membersAdded++;
-          }
-        } catch (error) {
-          this.logger.error(
-            `Failed to add contact ${identifier.amoCrmContactId}: ${error.message}`,
+      const toReAdd: SegmentMember[] = [];
+      const toInsert: SegmentMember[] = [];
+      for (const identifier of contactIdentifiers) {
+        const existing = existingByContactId.get(identifier.amoCrmContactId);
+        if (existing && existing.removedAt) {
+          existing.removedAt = null;
+          existing.syncStatus = "pending";
+          toReAdd.push(existing);
+        } else if (!existing) {
+          toInsert.push(
+            this.segmentMemberRepository.create({
+              segmentId,
+              ...identifier,
+              syncStatus: "pending",
+            }),
           );
-          membersFailed++;
         }
+      }
+
+      try {
+        if (toReAdd.length) await this.segmentMemberRepository.save(toReAdd);
+        if (toInsert.length) await this.segmentMemberRepository.save(toInsert);
+        membersAdded = toReAdd.length + toInsert.length;
+      } catch (error) {
+        this.logger.error(`Failed to upsert segment members: ${error.message}`);
+        membersFailed = toReAdd.length + toInsert.length;
       }
 
       const duration = Date.now() - startTime;
@@ -316,10 +326,13 @@ export class ContactSyncService {
       },
     });
 
-    // Mark as synced (in real implementation, would upload to platform)
-    for (const member of pendingMembers) {
-      member.syncStatus = "synced";
-      await this.segmentMemberRepository.save(member);
+    // Mark as synced (in real implementation, would upload to platform) —
+    // one bulk update instead of a save() per member (was N sequential awaits).
+    if (pendingMembers.length) {
+      await this.segmentMemberRepository.update(
+        { id: In(pendingMembers.map((m) => m.id)) },
+        { syncStatus: "synced" },
+      );
     }
 
     const duration = Date.now() - startTime;
