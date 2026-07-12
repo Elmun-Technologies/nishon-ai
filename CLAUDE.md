@@ -25,10 +25,29 @@ pnpm --filter api dev   # Faqat backend
 
 ---
 
-## Joriy holat (so'nggi yangilash: 2026-07-10)
+## Joriy holat (so'nggi yangilash: 2026-07-12)
 
-**Asosiy branch:** `main`
-**Faol branch:** `claude/loyihani-mvp-readiness-xv4anj` — MVP-tayyorlik: real deploy blockerlari tuzatildi
+**Asosiy branch:** `main` (PR #150 gacha merge qilingan)
+**Faol branch:** `claude/github-updates-optimization-jy2ut6` — GitHub holatini tekshirish + optimizatsiya
+
+### 2026-07-12 sessiyasi — GitHub sinxronizatsiya tekshiruvi
+`main`'dan so'nggi o'zgarishlar tortib olindi, branch `origin/main` (b80c4ae) bilan
+bir xil holatda ekanligi tasdiqlandi. Ochiq PR'lar tekshirildi:
+
+- **PR #150** (merged, hujjatlanmagan edi — endi quyida yozildi): dashboard N+1
+  so'rov tuzatildi, `1763400000000-AddPerformanceIndexes` migration qo'shildi
+  (ad-sets/ai-decisions/meta-campaign-sync indekslari), `useRealtimeRefresh`dagi
+  stale closure bug tuzatildi, campaign toolbar'dagi o'lik tugmalar olib
+  tashlandi, real vs disconnected holatlar aniqlashtirildi, brand SVG
+  illyustratsiyalar (`features`/`marketplace`/`solutions` sahifalari) qo'shildi,
+  RevenueAreaChart komponenti qo'shildi, budget/billing fix'lar.
+- ⚠️ **3 ta ochiq dependabot PR** (major versiya bumplari, hali merge qilinmagan):
+  - #144 `@nestjs/platform-express` 10.4.22→11.1.26 — CI ✅ yashil
+  - #143 `eslint-config-next` 14.0.4→16.2.7 — CI ❌ Web lint+i18n+build failure
+    (2026-06-08'dagi eski run, `main`'dan orqada qolgan bo'lishi mumkin)
+  - #141 `eslint` 8.56.0→10.4.1 — CI ❌ ham API ham Web build failure
+  - Bu ikkalasi `dependabot.yml`dagi weekly grouped bump'lardan oldingi/tashqi
+    PR'lar bo'lib, eski va stale ko'rinadi — qayta baholash yoki yopish kerak.
 
 ### 2026-07-10 sessiyasi — MVP-tayyorlik: real deploy blockerlari
 Holat aniqlash: barcha CI darvozalari yashil edi (API 295/295, web unit 112/112,
