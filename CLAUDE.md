@@ -61,6 +61,25 @@ bir xil holatda ekanligi tasdiqlandi. Ochiq PR'lar tekshirildi:
   `openPrintableReport()` naqshiga o'xshab, brauzer print-dialog orqali (yangi
   dependency yo'q). PreviewBanner'dan "PDF yaqin yangilanishlarda" olib
   tashlandi. Build/lint/unit testlar (API 295/295, web 112/112) toza.
+- ✅ **N+1 so'rov auditi + 3 ta tuzatish** (subagent orqali `apps/api/src`
+  bo'ylab qidirildi, 8 ta topilma ranked; eng yuqori ta'sirlisi tuzatildi):
+  - `meta.controller.ts` — `/meta/dashboard` va `/meta/reporting` ikkalasi ham
+    har ad-account uchun alohida `campaignRepo.find()` chaqirardi (PR #150
+    faqat insight-aggregatsiyani tuzatgan, kampaniya so'rovi qolib ketgan edi).
+    Endi ikkalasi ham umumiy `groupCampaignsByAccount()` helper orqali bitta
+    `In(accountIds)` so'rovi + xotirada guruhlash ishlatadi.
+  - `contact-sync.service.ts` — `syncAudienceSegment` har AmoCRM contact uchun
+    ketma-ket `findOne`+`save` qilardi (2x N so'rov, oddiy N+1'dan yomonroq);
+    `incrementalSyncSegment` esa har member uchun alohida `save()`. Ikkalasi
+    ham batch `find(In(...))` / bitta `update(In(...))`ga aylantirildi.
+  - Qolgan 5 ta topilma (triggersets.service.ts, agents.service.ts,
+    decision-loop.service.ts) cron-driven yoki past ta'sirli — keyingi
+    sessiyaga qoldirildi (audit natijasi transcript'da saqlangan).
+  - Har uch commit'dan keyin ham: API 295/295 test, lint 0 error, build toza.
+- ⚠️ **Dependabot #141/#143/#144 hali `dirty`** — `@dependabot rebase` va
+  `@dependabot recreate` komandalari bu sessiyada samara bermadi (bot
+  javob bermadi/juda sekin). Keyingi sessiyada holatni qayta tekshirish yoki
+  qo'lda rebase qilish kerak.
 
 ### 2026-07-10 sessiyasi — MVP-tayyorlik: real deploy blockerlari
 Holat aniqlash: barcha CI darvozalari yashil edi (API 295/295, web unit 112/112,
