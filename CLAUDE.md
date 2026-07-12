@@ -41,13 +41,26 @@ bir xil holatda ekanligi tasdiqlandi. Ochiq PR'lar tekshirildi:
   tashlandi, real vs disconnected holatlar aniqlashtirildi, brand SVG
   illyustratsiyalar (`features`/`marketplace`/`solutions` sahifalari) qo'shildi,
   RevenueAreaChart komponenti qo'shildi, budget/billing fix'lar.
-- ⚠️ **3 ta ochiq dependabot PR** (major versiya bumplari, hali merge qilinmagan):
-  - #144 `@nestjs/platform-express` 10.4.22→11.1.26 — CI ✅ yashil
-  - #143 `eslint-config-next` 14.0.4→16.2.7 — CI ❌ Web lint+i18n+build failure
-    (2026-06-08'dagi eski run, `main`'dan orqada qolgan bo'lishi mumkin)
-  - #141 `eslint` 8.56.0→10.4.1 — CI ❌ ham API ham Web build failure
-  - Bu ikkalasi `dependabot.yml`dagi weekly grouped bump'lardan oldingi/tashqi
-    PR'lar bo'lib, eski va stale ko'rinadi — qayta baholash yoki yopish kerak.
+- ⚠️ **3 ta ochiq dependabot PR** (major versiya bumplari, hali merge qilinmagan),
+  hammasi `mergeable_state: dirty` (asosiy branch bilan konflikt, 30+ kun ochiq
+  bo'lgani uchun avtomatik rebase o'chirilgan):
+  - #144 `@nestjs/platform-express` 10.4.22→11.1.26 — eski CI (06-08) yashil edi
+  - #143 `eslint-config-next` 14.0.4→16.2.7 — eski CI ❌ Web lint+i18n+build
+  - #141 `eslint` 8.56.0→10.4.1 — eski CI ❌ ham API ham Web build
+  - `@dependabot rebase` va `@dependabot recreate` sinab ko'rildi, ikkalasi ham
+    darhol samara bermadi — keyingi sessiyada holatni qayta tekshirish kerak.
+  - **Muhim:** #141/#143 real konflikt — ESLint 8→10 bump loyihaning eski
+    `.eslintrc.js` formatini qo'llab-quvvatlamaydi (ESLint v9+ `eslint.config.js`
+    flat config talab qiladi; xato log orqali tasdiqlangan: "ESLint couldn't find
+    an eslint.config.(js|mjs|cjs) file"). Bu versiya-bump emas, balki flat-config
+    migratsiya ishi (`.eslintrc.js` → `eslint.config.js`, ikkala `apps/api` va
+    `apps/web` uchun) — MVP fokusidan tashqarida, alohida vazifa sifatida
+    rejalashtirish kerak.
+- ✅ **Reports PDF eksport qo'shildi** (backlog'dagi oxirgi credential-siz item):
+  `reports/page.tsx`'ga `handleExportPdf()` — `reporting-export.ts`'dagi
+  `openPrintableReport()` naqshiga o'xshab, brauzer print-dialog orqali (yangi
+  dependency yo'q). PreviewBanner'dan "PDF yaqin yangilanishlarda" olib
+  tashlandi. Build/lint/unit testlar (API 295/295, web 112/112) toza.
 
 ### 2026-07-10 sessiyasi — MVP-tayyorlik: real deploy blockerlari
 Holat aniqlash: barcha CI darvozalari yashil edi (API 295/295, web unit 112/112,
