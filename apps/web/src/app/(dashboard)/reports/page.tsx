@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { CalendarClock, ChevronDown, FileDown, Info, Link2 } from 'lucide-react'
+import { CalendarClock, ChevronDown, FileDown, FileText, Info, Link2 } from 'lucide-react'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { useI18n } from '@/i18n/use-i18n'
 import { ComingSoonBadge, PageHeader, PreviewBanner } from '@/components/ui'
@@ -148,16 +148,11 @@ export default function ReportsBuilderPage() {
     }
   }
 
-  /**
-   * Export the current report layout as a CSV (the selected metrics, their
-   * category, type, and formula). This is the report *spec* — live metric
-   * values fill in once a Meta/Google account is connected. Generated fully
-   * client-side, so it works today with no backend.
-   */
-  function handleExportCsv() {
-    const esc = (v: string) => `"${String(v).replace(/"/g, '""')}"`
-    const header = ['#', 'Metrika', 'Kategoriya', 'Turi', 'Formula']
-    const rows = widgetIds.map((id, i) => {
+  const specRowHeader = ['#', 'Metrika', 'Kategoriya', 'Turi', 'Formula']
+
+  /** Row data for the current report spec — shared by the CSV and PDF exports. */
+  function buildSpecRows(): string[][] {
+    return widgetIds.map((id, i) => {
       const m = getMetricById(id)
       return [
         String(i + 1),
@@ -167,6 +162,16 @@ export default function ReportsBuilderPage() {
         m?.formula ?? '',
       ]
     })
+  }
+
+  /**
+   * Export the current report layout as a CSV (the selected metrics, their
+   * category, type, and formula). This is the report *spec* — live metric
+   * values fill in once a Meta/Google account is connected. Generated fully
+   * client-side, so it works today with no backend.
+   */
+  function handleExportCsv() {
+    const esc = (v: string) => `"${String(v).replace(/"/g, '""')}"`
     // A small meta block so the file is self-describing.
     const meta = [
       ['Nishon AI — Report spec'],
@@ -179,8 +184,8 @@ export default function ReportsBuilderPage() {
     ]
     const csv = [
       ...meta.map((r) => r.map(esc).join(',')),
-      header.map(esc).join(','),
-      ...rows.map((r) => r.map(esc).join(',')),
+      specRowHeader.map(esc).join(','),
+      ...buildSpecRows().map((r) => r.map(esc).join(',')),
     ].join('\n')
 
     const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' })
@@ -192,6 +197,34 @@ export default function ReportsBuilderPage() {
     a.click()
     a.remove()
     URL.revokeObjectURL(url)
+  }
+
+  /**
+   * "PDF" export via the browser's print dialog (Save as PDF) — no client
+   * bundle cost, same approach as reporting-export.ts's openPrintableReport.
+   */
+  function handleExportPdf() {
+    const escHtml = (v: string) => v.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    const rows = [specRowHeader, ...buildSpecRows()]
+    const table = `<table style="border-collapse:collapse;width:100%;font-size:12px;font-family:system-ui,sans-serif">
+<thead><tr>${rows[0].map((h) => `<th style="border:1px solid #ccc;padding:6px;text-align:left;background:#f4f4f5">${escHtml(h)}</th>`).join('')}</tr></thead>
+<tbody>${rows
+      .slice(1)
+      .map((r) => `<tr>${r.map((c) => `<td style="border:1px solid #ddd;padding:5px">${escHtml(c)}</td>`).join('')}</tr>`)
+      .join('')}
+</tbody></table>`
+    const w = window.open('', '_blank', 'noopener,noreferrer,width=1100,height=800')
+    if (!w) return
+    w.document.write(`<!DOCTYPE html><html><head><title>Nishon AI — Report spec</title>
+<style>@media print { @page { margin: 12mm; } }</style></head>
+<body style="padding:16px;color:#111">
+<h1 style="font-size:18px;margin:0 0 4px">Report spec — ${persona}</h1>
+<p style="margin:0 0 16px;color:#555;font-size:13px">Davr: ${filters.range} · Platforma: ${filters.platform} · ${widgetIds.length} metrika</p>
+${table}
+<p style="margin-top:16px;font-size:11px;color:#888">Nishon AI — ${new Date().toISOString().slice(0, 19)}</p>
+<script>window.onload=function(){window.focus();window.print();}</script>
+</body></html>`)
+    w.document.close()
   }
 
   const widgetProgress = (widgetIds.length / MAX_REPORT_WIDGETS) * 100
@@ -221,7 +254,7 @@ export default function ReportsBuilderPage() {
 
       <PreviewBanner
         title="Report builder — preview rejimida"
-        body="Layout, persona, metrika tanlovi va CSV eksport ishlaydi (workspace bo'yicha saqlanadi). Jonli metrika qiymatlari Meta/Google ulangach to'ladi; PDF va share-link yaqin yangilanishlarda."
+        body="Layout, persona, metrika tanlovi, CSV va PDF eksport ishlaydi (workspace bo'yicha saqlanadi). Jonli metrika qiymatlari Meta/Google ulangach to'ladi."
       />
 
       {/* ── Persona segmented control ── */}
@@ -431,6 +464,20 @@ export default function ReportsBuilderPage() {
               >
                 <FileDown className="w-3.5 h-3.5 text-text-tertiary" />
                 📤 CSV eksport ({widgetIds.length})
+              </button>
+              <button
+                type="button"
+                onClick={handleExportPdf}
+                disabled={widgetIds.length === 0}
+                title={widgetIds.length === 0 ? 'Avval metrika qo\'shing' : 'PDF sifatida chop etish/saqlash'}
+                className={cn(
+                  'inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium transition-all w-full',
+                  'bg-surface-2 hover:bg-white border border-border hover:border-emerald-300 text-text-primary',
+                  'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-surface-2 disabled:hover:border-border',
+                )}
+              >
+                <FileText className="w-3.5 h-3.5 text-text-tertiary" />
+                🖨️ PDF eksport
               </button>
               <Button
                 type="button"
