@@ -2831,11 +2831,25 @@
         "TOFU": "Top of Funnel — холодная аудитория",
         "MOFU": "Middle of Funnel — рассмотрение",
         "BOFU": "Bottom of Funnel — ретаргетинг"
-      }
+      },
+      "total": "Всего",
+      "byFunnel": "Этапы воронки"
     },
     "active": {
       "banner": "AI-агент активен — кампании управляются автоматически.",
       "reconfigure": "Настроить заново"
+    },
+    "thinking": {
+      "scanSite": "Сканируем ваш сайт…",
+      "analyzeAudience": "Анализируем аудиторию…",
+      "allocateBudget": "Распределяем бюджет по каналам…",
+      "draftCopy": "Готовим рекламные тексты…",
+      "launch": "Запускаем агента…"
+    },
+    "decisions": {
+      "title": "AI-агент — журнал решений",
+      "sample": "Пример",
+      "viewAll": "Все"
     }
   }
 }

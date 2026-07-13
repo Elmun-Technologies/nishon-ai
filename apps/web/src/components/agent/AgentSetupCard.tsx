@@ -1,7 +1,8 @@
 'use client'
 
-import { useMemo, useState } from 'react'
-import { Bot, Link2, Loader2, Megaphone, Shield, Sparkles, Target, TrendingUp } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import nextDynamic from 'next/dynamic'
+import { Bot, Check, Link2, Loader2, Megaphone, Shield, Sparkles, Target, TrendingUp } from 'lucide-react'
 import { Input } from '@/components/ui'
 import { useI18n } from '@/i18n/use-i18n'
 import { cn } from '@/lib/utils'
@@ -13,6 +14,12 @@ import {
   type AgentGoal,
 } from '@/lib/funnel-allocator'
 
+// Donut code-splits recharts out of the main bundle; only loads on preview.
+const AllocationDonut = nextDynamic(() => import('./AllocationDonut'), {
+  ssr: false,
+  loading: () => <div className="h-[200px] w-full animate-pulse rounded-2xl bg-surface-2/40" />,
+})
+
 /**
  * The autonomous agent's ultra-fast setup surface — the dashboard hero.
  *
@@ -22,11 +29,12 @@ import {
  *   3. Total budget
  *
  * From these, the Budget Allocator maps spend across the marketing funnel
- * (TOFU / MOFU / BOFU) and across Meta / Google / TikTok / Telegram, live.
+ * (TOFU / MOFU / BOFU) and across Meta / Google / TikTok / Telegram, shown live
+ * as an interactive donut.
  *
- * "Activate" persists the config locally and kicks the real AI optimization
- * loop (`aiAgent.optimize`) — it does NOT fabricate a launch, and it never
- * creates a duplicate workspace.
+ * "Activate" plays a staged "AI Agent is thinking…" sequence, persists the
+ * config locally, and kicks the real AI optimization loop (`aiAgent.optimize`)
+ * — it does NOT fabricate a launch, and never creates a duplicate workspace.
  */
 
 const STOP_LOSS_DEFAULT_USD = 30
@@ -64,6 +72,11 @@ function usd(n: number): string {
   return `$${Math.round(n).toLocaleString('en-US')}`
 }
 
+/** Steps shown during the "AI Agent is thinking…" sequence. */
+const THINKING_STEP_KEYS = ['scanSite', 'analyzeAudience', 'allocateBudget', 'draftCopy', 'launch'] as const
+type ThinkingStep = (typeof THINKING_STEP_KEYS)[number]
+const STEP_MS = 900
+
 export function AgentSetupCard({
   workspaceId,
   defaultLink = '',
@@ -78,8 +91,14 @@ export function AgentSetupCard({
   const [link, setLink] = useState(defaultLink)
   const [goal, setGoal] = useState<AgentGoal>('sales')
   const [budget, setBudget] = useState(1000)
-  const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+
+  // Staged "thinking" sequence: index into THINKING_STEP_KEYS, or -1 when idle.
+  const [thinkingStep, setThinkingStep] = useState(-1)
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([])
+  const submitting = thinkingStep >= 0
+
+  useEffect(() => () => timers.current.forEach(clearTimeout), [])
 
   const allocation = useMemo(
     () => allocateFunnelBudget({ goal, totalBudget: budget }),
@@ -88,9 +107,8 @@ export function AgentSetupCard({
 
   const canActivate = link.trim().length > 3 && budget >= 100 && !submitting
 
-  async function handleActivate() {
+  function handleActivate() {
     if (!canActivate) return
-    setSubmitting(true)
     setError('')
     const config: AgentConfig = {
       link: link.trim(),
@@ -99,27 +117,35 @@ export function AgentSetupCard({
       stopLossUsd: STOP_LOSS_DEFAULT_USD,
       activatedAt: new Date().toISOString(),
     }
-    try {
-      if (workspaceId) {
-        // Persist the plan client-side so the dashboard can show "agent active".
+
+    // Play the staged thinking animation; fire the real work on the last step.
+    timers.current.forEach(clearTimeout)
+    timers.current = []
+    THINKING_STEP_KEYS.forEach((_, i) => {
+      timers.current.push(setTimeout(() => setThinkingStep(i), i * STEP_MS))
+    })
+    timers.current.push(
+      setTimeout(async () => {
         try {
-          window.localStorage.setItem(configKey(workspaceId), JSON.stringify(config))
-        } catch {
-          /* ignore quota / private-mode errors */
+          if (workspaceId) {
+            try {
+              window.localStorage.setItem(configKey(workspaceId), JSON.stringify(config))
+            } catch {
+              /* ignore quota / private-mode errors */
+            }
+            await aiAgent.optimize(workspaceId)
+          }
+          onActivated?.(config)
+        } catch (e: unknown) {
+          setThinkingStep(-1)
+          setError(
+            e instanceof Error
+              ? e.message
+              : t('agent.setup.activateError', "AI Agent'ni ishga tushirishda xato"),
+          )
         }
-        // Kick the real autonomous optimization loop.
-        await aiAgent.optimize(workspaceId)
-      }
-      onActivated?.(config)
-    } catch (e: unknown) {
-      setError(
-        e instanceof Error
-          ? e.message
-          : t('agent.setup.activateError', "AI Agent'ni ishga tushirishda xato"),
-      )
-    } finally {
-      setSubmitting(false)
-    }
+      }, THINKING_STEP_KEYS.length * STEP_MS),
+    )
   }
 
   const GOALS: Array<{ id: AgentGoal; icon: typeof Target; title: string; sub: string }> = [
@@ -138,6 +164,14 @@ export function AgentSetupCard({
   ]
 
   const PRESETS = [1000, 2000, 3000]
+
+  const THINKING_LABELS: Record<ThinkingStep, string> = {
+    scanSite: t('agent.thinking.scanSite', 'Saytingiz skanerlanmoqda…'),
+    analyzeAudience: t('agent.thinking.analyzeAudience', 'Auditoriya tahlil qilinmoqda…'),
+    allocateBudget: t('agent.thinking.allocateBudget', 'Byudjet kanallarga taqsimlanmoqda…'),
+    draftCopy: t('agent.thinking.draftCopy', 'Reklama matnlari tayyorlanmoqda…'),
+    launch: t('agent.thinking.launch', 'Agent ishga tushirilmoqda…'),
+  }
 
   return (
     <div className="overflow-hidden rounded-3xl border border-brand-lime/25 bg-gradient-to-br from-brand-ink/[0.03] to-brand-lime/[0.06] shadow-sm dark:from-white/[0.02] dark:to-brand-lime/[0.04]">
@@ -177,6 +211,7 @@ export function AgentSetupCard({
               placeholder="https://example.uz  ·  t.me/kanal"
               className="rounded-xl"
               inputMode="url"
+              disabled={submitting}
             />
           </div>
 
@@ -194,9 +229,10 @@ export function AgentSetupCard({
                   <button
                     key={g.id}
                     type="button"
+                    disabled={submitting}
                     onClick={() => setGoal(g.id)}
                     className={cn(
-                      'flex flex-col items-start gap-1 rounded-xl border p-3 text-left transition-all',
+                      'flex flex-col items-start gap-1 rounded-xl border p-3 text-left transition-all disabled:opacity-60',
                       selected
                         ? 'border-brand-lime bg-brand-lime/10 ring-1 ring-brand-lime/40'
                         : 'border-border bg-surface hover:border-brand-lime/40',
@@ -230,6 +266,7 @@ export function AgentSetupCard({
                   min={100}
                   step={100}
                   value={String(budget)}
+                  disabled={submitting}
                   onChange={(e) => setBudget(Math.max(0, Number(e.target.value) || 0))}
                   className="rounded-xl pl-6"
                 />
@@ -239,9 +276,10 @@ export function AgentSetupCard({
                   <button
                     key={p}
                     type="button"
+                    disabled={submitting}
                     onClick={() => setBudget(p)}
                     className={cn(
-                      'rounded-lg border px-2.5 py-2 text-xs font-semibold transition-colors',
+                      'rounded-lg border px-2.5 py-2 text-xs font-semibold transition-colors disabled:opacity-60',
                       budget === p
                         ? 'border-brand-lime bg-brand-lime/10 text-brand-mid dark:text-brand-lime'
                         : 'border-border text-text-secondary hover:border-brand-lime/40',
@@ -276,7 +314,7 @@ export function AgentSetupCard({
 
           <button
             type="button"
-            onClick={() => void handleActivate()}
+            onClick={handleActivate}
             disabled={!canActivate}
             className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#1b2e06] text-base font-semibold text-white shadow-[0_8px_24px_-12px_rgba(27,46,6,0.5)] transition-all hover:bg-[#243a12] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
           >
@@ -294,68 +332,131 @@ export function AgentSetupCard({
           </button>
         </div>
 
-        {/* ── Live funnel allocation preview ───────────────────────────────── */}
+        {/* ── Right column: live allocation OR thinking sequence ───────────── */}
         <div className="rounded-2xl border border-border bg-surface/60 p-4">
-          <div className="mb-3 flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
-              {t('agent.setup.planTitle', 'Byudjet taqsimoti (jonli)')}
-            </p>
-            <span className="text-xs font-bold text-text-primary">{usd(budget)}</span>
-          </div>
+          {submitting ? (
+            <AgentThinking labels={THINKING_LABELS} activeIndex={thinkingStep} />
+          ) : (
+            <>
+              <div className="mb-2 flex items-center justify-between">
+                <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
+                  {t('agent.setup.planTitle', 'Byudjet taqsimoti (jonli)')}
+                </p>
+                <span className="text-xs font-bold text-text-primary">{usd(budget)}</span>
+              </div>
 
-          {/* Funnel stages */}
-          <div className="space-y-2.5">
-            {allocation.stages.map((stage) => (
-              <div key={stage.stage}>
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-semibold text-text-primary">
-                    {stage.stage}
-                    <span className="ml-1.5 font-normal text-text-tertiary">
-                      {t(`agent.setup.stage.${stage.stage}`, stage.label.long)}
+              <AllocationDonut
+                data={allocation.byPlatform}
+                total={budget}
+                totalLabel={t('agent.setup.total', 'Jami')}
+              />
+
+              {/* Per-platform legend */}
+              <div className="mt-3 grid grid-cols-2 gap-1.5">
+                {allocation.byPlatform.map((p) => (
+                  <div
+                    key={p.platform}
+                    className="flex items-center justify-between rounded-lg bg-surface-2/40 px-2.5 py-1.5"
+                  >
+                    <span className="flex items-center gap-1.5 text-xs font-medium text-text-primary">
+                      <span className={cn('h-2 w-2 rounded-full', PLATFORM_ACCENT[p.platform])} />
+                      {p.label}
                     </span>
-                  </span>
-                  <span className="tabular-nums text-text-secondary">
-                    {usd(stage.amount)} · {stage.pct}%
-                  </span>
-                </div>
-                <div className="mt-1 flex h-2 overflow-hidden rounded-full bg-surface-2/60">
-                  {stage.platforms
-                    .filter((p) => p.amount > 0)
-                    .map((p) => (
-                      <div
-                        key={p.platform}
-                        className={cn('h-full', PLATFORM_ACCENT[p.platform])}
-                        style={{ width: `${(p.amount / Math.max(stage.amount, 1)) * 100}%` }}
-                        title={`${PLATFORM_LABELS[p.platform]}: ${usd(p.amount)}`}
-                      />
-                    ))}
+                    <span className="tabular-nums text-xs text-text-secondary">{usd(p.amount)}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Funnel stages */}
+              <div className="mt-3 border-t border-border pt-3">
+                <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-text-tertiary">
+                  {t('agent.setup.byFunnel', 'Funnel bosqichlari')}
+                </p>
+                <div className="space-y-1.5">
+                  {allocation.stages.map((stage) => (
+                    <div key={stage.stage} className="flex items-center justify-between text-xs">
+                      <span className="font-medium text-text-primary">
+                        {stage.stage}
+                        <span className="ml-1.5 font-normal text-text-tertiary">
+                          {t(`agent.setup.stage.${stage.stage}`, stage.label.long)}
+                        </span>
+                      </span>
+                      <span className="tabular-nums text-text-secondary">
+                        {usd(stage.amount)} · {stage.pct}%
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
-            ))}
-          </div>
-
-          {/* Per-platform totals */}
-          <div className="mt-4 border-t border-border pt-3">
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-text-tertiary">
-              {t('agent.setup.byPlatform', 'Platformalar bo\'yicha')}
-            </p>
-            <div className="grid grid-cols-2 gap-2">
-              {allocation.byPlatform.map((p) => (
-                <div
-                  key={p.platform}
-                  className="flex items-center justify-between rounded-lg bg-surface-2/40 px-2.5 py-1.5"
-                >
-                  <span className="flex items-center gap-1.5 text-xs font-medium text-text-primary">
-                    <span className={cn('h-2 w-2 rounded-full', PLATFORM_ACCENT[p.platform])} />
-                    {p.label}
-                  </span>
-                  <span className="tabular-nums text-xs text-text-secondary">{usd(p.amount)}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+            </>
+          )}
         </div>
       </div>
+    </div>
+  )
+}
+
+/** The staged "AI Agent is thinking…" panel. */
+function AgentThinking({
+  labels,
+  activeIndex,
+}: {
+  labels: Record<ThinkingStep, string>
+  activeIndex: number
+}) {
+  return (
+    <div className="flex h-full min-h-[280px] flex-col justify-center gap-3 py-2">
+      <div className="mb-1 flex items-center gap-2">
+        <span className="relative inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-brand-lime/20 text-brand-mid dark:text-brand-lime">
+          <Bot className="h-4 w-4" aria-hidden />
+          <span className="absolute inset-0 animate-ping rounded-2xl bg-brand-lime/20" />
+        </span>
+        <p className="text-sm font-semibold text-text-primary">AI Agent is thinking…</p>
+      </div>
+      {THINKING_STEP_KEYS.map((step, i) => {
+        const done = i < activeIndex
+        const current = i === activeIndex
+        return (
+          <div
+            key={step}
+            className={cn(
+              'flex items-center gap-3 rounded-xl border px-3 py-2.5 transition-all duration-300',
+              current
+                ? 'border-brand-lime/40 bg-brand-lime/[0.08]'
+                : done
+                  ? 'border-border bg-surface-2/40'
+                  : 'border-transparent opacity-40',
+            )}
+          >
+            <span
+              className={cn(
+                'inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full',
+                done
+                  ? 'bg-emerald-500 text-white'
+                  : current
+                    ? 'bg-brand-lime/20 text-brand-mid dark:text-brand-lime'
+                    : 'bg-surface-2/60 text-text-tertiary',
+              )}
+            >
+              {done ? (
+                <Check className="h-3.5 w-3.5" aria-hidden />
+              ) : current ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
+              ) : (
+                <span className="text-[11px] font-semibold">{i + 1}</span>
+              )}
+            </span>
+            <span
+              className={cn(
+                'text-sm',
+                current ? 'font-medium text-text-primary' : 'text-text-secondary',
+              )}
+            >
+              {labels[step]}
+            </span>
+          </div>
+        )
+      })}
     </div>
   )
 }

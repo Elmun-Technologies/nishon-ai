@@ -38,6 +38,7 @@ import { FIRST_CAMPAIGN_BANNER_KEY } from '@/lib/onboarding-v2'
 import { ChatWidget } from '@/components/ui/ChatWidget'
 import { AGENT_MODE } from '@/lib/agent-mode'
 import { AgentSetupCard, loadAgentConfig, type AgentConfig } from '@/components/agent/AgentSetupCard'
+import { AgentDecisionsFeed } from '@/components/agent/AgentDecisionsFeed'
 
 export const dynamic = 'force-dynamic'
 
@@ -561,6 +562,11 @@ export default function DashboardPage() {
           </Button>
         </div>
       </div>
+
+      {/* ── AI Agent live decisions feed (autonomous mode, after activation) ── */}
+      {AGENT_MODE && agentConfig && (
+        <AgentDecisionsFeed workspaceId={currentWorkspace.id} />
+      )}
 
       {/* ── Filter bar ─────────────────────────────────────────────────────── */}
       <div className="flex flex-wrap items-center gap-2 rounded-xl border border-white/[0.06] bg-surface px-4 py-2.5">

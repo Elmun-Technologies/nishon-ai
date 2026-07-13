@@ -2831,11 +2831,25 @@
         "TOFU": "Top of Funnel — sovuq auditoriya",
         "MOFU": "Middle of Funnel — qiziqish",
         "BOFU": "Bottom of Funnel — retargeting"
-      }
+      },
+      "total": "Jami",
+      "byFunnel": "Funnel bosqichlari"
     },
     "active": {
       "banner": "AI Agent faol — kampaniyalar avtomatik boshqarilmoqda.",
       "reconfigure": "Qayta sozlash"
+    },
+    "thinking": {
+      "scanSite": "Saytingiz skanerlanmoqda…",
+      "analyzeAudience": "Auditoriya tahlil qilinmoqda…",
+      "allocateBudget": "Byudjet kanallarga taqsimlanmoqda…",
+      "draftCopy": "Reklama matnlari tayyorlanmoqda…",
+      "launch": "Agent ishga tushirilmoqda…"
+    },
+    "decisions": {
+      "title": "AI Agent — qarorlar jurnali",
+      "sample": "Namuna",
+      "viewAll": "Barchasi"
     }
   }
 }

@@ -2831,11 +2831,25 @@
         "TOFU": "Top of Funnel — cold audience",
         "MOFU": "Middle of Funnel — consideration",
         "BOFU": "Bottom of Funnel — retargeting"
-      }
+      },
+      "total": "Total",
+      "byFunnel": "Funnel stages"
     },
     "active": {
       "banner": "AI Agent is active — campaigns are managed automatically.",
       "reconfigure": "Reconfigure"
+    },
+    "thinking": {
+      "scanSite": "Scanning your website…",
+      "analyzeAudience": "Analyzing the audience…",
+      "allocateBudget": "Allocating budget across channels…",
+      "draftCopy": "Drafting ad copy…",
+      "launch": "Launching the agent…"
+    },
+    "decisions": {
+      "title": "AI Agent — decisions log",
+      "sample": "Sample",
+      "viewAll": "View all"
     }
   }
 }
