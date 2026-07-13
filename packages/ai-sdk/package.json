@@ -9,8 +9,7 @@
     "dev": "tsc --watch"
   },
   "dependencies": {
-    "openai": "^4.0.0",
-    "axios": "^1.18.1"
+    "openai": "^4.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

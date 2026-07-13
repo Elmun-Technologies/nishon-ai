@@ -38,22 +38,20 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build workspace packages
-        run: |
-          pnpm --filter @adspectr/shared build
-          pnpm --filter @adspectr/ai-sdk build
+      # Persist Turborepo's task cache so unchanged packages skip test/build/lint
+      # on subsequent runs. Turbo hashes inputs itself; this only stores the dir.
+      - name: Turbo cache
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: turbo-api-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            turbo-api-${{ runner.os }}-
 
-      - name: Unit tests
-        run: pnpm --filter api test
-
-      - name: Build
-        run: pnpm --filter api build
-
-      # API source is lint-error-free. We deliberately use `lint:check` (no
-      # --fix) so CI never silently rewrites prettier whitespace across
-      # ~190 files; warnings are visible but don't fail the build.
-      - name: Lint
-        run: pnpm --filter api lint:check
+      # `^build` builds @adspectr/shared + ai-sdk first; test/build/lint:check
+      # are cached per-package, so no-op changes hit FULL TURBO.
+      - name: Test + build + lint
+        run: pnpm exec turbo run test build lint:check --filter=api
 
   web:
     name: Web · lint + i18n + build
@@ -75,29 +73,30 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build workspace packages
-        run: |
-          pnpm --filter @adspectr/shared build
-          pnpm --filter @adspectr/ai-sdk build
+      - name: Turbo cache
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: turbo-web-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            turbo-web-${{ runner.os }}-
 
-      - name: Lint
-        run: pnpm --filter web lint
+      # Persist Next.js's compiler cache across runs (turbo deliberately excludes
+      # .next/cache from its own outputs, so it must be cached at the CI layer).
+      - name: Next.js build cache
+        uses: actions/cache@v4
+        with:
+          path: apps/web/.next/cache
+          key: nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('apps/web/src/**') }}
+          restore-keys: |
+            nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
 
-      - name: i18n key parity (uz/ru/en)
-        run: pnpm --filter web i18n:check
-
-      - name: Typecheck
-        run: pnpm --filter web exec tsc --noEmit
-
-      - name: Unit tests (vitest)
-        run: pnpm --filter web test:unit
-
-      - name: Build
-        run: pnpm --filter web build
-
-      # Smoke tests use Playwright's request API only (no browser download),
-      # so they run on the build output started via `next start`.
-      - name: Smoke tests (e2e)
-        run: pnpm --filter web test:e2e
+      # One turbo invocation runs the whole web gate with maximal parallelism:
+      # lint/i18n/test:unit run immediately; typecheck + e2e wait on build (so
+      # typecheck also validates Next's generated route types). Smoke tests use
+      # Playwright's request API only (no browser download), started via `next
+      # start`.
+      - name: Lint + i18n + typecheck + test + build + e2e
+        run: pnpm exec turbo run lint i18n:check test:unit typecheck build test:e2e --filter=web
         env:
           CI: 'true'

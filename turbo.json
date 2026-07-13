@@ -1,5 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": ["tsconfig.json", ".nvmrc", ".npmrc"],
   "tasks": {
     "dev": {
       "cache": false,
@@ -7,13 +8,31 @@
     },
     "build": {
       "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts", "!**/*.test.ts", "!**/*.test.tsx"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
     "test": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "test:unit": {
+      "outputs": []
+    },
+    "test:e2e": {
       "dependsOn": ["build"],
       "outputs": []
     },
     "lint": {
+      "outputs": []
+    },
+    "lint:check": {
+      "outputs": []
+    },
+    "typecheck": {
+      "dependsOn": ["build"],
+      "outputs": []
+    },
+    "i18n:check": {
       "outputs": []
     }
   }
