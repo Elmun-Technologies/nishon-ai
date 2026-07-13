@@ -11,7 +11,13 @@ import {
   ShieldCheck,
   Sparkles,
 } from 'lucide-react'
-import { PerformanceChart } from '@/components/marketplace/PerformanceChart'
+import nextDynamic from 'next/dynamic'
+// recharts is ~90 kB gzip and this page renders many sparklines in a list.
+// Code-split the chart out of the discovery bundle; it only loads when shown.
+const PerformanceChart = nextDynamic(
+  () => import('@/components/marketplace/PerformanceChart').then((m) => m.PerformanceChart),
+  { ssr: false, loading: () => <div className="h-full w-full animate-pulse rounded bg-white/5" /> },
+)
 import { filterTargetologists } from '@/lib/marketplace/filter-targetologists'
 import { calculateMarketplaceScores } from '@/lib/marketplace/scoring'
 import { parseSmartMarketplaceQuery } from '@/lib/marketplace/smart-search'

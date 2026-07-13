@@ -2,7 +2,13 @@
 
 import { useState } from 'react'
 import { getMetricById } from '@/lib/reports/metrics'
-import { ReportWidget } from '@/components/reports/Widget'
+import nextDynamic from 'next/dynamic'
+// Each widget mounts its own recharts instance (~90 kB gzip). Code-split the
+// widget so recharts stays out of the reports route bundle until a widget renders.
+const ReportWidget = nextDynamic(
+  () => import('@/components/reports/Widget').then((m) => m.ReportWidget),
+  { ssr: false, loading: () => <div className="h-40 w-full animate-pulse rounded-lg bg-white/5" /> },
+)
 import type { ReportFiltersState } from '@/components/reports/types'
 
 export interface GridCanvasProps {

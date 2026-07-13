@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, ReactNode, useCallback, useEffect, useState } from 'react'
+import { createContext, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Language,
   DEFAULT_LANGUAGE,
@@ -127,17 +127,13 @@ export function I18nProvider({
     [translations],
   )
 
-  return (
-    <I18nContext.Provider
-      value={{
-        language,
-        translations,
-        isLoading,
-        setLanguage,
-        t,
-      }}
-    >
-      {children}
-    </I18nContext.Provider>
+  // Memoize the context value so consumers don't re-render on every provider
+  // render — this provider wraps the whole app, so a fresh object literal here
+  // fans a re-render out to every `useI18n()` caller on any parent render.
+  const value = useMemo(
+    () => ({ language, translations, isLoading, setLanguage, t }),
+    [language, translations, isLoading, setLanguage, t],
   )
+
+  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>
 }

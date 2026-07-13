@@ -8,6 +8,18 @@ const nextConfig = {
     externalDir: true,
     /** Monorepo: trace server bundles from repo root so workspace packages resolve on Vercel. */
     outputFileTracingRoot: path.join(__dirname, '../..'),
+    /**
+     * Tree-shake barrel-heavy icon/chart/date libraries so each route only
+     * bundles the symbols it actually imports. `lucide-react` alone is
+     * barrel-imported across ~166 files; without this every import pulls the
+     * whole icon set into the route chunk.
+     */
+    optimizePackageImports: [
+      'lucide-react',
+      'recharts',
+      'date-fns',
+      'react-day-picker',
+    ],
   },
   transpilePackages: ['@adspectr/shared', '@adspectr/creative-hub-core'],
   staticPageGenerationTimeout: 120,
