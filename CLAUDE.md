@@ -71,9 +71,13 @@ npm run seed                             # seed data
 
 ## CI/CD
 
-`.github/workflows/ci.yml` — har PR va `main` push'da (Node 22, pnpm 8.15.5):
-- **api job:** `test` → `build` → `lint:check`
-- **web job:** `lint` → `i18n:check` → `tsc --noEmit` → `test:unit` (vitest) → `build` → `test:e2e`
+`.github/workflows/ci.yml` — har PR va `main` push'da (Node 22, pnpm 8.15.5).
+Har ikkala job **Turborepo** orqali ishlaydi (`pnpm exec turbo run … --filter=<app>`),
+`.turbo` task cache + web'da `.next/cache` `actions/cache` bilan saqlanadi —
+o'zgarmagan paketlar FULL TURBO cache-hit'ga tushadi:
+- **api job:** `turbo run test build lint:check --filter=api` (`^build` shared+ai-sdk'ni oldin quradi)
+- **web job:** `turbo run lint i18n:check test:unit typecheck build test:e2e --filter=web`
+  (typecheck build'dan keyin — Next route type'larini ham tekshiradi)
 - Top-level `permissions: contents: read` (default-deny GITHUB_TOKEN, hardening)
 - `concurrency` bilan eski run'lar bekor qilinadi
 - Dependabot: `.github/dependabot.yml` — weekly grouped bump'lar
@@ -84,10 +88,39 @@ shuning uchun `lint:check` (`--fix`'siz) ishlatiladi.
 
 ---
 
-## Joriy holat (so'nggi yangilash: 2026-07-12)
+## Joriy holat (so'nggi yangilash: 2026-07-13)
 
 **Asosiy branch:** `main`
-**Faol branch:** `claude/claude-md-docs-uiyjze` — hujjat yangilash (CLAUDE.md)
+**Faol branch:** `claude/platform-optimization-vrw9ua` — platforma ichki optimizatsiyasi
+
+### 2026-07-13 sessiyasi — Platforma optimizatsiyasi (3 mustaqil audit)
+Backend/frontend/build bo'yicha uch parallel audit → xavfsiz, yuqori-ta'sirli
+optimizatsiyalar (behavioral o'zgarishsiz):
+- ✅ **Frontend bundle/fetch:** `next.config` ga `optimizePackageImports`
+  (lucide-react ~166 faylda barrel-import, recharts, date-fns, react-day-picker);
+  recharts (~90 kB) automation/marketplace-discovery/reports route'laridan
+  `next/dynamic` bilan code-split; I18nContext value memoize (app-wide re-render
+  yo'q); dead `@tanstack/react-query`+devtools o'chirildi, build/lint tooling
+  `devDependencies`'ga ko'chirildi.
+- ✅ **Build/CI:** CI endi Turborepo orqali (`turbo run … --filter=<app>`) task
+  cache bilan ishlaydi (`.turbo` + `apps/web/.next/cache` `actions/cache`);
+  `turbo` root devDep'ga qo'shildi (avval lockfile'da yo'q edi); `turbo.json` ga
+  `inputs`/`globalDependencies` va yetishmayotgan pipeline'lar (test:unit,
+  test:e2e, lint:check, typecheck, i18n:check); typecheck endi build'dan keyin
+  (route type'larni ham tekshiradi); ishlatilmagan `node-fetch`(api)/`axios`
+  (ai-sdk) o'chirildi. Lokal tekshirildi: FULL TURBO cache-hit ishlaydi.
+- ✅ **Backend perf:** yangi idempotent migration (`1763500000000`) —
+  `connected_accounts(workspace_id,platform,"isActive")` + `(platform,"isActive")`,
+  `meta_ad_accounts(workspace_id)` indekslari (toza PG16'da end-to-end sinaldi,
+  revert+re-run idempotent); dashboard + reporting N+1 tuzatildi (har ad-account
+  uchun alohida query → bitta workspace query + xotirada guruhlash);
+  `getConversionTrend` in-memory date filtri SQL `BETWEEN`'ga o'tkazildi.
+- ⏳ **Keyingi ishga qoldirildi (feature-sized/behavioral):** Meta cron sync'ni
+  Bull queue'ga offload (cron `MetaSyncService.syncWorkspace` → `meta_*` jadvallar;
+  mavjud `campaign-sync` queue esa boshqa `performance_metrics` modeliga yozadi —
+  yangi processor kerak); `launch()` ni async queue + frontend polling; read-heavy
+  endpoint'larga (dashboard/reporting/audit) Redis cache + `meta_synced` invalidatsiya;
+  cron insight oynasini `last_30d`→`last_3d` toraytirish.
 
 ### 2026-07-12 sessiyasi — CLAUDE.md ni real holatga keltirish
 - ✅ CLAUDE.md yangilandi: to'liq command reference, CI tafsiloti, to'g'ri paket/modul
