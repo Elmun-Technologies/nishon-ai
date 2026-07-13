@@ -7,6 +7,7 @@ import {
   ManyToOne,
   OneToMany,
   JoinColumn,
+  Index,
 } from "typeorm";
 import { Workspace } from "../../workspaces/entities/workspace.entity";
 import { MetaCampaignSync } from "./meta-campaign-sync.entity";
@@ -19,6 +20,8 @@ import { MetaCampaignSync } from "./meta-campaign-sync.entity";
  * One workspace can have multiple ad accounts connected (e.g. different brands).
  */
 @Entity("meta_ad_accounts")
+// Dashboard, reporting, audiences and audit all filter by workspace.
+@Index("IDX_meta_ad_accounts_workspace_id", ["workspaceId"])
 export class MetaAdAccount {
   /** Meta's account ID in act_xxx format — used directly as PK to avoid duplicates on sync. */
   @PrimaryColumn({ length: 50 })

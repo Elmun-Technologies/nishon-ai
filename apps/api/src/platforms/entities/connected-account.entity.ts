@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  Index,
 } from "typeorm";
 import { Workspace } from "../../workspaces/entities/workspace.entity";
 import { Platform } from "@adspectr/shared";
@@ -18,6 +19,14 @@ import { Platform } from "@adspectr/shared";
  * One workspace can have multiple connected accounts (e.g. both Meta and Google).
  */
 @Entity("connected_accounts")
+// Token resolution / launch filters by all three; the sync cron scans by
+// (platform, isActive). See AddConnectedAndAdAccountIndexes migration.
+@Index("IDX_connected_accounts_ws_platform_active", [
+  "workspaceId",
+  "platform",
+  "isActive",
+])
+@Index("IDX_connected_accounts_platform_active", ["platform", "isActive"])
 export class ConnectedAccount {
   @PrimaryGeneratedColumn("uuid")
   id: string;

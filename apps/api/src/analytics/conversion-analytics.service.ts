@@ -135,25 +135,36 @@ export class ConversionAnalyticsService {
     startDate: Date,
     endDate: Date,
   ): Promise<ConversionTrendDto[]> {
-    const insights = await this.insightRepo.find({
-      where: { workspaceId, campaignId },
-      order: { date: "ASC" },
-      select: ["date", "conversions", "conversionValue", "spend", "clicks"],
-    });
+    // Filter the date range in SQL via query builder — the same BETWEEN pattern
+    // getTopConvertingCampaigns uses — instead of loading every row for the
+    // campaign and filtering in memory (which grows unbounded with history).
+    const insights = await this.insightRepo
+      .createQueryBuilder("i")
+      .select([
+        "i.date",
+        "i.conversions",
+        "i.conversionValue",
+        "i.spend",
+        "i.clicks",
+      ])
+      .where("i.workspaceId = :workspaceId", { workspaceId })
+      .andWhere("i.campaignId = :campaignId", { campaignId })
+      .andWhere("i.date BETWEEN :startDate AND :endDate", {
+        startDate,
+        endDate,
+      })
+      .orderBy("i.date", "ASC")
+      .getMany();
 
-    // Filter by date range in memory after select to avoid TypeORM Between type issues
-    // (date column is type 'date', not timestamp)
-    return insights
-      .filter((i) => i.date >= startDate && i.date <= endDate)
-      .map((i) => ({
-        date: i.date.toISOString().split("T")[0],
-        conversions: i.conversions,
-        conversionValue: Number(i.conversionValue),
-        spend: Number(i.spend),
-        clicks: i.clicks,
-        costPerConversion:
-          i.conversions > 0 ? Number(i.spend) / i.conversions : 0,
-      }));
+    return insights.map((i) => ({
+      date: i.date.toISOString().split("T")[0],
+      conversions: i.conversions,
+      conversionValue: Number(i.conversionValue),
+      spend: Number(i.spend),
+      clicks: i.clicks,
+      costPerConversion:
+        i.conversions > 0 ? Number(i.spend) / i.conversions : 0,
+    }));
   }
 
   async compareConversionPeriods(

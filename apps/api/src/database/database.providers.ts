@@ -21,6 +21,7 @@ import { CreateWorkspacesTable1763100000000 } from "./migrations/1763100000000-C
 import { CreateWorkspaceMembersTable1763200000000 } from "./migrations/1763200000000-CreateWorkspaceMembersTable";
 import { CreateConnectedAccountsTable1763300000000 } from "./migrations/1763300000000-CreateConnectedAccountsTable";
 import { AddPerformanceIndexes1763400000000 } from "./migrations/1763400000000-AddPerformanceIndexes";
+import { AddConnectedAndAdAccountIndexes1763500000000 } from "./migrations/1763500000000-AddConnectedAndAdAccountIndexes";
 
 const databaseUrl = process.env.DATABASE_URL;
 const isProduction = process.env.NODE_ENV === "production";
@@ -66,6 +67,7 @@ export default new DataSource({
     CreateWorkspaceMembersTable1763200000000,
     CreateConnectedAccountsTable1763300000000,
     AddPerformanceIndexes1763400000000,
+    AddConnectedAndAdAccountIndexes1763500000000,
   ],
   synchronize: false,
   logging: process.env.TYPEORM_LOGGING === "true" || !isProduction,
