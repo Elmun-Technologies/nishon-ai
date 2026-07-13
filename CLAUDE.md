@@ -106,6 +106,14 @@ Mahsulotni avtonom media-buyer modeliga burish. **Hech narsa o'chirilmadi** — 
 - ✅ **Hard Stop-Loss guardrail** — `auto-optimization/policy/action-policy.ts`:
   `allowAutoStopLossPause` (default false, opt-in). Yoqilsa agent zarar keltiruvchi
   creative/adset'ni avtonom pauza qiladi va AI Decisions log'ga yozadi (4 unit test).
+- ✅ **24h Hard Stop-Loss (kengaytirilgan)** — `rules/rules-engine.ts` `hardStopLoss`
+  (24h + $15 + 0 klik/0 konversiya → `hard_stop_loss_no_result`); `rules/stop-loss.ts`
+  `buildStopLossActions` → pause_adset/pause_creative; service `mergeAndDeduplicateActions`'ga
+  ulandi; window/min-spend workspace policy'dan sozlanadi. Perf tiplariga `ageHours` qo'shildi
+  (Meta sync plumbing kutilmoqda). 11 unit test.
+- ✅ **"Wow" UX (frontend)** — AgentSetupCard: bosqichli "AI Agent is thinking…" animatsiya +
+  interaktiv recharts donut (`AllocationDonut`, code-split); dashboard'da faollashtirilgandan
+  keyin jonli **AI Decisions chat feed** (`AgentDecisionsFeed`, real API + "Namuna" fallback).
 - ✅ **Manual worker'lar gated** — `queue/cron.service.ts` (triggersets) va
   `retargeting-worker` (manual `syncAudiences`) `AGENT_AUTONOMOUS_MODE` ortida; default OFF.
 - ✅ i18n: `agent.*` uz/ru/en (parity 2393). Barcha CI darvozalari yashil (web+api+e2e 39).

@@ -48,6 +48,17 @@ export interface WorkspacePolicy {
    * Every auto-pause is still recorded in the AI Decisions log.
    */
   allowAutoStopLossPause: boolean;
+  /**
+   * Hard Stop-Loss window (hours). An ad/ad set that has run at least this long
+   * with spend but zero results (clicks + conversions) is a stop-loss candidate.
+   * Optional — defaults to 24h in the rules engine when unset.
+   */
+  stopLossWindowHours?: number;
+  /**
+   * Minimum spend (USD) before the Hard Stop-Loss fires. Optional — defaults to
+   * the rules-engine default when unset.
+   */
+  stopLossMinSpendUsd?: number;
   /** Allow audience targeting changes automatically. Default: false */
   allowAudienceChanges: boolean;
   /** Campaign IDs that must never be auto-acted on */
