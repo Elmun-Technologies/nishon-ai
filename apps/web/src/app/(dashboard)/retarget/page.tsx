@@ -1,6 +1,8 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { AGENT_MODE } from '@/lib/agent-mode'
+import { AutomatedByAgent } from '@/components/ui/AutomatedByAgent'
 import { PageHeader } from '@/components/ui'
 import { Alert } from '@/components/ui/Alert'
 import { Button } from '@/components/ui/Button'
@@ -12,6 +14,13 @@ const LS_PAGE = 'retarget_meta_page_id'
 const LS_META = 'retarget_meta_access_token'
 
 export default function RetargetBridgePage() {
+  // Frozen in autonomous AI Agent mode — the agent owns the CRM signal bridge.
+  if (AGENT_MODE) return <AutomatedByAgent module="retargeting" />
+  return <RetargetBridgePageInner />
+}
+
+function RetargetBridgePageInner() {
+
   const [data, setData] = useState<RetargetSignalsResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)

@@ -387,7 +387,10 @@
       "actionLaunch": "🚀 Yangi kampaniya",
       "actionReport": "📊 Hisobot yaratish",
       "actionIdea": "💡 Idea olish",
-      "actionAudience": "👥 Auditoriya"
+      "actionAudience": "👥 Auditoriya",
+      "actionOptimize": "⚡ Optimizatsiya",
+      "actionBudget": "💰 Byudjet",
+      "actionPerf": "📈 Natijalar"
     },
     "metaRealtimePrefix": "Ko'rsatkichlar real vaqtda olinmoqda:",
     "settingsLink": "sozlamalar",
@@ -1326,9 +1329,6 @@
         }
       },
       "roi": {
-        "eyebrow": "Natijalar",
-        "title": "Raqamlar bilan o'sing",
-        "subtitle": "AdSpectr foydalanuvchilarining o'rtacha natijalari (3 oy davomida).",
         "0": {
           "value": "+34%",
           "label": "ROAS o'sishi"
@@ -1344,7 +1344,10 @@
         "3": {
           "value": "12 soat",
           "label": "Haftada tejaladi"
-        }
+        },
+        "eyebrow": "Natijalar",
+        "title": "Raqamlar bilan o'sing",
+        "subtitle": "AdSpectr foydalanuvchilarining o'rtacha natijalari (3 oy davomida)."
       },
       "pricing": {
         "eyebrow": "Tariflar",
@@ -1453,8 +1456,6 @@
         }
       },
       "testimonials": {
-        "eyebrow": "Mijozlar fikri",
-        "title": "Reklama jamoalari AdSpectr'ni nima uchun tanlaydi",
         "0": {
           "quote": "Ilgari 3 ta platforma orasida sakrar edik. Endi bitta dashboard — ROAS aniq, jamoa tartibli. 2 oyda CPA 31% pasaydi.",
           "name": "Madina Karimova",
@@ -1469,7 +1470,9 @@
           "quote": "Freelance markolog sifatida marketplace orqali har oyda 3-4 ta yangi loyiha olaman. Portfolio va badge tizimi ishonchni oshiradi.",
           "name": "Aziza Rahmonova",
           "role": "Mustaqil markolog"
-        }
+        },
+        "eyebrow": "Mijozlar fikri",
+        "title": "Reklama jamoalari AdSpectr'ni nima uchun tanlaydi"
       },
       "faq": {
         "title": "Ko'p so'raladigan savollar",
@@ -2782,5 +2785,57 @@
     "emptyDesc": "Qidiruvni o'zgartiring yoki Meta hisobingizni ulang.",
     "footerNote": "Ma'lumotlar Meta Marketing API orqali Meta reklama hisoblaridan olinadi.",
     "fullReport": "To'liq hisobot"
+  },
+  "agent": {
+    "frozen": {
+      "badge": "AI Agent tomonidan avtomatlashtirilgan",
+      "cta": "AI Agent sahifasiga o'tish",
+      "campaignBuilder": {
+        "title": "Kampaniyalarni AI Agent boshqaradi",
+        "body": "Qo'lda kampaniya yaratish o'chirildi. AI Agent maqsad va byudjetingizga qarab kampaniyalarni o'zi ishga tushiradi va optimallashtiradi."
+      },
+      "audienceBuilder": {
+        "title": "Auditoriyalarni AI Agent tuzadi",
+        "body": "Qo'lda auditoriya konstruktori o'chirildi. AI Agent funnel bosqichlariga (TOFU/MOFU/BOFU) qarab auditoriyalarni avtomatik shakllantiradi."
+      },
+      "retargeting": {
+        "title": "Retargeting AI Agent nazoratida",
+        "body": "Qo'lda retargeting sozlamasi o'chirildi. AI Agent signal va konversiyalarga qarab retargetingni avtomatik yuritadi."
+      },
+      "default": {
+        "title": "Bu modulni AI Agent boshqaradi",
+        "body": "Bu bo'lim avtonom AI Agent tomonidan avtomatlashtirildi. Sozlamalarni AI Agent o'zi hal qiladi."
+      }
+    },
+    "setup": {
+      "title": "AI Marketing Agent",
+      "badge": "Autonom",
+      "subtitle": "3 ta qadam — havola, maqsad, byudjet. Qolganini Agent bajaradi.",
+      "heroLead": "Autonom AI Marketing Agentni sozlang — 3 ta qadam yetarli.",
+      "linkLabel": "1. Sayt yoki kanal havolasi",
+      "goalLabel": "2. Maqsad",
+      "goalSales": "Sotuv",
+      "goalSalesSub": "Konversiya va daromad",
+      "goalAwareness": "Brend tanitish",
+      "goalAwarenessSub": "Reach va yangi auditoriya",
+      "budgetLabel": "3. Umumiy byudjet",
+      "guardrailTitle": "Hard Stop-Loss",
+      "guardrailBody": "reklama {amount} sarflab konversiya bermasa, Agent uni avtomatik to'xtatadi.",
+      "activate": "AI Agentni ishga tushirish",
+      "activating": "Agent ishga tushmoqda…",
+      "activateError": "AI Agent'ni ishga tushirishda xato",
+      "activatedMsg": "AI Agent ishga tushdi — qarorlarni AI Decisions bo'limida kuzating.",
+      "planTitle": "Byudjet taqsimoti (jonli)",
+      "byPlatform": "Platformalar bo'yicha",
+      "stage": {
+        "TOFU": "Top of Funnel — sovuq auditoriya",
+        "MOFU": "Middle of Funnel — qiziqish",
+        "BOFU": "Bottom of Funnel — retargeting"
+      }
+    },
+    "active": {
+      "banner": "AI Agent faol — kampaniyalar avtomatik boshqarilmoqda.",
+      "reconfigure": "Qayta sozlash"
+    }
   }
 }

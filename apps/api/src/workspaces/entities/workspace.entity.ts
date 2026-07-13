@@ -75,6 +75,8 @@ export class Workspace {
     maxAutoBudgetChangePct: number;
     allowAutoCreativeRefresh: boolean;
     allowAutoPauseCreative: boolean;
+    /** Autonomous Hard Stop-Loss auto-pause (spend-without-conversion / CPA overrun). */
+    allowAutoStopLossPause?: boolean;
     allowAudienceChanges: boolean;
     protectedCampaignIds: string[];
     protectedAdSetIds: string[];

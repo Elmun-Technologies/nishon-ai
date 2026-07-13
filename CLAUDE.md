@@ -84,10 +84,31 @@ shuning uchun `lint:check` (`--fix`'siz) ishlatiladi.
 
 ---
 
-## Joriy holat (so'nggi yangilash: 2026-07-12)
+## Joriy holat (so'nggi yangilash: 2026-07-13)
 
 **Asosiy branch:** `main`
-**Faol branch:** `claude/claude-md-docs-uiyjze` — hujjat yangilash (CLAUDE.md)
+**Faol branch:** `claude/adspectr-autonomous-agent-pivot-6l3vov` — Autonomous AI Agent pivot
+
+### 2026-07-13 sessiyasi — "Virtual AI Marketing Agent" pivot (feature-flag'li)
+Mahsulotni avtonom media-buyer modeliga burish. **Hech narsa o'chirilmadi** — hammasi
+`AGENT_MODE` (web) va `AGENT_AUTONOMOUS_MODE` (backend) flaglari ortida, qaytariladigan.
+- ✅ **Feature-flag qatlami** — `apps/web/src/lib/agent-mode.ts` (`AGENT_MODE`, `FROZEN_ROUTES`,
+  `isRouteFrozen`, `filterFrozenNavItems`). Default: web ON, backend OFF (live behavior saqlanadi).
+- ✅ **Funnel Allocator** — `apps/web/src/lib/funnel-allocator.ts`: umumiy byudjet + maqsad →
+  TOFU/MOFU/BOFU × Meta/Google/TikTok/Telegram (integer-exact, 12 unit test).
+- ✅ **AI Agent Setup (3 input)** — `components/agent/AgentSetupCard.tsx` (Havola → Maqsad:
+  Sotuv/Brend → Byudjet) jonli allokatsiya preview bilan; dashboard landing endi shu hero'ni
+  ko'rsatadi (`dashboard/page.tsx`), analitika o'rniga. Activate → real `aiAgent.optimize()`.
+- ✅ **Manual modullar muzlatildi** — Sidebar'dan olib tashlandi + har route'da
+  `AutomatedByAgent` locked overlay: `/launch`, `/campaigns`, `/ad-launcher` (Campaign Builder),
+  `/audiences` (Audience Builder), `/retargeting`, `/retarget`, `/triggersets` (Retargeting).
+  Har page = guard wrapper + `…Inner` (rules-of-hooks toza).
+- ✅ **Hard Stop-Loss guardrail** — `auto-optimization/policy/action-policy.ts`:
+  `allowAutoStopLossPause` (default false, opt-in). Yoqilsa agent zarar keltiruvchi
+  creative/adset'ni avtonom pauza qiladi va AI Decisions log'ga yozadi (4 unit test).
+- ✅ **Manual worker'lar gated** — `queue/cron.service.ts` (triggersets) va
+  `retargeting-worker` (manual `syncAudiences`) `AGENT_AUTONOMOUS_MODE` ortida; default OFF.
+- ✅ i18n: `agent.*` uz/ru/en (parity 2393). Barcha CI darvozalari yashil (web+api+e2e 39).
 
 ### 2026-07-12 sessiyasi — CLAUDE.md ni real holatga keltirish
 - ✅ CLAUDE.md yangilandi: to'liq command reference, CI tafsiloti, to'g'ri paket/modul

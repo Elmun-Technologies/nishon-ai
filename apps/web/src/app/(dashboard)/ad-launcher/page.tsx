@@ -1,5 +1,7 @@
 'use client'
 
+import { AGENT_MODE } from '@/lib/agent-mode'
+import { AutomatedByAgent } from '@/components/ui/AutomatedByAgent'
 import { PageHeader } from '@/components/ui'
 import { useI18n } from '@/i18n/use-i18n'
 import { ConfirmLaunchDialog } from './_components/ConfirmLaunchDialog'
@@ -14,6 +16,13 @@ import { useAdLauncher } from './_lib/use-ad-launcher'
 import type { StepId } from './_lib/types'
 
 export default function AdLauncherPage() {
+  // Frozen in autonomous AI Agent mode — the agent owns ad launches.
+  if (AGENT_MODE) return <AutomatedByAgent module="campaignBuilder" />
+  return <AdLauncherPageInner />
+}
+
+function AdLauncherPageInner() {
+
   const { t } = useI18n()
   const ctl = useAdLauncher()
 

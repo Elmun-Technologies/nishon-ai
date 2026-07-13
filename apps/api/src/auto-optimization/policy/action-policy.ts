@@ -41,6 +41,13 @@ export interface WorkspacePolicy {
   allowAutoCreativeRefresh: boolean;
   /** Allow auto-pausing individual creatives. Default: false */
   allowAutoPauseCreative: boolean;
+  /**
+   * Autonomous "Hard Stop-Loss": allow the AI agent to auto-pause a creative or
+   * ad set that trips a stop-loss rule (spend without conversion, or CPA
+   * overrun) without waiting for human approval. Default: false.
+   * Every auto-pause is still recorded in the AI Decisions log.
+   */
+  allowAutoStopLossPause: boolean;
   /** Allow audience targeting changes automatically. Default: false */
   allowAudienceChanges: boolean;
   /** Campaign IDs that must never be auto-acted on */
@@ -58,6 +65,7 @@ export const SAFE_DEFAULTS: WorkspacePolicy = {
   maxAutoBudgetChangePct: 0,
   allowAutoCreativeRefresh: true, // safe — generates content, no platform mutation
   allowAutoPauseCreative: false,
+  allowAutoStopLossPause: false, // autonomous hard stop-loss is opt-in per workspace
   allowAudienceChanges: false,
   protectedCampaignIds: [],
   protectedAdSetIds: [],
@@ -135,6 +143,19 @@ export function governAction(
 
   // ── 2. High-risk actions — always require approval ─────────────────────────
   if (riskLevel === "high") {
+    // Autonomous Hard Stop-Loss: the agent may pause an under-performing
+    // creative or ad set (spend-without-conversion / CPA overrun) on its own.
+    if (
+      (action.type === "pause_creative" || action.type === "pause_adset") &&
+      policy.allowAutoStopLossPause
+    ) {
+      return approved(
+        action,
+        riskLevel,
+        "Hard stop-loss: autonomous agent pausing an under-performing entity — recorded in the AI Decisions log.",
+      );
+    }
+
     if (action.type === "pause_creative" && policy.allowAutoPauseCreative) {
       // Exception: workspace explicitly opted in to auto-pause creatives
       return approved(

@@ -1,4 +1,6 @@
 "use client";
+import { AGENT_MODE } from "@/lib/agent-mode";
+import { AutomatedByAgent } from "@/components/ui/AutomatedByAgent";
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronDown, Link2 } from "lucide-react";
@@ -42,6 +44,13 @@ const OBJECTIVE_LABELS: Record<string, string> = {
 };
 
 export default function CampaignsPage() {
+  // Frozen in autonomous AI Agent mode — the agent owns campaign management.
+  if (AGENT_MODE) return <AutomatedByAgent module="campaignBuilder" />
+  return <CampaignsPageInner />
+}
+
+function CampaignsPageInner() {
+
   const { t } = useI18n();
   const router = useRouter();
   const { currentWorkspace, user } = useWorkspaceStore();

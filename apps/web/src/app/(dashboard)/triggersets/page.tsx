@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { AGENT_MODE } from '@/lib/agent-mode'
+import { AutomatedByAgent } from '@/components/ui/AutomatedByAgent'
 import { useWorkspaceStore } from '@/stores/workspace.store'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
@@ -92,6 +94,13 @@ function defaultForm(): { name: string; conditions: TriggerCondition[]; actions:
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function TriggerSetsPage() {
+  // Frozen in autonomous AI Agent mode — the agent owns automated rules.
+  if (AGENT_MODE) return <AutomatedByAgent module="retargeting" />
+  return <TriggerSetsPageInner />
+}
+
+function TriggerSetsPageInner() {
+
   const router = useRouter()
   const { currentWorkspace } = useWorkspaceStore()
   const [items, setItems] = useState<Triggerset[]>([])

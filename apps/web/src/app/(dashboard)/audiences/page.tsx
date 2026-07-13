@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
+import { AGENT_MODE } from '@/lib/agent-mode'
+import { AutomatedByAgent } from '@/components/ui/AutomatedByAgent'
 import {
   Link2,
   Loader2,
@@ -58,6 +60,13 @@ function formatCount(n: number | null): string {
 }
 
 export default function AudiencesPage() {
+  // Frozen in autonomous AI Agent mode — the agent builds audiences per funnel stage.
+  if (AGENT_MODE) return <AutomatedByAgent module="audienceBuilder" />
+  return <AudiencesPageInner />
+}
+
+function AudiencesPageInner() {
+
   const { t } = useI18n()
   const { currentWorkspace } = useWorkspaceStore()
   const workspaceId = currentWorkspace?.id

@@ -1,5 +1,7 @@
 'use client'
 
+import { AGENT_MODE } from '@/lib/agent-mode'
+import { AutomatedByAgent } from '@/components/ui/AutomatedByAgent'
 import { GoogleWizard } from './_components/google/GoogleWizard'
 import { LaunchHub } from './_components/LaunchHub'
 import { MetaWizard } from './_components/meta/MetaWizard'
@@ -8,6 +10,13 @@ import { YandexWizard } from './_components/yandex/YandexWizard'
 import { useLaunchWizard } from './_lib/use-launch-wizard'
 
 export default function LaunchPage() {
+  // Frozen in autonomous AI Agent mode — the agent owns campaign launches.
+  if (AGENT_MODE) return <AutomatedByAgent module="campaignBuilder" />
+  return <LaunchPageInner />
+}
+
+function LaunchPageInner() {
+
   const ctl = useLaunchWizard()
 
   if (!ctl.platform) {
