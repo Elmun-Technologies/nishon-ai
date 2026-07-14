@@ -2906,6 +2906,14 @@
       "cancel": "Bekor qilish",
       "approve": "Tasdiqlash va ishga tushirish",
       "going": "Faollashtirilmoqda…"
+    },
+    "regen": {
+      "button": "AI bilan qayta yozish",
+      "loading": "AI yangi matn tayyorlamoqda…",
+      "fallback": "AI ulanmadi — namuna matn ko‘rsatilmoqda.",
+      "aiBadge": "AI",
+      "sourceAi": "AI",
+      "sourceTemplate": "Namuna"
     }
   }
 }

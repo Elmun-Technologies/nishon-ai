@@ -190,7 +190,7 @@ export function AgentSetupCard({
 
             <div className="grid gap-4 lg:grid-cols-2">
               <BudgetVisualizer allocation={allocation} />
-              <AdCopyPreview vertical={vertical} />
+              <AdCopyPreview vertical={vertical} websiteUrl={link} goal={goal} />
             </div>
 
             <div className="flex flex-wrap gap-2 border-t border-border pt-4">
@@ -372,6 +372,7 @@ export function AgentSetupCard({
       <LaunchTimelineModal
         open={isAnalyzing}
         link={link}
+        goal={goal}
         activating={activating}
         error={error}
         onApprove={() => void handleApprove()}

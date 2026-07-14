@@ -2906,6 +2906,14 @@
       "cancel": "Cancel",
       "approve": "Approve & Go Live",
       "going": "Going live…"
+    },
+    "regen": {
+      "button": "Regenerate with AI",
+      "loading": "AI is crafting fresh copy…",
+      "fallback": "AI unavailable — showing template copy.",
+      "aiBadge": "AI",
+      "sourceAi": "AI",
+      "sourceTemplate": "Template"
     }
   }
 }

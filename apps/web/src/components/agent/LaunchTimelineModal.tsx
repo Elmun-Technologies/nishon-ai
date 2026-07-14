@@ -4,8 +4,9 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Bot, Check, Loader2, Rocket, Send, Sparkles, X } from 'lucide-react'
 import { useI18n } from '@/i18n/use-i18n'
 import { cn } from '@/lib/utils'
-import { adCopyFor, detectVertical, type CopyLang, type Vertical } from '@/lib/ad-copy-templates'
-import type { FunnelStage } from '@/lib/funnel-allocator'
+import { adCopyFor, detectVertical, type AdCopy, type CopyLang, type Vertical } from '@/lib/ad-copy-templates'
+import type { AgentGoal, FunnelStage } from '@/lib/funnel-allocator'
+import { regenerateAdCopy } from '@/lib/regenerate-copy'
 import { MetaAdPreview } from './MetaAdPreview'
 import { TelegramAdPreview } from './TelegramAdPreview'
 
@@ -54,6 +55,7 @@ const VERTICAL_BRAND: Record<Vertical, { handle: string; gradient: string }> = {
 export function LaunchTimelineModal({
   open,
   link,
+  goal,
   onApprove,
   onClose,
   activating,
@@ -61,6 +63,7 @@ export function LaunchTimelineModal({
 }: {
   open: boolean
   link: string
+  goal: AgentGoal
   onApprove: () => void
   onClose: () => void
   activating: boolean
@@ -71,6 +74,9 @@ export function LaunchTimelineModal({
   const [stepIndex, setStepIndex] = useState(0)
   const [platform, setPlatform] = useState<Platform>('meta')
   const [previewStage, setPreviewStage] = useState<FunnelStage>('BOFU')
+  const [aiCopyByStage, setAiCopyByStage] = useState<Partial<Record<FunnelStage, AdCopy>>>({})
+  const [regenLoading, setRegenLoading] = useState<FunnelStage | null>(null)
+  const [regenError, setRegenError] = useState<FunnelStage | null>(null)
   const timers = useRef<ReturnType<typeof setTimeout>[]>([])
 
   const vertical = useMemo<Vertical>(() => detectVertical(link), [link])
@@ -78,7 +84,32 @@ export function LaunchTimelineModal({
   const lang: CopyLang = (['uz', 'ru', 'en'] as const).includes(language as CopyLang)
     ? (language as CopyLang)
     : 'uz'
-  const copy = useMemo(() => adCopyFor(vertical, previewStage, lang), [vertical, previewStage, lang])
+  const templateCopy = useMemo(
+    () => adCopyFor(vertical, previewStage, lang),
+    [vertical, previewStage, lang],
+  )
+  const aiCopy = aiCopyByStage[previewStage]
+  const copy = aiCopy ?? templateCopy
+  const isAiCopy = !!aiCopy
+  const isRegenLoading = regenLoading === previewStage
+
+  async function handleRegenerate() {
+    if (isRegenLoading) return
+    setRegenError(null)
+    setRegenLoading(previewStage)
+    const res = await regenerateAdCopy({
+      websiteUrl: link,
+      goal,
+      stage: previewStage,
+      lang,
+    })
+    setRegenLoading(null)
+    if (res.source === 'ai') {
+      setAiCopyByStage((prev) => ({ ...prev, [previewStage]: res.copy }))
+    } else {
+      setRegenError(previewStage)
+    }
+  }
 
   // Kick off the timeline every time the modal opens.
   useEffect(() => {
@@ -87,6 +118,9 @@ export function LaunchTimelineModal({
     setStepIndex(0)
     setPlatform('meta')
     setPreviewStage('BOFU')
+    setAiCopyByStage({})
+    setRegenLoading(null)
+    setRegenError(null)
     timers.current.forEach(clearTimeout)
     timers.current = []
     let elapsed = 0
@@ -308,11 +342,60 @@ export function LaunchTimelineModal({
               </div>
 
               {/* The preview itself */}
-              <div className="rounded-2xl border border-border bg-surface-2/30 p-5">
-                {platform === 'meta' ? (
-                  <MetaAdPreview brand={brand.handle} copy={copy} gradient={brand.gradient} />
-                ) : (
-                  <TelegramAdPreview brand={brand.handle} copy={copy} gradient={brand.gradient} />
+              <div className="relative rounded-2xl border border-border bg-surface-2/30 p-5">
+                {/* Source badge — sits above the mock ad */}
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                  <span
+                    className={cn(
+                      'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide',
+                      isAiCopy
+                        ? 'border-brand-lime/40 bg-brand-lime/15 text-brand-mid dark:text-brand-lime'
+                        : 'border-border bg-surface text-text-tertiary',
+                    )}
+                  >
+                    <Sparkles className="h-2.5 w-2.5" aria-hidden />
+                    {isAiCopy
+                      ? t('agent.regen.aiBadge', 'AI')
+                      : t('agent.regen.sourceTemplate', 'Namuna')}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => void handleRegenerate()}
+                    disabled={isRegenLoading || activating}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-brand-lime/30 bg-brand-lime/10 px-3 py-1.5 text-xs font-semibold text-brand-mid transition-colors hover:bg-brand-lime/20 disabled:cursor-not-allowed disabled:opacity-60 dark:text-brand-lime"
+                  >
+                    {isRegenLoading ? (
+                      <Loader2 className="h-3 w-3 animate-spin" aria-hidden />
+                    ) : (
+                      <Sparkles className="h-3 w-3" aria-hidden />
+                    )}
+                    {t('agent.regen.button', 'AI bilan qayta yozish')}
+                  </button>
+                </div>
+
+                {/* The mock ad, dimmed while regen is running */}
+                <div className={cn('relative transition-opacity', isRegenLoading && 'opacity-40')}>
+                  {platform === 'meta' ? (
+                    <MetaAdPreview brand={brand.handle} copy={copy} gradient={brand.gradient} />
+                  ) : (
+                    <TelegramAdPreview brand={brand.handle} copy={copy} gradient={brand.gradient} />
+                  )}
+                </div>
+
+                {/* Card-local spinner overlay — the rest of the modal stays responsive */}
+                {isRegenLoading && (
+                  <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                    <div className="pointer-events-auto flex items-center gap-2 rounded-full border border-brand-lime/30 bg-surface px-3 py-1.5 text-xs font-medium text-text-primary shadow-lg">
+                      <Loader2 className="h-3.5 w-3.5 animate-spin text-brand-mid dark:text-brand-lime" aria-hidden />
+                      {t('agent.regen.loading', 'AI yangi matn tayyorlamoqda…')}
+                    </div>
+                  </div>
+                )}
+
+                {regenError === previewStage && !isRegenLoading && (
+                  <p className="mt-2 text-[11px] text-amber-600 dark:text-amber-400">
+                    {t('agent.regen.fallback', 'AI ulanmadi — namuna matn ko‘rsatilmoqda.')}
+                  </p>
                 )}
               </div>
 
