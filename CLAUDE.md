@@ -89,6 +89,28 @@ shuning uchun `lint:check` (`--fix`'siz) ishlatiladi.
 **Asosiy branch:** `main`
 **Faol branch:** `claude/adspectr-autonomous-agent-pivot-6l3vov` — Autonomous AI Agent pivot
 
+### 2026-07-14 sessiyasi — Xavfsizlik mustahkamlash (audit + fix, 4 commit)
+3 ta parallel security audit → tasdiqlangan cross-tenant va payment kamchiliklari tuzatildi.
+Har biri test bilan; barcha api darvozalari yashil (331 test).
+- ✅ **Payme webhook fail-open (critical)** — `verifyAuth` merchant key yo'q bo'lsa
+  `Basic Paycom:` ni qabul qilardi (payment forgery). Endi fail-closed + constant-time
+  compare; web stub ham. (`billing/services/payme.service.ts`, +4 test)
+- ✅ **ai-agent BOLA (critical, yangi surface)** — har workspace/decision endpoint JWT'li
+  edi lekin ownership tekshirmasdi (boshqa tenant'ni optimize/chat/approve qilish mumkin).
+  `assertWorkspaceOwner`/`assertDecisionAccess` qo'shildi, `req.user.id` ulandi. Cron yo'li
+  o'zgarmadi. (+7 test)
+- ✅ **integrations IDOR + token exposure (critical)** — `req.workspace?.id` hech qачон
+  to'ldirilmasdi → TypeORM filter tushib qolardi → har kim boshqa tenant'ning ulanishini
+  (shifrlangan OAuth token'lar bilan) o'qishi mumkin edi. `assertConnectionOwner` +
+  `listConnectionsForUser`. (+7 test)
+- ✅ **platforms select-account IDOR (high)** — Meta/Google ad-account bind'ni ownership'siz
+  qayta yozardi. Endi `assertWorkspaceOwner`.
+- ✅ **creatives IDOR (high)** — har qanday creative'ni id bo'yicha o'qish/o'zgartirish/o'chirish.
+  `assertCreativeOwner` + list owned workspaces'ga cheklandi. (+5 test)
+- ✅ **CORS fail-closed (prod)** + **encryption fallback key'lar olib tashlandi** (fail-closed).
+- ⏳ **Qolgan follow-up:** rate-limiting (auth/AI, Redis), audience-segment/commission
+  segment-level IDOR, retarget `/signals` PII scoping, heygen status, CBC→GCM.
+
 ### 2026-07-13 sessiyasi — "Virtual AI Marketing Agent" pivot (feature-flag'li)
 Mahsulotni avtonom media-buyer modeliga burish. **Hech narsa o'chirilmadi** — hammasi
 `AGENT_MODE` (web) va `AGENT_AUTONOMOUS_MODE` (backend) flaglari ortida, qaytariladigan.
