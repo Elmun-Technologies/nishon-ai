@@ -31,11 +31,16 @@ interface PaymeRpcBody {
 
 function verifyPaymeBasic(authHeader: string | null): boolean {
   const key = process.env.PAYME_MERCHANT_KEY
-  if (!key) return true
+  // Fail closed: with no key configured, reject rather than accept — an
+  // accept-if-unset default lets anyone forge payment/order state.
+  if (!key) return false
   if (!authHeader?.startsWith('Basic ')) return false
   try {
     const decoded = Buffer.from(authHeader.slice(6), 'base64').toString('utf-8')
-    const [login, password] = decoded.split(':')
+    const sep = decoded.indexOf(':')
+    if (sep === -1) return false
+    const login = decoded.slice(0, sep)
+    const password = decoded.slice(sep + 1)
     return login === 'Paycom' && password === key
   } catch {
     return false

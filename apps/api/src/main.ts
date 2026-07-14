@@ -58,7 +58,18 @@ async function bootstrap() {
   // Enable CORS
   app.enableCors({
     origin: (origin, callback) => {
-      if (frontendOrigins.length === 0) return callback(null, true);
+      // Fail closed in production: if FRONTEND_URL is unset we must NOT reflect
+      // every origin while credentials:true — that would let any site make
+      // credentialed cross-origin requests. Only fall open in non-production.
+      if (frontendOrigins.length === 0) {
+        if (nodeEnv === "production") {
+          return callback(
+            new Error("CORS: FRONTEND_URL not configured"),
+            false,
+          );
+        }
+        return callback(null, true);
+      }
       if (!origin) return callback(null, true);
       if (exactOrigins.includes(origin)) return callback(null, true);
 

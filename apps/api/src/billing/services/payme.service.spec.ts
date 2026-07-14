@@ -103,6 +103,37 @@ describe("PaymeService", () => {
       expect(service.verifyAuth(undefined)).toBe(false);
       expect(service.verifyAuth("Bearer x")).toBe(false);
     });
+
+    it("rejects an empty password (Paycom:)", () => {
+      const header = "Basic " + Buffer.from("Paycom:").toString("base64");
+      expect(service.verifyAuth(header)).toBe(false);
+    });
+
+    it("fails closed when no merchant key is configured", async () => {
+      const config = { get: jest.fn(() => undefined) };
+      const mod: TestingModule = await Test.createTestingModule({
+        providers: [
+          PaymeService,
+          { provide: getRepositoryToken(PaymeTransaction), useValue: txRepo },
+          {
+            provide: getRepositoryToken(BillingInvoice),
+            useValue: invoiceRepo,
+          },
+          { provide: getRepositoryToken(User), useValue: userRepo },
+          { provide: ConfigService, useValue: config },
+        ],
+      }).compile();
+      const unconfigured = mod.get(PaymeService);
+
+      // The classic fail-open payload: Basic base64("Paycom:") with no key set.
+      const emptyPass = "Basic " + Buffer.from("Paycom:").toString("base64");
+      expect(unconfigured.verifyAuth(emptyPass)).toBe(false);
+      // Any credentials are rejected while unconfigured.
+      const anyKey =
+        "Basic " + Buffer.from("Paycom:anything").toString("base64");
+      expect(unconfigured.verifyAuth(anyKey)).toBe(false);
+      expect(unconfigured.isConfigured()).toBe(false);
+    });
   });
 
   describe("handleRequest routing", () => {

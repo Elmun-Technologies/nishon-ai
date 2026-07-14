@@ -12,7 +12,15 @@ import {
   getPlanPriceTiyin,
   tiyinToUzs,
 } from "../../config/plan-pricing.config";
-import { randomUUID } from "crypto";
+import { randomUUID, timingSafeEqual } from "crypto";
+
+/** Constant-time string comparison (avoids timing side-channels on secrets). */
+function timingSafeEqualStr(a: string, b: string): boolean {
+  const ab = new Uint8Array(Buffer.from(a, "utf-8"));
+  const bb = new Uint8Array(Buffer.from(b, "utf-8"));
+  if (ab.length !== bb.length) return false;
+  return timingSafeEqual(ab, bb);
+}
 
 // ─── Payme JSON-RPC Error Codes ──────────────────────────────────────────────
 
@@ -96,14 +104,34 @@ export class PaymeService {
    */
   verifyAuth(authHeader: string | undefined): boolean {
     if (!authHeader?.startsWith("Basic ")) return false;
-    const decoded = Buffer.from(authHeader.slice(6), "base64").toString(
-      "utf-8",
-    );
-    const [login, password] = decoded.split(":");
+
     const expectedKey = this.isTestMode
       ? this.config.get<string>("PAYME_MERCHANT_TEST_KEY") || this.merchantKey
       : this.merchantKey;
-    return login === "Paycom" && password === expectedKey;
+
+    // Fail closed: never authenticate a webhook when no merchant key is
+    // configured. Otherwise `Basic base64("Paycom:")` (empty password) would
+    // pass and let anyone forge payment/transaction state.
+    if (!expectedKey) {
+      this.logger.warn(
+        "Payme webhook rejected — merchant key not configured (fail-closed)",
+      );
+      return false;
+    }
+
+    let decoded: string;
+    try {
+      decoded = Buffer.from(authHeader.slice(6), "base64").toString("utf-8");
+    } catch {
+      return false;
+    }
+    // Split on the FIRST colon only — the key itself may contain colons.
+    const sep = decoded.indexOf(":");
+    if (sep === -1) return false;
+    const login = decoded.slice(0, sep);
+    const password = decoded.slice(sep + 1);
+
+    return login === "Paycom" && timingSafeEqualStr(password, expectedKey);
   }
 
   // ─── JSON-RPC Router ──────────────────────────────────────────────────────

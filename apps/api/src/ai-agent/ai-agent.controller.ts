@@ -7,9 +7,13 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  Req,
   Res,
 } from "@nestjs/common";
-import type { Response } from "express";
+import type { Request, Response } from "express";
+
+/** Shape of the JWT-authenticated request (req.user is the User entity). */
+type AuthedRequest = Request & { user: { id: string } };
 import {
   ApiTags,
   ApiBearerAuth,
@@ -40,9 +44,11 @@ export class AiAgentController {
     summary: "Generate platform-specific ad scripts after onboarding",
   })
   async generateScripts(
+    @Req() req: AuthedRequest,
     @Param("workspaceId") workspaceId: string,
     @Body() dto: any,
   ) {
+    await this.aiAgentService.assertWorkspaceOwner(workspaceId, req.user.id);
     return this.aiAgentService.generateAdScripts(workspaceId, dto);
   }
 
@@ -75,14 +81,22 @@ export class AiAgentController {
   })
   @ApiParam({ name: "workspaceId", description: "Workspace UUID" })
   @ApiResponse({ status: 200, description: "Strategy generated successfully" })
-  async generateStrategy(@Param("workspaceId") workspaceId: string) {
+  async generateStrategy(
+    @Req() req: AuthedRequest,
+    @Param("workspaceId") workspaceId: string,
+  ) {
+    await this.aiAgentService.assertWorkspaceOwner(workspaceId, req.user.id);
     return this.aiAgentService.generateStrategy(workspaceId);
   }
 
   @Post("workspaces/:workspaceId/strategy/regenerate")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: "Regenerate strategy with fresh AI analysis" })
-  async regenerateStrategy(@Param("workspaceId") workspaceId: string) {
+  async regenerateStrategy(
+    @Req() req: AuthedRequest,
+    @Param("workspaceId") workspaceId: string,
+  ) {
+    await this.aiAgentService.assertWorkspaceOwner(workspaceId, req.user.id);
     return this.aiAgentService.regenerateStrategy(workspaceId);
   }
 
@@ -94,21 +108,33 @@ export class AiAgentController {
     description:
       "Normally runs automatically every 2 hours. Call this to trigger manually.",
   })
-  async optimize(@Param("workspaceId") workspaceId: string) {
+  async optimize(
+    @Req() req: AuthedRequest,
+    @Param("workspaceId") workspaceId: string,
+  ) {
+    await this.aiAgentService.assertWorkspaceOwner(workspaceId, req.user.id);
     return this.aiAgentService.runOptimizationLoop(workspaceId);
   }
 
   @Patch("decisions/:decisionId/approve")
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: "Approve a pending AI decision (ASSISTED mode)" })
-  async approveDecision(@Param("decisionId") decisionId: string) {
+  async approveDecision(
+    @Req() req: AuthedRequest,
+    @Param("decisionId") decisionId: string,
+  ) {
+    await this.aiAgentService.assertDecisionAccess(decisionId, req.user.id);
     return this.aiAgentService.approveDecision(decisionId);
   }
 
   @Patch("decisions/:decisionId/reject")
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: "Reject a pending AI decision (ASSISTED mode)" })
-  async rejectDecision(@Param("decisionId") decisionId: string) {
+  async rejectDecision(
+    @Req() req: AuthedRequest,
+    @Param("decisionId") decisionId: string,
+  ) {
+    await this.aiAgentService.assertDecisionAccess(decisionId, req.user.id);
     return this.aiAgentService.rejectDecision(decisionId);
   }
 
@@ -133,9 +159,11 @@ export class AiAgentController {
     description: "Pipeline result with per-step outputs and error map",
   })
   async runPipeline(
+    @Req() req: AuthedRequest,
     @Param("workspaceId") workspaceId: string,
     @Body() dto: Omit<CampaignPipelineInput, "workspaceId">,
   ) {
+    await this.aiAgentService.assertWorkspaceOwner(workspaceId, req.user.id);
     return this.orchestrator.runCampaignPipeline({ ...dto, workspaceId });
   }
 
@@ -146,6 +174,7 @@ export class AiAgentController {
     description: "Powers the floating chat widget on the dashboard.",
   })
   async chat(
+    @Req() req: AuthedRequest,
     @Body()
     dto: {
       workspaceId: string;
@@ -155,6 +184,10 @@ export class AiAgentController {
       assistantPersona?: "targetologist" | "optimizer" | "general";
     },
   ) {
+    await this.aiAgentService.assertWorkspaceOwner(
+      dto.workspaceId,
+      req.user.id,
+    );
     return this.aiAgentService.chat(dto);
   }
 
@@ -168,6 +201,7 @@ export class AiAgentController {
       "and the connection is closed.",
   })
   async chatStream(
+    @Req() req: AuthedRequest,
     @Body()
     dto: {
       workspaceId: string;
@@ -177,6 +211,10 @@ export class AiAgentController {
     },
     @Res() res: Response,
   ) {
+    await this.aiAgentService.assertWorkspaceOwner(
+      dto.workspaceId,
+      req.user.id,
+    );
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache, no-transform");
     res.setHeader("Connection", "keep-alive");

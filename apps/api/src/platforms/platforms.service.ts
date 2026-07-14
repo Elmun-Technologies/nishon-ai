@@ -124,7 +124,12 @@ export class PlatformsService {
     workspaceId: string,
     adAccountId: string,
     adAccountName: string,
+    userId: string,
   ): Promise<ConnectedAccount> {
+    // Ownership check — without it any user could rebind another workspace's
+    // freshly-connected Meta account to an arbitrary act_<id> (IDOR).
+    await this.assertWorkspaceOwner(workspaceId, userId);
+
     const pendingAccount = await this.accountRepo.findOne({
       where: {
         workspaceId,
@@ -297,7 +302,10 @@ export class PlatformsService {
     workspaceId: string,
     customerId: string,
     customerName: string,
+    userId: string,
   ): Promise<ConnectedAccount> {
+    await this.assertWorkspaceOwner(workspaceId, userId);
+
     const account = await this.accountRepo.findOne({
       where: { workspaceId, platform: Platform.GOOGLE },
     });
