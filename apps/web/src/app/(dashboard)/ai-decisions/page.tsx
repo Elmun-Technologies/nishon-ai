@@ -29,30 +29,69 @@ interface AiDecision {
 
 const DEMO_DECISIONS: AiDecision[] = [
   {
-    id: 'demo-pause-1',
-    actionType: 'pause_ad',
-    reason:
-      'CTR dropped 42% over 7 days while frequency climbed. Pausing protects spend until creative refresh.',
-    estimatedImpact: 'Save ~$120/week; re-test after new hook.',
-    beforeState: { status: 'active', spend: 340, ctr: '0.9%' },
-    afterState: { status: 'paused', spend: 340, ctr: '0.9%' },
-    isApproved: null,
-    isExecuted: false,
-    createdAt: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
-    campaignId: 'demo-camp-1',
-  },
-  {
     id: 'demo-scale-1',
     actionType: 'scale_budget',
     reason:
-      'Stable CPA under target for 5 days with headroom on frequency. Scaling captures demand safely.',
-    estimatedImpact: '+18% conversions at same CPA band.',
-    beforeState: { dailyBudget: 80, roas: 2.4 },
-    afterState: { dailyBudget: 100, roas: 2.4 },
+      'Meta Retargeting audience — stable CPA under target for 5 days with headroom on frequency. Budget increased by 15% to capture demand safely.',
+    estimatedImpact: '+15% budget · projected +12% conversions at same CPA band.',
+    beforeState: { platform: 'Meta', channel: 'Retargeting', dailyBudget: 80, roas: 2.4 },
+    afterState: { platform: 'Meta', channel: 'Retargeting', dailyBudget: 92, roas: 2.4 },
     isApproved: true,
     isExecuted: true,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 6).toISOString(),
-    campaignId: 'demo-camp-2',
+    createdAt: new Date(Date.now() - 1000 * 60 * 25).toISOString(),
+    campaignId: 'demo-camp-meta-rtg',
+  },
+  {
+    id: 'demo-pause-tg',
+    actionType: 'pause_ad',
+    reason:
+      'Telegram Channel ad — spent $30 in 24h with 0 conversions. Hard Stop-Loss triggered; ad paused to prevent further waste.',
+    estimatedImpact: 'Saves ~$45/day. Budget will be reallocated to Meta Retargeting.',
+    beforeState: { platform: 'Telegram', channel: 'Kiyimlar kanali', status: 'active', spend: 30, conversions: 0 },
+    afterState: { platform: 'Telegram', channel: 'Kiyimlar kanali', status: 'paused', spend: 30, conversions: 0 },
+    isApproved: true,
+    isExecuted: true,
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+    campaignId: 'demo-camp-tg',
+  },
+  {
+    id: 'demo-rotate',
+    actionType: 'rotate_creative',
+    reason:
+      'Instagram Reels CTR fell below 0.5% while frequency climbed to 3.8x. A fresh visual is queued and awaiting your approval.',
+    estimatedImpact: 'Expected CTR recovery to 1.1%; ~+22% clicks at flat spend.',
+    beforeState: { platform: 'Meta', placement: 'Instagram Reels', ctr: '0.4%', frequency: 3.8 },
+    afterState: { platform: 'Meta', placement: 'Instagram Reels', ctr: '(pending)', frequency: '(pending)' },
+    isApproved: null,
+    isExecuted: false,
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
+    campaignId: 'demo-camp-meta-cold',
+  },
+  {
+    id: 'demo-shift',
+    actionType: 'shift_budget',
+    reason:
+      'Google Search "kiyim sotib olish" CPC lower than forecast — shifted $50/week from TikTok TOFU to Google MOFU to capture higher-intent traffic.',
+    estimatedImpact: 'Projected +9 conversions/week at CPA −8%.',
+    beforeState: { from: 'TikTok · TOFU', to: 'Google · MOFU', weeklyBudget: 200 },
+    afterState: { from: 'TikTok · TOFU', to: 'Google · MOFU', weeklyBudget: 250 },
+    isApproved: true,
+    isExecuted: true,
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 9).toISOString(),
+    campaignId: 'demo-camp-google',
+  },
+  {
+    id: 'demo-strategy',
+    actionType: 'generate_strategy',
+    reason:
+      'Weekly optimization cycle complete. Funnel rebalanced (TOFU 30% / MOFU 40% / BOFU 30%). 2 creatives auto-rotated; retargeting audience refreshed.',
+    estimatedImpact: 'Overall ROAS trending 2.4x → 2.7x over the next 7 days.',
+    beforeState: { cycle: 'week 2', roas: 2.4, activeAdSets: 6 },
+    afterState: { cycle: 'week 3', roas: 2.7, activeAdSets: 6 },
+    isApproved: true,
+    isExecuted: true,
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 20).toISOString(),
+    campaignId: 'demo-workspace',
   },
 ]
 

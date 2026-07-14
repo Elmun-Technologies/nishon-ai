@@ -2865,7 +2865,8 @@
     "result": {
       "ready": "Strategy ready",
       "adjust": "Adjust",
-      "activate": "Activate the AI Agent"
+      "activate": "Activate the AI Agent",
+      "launch": "Launch the AI Agent"
     },
     "copy": {
       "title": "AI-generated ad copy",
@@ -2885,6 +2886,26 @@
       "influencers": "Influencers",
       "search": "Search",
       "retargeting": "Retargeting"
+    },
+    "launch": {
+      "title": "Launching the AI Agent",
+      "subtitle": "Ready in a few seconds",
+      "step": "Step",
+      "scrape": "Scraping and analyzing your website metadata…",
+      "audience": "Identifying target audience and competitive positioning…",
+      "copy": "Generating high-converting copy for Meta, Google, and Telegram…",
+      "guardrails": "Creating micro-budget allocation and setting up stop-loss guardrails…"
+    },
+    "preview": {
+      "title": "AI-generated ad previews",
+      "subtitle": "Review and approve — the Agent starts right away.",
+      "metaTab": "Meta · Instagram Feed",
+      "telegramTab": "Telegram Channel",
+      "stage": "Stage",
+      "footer": "Once approved, the Agent runs automatically on Meta, Google and Telegram.",
+      "cancel": "Cancel",
+      "approve": "Approve & Go Live",
+      "going": "Going live…"
     }
   }
 }

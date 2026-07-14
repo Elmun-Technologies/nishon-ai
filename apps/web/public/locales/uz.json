@@ -2865,7 +2865,8 @@
     "result": {
       "ready": "Strategiya tayyor",
       "adjust": "O‘zgartirish",
-      "activate": "AI Agentni faollashtirish"
+      "activate": "AI Agentni faollashtirish",
+      "launch": "AI Agentni ishga tushirish"
     },
     "copy": {
       "title": "AI tayyorlagan reklama matni",
@@ -2885,6 +2886,26 @@
       "influencers": "Influencerlar",
       "search": "Qidiruv",
       "retargeting": "Retargeting"
+    },
+    "launch": {
+      "title": "AI Agent ishga tushirilmoqda",
+      "subtitle": "Bir necha soniyada tayyor bo‘ladi",
+      "step": "Qadam",
+      "scrape": "Saytingiz metama’lumotlari yig’ilmoqda va tahlil qilinmoqda…",
+      "audience": "Maqsadli auditoriya va raqobat pozitsiyasi aniqlanmoqda…",
+      "copy": "Meta, Google va Telegram uchun yuqori konversiyali matnlar yaratilmoqda…",
+      "guardrails": "Mikro-byudjet taqsimoti tuzilmoqda va stop-loss himoyasi o’rnatilmoqda…"
+    },
+    "preview": {
+      "title": "AI tayyorlagan reklama namunalari",
+      "subtitle": "Ko‘rib chiqing va tasdiqlang — Agent shu ondayoq boshlaydi.",
+      "metaTab": "Meta · Instagram Feed",
+      "telegramTab": "Telegram Channel",
+      "stage": "Bosqich",
+      "footer": "Faollashtirilgach, Agent Meta, Google va Telegram’da avtomatik boshlaydi.",
+      "cancel": "Bekor qilish",
+      "approve": "Tasdiqlash va ishga tushirish",
+      "going": "Faollashtirilmoqda…"
     }
   }
 }
