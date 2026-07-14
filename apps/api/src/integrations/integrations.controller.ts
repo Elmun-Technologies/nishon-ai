@@ -90,7 +90,9 @@ export class IntegrationsController {
     @Body() dto: CreateIntegrationAuthDto,
     @Req() req: any,
   ): Promise<IntegrationConnectionResponseDto> {
-    const workspaceId = req.workspace?.id;
+    // OAuth create path — workspace context comes from the authenticated
+    // request; connection does not exist yet so there is nothing to own-check.
+    const workspaceId: string | undefined = req.workspace?.id;
     const userId = req.user?.id;
 
     if (!workspaceId || !userId) {
@@ -116,9 +118,11 @@ export class IntegrationsController {
   async listConnections(
     @Req() req: any,
   ): Promise<IntegrationConnectionResponseDto[]> {
-    const workspaceId = req.workspace?.id;
-    const connections =
-      await this.integrationService.listConnections(workspaceId);
+    // Scope to the caller's own workspaces — the old req.workspace?.id was
+    // always undefined, so the query returned every tenant's connections.
+    const connections = await this.integrationService.listConnectionsForUser(
+      req.user.id,
+    );
     return connections.map((c) => this.mapConnectionToDto(c));
   }
 
@@ -132,7 +136,14 @@ export class IntegrationsController {
     @Param("connectionId") connectionId: string,
     @Req() req: any,
   ): Promise<IntegrationConnectionResponseDto> {
-    const workspaceId = req.workspace?.id;
+    // IDOR guard: verify the caller owns the connection's workspace and use the
+    // real workspaceId (req.workspace was never populated → filter was dropped).
+    const workspaceId = (
+      await this.integrationService.assertConnectionOwner(
+        connectionId,
+        req.user.id,
+      )
+    ).workspaceId;
     const connection = await this.integrationService.getConnectionWithTokens(
       connectionId,
       workspaceId,
@@ -150,7 +161,14 @@ export class IntegrationsController {
     @Param("connectionId") connectionId: string,
     @Req() req: any,
   ): Promise<IntegrationHealthStatusDto> {
-    const workspaceId = req.workspace?.id;
+    // IDOR guard: verify the caller owns the connection's workspace and use the
+    // real workspaceId (req.workspace was never populated → filter was dropped).
+    const workspaceId = (
+      await this.integrationService.assertConnectionOwner(
+        connectionId,
+        req.user.id,
+      )
+    ).workspaceId;
     return this.integrationService.getHealthStatus(connectionId, workspaceId);
   }
 
@@ -164,7 +182,14 @@ export class IntegrationsController {
     @Param("connectionId") connectionId: string,
     @Req() req: any,
   ): Promise<{ success: boolean; message: string }> {
-    const workspaceId = req.workspace?.id;
+    // IDOR guard: verify the caller owns the connection's workspace and use the
+    // real workspaceId (req.workspace was never populated → filter was dropped).
+    const workspaceId = (
+      await this.integrationService.assertConnectionOwner(
+        connectionId,
+        req.user.id,
+      )
+    ).workspaceId;
 
     try {
       const success = await this.integrationService.testConnection(
@@ -194,7 +219,10 @@ export class IntegrationsController {
     @Body() dto: SaveConfigurationDto,
     @Req() req: any,
   ): Promise<{ success: boolean; message: string }> {
-    const _workspaceId = req.workspace?.id;
+    await this.integrationService.assertConnectionOwner(
+      connectionId,
+      req.user.id,
+    );
 
     try {
       await this.integrationService.saveConfiguration(connectionId, dto as any);
@@ -213,7 +241,14 @@ export class IntegrationsController {
    */
   @Get(":connectionId/config")
   @HttpCode(200)
-  async getConfiguration(@Param("connectionId") connectionId: string) {
+  async getConfiguration(
+    @Param("connectionId") connectionId: string,
+    @Req() req: any,
+  ) {
+    await this.integrationService.assertConnectionOwner(
+      connectionId,
+      req.user.id,
+    );
     return this.integrationService.getConfiguration(connectionId);
   }
 
@@ -228,7 +263,14 @@ export class IntegrationsController {
     @Body() dto: SyncConversionDto,
     @Req() req: any,
   ): Promise<{ success: boolean; leadId?: number; error?: string }> {
-    const workspaceId = req.workspace?.id;
+    // IDOR guard: verify the caller owns the connection's workspace and use the
+    // real workspaceId (req.workspace was never populated → filter was dropped).
+    const workspaceId = (
+      await this.integrationService.assertConnectionOwner(
+        connectionId,
+        req.user.id,
+      )
+    ).workspaceId;
 
     const conversion = this.dtoToConversionEvent(dto.conversion);
     return this.integrationService.syncConversionToLead(
@@ -254,7 +296,14 @@ export class IntegrationsController {
     skipped: number;
     errors: Array<{ conversionId: string; error: string }>;
   }> {
-    const workspaceId = req.workspace?.id;
+    // IDOR guard: verify the caller owns the connection's workspace and use the
+    // real workspaceId (req.workspace was never populated → filter was dropped).
+    const workspaceId = (
+      await this.integrationService.assertConnectionOwner(
+        connectionId,
+        req.user.id,
+      )
+    ).workspaceId;
 
     const conversions = dto.conversions.map((c) =>
       this.dtoToConversionEvent(c),
@@ -276,7 +325,14 @@ export class IntegrationsController {
     @Param("connectionId") connectionId: string,
     @Req() req: any,
   ): Promise<SyncLogsResponseDto> {
-    const workspaceId = req.workspace?.id;
+    // IDOR guard: verify the caller owns the connection's workspace and use the
+    // real workspaceId (req.workspace was never populated → filter was dropped).
+    const workspaceId = (
+      await this.integrationService.assertConnectionOwner(
+        connectionId,
+        req.user.id,
+      )
+    ).workspaceId;
     const limit = req.query.limit ? parseInt(req.query.limit) : 50;
     const offset = req.query.offset ? parseInt(req.query.offset) : 0;
 
@@ -298,7 +354,14 @@ export class IntegrationsController {
     @Param("connectionId") connectionId: string,
     @Req() req: any,
   ): Promise<any> {
-    const workspaceId = req.workspace?.id;
+    // IDOR guard: verify the caller owns the connection's workspace and use the
+    // real workspaceId (req.workspace was never populated → filter was dropped).
+    const workspaceId = (
+      await this.integrationService.assertConnectionOwner(
+        connectionId,
+        req.user.id,
+      )
+    ).workspaceId;
     const lookbackDays = req.query.lookbackDays
       ? parseInt(req.query.lookbackDays)
       : 90;
@@ -320,7 +383,14 @@ export class IntegrationsController {
     @Param("connectionId") connectionId: string,
     @Req() req: any,
   ): Promise<any> {
-    const workspaceId = req.workspace?.id;
+    // IDOR guard: verify the caller owns the connection's workspace and use the
+    // real workspaceId (req.workspace was never populated → filter was dropped).
+    const workspaceId = (
+      await this.integrationService.assertConnectionOwner(
+        connectionId,
+        req.user.id,
+      )
+    ).workspaceId;
     return this.integrationService.getRevenueAttribution(
       connectionId,
       workspaceId,
@@ -337,7 +407,14 @@ export class IntegrationsController {
     @Param("connectionId") connectionId: string,
     @Req() req: any,
   ): Promise<any> {
-    const workspaceId = req.workspace?.id;
+    // IDOR guard: verify the caller owns the connection's workspace and use the
+    // real workspaceId (req.workspace was never populated → filter was dropped).
+    const workspaceId = (
+      await this.integrationService.assertConnectionOwner(
+        connectionId,
+        req.user.id,
+      )
+    ).workspaceId;
     const days = req.query.days ? parseInt(req.query.days) : 30;
 
     const trends = await this.integrationService.getRevenueTrends(
@@ -362,7 +439,14 @@ export class IntegrationsController {
     @Param("connectionId") connectionId: string,
     @Req() req: any,
   ): Promise<void> {
-    const workspaceId = req.workspace?.id;
+    // IDOR guard: verify the caller owns the connection's workspace and use the
+    // real workspaceId (req.workspace was never populated → filter was dropped).
+    const workspaceId = (
+      await this.integrationService.assertConnectionOwner(
+        connectionId,
+        req.user.id,
+      )
+    ).workspaceId;
     await this.integrationService.disconnect(connectionId, workspaceId);
   }
 
@@ -381,7 +465,14 @@ export class IntegrationsController {
     @Body() dto: CreateAudienceSegmentDto,
     @Req() req?: any,
   ): Promise<any> {
-    const workspaceId = req.workspace?.id;
+    // IDOR guard: verify the caller owns the connection's workspace and use the
+    // real workspaceId (req.workspace was never populated → filter was dropped).
+    const workspaceId = (
+      await this.integrationService.assertConnectionOwner(
+        connectionId,
+        req.user.id,
+      )
+    ).workspaceId;
     return this.audienceSegmentService.createSegment({
       ...dto,
       connectionId,
@@ -521,7 +612,14 @@ export class IntegrationsController {
     @Query("year") year?: number,
     @Req() req?: any,
   ): Promise<any> {
-    const workspaceId = req.workspace?.id;
+    // IDOR guard: verify the caller owns the connection's workspace and use the
+    // real workspaceId (req.workspace was never populated → filter was dropped).
+    const workspaceId = (
+      await this.integrationService.assertConnectionOwner(
+        connectionId,
+        req.user.id,
+      )
+    ).workspaceId;
     const now = new Date();
     const m = month || now.getMonth() + 1;
     const y = year || now.getFullYear();
@@ -553,7 +651,14 @@ export class IntegrationsController {
     @Query("offset") offset: number = 0,
     @Req() req?: any,
   ): Promise<any> {
-    const workspaceId = req.workspace?.id;
+    // IDOR guard: verify the caller owns the connection's workspace and use the
+    // real workspaceId (req.workspace was never populated → filter was dropped).
+    const workspaceId = (
+      await this.integrationService.assertConnectionOwner(
+        connectionId,
+        req.user.id,
+      )
+    ).workspaceId;
     const summary = await this.commissionReportingService.getCommissionsSummary(
       workspaceId,
       { status, specialistId },
@@ -638,7 +743,14 @@ export class IntegrationsController {
     @Query("periodEnd") periodEnd?: string,
     @Req() req?: any,
   ): Promise<any> {
-    const workspaceId = req.workspace?.id;
+    // IDOR guard: verify the caller owns the connection's workspace and use the
+    // real workspaceId (req.workspace was never populated → filter was dropped).
+    const workspaceId = (
+      await this.integrationService.assertConnectionOwner(
+        connectionId,
+        req.user.id,
+      )
+    ).workspaceId;
     return this.commissionReportingService.getCommissionsSummary(workspaceId, {
       periodStart: periodStart ? new Date(periodStart) : undefined,
       periodEnd: periodEnd ? new Date(periodEnd) : undefined,
@@ -656,7 +768,14 @@ export class IntegrationsController {
     @Param("specialistId") specialistId: string,
     @Req() req?: any,
   ): Promise<any> {
-    const workspaceId = req.workspace?.id;
+    // IDOR guard: verify the caller owns the connection's workspace and use the
+    // real workspaceId (req.workspace was never populated → filter was dropped).
+    const workspaceId = (
+      await this.integrationService.assertConnectionOwner(
+        connectionId,
+        req.user.id,
+      )
+    ).workspaceId;
     return this.commissionReportingService.getSpecialistStats(
       workspaceId,
       parseInt(specialistId),
@@ -674,7 +793,14 @@ export class IntegrationsController {
     @Param("period") period: string,
     @Req() req?: any,
   ): Promise<any> {
-    const workspaceId = req.workspace?.id;
+    // IDOR guard: verify the caller owns the connection's workspace and use the
+    // real workspaceId (req.workspace was never populated → filter was dropped).
+    const workspaceId = (
+      await this.integrationService.assertConnectionOwner(
+        connectionId,
+        req.user.id,
+      )
+    ).workspaceId;
     return this.commissionReportingService.generatePayroll(workspaceId, period);
   }
 
@@ -689,7 +815,14 @@ export class IntegrationsController {
     @Query("activeOnly") activeOnly: boolean = false,
     @Req() req?: any,
   ): Promise<any> {
-    const workspaceId = req.workspace?.id;
+    // IDOR guard: verify the caller owns the connection's workspace and use the
+    // real workspaceId (req.workspace was never populated → filter was dropped).
+    const workspaceId = (
+      await this.integrationService.assertConnectionOwner(
+        connectionId,
+        req.user.id,
+      )
+    ).workspaceId;
     const rates = await this.commissionRateService.listRates(
       workspaceId,
       activeOnly,
@@ -708,7 +841,14 @@ export class IntegrationsController {
     @Body() dto: CreateCommissionRateDto,
     @Req() req?: any,
   ): Promise<any> {
-    const workspaceId = req.workspace?.id;
+    // IDOR guard: verify the caller owns the connection's workspace and use the
+    // real workspaceId (req.workspace was never populated → filter was dropped).
+    const workspaceId = (
+      await this.integrationService.assertConnectionOwner(
+        connectionId,
+        req.user.id,
+      )
+    ).workspaceId;
     return this.commissionRateService.createRate({
       ...dto,
       workspaceId,

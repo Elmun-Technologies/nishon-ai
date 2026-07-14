@@ -16,6 +16,7 @@ import {
   CommissionLog,
   SpecialistProfile,
 } from "./entities";
+import { Workspace } from "../workspaces/entities/workspace.entity";
 import {
   EncryptionService,
   AmoCRMConnectorService,
@@ -50,6 +51,8 @@ import { IntegrationsController } from "./integrations.controller";
       CommissionRate,
       CommissionLog,
       SpecialistProfile,
+      // Ownership checks (IDOR guard)
+      Workspace,
     ]),
   ],
   controllers: [IntegrationsController],

@@ -2,9 +2,9 @@ import {
   Injectable,
   BadRequestException,
   NotFoundException,
-  ForbiddenException as _ForbiddenException,
+  ForbiddenException,
 } from "@nestjs/common";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import { AxiosInstance as _AxiosInstance } from "axios";
 import {
@@ -12,6 +12,7 @@ import {
   IntegrationConfigEntity,
   SyncLog,
 } from "../entities";
+import { Workspace } from "../../workspaces/entities/workspace.entity";
 import {
   IntegrationStatus,
   IntegrationHealthStatus,
@@ -38,7 +39,49 @@ export class IntegrationService {
     private amoCrmConnector: AmoCRMConnectorService,
     private conversionToLeadSync: ConversionToLeadSyncService,
     private dealPullSync: DealPullSyncService,
+    @InjectRepository(Workspace)
+    private workspaceRepository: Repository<Workspace>,
   ) {}
+
+  // ─── Ownership (IDOR guard) ─────────────────────────────────────────────────
+
+  /** Workspace ids owned by the user — used to scope list queries. */
+  private async ownedWorkspaceIds(userId: string): Promise<string[]> {
+    const rows = await this.workspaceRepository.find({
+      where: { userId },
+      select: ["id"],
+    });
+    return rows.map((w) => w.id);
+  }
+
+  /**
+   * Resolve the connection and assert the authenticated user owns the workspace
+   * it belongs to. Every connection-scoped controller route must call this —
+   * previously handlers relied on `req.workspace?.id`, which is never populated,
+   * so TypeORM dropped the filter and any user could read/mutate any tenant's
+   * integration (including encrypted OAuth tokens). Fail-closed on any gap.
+   */
+  async assertConnectionOwner(
+    connectionId: string,
+    userId: string,
+  ): Promise<IIntegrationConnection> {
+    if (!connectionId || !userId) {
+      throw new ForbiddenException("Access denied");
+    }
+    const connection = await this.connectionRepository.findOne({
+      where: { id: connectionId },
+    });
+    if (!connection) {
+      throw new NotFoundException("Integration connection not found");
+    }
+    const workspace = await this.workspaceRepository.findOne({
+      where: { id: connection.workspaceId },
+    });
+    if (!workspace || workspace.userId !== userId) {
+      throw new ForbiddenException("Access denied");
+    }
+    return connection;
+  }
 
   /**
    * Get OAuth authorization URL
@@ -291,6 +334,31 @@ export class IntegrationService {
   ): Promise<IIntegrationConnection[]> {
     return this.connectionRepository.find({
       where: { workspaceId },
+      select: [
+        "id",
+        "integrationKey",
+        "externalAccountId",
+        "status",
+        "isActive",
+        "lastSyncedAt",
+        "connectedAt",
+        "updatedAt",
+      ],
+    });
+  }
+
+  /**
+   * List connections across every workspace the user owns. Replaces the
+   * broken `listConnections(req.workspace?.id)` path (undefined workspaceId
+   * returned all tenants' connections).
+   */
+  async listConnectionsForUser(
+    userId: string,
+  ): Promise<IIntegrationConnection[]> {
+    const workspaceIds = await this.ownedWorkspaceIds(userId);
+    if (workspaceIds.length === 0) return [];
+    return this.connectionRepository.find({
+      where: { workspaceId: In(workspaceIds) },
       select: [
         "id",
         "integrationKey",
