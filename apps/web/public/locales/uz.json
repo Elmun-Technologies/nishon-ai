@@ -2833,7 +2833,12 @@
         "BOFU": "Bottom of Funnel — retargeting"
       },
       "total": "Jami",
-      "byFunnel": "Funnel bosqichlari"
+      "byFunnel": "Funnel bosqichlari",
+      "analyze": "Tahlil qilish & Taqsimlash",
+      "livePreview": "Jonli ko‘rinish",
+      "livePreviewHint": "“Tahlil qilish”ni bosing — to‘liq strategiya va reklama matnini ko‘rasiz.",
+      "goalBrand": "Brend tanitish",
+      "goalBrandSub": "Reach va yangi auditoriya"
     },
     "active": {
       "banner": "AI Agent faol — kampaniyalar avtomatik boshqarilmoqda.",
@@ -2850,6 +2855,36 @@
       "title": "AI Agent — qarorlar jurnali",
       "sample": "Namuna",
       "viewAll": "Barchasi"
+    },
+    "analyze": {
+      "title": "AI Agent tahlil qilmoqda…",
+      "scan": "Sayt kontenti skanerlanmoqda va brend identifikatsiyasi aniqlanmoqda…",
+      "audience": "Maqsadli auditoriya va platforma trendlari tahlil qilinmoqda…",
+      "strategy": "Funnel strategiyasi va reklama matni tayyorlanmoqda…"
+    },
+    "result": {
+      "ready": "Strategiya tayyor",
+      "adjust": "O‘zgartirish",
+      "activate": "AI Agentni faollashtirish"
+    },
+    "copy": {
+      "title": "AI tayyorlagan reklama matni",
+      "hint": "Namuna matnlar — agent faollashgach real kreativlar tayyorlanadi.",
+      "stage": {
+        "TOFU": "TOFU — sovuq auditoriya",
+        "MOFU": "MOFU — qiziqish",
+        "BOFU": "BOFU — konversiya"
+      }
+    },
+    "channel": {
+      "meta": "Meta",
+      "tiktok": "TikTok",
+      "google": "Google",
+      "telegram": "Telegram",
+      "youtube": "YouTube",
+      "influencers": "Influencerlar",
+      "search": "Qidiruv",
+      "retargeting": "Retargeting"
     }
   }
 }

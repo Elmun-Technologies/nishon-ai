@@ -2833,7 +2833,12 @@
         "BOFU": "Bottom of Funnel — retargeting"
       },
       "total": "Total",
-      "byFunnel": "Funnel stages"
+      "byFunnel": "Funnel stages",
+      "analyze": "Analyze & Allocate",
+      "livePreview": "Live preview",
+      "livePreviewHint": "Hit “Analyze” to see the full strategy and ad copy.",
+      "goalBrand": "Brand awareness",
+      "goalBrandSub": "Reach and new audience"
     },
     "active": {
       "banner": "AI Agent is active — campaigns are managed automatically.",
@@ -2850,6 +2855,36 @@
       "title": "AI Agent — decisions log",
       "sample": "Sample",
       "viewAll": "View all"
+    },
+    "analyze": {
+      "title": "AI Agent is analyzing…",
+      "scan": "Scanning website content & extracting brand identity…",
+      "audience": "Analyzing target audience and platform trends…",
+      "strategy": "Generating funnel strategy & creative copy…"
+    },
+    "result": {
+      "ready": "Strategy ready",
+      "adjust": "Adjust",
+      "activate": "Activate the AI Agent"
+    },
+    "copy": {
+      "title": "AI-generated ad copy",
+      "hint": "Sample copy — real creatives are produced once the agent is active.",
+      "stage": {
+        "TOFU": "TOFU — cold audience",
+        "MOFU": "MOFU — consideration",
+        "BOFU": "BOFU — conversion"
+      }
+    },
+    "channel": {
+      "meta": "Meta",
+      "tiktok": "TikTok",
+      "google": "Google",
+      "telegram": "Telegram",
+      "youtube": "YouTube",
+      "influencers": "Influencers",
+      "search": "Search",
+      "retargeting": "Retargeting"
     }
   }
 }

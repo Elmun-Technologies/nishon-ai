@@ -2,26 +2,21 @@
 
 import { useState } from 'react'
 import { Cell, Pie, PieChart, ResponsiveContainer, Sector } from 'recharts'
-import type { AdPlatform } from '@/lib/funnel-allocator'
 
 /**
- * Interactive donut chart of the per-platform budget split. Split into its own
- * module so recharts (~90 kB gzip) code-splits out and only loads when the AI
- * Agent allocation preview actually renders (via next/dynamic).
+ * Interactive donut chart of a budget split. Generic over any set of colored
+ * segments (funnel stages, channels, …). Split into its own module so recharts
+ * (~90 kB gzip) code-splits out and only loads when the allocation preview
+ * actually renders (via next/dynamic).
  */
 
-const PLATFORM_HEX: Record<AdPlatform, string> = {
-  meta: '#3b82f6', // blue-500
-  google: '#ef4444', // red-500
-  tiktok: '#d946ef', // fuchsia-500
-  telegram: '#0ea5e9', // sky-500
-}
-
-export interface DonutDatum {
-  platform: AdPlatform
+export interface DonutSegment {
+  key: string
   label: string
   amount: number
+  /** Percent of the total (0-100). */
   pct: number
+  colorHex: string
 }
 
 function usd(n: number): string {
@@ -44,16 +39,16 @@ function renderActiveShape(props: any) {
 }
 
 export default function AllocationDonut({
-  data,
+  segments,
   totalLabel,
   total,
 }: {
-  data: DonutDatum[]
+  segments: DonutSegment[]
   totalLabel: string
   total: number
 }) {
   const [active, setActive] = useState<number | null>(null)
-  const shown = data.filter((d) => d.amount > 0)
+  const shown = segments.filter((d) => d.amount > 0)
   const focus = active != null ? shown[active] : null
 
   return (
@@ -77,7 +72,7 @@ export default function AllocationDonut({
             isAnimationActive
           >
             {shown.map((d) => (
-              <Cell key={d.platform} fill={PLATFORM_HEX[d.platform]} />
+              <Cell key={d.key} fill={d.colorHex} />
             ))}
           </Pie>
         </PieChart>
