@@ -2,6 +2,8 @@
 
 import Link from 'next/link'
 import { Plus, Users, Megaphone, TrendingUp, Play, Pause, ArrowRight } from 'lucide-react'
+import { AGENT_MODE } from '@/lib/agent-mode'
+import { AutomatedByAgent } from '@/components/ui/AutomatedByAgent'
 import { useI18n } from '@/i18n/use-i18n'
 import { ComingSoonBadge, PageHeader } from '@/components/ui'
 import { Alert } from '@/components/ui/Alert'
@@ -58,6 +60,13 @@ function campaignTitle(name: string, t: (k: string, d?: string) => string) {
 }
 
 export default function RetargetingPage() {
+  // Frozen in autonomous AI Agent mode — the agent runs retargeting automatically.
+  if (AGENT_MODE) return <AutomatedByAgent module="retargeting" />
+  return <RetargetingPageInner />
+}
+
+function RetargetingPageInner() {
+
   const { t } = useI18n()
   const { audiences, metrics, getByStage } = useAudienceStore()
   const { campaigns, updateCampaignStatus } = useRetargetingStore()

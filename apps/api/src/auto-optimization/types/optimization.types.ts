@@ -62,6 +62,8 @@ export interface AdPerformance {
   hookRate?: number; // % who watched past first 3 seconds (video only)
   holdRate?: number; // % who watched 75%+ (video only)
   creative?: CreativeMetadata;
+  /** Hours this ad has been running. Enables the 24h Hard Stop-Loss window. */
+  ageHours?: number;
 }
 
 export interface AdSetPerformance {
@@ -76,6 +78,8 @@ export interface AdSetPerformance {
   cpa: number | null;
   roas: number;
   audienceSize?: number;
+  /** Hours this ad set has been running. Enables the 24h Hard Stop-Loss window. */
+  ageHours?: number;
   ads: AdPerformance[];
 }
 

@@ -36,6 +36,9 @@ import { formatCurrency, formatNumber, cn } from '@/lib/utils'
 import { formatUzs } from '@/lib/subscription-plans'
 import { FIRST_CAMPAIGN_BANNER_KEY } from '@/lib/onboarding-v2'
 import { ChatWidget } from '@/components/ui/ChatWidget'
+import { AGENT_MODE } from '@/lib/agent-mode'
+import { AgentSetupCard, loadAgentConfig, type AgentConfig } from '@/components/agent/AgentSetupCard'
+import { AgentDecisionsFeed } from '@/components/agent/AgentDecisionsFeed'
 
 export const dynamic = 'force-dynamic'
 
@@ -252,6 +255,15 @@ export default function DashboardPage() {
   const [error, setError] = useState('')
   const [firstCampaignBanner, setFirstCampaignBanner] = useState(false)
 
+  // ── AI Agent (autonomous mode) ─────────────────────────────────────────────
+  // Whether this workspace has already activated the autonomous agent. Read
+  // from local persistence on mount (client-only) so the dashboard hero shows
+  // the setup card for a fresh user and the "agent active" summary afterwards.
+  const [agentConfig, setAgentConfig] = useState<AgentConfig | null>(null)
+  useEffect(() => {
+    if (AGENT_MODE) setAgentConfig(loadAgentConfig(currentWorkspace?.id))
+  }, [currentWorkspace?.id])
+
   // ── Filters ──────────────────────────────────────────────────────────────
   const [datePreset, setDatePreset] = useState<DatePreset>('7d')
   const [, startFilterTransition] = useTransition()
@@ -382,14 +394,26 @@ export default function DashboardPage() {
     return list
   }, [t, roas, reportCampaigns.length])
 
-  const quickActions = [
-    { href: '/launch',          icon: Rocket,          label: t('dashboard.dashboardHome.actionLaunch',   '🚀 Yangi kampaniya') },
-    { href: '/reports',         icon: FileText,         label: t('dashboard.dashboardHome.actionReport',   '📊 Hisobot') },
-    { href: '/ad-library',      icon: ScanSearch,       label: t('dashboard.dashboardHome.actionIdea',     '💡 Ideyalar') },
-    { href: '/audiences',       icon: BookHeart,        label: t('dashboard.dashboardHome.actionAudience', '👥 Auditoriya') },
-    { href: '/triggersets',     icon: Zap,              label: t('dashboard.dashboardHome.actionTrigger',  '⚡ Triggerlar') },
-    { href: '/ai-decisions',    icon: Brain,            label: t('dashboard.dashboardHome.actionAi',       '🤖 AI qarorlar') },
-  ]
+  // In autonomous mode the manual routes (/launch, /audiences, /triggersets)
+  // are frozen — swap them for agent-owned surfaces so no quick action leads to
+  // a locked screen.
+  const quickActions = AGENT_MODE
+    ? [
+        { href: '/auto-optimization', icon: Sparkles,   label: t('dashboard.dashboardHome.actionOptimize', '⚡ Optimizatsiya') },
+        { href: '/reports',           icon: FileText,   label: t('dashboard.dashboardHome.actionReport',   '📊 Hisobot') },
+        { href: '/ad-library',        icon: ScanSearch, label: t('dashboard.dashboardHome.actionIdea',     '💡 Ideyalar') },
+        { href: '/budget',            icon: Wallet,     label: t('dashboard.dashboardHome.actionBudget',   '💰 Byudjet') },
+        { href: '/performance',       icon: TrendingUp, label: t('dashboard.dashboardHome.actionPerf',     '📈 Natijalar') },
+        { href: '/ai-decisions',      icon: Brain,      label: t('dashboard.dashboardHome.actionAi',       '🤖 AI qarorlar') },
+      ]
+    : [
+        { href: '/launch',          icon: Rocket,          label: t('dashboard.dashboardHome.actionLaunch',   '🚀 Yangi kampaniya') },
+        { href: '/reports',         icon: FileText,         label: t('dashboard.dashboardHome.actionReport',   '📊 Hisobot') },
+        { href: '/ad-library',      icon: ScanSearch,       label: t('dashboard.dashboardHome.actionIdea',     '💡 Ideyalar') },
+        { href: '/audiences',       icon: BookHeart,        label: t('dashboard.dashboardHome.actionAudience', '👥 Auditoriya') },
+        { href: '/triggersets',     icon: Zap,              label: t('dashboard.dashboardHome.actionTrigger',  '⚡ Triggerlar') },
+        { href: '/ai-decisions',    icon: Brain,            label: t('dashboard.dashboardHome.actionAi',       '🤖 AI qarorlar') },
+      ]
 
   const dismissBanner = useCallback(() => {
     try { sessionStorage.removeItem(FIRST_CAMPAIGN_BANNER_KEY) } catch { /* ignore */ }
@@ -431,6 +455,36 @@ export default function DashboardPage() {
 
   const name = firstName(user?.name) || t('dashboard.dashboardHome.fallbackName', 'do\'st')
 
+  // ── AI Agent setup hero ────────────────────────────────────────────────────
+  // In autonomous mode, a logged-in user who hasn't activated the agent is
+  // greeted with the 3-input AI Agent Setup instead of a blank analytics grid.
+  if (AGENT_MODE && !agentConfig) {
+    return (
+      <div className="mx-auto max-w-[1100px] space-y-5 pb-10">
+        {error && <Alert variant="error">{error}</Alert>}
+        <div>
+          <p className="text-xs text-text-tertiary">{currentWorkspace.name}</p>
+          <h1 className="mt-0.5 text-xl font-bold text-text-primary">
+            {t('dashboard.dashboardHome.greeting', 'Salom')}, {name} 👋
+          </h1>
+          <p className="mt-1 text-sm text-text-secondary">
+            {t('agent.setup.heroLead', "Autonom AI Marketing Agentni sozlang — 3 ta qadam yetarli.")}
+          </p>
+        </div>
+        <AgentSetupCard
+          workspaceId={currentWorkspace.id}
+          onActivated={(cfg) => {
+            setAgentConfig(cfg)
+            setOptimizeMsg(
+              t('agent.setup.activatedMsg', "AI Agent ishga tushdi — qarorlarni AI Decisions bo'limida kuzating."),
+            )
+          }}
+        />
+        <ChatWidget />
+      </div>
+    )
+  }
+
   // ── Date presets ──────────────────────────────────────────────────────────
   const DATE_PRESETS: Array<{ id: DatePreset; label: string }> = [
     { id: '1d',  label: t('dashboard.filter1d',  'Bugun') },
@@ -446,7 +500,17 @@ export default function DashboardPage() {
       {/* ── Toasts ─────────────────────────────────────────────────────────── */}
       {error      && <Alert variant="error">{error}</Alert>}
       {optimizeMsg && <Alert variant="success">{optimizeMsg}</Alert>}
-      {firstCampaignBanner && (
+      {AGENT_MODE && agentConfig && (
+        <Alert variant="success" className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm font-medium">
+            {t('agent.active.banner', 'AI Agent faol — kampaniyalar avtomatik boshqarilmoqda.')}
+          </p>
+          <Button variant="ghost" size="sm" onClick={() => setAgentConfig(null)}>
+            {t('agent.active.reconfigure', 'Qayta sozlash')}
+          </Button>
+        </Alert>
+      )}
+      {firstCampaignBanner && !AGENT_MODE && (
         <Alert variant="info" className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm font-medium">
             {t('dashboard.firstCampaignBanner', 'Birinchi kampaniyangizni yarating — bir qadamda boshlang.')}
@@ -498,6 +562,11 @@ export default function DashboardPage() {
           </Button>
         </div>
       </div>
+
+      {/* ── AI Agent live decisions feed (autonomous mode, after activation) ── */}
+      {AGENT_MODE && agentConfig && (
+        <AgentDecisionsFeed workspaceId={currentWorkspace.id} />
+      )}
 
       {/* ── Filter bar ─────────────────────────────────────────────────────── */}
       <div className="flex flex-wrap items-center gap-2 rounded-xl border border-white/[0.06] bg-surface px-4 py-2.5">
@@ -690,12 +759,14 @@ export default function DashboardPage() {
               </span>
             )}
           </h2>
-          <Link
-            href="/campaigns"
-            className="text-xs font-medium text-primary hover:text-primary/80 hover:underline"
-          >
-            {t('dashboard.viewAll', 'Barchasini ko\'rish →')}
-          </Link>
+          {!AGENT_MODE && (
+            <Link
+              href="/campaigns"
+              className="text-xs font-medium text-primary hover:text-primary/80 hover:underline"
+            >
+              {t('dashboard.viewAll', 'Barchasini ko\'rish →')}
+            </Link>
+          )}
         </div>
 
         <div className="overflow-x-auto">

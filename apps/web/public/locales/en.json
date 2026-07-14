@@ -387,7 +387,10 @@
       "actionLaunch": "🚀 New campaign",
       "actionReport": "📊 Build report",
       "actionIdea": "💡 Get ideas",
-      "actionAudience": "👥 Audience"
+      "actionAudience": "👥 Audience",
+      "actionOptimize": "⚡ Optimization",
+      "actionBudget": "💰 Budget",
+      "actionPerf": "📈 Performance"
     },
     "metaRealtimePrefix": "Metrics are streamed in real-time from",
     "settingsLink": "settings",
@@ -1326,9 +1329,6 @@
         }
       },
       "roi": {
-        "eyebrow": "Outcomes",
-        "title": "Grow by the numbers",
-        "subtitle": "Average AdSpectr customer results over 3 months.",
         "0": {
           "value": "+34%",
           "label": "ROAS uplift"
@@ -1344,7 +1344,10 @@
         "3": {
           "value": "12 hrs",
           "label": "Saved per week"
-        }
+        },
+        "eyebrow": "Outcomes",
+        "title": "Grow by the numbers",
+        "subtitle": "Average AdSpectr customer results over 3 months."
       },
       "pricing": {
         "eyebrow": "Pricing",
@@ -1453,8 +1456,6 @@
         }
       },
       "testimonials": {
-        "eyebrow": "Customer voices",
-        "title": "Why marketing teams choose AdSpectr",
         "0": {
           "quote": "We used to jump between three ad managers. Now one dashboard — ROAS is clear, the team is organized. CPA dropped 31% in 2 months.",
           "name": "Madina Karimova",
@@ -1469,7 +1470,9 @@
           "quote": "As a freelance marketer I get 3-4 new projects a month through the marketplace. Portfolio and badges build trust fast.",
           "name": "Aziza Rahmonova",
           "role": "Independent marketer"
-        }
+        },
+        "eyebrow": "Customer voices",
+        "title": "Why marketing teams choose AdSpectr"
       },
       "faq": {
         "title": "Frequently asked questions",
@@ -2782,5 +2785,71 @@
     "emptyDesc": "Try adjusting your search or connect a Meta ad account.",
     "footerNote": "Data sourced from connected Meta Ad accounts via the Meta Marketing API.",
     "fullReport": "Full report"
+  },
+  "agent": {
+    "frozen": {
+      "badge": "Automated by AI Agent",
+      "cta": "Go to AI Agent",
+      "campaignBuilder": {
+        "title": "Campaigns are run by the AI Agent",
+        "body": "Manual campaign creation is disabled. The AI Agent launches and optimizes campaigns based on your goal and budget."
+      },
+      "audienceBuilder": {
+        "title": "Audiences are built by the AI Agent",
+        "body": "The manual audience builder is disabled. The AI Agent forms audiences automatically per funnel stage (TOFU/MOFU/BOFU)."
+      },
+      "retargeting": {
+        "title": "Retargeting is handled by the AI Agent",
+        "body": "Manual retargeting configuration is disabled. The AI Agent runs retargeting automatically from signals and conversions."
+      },
+      "default": {
+        "title": "This module is run by the AI Agent",
+        "body": "This section is automated by the autonomous AI Agent. The agent decides the settings itself."
+      }
+    },
+    "setup": {
+      "title": "AI Marketing Agent",
+      "badge": "Autonomous",
+      "subtitle": "3 steps — link, goal, budget. The Agent does the rest.",
+      "heroLead": "Set up your autonomous AI Marketing Agent — just 3 steps.",
+      "linkLabel": "1. Website or channel link",
+      "goalLabel": "2. Goal",
+      "goalSales": "Sales",
+      "goalSalesSub": "Conversions and revenue",
+      "goalAwareness": "Brand awareness",
+      "goalAwarenessSub": "Reach and new audience",
+      "budgetLabel": "3. Total budget",
+      "guardrailTitle": "Hard Stop-Loss",
+      "guardrailBody": "if an ad spends {amount} with no conversion, the Agent pauses it automatically.",
+      "activate": "Launch the AI Agent",
+      "activating": "Agent starting…",
+      "activateError": "Failed to start the AI Agent",
+      "activatedMsg": "AI Agent started — track its decisions in the AI Decisions section.",
+      "planTitle": "Budget allocation (live)",
+      "byPlatform": "By platform",
+      "stage": {
+        "TOFU": "Top of Funnel — cold audience",
+        "MOFU": "Middle of Funnel — consideration",
+        "BOFU": "Bottom of Funnel — retargeting"
+      },
+      "total": "Total",
+      "byFunnel": "Funnel stages"
+    },
+    "active": {
+      "banner": "AI Agent is active — campaigns are managed automatically.",
+      "reconfigure": "Reconfigure"
+    },
+    "thinking": {
+      "scanSite": "Scanning your website…",
+      "analyzeAudience": "Analyzing the audience…",
+      "allocateBudget": "Allocating budget across channels…",
+      "draftCopy": "Drafting ad copy…",
+      "launch": "Launching the agent…"
+    },
+    "decisions": {
+      "title": "AI Agent — decisions log",
+      "sample": "Sample",
+      "viewAll": "View all"
+    }
   }
 }

@@ -14,6 +14,15 @@ import { TriggersetService } from "../triggersets/triggersets.service";
  * If a processor fails, Bull retries it automatically.
  * If we put everything in cron, failed tasks would just be lost.
  */
+/**
+ * Autonomous AI Agent mode. When enabled, the manual rule engine (triggersets)
+ * is frozen — the AI optimization loop owns automation instead. Default is OFF
+ * so live environments keep their current behavior until explicitly switched
+ * over with AGENT_AUTONOMOUS_MODE=true.
+ */
+const AGENT_AUTONOMOUS_MODE =
+  (process.env.AGENT_AUTONOMOUS_MODE ?? "false").toLowerCase() === "true";
+
 @Injectable()
 export class CronService implements OnModuleInit {
   private readonly logger = new Logger(CronService.name);
@@ -64,6 +73,14 @@ export class CronService implements OnModuleInit {
    */
   @Cron("*/30 * * * *")
   async runTriggersets(): Promise<void> {
+    if (AGENT_AUTONOMOUS_MODE) {
+      // Manual rule engine is frozen in autonomous mode — the 2-hour AI
+      // optimization cycle drives automation instead.
+      this.logger.debug(
+        "Cron: triggersets frozen (AGENT_AUTONOMOUS_MODE) — skipping",
+      );
+      return;
+    }
     this.logger.log("Cron: Running triggersets");
     await this.triggersetService.runAll();
   }

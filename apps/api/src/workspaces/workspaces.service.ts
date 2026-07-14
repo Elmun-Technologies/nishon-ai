@@ -317,6 +317,7 @@ export class WorkspacesService {
       maxAutoBudgetChangePct: 0,
       allowAutoCreativeRefresh: true,
       allowAutoPauseCreative: false,
+      allowAutoStopLossPause: false,
       allowAudienceChanges: false,
       protectedCampaignIds: [],
       protectedAdSetIds: [],

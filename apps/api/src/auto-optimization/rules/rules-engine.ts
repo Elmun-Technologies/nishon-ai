@@ -32,6 +32,11 @@ const THRESHOLDS = {
   wastedSpend: {
     minSpend: 30, // flag ad with $30+ spend and 0 conversions
   },
+  hardStopLoss: {
+    windowHours: 24, // after 24h running…
+    minSpend: 15, // …and $15+ spent…
+    // …with zero clicks AND zero conversions → autonomous Hard Stop-Loss
+  },
   budgetConcentration: {
     threshold: 0.8, // one adset eating >80% of budget
   },
@@ -47,6 +52,14 @@ const THRESHOLDS = {
 
 // ─── Main entry point ─────────────────────────────────────────────────────────
 
+/** Optional runtime overrides (e.g. from a workspace policy). */
+export interface RulesEngineOptions {
+  /** Hard Stop-Loss window in hours (default 24). */
+  stopLossWindowHours?: number;
+  /** Hard Stop-Loss minimum spend in USD (default 15). */
+  stopLossMinSpendUsd?: number;
+}
+
 /**
  * Runs all deterministic rule checks against the campaign data.
  * Returns a structured analysis result. No AI calls, no side effects.
@@ -54,9 +67,16 @@ const THRESHOLDS = {
 export function runRulesEngine(
   campaign: CampaignPerformance,
   goal?: OptimizationGoal,
+  options?: RulesEngineOptions,
 ): RuleAnalysisResult {
   const problems: DetectedProblem[] = [];
   const opportunities: Opportunity[] = [];
+
+  const stopLoss = {
+    windowHours:
+      options?.stopLossWindowHours ?? THRESHOLDS.hardStopLoss.windowHours,
+    minSpend: options?.stopLossMinSpendUsd ?? THRESHOLDS.hardStopLoss.minSpend,
+  };
 
   const allAds = campaign.adSets.flatMap((s) => s.ads);
   const _totalAds = allAds.length;
@@ -83,6 +103,7 @@ export function runRulesEngine(
   for (const adSet of campaign.adSets) {
     checkBudgetConcentration(adSet, campaign, opportunities);
     checkAdSetRoas(adSet, problems, goal?.targetRoas);
+    checkAdSetHardStopLoss(adSet, problems, stopLoss);
   }
 
   // ── Ad-level rules ────────────────────────────────────────────────────────
@@ -98,6 +119,7 @@ export function runRulesEngine(
     checkWastedSpend(ad, problems, goal?.targetCpa);
     checkAdCtr(ad, problems, goal?.targetCtr);
     checkScaleOpportunity(ad, campaign, avgRoas, opportunities);
+    checkAdHardStopLoss(ad, problems, stopLoss);
   }
 
   // ── Winners & losers ──────────────────────────────────────────────────────
@@ -313,6 +335,61 @@ function checkWastedSpend(
       });
     }
   }
+}
+
+/**
+ * Hard Stop-Loss (24h window) — the autonomous guardrail.
+ *
+ * An entity that has run long enough (>= windowHours) with real spend
+ * (>= minSpend) but produced **zero** results (no clicks AND no conversions)
+ * is bleeding budget. Flag it critical so the agent can pause it immediately.
+ *
+ * Time-gated: fires only when ageHours is known and past the window. If ad-age
+ * data isn't available yet, this stays silent (the spend-only wasted-spend rule
+ * still flags for review) — no false auto-pauses.
+ */
+function checkAdHardStopLoss(
+  ad: AdPerformance,
+  problems: DetectedProblem[],
+  cfg: { windowHours: number; minSpend: number },
+): void {
+  if (ad.ageHours == null || ad.ageHours < cfg.windowHours) return;
+  if (ad.spend < cfg.minSpend) return;
+  if (ad.clicks > 0 || ad.conversions > 0) return;
+
+  problems.push({
+    type: "hard_stop_loss_no_result",
+    targetId: ad.adId,
+    targetType: "ad",
+    severity: "critical",
+    value: ad.spend,
+    threshold: cfg.minSpend,
+    message:
+      `Hard Stop-Loss: "${ad.adName}" ran ${Math.round(ad.ageHours)}h and spent ` +
+      `$${ad.spend} with 0 clicks and 0 conversions — pause to stop the bleed.`,
+  });
+}
+
+function checkAdSetHardStopLoss(
+  adSet: AdSetPerformance,
+  problems: DetectedProblem[],
+  cfg: { windowHours: number; minSpend: number },
+): void {
+  if (adSet.ageHours == null || adSet.ageHours < cfg.windowHours) return;
+  if (adSet.spend < cfg.minSpend) return;
+  if (adSet.clicks > 0 || adSet.conversions > 0) return;
+
+  problems.push({
+    type: "hard_stop_loss_no_result",
+    targetId: adSet.adSetId,
+    targetType: "adset",
+    severity: "critical",
+    value: adSet.spend,
+    threshold: cfg.minSpend,
+    message:
+      `Hard Stop-Loss: ad set "${adSet.adSetName}" ran ${Math.round(adSet.ageHours)}h and ` +
+      `spent $${adSet.spend} with 0 clicks and 0 conversions — pause to stop the bleed.`,
+  });
 }
 
 function checkBudgetConcentration(

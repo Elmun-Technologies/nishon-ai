@@ -75,6 +75,12 @@ export class Workspace {
     maxAutoBudgetChangePct: number;
     allowAutoCreativeRefresh: boolean;
     allowAutoPauseCreative: boolean;
+    /** Autonomous Hard Stop-Loss auto-pause (spend-without-conversion / CPA overrun). */
+    allowAutoStopLossPause?: boolean;
+    /** Hard Stop-Loss window in hours (default 24 in the rules engine). */
+    stopLossWindowHours?: number;
+    /** Hard Stop-Loss minimum spend in USD (default 15 in the rules engine). */
+    stopLossMinSpendUsd?: number;
     allowAudienceChanges: boolean;
     protectedCampaignIds: string[];
     protectedAdSetIds: string[];

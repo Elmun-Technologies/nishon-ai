@@ -8,6 +8,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { OptimizerAgentService } from "./optimizer-agent.service";
 import { runRulesEngine } from "./rules/rules-engine";
+import { buildStopLossActions } from "./rules/stop-loss";
 import { scoreAndRankActions } from "./action-scorer";
 import { governActions, SAFE_DEFAULTS } from "./policy/action-policy";
 import type { WorkspacePolicy } from "./policy/action-policy";
@@ -119,7 +120,10 @@ export class AutoOptimizationService {
 
     // ── Step 1: Rule-based analysis ──────────────────────────────────────────
     try {
-      report.ruleAnalysis = runRulesEngine(campaign, goal);
+      report.ruleAnalysis = runRulesEngine(campaign, goal, {
+        stopLossWindowHours: policy.stopLossWindowHours,
+        stopLossMinSpendUsd: policy.stopLossMinSpendUsd,
+      });
       report.completedSteps.push("rule_analysis");
       this.logger.log(
         `[${workspaceId}] Rules: ${report.ruleAnalysis.problems.length} problems,` +
@@ -307,6 +311,14 @@ export class AutoOptimizationService {
           autoApplicable: false,
         });
       }
+    }
+
+    // Add 24h Hard Stop-Loss pauses (zero-result entities), deduped by target.
+    for (const action of buildStopLossActions(ruleAnalysis.problems)) {
+      const alreadyCovered = merged.some(
+        (a) => a.targetId === action.targetId && a.type === action.type,
+      );
+      if (!alreadyCovered) merged.push(action);
     }
 
     // Filter locked IDs (doNotPause constraint)

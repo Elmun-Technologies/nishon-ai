@@ -47,6 +47,7 @@ import {
   Star,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { filterFrozenNavItems } from '@/lib/agent-mode'
 
 const STORAGE_KEY = 'adspectr-sidebar-mode'
 
@@ -190,6 +191,17 @@ export default function Sidebar() {
   const { currentWorkspace, user, logout } = useWorkspaceStore()
   const shellRef = useRef<HTMLDivElement>(null)
 
+  // In autonomous AI Agent mode, the manual builders (Campaign / Audience /
+  // Retargeting) are frozen — drop their nav items and any category that ends
+  // up empty. Flip NEXT_PUBLIC_AGENT_MODE=false to restore the full nav.
+  const visibleCategories = useMemo(
+    () =>
+      CATEGORIES.map((c) => ({ ...c, items: filterFrozenNavItems(c.items) })).filter(
+        (c) => c.items.length > 0,
+      ),
+    [],
+  )
+
   const [mode, setMode] = useState<SidebarMode>('wide')
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
   const [openFlyout, setOpenFlyout] = useState<string | null>(null)
@@ -315,7 +327,7 @@ export default function Sidebar() {
           </div>
 
           <nav className="flex flex-1 flex-col items-center gap-0.5 overflow-y-auto px-1 py-1.5">
-            {CATEGORIES.map((cat) => {
+            {visibleCategories.map((cat) => {
               const Icon = cat.icon
               const anyActive = cat.items.some((i) => navPathMatches(pathname, i.href))
               const flyoutOpen = openFlyout === cat.id
@@ -389,7 +401,7 @@ export default function Sidebar() {
             className="animate-in fade-in slide-in-from-left-2 absolute left-[60px] top-0 z-[70] flex h-full min-h-0 w-[min(248px,calc(100vw-4.5rem))] flex-col border-r border-white/[0.08] bg-[#121214] py-2 shadow-2xl shadow-black/40 duration-150"
             onPointerDown={(e) => e.stopPropagation()}
           >
-            {CATEGORIES.filter((c) => c.id === openFlyout).map((cat) => (
+            {visibleCategories.filter((c) => c.id === openFlyout).map((cat) => (
               <div key={cat.id} className="flex min-h-0 flex-1 flex-col px-1.5">
                 <p className="mb-1.5 px-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
                   {t(cat.labelKey, cat.fallback)}
@@ -444,7 +456,7 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex-1 space-y-0.5 overflow-y-auto px-1.5 py-2">
-        {CATEGORIES.map((cat) => {
+        {visibleCategories.map((cat) => {
           const isOpen = !!expanded[cat.id]
           const Icon = cat.icon
           const anyActive = cat.items.some((i) => navPathMatches(pathname, i.href))
