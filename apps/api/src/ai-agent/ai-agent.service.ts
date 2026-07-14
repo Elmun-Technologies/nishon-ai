@@ -4,6 +4,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
   BadRequestException,
+  ForbiddenException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -13,6 +14,7 @@ import {
 } from "./strategy-engine.service";
 import { DecisionLoopService } from "./decision-loop.service";
 import { AiDecision } from "../ai-decisions/entities/ai-decision.entity";
+import { Workspace } from "../workspaces/entities/workspace.entity";
 import { ConfigService } from "@nestjs/config";
 import { createAdSpectrAiClientFromEnv } from "@adspectr/ai-sdk";
 import type { AdSpectrAiClient } from "@adspectr/ai-sdk";
@@ -40,6 +42,8 @@ export class AiAgentService {
     private readonly metaConnector: MetaConnector,
     @InjectRepository(AiDecision)
     private readonly decisionRepo: Repository<AiDecision>,
+    @InjectRepository(Workspace)
+    private readonly workspaceRepo: Repository<Workspace>,
   ) {
     this.aiClient = createAdSpectrAiClientFromEnv((k) =>
       this.config.get<string>(k),
@@ -100,6 +104,49 @@ export class AiAgentService {
       lines.join("\n") +
       `\n`
     );
+  }
+
+  // ─── Authorization ──────────────────────────────────────────────────────────
+
+  /**
+   * Assert the caller owns the workspace before running any AI action against
+   * it. Prevents cross-tenant BOLA — every workspace-scoped controller handler
+   * must call this with the authenticated user's id. The system cron path calls
+   * the underlying loops directly and is intentionally unaffected.
+   */
+  async assertWorkspaceOwner(
+    workspaceId: string,
+    userId: string,
+  ): Promise<void> {
+    if (!workspaceId || !userId) {
+      throw new ForbiddenException("Access denied");
+    }
+    const workspace = await this.workspaceRepo.findOne({
+      where: { id: workspaceId },
+    });
+    if (!workspace) throw new NotFoundException("Workspace not found");
+    if (workspace.userId !== userId) {
+      throw new ForbiddenException("Access denied");
+    }
+  }
+
+  /**
+   * Assert the caller owns the workspace a decision belongs to, and return the
+   * decision. Used by approve/reject so a user can only act on their own
+   * workspace's decisions.
+   */
+  async assertDecisionAccess(
+    decisionId: string,
+    userId: string,
+  ): Promise<AiDecision> {
+    const decision = await this.decisionRepo.findOne({
+      where: { id: decisionId },
+    });
+    if (!decision) {
+      throw new NotFoundException(`AI decision ${decisionId} not found`);
+    }
+    await this.assertWorkspaceOwner(decision.workspaceId, userId);
+    return decision;
   }
 
   async generateStrategy(workspaceId: string): Promise<StrategyResult> {

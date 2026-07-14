@@ -1,9 +1,15 @@
-import { Injectable, Logger } from "@nestjs/common";
+import {
+  Injectable,
+  Logger,
+  ForbiddenException,
+  NotFoundException,
+} from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import OpenAI from "openai";
 import { Creative, CreativePerformance } from "../entities";
+import { Workspace } from "../../workspaces/entities/workspace.entity";
 import {
   CreateImageCreativeDto,
   CreateVideoCreativeDto,
@@ -38,6 +44,8 @@ export class CreativeService {
     private creativeRepository: Repository<Creative>,
     @InjectRepository(CreativePerformance)
     private performanceRepository: Repository<CreativePerformance>,
+    @InjectRepository(Workspace)
+    private workspaceRepository: Repository<Workspace>,
     private config: ConfigService,
   ) {
     const openaiKey = this.config.get<string>("OPENAI_API_KEY");
@@ -309,14 +317,19 @@ export class CreativeService {
   // ─── CRUD ─────────────────────────────────────────────────────────────────
 
   async listCreatives(
-    workspaceId: string,
+    workspaceIds: string[],
     type?: string,
     campaignId?: string,
     limit: number = 50,
     offset: number = 0,
   ): Promise<{ creatives: Creative[]; total: number }> {
+    // Scope to the caller's own workspaces (was a single, always-undefined
+    // workspaceId from req.workspace).
+    if (!workspaceIds || workspaceIds.length === 0) {
+      return { creatives: [], total: 0 };
+    }
     const query = this.creativeRepository.createQueryBuilder("creative");
-    query.where("creative.workspaceId = :workspaceId", { workspaceId });
+    query.where("creative.workspaceId IN (:...workspaceIds)", { workspaceIds });
 
     if (type) {
       query.andWhere("creative.type = :type", { type });
@@ -334,6 +347,43 @@ export class CreativeService {
       .getMany();
 
     return { creatives, total };
+  }
+
+  // ─── Ownership (IDOR guard) ─────────────────────────────────────────────────
+
+  /** Workspace ids owned by the user — used to scope list queries. */
+  async ownedWorkspaceIds(userId: string): Promise<string[]> {
+    const rows = await this.workspaceRepository.find({
+      where: { userId },
+      select: ["id"],
+    });
+    return rows.map((w) => w.id);
+  }
+
+  /**
+   * Load a creative and assert the caller owns the workspace it belongs to.
+   * Every id-scoped controller route must call this — the handlers previously
+   * looked a creative up by id alone, letting any user read/update/delete or
+   * inspect the performance of another tenant's creative (IDOR).
+   */
+  async assertCreativeOwner(
+    creativeId: string,
+    userId: string,
+  ): Promise<Creative> {
+    if (!creativeId || !userId) {
+      throw new ForbiddenException("Access denied");
+    }
+    const creative = await this.creativeRepository.findOne({
+      where: { id: creativeId },
+    });
+    if (!creative) throw new NotFoundException("Creative not found");
+    const workspace = await this.workspaceRepository.findOne({
+      where: { id: creative.workspaceId },
+    });
+    if (!workspace || workspace.userId !== userId) {
+      throw new ForbiddenException("Access denied");
+    }
+    return creative;
   }
 
   async getCreative(creativeId: string): Promise<Creative> {

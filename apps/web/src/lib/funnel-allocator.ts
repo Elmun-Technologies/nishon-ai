@@ -1,34 +1,58 @@
 /**
  * Funnel budget allocator for the autonomous AI agent.
  *
- * Given a total budget and a single business goal, distribute spend across the
- * three marketing-funnel stages and then across the ad platforms the agent can
- * buy on:
+ * Given a total budget and a business goal, distribute spend across the three
+ * marketing-funnel stages and, within each stage, across the channels that fit
+ * that goal:
  *
  *   TOFU — Top of Funnel   (cold audience / reach)
  *   MOFU — Middle of Funnel (consideration / engaged)
  *   BOFU — Bottom of Funnel (retargeting / conversion)
  *
- * Platforms: Meta, Google, TikTok, Telegram.
+ * Goal-specific plan (stage % + channels):
  *
- * This is the programmatic mapper the agent uses to turn "3 inputs" (link +
- * goal + budget) into a concrete, per-platform, per-stage media plan. It is
- * pure and deterministic so it can be unit-tested and reused on the backend.
+ *   Sales  → TOFU 30% (Meta · TikTok) · MOFU 40% (Google · Telegram) · BOFU 30% (Retargeting)
+ *   Brand  → TOFU 60% (Meta · YouTube) · MOFU 30% (Influencers · Telegram) · BOFU 10% (Search)
+ *
+ * Within a stage the budget splits evenly across its channels. Pure and
+ * deterministic so it can be unit-tested and reused on the backend.
  */
 
-export type AgentGoal = 'sales' | 'awareness'
+export type AgentGoal = 'sales' | 'brand'
 
 export type FunnelStage = 'TOFU' | 'MOFU' | 'BOFU'
 
-export type AdPlatform = 'meta' | 'google' | 'tiktok' | 'telegram'
+export type Channel =
+  | 'meta'
+  | 'tiktok'
+  | 'google'
+  | 'telegram'
+  | 'youtube'
+  | 'influencers'
+  | 'search'
+  | 'retargeting'
 
-export const PLATFORMS: readonly AdPlatform[] = ['meta', 'google', 'tiktok', 'telegram']
-
-export const PLATFORM_LABELS: Record<AdPlatform, string> = {
+export const CHANNEL_LABELS: Record<Channel, string> = {
   meta: 'Meta',
-  google: 'Google',
   tiktok: 'TikTok',
+  google: 'Google',
   telegram: 'Telegram',
+  youtube: 'YouTube',
+  influencers: 'Influencers',
+  search: 'Search',
+  retargeting: 'Retargeting',
+}
+
+/** Hex accents for channel chips (kept close to each brand's hue). */
+export const CHANNEL_HEX: Record<Channel, string> = {
+  meta: '#3b82f6', // blue
+  tiktok: '#d946ef', // fuchsia
+  google: '#ef4444', // red
+  telegram: '#0ea5e9', // sky
+  youtube: '#dc2626', // red-600
+  influencers: '#f59e0b', // amber
+  search: '#10b981', // emerald
+  retargeting: '#8b5cf6', // violet
 }
 
 export const STAGE_LABELS: Record<FunnelStage, { short: string; long: string }> = {
@@ -37,35 +61,37 @@ export const STAGE_LABELS: Record<FunnelStage, { short: string; long: string }> 
   BOFU: { short: 'BOFU', long: 'Bottom of Funnel — retargeting' },
 }
 
-/**
- * How much of the total budget each funnel stage receives, per goal.
- * Each row sums to 100.
- *
- * - awareness → weight the top of the funnel (build cold reach)
- * - sales     → weight the bottom of the funnel (harvest intent + retarget)
- */
-const STAGE_SPLIT: Record<AgentGoal, Record<FunnelStage, number>> = {
-  awareness: { TOFU: 60, MOFU: 30, BOFU: 10 },
-  sales: { TOFU: 30, MOFU: 30, BOFU: 40 },
+/** Distinct hues for the three funnel stages (used by the donut / bars). */
+export const STAGE_HEX: Record<FunnelStage, string> = {
+  TOFU: '#3b82f6', // blue
+  MOFU: '#8b5cf6', // violet
+  BOFU: '#10b981', // emerald
 }
 
-/**
- * Within a stage, how spend is split across platforms. Each row sums to 100.
- * Reflects where each platform performs best across the journey:
- * - TOFU: broad video/reach → Meta + TikTok lead
- * - MOFU: intent + engagement → Meta + Google
- * - BOFU: conversion + retargeting → Meta + Google, Telegram for warm re-engage
- */
-const STAGE_PLATFORM_WEIGHTS: Record<FunnelStage, Record<AdPlatform, number>> = {
-  TOFU: { meta: 40, tiktok: 30, google: 15, telegram: 15 },
-  MOFU: { meta: 35, google: 35, tiktok: 15, telegram: 15 },
-  BOFU: { meta: 40, google: 40, telegram: 15, tiktok: 5 },
+interface StagePlan {
+  pct: number
+  channels: Channel[]
 }
 
-export interface PlatformSlice {
-  platform: AdPlatform
-  /** Percent of the *stage* budget (0-100). */
-  stagePct: number
+/** The goal-specific media plan. Each goal's stage percentages sum to 100. */
+const PLAN: Record<AgentGoal, Record<FunnelStage, StagePlan>> = {
+  sales: {
+    TOFU: { pct: 30, channels: ['meta', 'tiktok'] },
+    MOFU: { pct: 40, channels: ['google', 'telegram'] },
+    BOFU: { pct: 30, channels: ['retargeting'] },
+  },
+  brand: {
+    TOFU: { pct: 60, channels: ['meta', 'youtube'] },
+    MOFU: { pct: 30, channels: ['influencers', 'telegram'] },
+    BOFU: { pct: 10, channels: ['search'] },
+  },
+}
+
+const STAGE_ORDER: FunnelStage[] = ['TOFU', 'MOFU', 'BOFU']
+
+export interface ChannelSlice {
+  channel: Channel
+  label: string
   amount: number
 }
 
@@ -75,11 +101,12 @@ export interface StageAllocation {
   /** Percent of the *total* budget (0-100). */
   pct: number
   amount: number
-  platforms: PlatformSlice[]
+  colorHex: string
+  channels: ChannelSlice[]
 }
 
-export interface PlatformTotal {
-  platform: AdPlatform
+export interface ChannelTotal {
+  channel: Channel
   label: string
   amount: number
   /** Percent of the *total* budget (0-100). */
@@ -90,18 +117,16 @@ export interface FunnelAllocation {
   goal: AgentGoal
   totalBudget: number
   stages: StageAllocation[]
-  byPlatform: PlatformTotal[]
+  byChannel: ChannelTotal[]
 }
 
-/** Round to whole currency units, then fix rounding drift onto the largest bucket. */
+/** Round to whole units, then fix rounding drift onto the largest bucket. */
 function distributeRounded(total: number, weights: number[]): number[] {
   const weightSum = weights.reduce((a, b) => a + b, 0)
   if (weightSum <= 0 || total <= 0) return weights.map(() => 0)
-  const raw = weights.map((w) => (w / weightSum) * total)
-  const rounded = raw.map((n) => Math.round(n))
+  const rounded = weights.map((w) => Math.round((w / weightSum) * total))
   const drift = total - rounded.reduce((a, b) => a + b, 0)
   if (drift !== 0) {
-    // Push the leftover onto the largest allocation so the parts sum to `total`.
     let largest = 0
     for (let i = 1; i < rounded.length; i += 1) {
       if (rounded[i] > rounded[largest]) largest = i
@@ -111,8 +136,13 @@ function distributeRounded(total: number, weights: number[]): number[] {
   return rounded
 }
 
+/** Normalize any legacy/unknown goal (e.g. stored "awareness") to a valid goal. */
+export function normalizeGoal(goal: string | undefined): AgentGoal {
+  return goal === 'brand' || goal === 'awareness' ? 'brand' : 'sales'
+}
+
 /**
- * Allocate a total budget across funnel stages and platforms for a given goal.
+ * Allocate a total budget across funnel stages and channels for a goal.
  * Amounts are integers and reconcile exactly to `totalBudget` at every level.
  */
 export function allocateFunnelBudget(opts: {
@@ -121,47 +151,44 @@ export function allocateFunnelBudget(opts: {
 }): FunnelAllocation {
   const goal = opts.goal
   const totalBudget = Math.max(0, Math.round(opts.totalBudget || 0))
+  const plan = PLAN[goal]
 
-  const stageKeys: FunnelStage[] = ['TOFU', 'MOFU', 'BOFU']
-  const stagePcts = stageKeys.map((s) => STAGE_SPLIT[goal][s])
-  const stageAmounts = distributeRounded(totalBudget, stagePcts)
+  const stageAmounts = distributeRounded(
+    totalBudget,
+    STAGE_ORDER.map((s) => plan[s].pct),
+  )
 
-  const platformTotals: Record<AdPlatform, number> = {
-    meta: 0,
-    google: 0,
-    tiktok: 0,
-    telegram: 0,
-  }
+  const channelTotals = new Map<Channel, number>()
 
-  const stages: StageAllocation[] = stageKeys.map((stage, i) => {
-    const stageAmount = stageAmounts[i]
-    const platformWeights = PLATFORMS.map((p) => STAGE_PLATFORM_WEIGHTS[stage][p])
-    const platformAmounts = distributeRounded(stageAmount, platformWeights)
-
-    const platforms: PlatformSlice[] = PLATFORMS.map((platform, j) => {
-      platformTotals[platform] += platformAmounts[j]
-      return {
-        platform,
-        stagePct: STAGE_PLATFORM_WEIGHTS[stage][platform],
-        amount: platformAmounts[j],
-      }
+  const stages: StageAllocation[] = STAGE_ORDER.map((stage, i) => {
+    const amount = stageAmounts[i]
+    const chans = plan[stage].channels
+    const chanAmounts = distributeRounded(
+      amount,
+      chans.map(() => 1),
+    )
+    const channels: ChannelSlice[] = chans.map((channel, j) => {
+      channelTotals.set(channel, (channelTotals.get(channel) ?? 0) + chanAmounts[j])
+      return { channel, label: CHANNEL_LABELS[channel], amount: chanAmounts[j] }
     })
-
     return {
       stage,
       label: STAGE_LABELS[stage],
-      pct: STAGE_SPLIT[goal][stage],
-      amount: stageAmount,
-      platforms,
+      pct: plan[stage].pct,
+      amount,
+      colorHex: STAGE_HEX[stage],
+      channels,
     }
   })
 
-  const byPlatform: PlatformTotal[] = PLATFORMS.map((platform) => ({
-    platform,
-    label: PLATFORM_LABELS[platform],
-    amount: platformTotals[platform],
-    pct: totalBudget > 0 ? Math.round((platformTotals[platform] / totalBudget) * 100) : 0,
-  }))
+  const byChannel: ChannelTotal[] = [...channelTotals.entries()].map(
+    ([channel, amount]) => ({
+      channel,
+      label: CHANNEL_LABELS[channel],
+      amount,
+      pct: totalBudget > 0 ? Math.round((amount / totalBudget) * 100) : 0,
+    }),
+  )
 
-  return { goal, totalBudget, stages, byPlatform }
+  return { goal, totalBudget, stages, byChannel }
 }

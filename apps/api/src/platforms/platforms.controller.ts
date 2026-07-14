@@ -85,6 +85,7 @@ export class PlatformsController {
       body.workspaceId,
       body.adAccountId,
       body.adAccountName,
+      req.user.id,
     );
   }
 
@@ -136,6 +137,7 @@ export class PlatformsController {
     summary: "Select which Google Ads customer account to use after OAuth",
   })
   async selectGoogleAccount(
+    @Request() req: any,
     @Body()
     body: {
       workspaceId: string;
@@ -147,6 +149,7 @@ export class PlatformsController {
       body.workspaceId,
       body.customerId,
       body.customerName,
+      req.user.id,
     );
   }
 
