@@ -132,10 +132,12 @@ export class CreativeController {
     @Query("offset") offset: number = 0,
     @Req() req?: any,
   ): Promise<CreativeListResponseDto> {
-    const workspaceId = req.workspace?.id;
+    const workspaceIds = await this.creativeService.ownedWorkspaceIds(
+      req.user.id,
+    );
 
     const { creatives, total } = await this.creativeService.listCreatives(
-      workspaceId,
+      workspaceIds,
       type,
       campaignId,
       limit,
@@ -156,8 +158,12 @@ export class CreativeController {
   @HttpCode(200)
   async getCreative(
     @Param("id") creativeId: string,
+    @Req() req: any,
   ): Promise<CreativeResponseDto> {
-    const creative = await this.creativeService.getCreative(creativeId);
+    const creative = await this.creativeService.assertCreativeOwner(
+      creativeId,
+      req.user.id,
+    );
     return this.mapToDto(creative);
   }
 
@@ -170,7 +176,9 @@ export class CreativeController {
   async updateCreative(
     @Param("id") creativeId: string,
     @Body() updates: Partial<CreativeResponseDto>,
+    @Req() req: any,
   ): Promise<CreativeResponseDto> {
+    await this.creativeService.assertCreativeOwner(creativeId, req.user.id);
     const creative = await this.creativeService.updateCreative(
       creativeId,
       updates,
@@ -184,7 +192,11 @@ export class CreativeController {
    */
   @Delete(":id")
   @HttpCode(204)
-  async deleteCreative(@Param("id") creativeId: string): Promise<void> {
+  async deleteCreative(
+    @Param("id") creativeId: string,
+    @Req() req: any,
+  ): Promise<void> {
+    await this.creativeService.assertCreativeOwner(creativeId, req.user.id);
     await this.creativeService.deleteCreative(creativeId);
   }
 
@@ -199,6 +211,7 @@ export class CreativeController {
     @Req() req: any,
   ): Promise<CreativeResponseDto> {
     const userId = req.user?.id;
+    await this.creativeService.assertCreativeOwner(creativeId, userId);
     const creative = await this.creativeService.createVersion(
       creativeId,
       userId,
@@ -219,7 +232,10 @@ export class CreativeController {
       userId,
       permission,
     }: { userId: string; permission: "view" | "edit" | "admin" },
+    @Req() req: any,
   ): Promise<CreativeResponseDto> {
+    // Only the owner may share their creative (userId in the body is the grantee).
+    await this.creativeService.assertCreativeOwner(creativeId, req.user.id);
     const creative = await this.creativeService.shareCreative(
       creativeId,
       userId,
@@ -234,7 +250,8 @@ export class CreativeController {
    */
   @Get(":id/collaborators")
   @HttpCode(200)
-  async getCollaborators(@Param("id") creativeId: string) {
+  async getCollaborators(@Param("id") creativeId: string, @Req() req: any) {
+    await this.creativeService.assertCreativeOwner(creativeId, req.user.id);
     return this.creativeService.getCollaborators(creativeId);
   }
 
@@ -247,7 +264,9 @@ export class CreativeController {
   async getPerformance(
     @Param("id") creativeId: string,
     @Query("days") days: number = 30,
+    @Req() req?: any,
   ): Promise<CreativePerformanceDto[]> {
+    await this.creativeService.assertCreativeOwner(creativeId, req.user.id);
     return this.creativeService.getPerformance(creativeId, days) as any;
   }
 

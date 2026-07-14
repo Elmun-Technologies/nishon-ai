@@ -8,10 +8,15 @@ export class EncryptionService {
   private algorithm = "aes-256-gcm";
 
   constructor(private configService: ConfigService) {
-    const keyString = this.configService.get<string>(
-      "ENCRYPTION_KEY",
-      "default-encryption-key-please-set-env-var",
-    );
+    // Fail closed — never derive the key from a hardcoded default constant,
+    // which would encrypt secrets under an attacker-known value. Boot-time
+    // validateEnv requires ENCRYPTION_KEY, so a valid deploy never throws here.
+    const keyString = this.configService.get<string>("ENCRYPTION_KEY");
+    if (!keyString || keyString.trim().length === 0) {
+      throw new Error(
+        "ENCRYPTION_KEY is required — refusing to start with an insecure default encryption key.",
+      );
+    }
     // Use SHA-256 hash of the key string to get exactly 32 bytes
     this.encryptionKey = crypto.createHash("sha256").update(keyString).digest();
   }

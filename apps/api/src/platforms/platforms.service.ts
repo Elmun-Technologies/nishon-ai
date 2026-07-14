@@ -42,16 +42,17 @@ export class PlatformsService {
     private readonly yandexConnector: YandexConnector,
     private readonly config: ConfigService,
   ) {
-    // Encryption key must be exactly 32 chars for AES-256
+    // Encryption key must be exactly 32 chars for AES-256. Fail closed rather
+    // than fall back to a predictable all-zeros key that would encrypt OAuth
+    // tokens under an attacker-known constant. Boot-time validateEnv already
+    // requires this, so a valid deploy never hits the throw.
     const key = this.config.get<string>("ENCRYPTION_KEY", "");
     if (key.length !== 32) {
-      this.logger.warn(
-        "ENCRYPTION_KEY is not set or not 32 characters - platform token encryption will be unavailable",
+      throw new Error(
+        "ENCRYPTION_KEY must be exactly 32 characters — refusing to start with an insecure fallback key.",
       );
-      this.encryptionKey = "00000000000000000000000000000000";
-    } else {
-      this.encryptionKey = key;
     }
+    this.encryptionKey = key;
   }
 
   // ─── META OAUTH FLOW ──────────────────────────────────────────────────────
