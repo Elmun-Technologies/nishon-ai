@@ -2906,6 +2906,11 @@
       "cancel": "Cancel",
       "approve": "Approve & Go Live",
       "going": "Going live…"
+    },
+    "plan": {
+      "title": "Agent plan",
+      "budgetLabel": "Monthly budget",
+      "stopLossLabel": "Stop-loss guardrail"
     }
   }
 }

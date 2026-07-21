@@ -38,6 +38,7 @@ import { FIRST_CAMPAIGN_BANNER_KEY } from '@/lib/onboarding-v2'
 import { ChatWidget } from '@/components/ui/ChatWidget'
 import { AGENT_MODE } from '@/lib/agent-mode'
 import { AgentSetupCard } from '@/components/agent/AgentSetupCard'
+import { AgentPlanSummary } from '@/components/agent/AgentPlanSummary'
 import {
   loadAgentConfig,
   saveAgentConfigLocal,
@@ -537,14 +538,10 @@ export default function DashboardPage() {
       {error      && <Alert variant="error">{error}</Alert>}
       {optimizeMsg && <Alert variant="success">{optimizeMsg}</Alert>}
       {AGENT_MODE && agentConfig && (
-        <Alert variant="success" className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm font-medium">
-            {t('agent.active.banner', 'AI Agent faol — kampaniyalar avtomatik boshqarilmoqda.')}
-          </p>
-          <Button variant="ghost" size="sm" onClick={() => setAgentConfig(null)}>
-            {t('agent.active.reconfigure', 'Qayta sozlash')}
-          </Button>
-        </Alert>
+        <AgentPlanSummary
+          config={agentConfig}
+          onReconfigure={() => setAgentConfig(null)}
+        />
       )}
       {firstCampaignBanner && !AGENT_MODE && (
         <Alert variant="info" className="flex flex-wrap items-center justify-between gap-3">

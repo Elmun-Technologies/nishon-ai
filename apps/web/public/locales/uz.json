@@ -2906,6 +2906,11 @@
       "cancel": "Bekor qilish",
       "approve": "Tasdiqlash va ishga tushirish",
       "going": "Faollashtirilmoqda…"
+    },
+    "plan": {
+      "title": "Agent rejasi",
+      "budgetLabel": "Oylik byudjet",
+      "stopLossLabel": "Stop-loss himoyasi"
     }
   }
 }
