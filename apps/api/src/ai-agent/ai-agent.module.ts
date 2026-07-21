@@ -6,6 +6,8 @@ import { AiAgentController } from "./ai-agent.controller";
 import { StrategyEngineService } from "./strategy-engine.service";
 import { DecisionLoopService } from "./decision-loop.service";
 import { CampaignOrchestratorService } from "./campaign-orchestrator.service";
+import { AgentConfigService } from "./agent-config.service";
+import { AgentConfig } from "./entities/agent-config.entity";
 import { Workspace } from "../workspaces/entities/workspace.entity";
 import { AiDecision } from "../ai-decisions/entities/ai-decision.entity";
 import { Campaign } from "../campaigns/entities/campaign.entity";
@@ -21,6 +23,7 @@ import { PlatformsModule } from "../platforms/platforms.module";
       AiDecision,
       Campaign,
       ConnectedAccount,
+      AgentConfig,
     ]),
     // AiDecision is needed by AiAgentService (approveDecision/rejectDecision)
     WorkspacesModule,
@@ -32,12 +35,14 @@ import { PlatformsModule } from "../platforms/platforms.module";
     StrategyEngineService,
     DecisionLoopService,
     CampaignOrchestratorService,
+    AgentConfigService,
   ],
   exports: [
     AiAgentService,
     StrategyEngineService,
     DecisionLoopService,
     CampaignOrchestratorService,
+    AgentConfigService,
   ],
 })
 export class AiAgentModule {}

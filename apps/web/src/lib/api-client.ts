@@ -139,6 +139,8 @@ const apiClient = {
   ): Promise<ApiResponse<T>> => apiRequest('POST', pathOrUrl, body, true, extraHeaders),
   patch: <T = any>(pathOrUrl: string, body?: any): Promise<ApiResponse<T>> =>
     apiRequest('PATCH', pathOrUrl, body),
+  put: <T = any>(pathOrUrl: string, body?: any): Promise<ApiResponse<T>> =>
+    apiRequest('PUT', pathOrUrl, body),
 }
 
 // ─── API METHODS ─────────────────────────────────────────────────────────────
@@ -263,6 +265,18 @@ export const aiAgent = {
     apiClient.post(`/ai-agent/workspaces/${workspaceId}/strategy/regenerate`),
   optimize: (workspaceId: string) =>
     apiClient.post(`/ai-agent/workspaces/${workspaceId}/optimize`),
+  /** Persist the AI Agent plan (goal / budget / link / stop-loss) server-side. */
+  saveConfig: (
+    workspaceId: string,
+    config: {
+      link?: string
+      goal: 'sales' | 'brand'
+      budget: number
+      stopLossUsd?: number
+    },
+  ) => apiClient.put(`/ai-agent/workspaces/${workspaceId}/config`, config),
+  getConfig: (workspaceId: string) =>
+    apiClient.get(`/ai-agent/workspaces/${workspaceId}/config`),
   approveDecision: (decisionId: string) =>
     apiClient.patch(`/ai-agent/decisions/${decisionId}/approve`, {}),
   rejectDecision: (decisionId: string) =>

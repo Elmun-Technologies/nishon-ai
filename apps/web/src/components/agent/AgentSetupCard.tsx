@@ -117,6 +117,19 @@ export function AgentSetupCard({
         } catch {
           /* ignore quota / private-mode errors */
         }
+        // Persist the plan server-side so the optimization engine enforces the
+        // approved goal / budget / stop-loss (not just the browser). Best-effort:
+        // a failure here must not block activation, which still runs optimize().
+        try {
+          await aiAgent.saveConfig(workspaceId, {
+            link: config.link,
+            goal: config.goal,
+            budget: config.budget,
+            stopLossUsd: config.stopLossUsd,
+          })
+        } catch {
+          /* config persistence is best-effort — proceed to optimize regardless */
+        }
         await aiAgent.optimize(workspaceId)
       }
       setIsAnalyzing(false)
