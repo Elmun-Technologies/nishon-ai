@@ -95,8 +95,15 @@ export class AiAgentController {
     summary:
       "Analyze a competitor against the client's business (12-category audit); may prepend Meta Ad Library snippets from the Marketing API when available.",
   })
-  async analyzeCompetitor(@Body() dto: any) {
-    return this.aiAgentService.analyzeCompetitor(dto);
+  async analyzeCompetitor(
+    @Req() req: AuthedRequest,
+    @Body() dto: { workspaceId: string } & Record<string, unknown>,
+  ) {
+    await this.aiAgentService.assertWorkspaceOwner(
+      dto?.workspaceId,
+      req.user.id,
+    );
+    return this.aiAgentService.analyzeCompetitor(dto as any);
   }
 
   @Post("competitor-analysis-batch")
@@ -105,8 +112,15 @@ export class AiAgentController {
     summary:
       "Portfolio analysis for multiple competitors (links + names); enriches prompts with Meta Marketing API Ad Library (ads_archive) when app credentials are configured, then returns Uzbek JSON via the AI model.",
   })
-  async analyzeCompetitorsBatch(@Body() dto: any) {
-    return this.aiAgentService.analyzeCompetitorsBatch(dto);
+  async analyzeCompetitorsBatch(
+    @Req() req: AuthedRequest,
+    @Body() dto: { workspaceId: string } & Record<string, unknown>,
+  ) {
+    await this.aiAgentService.assertWorkspaceOwner(
+      dto?.workspaceId,
+      req.user.id,
+    );
+    return this.aiAgentService.analyzeCompetitorsBatch(dto as any);
   }
 
   @Post("workspaces/:workspaceId/strategy")
