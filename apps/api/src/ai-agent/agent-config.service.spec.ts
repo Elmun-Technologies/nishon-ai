@@ -3,6 +3,7 @@ import { getRepositoryToken } from "@nestjs/typeorm";
 import { NotFoundException } from "@nestjs/common";
 import { AgentConfigService } from "./agent-config.service";
 import { AgentConfig } from "./entities/agent-config.entity";
+import { AiDecision } from "../ai-decisions/entities/ai-decision.entity";
 import { Workspace } from "../workspaces/entities/workspace.entity";
 
 const mockConfigRepo = () => ({
@@ -16,20 +17,28 @@ const mockWorkspaceRepo = () => ({
   save: jest.fn((data: any) => Promise.resolve(data)),
 });
 
+const mockDecisionRepo = () => ({
+  create: jest.fn((data: any) => data),
+  save: jest.fn((data: any) => Promise.resolve({ id: "dec-1", ...data })),
+});
+
 describe("AgentConfigService", () => {
   let service: AgentConfigService;
   let configRepo: ReturnType<typeof mockConfigRepo>;
   let workspaceRepo: ReturnType<typeof mockWorkspaceRepo>;
+  let decisionRepo: ReturnType<typeof mockDecisionRepo>;
 
   beforeEach(async () => {
     configRepo = mockConfigRepo();
     workspaceRepo = mockWorkspaceRepo();
+    decisionRepo = mockDecisionRepo();
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AgentConfigService,
         { provide: getRepositoryToken(AgentConfig), useValue: configRepo },
         { provide: getRepositoryToken(Workspace), useValue: workspaceRepo },
+        { provide: getRepositoryToken(AiDecision), useValue: decisionRepo },
       ],
     }).compile();
 
@@ -138,5 +147,70 @@ describe("AgentConfigService", () => {
   it("getConfig returns null when the agent was never set up", async () => {
     configRepo.findOne.mockResolvedValue(null);
     await expect(service.getConfig("ws-1")).resolves.toBeNull();
+  });
+
+  it("records an AI decision on first activation", async () => {
+    workspaceRepo.findOne.mockResolvedValue({ id: "ws-1" });
+    configRepo.findOne.mockResolvedValue(null);
+
+    await service.saveConfig("ws-1", { goal: "sales", budget: 2000 });
+
+    expect(decisionRepo.save).toHaveBeenCalledTimes(1);
+    const decision = decisionRepo.save.mock.calls[0][0];
+    expect(decision.workspaceId).toBe("ws-1");
+    expect(decision.isExecuted).toBe(true);
+    expect(decision.reason).toContain("faollashtirildi");
+    expect(decision.afterState.allocation).toBeDefined();
+  });
+
+  it("records a decision when the plan materially changes", async () => {
+    workspaceRepo.findOne.mockResolvedValue({ id: "ws-1" });
+    configRepo.findOne.mockResolvedValue({
+      id: "cfg-1",
+      workspaceId: "ws-1",
+      goal: "sales",
+      budget: 2000,
+      stopLossUsd: 30,
+      activatedAt: new Date("2026-01-01T00:00:00.000Z"),
+    });
+
+    await service.saveConfig("ws-1", { goal: "brand", budget: 5000 });
+
+    expect(decisionRepo.save).toHaveBeenCalledTimes(1);
+    expect(decisionRepo.save.mock.calls[0][0].reason).toContain(
+      "rejasi yangilandi",
+    );
+  });
+
+  it("does not record a decision on a no-op re-save", async () => {
+    workspaceRepo.findOne.mockResolvedValue({ id: "ws-1" });
+    configRepo.findOne.mockResolvedValue({
+      id: "cfg-1",
+      workspaceId: "ws-1",
+      goal: "sales",
+      budget: 2000,
+      stopLossUsd: 30,
+      activatedAt: new Date("2026-01-01T00:00:00.000Z"),
+    });
+
+    await service.saveConfig("ws-1", {
+      goal: "sales",
+      budget: 2000,
+      stopLossUsd: 30,
+    });
+
+    expect(decisionRepo.save).not.toHaveBeenCalled();
+  });
+
+  it("still saves the config if decision logging throws", async () => {
+    workspaceRepo.findOne.mockResolvedValue({ id: "ws-1" });
+    configRepo.findOne.mockResolvedValue(null);
+    decisionRepo.save.mockRejectedValue(new Error("db down"));
+
+    const saved = await service.saveConfig("ws-1", {
+      goal: "sales",
+      budget: 1000,
+    });
+    expect(saved.budget).toBe(1000);
   });
 });
