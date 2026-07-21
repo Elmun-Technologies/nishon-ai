@@ -84,10 +84,37 @@ shuning uchun `lint:check` (`--fix`'siz) ishlatiladi.
 
 ---
 
-## Joriy holat (so'nggi yangilash: 2026-07-13)
+## Joriy holat (so'nggi yangilash: 2026-07-21)
 
 **Asosiy branch:** `main`
-**Faol branch:** `claude/adspectr-autonomous-agent-pivot-6l3vov` — Autonomous AI Agent pivot
+**Faol branch:** `claude/loyihani-davom-254pgx` — Agent rejasini haqiqiy holatga aylantirish
+
+### 2026-07-21 sessiyasi — AI Agent rejasini serverda haqiqiy holat qilish (4 commit)
+Agent'ning "rejasi" (link + maqsad + byudjet + stop-loss) faqat brauzer localStorage'da
+edi — backend optimizatsiya loop'i uni ko'rmasdi ("client-side teatr"). Endi reja
+serverda saqlanadigan holat: engine unga tayanadi. Har biri test bilan; barcha darvozalar
+yashil (api 348 test, web 141 unit + 39 e2e).
+- ✅ **AgentConfig serverda saqlanadi** — yangi `agent_configs` jadvali (workspace bo'yicha
+  bitta, idempotent migration; toza Postgres'da tekshirildi: to'liq zanjir o'tadi, qayta
+  ishga tushirish no-op, revert toza). `AgentConfigService` funnel allokatsiyani hisoblaydi
+  va byudjet + Hard Stop-Loss'ni `workspace.optimizationPolicy`'ga sinxronlaydi (mavjud
+  maydonlar saqlanadi) → engine (auto-optimization) uni o'qiydi. `GET/PUT
+  /ai-agent/workspaces/:id/config`, ikkalasi `assertWorkspaceOwner` bilan. (+13 test)
+- ✅ **Funnel allocator `@adspectr/shared`'da** — kanonik toza matematik (maqsad + byudjet →
+  TOFU/MOFU/BOFU × kanallar, butun-son aniq). Backend manba; web presentatsion nusxasini
+  saqlaydi.
+- ✅ **Web: reja backenddan hidratsiya** — localStorage bo'sh bo'lsa dashboard rejani
+  `GET config`'dan yuklaydi → "agent faol" holati qurilmalar aro saqlanadi. Config
+  helper'lari `@/lib/agent-config`'ga ajratildi (test uchun). AgentSetupCard approve'da
+  serverga saqlaydi (best-effort). (+7 web unit)
+- ✅ **Agent Plan kartasi (dashboard)** — bir qatorli banner o'rniga: maqsad, byudjet,
+  stop-loss + funnel/kanal taqsimoti. `AgentPlanSummary` (i18n uz/ru/en, parity 2448).
+- ✅ **Xavfsizlik: competitor-analysis owner check** — `/competitor-analysis[-batch]`
+  workspace-scoped edi lekin faqat JWT bilan → har kim boshqa tenant workspace'iga qarshi
+  paid AI ishlata olardi. `assertWorkspaceOwner` qo'shildi. (+4 test)
+- ⏳ **Qolgan follow-up:** funnel allokatsiyasini real platforma byudjetlariga qo'llash
+  (Meta/Google execution, credential kerak); avtonom kampaniya yaratish (link→launch);
+  score-creative/wizard endpoint'lariga workspace scoping; AI Decisions "Namuna" fallback.
 
 ### 2026-07-14 sessiyasi — Xavfsizlik mustahkamlash (audit + fix, 4 commit)
 3 ta parallel security audit → tasdiqlangan cross-tenant va payment kamchiliklari tuzatildi.
