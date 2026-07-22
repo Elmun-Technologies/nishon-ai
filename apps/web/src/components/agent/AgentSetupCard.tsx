@@ -15,8 +15,13 @@ import { Input } from '@/components/ui'
 import { useI18n } from '@/i18n/use-i18n'
 import { cn } from '@/lib/utils'
 import { aiAgent } from '@/lib/api-client'
-import { allocateFunnelBudget, normalizeGoal, type AgentGoal } from '@/lib/funnel-allocator'
+import { allocateFunnelBudget, type AgentGoal } from '@/lib/funnel-allocator'
 import { detectVertical, type Vertical } from '@/lib/ad-copy-templates'
+import {
+  STOP_LOSS_DEFAULT_USD,
+  saveAgentConfigLocal,
+  type AgentConfig,
+} from '@/lib/agent-config'
 import { BudgetVisualizer, BudgetBars } from './BudgetVisualizer'
 import { AdCopyPreview } from './AdCopyPreview'
 import { LaunchTimelineModal } from './LaunchTimelineModal'
@@ -31,35 +36,19 @@ import { LaunchTimelineModal } from './LaunchTimelineModal'
  *             4-step timeline (1.5s each) → Meta/Telegram ad previews →
  *             "Approve & Go Live" (the only step that hits the backend).
  *
- * Everything before Approve is client-side, instant, and free. Approve calls
- * the real optimization loop and persists the AgentConfig locally.
+ * Everything before Approve is client-side, instant, and free. Approve persists
+ * the plan (backend + local cache) and calls the real optimization loop.
+ *
+ * The AgentConfig persistence/mapping helpers live in `@/lib/agent-config`.
  */
 
-const STOP_LOSS_DEFAULT_USD = 30
-
-function configKey(workspaceId: string) {
-  return `nishon.agentConfig.${workspaceId}`
-}
-
-export interface AgentConfig {
-  link: string
-  goal: AgentGoal
-  budget: number
-  stopLossUsd: number
-  activatedAt: string
-}
-
-export function loadAgentConfig(workspaceId: string | undefined): AgentConfig | null {
-  if (!workspaceId || typeof window === 'undefined') return null
-  try {
-    const raw = window.localStorage.getItem(configKey(workspaceId))
-    if (!raw) return null
-    const parsed = JSON.parse(raw) as AgentConfig
-    return { ...parsed, goal: normalizeGoal(parsed.goal) }
-  } catch {
-    return null
-  }
-}
+// Re-exported for existing importers (the dashboard reads these from here).
+export {
+  loadAgentConfig,
+  saveAgentConfigLocal,
+  agentConfigFromApi,
+  type AgentConfig,
+} from '@/lib/agent-config'
 
 function usd(n: number): string {
   return `$${Math.round(n).toLocaleString('en-US')}`
@@ -112,10 +101,19 @@ export function AgentSetupCard({
     }
     try {
       if (workspaceId) {
+        saveAgentConfigLocal(workspaceId, config)
+        // Persist the plan server-side so the optimization engine enforces the
+        // approved goal / budget / stop-loss (not just the browser). Best-effort:
+        // a failure here must not block activation, which still runs optimize().
         try {
-          window.localStorage.setItem(configKey(workspaceId), JSON.stringify(config))
+          await aiAgent.saveConfig(workspaceId, {
+            link: config.link,
+            goal: config.goal,
+            budget: config.budget,
+            stopLossUsd: config.stopLossUsd,
+          })
         } catch {
-          /* ignore quota / private-mode errors */
+          /* config persistence is best-effort — proceed to optimize regardless */
         }
         await aiAgent.optimize(workspaceId)
       }

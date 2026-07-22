@@ -1,6 +1,8 @@
 import {
   Controller,
+  Get,
   Post,
+  Put,
   Patch,
   Param,
   Body,
@@ -27,6 +29,8 @@ import {
   CampaignOrchestratorService,
   CampaignPipelineInput,
 } from "./campaign-orchestrator.service";
+import { AgentConfigService } from "./agent-config.service";
+import { SaveAgentConfigDto } from "./dto/save-agent-config.dto";
 
 @ApiTags("AI Agent")
 @Controller("ai-agent")
@@ -36,7 +40,40 @@ export class AiAgentController {
   constructor(
     private readonly aiAgentService: AiAgentService,
     private readonly orchestrator: CampaignOrchestratorService,
+    private readonly agentConfigService: AgentConfigService,
   ) {}
+
+  @Get("workspaces/:workspaceId/config")
+  @ApiOperation({
+    summary: "Get the persisted AI Agent plan (goal / budget / stop-loss)",
+    description:
+      "Returns the workspace's saved agent config with the computed funnel allocation, or null if the agent was never activated.",
+  })
+  @ApiParam({ name: "workspaceId", description: "Workspace UUID" })
+  async getConfig(
+    @Req() req: AuthedRequest,
+    @Param("workspaceId") workspaceId: string,
+  ) {
+    await this.aiAgentService.assertWorkspaceOwner(workspaceId, req.user.id);
+    return this.agentConfigService.getConfig(workspaceId);
+  }
+
+  @Put("workspaces/:workspaceId/config")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: "Save/activate the AI Agent plan for a workspace",
+    description:
+      "Persists link + goal + budget + stop-loss, computes the funnel allocation, and syncs the workspace optimization policy so the plan is enforced. Idempotent upsert.",
+  })
+  @ApiParam({ name: "workspaceId", description: "Workspace UUID" })
+  async saveConfig(
+    @Req() req: AuthedRequest,
+    @Param("workspaceId") workspaceId: string,
+    @Body() dto: SaveAgentConfigDto,
+  ) {
+    await this.aiAgentService.assertWorkspaceOwner(workspaceId, req.user.id);
+    return this.agentConfigService.saveConfig(workspaceId, dto);
+  }
 
   @Post("generate-scripts/:workspaceId")
   @HttpCode(HttpStatus.OK)
@@ -58,8 +95,15 @@ export class AiAgentController {
     summary:
       "Analyze a competitor against the client's business (12-category audit); may prepend Meta Ad Library snippets from the Marketing API when available.",
   })
-  async analyzeCompetitor(@Body() dto: any) {
-    return this.aiAgentService.analyzeCompetitor(dto);
+  async analyzeCompetitor(
+    @Req() req: AuthedRequest,
+    @Body() dto: { workspaceId: string } & Record<string, unknown>,
+  ) {
+    await this.aiAgentService.assertWorkspaceOwner(
+      dto?.workspaceId,
+      req.user.id,
+    );
+    return this.aiAgentService.analyzeCompetitor(dto as any);
   }
 
   @Post("competitor-analysis-batch")
@@ -68,8 +112,15 @@ export class AiAgentController {
     summary:
       "Portfolio analysis for multiple competitors (links + names); enriches prompts with Meta Marketing API Ad Library (ads_archive) when app credentials are configured, then returns Uzbek JSON via the AI model.",
   })
-  async analyzeCompetitorsBatch(@Body() dto: any) {
-    return this.aiAgentService.analyzeCompetitorsBatch(dto);
+  async analyzeCompetitorsBatch(
+    @Req() req: AuthedRequest,
+    @Body() dto: { workspaceId: string } & Record<string, unknown>,
+  ) {
+    await this.aiAgentService.assertWorkspaceOwner(
+      dto?.workspaceId,
+      req.user.id,
+    );
+    return this.aiAgentService.analyzeCompetitorsBatch(dto as any);
   }
 
   @Post("workspaces/:workspaceId/strategy")

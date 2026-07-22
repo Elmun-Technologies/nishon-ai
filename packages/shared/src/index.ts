@@ -13,3 +13,6 @@ export * from './types/platform.types'
 export * from './dtos/auth.dto'
 export * from './dtos/workspace.dto'
 export * from './dtos/campaign.dto'
+
+// Utils
+export * from './utils/funnel-allocator'

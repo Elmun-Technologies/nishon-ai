@@ -37,7 +37,14 @@ import { formatUzs } from '@/lib/subscription-plans'
 import { FIRST_CAMPAIGN_BANNER_KEY } from '@/lib/onboarding-v2'
 import { ChatWidget } from '@/components/ui/ChatWidget'
 import { AGENT_MODE } from '@/lib/agent-mode'
-import { AgentSetupCard, loadAgentConfig, type AgentConfig } from '@/components/agent/AgentSetupCard'
+import { AgentSetupCard } from '@/components/agent/AgentSetupCard'
+import { AgentPlanSummary } from '@/components/agent/AgentPlanSummary'
+import {
+  loadAgentConfig,
+  saveAgentConfigLocal,
+  agentConfigFromApi,
+  type AgentConfig,
+} from '@/lib/agent-config'
 import { AgentDecisionsFeed } from '@/components/agent/AgentDecisionsFeed'
 
 export const dynamic = 'force-dynamic'
@@ -261,7 +268,37 @@ export default function DashboardPage() {
   // the setup card for a fresh user and the "agent active" summary afterwards.
   const [agentConfig, setAgentConfig] = useState<AgentConfig | null>(null)
   useEffect(() => {
-    if (AGENT_MODE) setAgentConfig(loadAgentConfig(currentWorkspace?.id))
+    if (!AGENT_MODE) return
+    const wsId = currentWorkspace?.id
+    const local = loadAgentConfig(wsId)
+    if (local) {
+      setAgentConfig(local)
+      return
+    }
+    // No local copy — hydrate the persisted plan from the backend so the agent
+    // stays "active" across devices and browser-storage clears. Best-effort:
+    // any failure just leaves the setup hero showing (treated as not activated).
+    if (!wsId) {
+      setAgentConfig(null)
+      return
+    }
+    let cancelled = false
+    aiAgent
+      .getConfig(wsId)
+      .then((res) => {
+        if (cancelled) return
+        const cfg = agentConfigFromApi(res.data)
+        if (cfg) {
+          setAgentConfig(cfg)
+          saveAgentConfigLocal(wsId, cfg)
+        }
+      })
+      .catch(() => {
+        /* not activated / offline — keep the setup hero */
+      })
+    return () => {
+      cancelled = true
+    }
   }, [currentWorkspace?.id])
 
   // ── Filters ──────────────────────────────────────────────────────────────
@@ -501,14 +538,10 @@ export default function DashboardPage() {
       {error      && <Alert variant="error">{error}</Alert>}
       {optimizeMsg && <Alert variant="success">{optimizeMsg}</Alert>}
       {AGENT_MODE && agentConfig && (
-        <Alert variant="success" className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm font-medium">
-            {t('agent.active.banner', 'AI Agent faol — kampaniyalar avtomatik boshqarilmoqda.')}
-          </p>
-          <Button variant="ghost" size="sm" onClick={() => setAgentConfig(null)}>
-            {t('agent.active.reconfigure', 'Qayta sozlash')}
-          </Button>
-        </Alert>
+        <AgentPlanSummary
+          config={agentConfig}
+          onReconfigure={() => setAgentConfig(null)}
+        />
       )}
       {firstCampaignBanner && !AGENT_MODE && (
         <Alert variant="info" className="flex flex-wrap items-center justify-between gap-3">

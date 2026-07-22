@@ -21,7 +21,8 @@ import { aiDecisions as aiDecisionsApi } from '@/lib/api-client'
 
 interface AiDecision {
   id: string
-  actionType: string
+  // Nullable server-side (informational decisions may carry no action type).
+  actionType: string | null
   reason: string
   isApproved: boolean | null
   isExecuted: boolean
@@ -37,7 +38,7 @@ const DOT_CLASS: Record<DotStatus, string> = {
 }
 
 function statusOf(d: AiDecision): DotStatus {
-  const a = d.actionType.toLowerCase()
+  const a = (d.actionType ?? '').toLowerCase()
   if (a.includes('pause') || a.includes('stop') || a.includes('off')) return 'stopped'
   if (d.isApproved === null && !d.isExecuted) return 'attention'
   return 'done'
@@ -174,7 +175,7 @@ export function AgentDecisionsFeed({ workspaceId }: { workspaceId?: string }) {
                       {hhmm(d.createdAt)}
                     </span>
                     <span className="text-[10px] uppercase tracking-wide text-text-tertiary">
-                      {d.actionType.replace(/_/g, ' ')}
+                      {(d.actionType ?? 'agent').replace(/_/g, ' ')}
                     </span>
                   </div>
                   <p className="text-sm leading-snug text-text-secondary">{d.reason}</p>
